@@ -112,7 +112,6 @@ ZEHolder<const ZEGRVertexBuffer> ZEGRVertexBuffer::CreateResourceShared(const ZE
 
 	ZEGRVertexBuffer* StagingResourceTemp;
 	ZEHolder<const ZEGRVertexBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRVertexBuffer>(GUID, &StagingResourceTemp, Instanciator);
-
 	if (Resource == NULL)
 		return NULL;
 

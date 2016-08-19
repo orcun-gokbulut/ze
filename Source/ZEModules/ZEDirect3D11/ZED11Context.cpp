@@ -210,9 +210,7 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 	if (D11State->RasterizerState != NULL && GraphicsState->RasterizerState != D11State->RasterizerState)
 	{
 		LockContext();
-
 		Context->RSSetState(D11State->RasterizerState->GetInterface());
-
 		UnlockContext();
 
 		GraphicsState->RasterizerState = D11State->RasterizerState;
@@ -227,9 +225,7 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 	if (D11State->VertexLayout != NULL && GraphicsState->VertexLayout != D11State->VertexLayout)
 	{
 		LockContext();
-
 		Context->IASetInputLayout(D11State->VertexLayout->GetInterface());
-
 		UnlockContext();
 
 		GraphicsState->VertexLayout = D11State->VertexLayout;
@@ -238,9 +234,7 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 	if (GraphicsState->PrimitiveTopology != D11State->PrimitiveTopology)
 	{
 		LockContext();
-
 		Context->IASetPrimitiveTopology(D11State->PrimitiveTopology);
-
 		UnlockContext();
 
 		GraphicsState->PrimitiveTopology = D11State->PrimitiveTopology;
@@ -269,9 +263,7 @@ void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State
 	}
 
 	LockContext();
-
 	Context->CSSetShader(SrcShader->GetComputeShader(), NULL, 0);
-
 	UnlockContext();
 
 	ComputeState->ComputeShader = D11State->ComputeShader;
@@ -297,9 +289,7 @@ void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertex
 	}
 
 	LockContext();
-
 	Context->IASetVertexBuffers(Index, Count, NativeBuffers, Strides, Offsets);
-
 	UnlockContext();
 }
 
@@ -318,9 +308,7 @@ void ZED11Context::SetIndexBuffer(const ZEGRIndexBuffer* Buffer)
 	}
 
 	LockContext();
-
 	Context->IASetIndexBuffer(NativeBuffer, Format, 0);
-
 	UnlockContext();
 }
 
@@ -655,9 +643,7 @@ void ZED11Context::SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* 
 		NativeDepthStencil = static_cast<const ZED11DepthStencilBuffer*>(this->DepthStencilBuffer)->GetView();
 	
 	LockContext();
-
 	Context->OMSetRenderTargets(Count, (Count == 0) ? NULL : NativeRenderTargets, NativeDepthStencil);
-
 	UnlockContext();
 }
 
@@ -677,9 +663,7 @@ void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
 	}
 	
 	LockContext();
-
 	Context->RSSetScissorRects(Count, NativeRects);
-
 	UnlockContext();
 }
 
@@ -701,9 +685,7 @@ void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 	}
 	
 	LockContext();
-
 	Context->RSSetViewports(Count, NativeViewports);
-
 	UnlockContext();
 }
 
@@ -782,9 +764,7 @@ void ZED11Context::SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGR
 	}
 	
 	LockContext();
-
 	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
-
 	UnlockContext();
 }
 
@@ -836,9 +816,7 @@ void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*c
 	}
 
 	LockContext();
-
 	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
-
 	UnlockContext();
 }
 
@@ -886,9 +864,7 @@ void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRReso
 	}
 
 	LockContext();
-
 	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
-
 	UnlockContext();
 }
 
@@ -928,9 +904,7 @@ void ZED11Context::ResolveSubresource(const ZEGRResource* DestResource, ZEUInt D
 	}
 
 	LockContext();
-
 	GetMainContext()->ResolveSubresource(DestNativeResource, DestSubresource, SrcNativeResource, SrcSubresource, ConvertFormat(Format));
-
 	UnlockContext();
 }
 
@@ -939,9 +913,16 @@ void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 	UpdateGraphicsState();
 
 	LockContext();
-
 	GetMainContext()->Draw(VertexCount, FirstVertex);
+	UnlockContext();
+}
 
+void ZED11Context::DrawIndexed(ZEUInt IndexCount, ZEUInt IndexOffset, ZEUInt VertexOffset)
+{
+	UpdateGraphicsState();
+
+	LockContext();
+	GetMainContext()->DrawIndexed(IndexCount, IndexOffset, VertexOffset);
 	UnlockContext();
 }
 
@@ -950,18 +931,14 @@ void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt 
 	UpdateGraphicsState();
 
 	LockContext();
-
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
-
 	UnlockContext();
 }
 
 void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ)
 {
 	LockContext();
-
 	GetMainContext()->Dispatch(GroupCountX, GroupCountY, GroupCountZ);
-
 	UnlockContext();
 }
 

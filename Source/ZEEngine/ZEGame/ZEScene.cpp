@@ -68,26 +68,30 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 	Entity->Tick(ElapsedTime);
 }
 
-void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
+bool ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
 	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
 
 	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
-		return;
+		return false;
 
 	if (!Entity->IsLoaded())
-		return;
+		return false;
 
 	bool Cullable = Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE);
 	if (Cullable && Parameters->View->ViewVolume != NULL)
 	{
-		if (Parameters->View->ViewVolume->IntersectionTest(Entity->GetWorldBoundingBox()))
-			Entity->PreRender(Parameters);
+		if (!Parameters->View->ViewVolume->IntersectionTest(Entity->GetWorldBoundingBox()))
+			return false;
+
+		Entity->PreRender(Parameters);
 	}
 	else
 	{
 		Entity->PreRender(Parameters);
 	}
+
+	return true;
 }
 
 void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -421,19 +425,61 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	Parameters->Renderer->StartScene(GetConstantBuffer());
 
+	// Statistics
+	ZESize TotalRenderableEntity = 0;
+	
+	ZESize RenderedEntity = 0;
+	float RenderRatio = 0.0f;
+
+	ZESize CulledEntity = 0;
+	float CullRatio = 0.0f;
+	
+	ZESize OctreeProcessedEntity = 0;
+	ZESize OctreeCulledEntity = 0;
+	ZESize OctreeVisitedNodeCount = 0;
+	float OctreeCullRatio = 0.0f;
+	float OctreePerformanceRatio = 0.0f;
+
+	ZESize ViewTestCulledEntity = 0;
+	float ViewTestCullRatio = 0.0f;
+
+	float TotalCullRatio = 0.0f;
+
 	ZE_LOCK_SECTION(RenderListLock)
 	{
+		TotalRenderableEntity = RenderListOctree.GetTotalItemCount() + RenderList.GetCount();
+
 		ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
 		{
-			for (ZESize I = 0; I < Node->GetItemCount(); I++)
-			{
-				ZEEntity* Entity = Node->GetItem(I);
-				PreRenderEntity(Entity, Parameters);
+			OctreeVisitedNodeCount++;
+			OctreeProcessedEntity += Node->GetItems().GetCount();
+			for (ZESize I = 0; I < Node->GetItems().GetCount(); I++)
+			{		
+				ZEEntity* Entity = Node->GetItems()[I];
+				if (PreRenderEntity(Entity, Parameters))
+					RenderedEntity++;
+				else
+					ViewTestCulledEntity++;
 			}
 		}
 
+		OctreeCulledEntity = RenderListOctree.GetTotalItemCount() - OctreeProcessedEntity;
+		OctreeCullRatio = (float)OctreeCulledEntity / (float)TotalRenderableEntity;
+		OctreePerformanceRatio = (float)OctreeCulledEntity / (float)OctreeVisitedNodeCount;
+
 		ze_for_each(Entity, RenderList)
-			PreRenderEntity(Entity.GetPointer(), Parameters);
+		{
+			if (PreRenderEntity(Entity.GetPointer(), Parameters))
+				RenderedEntity++;
+			else
+				ViewTestCulledEntity++;
+		}
+
+		RenderRatio = (float)RenderedEntity / (float)TotalRenderableEntity;
+
+		CulledEntity = TotalRenderableEntity - RenderedEntity;
+		CullRatio = (float)CulledEntity / (float)TotalRenderableEntity;
+		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)TotalRenderableEntity;
 	}
 
 	Parameters->Renderer->EndScene();
@@ -599,6 +645,9 @@ ZEScene::ZEScene()
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.0f;
+	
+	RenderListOctree.SetBoundingBox(ZEAABBox(-32000.0f * ZEVector3::One, 32000.0f * ZEVector3::One));
+	RenderListOctree.SetMaxDepth(8);
 }
 
 ZEScene::~ZEScene()

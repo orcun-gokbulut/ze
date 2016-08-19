@@ -58,7 +58,7 @@ class ZEGRIndexBuffer : public ZEGRResource
 		ZEGRIndexBufferFormat						Format;
 
 	protected:
-		virtual bool								Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		virtual bool								Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data);
 		virtual void								Deinitialize();
 
 													ZEGRIndexBuffer();
@@ -73,8 +73,8 @@ class ZEGRIndexBuffer : public ZEGRResource
 		virtual bool								Lock(void** Data) = 0;
 		virtual void								Unlock() = 0;
 	
-		static ZEHolder<ZEGRIndexBuffer>			CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
-		static ZEHolder<const ZEGRIndexBuffer>		CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRIndexBuffer** StagingResource = NULL);
+		static ZEHolder<ZEGRIndexBuffer>			CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL);
+		static ZEHolder<const ZEGRIndexBuffer>		CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL, ZEGRIndexBuffer** StagingResource = NULL);
 };
 
 #endif

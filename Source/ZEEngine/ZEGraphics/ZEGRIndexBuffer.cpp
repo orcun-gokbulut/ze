@@ -54,13 +54,16 @@ inline ZESize SizeOfIndex(ZEGRIndexBufferFormat Format)
 	}
 }
 
-bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data)
 {
-	zeCheckError(SizeOfIndex(Format), false, "Invalid Index buffer format.");
+	zeDebugCheck(IndexCount == 0, "IndexCount count cannot be zero.");
+	zeDebugCheck(Format != ZEGR_IBF_INDEX16 && Format != ZEGR_IBF_INDEX32, "Unknown index buffer format.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static index buffer");
 
 	this->IndexCount = IndexCount;
 	this->Format = Format;
-
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(ZEGR_RBF_INDEX_BUFFER);
 	SetSize(IndexCount * SizeOfIndex(Format));
 
 	return true;
@@ -102,13 +105,28 @@ static ZERSResource* Instanciator(const void*)
 	return ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
 }
 
-ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data)
 {
-	return ZERSTemplates::CreateResource<ZEGRIndexBuffer>(Instanciator);
+	zeDebugCheck(IndexCount == 0, "IndexCount count cannot be zero.");
+	zeDebugCheck(Format != ZEGR_IBF_INDEX16 && Format != ZEGR_IBF_INDEX32, "Unknown index buffer format.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static index buffer");
+
+	ZEHolder<ZEGRIndexBuffer> Resource = ZERSTemplates::CreateResource<ZEGRIndexBuffer>(Instanciator);
+	if (Resource == NULL)
+		return NULL;
+
+	if (!Resource->Initialize(IndexCount, Format, Usage, Data))
+		return NULL;
+
+	return Resource;
 }
 
-ZEHolder<const ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRIndexBuffer** StagingResource)
+ZEHolder<const ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data, ZEGRIndexBuffer** StagingResource)
 {
+	zeDebugCheck(IndexCount == 0, "IndexCount count cannot be zero.");
+	zeDebugCheck(Format != ZEGR_IBF_INDEX16 && Format != ZEGR_IBF_INDEX32, "Unknown index buffer format.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static index buffer");
+
 	ZEGRIndexBuffer* StagingResourceTemp;
 	ZEHolder<const ZEGRIndexBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRIndexBuffer>(GUID, &StagingResourceTemp, Instanciator);
 	if (Resource == NULL)
@@ -116,7 +134,7 @@ ZEHolder<const ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResourceShared(const ZEGU
 
 	if (StagingResourceTemp != NULL)
 	{
-		if (!StagingResourceTemp->Initialize(IndexCount, Format))
+		if (!StagingResourceTemp->Initialize(IndexCount, Format, Usage, Data))
 			return NULL;
 
 		if (StagingResource != NULL)

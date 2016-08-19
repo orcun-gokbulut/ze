@@ -344,10 +344,17 @@ void ZERSResource::RegisterExternalResource(const ZERSResource* Resource)
 	if (Resource == NULL)
 		return;
 
+	ResourceLock.Lock();
+
 	if (ExternalResources.Exists(Resource))
+	{
+		ResourceLock.Unlock();
 		return;
+	}
 
 	ExternalResources.Add(Resource);
+	
+	ResourceLock.Unlock();
 }
 
 void ZERSResource::UnregisterExternalResource(const ZERSResource* Resource)
@@ -355,7 +362,9 @@ void ZERSResource::UnregisterExternalResource(const ZERSResource* Resource)
 	if (Resource == NULL)
 		return;
 
+	ResourceLock.Lock();
 	ExternalResources.RemoveValue(Resource);
+	ResourceLock.Unlock();
 }
 
 

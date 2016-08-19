@@ -66,7 +66,6 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZEInt32									Level;
 		float									StartDistance;
 		float									EndDistance;
-		ZEArray<ZEUInt16>						AffectingBoneIds;
 
 		ZEMDVertexType							VertexType;
 		ZEArray<ZEMDVertex>						Vertices;
@@ -77,10 +76,7 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZEArray<ZEUInt16>						Indices;
 		ZEArray<ZEUInt32>						Indices32;
 
-		ZEHolder<const ZEGRVertexBuffer>		VertexBufferBase;
-		ZEHolder<const ZEGRVertexBuffer>		VertexBufferNormals;
-		ZEHolder<const ZEGRVertexBuffer>		VertexBufferSkin;
-		ZEHolder<const ZEGRVertexBuffer>		VertexBufferExtra;
+		ZEHolder<const ZEGRVertexBuffer>		VertexBuffer;
 		ZEHolder<const ZEGRIndexBuffer>			IndexBuffer;
 		
 												ZEMDResourceLOD();
@@ -120,20 +116,8 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		void									SetIndices32(const ZEArray<ZEUInt32>& Indices);
 		const ZEArray<ZEUInt32>&				GetIndices32() const;
 
-		void									SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds);
-		const ZEArray<ZEUInt16>&				GetAffectingBoneIds() const;
-
-		void									SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferBase() const;
-
-		void									SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferNormals() const;
-
-		void									SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferSkin() const;
-
-		void									SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferExtra() const;
+		void									SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>		GetVertexBuffer() const;
 
 		void									SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
 		ZEHolder<const ZEGRIndexBuffer>			GetIndexBuffer() const;

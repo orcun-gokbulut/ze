@@ -714,7 +714,7 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	Moon->SetColor(TerrestrialMoonColor * 1.0f);
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
-	Moon->SetVisible(!SunVisible);
+	//Moon->SetVisible(!SunVisible);
 
 	if (SunVisible)
 	{

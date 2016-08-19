@@ -103,6 +103,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									ResolveSubresource(const ZEGRResource* DestResource, ZEUInt DestSubresource, const ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format);
 
 		virtual void									Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
+		virtual void									DrawIndexed(ZEUInt IndexCount, ZEUInt IndexOffset, ZEUInt VertexOffset);
 		virtual void									DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
 
 		virtual void									Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ);

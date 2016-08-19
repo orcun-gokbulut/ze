@@ -41,6 +41,7 @@
 
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRIndexBuffer.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
@@ -100,35 +101,29 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	if (GetLOD()->GetMesh() == NULL)
 		return;
 
-	if (GetLOD()->VertexBufferBase.IsNull())
+	if (GetLOD()->VertexBuffer.IsNull())
+		return;
+
+	if (GetLOD()->GetIndexType() != ZEMD_VIT_NONE && GetLOD()->IndexBuffer.IsNull())
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	Context->SetVertexBuffer(0, GetLOD()->VertexBufferBase);
+	Context->SetVertexBuffer(0, GetLOD()->VertexBuffer);
+	
+	if (GetLOD()->GetIndexType() != ZEMD_VIT_NONE)
+		Context->SetIndexBuffer(GetLOD()->GetIndexBuffer());
+
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetLOD()->GetMesh()->ConstantBuffer);
 
 	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage))
 		return;
 
-	Context->Draw(GetCount(), GetOffset());
+	if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
+		Context->Draw(GetCount(), GetOffset());
+	else
+		Context->DrawIndexed(GetCount(), GetOffset(), 0);
 
 	GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
-
-	/*Context->SetIndexBuffer(IndexBuffer);
-	if (RenderParameters->Stage == ZERNStageShadowmapGeneration::Class())
-	{
-		Context->SetVertexBuffers(0, 1, VertexBufferBase.GetPointerToPointer());
-		if (GetVertexType() == ZEMD_VT_SKINNED)
-			Context->SetVertexBuffers(2, 1, VertexBufferSkin.GetPointerToPointer);
-	}
-	else
-	{
-		const ZEGRVertexBuffer* Buffers[2];
-		Buffers[0] = VertexBufferBase;
-		Buffers[1] = VertexBufferNormals;
-		Context->SetVertexBuffers(0, 2, Buffers);
-	}*/
-
 }
 
 

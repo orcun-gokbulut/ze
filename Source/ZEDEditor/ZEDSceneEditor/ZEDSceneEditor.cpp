@@ -101,8 +101,9 @@ bool ZEDSceneEditor::InitializeInternal()
 	Scene->AddEntity(Grid);
 
  	ZEModel* Trial = ZEModel::CreateInstance();
- 	Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL");
- 	Scene->AddEntity(Trial);
+	//Trial->SetModelFile("#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Track-100.new.ZEMODEL");
+	Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector001/Sector001.new.ZEMODEL");
+	Scene->AddEntity(Trial);
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
 	Light1->SetIntensity(3.0f);
@@ -110,25 +111,29 @@ bool ZEDSceneEditor::InitializeInternal()
 	Light1->SetUseSunLight(true);
 	Scene->AddEntity(Light1);
 
-	ZESector* Sector = ZESector::CreateInstance();
+	/*ZESector* Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector001/Sector001.ZESector");
 	Scene->AddEntity(Sector);
 
 	Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector002/Sector002.ZESector");
+	Sector->SetWorldPosition(2.0f * ZEVector3::UnitX * 1000.0f);
 	Scene->AddEntity(Sector);
 
 	Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZESector");
+	Sector->SetWorldPosition(3.0f * ZEVector3::UnitX * 1000.0f);
 	Scene->AddEntity(Sector);
 
 	Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector004/Sector004.ZESector");
+	Sector->SetWorldPosition(4.0f * ZEVector3::UnitX * 1000.0f);
 	Scene->AddEntity(Sector);
 
 	Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector005/Sector005.ZESector");
-	Scene->AddEntity(Sector);
+	Sector->SetWorldPosition(5.0f * ZEVector3::UnitX * 1000.0f);
+	Scene->AddEntity(Sector);*/
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);

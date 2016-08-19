@@ -36,6 +36,8 @@
 #include "ZEError.h"
 #include "ZED11IndexBuffer.h"
 #include "ZED11Module.h"
+#include <d3d11.h>
+#include "ZEPointer\ZEPointer.h"
 
 inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 {
@@ -53,29 +55,36 @@ ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
 	return Buffer;
 }
 
-bool ZED11IndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+bool ZED11IndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data)
 {
-	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
-	zeDebugCheck(Format == ZEGR_IBF_NONE, "Unknown buffer format");
+	zeDebugCheck(Buffer != NULL, "Index buffer is already initialized.");
 
 	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
 	zeDebugCheck(Size > 134217728, "Buffer too large");
 	
 	D3D11_BUFFER_DESC BufferDesc;
 	BufferDesc.MiscFlags = 0;
-	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	BufferDesc.Usage = ConvertUsage(Usage);
 	BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	BufferDesc.CPUAccessFlags = ConvertUsageToCpuAccessFlags(Usage);
 	BufferDesc.ByteWidth = (UINT)Size;
 
-	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
+	ZEPointer<D3D11_SUBRESOURCE_DATA> SubresourceData;
+	if (Data != NULL)
+	{
+		SubresourceData = new D3D11_SUBRESOURCE_DATA();
+		SubresourceData->pSysMem = Data;
+		SubresourceData->SysMemPitch = Size;
+	}
+
+	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, SubresourceData, &Buffer);
 	if (FAILED(Result))
 	{
 		zeError("Index buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 	
-	return ZEGRIndexBuffer::Initialize(IndexCount, Format);
+	return ZEGRIndexBuffer::Initialize(IndexCount, Format, Usage, Data);
 }
 
 void ZED11IndexBuffer::Deinitialize()
@@ -93,7 +102,9 @@ ZED11IndexBuffer::ZED11IndexBuffer()
 bool ZED11IndexBuffer::Lock(void** Data)
 {
 	D3D11_MAPPED_SUBRESOURCE Map;
+	LockContext();
 	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE, 0, &Map);
+	UnlockContext();
 	if (FAILED(Result))
 		return false;
 	
@@ -106,7 +117,9 @@ bool ZED11IndexBuffer::Lock(void** Data)
 
 void ZED11IndexBuffer::Unlock()
 {
+	LockContext();
 	GetMainContext()->Unmap(Buffer, 0);
+	UnlockContext();
 }
 
 ZED11IndexBuffer::~ZED11IndexBuffer()

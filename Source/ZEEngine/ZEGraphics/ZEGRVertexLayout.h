@@ -37,32 +37,15 @@
 
 #include "ZEGRResource.h"
 
-#include "ZEGRDefinitions.h"
 #include "ZEGRState.h"
+#include "ZEGRDefinitions.h"
+#include "ZEGRVertexElementType.h"
 
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEGRShaderMeta;
-
-ZE_ENUM(ZEGRVertexElementType)
-{
-	ZEGR_VET_NONE				= 0,
-	ZEGR_VET_INT				= 1,
-	ZEGR_VET_INT2				= 2,
-	ZEGR_VET_INT3				= 3,
-	ZEGR_VET_INT4				= 4,
-	ZEGR_VET_UINT				= 5,
-	ZEGR_VET_UINT2				= 6,
-	ZEGR_VET_UINT3				= 7,
-	ZEGR_VET_UINT4				= 8,
-	ZEGR_VET_FLOAT				= 9,
-	ZEGR_VET_FLOAT2				= 10,
-	ZEGR_VET_FLOAT3				= 11,
-	ZEGR_VET_FLOAT4				= 12,
-	ZEGR_VET_UINT8_4			= 13
-};
 
 ZE_ENUM(ZEGRVertexUsage)
 {

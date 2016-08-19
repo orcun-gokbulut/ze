@@ -103,7 +103,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void									UpdateOctree(ZEEntity* Entity);
 
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
-		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
+		bool									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		bool									InitializeInternal();

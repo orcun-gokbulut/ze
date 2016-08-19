@@ -316,10 +316,10 @@ ZEGRVertexElementType ZED11ShaderMetaCompiler::ConvertVertexElementType(ZEShader
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZEGR_VET_UINT;
+					Type = ZEGR_VET_UINT32;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZEGR_VET_INT;
+					Type = ZEGR_VET_INT32;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
 					Type = ZEGR_VET_FLOAT;
@@ -330,13 +330,13 @@ ZEGRVertexElementType ZED11ShaderMetaCompiler::ConvertVertexElementType(ZEShader
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZEGR_VET_UINT2;
+					Type = ZEGR_VET_UINT32_2;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZEGR_VET_INT2;
+					Type = ZEGR_VET_INT32_2;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZEGR_VET_FLOAT2;
+					Type = ZEGR_VET_FLOAT_2;
 					break;
 			};
 			break;
@@ -344,13 +344,13 @@ ZEGRVertexElementType ZED11ShaderMetaCompiler::ConvertVertexElementType(ZEShader
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZEGR_VET_UINT3;
+					Type = ZEGR_VET_UINT32_3;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZEGR_VET_INT3;
+					Type = ZEGR_VET_INT32_3;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZEGR_VET_FLOAT3;
+					Type = ZEGR_VET_FLOAT_3;
 					break;
 			};
 			break;
@@ -358,13 +358,13 @@ ZEGRVertexElementType ZED11ShaderMetaCompiler::ConvertVertexElementType(ZEShader
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZEGR_VET_UINT4;
+					Type = ZEGR_VET_UINT32_4;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZEGR_VET_INT4;
+					Type = ZEGR_VET_INT32_4;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZEGR_VET_FLOAT4;
+					Type = ZEGR_VET_FLOAT_4;
 					break;
 			};
 			break;
