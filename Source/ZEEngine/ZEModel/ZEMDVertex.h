@@ -37,7 +37,9 @@
 
 #include "ZETypes.h"
 #include "ZEPacking.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
+
+#include "ZEGraphics/ZEGRVertexElementType.h"
 
 class ZEGRVertexLayout;
 
@@ -58,9 +60,9 @@ ZEPackStruct(
 struct ZEMDVertex
 {
 	ZEVector3						Position;
-	ZEVector3						Normal;
-	ZEVector3						Tangent;
-	ZEVector3						Binormal;
+	float							Reserved0;
+	ZEInt16_2						Normal;
+	ZEInt16_2						Tangent;
 	ZEVector2						Texcoords;
 
 	static const ZEGRVertexLayout&	GetVertexLayout();
@@ -69,8 +71,12 @@ struct ZEMDVertex
 ZEPackStruct(
 struct ZEMDVertexSkin : public ZEMDVertex
 {
-	ZEUInt8							Indices[4];
+	ZEVector3						Position;
+	ZEUInt8_4						Indices;
+	ZEInt16_2						Normal;
+	ZEInt16_2						Tangent;
+	ZEVector2						Texcoords;
 	ZEVector4						Weights;
-	
+
 	static const ZEGRVertexLayout&	GetVertexLayout();
 });

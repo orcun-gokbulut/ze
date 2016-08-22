@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZECVMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelConverter.h"
+#include "ZECVModelConverterV2.h"
 
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
@@ -57,7 +57,8 @@ static bool Operation(const char* Path, ZEPathOperationElement Element)
 		printf(" Source File: %s.\n", Path);
 		printf(" Destination File: %s.\n", Path);
 
-		if (!ZEModelConverter::Convert(Path, TempDestination))
+		ZECVModelConverterV2 Converter;
+		if (!Converter.Convert(Path, TempDestination))
 			return false;
 
 		ZEFileInfo FileInfo(TempDestination);
@@ -93,9 +94,14 @@ int main(int argc, char** argv)
 	const char* Source = argv[1];
 	const char* Destination = argv[2];
 	if (argc == 3)
-		return ZEModelConverter::Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
+	{
+		ZECVModelConverterV2 Converter;
+		return Converter.Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
+	}
 	else if (argc == 2)
+	{
 		ZEPathInfo(Source).Operate(Source, ZEPathOperationFunction::Create<Operation>(), ZE_POE_FILE, true);
+	}
 
 	return EXIT_SUCCESS;
 }
