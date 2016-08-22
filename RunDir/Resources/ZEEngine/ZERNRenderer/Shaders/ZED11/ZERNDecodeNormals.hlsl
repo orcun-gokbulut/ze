@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZERNDecodeNormals.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#ifndef __ZERN_DECODE_NORMALS_H__
+#define __ZERN_DECODE_NORMALS_H__
 
-ze_add_source(ZECVConverter.cpp				Sources)
-ze_add_source(ZECVConverter.h				Sources Headers)
-ze_add_source(ZECVModelConverterV2.cpp		Sources)
-ze_add_source(ZECVModelConverterV2.h		Sources Headers)
-ze_add_source(ZECVMain.cpp					Sources)
+float3 DecodeNormal(int2 NormalEncoded)
+{
+	float2 NormalNormalized = (float2)NormalEncoded  / 32767.0f;
+	float NormalZSign = 2.0f * (NormalEncoded.x & 0x0001) - 1.0f;
+	float NormalZ = sqrt(saturate(1.0f - dot(NormalNormalized, NormalNormalized))) * NormalZSign;
+	return normalize(float3(NormalNormalized, NormalZ));
+}
 
-ze_add_executable(TARGET ZEModelConverter
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation ZEModel)
+void DecodeTangentBinormal(in int2 TangentEncoded, in float3 Normal, out float3 Tangent, out float3 Binormal)
+{
+	float2 TangentNormalized = (float2)TangentEncoded  / 32767.0f;
+	float TangentZSign = 2.0f * (TangentEncoded.x & 0x0001) - 1.0f;
+	float TangentZ = sqrt(saturate(1.0f - dot(TangentNormalized, TangentNormalized))) * TangentZSign;
+	Tangent = normalize(float3(TangentNormalized, TangentZ));
+
+	float BinormalDirection = 1.0f - 2.0f * (TangentEncoded.y & 0x0001);
+	Binormal = normalize(cross(Normal, Tangent) * BinormalDirection);
+}
+
+#endif

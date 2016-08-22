@@ -37,170 +37,223 @@
 
 #include "ZETypes.h"
 #include "ZEPacking.h"
-#include "ZEMeta\ZEEnumerator.h"
 
-ZE_ENUM(ZEGRVertexElementType)
+ZEPackStruct(
+struct ZEInt8_2
 {
-	ZEGR_VET_NONE				= 0,
-
-		ZEGR_VET_FLOAT				= 1,
-		ZEGR_VET_FLOAT_2			= 2,
-		ZEGR_VET_FLOAT_3			= 3,
-		ZEGR_VET_FLOAT_4			= 4,
-
-		ZEGR_VET_INT8				= 5,
-		ZEGR_VET_INT8_NORM			= 6,
-		ZEGR_VET_INT8_2				= 7,
-		ZEGR_VET_INT8_2_NORM		= 8,
-		ZEGR_VET_INT8_4				= 9,
-		ZEGR_VET_INT8_4_NORM		= 10,
-
-		ZEGR_VET_UINT8				= 11,
-		ZEGR_VET_UINT8_NORM			= 12,
-		ZEGR_VET_UINT8_2			= 13,
-		ZEGR_VET_UINT8_2_NORM		= 14,
-		ZEGR_VET_UINT8_4			= 15,
-		ZEGR_VET_UINT8_4_NORM		= 16,
-
-		ZEGR_VET_INT16				= 17,
-		ZEGR_VET_INT16_NORM			= 18,
-		ZEGR_VET_INT16_2			= 19,
-		ZEGR_VET_INT16_2_NORM		= 20,
-		ZEGR_VET_INT16_4			= 21,
-		ZEGR_VET_INT16_4_NORM		= 22,
-
-		ZEGR_VET_UINT16				= 23,
-		ZEGR_VET_UINT16_NORM		= 24,
-		ZEGR_VET_UINT16_2			= 25,
-		ZEGR_VET_UINT16_2_NORM		= 26,
-		ZEGR_VET_UINT16_4			= 27,
-		ZEGR_VET_UINT16_4_NORM		= 28,
-
-		ZEGR_VET_INT32				= 29,
-		ZEGR_VET_INT32_NORM			= 30,
-		ZEGR_VET_INT32_2			= 31,
-		ZEGR_VET_INT32_2_NORM		= 32,
-		ZEGR_VET_INT32_3			= 33,
-		ZEGR_VET_INT32_3_NORM		= 34,
-		ZEGR_VET_INT32_4			= 35,
-		ZEGR_VET_INT32_4_NORM		= 36,
-
-		ZEGR_VET_UINT32				= 37,
-		ZEGR_VET_UINT32_2			= 38,
-		ZEGR_VET_UINT32_3			= 39,
-		ZEGR_VET_UINT32_4			= 40,
-};
-
-ZEPackStruct
-(
-	union ZEUInt8_2
+	union
 	{
 		struct
 		{
-			ZEUInt8 x;
-			ZEUInt8 y;
+			ZEInt8			x;
+			ZEInt8			y;
 		};
-		ZEUInt16 Packed;
-	}
-);
+		ZEInt8				M[2];
+		ZEUInt16			Packed;
+	};
+});
 
-ZEPackStruct
-(
-	union ZEUInt8_4
+ZEPackStruct(
+struct ZEInt8_4
+{
+	union
 	{
 		struct
 		{
-			ZEUInt8 x;
-			ZEUInt8 y;
-			ZEUInt8 z;
-			ZEUInt8 w;
+			ZEInt8			x;
+			ZEInt8			y;
+			ZEInt8			z;
+			ZEInt8			w;
 		};
-		ZEUInt32 Packed;
-	}
-);
+		ZEInt8				M[4];
+		ZEUInt32			Packed;
+	};
+});
 
-ZEPackStruct
-(
-	union ZEInt8_2
+ZEPackStruct(
+struct ZEUInt8_2
+{
+	union
 	{
 		struct
 		{
-			ZEInt8 x;
-			ZEInt8 y;
+			ZEUInt8			x;
+			ZEUInt8			y;
 		};
-		ZEUInt16 Packed;
-	}
-);
+		ZEUInt8				M[2];
+		ZEUInt16			Packed;
+	};
+});
 
-ZEPackStruct
-(
-	union ZEInt8_4
+ZEPackStruct(
+struct ZEUInt8_4
+{
+	union
 	{
 		struct
 		{
-			ZEInt8 x;
-			ZEInt8 y;
-			ZEInt8 z;
-			ZEInt8 w;
+			ZEUInt8			x;
+			ZEUInt8			y;
+			ZEUInt8			z;
+			ZEUInt8			w;
 		};
-		ZEUInt32 Packed;
-	}
-);
+		ZEUInt8				M[4];
+		ZEUInt32			Packed;
+	};
+});
 
-////////////////////////////////
-
-ZEPackStruct
-(
-	union ZEUInt16_2
+ZEPackStruct(
+struct ZEInt16_2
+{
+	union 
 	{
 		struct
 		{
-			ZEInt16 x;
-			ZEInt16 y;
+			ZEInt16			x;
+			ZEInt16			y;
 		};
-		ZEUInt16 Packed;
-	}
-);
+		ZEInt16				M[2];
+		ZEUInt32			Packed;
+	};
+});
 
-ZEPackStruct
-(
-	union ZEUInt16_4
+ZEPackStruct(
+struct ZEInt16_4
+{
+	union
 	{
 		struct
 		{
-			ZEInt16 x;
-			ZEInt16 y;
-			ZEInt16 z;
-			ZEInt16 w;
+			ZEInt16			x;
+			ZEInt16			y;
+			ZEInt16			z;
+			ZEInt16			w;
 		};
-		ZEUInt32 Packed;
-	}
-);
+		ZEInt16				M[4];
+		ZEUInt64			Packed;
 
-ZEPackStruct
-(
-	union ZEInt16_2
+	};
+});
+
+ZEPackStruct(
+struct ZEUInt16_2
+{
+	union
 	{
 		struct
 		{
-			ZEInt16 x;
-			ZEInt16 y;
+			ZEUInt16		x;
+			ZEUInt16		y;
 		};
-		ZEUInt16 Packed;
-	}
-);
+		ZEUInt16			M[2];
+		ZEUInt32			Packed;
+	};
+});
 
-ZEPackStruct
-(
-	union ZEInt16_4
+ZEPackStruct(
+struct ZEUInt16_4
+{
+	union 
 	{
 		struct
 		{
-			ZEInt16 x;
-			ZEInt16 y;
-			ZEInt16 z;
-			ZEInt16 w;
+			ZEUInt16		x;
+			ZEUInt16		y;
+			ZEUInt16		z;
+			ZEUInt16		w;
 		};
-		ZEUInt32 Packed;
-	}
-);
+		ZEUInt16			M[4];
+		ZEUInt64			Packed;
+	};
+});
+
+ZEPackStruct(
+struct ZEInt32_2
+{
+	union 
+	{
+		struct
+		{
+			ZEInt32			x;
+			ZEInt32			y;
+		};
+		ZEInt32				M[2];
+		ZEUInt64			Packed;
+	};
+});
+
+ZEPackStruct(
+struct ZEInt32_3
+{
+	union
+	{
+		struct
+		{
+			ZEInt32			x;
+			ZEInt32			y;
+			ZEInt32			z;
+		};
+		ZEInt32				M[3];
+	};
+});
+
+ZEPackStruct(
+struct ZEInt32_4
+{
+	union 
+	{
+		struct
+		{
+			ZEInt32			x;
+			ZEInt32			y;
+			ZEInt32			z;
+			ZEInt32			w;
+		};
+		ZEInt32				M[4];
+	};
+});
+
+ZEPackStruct(
+struct ZEUInt32_2
+{
+	union
+	{
+		struct
+		{
+			ZEUInt32		x;
+			ZEUInt32		y;
+		};
+		ZEUInt32			M[2];
+	};
+});
+
+ZEPackStruct(
+struct ZEUInt32_3
+{
+	union
+	{
+		struct
+		{
+			ZEUInt32		x;
+			ZEUInt32		y;
+			ZEUInt32		z;
+		};
+		ZEUInt32			M[3];
+	};
+});
+
+ZEPackStruct(
+struct ZEUInt32_4
+{
+	union
+	{
+		struct
+		{
+			ZEUInt32		x;
+			ZEUInt32		y;
+			ZEUInt32		z;
+			ZEUInt32		w;
+		};
+		ZEUInt32			M[4];
+	};
+});

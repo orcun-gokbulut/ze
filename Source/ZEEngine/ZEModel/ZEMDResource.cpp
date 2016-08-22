@@ -206,8 +206,22 @@ ZETaskResult ZEMDResource::LoadInternal()
 
 	ZEMLReaderNode ModelNode = Reader.GetRootNode();
 
-	zeCheckError(!ModelNode.IsValid(), ZE_TR_FAILED, "Invalid Model node.");
-	zeCheckError(ModelNode.GetName() != "ZEModel", ZE_TR_FAILED, "Invalid Model node name.");
+	zeCheckError(!ModelNode.IsValid(), ZE_TR_FAILED, "Cannot load model resource. Invalid Model node. File Name: \"%s\".", GetFileName().ToCString());
+	zeCheckError(ModelNode.GetName() != "ZEModel", ZE_TR_FAILED, "Cannot load model resource. Invalid Model node name. File Name: \"%s\".", GetFileName().ToCString());
+
+	ZEUInt8 MajorVersion = ModelNode.ReadUInt8("MajorVersion");
+	ZEUInt8 MinorVersion = ModelNode.ReadUInt8("MinorVersion");
+	if (MajorVersion != 2)
+	{
+		zeError("Cannot load model resource. Major version mismatch. Please run converter tool on this file. Current Version: 2.0. File Version: %d.%d, File Name: \"%s\".", MajorVersion, MinorVersion, GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (MinorVersion != 0)
+	{
+		zeError("Model resource minor version mismatch. This can may cause some problems. Current Version: 2.0. File Version: %d.%d, File Name: \"%s\".", MajorVersion, MinorVersion, GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
 
 	ZEMLReaderNode UserDefinedBoundingBoxNode = ModelNode.GetNode("UserDefinedBoundingBox");
 	if (UserDefinedBoundingBoxNode.IsValid())

@@ -41,6 +41,7 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNScene.hlsl"
 #include "ZERNShading.hlsl"
+#include "ZERNDecodeNormals.hlsl"
 
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,17 +120,20 @@ SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 struct ZERNFixedMaterial_VSInput
 {
 	float3 Position			: POSITION0;
-	float3 Normal			: NORMAL0;
-	float3 Tangent			: TANGENT0;
-	float3 Binormal			: BINORMAL0;
+
+	#ifdef ZERN_FM_SKIN_TRANSFORM
+	uint4 BoneIndices		: BLENDINDICES;
+	#endif
+
+	int2 NormalEncoded		: NORMAL0;
+	int2 TangentEncoded		: TANGENT0;
 	float2 Texcoord         : TEXCOORD0;
 	
 	#ifdef ZERN_FM_VERTEX_COLOR
 		float4 Color		: COLOR0;
 	#endif
-	
+
 	#ifdef ZERN_FM_SKIN_TRANSFORM
-		uint4 BoneIndices	: BLENDINDICES;
 		float4 BoneWeights	: BLENDWEIGHTS;
 	#endif
 };
@@ -217,18 +221,23 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 {
 	ZERNFixedMaterial_VSOutput Output = (ZERNFixedMaterial_VSOutput)0;
 	
+	float3 Normal = DecodeNormal(Input.NormalEncoded);
+	float3 Tangent;
+	float3 Binormal;
+	DecodeTangentBinormal(Input.TangentEncoded, Normal, Tangent, Binormal);
+
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
 		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
-		Input.Normal = mul(SkinTransform, float4(Input.Normal, 0.0f)).xyz;
-		Input.Tangent = mul(SkinTransform, float4(Input.Tangent, 0.0f)).xyz;
-		Input.Binormal = mul(SkinTransform, float4(Input.Binormal, 0.0f)).xyz;
+		Normal = mul(SkinTransform, float4(Normal, 0.0f)).xyz;
+		Tangent = mul(SkinTransform, float4(Tangent, 0.0f)).xyz;
+		Binormal = mul(SkinTransform, float4(Binormal, 0.0f)).xyz;
 	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
-	float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Input.Normal, 0.0f)).xyz;
-	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Tangent, 0.0f)).xyz;
-	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Binormal, 0.0f)).xyz;
+	float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
+	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Tangent, 0.0f)).xyz;
+	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Binormal, 0.0f)).xyz;
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(float4(NormalWorld, 0.0f));

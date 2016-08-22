@@ -39,13 +39,64 @@
 
 #include "ZEGRState.h"
 #include "ZEGRDefinitions.h"
-#include "ZEGRVertexElementType.h"
 
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEGRShaderMeta;
+
+ZE_ENUM(ZEGRVertexElementType)
+{
+	ZEGR_VET_NONE				= 0,
+
+		ZEGR_VET_FLOAT				= 1,
+		ZEGR_VET_FLOAT_2			= 2,
+		ZEGR_VET_FLOAT_3			= 3,
+		ZEGR_VET_FLOAT_4			= 4,
+
+		ZEGR_VET_INT8				= 5,
+		ZEGR_VET_INT8_NORM			= 6,
+		ZEGR_VET_INT8_2				= 7,
+		ZEGR_VET_INT8_2_NORM		= 8,
+		ZEGR_VET_INT8_4				= 9,
+		ZEGR_VET_INT8_4_NORM		= 10,
+
+		ZEGR_VET_UINT8				= 11,
+		ZEGR_VET_UINT8_NORM			= 12,
+		ZEGR_VET_UINT8_2			= 13,
+		ZEGR_VET_UINT8_2_NORM		= 14,
+		ZEGR_VET_UINT8_4			= 15,
+		ZEGR_VET_UINT8_4_NORM		= 16,
+
+		ZEGR_VET_INT16				= 17,
+		ZEGR_VET_INT16_NORM			= 18,
+		ZEGR_VET_INT16_2			= 19,
+		ZEGR_VET_INT16_2_NORM		= 20,
+		ZEGR_VET_INT16_4			= 21,
+		ZEGR_VET_INT16_4_NORM		= 22,
+
+		ZEGR_VET_UINT16				= 23,
+		ZEGR_VET_UINT16_NORM		= 24,
+		ZEGR_VET_UINT16_2			= 25,
+		ZEGR_VET_UINT16_2_NORM		= 26,
+		ZEGR_VET_UINT16_4			= 27,
+		ZEGR_VET_UINT16_4_NORM		= 28,
+
+		ZEGR_VET_INT32				= 29,
+		ZEGR_VET_INT32_NORM			= 30,
+		ZEGR_VET_INT32_2			= 31,
+		ZEGR_VET_INT32_2_NORM		= 32,
+		ZEGR_VET_INT32_3			= 33,
+		ZEGR_VET_INT32_3_NORM		= 34,
+		ZEGR_VET_INT32_4			= 35,
+		ZEGR_VET_INT32_4_NORM		= 36,
+
+		ZEGR_VET_UINT32				= 37,
+		ZEGR_VET_UINT32_2			= 38,
+		ZEGR_VET_UINT32_3			= 39,
+		ZEGR_VET_UINT32_4			= 40,
+};
 
 ZE_ENUM(ZEGRVertexUsage)
 {
