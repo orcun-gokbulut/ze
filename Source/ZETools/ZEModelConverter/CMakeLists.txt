@@ -35,13 +35,13 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZECVMain.cpp					Sources)
 ze_add_source(ZECVConverter.cpp				Sources)
 ze_add_source(ZECVConverter.h				Sources Headers)
 ze_add_source(ZECVModelConverterV2.cpp		Sources)
 ze_add_source(ZECVModelConverterV2.h		Sources Headers)
-ze_add_source(ZECVMain.cpp					Sources)
 
 ze_add_executable(TARGET ZEModelConverter
 	CONSOLE
 	SOURCES ${Sources}
-	LIBS ZEFoundation ZEModel)
+	LIBS ZEFoundation ZEModel libTootle)

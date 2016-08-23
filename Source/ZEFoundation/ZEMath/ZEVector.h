@@ -96,12 +96,18 @@ class ZEVector2
 		float						LengthSquare() const;
 		ZEVector2					Normalize() const;
 		void						NormalizeSelf();
+		ZEVector2					Abs() const;
+		void						AbsSelf();
+
 		ZEVector2					Clamp(float MinValue, float MaxValue) const;
-		ZEVector2					Clamp(const ZEVector2& MinValue, const ZEVector2& MaxValue) const;
 		void						ClampSelf(float MinValue, float MaxValue);
+		ZEVector2					Clamp(const ZEVector2& MinValue, const ZEVector2& MaxValue) const;
 		void						ClampSelf(const ZEVector2& MinValue, const ZEVector2& MaxValue);
 		ZEVector2					Saturate() const;
 		void						SaturateSelf();
+
+		float						Sum() const;
+		float						Product() const;
 		float						Min() const;
 		float						Max() const;
 
@@ -189,7 +195,7 @@ class ZEVector3
 		static void					Normalize(ZEVector3& Out, const ZEVector3& Vector);	
 		static float				Distance(const ZEVector3& A, const ZEVector3& B);
 		static float				DistanceSquare(const ZEVector3& A, const ZEVector3& B);	
-		static void					Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor);	
+		static void					Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor);
 		static void					Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B);
 		static void					Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B);
 		static void					Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue);
@@ -207,27 +213,28 @@ class ZEVector3
 
 		float						Length() const;
 		float						LengthSquare() const;
-
 		ZEVector3					Normalize() const;
 		void						NormalizeSelf();
+		ZEVector3					Abs() const;
+		void						AbsSelf();
 
 		ZEVector3					Clamp(float MinValue, float MaxValue) const;
-		ZEVector3					Clamp(const ZEVector3& MinValue, const ZEVector3& MaxValue) const;
-		ZEVector3					ClampLower(float MinValue) const;
-		ZEVector3					ClampLower(const ZEVector3& MinValue) const;
-		ZEVector3					ClampUpper(float MaxValue) const;
-		ZEVector3					ClampUpper(const ZEVector3& MaxValue) const;
-
 		void						ClampSelf(float MinValue, float MaxValue);
+		ZEVector3					Clamp(const ZEVector3& MinValue, const ZEVector3& MaxValue) const;
 		void						ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue);
+		ZEVector3					ClampLower(float MinValue) const;
 		void						ClampLowerSelf(float MinValue);
+		ZEVector3					ClampLower(const ZEVector3& MinValue) const;
 		void						ClampLowerSelf(const ZEVector3& MinValue);
+		ZEVector3					ClampUpper(float MaxValue) const;
 		void						ClampUpperSelf(float MaxValue);
+		ZEVector3					ClampUpper(const ZEVector3& MaxValue) const;
 		void						ClampUpperSelf(const ZEVector3& MaxValue);
-
 		ZEVector3					Saturate() const;
 		void						SaturateSelf();
 
+		float						Sum() const;
+		float						Product() const;
 		float						Min() const;
 		float						Max() const;
 
@@ -329,12 +336,18 @@ class ZEVector4
 		float						LengthSquare() const;
 		ZEVector4					Normalize() const;
 		void						NormalizeSelf();
+		ZEVector4					Abs() const;
+		void						AbsSelf();
+
 		ZEVector4					Clamp(float MinValue, float MaxValue) const;
 		ZEVector4					Clamp(const ZEVector4& MinValue, const ZEVector4& MaxValue) const;
 		void						ClampSelf(float MinValue, float MaxValue);
 		void						ClampSelf(const ZEVector4& MinValue, const ZEVector4& MaxValue);
 		ZEVector4					Saturate() const;
 		void						SaturateSelf();
+
+		float						Sum() const;
+		float						Product() const;
 		float						Min() const;
 		float						Max() const;
 

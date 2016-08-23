@@ -94,8 +94,8 @@ class ZECVModelConverterV2 : public ZECVConverter
 		static bool							ConvertPhysicalJoint(ZEMLReaderNode* SourceJointNode, ZEMLWriterNode* DestinationJointNode);
 		static bool							ConvertBone(ZEMLReaderNode* SourceBoneNode, ZEMLWriterNode* DestinationBoneNode);
 		static bool							ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationBoundingBoxNode);
-		static void							ConvertVertexData(ZEArray<ZEMDVertexV2>& Output, const ZEArray<ZEMDVertexV1>& Input);
-		static void							ConvertVertexData(ZEArray<ZEMDVertexSkinV2>& Output, const ZEArray<ZEMDVertexSkinV1>& Input);
+		static void							ConvertVertexData(ZEArray<ZEMDVertexV2>& Output, const ZEArray<ZEMDVertexV1>& Input, bool& DegenerateFaceDetected);
+		static void							ConvertVertexData(ZEArray<ZEMDVertexSkinV2>& Output, const ZEArray<ZEMDVertexSkinV1>& Input, bool& DegenerateFaceDetected);
 		static bool							ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode);
 		static bool							ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode);
 		static bool							ConvertHelper(ZEMLReaderNode* SourceHelperNode, ZEMLWriterNode* DestinationHelperNode);
