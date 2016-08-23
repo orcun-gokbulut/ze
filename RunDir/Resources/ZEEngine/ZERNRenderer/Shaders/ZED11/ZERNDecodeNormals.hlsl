@@ -51,8 +51,8 @@ void DecodeTangentBinormal(in int2 TangentEncoded, in float3 Normal, out float3 
 	float TangentZ = sqrt(saturate(1.0f - dot(TangentNormalized, TangentNormalized))) * TangentZSign;
 	Tangent = normalize(float3(TangentNormalized, TangentZ));
 
-	float BinormalDirection = 1.0f - 2.0f * (TangentEncoded.y & 0x0001);
-	Binormal = normalize(cross(Normal, Tangent) * BinormalDirection);
+	float BinormalDirection = 2.0f * (TangentEncoded.y & 0x0001) - 1.0f;
+	Binormal = normalize(cross(Normal, Tangent) * BinormalDirection); // Inverted UVs(Y axis) and Binormal (D3D)
 }
 
 #endif

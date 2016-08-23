@@ -147,6 +147,17 @@ void ZEVector2::NormalizeSelf()
 	ZEVector2::Normalize(*this, *this);
 }
 
+ZEVector2 ZEVector2::Abs() const
+{
+	return ZEVector2(ZEMath::Abs(x), ZEMath::Abs(y));
+}
+
+void ZEVector2::AbsSelf()
+{
+	x = ZEMath::Abs(x);
+	y = ZEMath::Abs(y);
+}
+
 inline float ZEVector2::Length() const
 {
 	return ZEMath::Sqrt(ZEVector2::DotProduct(*this, *this));
@@ -171,16 +182,16 @@ ZEVector2 ZEVector2::Clamp(float MinValue, float MaxValue) const
 	return Temp;
 }
 
+void ZEVector2::ClampSelf(float MinValue, float MaxValue) 
+{
+	ZEVector2::Clamp(*this, *this, MinValue, MaxValue);
+}
+
 ZEVector2 ZEVector2::Clamp(const ZEVector2& MinValue, const ZEVector2& MaxValue) const
 {
 	ZEVector2 Temp;
 	ZEVector2::Clamp(Temp, *this, MinValue, MaxValue);
 	return Temp;
-}
-
-void ZEVector2::ClampSelf(float MinValue, float MaxValue) 
-{
-	ZEVector2::Clamp(*this, *this, MinValue, MaxValue);
 }
 
 void ZEVector2::ClampSelf(const ZEVector2& MinValue, const ZEVector2& MaxValue) 
@@ -198,6 +209,16 @@ ZEVector2 ZEVector2::Saturate() const
 void ZEVector2::SaturateSelf()
 {
 	ZEVector2::Saturate(*this, *this);
+}
+
+float ZEVector2::Sum() const
+{
+	return x + y;
+}
+
+float ZEVector2::Product() const
+{
+	return x * y;
 }
 
 float ZEVector2::Min() const
@@ -527,11 +548,28 @@ void ZEVector3::NormalizeSelf()
 	ZEVector3::Normalize(*this, *this);
 }
 
+ZEVector3 ZEVector3::Abs() const
+{
+	return ZEVector3(ZEMath::Abs(x), ZEMath::Abs(y), ZEMath::Abs(z));
+}
+
+void ZEVector3::AbsSelf()
+{
+	x = ZEMath::Abs(x);
+	y = ZEMath::Abs(y);
+	z = ZEMath::Abs(z);
+}
+
 ZEVector3 ZEVector3::Clamp(float MinValue, float MaxValue) const
 {
 	ZEVector3 Temp;
 	ZEVector3::Clamp(Temp, *this, MinValue, MaxValue);
 	return Temp;
+}
+
+void ZEVector3::ClampSelf(float MinValue, float MaxValue)
+{
+	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
 }
 
 ZEVector3 ZEVector3::Clamp(const ZEVector3& MinValue, const ZEVector3& MaxValue) const
@@ -541,6 +579,11 @@ ZEVector3 ZEVector3::Clamp(const ZEVector3& MinValue, const ZEVector3& MaxValue)
 	return Temp;
 }
 
+void ZEVector3::ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue)
+{
+	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
+}
+
 ZEVector3 ZEVector3::ClampLower(float MinValue) const
 {
 	ZEVector3 Temp;
@@ -548,12 +591,21 @@ ZEVector3 ZEVector3::ClampLower(float MinValue) const
 	return Temp;
 }
 
+void ZEVector3::ClampLowerSelf(float MinValue)
+{
+	ZEVector3::ClampLower(*this, *this, MinValue);
+}
+
 ZEVector3 ZEVector3::ClampLower(const ZEVector3& MinValue) const
 {
 	ZEVector3 Temp;
 	ZEVector3::ClampLower(Temp, *this, MinValue);
 	return Temp;
+}
 
+void ZEVector3::ClampLowerSelf(const ZEVector3& MinValue)
+{
+	ZEVector3::ClampLower(*this, *this, MinValue);
 }
 
 ZEVector3 ZEVector3::ClampUpper(float MaxValue) const
@@ -563,36 +615,16 @@ ZEVector3 ZEVector3::ClampUpper(float MaxValue) const
 	return Temp;
 }
 
+void ZEVector3::ClampUpperSelf(float MaxValue)
+{
+	ZEVector3::ClampUpper(*this, *this, MaxValue);
+}
+
 ZEVector3 ZEVector3::ClampUpper(const ZEVector3& MaxValue) const
 {
 	ZEVector3 Temp;
 	ZEVector3::ClampUpper(Temp, *this, MaxValue);
 	return Temp;
-}
-
-void ZEVector3::ClampSelf(float MinValue, float MaxValue)
-{
-	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
-}
-
-void ZEVector3::ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue)
-{
-	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
-}
-
-void ZEVector3::ClampLowerSelf(float MinValue)
-{
-	ZEVector3::ClampLower(*this, *this, MinValue);
-}
-
-void ZEVector3::ClampLowerSelf(const ZEVector3& MinValue)
-{
-	ZEVector3::ClampLower(*this, *this, MinValue);
-}
-
-void ZEVector3::ClampUpperSelf(float MaxValue)
-{
-	ZEVector3::ClampUpper(*this, *this, MaxValue);
 }
 
 void ZEVector3::ClampUpperSelf(const ZEVector3& MaxValue)
@@ -616,6 +648,16 @@ ZEVector2 ZEVector3::ToVector2(const ZEVector3& Vector)
 void ZEVector3::SaturateSelf()
 {
 	ZEVector3::Saturate(*this, *this);
+}
+
+float ZEVector3::Sum() const
+{
+	return x + y + z;
+}
+
+float ZEVector3::Product() const
+{
+	return x * y * z;
 }
 
 float ZEVector3::Min() const
@@ -876,14 +918,20 @@ void ZEVector4::NormalizeSelf()
 	ZEVector4::Normalize(*this, *this);
 }
 
-ZEVector4 ZEVector4::Clamp(float MinValue, float MaxValue) const
+ZEVector4 ZEVector4::Abs() const
 {
-	ZEVector4 Temp;
-	ZEVector4::Clamp(Temp, *this, MinValue, MaxValue);
-	return Temp;
+	return ZEVector4(ZEMath::Abs(x), ZEMath::Abs(y), ZEMath::Abs(z), ZEMath::Abs(w));
 }
 
-ZEVector4 ZEVector4::Clamp(const ZEVector4& MinValue, const ZEVector4& MaxValue) const
+void ZEVector4::AbsSelf()
+{
+	x = ZEMath::Abs(x);
+	y = ZEMath::Abs(y);
+	z = ZEMath::Abs(z);
+	w = ZEMath::Abs(w);
+}
+
+ZEVector4 ZEVector4::Clamp(float MinValue, float MaxValue) const
 {
 	ZEVector4 Temp;
 	ZEVector4::Clamp(Temp, *this, MinValue, MaxValue);
@@ -893,6 +941,13 @@ ZEVector4 ZEVector4::Clamp(const ZEVector4& MinValue, const ZEVector4& MaxValue)
 void ZEVector4::ClampSelf(float MinValue, float MaxValue)
 {
 	ZEVector4::Clamp(*this, *this, MinValue, MaxValue);
+}
+
+ZEVector4 ZEVector4::Clamp(const ZEVector4& MinValue, const ZEVector4& MaxValue) const
+{
+	ZEVector4 Temp;
+	ZEVector4::Clamp(Temp, *this, MinValue, MaxValue);
+	return Temp;
 }
 
 void ZEVector4::ClampSelf(const ZEVector4& MinValue, const ZEVector4& MaxValue)
@@ -920,6 +975,16 @@ ZEVector3 ZEVector4::ToVector3(const ZEVector4& Vector)
 void ZEVector4::SaturateSelf()
 {
 	ZEVector4::Saturate(*this, *this);
+}
+
+float ZEVector4::Sum() const
+{
+	return x + y + z + w;
+}
+
+float ZEVector4::Product() const
+{
+	return x * y * z * w;
 }
 
 float ZEVector4::Min() const
