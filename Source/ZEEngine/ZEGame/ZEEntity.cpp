@@ -734,6 +734,8 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	InvWorldTransform = ZEMatrix4x4::Identity;
 	BoundingBox = ZEAABBox::Zero;
 	WorldBoundingBox = ZEAABBox::Zero;
+	
+	RenderListOctree = NULL;
 
 	LocalTransformChanged();
 }
