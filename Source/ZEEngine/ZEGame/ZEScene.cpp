@@ -205,13 +205,13 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
 	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
 
-	if (Entity->RenderListLink.GetInUse())
+	if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
 		return;
 
 	ZE_LOCK_SECTION(RenderListLock)
 	{
 		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
-			RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+			Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
 		else
 			RenderList.AddEnd(&Entity->RenderListLink);
 	}
@@ -225,9 +225,16 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 	ZE_LOCK_SECTION(RenderListLock)
 	{
 		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
-			RenderListOctree.RemoveItem(Entity, Entity->GetWorldBoundingBox());
+		{
+			if (Entity->RenderListOctree != NULL)
+				Entity->RenderListOctree->RemoveItem(Entity, Entity->GetWorldBoundingBox());
+
+			Entity->RenderListOctree = NULL;
+		}
 		else
+		{
 			RenderList.Remove(&Entity->RenderListLink);
+		}
 	}
 }
 
