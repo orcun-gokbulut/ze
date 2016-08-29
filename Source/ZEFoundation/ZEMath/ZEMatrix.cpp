@@ -295,6 +295,14 @@ void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Tran
 	Matrix.M33 = 1.0f;
 }
 
+void ZEMatrix3x3::CreateUVN(ZEMatrix3x3& Matrix, const ZEVector3& U, const ZEVector3& V, const ZEVector3& N)
+{
+	Create(Matrix,
+		U.x, V.x, N.x,
+		U.y, V.y, N.y,
+		U.z, V.z, N.z);
+}
+
 float ZEMatrix3x3::Determinant() const
 {
 	return ZEMatrix3x3::Determinant(*this);
@@ -842,6 +850,16 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 		Scale.x, 0.0f, 0.0f, Position.x,
 		0.0f, Scale.y, 0.0f, Position.y,
 		0.0f, 0.0f, Scale.z, Position.z,
+		0.0f, 0.0f, 0.0f, 1.0f);
+}
+
+
+void ZEMatrix4x4::CreateUVN(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& U, const ZEVector3& V, const ZEVector3& N)
+{
+	Create(Matrix,
+		U.x, V.x, N.x, Position.x,
+		U.y, V.y, N.y, Position.y,
+		U.z, V.z, N.z, Position.z,
 		0.0f, 0.0f, 0.0f, 1.0f);
 }
 

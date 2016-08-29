@@ -54,22 +54,22 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float w, float x, float y, float
 
 void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float x, float y, float z)
 {
-   float SinPitch		= ZEAngle::Sin(x * 0.5f);
-   float CosPitch		= ZEAngle::Cos(x * 0.5f);
-   float SinYaw			= ZEAngle::Sin(y * 0.5f);
-   float CosYaw			= ZEAngle::Cos(y * 0.5f);
-   float SinRoll		= ZEAngle::Sin(z * 0.5f);
-   float CosRoll		= ZEAngle::Cos(z * 0.5f);
-   float CosPitchCosYaw	= CosPitch * CosYaw;
-   float SinPitchSinYaw	= SinPitch * SinYaw;
-  
-   Output.w = CosRoll * CosPitchCosYaw + SinRoll * SinPitchSinYaw;
-   Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
-   Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
-   Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
+	float SinPitch		= ZEAngle::Sin(x * 0.5f);
+	float CosPitch		= ZEAngle::Cos(x * 0.5f);
+	float SinYaw			= ZEAngle::Sin(y * 0.5f);
+	float CosYaw			= ZEAngle::Cos(y * 0.5f);
+	float SinRoll		= ZEAngle::Sin(z * 0.5f);
+	float CosRoll		= ZEAngle::Cos(z * 0.5f);
+	float CosPitchCosYaw	= CosPitch * CosYaw;
+	float SinPitchSinYaw	= SinPitch * SinYaw;
 
-   // zeDebugCheck(!Output.IsValid(), "Output quaternion is not valid.");
-   // zeDebugCheck(!Output.IsNormalized(), "Output quaternion is not normalized.");
+	Output.w = CosRoll * CosPitchCosYaw + SinRoll * SinPitchSinYaw;
+	Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
+	Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
+	Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
+
+	//zeDebugCheck(!Output.IsValid(), "Output quaternion is not valid.");
+	//zeDebugCheck(!Output.IsNormalized(), "Output quaternion is not normalized.");
 
 }
 
@@ -385,17 +385,17 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 
 void ZEQuaternion::Nlerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)
 {
-		Output.w = A.w + (B.w - A.w) * Factor;
-		Output.x = A.x + (B.x - A.x) * Factor;
-		Output.y = A.y + (B.y - A.y) * Factor;
-		Output.z = A.z + (B.z - A.z) * Factor;
+	Output.w = A.w + (B.w - A.w) * Factor;
+	Output.x = A.x + (B.x - A.x) * Factor;
+	Output.y = A.y + (B.y - A.y) * Factor;
+	Output.z = A.z + (B.z - A.z) * Factor;
 
-		Output.NormalizeSelf();
+	Output.NormalizeSelf();
 }
 
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
-//	zeDebugCheck(!Quaternion.IsValid(), "Parameter quaternion is not valid.");
+	//zeDebugCheck(!Quaternion.IsValid(), "Parameter quaternion is not valid.");
 
 	float L = Length(Quaternion);
 	Output.x = Quaternion.x / L;
@@ -561,4 +561,5 @@ ZEQuaternion::ZEQuaternion(float Angle, const ZEVector3& Axis)
 
 ZEQuaternion::ZEQuaternion()
 {
+
 }

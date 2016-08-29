@@ -49,14 +49,30 @@ class ZETriangle
 		ZEVector3					V1;
 		ZEVector3					V2;
 
+		ZEVector3					GetNormal() const;
+		ZEVector3					GetTangent() const;
+		ZEVector3					GetBinormal() const;
+
+		float						GetArea() const;
+		ZEPlane						GetSurfacePlane() const;
+		ZEVector3					GetCentroid() const;
+		ZEVector3					GetBarycentricCoordinates(const ZEVector3& Point) const;
+		ZEAABBox					GetBoundingBox() const;
+
+									ZETriangle();
+									ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);
+
 		static void					Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);
 
 		static void					GetNormal(const ZETriangle& Triangle, ZEVector3& Normal);
-		static void					GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BaryCoords);
-		static void					GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid);
-		static void					GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane);
+		static void					GetTangent(const ZETriangle& Triangle, ZEVector3& Tangent);
+		static void					GetBinormal(const ZETriangle& Triangle, ZEVector3& Binormal);
 
 		static float				GetArea(const ZETriangle& Triangle);
+		static void					GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid);
+		static void					GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane);
+		static void					GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BaryCoords);
+		static void					GetBoundingBox(const ZETriangle& Triangle, ZEAABBox& BoundingBox);
 
 		static bool					InsideTest(const ZETriangle& Triangle, const ZEVector3& Point);
 
@@ -65,13 +81,8 @@ class ZETriangle
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, float &t);
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line);
 
-		ZEVector3					GetCentroid() const;
-		ZEAABBox					GetBoundingBox() const;
-
-									ZETriangle();
-									ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);
-
-
+		static bool					GenerateVertexTangentBinormal(const ZETriangle& PositionTriangle, const ZETriangle& TexcoordsTriangle, ZEVector3& Tangents, ZEVector3& Binormals);
+		static bool					OrtogonolizeTangentBinormal(const ZEVector3& Normal, ZEVector3& Tangent, ZEVector3& Binormal);
 };
 
 #endif

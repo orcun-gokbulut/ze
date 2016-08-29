@@ -39,6 +39,7 @@
 
 #include <ZETypes.h>
 #include "ZEMeta/ZEMTFundamental.h"
+#include "ZEVectorSwizzle.h"
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -90,6 +91,8 @@ class ZEVector2
 		static void					Saturate(ZEVector2& Out, const ZEVector2& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		float						Length() const;
@@ -141,9 +144,12 @@ class ZEVector2
 									ZEVector2(float x, float y);
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);
 									ZEVector2();
+
+									ZE_VECTOR_SWIZZLE_2D_DEFINITION(ZEVector2);
 };
 
 ZEVector2 operator*(float S, const ZEVector2& RightOperand);
+
 
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,6 +215,8 @@ class ZEVector3
 		static ZEVector2			ToVector2(const ZEVector3& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		float						Length() const;
@@ -266,21 +274,25 @@ class ZEVector3
 		float						operator[](ZESize Index) const;
 		float&						operator[](ZESize Index);
 
+									ZE_VECTOR_SWIZZLE_3D_DEFINITION(ZEVector3, ZEVector2);
+
 		explicit					ZEVector3(float Value);
 									ZEVector3(float x, float y, float z);
-									ZEVector3(ZEVector2& Base, float z);
+									ZEVector3(const ZEVector2& Base, float z);
 									ZEVector3(const ZEVector3& Start, const ZEVector3& End);
 									ZEVector3();
+
+
 };
 
 ZEVector3 operator*(float S, const ZEVector3& RightOperand);
+
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector4
 {
 	ZE_FUNDAMENTAL
-
 	public:
 		union
 		{
@@ -291,7 +303,6 @@ class ZEVector4
 			float M[4];
 		};
 
-	public:
 		static const ZEVector4		Zero;
 		static const ZEVector4		One;
 		static const ZEVector4		UnitX;
@@ -330,6 +341,8 @@ class ZEVector4
 		static ZEVector3			ToVector3(const ZEVector4& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		float						Length() const;
@@ -379,6 +392,8 @@ class ZEVector4
 
 		float						operator[](ZESize Index) const;
 		float&						operator[](ZESize Index);
+
+									ZE_VECTOR_SWIZZLE_4D_DEFINITION(ZEVector4, ZEVector3, ZEVector2);
 
 									ZEVector4(float x, float y, float z, float w);
 									ZEVector4(const ZEVector2& Base, float z, float w);

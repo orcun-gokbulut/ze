@@ -88,6 +88,8 @@ class ZEVector2d
 		static ZEVector2			ToVector2(const ZEVector2d& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		double						Length() const;
@@ -131,9 +133,11 @@ class ZEVector2d
 		double						operator[](ZESize Index) const;
 		double&						operator[](ZESize Index);
 
-		ZEVector2d(double x, double y);
-		ZEVector2d(const ZEVector2d &Start, const ZEVector2d &End);
-		ZEVector2d();
+									ZE_VECTOR_SWIZZLE_2D_DEFINITION(ZEVector2d);
+
+									ZEVector2d(double x, double y);
+									ZEVector2d(const ZEVector2d &Start, const ZEVector2d &End);
+									ZEVector2d();
 };
 
 ZEVector2d operator*(double S, const ZEVector2d& RightOperand);
@@ -199,6 +203,8 @@ class ZEVector3d
 		static ZEVector3			ToVector3(const ZEVector3d& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		double						Length() const;
@@ -255,10 +261,12 @@ class ZEVector3d
 		double						operator[](ZESize Index) const;
 		double&						operator[](ZESize Index);
 
-		ZEVector3d(double x, double y, double z);
-		ZEVector3d(ZEVector2d& Base, double z);
-		ZEVector3d(const ZEVector3d& Start, const ZEVector3d& End);
-		ZEVector3d();
+									ZE_VECTOR_SWIZZLE_3D_DEFINITION(ZEVector3d, ZEVector2d);
+
+									ZEVector3d(double x, double y, double z);
+									ZEVector3d(ZEVector2d& Base, double z);
+									ZEVector3d(const ZEVector3d& Start, const ZEVector3d& End);
+									ZEVector3d();
 };
 
 ZEVector3d operator*(double S, const ZEVector3d& RightOperand);
@@ -318,6 +326,8 @@ class ZEVector4d
 		static ZEVector4			ToVector4(const ZEVector4d& Vector);
 
 		bool						IsValid() const;
+		bool						IsInfinite() const;
+		bool						IsValidNotInf() const;
 		bool						IsNormalized() const;
 
 		double						Length() const;
@@ -362,11 +372,13 @@ class ZEVector4d
 		double						operator[](ZESize Index) const;
 		double&						operator[](ZESize Index);
 
-		ZEVector4d(double x, double y, double z, double w);
-		ZEVector4d(const ZEVector2d& Base, double z, double w);
-		ZEVector4d(const ZEVector3d& Base, double w);
-		ZEVector4d(const ZEVector4d& Start, const ZEVector4d& End);
-		ZEVector4d();
+									ZE_VECTOR_SWIZZLE_4D_DEFINITION(ZEVector4d, ZEVector3d, ZEVector2d);
+
+									ZEVector4d(double x, double y, double z, double w);
+									ZEVector4d(const ZEVector2d& Base, double z, double w);
+									ZEVector4d(const ZEVector3d& Base, double w);
+									ZEVector4d(const ZEVector4d& Start, const ZEVector4d& End);
+									ZEVector4d();
 };
 
 ZEVector4d operator*(double S, const ZEVector4d& RightOperand);

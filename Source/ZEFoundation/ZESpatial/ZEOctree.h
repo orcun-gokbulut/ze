@@ -67,6 +67,8 @@ class ZEOctree
 		void									CreateChildNode(ZEInt Octant);
 
 	public:
+		typedef ZEOctreeIterator<ZEItemType>	Iterator;
+
 		ZEOctree*								GetParent();
 		const ZEOctree*							GetParent() const;
 		ZEUInt									GetParentOctant() const;	
