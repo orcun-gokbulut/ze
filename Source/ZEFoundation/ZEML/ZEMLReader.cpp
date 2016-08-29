@@ -429,6 +429,7 @@ ZESize ZEMLReaderNode::ReadDataSize(const char* Name) const
 
 bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset) const
 {
+
 	const ZEMLFormatElement* Property = FindElement(Name, ZEML_ET_DATA);
 	if (Property == NULL)
 		return true;
@@ -437,6 +438,12 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 		return true;
 
 	if (Offset + BufferSize > Property->Size)
+		return false;
+
+	if (BufferSize == 0)
+		return true;
+
+	if (Buffer == NULL)
 		return false;
 
 	return Format->ReadData(File, *Property, Buffer, Offset, BufferSize);

@@ -44,4 +44,4 @@ ze_add_source(ZECVModelConverterV2.h		Sources Headers)
 ze_add_executable(TARGET ZEModelConverter
 	CONSOLE
 	SOURCES ${Sources}
-	LIBS ZEFoundation ZEModel libTootle)
+	LIBS ZEFoundation libTootle)

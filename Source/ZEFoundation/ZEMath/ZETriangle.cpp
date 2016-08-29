@@ -41,6 +41,72 @@
 #include "ZERay.h"
 #include "ZEMath/ZEMath.h"
 
+
+ZEVector3 ZETriangle::GetNormal() const
+{
+	ZEVector3 Normal;
+	ZETriangle::GetNormal(*this, Normal);
+	return Normal;
+}
+
+ZEVector3 ZETriangle::GetTangent() const
+{
+	ZEVector3 Tangent;
+	ZETriangle::GetTangent(*this, Tangent);
+	return Tangent;
+}
+
+ZEVector3 ZETriangle::GetBinormal() const
+{
+	ZEVector3 Binormal;
+	ZETriangle::GetBinormal(*this, Binormal);
+	return Binormal;
+}
+
+float ZETriangle::GetArea() const
+{
+	return ZETriangle::GetArea(*this);
+}
+
+ZEPlane ZETriangle::GetSurfacePlane() const
+{
+	ZEPlane Plane;
+	ZETriangle::GetSurfacePlane(*this, Plane);
+	return Plane;
+}
+
+ZEVector3 ZETriangle::GetCentroid() const
+{
+	ZEVector3 Centroid;
+	ZETriangle::GetCentroid(*this, Centroid);
+	return Centroid;
+}
+
+ZEVector3 ZETriangle::GetBarycentricCoordinates(const ZEVector3& Point) const
+{
+	ZEVector3 BaryCoords;
+	ZETriangle::GetBarycentricCoordinates(*this, Point, BaryCoords);
+	return BaryCoords;
+}
+
+ZEAABBox ZETriangle::GetBoundingBox() const
+{
+	ZEAABBox BoundingBox;
+	ZETriangle::GetBoundingBox(*this, BoundingBox);
+	return BoundingBox;
+}
+
+
+ZETriangle::ZETriangle()
+{
+
+}
+
+ZETriangle::ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
+{
+	Create(*this, V0, V1, V2);
+}
+
 void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
 {
 	Triangle.V0 = V0;
@@ -50,11 +116,39 @@ void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVecto
 
 void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)
 {
-	ZEVector3 U, V;
-	ZEVector3::Sub(U, Triangle.V1, Triangle.V0);
-	ZEVector3::Sub(V, Triangle.V2, Triangle.V0);
-	ZEVector3::CrossProduct(Normal, U, V);
+	ZEVector3 Tangent, Binormal;
+	GetTangent(Triangle, Tangent);
+	GetBinormal(Triangle, Binormal);
+	ZEVector3::CrossProduct(Normal, Tangent, Binormal);
 	ZEVector3::Normalize(Normal, Normal);
+}
+
+void ZETriangle::GetTangent(const ZETriangle& Triangle, ZEVector3& Tangent)
+{
+	ZEVector3::Sub(Tangent, Triangle.V1, Triangle.V0);
+	ZEVector3::Normalize(Tangent, Tangent);
+}
+
+void ZETriangle::GetBinormal(const ZETriangle& Triangle, ZEVector3& Binormal)
+{
+	ZEVector3::Sub(Binormal, Triangle.V1, Triangle.V0);
+	ZEVector3::Normalize(Binormal, Binormal);
+}
+
+float ZETriangle::GetArea(const ZETriangle& Triangle)
+{
+	ZEVector3 Temp;
+	ZEVector3 V0V1(Triangle.V1 - Triangle.V0);
+	ZEVector3 V0V2(Triangle.V2 - Triangle.V0);
+	ZEVector3::CrossProduct(Temp, V0V1, V0V2);
+
+	return ZEVector3::Length(Temp) / 2.0f;
+}
+
+void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
+{
+	Plane.p = Triangle.V1;
+	GetNormal(Triangle, Plane.n);
 }
 
 void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BaryCoords)
@@ -80,33 +174,12 @@ void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)
 }
 
 
-ZEAABBox ZETriangle::GetBoundingBox() const
+void ZETriangle::GetBoundingBox(const ZETriangle& Triangle, ZEAABBox& BoundingBox)
 {
-	ZEAABBox Box;
-
-	ZEVector3::Max(Box.Max, V0, V1);
-	ZEVector3::Max(Box.Max, Box.Max, V2);
-
-	ZEVector3::Min(Box.Min, V0, V1);
-	ZEVector3::Min(Box.Min, Box.Max, V2);
-
-	return Box;
-}
-
-void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
-{
-	Plane.p = Triangle.V1;
-	GetNormal(Triangle, Plane.n);
-}
-
-float ZETriangle::GetArea(const ZETriangle& Triangle)
-{
-	ZEVector3 Temp;
-	ZEVector3 V0V1(Triangle.V1 - Triangle.V0);
-	ZEVector3 V0V2(Triangle.V2 - Triangle.V0);
-	ZEVector3::CrossProduct(Temp, V0V1, V0V2);
-
-	return ZEVector3::Length(Temp) / 2.0f;
+	ZEVector3::Max(BoundingBox.Max, Triangle.V0, Triangle.V1);
+	ZEVector3::Max(BoundingBox.Max, BoundingBox.Max, Triangle.V2);
+	ZEVector3::Min(BoundingBox.Min, Triangle.V0, Triangle.V1);
+	ZEVector3::Min(BoundingBox.Min, BoundingBox.Max, Triangle.V2);
 }
 
 bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEVector3& Point)
@@ -188,21 +261,53 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Pl
 	return false;
 }
 
-ZEVector3 ZETriangle::GetCentroid() const
+bool ZETriangle::GenerateVertexTangentBinormal(const ZETriangle& PositionTriangle, const ZETriangle& TexcoordsTriangle, ZEVector3& Tangent, ZEVector3& Binormal)
 {
-	ZEVector3 Temp;
-	Temp.x = (V0.x + V1.x + V2.x) / 3.0f;
-	Temp.y = (V0.y + V1.y + V2.y) / 3.0f;
-	Temp.z = (V0.z + V1.z + V2.z) / 3.0f;
-	return Temp;
+	const ZEVector3& v1 = PositionTriangle.V0;
+	const ZEVector3& v2 = PositionTriangle.V1;
+	const ZEVector3& v3 = PositionTriangle.V2;
+
+	const ZEVector3& w1 = TexcoordsTriangle.V0;
+	const ZEVector3& w2 = TexcoordsTriangle.V1;
+	const ZEVector3& w3 = TexcoordsTriangle.V2;
+
+	float x1 = v2.x - v1.x;
+	float x2 = v3.x - v1.x;
+	float y1 = v2.y - v1.y;
+	float y2 = v3.y - v1.y;
+	float z1 = v2.z - v1.z;
+	float z2 = v3.z - v1.z;
+	float s1 = w2.x - w1.x;
+	float s2 = w3.x - w1.x;
+	float t1 = w2.y - w1.y;
+	float t2 = w3.y - w1.y;
+
+	float rt = (s1 * t2 - s2 * t1);
+
+	if (rt < 0.000000001f)
+		return false;
+
+	float r = 1.0f / rt;
+
+	Tangent = ZEVector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,	(t2 * z1 - t1 * z2) * r);
+	Binormal = ZEVector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,	(s1 * z2 - s2 * z1) * r);
+
+	if (!Tangent.IsValidNotInf() || !Binormal.IsValidNotInf())
+		return false;
+
+	Tangent.NormalizeSelf();
+	Binormal.NormalizeSelf();
+
+	return true;
 }
 
-ZETriangle::ZETriangle()
+bool ZETriangle::OrtogonolizeTangentBinormal(const ZEVector3& Normal, ZEVector3& Tangent, ZEVector3& Binormal)
 {
-	
-}
+	Tangent  = (Tangent  - Normal * ZEVector3::DotProduct(Normal, Tangent)).Normalize();
+	Binormal = (Binormal - Normal * ZEVector3::DotProduct(Normal, Binormal)).Normalize();
 
-ZETriangle::ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
-{
-	Create(*this, V0, V1, V2);
+	if (!Tangent.IsValidNotInf() || !Binormal.IsValidNotInf())
+		return false;
+
+	return true;
 }

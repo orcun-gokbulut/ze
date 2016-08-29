@@ -56,8 +56,8 @@ class ZEArray
 		ZEType*		Items;
 
 	public:
-		typedef ZEArrayIterator<ZEType, Allocator_> Iterator;
-		typedef ZEArrayIteratorConst<ZEType, Allocator_> IteratorConst;
+		typedef ZEArrayIterator<ZEType, Allocator_>			Iterator;
+		typedef ZEArrayIteratorConst<ZEType, Allocator_>	IteratorConst;
 
 		Iterator GetIterator()
 		{
@@ -369,6 +369,39 @@ class ZEArray
 			}
 
 			Count--;
+
+			ZEDebugCheckMemory();
+		}
+
+		inline void RemoveRange(ZESize Index, ZESize Count)
+		{
+			zeDebugCheck(Index + Count >= Count, "Index and Count is out of range.");
+
+			ZEType* TempPointer = this->Items;
+			bool Changed;
+
+			if (this->Count > 1)
+			{
+				Changed = Allocator.Allocate(&Items, this->Count - Count);
+			}
+			else
+			{
+				Allocator.Deallocate(&Items);
+				this->Count = 0;
+				return;
+			}
+
+			for(ZESize I = Index + Count; I < this->Count - Count; I++)
+				Items[I] = TempPointer[I + 1];
+
+			if (Changed && Index != 0)
+			{
+				for(ZESize I = 0; I < Index; I++)
+					Items[I] = TempPointer[I];
+				delete[] TempPointer;
+			}
+
+			this->Count -= Count;
 
 			ZEDebugCheckMemory();
 		}

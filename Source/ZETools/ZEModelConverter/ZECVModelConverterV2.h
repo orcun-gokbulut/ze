@@ -88,14 +88,24 @@ struct ZEMDVertexSkinV2
 class ZECVModelConverterV2 : public ZECVConverter
 {
 	private:
-		static void							GenerateIndices(const ZEArray<ZEMDVertexV2>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertexV2>& IndexedVertices);
-		static void							GenerateIndices(const ZEArray<ZEMDVertexSkinV2>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertexSkinV2>& IndexedVertices);
+		static void							ConvertVertexBase(ZEMDVertexV2& Output, const ZEMDVertexV1& Input);
+		static void							ConvertVertexBase(ZEMDVertexSkinV2& Output, const ZEMDVertexSkinV1& Input);
+		template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+		static void							VerifyVertexNormals(const ZEVertexTypeV1& InputVertex, const ZEVertexTypeV2& OutputVertex, ZESize Index);
+		template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+		static void							ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex, ZESize Index, const ZEVector3& TriangleTangent, const ZEVector3& TriangleBinormal);
+		template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+		static void							ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, const ZEArray<ZEVertexTypeV1>& Input, bool& DegenerateFaceDetected);
+
+		static bool							CompareVertexes(const ZEMDVertexV2& VertexA, const ZEMDVertexV2& VertexB);
+		static bool							CompareVertexes(const ZEMDVertexSkinV2& VertexA, const ZEMDVertexSkinV2& VertexB);
+		template<typename ZEVertexType>
+		static void							GenerateIndices(const ZEArray<ZEVertexType>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEVertexType>& IndexedVertices);
+
 		static bool							ConvertPhysicalBody(ZEMLReaderNode* SourcePhysicalBodyNode, ZEMLWriterNode* DestinationPhysicalBodyNode);
 		static bool							ConvertPhysicalJoint(ZEMLReaderNode* SourceJointNode, ZEMLWriterNode* DestinationJointNode);
 		static bool							ConvertBone(ZEMLReaderNode* SourceBoneNode, ZEMLWriterNode* DestinationBoneNode);
 		static bool							ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationBoundingBoxNode);
-		static void							ConvertVertexData(ZEArray<ZEMDVertexV2>& Output, const ZEArray<ZEMDVertexV1>& Input, bool& DegenerateFaceDetected);
-		static void							ConvertVertexData(ZEArray<ZEMDVertexSkinV2>& Output, const ZEArray<ZEMDVertexSkinV1>& Input, bool& DegenerateFaceDetected);
 		static bool							ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode);
 		static bool							ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode);
 		static bool							ConvertHelper(ZEMLReaderNode* SourceHelperNode, ZEMLWriterNode* DestinationHelperNode);

@@ -47,6 +47,8 @@ const ZEVector2d ZEVector2d::UnitY = ZEVector2d(0.0, 1.0);
 const ZEVector2d ZEVector2d::MinValue = ZEVector2d(ZE_DOUBLE_MIN, ZE_DOUBLE_MIN);
 const ZEVector2d ZEVector2d::MaxValue = ZEVector2d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX);
 
+ZE_VECTOR_SWIZZLE_2D_IMPLEMENTATION(ZEVector2d, ZEVector2d);
+
 inline void ZEVector2d::Create(ZEVector2d& Out, double x, double y)
 {
 	Out.x = x;
@@ -103,10 +105,23 @@ void ZEVector2d::Divide(ZEVector2d& Out, const ZEVector2d& A, double s)
 
 bool ZEVector2d::IsValid() const
 {
-	if (x != x || y != y)
+	return (x == x && y == y);
+}
+
+bool ZEVector2d::IsInfinite() const
+{
+	if (!IsValid())
 		return false;
-	else
-		return true;
+
+	return (x - x != 0 || y - y != 0);
+}
+
+bool ZEVector2d::IsValidNotInf() const
+{
+	if (!IsValid())
+		return false;
+
+	return (x - x == 0 && y - y == 0);
 }
 
 bool ZEVector2d::IsNormalized() const
@@ -372,6 +387,8 @@ const ZEVector3d ZEVector3d::UnitZ = ZEVector3d(0.0, 0.0, 1.0);
 const ZEVector3d ZEVector3d::MinValue = ZEVector3d(ZE_DOUBLE_MIN, ZE_DOUBLE_MIN, ZE_DOUBLE_MIN);
 const ZEVector3d ZEVector3d::MaxValue = ZEVector3d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX, ZE_DOUBLE_MAX);
 
+ZE_VECTOR_SWIZZLE_3D_IMPLEMENTATION(ZEVector3d, ZEVector2d);
+
 inline void ZEVector3d::Create(ZEVector3d& Out, double x, double y, double z)
 {
 	Out.x = x;
@@ -463,10 +480,23 @@ void ZEVector3d::CrossProduct(ZEVector3d& Out, const ZEVector3d& A, const ZEVect
 
 bool ZEVector3d::IsValid() const
 {
-	if (x != x || y != y || z != z)
+	return (x == x && y == y && z == z);
+}
+
+bool ZEVector3d::IsInfinite() const
+{
+	if (!IsValid())
 		return false;
-	else
-		return true;
+
+	return (x - x != 0 || y - y != 0 || z - z != 0);
+}
+
+bool ZEVector3d::IsValidNotInf() const
+{
+	if (!IsValid())
+		return false;
+
+	return (x - x == 0 && y - y == 0 && z - z == 0);
 }
 
 bool ZEVector3d::IsNormalized() const
@@ -803,6 +833,8 @@ const ZEVector4d ZEVector4d::HomogenousUnitZ = ZEVector4d(0.0, 0.0, 1.0, 1.0);
 const ZEVector4d ZEVector4d::MinValue = ZEVector4d(ZE_DOUBLE_MIN, ZE_DOUBLE_MIN, ZE_DOUBLE_MIN, ZE_DOUBLE_MIN);
 const ZEVector4d ZEVector4d::MaxValue = ZEVector4d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX, ZE_DOUBLE_MAX, ZE_DOUBLE_MAX);
 
+ZE_VECTOR_SWIZZLE_4D_IMPLEMENTATION(ZEVector4d, ZEVector3d, ZEVector2d);
+
 inline void ZEVector4d::Create(ZEVector4d& Out, double x, double y, double z, double w)
 {
 	Out.x = x;
@@ -836,10 +868,23 @@ double ZEVector4d::Distance(const ZEVector4d& A, const ZEVector4d& B)
 
 bool ZEVector4d::IsValid() const
 {
-	if (w != w || x != x || y != y || z != z)
+	return (x == x && y == y && z == z && w == w);
+}
+
+bool ZEVector4d::IsInfinite() const
+{
+	if (!IsValid())
 		return false;
-	else
-		return true;
+
+	return (x - x != 0 || y - y != 0 || z - z != 0 || w - w != 0);
+}
+
+bool ZEVector4d::IsValidNotInf() const
+{
+	if (!IsValid())
+		return false;
+
+	return (x - x == 0 && y - y == 0 && z - z == 0 && w - w == 0);
 }
 
 bool ZEVector4d::IsNormalized() const

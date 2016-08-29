@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECVMain.cpp
+ Zinek Engine - ZEVectorSwizzle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,73 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECVModelConverterV2.h"
+#include "ZEVectorSwizzle.h"
+#include "ZECommon.h"
 
-#include "ZEFile/ZEPathInfo.h"
-#include "ZEFile/ZEFileInfo.h"
-#include "ZEDS/ZEFormat.h"
-#include "ZEFile/ZEPathManager.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-static bool Operation(const char* Path, ZEPathOperationElement Element)
-{
-	ZEPathInfo PathInfo(Path);
-
-	if (PathInfo.GetExtension().EqualsIncase(".ZEMODEL"))
-	{
-		ZEString TempDestination = ZEFormat::Format("{0}/{1}.new.ZEModel", 
-			PathInfo.GetParentDirectory(),
-			PathInfo.GetName());
-
-		printf("Converting ZEMaterial file:\n");
-		printf(" Source File: %s.\n", Path);
-		printf(" Destination File: %s.\n", Path);
-
-		ZECVModelConverterV2 Converter;
-		if (!Converter.Convert(Path, TempDestination))
-			return true;
-
-		ZEFileInfo FileInfo(TempDestination);
-		if (!FileInfo.IsExists())
-			return true;
-
-		FileInfo.Rename(PathInfo.GetFileName().ToCString());
-	}
-
-	return true;
-}
-
-int main(int argc, char** argv)
-{
-	printf(" Zinek Engine Model Converter\n");
-	printf("----------------------------------------------------------------------------------- \n");
-
-	if (argc == 1 || argc > 3)
-	{
-		printf(" This tool is provided for converting files in old format ZEModel v1.0 to new ZEModel v2.0 format\n");
-		printf("\n");
-		printf(" Usage:\n");
-		printf("   ZEModelConverter [Old Format Model File] [ZEModel v2.0 Model File]\n");
-		printf("   ZEModelConverter [Search Directory]\n");
-
-		return EXIT_FAILURE;
-	}
-
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	const char* Source = argv[1];
-	const char* Destination = argv[2];
-	if (argc == 3)
-	{
-		ZECVModelConverterV2 Converter;
-		return Converter.Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
-	}
-	else if (argc == 2)
-	{
-		ZEPathInfo(Source).Operate(Source, ZEPathOperationFunction::Create<Operation>(), ZE_POE_FILE, true);
-	}
-
-	return EXIT_SUCCESS;
-}
+ZE_SUPPRESS_LNK4221

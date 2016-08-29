@@ -117,6 +117,7 @@ class ZEMatrix3x3
 		static void						CreateScale2D(ZEMatrix3x3& Matrix, float x, float y);
 		static void						CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale);
 		static void						CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale);
+		static void						CreateUVN(ZEMatrix3x3& Matrix, const ZEVector3& U, const ZEVector3& V, const ZEVector3& N);
 
 		static void						Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
 		static void						Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
@@ -222,6 +223,7 @@ class ZEMatrix4x4
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& Scale);
+		static void						CreateUVN(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& U, const ZEVector3& V, const ZEVector3& N);
 		static void						CreateIdentity(ZEMatrix4x4& Matrix);
 		static void						CreateZero(ZEMatrix4x4& Matrix);
 		static void						CreateViewTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);

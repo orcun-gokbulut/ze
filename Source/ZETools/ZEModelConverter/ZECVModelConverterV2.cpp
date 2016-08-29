@@ -383,65 +383,59 @@ bool ZECVModelConverterV2::ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode
 	return true;
 }
 
-void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEMDVertexV2>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertexV2>& IndexedVertices)
+bool ZECVModelConverterV2::CompareVertexes(const ZEMDVertexV2& VertexA, const ZEMDVertexV2& VertexB)
 {
-	// GENERATING INDICES
-	ZEArray<ZEInt> VertexDuplicateIndices;
-	VertexDuplicateIndices.SetCount(Vertices.GetCount());
-	VertexDuplicateIndices.Fill(-1);
-
-	Indices.SetCount(Vertices.GetCount());
-
-	ZEUInt IndexedVertexCount = 0;
-	ZEArray<ZEInt> VertexMapping;
-	VertexMapping.SetCount(Vertices.GetCount());
-
-	for (ZEUInt I = 0; I < Vertices.GetCount(); I++)
+	if (VertexA.Position != VertexB.Position || 
+		VertexA.Normal[0] != VertexB.Normal[0] ||
+		VertexA.Normal[1] != VertexB.Normal[1] ||
+		VertexA.Tangent[0] != VertexB.Tangent[0] ||
+		VertexA.Tangent[1] != VertexB.Tangent[1] ||
+		VertexA.Texcoords != VertexB.Texcoords)
 	{
-		if (VertexDuplicateIndices[I] != -1)
-		{
-			Indices[I] = VertexDuplicateIndices[I];
-			continue;
-		}
-		else
-		{
-			Indices[I] = IndexedVertexCount;
-			VertexMapping[IndexedVertexCount] = I;
-		}
-
-		for (ZEUInt N = I + 1; N < Vertices.GetCount(); N++)
-		{
-			const ZEMDVertexV2& VertexA = Vertices[I];
-			const ZEMDVertexV2& VertexB = Vertices[N];
-
-			if (VertexDuplicateIndices[N] != -1)
-				continue;
-
-			if (VertexA.Position != VertexB.Position || 
-				VertexA.Normal[0] != VertexB.Normal[0] ||
-				VertexA.Normal[1] != VertexB.Normal[1] ||
-				VertexA.Tangent[0] != VertexB.Tangent[0] ||
-				VertexA.Tangent[1] != VertexB.Tangent[1] ||
-				VertexA.Texcoords != VertexB.Texcoords)
-			{
-				continue;
-			}
-
-			VertexDuplicateIndices[N] = IndexedVertexCount;
-		}
-
-		IndexedVertexCount++;
+		return false;
 	}
 
-	// GENERATE SKINNED VERTEX BUFFER
-	IndexedVertices.SetCount(IndexedVertexCount);
-	for (ZESize I = 0; I < IndexedVertexCount; I++)
-	{
-		IndexedVertices[I] = Vertices[VertexMapping[I]];
-	}
+	return true;
 }
 
-void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEMDVertexSkinV2>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertexSkinV2>& IndexedVertices)
+bool ZECVModelConverterV2::CompareVertexes(const ZEMDVertexSkinV2& VertexA, const ZEMDVertexSkinV2& VertexB)
+{
+	if (VertexA.Position != VertexB.Position || 
+		VertexA.Normal[0] != VertexB.Normal[0] ||
+		VertexA.Normal[1] != VertexB.Normal[1] ||
+		VertexA.Tangent[0] != VertexB.Tangent[0] ||
+		VertexA.Tangent[1] != VertexB.Tangent[1] ||
+		VertexA.Texcoords != VertexB.Texcoords)
+	{
+		return false;
+	}
+
+
+	bool SkinFound[4] = {false};
+	for (int J = 0; J < 4; J++)
+	{
+		for (ZESize K = 0; K < 4; K++)
+		{
+			if (SkinFound[K])
+				continue;
+
+			if (VertexA.Indices[J] == VertexB.Indices[K] &&
+				VertexA.Weights[J] == VertexB.Weights[K])
+			{
+				SkinFound[K] = true;
+				break;
+			}		
+		}
+	}
+
+	if (!SkinFound[0] || !SkinFound[1] || !SkinFound[2] || !SkinFound[3])
+		return false;
+
+	return true;
+}
+
+template<typename ZEVertexType>
+void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEVertexType>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEVertexType>& IndexedVertices)
 {
 	// GENERATING INDICES
 	ZEArray<ZEInt> VertexDuplicateIndices;
@@ -469,41 +463,13 @@ void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEMDVertexSkinV2>& Vert
 
 		for (ZEUInt N = I + 1; N < Vertices.GetCount(); N++)
 		{
-			const ZEMDVertexSkinV2& VertexA = Vertices[I];
-			const ZEMDVertexSkinV2& VertexB = Vertices[N];
+			const ZEVertexType& VertexA = Vertices[I];
+			const ZEVertexType& VertexB = Vertices[N];
 
 			if (VertexDuplicateIndices[N] != -1)
 				continue;
 
-			if (VertexA.Position != VertexB.Position || 
-				VertexA.Normal[0] != VertexB.Normal[0] ||
-				VertexA.Normal[1] != VertexB.Normal[1] ||
-				VertexA.Tangent[0] != VertexB.Tangent[0] ||
-				VertexA.Tangent[1] != VertexB.Tangent[1] ||
-				VertexA.Texcoords != VertexB.Texcoords)
-			{
-				continue;
-			}
-
-
-			bool SkinFound[4] = {false};
-			for (int J = 0; J < 4; J++)
-			{
-				for (ZESize K = 0; K < 4; K++)
-				{
-					if (SkinFound[K])
-						continue;
-
-					if (VertexA.Indices[J] == VertexB.Indices[K] &&
-						VertexA.Weights[J] == VertexB.Weights[K])
-					{
-						SkinFound[K] = true;
-						break;
-					}		
-				}
-			}
-
-			if (!SkinFound[0] || !SkinFound[1] || !SkinFound[2] || !SkinFound[3])
+			if (!CompareVertexes(VertexA, VertexB))
 				continue;
 
 			VertexDuplicateIndices[N] = IndexedVertexCount;
@@ -515,41 +481,145 @@ void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEMDVertexSkinV2>& Vert
 	// GENERATE SKINNED VERTEX BUFFER
 	IndexedVertices.SetCount(IndexedVertexCount);
 	for (ZESize I = 0; I < IndexedVertexCount; I++)
-	{
 		IndexedVertices[I] = Vertices[VertexMapping[I]];
-	}
+}
+
+void ZECVModelConverterV2::ConvertVertexBase(ZEMDVertexV2& Output, const ZEMDVertexV1& Input)
+{
+	Output.Position = Input.Position;
+	Output.Texcoords = Input.Texcoords;
+	Output.Reserved0 = 1.0f;
+}
+
+void ZECVModelConverterV2::ConvertVertexBase(ZEMDVertexSkinV2& Output, const ZEMDVertexSkinV1& Input)
+{
+	Output.Position = Input.Position;
+	Output.Texcoords = Input.Texcoords;
+	Output.Indices[0] = Input.Indices[0];
+	Output.Indices[1] = Input.Indices[1];
+	Output.Indices[2] = Input.Indices[2];
+	Output.Indices[3] = Input.Indices[3];
+	Output.Weights = Input.Weights;
 }
 
 template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
-void ConvertVertexBase(ZESize Index, const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex)
+void ZECVModelConverterV2::VerifyVertexNormals(const ZEVertexTypeV1& InputVertex, const ZEVertexTypeV2& OutputVertex, ZESize Index)
 {
-	OutputVertex.Position = InputVertex.Position;
-	OutputVertex.Texcoords = InputVertex.Texcoords;
+	// Regenerated Normal
+	ZEVector3 RegeneratedNormal;
+	RegeneratedNormal.x = (float)OutputVertex.Normal[0] / (float)0x7FFF;
+	RegeneratedNormal.y = (float)OutputVertex.Normal[1] / (float)0x7FFF;
+	float NormalSign = (2.0f * (OutputVertex.Normal[0] & 0x0001) - 1.0f);
+	RegeneratedNormal.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedNormal.x * RegeneratedNormal.x - RegeneratedNormal.y * RegeneratedNormal.y)) * NormalSign;
+	RegeneratedNormal.NormalizeSelf();	
+	if (!RegeneratedNormal.IsValid())
+		zeWarning("Validation check failed. Regenerated normal is not valid. Index: %u.", Index);
 
-	ZEVector3 Normal = InputVertex.Normal.Normalize();
-	OutputVertex.Normal[0] = (ZEInt16)(Normal.x * 32766.0f);
-	OutputVertex.Normal[1] = (ZEInt16)(Normal.y * 32766.0f);
-	if (InputVertex.Normal.z < 0.0f)
+	float ErrorNormal = (RegeneratedNormal - InputVertex.Normal).Abs().Max();
+	if (ErrorNormal >= 0.02f)
+		zeWarning("Validation check failed. Regenerated normal is not equals to original normal. Index: %u, Error: %f.", Index, ErrorNormal);
+
+	// Regenerated Tangent
+	ZEVector3 RegeneratedTangent;
+	RegeneratedTangent.x = (float)OutputVertex.Tangent[0] / (float)0x7FFF;
+	RegeneratedTangent.y = (float)OutputVertex.Tangent[1] / (float)0x7FFF;
+	float TangentSign = (2.0f * (OutputVertex.Tangent[0] & 0x0001) - 1.0f);
+	RegeneratedTangent.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedTangent.x * RegeneratedTangent.x - RegeneratedTangent.y * RegeneratedTangent.y)) * TangentSign;
+	RegeneratedTangent.NormalizeSelf();
+	if (!RegeneratedTangent.IsValid())
+		zeWarning("Validation check failed. Regenerated tangent is not valid. Index: %u.", Index);
+
+	float ErrorTangent = (RegeneratedTangent - InputVertex.Tangent).Abs().Max();
+	if (ErrorTangent >= 0.02f)
+		zeWarning("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u, Error: %f.", Index, ErrorTangent);
+	
+
+	// Calculated Binormal
+	float BinormalDirection = (2.0f * (OutputVertex.Tangent[1] & 0x0001) - 1.0f);
+
+	ZEVector3 CalculatedBinormal;
+	ZEVector3::CrossProduct(CalculatedBinormal, InputVertex.Tangent, InputVertex.Normal);
+	CalculatedBinormal *= BinormalDirection;
+	CalculatedBinormal.NormalizeSelf();
+	if (!CalculatedBinormal.IsValid())
+		zeWarning("Validation check failed. Calculated binormal is not valid. Index: %u.", Index);
+
+	float ErrorCalculatedBinormal = (InputVertex.Binormal - CalculatedBinormal).Abs().Sum();
+	if (ErrorCalculatedBinormal >= 0.2f)
+		zeWarning("Validation check failed. Calculated binormal is not equals to original binormal. Index: %u, Error: %f.", Index, ErrorCalculatedBinormal);
+
+
+	// Regenerated Binormal
+	ZEVector3 RegeneratedBinormal;
+	ZEVector3::CrossProduct(RegeneratedBinormal, RegeneratedTangent, RegeneratedNormal);
+	RegeneratedBinormal = RegeneratedBinormal.Normalize() * BinormalDirection;
+	if (!RegeneratedBinormal.IsValid())
+		zeWarning("Validation check failed. Regenerated binormal is not valid. Index: %u.", Index);
+
+	float ErrorBinormal = (RegeneratedBinormal - CalculatedBinormal).Abs().Max();
+	if (ErrorBinormal >= 0.05f)
+		zeWarning("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u, Error: %f.", Index, ErrorNormal);
+
+
+	/*
+	// Calculated Normal
+	ZEVector3 CalculatedNormal;
+	ZEVector3::CrossProduct(CalculatedNormal, InputVertex.Tangent, InputVertex.Binormal);
+	CalculatedNormal.NormalizeSelf();
+	if (!CalculatedNormal.IsValid())
+		zeWarning("Validation check failed. Calculated normal is not valid. Index: %u.", Index);
+
+	float ErrorCalculatedNormal = (InputVertex.Normal - CalculatedNormal).Abs().Sum();
+	if (ErrorCalculatedNormal >= 0.2f)
+		zeWarning("Validation check failed. Calculated normal is not equals to original normal. Index: %u. Error: %f", Index, ErrorCalculatedNormal);
+
+
+	// Regenerated Normal
+	ZEVector3 RegeneratedNormal;
+	ZEVector3::CrossProduct(RegeneratedNormal, RegeneratedTangent, RegeneratedBinormal);
+	float NormalDirection = (2.0f * (OutputVertex.Binormal[1] & 0x0001) - 1.0f);
+	RegeneratedNormal = RegeneratedNormal.Normalize() * NormalDirection;
+	if (!RegeneratedNormal.IsValid())
+		zeWarning("Validation check failed. Validation check failed. Regenerated normal is not valid. Index: %u.", Index);
+
+	float ErrorNormal = (RegeneratedNormal - InputVertex.Normal).Abs().Max();
+	if (ErrorNormal >= 0.2f)
+		zeWarning("Validation check failed. Regenerated normal is not equals to calculated normal. Index: %u. Error: %f", Index, ErrorNormal);
+	*/
+}
+
+template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+void ZECVModelConverterV2::ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex, ZESize Index, const ZEVector3& TriangleTangent, const ZEVector3& TriangleBinormal)
+{
+	/*
+	ZEVector3 Tangent = TriangleTangent;
+	ZEVector3 Binormal = TriangleBinormal;
+	ZETriangle::OrtogonolizeTangentBinormal(InputVertex.Normal, Tangent, Binormal);
+	*/
+
+	const ZEVector3& Normal = InputVertex.Normal;
+	const ZEVector3& Tangent = InputVertex.Tangent;
+	const ZEVector3& Binormal = InputVertex.Binormal;
+
+	OutputVertex.Normal[0] = (ZEInt16)(Normal.x * (float)0x7FFF);
+	OutputVertex.Normal[1] = (ZEInt16)(Normal.y * (float)0x7FFF);
+	if (Normal.z < 0.0f)
 		OutputVertex.Normal[0] &= 0xFFFE;
 	else
 		OutputVertex.Normal[0] |= 0x0001;
 
-	ZEVector3 Tangent = InputVertex.Tangent.Normalize();
-	OutputVertex.Tangent[0] = (ZEInt16)(Tangent.x * 32766.0f);
-	OutputVertex.Tangent[1] = (ZEInt16)(Tangent.y * 32766.0f);
-
-	if (InputVertex.Tangent.z < 0.0f)
+	OutputVertex.Tangent[0] = (ZEInt16)(Tangent.x * (float)0x7FFF);
+	OutputVertex.Tangent[1] = (ZEInt16)(Tangent.y * (float)0x7FFF);
+	if (Tangent.z < 0.0f)
 		OutputVertex.Tangent[0] &= 0xFFFE;
 	else
 		OutputVertex.Tangent[0] |= 0x0001;
 
-	// Binormals of the 3ds Max Export is inverted (OpenGL to D3D Conversion)
-	// Because of that InvertedBinormal determination mus be done on inverted space. B = T x N.
-	// However after conversation shader must calculate its binormal as B = N x T.
-	ZEVector3 Binormal = -InputVertex.Binormal.Normalize();
 	ZEVector3 CalculatedBinormal;
 	ZEVector3::CrossProduct(CalculatedBinormal, Tangent, Normal);
 	CalculatedBinormal.NormalizeSelf();
+	if (!CalculatedBinormal.IsValid())
+		zeError("Calculated normal is not valid.");
 
 	if (ZEVector3::DotProduct(CalculatedBinormal, Binormal) < 0.0f) // Mirrored
 	{
@@ -560,104 +630,59 @@ void ConvertVertexBase(ZESize Index, const ZEVertexTypeV1& InputVertex, ZEVertex
 	{
 		OutputVertex.Tangent[1] |= 0x0001;
 	}
-
-	// VERIFICATION
-	float Error = (Binormal - CalculatedBinormal).Abs().Max();
-	if (Error >= 0.2f)
-		zeError("Calculated Binormal is not equals to original binormal. Weird binormal. Index: %u. Error: %f", Index, Error);
-
-	ZEVector3 RegeneratedNormal;
-	RegeneratedNormal.x = (float)OutputVertex.Normal[0] / 32767.0f;
-	RegeneratedNormal.y = (float)OutputVertex.Normal[1] / 32767.0f;
-	float Sign = (2.0f * (OutputVertex.Normal[0] & 0x0001) - 1.0f);
-	RegeneratedNormal.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedNormal.x * RegeneratedNormal.x - RegeneratedNormal.y * RegeneratedNormal.y)) * Sign;
-	RegeneratedNormal.NormalizeSelf();	
-	if (!RegeneratedNormal.IsValid())
-		zeError("Validation check failed. Regenerated normal is not valid. Index: %u.", Index);
-
-	Error = (RegeneratedNormal - Normal).Abs().Max();
-	if (Error >= 0.1f)
-		zeError("Validation check failed. Regenerated normal is not equals to original normal. Index: %u. Error: %f", Index, Error);
-	else if (Error >= 0.02f)
-		zeWarning("Validation check failed. Regenerated normal is not equals to original normal. Index: %u. Error: %f", Index, Error);
-
-
-	ZEVector3 RegeneratedTangent;
-	RegeneratedTangent.x = (float)OutputVertex.Tangent[0] / 32767.0f;
-	RegeneratedTangent.y = (float)OutputVertex.Tangent[1] / 32767.0f;
-	Sign = (2.0f * (OutputVertex.Tangent[0] & 0x0001) - 1.0f);
-	RegeneratedTangent.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedTangent.x * RegeneratedTangent.x - RegeneratedTangent.y * RegeneratedTangent.y)) * Sign;
-	RegeneratedTangent.NormalizeSelf();
-	if (!RegeneratedTangent.IsValid())
-		zeError("Validation check failed. Regenerated tangent is not valid. Index: %u.", Index);
-
-	Error = (RegeneratedTangent - Tangent).Abs().Max();
-	if (Error >= 0.1f)
-		zeError("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u. Error: %f", Index, Error);
-	else if (Error >= 0.02f)
-		zeError("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u. Error: %f", Index, Error);
-
-
-	ZEVector3 RegeneratedBinormal;
-	ZEVector3::CrossProduct(RegeneratedBinormal, RegeneratedTangent, RegeneratedNormal);
-	Sign = (2.0f * (OutputVertex.Tangent[1] & 0x0001) - 1.0f);
-	RegeneratedBinormal = RegeneratedBinormal.Normalize() * Sign;
-	if (!RegeneratedBinormal.IsValid())
-		zeError("Validation check failed. Regenerated binormal is not valid. Index: %u.", Index);
-
-	Error = (RegeneratedBinormal - CalculatedBinormal).Abs().Max();
-	if (Error >= 0.1f)
-		zeError("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u. Error: %f", Index, Error);
-	else if (Error >= 0.02f)
-		zeWarning("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u. Error: %f", Index, Error);
 }
 
-void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEMDVertexV2>& Output, const ZEArray<ZEMDVertexV1>& Input, bool& DegenerateFaceDetected)
+template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, const ZEArray<ZEVertexTypeV1>& Input, bool& DegenerateFaceDetected)
 {
+	ZEMatrix3x3 InvTangentTransform;
 	DegenerateFaceDetected = false;
 	Output.SetCount(Input.GetCount());
-	for (ZESize I = 0 ; I < Input.GetCount(); I++)
+
+	ZEVector3 TriangleTangent;
+	ZEVector3 TriangleBinormal;
+	for (ZESize I = 0 ; I < Input.GetCount(); I += 3)
 	{
-		if (I % 3 == 0)
-		{ 
-			ZETriangle Triangle(ZETriangle(Input[I].Position, Input[I + 1].Position, Input[I + 2].Position));
-			float Area = ZETriangle::GetArea(Triangle);
-			if (Area <= 0.00001)
-			{
-				zeError("Degenerate face detected. Face Index: %u. Vertex Index: %u.", I / 3, I);
-				DegenerateFaceDetected = true;
-			}
+		ZETriangle TrianglePosition;
+		TrianglePosition.V0 = Input[I].Position;
+		TrianglePosition.V1 = Input[I + 1].Position;
+		TrianglePosition.V2 = Input[I + 2].Position;
+		float Area = ZETriangle::GetArea(TrianglePosition);
+		if (Area <= 0.00001)
+		{
+			zeError("Degenerate triangle (position) detected. Triangle Index: %u. Vertex Indexes: %u, %u, %u.", I / 3, I, I + 1, I + 2);
+			DegenerateFaceDetected = true;
 		}
 
-		Output[I].Reserved0 = 1.0f;
-		ConvertVertexBase(I, Input[I], Output[I]);
-	}
-}
-
-void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEMDVertexSkinV2>& Output, const ZEArray<ZEMDVertexSkinV1>& Input, bool& DegenerateFaceDetected)
-{
-	DegenerateFaceDetected = false;
-	Output.SetCount(Input.GetCount());
-	for (ZESize I = 0 ; I < Input.GetCount(); I++)
-	{
-		if (I % 3 == 0)
-		{ 
-			ZETriangle Triangle(ZETriangle(Input[I].Position, Input[I + 1].Position, Input[I + 2].Position));
-			float Area = ZETriangle::GetArea(Triangle);
-			if (Area <= 0.0001)
-			{
-				zeError("Degenerate face detected. Face Index: %u. Vertex Index: %u.", I / 3, I);
-				DegenerateFaceDetected = true;
-			}
+		/*ZETriangle TriangleTexcoords;
+		TriangleTexcoords.V0 = ZEVector3(Input[I].Texcoords, 0.0f);
+		TriangleTexcoords.V1 = ZEVector3(Input[I + 1].Texcoords, 0.0f);
+		TriangleTexcoords.V2 = ZEVector3(Input[I + 2].Texcoords, 0.0f);
+		Area = ZETriangle::GetArea(TriangleTexcoords);
+		if (Area <= FLT_EPSILON)
+		{
+			zeError("Degenerate triangle (texcoords) detected. Triangle Index: %u. Vertex Indexes: %u, %u, %u.", I / 3, I, I + 1, I + 2);
+			DegenerateFaceDetected = true;
 		}
 
-		Output[I].Indices[0] = Input[I].Indices[0];
-		Output[I].Indices[1] = Input[I].Indices[1];
-		Output[I].Indices[2] = Input[I].Indices[2];
-		Output[I].Indices[3] = Input[I].Indices[3];
-		Output[I].Weights = Input[I].Weights;
+		if (!ZETriangle::GenerateVertexTangentBinormal(TrianglePosition, TriangleTexcoords, TriangleTangent, TriangleBinormal))
+		{
+			TriangleTangent =  Input[I].Tangent;
+			TriangleBinormal = Input[I].Binormal;
+		}*/
+		
 
-		ConvertVertexBase(I, Input[I], Output[I]);
+		ConvertVertexBase(Output[I], Input[I]);
+		ConvertVertexNormals(Input[I], Output[I], I, TriangleTangent, TriangleBinormal);
+		VerifyVertexNormals(Input[I], Output[I], I);
+
+		ConvertVertexBase(Output[I + 1], Input[I + 1]);
+		ConvertVertexNormals(Input[I + 1], Output[I + 1], I + 1, TriangleTangent, TriangleBinormal);
+		VerifyVertexNormals(Input[I + 1], Output[I + 1], I);
+
+		ConvertVertexBase(Output[I + 2], Input[I + 2]);
+		ConvertVertexNormals(Input[I + 2], Output[I + 2], I + 2, TriangleTangent, TriangleBinormal);
+		VerifyVertexNormals(Input[I + 2], Output[I + 2], I);
 	}
 }
 
@@ -718,8 +743,8 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 	ZEArray<ZEUInt32> Indexes;
 	ZEArray<ZEMDVertexV2> IndexedVertices;
 	ZEArray<ZEMDVertexSkinV2> IndexedVerticesSkin;
-	ZESize IndexedVertexCount;
-	ZESize IndexedVertexBufferSize;
+	ZESize IndexedVertexCount = 0;
+	ZESize IndexedVertexBufferSize = 0;
 	if (VertexCount > 600)
 	{
 		zeLog("Generating Indexes.");
@@ -748,27 +773,27 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 			IsIndexed = false;
 		}
 
-		if (!DegenerateFaceDetected)
+		if (IsIndexed && !DegenerateFaceDetected)
 		{
 			if (!IsSourceLODSkinned)
 			{
 				zeLog("Reordering indexes for vertex cache optimization.");
-				TootleOptimize(IndexedVertices.GetConstCArray(), Indexes.GetConstCArray(), IndexedVertices.GetCount(), Indexes.GetCount() / 3, 
-					sizeof(ZEMDVertexV2), TOOTLE_DEFAULT_VCACHE_SIZE, NULL, 0, TOOTLE_CW, Indexes.GetCArray(), NULL);
+				TootleOptimize(IndexedVertices.GetConstCArray(), Indexes.GetConstCArray(), (unsigned int)IndexedVertices.GetCount(), (unsigned int)Indexes.GetCount() / 3, 
+					(unsigned int)sizeof(ZEMDVertexV2), TOOTLE_DEFAULT_VCACHE_SIZE, NULL, 0, TOOTLE_CW, Indexes.GetCArray(), NULL);
 				
 				zeLog("Reordering vertices for vertex precache optimization.");
-				TootleOptimizeVertexMemory(IndexedVertices.GetConstCArray(), Indexes.GetConstCArray(), IndexedVertices.GetCount(), Indexes.GetCount() / 3, 
-					sizeof(ZEMDVertexV2), IndexedVertices.GetCArray(), Indexes.GetCArray(), NULL);
+				TootleOptimizeVertexMemory(IndexedVertices.GetConstCArray(), Indexes.GetConstCArray(), (unsigned int)IndexedVertices.GetCount(), (unsigned int)Indexes.GetCount() / 3, 
+					(unsigned int)sizeof(ZEMDVertexV2), IndexedVertices.GetCArray(), Indexes.GetCArray(), NULL);
 			}
 			else
 			{
 				zeLog("Reordering indexes for vertex cache optimization.");
-				TootleOptimize(IndexedVerticesSkin.GetConstCArray(), Indexes.GetConstCArray(), IndexedVerticesSkin.GetCount(), Indexes.GetCount() / 3, 
-					sizeof(ZEMDVertexSkinV2), TOOTLE_DEFAULT_VCACHE_SIZE, NULL, 0, TOOTLE_CW, Indexes.GetCArray(), NULL);
+				TootleOptimize(IndexedVerticesSkin.GetConstCArray(), Indexes.GetConstCArray(), (unsigned int)IndexedVerticesSkin.GetCount(), (unsigned int)Indexes.GetCount() / 3, 
+					(unsigned int)sizeof(ZEMDVertexSkinV2), TOOTLE_DEFAULT_VCACHE_SIZE, NULL, 0, TOOTLE_CW, Indexes.GetCArray(), NULL);
 
 				zeLog("Reordering vertices for vertex precache optimization.");
-				TootleOptimizeVertexMemory(IndexedVerticesSkin.GetConstCArray(), Indexes.GetConstCArray(), IndexedVerticesSkin.GetCount(), Indexes.GetCount() / 3, 
-					sizeof(ZEMDVertexSkinV2), IndexedVerticesSkin.GetCArray(), Indexes.GetCArray(), NULL);
+				TootleOptimizeVertexMemory(IndexedVerticesSkin.GetConstCArray(), Indexes.GetConstCArray(), (unsigned int)IndexedVerticesSkin.GetCount(), (unsigned int)Indexes.GetCount() / 3, 
+					(unsigned int)sizeof(ZEMDVertexSkinV2), IndexedVerticesSkin.GetCArray(), Indexes.GetCArray(), NULL);
 			}
 		}
 		else
@@ -1045,7 +1070,7 @@ bool ZECVModelConverterV2::ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriter
 			ZEMLWriterNode DestinationAnimationNode;
 			DestinationAnimationsNode.OpenNode("Animation", DestinationAnimationNode);
 			
-			if (!ConvertAnimation(&SourceAnimationsNode.GetNode("Animation", I), &DestinationAnimationNode))
+			if (ConvertAnimation(&SourceAnimationsNode.GetNode("Animation", I), &DestinationAnimationNode))
 				return false;
 
 			DestinationAnimationNode.CloseNode();
@@ -1148,3 +1173,100 @@ bool ZECVModelConverterV2::Convert(const ZEString& SourceFileName, const ZEStrin
 
 	return true;
 }
+
+
+/*
+// 
+// template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+// void ConvertVertexBase(ZESize Index, const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex)
+// {
+// 	OutputVertex.Position = InputVertex.Position;
+// 	OutputVertex.Texcoords = InputVertex.Texcoords;
+// 
+// 	ZEVector3 Normal = InputVertex.Normal.Normalize();
+// 	OutputVertex.Normal[0] = (ZEInt16)(Normal.x * 32766.0f);
+// 	OutputVertex.Normal[1] = (ZEInt16)(Normal.y * 32766.0f);
+// 	if (InputVertex.Normal.z < 0.0f)
+// 		OutputVertex.Normal[0] &= 0xFFFE;
+// 	else
+// 		OutputVertex.Normal[0] |= 0x0001;
+// 
+// 	ZEVector3 Tangent = InputVertex.Tangent.Normalize();
+// 	OutputVertex.Tangent[0] = (ZEInt16)(Tangent.x * 32766.0f);
+// 	OutputVertex.Tangent[1] = (ZEInt16)(Tangent.y * 32766.0f);
+// 
+// 	if (InputVertex.Tangent.z < 0.0f)
+// 		OutputVertex.Tangent[0] &= 0xFFFE;
+// 	else
+// 		OutputVertex.Tangent[0] |= 0x0001;
+// 
+// 	// Binormals of the 3ds Max Export is inverted (OpenGL to D3D Conversion)
+// 	// Because of that InvertedBinormal determination mus be done on inverted space. B = T x N.
+// 	// However after conversation shader must calculate its binormal as B = N x T.
+// 	ZEVector3 Binormal = -InputVertex.Binormal.Normalize();
+// 	ZEVector3 CalculatedBinormal;
+// 	ZEVector3::CrossProduct(CalculatedBinormal, Tangent, Normal);
+// 	CalculatedBinormal.NormalizeSelf();
+// 
+// 	if (ZEVector3::DotProduct(CalculatedBinormal, Binormal) < 0.0f) // Mirrored
+// 	{
+// 		CalculatedBinormal *= -1.0f;
+// 		OutputVertex.Tangent[1] &= 0xFFFE;
+// 	}
+// 	else
+// 	{
+// 		OutputVertex.Tangent[1] |= 0x0001;
+// 	}
+// 
+// 	// VERIFICATION
+// 	float Error = (Binormal - CalculatedBinormal).Abs().Max();
+// 	if (Error >= 0.2f)
+// 		zeError("Calculated Binormal is not equals to original binormal. Weird binormal. Index: %u. Error: %f", Index, Error);
+// 
+// 	ZEVector3 RegeneratedNormal;
+// 	RegeneratedNormal.x = (float)OutputVertex.Normal[0] / 32767.0f;
+// 	RegeneratedNormal.y = (float)OutputVertex.Normal[1] / 32767.0f;
+// 	float Sign = (2.0f * (OutputVertex.Normal[0] & 0x0001) - 1.0f);
+// 	RegeneratedNormal.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedNormal.x * RegeneratedNormal.x - RegeneratedNormal.y * RegeneratedNormal.y)) * Sign;
+// 	RegeneratedNormal.NormalizeSelf();	
+// 	if (!RegeneratedNormal.IsValid())
+// 		zeError("Validation check failed. Regenerated normal is not valid. Index: %u.", Index);
+// 
+// 	Error = (RegeneratedNormal - Normal).Abs().Max();
+// 	if (Error >= 0.1f)
+// 		zeError("Validation check failed. Regenerated normal is not equals to original normal. Index: %u. Error: %f", Index, Error);
+// 	else if (Error >= 0.02f)
+// 		zeWarning("Validation check failed. Regenerated normal is not equals to original normal. Index: %u. Error: %f", Index, Error);
+// 
+// 
+// 	ZEVector3 RegeneratedTangent;
+// 	RegeneratedTangent.x = (float)OutputVertex.Tangent[0] / 32767.0f;
+// 	RegeneratedTangent.y = (float)OutputVertex.Tangent[1] / 32767.0f;
+// 	Sign = (2.0f * (OutputVertex.Tangent[0] & 0x0001) - 1.0f);
+// 	RegeneratedTangent.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedTangent.x * RegeneratedTangent.x - RegeneratedTangent.y * RegeneratedTangent.y)) * Sign;
+// 	RegeneratedTangent.NormalizeSelf();
+// 	if (!RegeneratedTangent.IsValid())
+// 		zeError("Validation check failed. Regenerated tangent is not valid. Index: %u.", Index);
+// 
+// 	Error = (RegeneratedTangent - Tangent).Abs().Max();
+// 	if (Error >= 0.1f)
+// 		zeError("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u. Error: %f", Index, Error);
+// 	else if (Error >= 0.02f)
+// 		zeError("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u. Error: %f", Index, Error);
+// 
+// 
+// 	ZEVector3 RegeneratedBinormal;
+// 	ZEVector3::CrossProduct(RegeneratedBinormal, RegeneratedTangent, RegeneratedNormal);
+// 	Sign = (2.0f * (OutputVertex.Tangent[1] & 0x0001) - 1.0f);
+// 	RegeneratedBinormal = RegeneratedBinormal.Normalize() * Sign;
+// 	if (!RegeneratedBinormal.IsValid())
+// 		zeError("Validation check failed. Regenerated binormal is not valid. Index: %u.", Index);
+// 
+// 	Error = (RegeneratedBinormal - CalculatedBinormal).Abs().Max();
+// 	if (Error >= 0.1f)
+// 		zeError("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u. Error: %f", Index, Error);
+// 	else if (Error >= 0.02f)
+// 		zeWarning("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u. Error: %f", Index, Error);
+// }
+*/
+
