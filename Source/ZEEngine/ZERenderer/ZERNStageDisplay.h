@@ -38,10 +38,8 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
-#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZERNStage.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
@@ -62,12 +60,13 @@ ZE_ENUM(ZERNStageDisplayFlipMode)
 	ZERN_SDMF_BOTH
 };
 
+class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRConstantBuffer;
-class ZEGRViewport;
 class ZEGRRenderTarget;
+class ZERNStageMultiplexer;
 
-class ZERNStageDisplay : public ZERNStage
+class ZERNStageDisplay : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStageMultiplexer;
@@ -75,8 +74,7 @@ class ZERNStageDisplay : public ZERNStage
 		ZEFlags									DirtyFlags;
 												
 		ZERNStageMultiplexer*					Owner;
-		ZERNStageBuffer							Input;
-		ZEString								GlobalInput;
+		ZEString								InputName;
 												
 		ZEVector2								InputOffset;
 		ZEVector2								InputSize;
@@ -103,34 +101,27 @@ class ZERNStageDisplay : public ZERNStage
 												
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
-		
-		ZELink<ZERNStageDisplay>				StageLink;
 
-		const ZEGRTexture2D*					InputTexture;
-		const ZEGRRenderTarget*					OutputRenderTarget;	
+		ZEHolder<const ZEGRTexture2D>			InputTexture;
 
+		ZELink<ZERNStageDisplay>				Link;
+
+		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 												
-		bool									UpdateInputOutput();
 		bool									UpdateConstantBuffer();
 		bool									UpdateSampler();
 		bool									Update();
 												
 		bool									Draw(ZEGRContext* Context);
 												
-	public:										
-		virtual ZEInt							GetId() const;
-		virtual const ZEString&					GetName() const;
-												
-		void									SetInput(ZERNStageBuffer Input);
-		ZERNStageBuffer							GetInput() const;
-												
-		void									SetInputGlobal(const ZEString& Name);
-		const ZEString&							GetInputGlobal();
-												
-		void									SetTexture(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*					GetTexture() const;
-												
+												ZERNStageDisplay();
+		virtual									~ZERNStageDisplay();
+
+	public:											
+		void									SetInput(const ZEString& InputName);
+		const ZEString&							GetInput() const;
+
 		void									SetInputOffset(const ZEVector2& Offset);
 		const ZEVector2&						GetInputOffset() const;
 												
@@ -149,7 +140,7 @@ class ZERNStageDisplay : public ZERNStage
 		void									SetZoom(const ZEVector2& Zoom);
 		const ZEVector2&						GetZoom() const;
 												
-		void									SetRotate(float Rotation);
+		void									SetRotation(float Rotation);
 		float									GetRotation()const;
 												
 		void									SetFlipMode(ZERNStageDisplayFlipMode Mode);
@@ -157,9 +148,9 @@ class ZERNStageDisplay : public ZERNStage
 												
 		void									SetFilter(ZEGRTextureFilter Filter);
 		ZEGRTextureFilter						GetFilter() const;
-												
-		bool									Setup(ZEGRContext* Context);
-		bool									Setup(ZEGRContext* Context, const ZEGRViewport& Viewport);
-												
-												ZERNStageDisplay();
+
+		void									SetViewport(const ZEGRViewport& Viewport);
+		const ZEGRViewport&						GetViewport() const;
+
+		static ZERNStageDisplay*				CreateInstance();
 };

@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	printf(" Zinek Engine Material Converter\n");
 	printf("----------------------------------------------------------------------------------- \n");
 
-	if (argc == 2 && argc == 3)
+	if (argc == 1 || argc > 3)
 	{
 		printf(" This tool is provided for converting files in old format ZEMaterial v1.0 to new ZERNStandardMaterial v2.0\n");
 		printf(" format.\n");

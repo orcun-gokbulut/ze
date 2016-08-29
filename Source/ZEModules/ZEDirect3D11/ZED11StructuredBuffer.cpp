@@ -136,8 +136,6 @@ bool ZED11StructuredBuffer::Lock(void** Buffer)
 	D3D11_MAPPED_SUBRESOURCE Map;
 	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, MapType, 0, &Map);
 
-	UnlockContext();
-
 	if (FAILED(Result))
 	{
 		zeError("Cannot lock structured buffer.");
@@ -153,8 +151,6 @@ bool ZED11StructuredBuffer::Lock(void** Buffer)
 void ZED11StructuredBuffer::Unlock()
 {
 	zeCheckError(this->Buffer == NULL, ZE_VOID, "Structured buffer is not initialized.");
-
-	LockContext();
 
 	GetMainContext()->Unmap(Buffer, 0);
 

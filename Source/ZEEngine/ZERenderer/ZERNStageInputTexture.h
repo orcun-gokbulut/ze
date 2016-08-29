@@ -42,8 +42,8 @@ class ZERNStageInputTexture : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZERNStageBuffer						Buffer;
-		ZEHolder<const ZEGRTexture2D>		Texture;
+		//ZERNStageBuffer						Buffer;
+		//ZEHolder<const ZEGRTexture2D>		Texture;
 
 											ZERNStageInputTexture();
 
@@ -51,11 +51,11 @@ class ZERNStageInputTexture : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		void								SetBuffer(ZERNStageBuffer Output);
-		ZERNStageBuffer						GetBuffer() const;
-
-		void								SetTextures(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*				GetTexture() const;
-
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		//void								SetBuffer(ZERNStageBuffer Output);
+		//ZERNStageBuffer						GetBuffer() const;
+		//
+		//void								SetTextures(const ZEGRTexture2D* Texture);
+		//const ZEGRTexture2D*				GetTexture() const;
+		//
+		//virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 };

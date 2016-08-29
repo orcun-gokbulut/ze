@@ -222,7 +222,7 @@ void ZEMDResourceLOD::GenerateBuffers()
 	if (GetIndexType() == ZEMD_VIT_16BIT)
 		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices.GetCount(), ZEGR_IBF_INDEX16, ZEGR_RU_GPU_READ_ONLY, Indices.GetConstCArray()).GetPointer();
 	else if (GetIndexType() == ZEMD_VIT_32BIT)
-		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices32.GetCount(), ZEGR_IBF_INDEX32, ZEGR_RU_GPU_READ_ONLY, Indices.GetConstCArray()).GetPointer();
+		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices32.GetCount(), ZEGR_IBF_INDEX32, ZEGR_RU_GPU_READ_ONLY, Indices32.GetConstCArray()).GetPointer();
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 		VertexBuffer = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray()).GetPointer();
@@ -272,8 +272,8 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	}
 	else if (GetIndexType() == ZEMD_VIT_32BIT)
 	{
-		Indices32.SetCount(LODNode.ReadDataSize("Indices32") / sizeof(ZEUInt32));
-		if (!LODNode.ReadDataItems("Indices32", Indices32.GetCArray(), sizeof(ZEUInt32), Indices32.GetCount()))
+		Indices32.SetCount(LODNode.ReadDataSize("Indices") / sizeof(ZEUInt32));
+		if (!LODNode.ReadDataItems("Indices", Indices32.GetCArray(), sizeof(ZEUInt32), Indices32.GetCount()))
 			return false;
 	}
 

@@ -37,12 +37,7 @@
 
 #include "ZERNStage.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRDefinitions.h"
-#include "ZEGraphics/ZEGRSampler.h"
 
 ZE_ENUM(ZERNStageMultiplexerMode)
 {
@@ -54,7 +49,7 @@ ZE_ENUM(ZERNStageMultiplexerMode)
 	ZERN_SMM_CUSTOM
 };
 
-class ZEGRTexture;
+class ZEGRTexture2D;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;
 class ZERNStageDisplay;
@@ -62,17 +57,16 @@ class ZERNStageDisplay;
 class ZERNStageMultiplexer : public ZERNStage
 {
 	ZE_OBJECT
-	friend class ZERNStageDisplay;
 	private:
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
-		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEFlags								DirtyFlags;
 		ZERNStageMultiplexerMode			Mode;
-
 		ZEList2<ZERNStageDisplay>			Displays;
 
-		const ZEGRRenderTarget*				OutputRenderTarget;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
 
-		bool								UpdateInputOutputs();
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		void								DrawSingle(ZEGRContext* Context);
 		void								DrawVertical2(ZEGRContext* Context);
@@ -83,6 +77,8 @@ class ZERNStageMultiplexer : public ZERNStage
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
 
+		virtual void						CreateOutput(const ZEString& Name);
+
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
@@ -91,11 +87,11 @@ class ZERNStageMultiplexer : public ZERNStage
 		ZERNStageMultiplexerMode			GetMode();
 
 		const ZEList2<ZERNStageDisplay>&	GetInputs();
+
 		void								AddInput(ZERNStageDisplay* Input);
 		void								RemoveInput(ZERNStageDisplay* Input);
 
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

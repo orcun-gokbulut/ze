@@ -37,14 +37,14 @@
 #define __ZERN_DEBUG_H__
 
 #include "ZERNTransformations.hlsl"
+#include "ZERNDecodeNormals.hlsl"
 
 struct ZERNDebug_VertexShader_Input
 {
-	float3		Position	: POSITION0;
-	float3		Normal		: NORMAL0;
-	float3		Tangent		: TANGENT0;
-	float3		Binormal	: BINORMAL0;
-	float2		Texcoord	: TEXCOORD0;
+	float3		Position		: POSITION0;
+	int2		NormalEncoded	: NORMAL0;
+	int2		TangentEncoded	: TANGENT0;
+	float2		TexCoord		: TEXCOORD0;
 };
 
 struct ZERNDebug_GeometryShader_Input
@@ -88,12 +88,17 @@ static const float3 ZERNDebug_ColorBoundingBox	= float3(1.0f, 1.0f, 0.0f);
 
 ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShader_Input Input)
 {
+	float3 Normal = DecodeNormal(Input.NormalEncoded);
+	float3 Tangent;
+	float3 Binormal;
+	DecodeTangentBinormal(Input.TangentEncoded, Normal, Tangent, Binormal);
+	
 	ZERNDebug_GeometryShader_Input Output;
 	
 	Output.Position = mul(ZERNDebug_WorldTransform, float4(Input.Position, 1.0f)).xyz;
-	Output.Normal = mul(ZERNDebug_WorldTransformInverseTranspose, float4(Input.Normal, 0.0f)).xyz;
-	Output.Tangent = mul(ZERNDebug_WorldTransform, float4(Input.Tangent, 0.0f)).xyz;
-	Output.Binormal = mul(ZERNDebug_WorldTransform, float4(Input.Binormal, 0.0f)).xyz;
+	Output.Normal = mul(ZERNDebug_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
+	Output.Tangent = mul(ZERNDebug_WorldTransform, float4(Tangent, 0.0f)).xyz;
+	Output.Binormal = mul(ZERNDebug_WorldTransform, float4(Binormal, 0.0f)).xyz;
 	
 	return Output;
 }

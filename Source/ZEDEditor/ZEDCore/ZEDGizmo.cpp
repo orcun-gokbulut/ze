@@ -1029,6 +1029,7 @@ ZEEntityResult ZEDGizmo::LoadInternal()
 	MaterialLines->SetTwoSided(true);
 	MaterialLines->SetDepthTestDisabled(true);
 	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+	MaterialLines->Update();
 	zeCheckError(MaterialLines == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create line material.");
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
@@ -1036,6 +1037,7 @@ ZEEntityResult ZEDGizmo::LoadInternal()
 	MaterialTriangles->SetTwoSided(true);
 	MaterialTriangles->SetDepthTestDisabled(true);
 	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+	MaterialTriangles->Update();
 	zeCheckError(MaterialTriangles == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create triangle material.");
 
 	return ZE_ER_DONE;

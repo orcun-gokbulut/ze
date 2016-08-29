@@ -74,5 +74,5 @@ class ZEIteratorConst
 		ZEIteratorConst&		operator++();
 
 		const ZEItemType&		operator*() const;
-		const ZEItemType&		operator->() const;
+		const ZEItemType*		operator->() const;
 };

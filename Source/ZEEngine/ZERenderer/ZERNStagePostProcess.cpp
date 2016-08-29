@@ -35,40 +35,47 @@
 
 #include "ZERNStagePostProcess.h"
 
-#include "ZERNRenderer.h"
-#include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZERNRenderer.h"
+#include "ZERNStageID.h"
+
+#define ZERN_SPDF_OUTPUT	1
 
 bool ZERNStagePostProcess::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	return UpdateInputOutputs();
+	return true;
 }
 
 bool ZERNStagePostProcess::DeinitializeInternal()
 {
-	AccumulationTexture = NULL;
+	DirtyFlags.RaiseAll();
+
+	ColorTexture = NULL;
 	DepthTexture = NULL;
 
 	return ZERNStage::DeinitializeInternal();
 }
 
-bool ZERNStagePostProcess::UpdateInputOutputs()
+void ZERNStagePostProcess::CreateOutput(const ZEString& Name)
 {
-	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
-	if (AccumulationTexture == NULL)
-		return false;
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	DepthTexture = GetPrevOutput(ZERN_SO_TRANSPARENT_DEPTH);
-	if (DepthTexture == NULL)
-		return false;
-
-	return true;
+	if (Name == "ColorTexture")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SPDF_OUTPUT))
+		{
+			ColorTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			DirtyFlags.UnraiseFlags(ZERN_SPDF_OUTPUT);
+		}
+	}
 }
 
 ZEInt ZERNStagePostProcess::GetId() const
@@ -82,19 +89,21 @@ const ZEString& ZERNStagePostProcess::GetName() const
 	return Name;
 }
 
+void ZERNStagePostProcess::Resized(ZEUInt Width, ZEUInt Height)
+{
+	DirtyFlags.RaiseFlags(ZERN_SPDF_OUTPUT);
+}
+
 bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
-		return false;
-
-	if (!UpdateInputOutputs())
 		return false;
 
 	if (GetCommands().GetCount() == 0)
 		return false;
 
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, DepthTexture);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)ColorTexture->GetWidth(), (float)ColorTexture->GetHeight()));
 
 	return true;
 }
@@ -104,26 +113,13 @@ void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
-const ZEGRRenderTarget* ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
-{
-	if (GetEnabled() && (Input == ZERN_SO_COLOR || Input == ZERN_SO_ACCUMULATION))
-		return AccumulationTexture->GetRenderTarget();
-
-	return ZERNStage::GetProvidedInput(Input);
-}
-
-const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
-{
-	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
-		return AccumulationTexture;
-
-	return ZERNStage::GetOutput(Output);
-}
-
 ZERNStagePostProcess::ZERNStagePostProcess()
 {
-	AccumulationTexture = NULL;
-	DepthTexture = NULL;
+	DirtyFlags.RaiseAll();
+
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ColorTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
 
 ZEGRRenderState ZERNStagePostProcess::GetRenderState()

@@ -37,7 +37,6 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -45,56 +44,25 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-bool ZERNStageGBuffer::UpdateRenderTargets()
-{
-	const ZEGRRenderTarget* RenderTarget = GetRenderer()->GetOutputRenderTarget();
-	if(RenderTarget == NULL)
-		return false;
-
-	ZEUInt Width = RenderTarget->GetWidth();
-	ZEUInt Height = RenderTarget->GetHeight();
-
-	if (GBuffer0 != NULL &&
-		GBuffer0->GetWidth() == Width && GBuffer0->GetHeight() == Height)
-	{
-		return true;
-	}
-
-	Viewport.SetWidth((float)Width);
-	Viewport.SetHeight((float)Height);
-
-	GBuffer0 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
-	GBuffer1 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
-	GBuffer2 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
-	GBuffer3 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
-	DepthStencilBuffer	= ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
-
-	RenderTargets[0] = GBuffer0->GetRenderTarget();
-	RenderTargets[1] = GBuffer1->GetRenderTarget();
-	RenderTargets[2] = GBuffer2->GetRenderTarget();
-	RenderTargets[3] = GBuffer3->GetRenderTarget();
-
-	return true;
-}
-
-bool ZERNStageGBuffer::Update()
-{
-	if (!UpdateRenderTargets())
-		return false;
-
-	return true;
-}
+#define ZERN_SGDF_OUTPUT0		1
+#define ZERN_SGDF_OUTPUT1		2
+#define ZERN_SGDF_OUTPUT2		4
+#define ZERN_SGDF_OUTPUT3		8
+#define ZERN_SGDF_OUTPUT4		16
+#define ZERN_SGDF_OUTPUT_ALL	(ZERN_SGDF_OUTPUT0 | ZERN_SGDF_OUTPUT1 | ZERN_SGDF_OUTPUT2 | ZERN_SGDF_OUTPUT3 | ZERN_SGDF_OUTPUT4)
 
 bool ZERNStageGBuffer::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	return Update();
+	return true;
 }
 
 bool ZERNStageGBuffer::DeinitializeInternal()
 {
+	DirtyFlags.RaiseAll();
+
 	GBuffer0.Release();
 	GBuffer1.Release();
 	GBuffer2.Release();
@@ -102,6 +70,53 @@ bool ZERNStageGBuffer::DeinitializeInternal()
 	DepthStencilBuffer.Release();
 
 	return ZERNStage::DeinitializeInternal();
+}
+
+void ZERNStageGBuffer::CreateOutput(const ZEString& Name)
+{
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
+
+	if (Name == "ColorTexture")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT0))
+		{
+			GBuffer0 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT0);
+		}
+	}
+	else if (Name == "GBufferEmissive")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT1))
+		{
+			GBuffer1 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT1);
+		}
+	}
+	else if (Name == "GBufferDiffuse")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT2))
+		{
+			GBuffer2 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT2);
+		}
+	}
+	else if (Name == "GBufferNormal")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT3))
+		{
+			GBuffer3 = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT3);
+		}
+	}
+	else if (Name == "DepthTexture")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT4))
+		{
+			DepthStencilBuffer = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT4);
+		}
+	}
 }
 
 ZEInt ZERNStageGBuffer::GetId() const
@@ -115,71 +130,25 @@ const ZEString& ZERNStageGBuffer::GetName() const
 	return Name;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationMap() const
+void ZERNStageGBuffer::Resized(ZEUInt Width, ZEUInt Height)
 {
-	return GBuffer0;
-}
+	Viewport.SetWidth((float)Width);
+	Viewport.SetHeight((float)Height);
 
-ZEGRTexture2D* ZERNStageGBuffer::GetEmissiveGlossMap() const
-{
-	return GBuffer1;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseSubSurfaceMap() const
-{
-	return GBuffer2;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetNormalSpecularMap() const
-{
-	return GBuffer3;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetDepthStencilMap() const
-{
-	return DepthStencilBuffer;
-}
-
-const ZEGRTexture2D* ZERNStageGBuffer::GetOutput(ZERNStageBuffer Output) const 
-{
-	if (GetEnabled())
-	{
-		switch (Output)
-		{
-			case ZERN_SO_COLOR:
-			case ZERN_SO_ACCUMULATION:
-				return GetAccumulationMap();
-
-			case ZERN_SO_GBUFFER_EMISSIVE:
-				return GetEmissiveGlossMap();
-
-			case ZERN_SO_GBUFFER_DIFFUSE:
-				return GetDiffuseSubSurfaceMap();
-
-			case ZERN_SO_NORMAL:
-				return GetNormalSpecularMap();	
-
-			case ZERN_SO_DEPTH:
-			case ZERN_SO_TRANSPARENT_DEPTH:
-				return GetDepthStencilMap();
-		}
-	}
-
-	return ZERNStage::GetOutput(Output);
+	DirtyFlags.RaiseFlags(ZERN_SGDF_OUTPUT_ALL);
 }
 
 bool ZERNStageGBuffer::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
 		return false;
-
-	if (!Update())
-		return false;
 	
-	Context->ClearRenderTarget(GBuffer0->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(), ZEVector4::Zero);
+	const ZEGRRenderTarget* RenderTargets[] = {GBuffer0->GetRenderTarget(), GBuffer1->GetRenderTarget(), GBuffer2->GetRenderTarget(), GBuffer3->GetRenderTarget()};
+
+	Context->ClearRenderTarget(RenderTargets[0], ZEVector4::Zero);
+	Context->ClearRenderTarget(RenderTargets[1], ZEVector4::Zero);
+	Context->ClearRenderTarget(RenderTargets[2], ZEVector4::Zero);
+	Context->ClearRenderTarget(RenderTargets[3], ZEVector4::Zero);
 	const ZEGRDepthStencilBuffer* DepthStencil = DepthStencilBuffer->GetDepthStencilBuffer();
 	Context->ClearDepthStencilBuffer(DepthStencil, true, true, 0.0f, 0x00);
 
@@ -196,7 +165,13 @@ void ZERNStageGBuffer::CleanUp(ZEGRContext* Context)
 
 ZERNStageGBuffer::ZERNStageGBuffer()
 {
-	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * 4);
+	DirtyFlags.RaiseAll();
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer0), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBufferEmissive", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBufferDiffuse", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBufferNormal", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthStencilBuffer), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN);
 }
 
 ZEGRRenderState ZERNStageGBuffer::GetRenderState()

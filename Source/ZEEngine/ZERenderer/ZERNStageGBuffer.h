@@ -42,37 +42,31 @@
 #include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRTexture2D;
-class ZEGRRenderTarget;
 
 class ZERNStageGBuffer : public ZERNStage
 {
 	ZE_OBJECT
 	private:
+		ZEFlags								DirtyFlags;
+
 		ZEHolder<ZEGRTexture2D>				GBuffer0;
 		ZEHolder<ZEGRTexture2D>				GBuffer1;
 		ZEHolder<ZEGRTexture2D>				GBuffer2;
 		ZEHolder<ZEGRTexture2D>				GBuffer3;
 		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		const ZEGRRenderTarget*				RenderTargets[4];
-		ZEGRViewport						Viewport;
 
-		bool								UpdateRenderTargets();
-		bool								Update();
+		ZEGRViewport						Viewport;
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
+
+		virtual void						CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		ZEGRTexture2D*						GetAccumulationMap() const;
-		ZEGRTexture2D*						GetEmissiveGlossMap() const;
-		ZEGRTexture2D*						GetDiffuseSubSurfaceMap() const;
-		ZEGRTexture2D*						GetNormalSpecularMap() const;
-		ZEGRTexture2D*						GetDepthStencilMap() const;
-
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

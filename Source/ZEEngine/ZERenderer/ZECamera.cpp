@@ -117,9 +117,9 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 			case ZERN_PT_PERSPECTIVE_OFFCENTER:
 			{
 				float Top = View.NearZ * ZEAngle::Tan(GetTopFOV());
-				float Bottom = -View.NearZ * ZEAngle::Tan(GetBottomFOV());
+				float Bottom = View.NearZ * ZEAngle::Tan(GetBottomFOV());
 				float Right = View.NearZ * ZEAngle::Tan(GetRightFOV());
-				float Left = -View.NearZ * ZEAngle::Tan(GetLeftFOV());
+				float Left = View.NearZ * ZEAngle::Tan(GetLeftFOV());
 
 				ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(View.ProjectionTransform, Left, Right, Bottom, Top, View.NearZ, View.FarZ);
 				break;

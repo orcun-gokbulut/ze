@@ -620,7 +620,7 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	}
 	InstanceBuffer->Unlock();
 
-	const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
+	const ZEGRTexture* DepthMap = static_cast<const ZEGRTexture*>(Stage->GetInput("DepthTexture"));
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, InstanceBuffer);

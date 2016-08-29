@@ -43,6 +43,4 @@ class ZERNStageOutput : public ZERNStage
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
-
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
 };

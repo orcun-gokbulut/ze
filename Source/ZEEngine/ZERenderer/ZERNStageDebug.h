@@ -67,6 +67,8 @@ class ZERNStageDebug : public ZERNStage
 
 		ZEHolder<ZEGRTexture2D>			DepthMap;
 
+		ZEHolder<const ZEGRTexture2D>	OutputTexture;
+
 		struct  
 		{
 			ZEBool32					ShowNormalVectors;
@@ -100,6 +102,8 @@ class ZERNStageDebug : public ZERNStage
 
 		void							SetCullBackface(bool CullBackface);
 		bool							GetCullBackface() const;
+
+		virtual void					Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);

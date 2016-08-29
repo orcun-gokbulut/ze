@@ -622,7 +622,7 @@ void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEMDVertexV2>& Output, cons
 		{ 
 			ZETriangle Triangle(ZETriangle(Input[I].Position, Input[I + 1].Position, Input[I + 2].Position));
 			float Area = ZETriangle::GetArea(Triangle);
-			if (Area <= 0.0001)
+			if (Area <= 0.00001)
 			{
 				zeError("Degenerate face detected. Face Index: %u. Vertex Index: %u.", I / 3, I);
 				DegenerateFaceDetected = true;
@@ -1045,7 +1045,7 @@ bool ZECVModelConverterV2::ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriter
 			ZEMLWriterNode DestinationAnimationNode;
 			DestinationAnimationsNode.OpenNode("Animation", DestinationAnimationNode);
 			
-			if (ConvertAnimation(&SourceAnimationsNode.GetNode("Animation", I), &DestinationAnimationNode))
+			if (!ConvertAnimation(&SourceAnimationsNode.GetNode("Animation", I), &DestinationAnimationNode))
 				return false;
 
 			DestinationAnimationNode.CloseNode();

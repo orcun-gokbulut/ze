@@ -406,11 +406,20 @@ void ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, 
 		D11Rect.bottom = DestRect->y + DestRect->Height;
 		D11Rect.front = 0;
 		D11Rect.back = 1;
+
+		LockContext();
+
 		GetMainContext()->UpdateSubresource(Texture2D, DestArrayIndex * GetLevelCount() + DestLevel, &D11Rect, SrcData, SrcRowPitch, 0);
+		
+		UnlockContext();
 	}
 	else
 	{
+		LockContext();
+
 		GetMainContext()->UpdateSubresource(Texture2D, DestArrayIndex * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
+		
+		UnlockContext();
 	}
 }
 

@@ -41,43 +41,42 @@
 #include "ZETypes.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRFormat.h"
+#include "ZEGraphics/ZEGRResource.h"
 
-class ZEString;
 class ZEGRContext;
-class ZEGRTexture2D;
+class ZEGRResource;
 class ZEGRRenderState;
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
 class ZERNRenderer;
 class ZERNCommand;
 
-template<typename Type> class ZEList2;
-
-ZE_ENUM(ZERNStageBuffer)
+ZE_ENUM(ZERNStageResourceUsageType)
 {
-	ZERN_SO_NONE,
-	ZERN_SO_ACCUMULATION,
-	ZERN_SO_GBUFFER_EMISSIVE,
-	ZERN_SO_GBUFFER_DIFFUSE,
-	ZERN_SO_NORMAL,
-	ZERN_SO_DEPTH,
-	ZERN_SO_TRANSPARENT_DEPTH,
-	ZERN_SO_COLOR,
-	ZERN_SO_HDR,
-	ZERN_SO_AMBIENT_OCCLUSION,
-	ZERN_SO_PROJECTIVE_SHADOWMAPS,
-	ZERN_SO_CUSTOM_0,
-	ZERN_SO_CUSTOM_1,
-	ZERN_SO_CUSTOM_2,
-	ZERN_SO_CUSTOM_3,
-	ZERN_SO_CUSTOM_4,
-	ZERN_SO_CUSTOM_5,
-	ZERN_SO_CUSTOM_6,
-	ZERN_SO_CUSTOM_7,
-	ZERN_SO_CUSTOM_8,
-	ZERN_SO_CUSTOM_9
+	ZERN_SRUT_READ			= 1,
+	ZERN_SRUT_WRITE			= 2,
+	ZERN_SRUT_READ_WRITE	= 3
+};
+
+ZE_ENUM(ZERNStageResourceCreationFlag)
+{
+	ZERN_SRCF_GET_FROM_PREV	= 1,
+	ZERN_SRCF_GET_OUTPUT	= 2,
+	ZERN_SRCF_CREATE_OWN	= 4,
+	ZERN_SRCF_REQUIRED		= 8,
+};
+
+typedef ZEFlags ZERNStageResourceCreationFlags;
+
+class ZERNStageResource
+{
+	public:
+		ZEHolder<const ZEGRResource>*		Resource;
+		ZEString							Name;
+		ZERNStageResourceUsageType			Usage;
+		ZERNStageResourceCreationFlags		CreationFlags;
 };
 
 class ZERNStage : public ZEObject, public ZEInitializable
@@ -89,30 +88,36 @@ class ZERNStage : public ZEObject, public ZEInitializable
 		ZELink<ZERNStage>					Link;
 		ZEList2<ZERNCommand>				Commands;
 		bool								Enabled;
-		
+
+		ZEArray<ZERNStageResource>			InputResources;
+		ZEArray<ZERNStageResource>			OutputResources;
+	
 	protected:
-		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
-		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
+		const ZEArray<ZERNStageResource>&	GetInputResources() const;
+		const ZEArray<ZERNStageResource>&	GetOutputResources() const;
 
-		bool								BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRRenderTarget>& Target);
-		bool								BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRDepthStencilBuffer>& Target);
+		void								AddInputResource(ZEHolder<const ZEGRResource>* ResourcePointer, const ZEString& Name, ZERNStageResourceUsageType Usage, ZERNStageResourceCreationFlags CreationFlags);
+		void								AddOutputResource(ZEHolder<const ZEGRResource>* ResourcePointer, const ZEString& Name, ZERNStageResourceUsageType Usage, ZERNStageResourceCreationFlags CreationFlags);
 
+		void								RemoveInputResource(const ZEString& Name);
+		void								RemoveOutputResource(const ZEString& Name);
+
+		virtual void						CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt						GetId() const = 0;
 		virtual const ZEString&				GetName() const = 0;
+		
 		ZERNRenderer*						GetRenderer() const;
-
-		ZERNStage*							GetPrevStage() const;
-		ZERNStage*							GetNextStage() const;
+		const ZEList2<ZERNCommand>&			GetCommands() const;
 
 		void								SetEnabled(bool Enable);
 		bool								GetEnabled() const;
 
-		const ZEList2<ZERNCommand>&			GetCommands() const;
+		const ZEGRResource*					GetInput(const ZEString& ResourceName) const;
+		const ZEGRResource*					GetOutput(const ZEString& ResourceName) const;
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

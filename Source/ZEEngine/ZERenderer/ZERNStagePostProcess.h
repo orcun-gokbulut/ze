@@ -37,6 +37,7 @@
 
 #include "ZERNStage.h"
 
+#include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
@@ -45,20 +46,21 @@ class ZERNStagePostProcess : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		const ZEGRTexture2D*				AccumulationTexture;
-		const ZEGRTexture2D*				DepthTexture;
+		ZEFlags								DirtyFlags;
+
+		ZEHolder<const ZEGRTexture2D>		ColorTexture;
+		ZEHolder<const ZEGRTexture2D>		DepthTexture;
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
 
-		bool								UpdateInputOutputs();
+		virtual void						CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

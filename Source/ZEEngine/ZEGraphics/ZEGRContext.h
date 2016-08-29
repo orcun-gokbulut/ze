@@ -139,4 +139,6 @@ class ZEGRContext : public ZEObject
 		virtual void					ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void					ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
 		virtual void					ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor) = 0;
+
+		virtual void					ClearState();
 };

@@ -711,6 +711,8 @@ bool ZEGRWindow::InitializeInternal()
 
 bool ZEGRWindow::DeinitializeInternal()
 {
+	Output.Release();
+
 	if (Handle != NULL)
 	{
 		BOOL Result = DestroyWindow((HWND)Handle);

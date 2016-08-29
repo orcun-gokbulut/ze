@@ -43,7 +43,7 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
 
-cbuffer ZERNFiltering_Constants									: register(b8)
+cbuffer ZERNFiltering_Constants									: register(b9)
 {
 	uint			ZERNFiltering_KernelRadius;
 	float3			ZERNFiltering_Reserved;

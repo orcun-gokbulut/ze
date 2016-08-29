@@ -37,31 +37,34 @@
 
 #include "ZERNStage.h"
 
-#include "ZECommon.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
+
+class ZEGRTexture2D;
 
 class ZERNStageParticleRendering : public ZERNStage
 {
 	ZE_OBJECT
 	private:
+		ZEFlags							DirtyFlags;
 		ZEGRViewport					Viewport;
 
-		const ZEGRTexture2D*			AccumulationTexture;
-		const ZEGRTexture2D*			DepthTexture;
+		ZEHolder<const ZEGRTexture2D>	AccumulationTexture;
+		ZEHolder<const ZEGRTexture2D>	DepthTexture;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
-		bool							UpdateInputOutputs();
+		virtual void					CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
 
+		virtual void					Resized(ZEUInt Width, ZEUInt Height);
+
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);
-
-		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
 
 										ZERNStageParticleRendering();
 

@@ -38,7 +38,7 @@
 
 #include "ZERNMath.hlsl"
 
-cbuffer ZERNBlurCompute_Constants					: register(b8)
+cbuffer ZERNBlurCompute_Constants					: register(b9)
 {
 	//float	ZERNBlurCompute_KernelWeights[63];
 	uint	ZERNBlurCompute_KernelRadius;

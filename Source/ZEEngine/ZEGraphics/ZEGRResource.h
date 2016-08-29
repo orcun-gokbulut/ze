@@ -93,7 +93,7 @@ class ZEGRResource : public ZERSResource
 	protected:
 		void							SetSize(ZESize Size);
 		void							SetResourceUsage(ZEGRResourceUsage Usage);
-		void							SetResourceBindFlags(ZEFlags BindFlags);	
+		void							SetResourceBindFlags(ZEFlags BindFlags);
 
 										ZEGRResource();
 		virtual 						~ZEGRResource();
