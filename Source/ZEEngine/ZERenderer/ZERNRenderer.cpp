@@ -129,7 +129,7 @@ void ZERNRenderer::UpdateConstantBuffers()
 	Buffer->ProjectionTransform = View.ProjectionTransform;
 	Buffer->ViewProjectionTransform = View.ViewProjectionTransform;
 	Buffer->InvViewTransform = View.InvViewTransform;
-	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
+	Buffer->InvProjectionTransform = View.InvProjectionTransform;
 	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
 
 	Buffer->Width = View.Viewport.GetWidth();
@@ -159,9 +159,9 @@ void ZERNRenderer::UpdateConstantBuffers()
 	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
 	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
 	RendererConstants.FrameId = (ZEUInt32)ZECore::GetInstance()->GetFrameId();
-	if (OutputRenderTarget != NULL)
+	if (OutputTexture != NULL)
 	{
-		RendererConstants.OutputSize = ZEVector2((float)OutputRenderTarget->GetWidth(), (float)OutputRenderTarget->GetHeight());
+		RendererConstants.OutputSize = ZEVector2((float)OutputTexture->GetWidth(), (float)OutputTexture->GetHeight());
 		RendererConstants.InvOutputSize = ZEVector2::One / RendererConstants.OutputSize;
 	}
 	else
@@ -210,24 +210,31 @@ void ZERNRenderer::RenderStages()
 	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
 	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_SCENE, &PrevSceneConstantBuffer);
 
-	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, PrevViewConstantBuffer, PrevSceneConstantBuffer};
-
 	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
 
-	if(OutputRenderTarget != NULL)
-	{
-		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
+	if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
+		Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
 
-		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)OutputRenderTarget->GetWidth(), (float)OutputRenderTarget->GetHeight()));
-		Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	if (Resized)
+	{
+		ze_for_each(Stage, Stages)
+			Stage->Resized(OutputTexture->GetWidth(), OutputTexture->GetHeight());
+	}
+
+	if (DirtyPipeline || Resized)
+	{
+		DirtyPipeline = false;
+		Resized = false;
+
+		BindStages();
 	}
 
 	ze_for_each(Stage, Stages)
 	{
 		if (!Stage->GetEnabled())
 			continue;
-		
+
 		if (!Stage->Setup(Context))
 			continue;
 
@@ -250,6 +257,7 @@ void ZERNRenderer::RenderStages()
 
 	CleanCommands();
 
+	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, PrevViewConstantBuffer, PrevSceneConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 }
 
@@ -283,6 +291,9 @@ bool ZERNRenderer::DeinitializeInternal()
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
 
+	Context = NULL;
+	OutputTexture = NULL;
+
 	return ZEInitializable::DeinitializeInternal();
 }
 
@@ -306,14 +317,19 @@ const ZERNView& ZERNRenderer::GetView()
 	return View;
 }
 
-void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
+void ZERNRenderer::SetOutputTexture(const ZEGRTexture2D* OutputTexture)
 {
-	this->OutputRenderTarget = OutputRenderTarget;
+	if (this->OutputTexture == NULL || 
+		this->OutputTexture->GetWidth() != OutputTexture->GetWidth() || 
+		this->OutputTexture->GetHeight() != OutputTexture->GetHeight())
+		Resized = true;
+
+	this->OutputTexture = OutputTexture;
 }
 
-ZEGRRenderTarget* ZERNRenderer::GetOutputRenderTarget()
+const ZEGRTexture2D* ZERNRenderer::GetOutputTexture() const
 {
-	return OutputRenderTarget;
+	return OutputTexture;
 }
 
 const ZEList2<ZERNStage>& ZERNRenderer::GetStages()
@@ -367,11 +383,121 @@ void ZERNRenderer::RemoveStage(ZERNStage* Stage)
 
 void ZERNRenderer::CleanStages()
 {
-	while(Stages.GetFirst() != NULL)
+	while (Stages.GetFirst() != NULL)
 	{
 		ZERNStage* Stage = Stages.GetFirst()->GetItem();
 		RemoveStage(Stage);
 		delete Stage;
+	}
+}
+
+void ZERNRenderer::MarkDirtyPipeline()
+{
+	DirtyPipeline = true;
+}
+
+void ZERNRenderer::BindStages()
+{
+	ze_for_each(Stage, Stages)
+	{
+		if (!Stage->GetEnabled())
+			continue;
+
+		ze_for_each(InputResource, Stage->InputResources)
+		{
+			*InputResource->Resource = NULL;
+
+			if (InputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
+			{
+				for (auto PrevStage = Stage->Link.GetPrev()->GetIteratorConst(); PrevStage.IsValid(); --PrevStage)
+				{
+					if (!PrevStage->GetEnabled())
+						continue;
+
+					ze_for_each(PrevStageOutputResource, PrevStage->OutputResources)
+					{
+						if (PrevStageOutputResource->Name == InputResource->Name)
+						{
+							*InputResource->Resource = *PrevStageOutputResource->Resource;
+							break;
+						}
+					}
+
+					if ((*InputResource->Resource) != NULL)
+						break;
+				}
+			}
+
+			if ((*InputResource->Resource) == NULL && InputResource->CreationFlags.GetFlags(ZERN_SRCF_REQUIRED))
+				zeError("Binding input resource failed. Required input resource of a stage cannot be null. Input resource name: %s, Stage: %s", InputResource->Name.ToCString(), Stage->GetName().ToCString());
+		}
+
+		ze_for_each(OutputResource, Stage->OutputResources)
+		{
+			bool Valid = false;
+
+			if (OutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
+			{
+				for (auto PrevStage = Stage->Link.GetPrev()->GetIteratorConst(); PrevStage.IsValid(); --PrevStage)
+				{
+					if (!PrevStage->GetEnabled())
+						continue;
+
+					ze_for_each(PrevStageOutputResource, PrevStage->OutputResources)
+					{
+						if (PrevStageOutputResource->Name == OutputResource->Name)
+						{
+							if (*PrevStageOutputResource->Resource != NULL)
+							{
+								*OutputResource->Resource = *PrevStageOutputResource->Resource;
+								Valid = true;
+							}
+
+							break;
+						}
+					}
+
+					if (Valid)
+						break;
+				}
+			}
+
+			if (!Valid && OutputResource->CreationFlags.GetFlags(ZERN_SRCF_CREATE_OWN))
+			{
+				for (auto NextStage = Stage->Link.GetNext()->GetIteratorConst(); NextStage.IsValid(); ++NextStage)
+				{
+					if (!NextStage->GetEnabled())
+						continue;
+
+					ze_for_each(NextStageInputResource, NextStage->InputResources)
+					{
+						if (NextStageInputResource->Name == OutputResource->Name)
+						{
+							if (NextStageInputResource->Usage == ZERN_SRUT_READ)
+							{
+								Stage->CreateOutput(OutputResource->Name);
+								Valid = true;
+							}
+
+							break;
+						}
+					}
+
+					if (Valid)
+						break;
+				}
+			}
+
+			if (!Valid && OutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_OUTPUT))
+			{
+				*OutputResource->Resource = this->OutputTexture;
+				Valid = true;
+			}
+
+			if (!Valid && OutputResource->CreationFlags.GetFlags(ZERN_SRCF_REQUIRED))
+				zeError("Binding output resource failed. Output resource of a stage cannot be null. Output resource name: %s, Stage: %s", OutputResource->Name.ToCString(), Stage->GetName().ToCString());
+
+		}
 	}
 }
 
@@ -456,7 +582,9 @@ void ZERNRenderer::Render()
 ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
-	OutputRenderTarget = NULL;
+
+	DirtyPipeline = false;
+	Resized = false;
 }
 
 ZERNRenderer::~ZERNRenderer()

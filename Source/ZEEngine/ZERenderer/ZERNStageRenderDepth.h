@@ -45,20 +45,21 @@ class ZERNStageRenderDepth : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<ZEGRTexture2D>			TransparentDepthBuffer;
+		ZEFlags							DirtyFlags;
+		ZEHolder<ZEGRTexture2D>			OpaqueDepthTexture;
 
-		const ZEGRTexture2D*			DepthTexture;
+		ZEHolder<const ZEGRTexture2D>	DepthTexture;
 
 		virtual bool					InitializeInternal();						
 		virtual bool					DeinitializeInternal();
 
-		bool							UpdateInputOutputs();
+		virtual void					CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
 
-		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
+		virtual void					Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);

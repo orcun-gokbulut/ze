@@ -50,11 +50,13 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNFilter.h"
 #include "ZERNStageID.h"
+#include "ZERNRenderer.h"
 
 #define ZERN_AODF_CONSTANT_BUFFER	1
 #define ZERN_AODF_SHADER			2
 #define ZERN_AODF_RENDER_STATE		4
 #define ZERN_AODF_TEXTURE			8
+#define ZERN_AODF_OUTPUT			16
 
 static ZEUInt ConvertSampleCount(ZERNSSAOSampleCount SampleCount)
 {
@@ -253,42 +255,13 @@ bool ZERNStageAO::UpdateConstantBuffers()
 	return true;
 }
 
-bool ZERNStageAO::UpdateInputOutputs()
-{
-	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
-	if (DepthTexture == NULL)
-		return false;
-
-	NormalTexture = GetPrevOutput(ZERN_SO_NORMAL);
-	if (NormalTexture == NULL)
-		return false;
-
-	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
-	if (AccumulationTexture == NULL)
-		return false;
-
-	ZEUInt Width = AccumulationTexture->GetWidth();
-	ZEUInt Height = AccumulationTexture->GetHeight();
-	if (Constants.WidthHeight.x != Width || Constants.WidthHeight.y != Height)
-	{
-		Constants.WidthHeight.x = Width;
-		Constants.WidthHeight.y = Height;
-		Constants.InvWidthHeight.x = 1.0f / Width;
-		Constants.InvWidthHeight.y = 1.0f / Height;
-
-		DirtyFlags.RaiseFlags(ZERN_AODF_TEXTURE | ZERN_AODF_CONSTANT_BUFFER);
-	}
-
-	return true;
-}
-
 bool ZERNStageAO::UpdateTextures()
 {
 	if (!DirtyFlags.GetFlags(ZERN_AODF_TEXTURE))
 		return true;
 
-	ZEUInt Width = Constants.WidthHeight.x;
-	ZEUInt Height = Constants.WidthHeight.y;
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
 	AmbientOcclusionTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
 	BlurTempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
@@ -312,9 +285,6 @@ bool ZERNStageAO::Update()
 		return false;
 
 	if (!UpdateRenderStates())
-		return false;
-
-	if (!UpdateInputOutputs())
 		return false;
 
 	if (!UpdateTextures())
@@ -516,6 +486,21 @@ bool ZERNStageAO::DeinitializeInternal()
 	return ZERNStage::DeinitializeInternal();
 }
 
+void ZERNStageAO::CreateOutput(const ZEString& Name)
+{
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
+
+	if (Name == "ColorTexture")
+	{
+		if (DirtyFlags.GetFlags(ZERN_AODF_OUTPUT))
+		{
+			AccumulationTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			DirtyFlags.UnraiseFlags(ZERN_AODF_OUTPUT);
+		}
+	}
+}
+
 ZEInt ZERNStageAO::GetId() const
 {
 	return ZERN_STAGE_AO;
@@ -619,12 +604,14 @@ bool ZERNStageAO::GetDeinterleavedTexturing() const
 	return UseDeinterleavedTexturing;
 }
 
-const ZEGRTexture2D* ZERNStageAO::GetOutput(ZERNStageBuffer Output) const
+void ZERNStageAO::Resized(ZEUInt Width, ZEUInt Height)
 {
-	if (GetEnabled() && Output == ZERN_SO_AMBIENT_OCCLUSION)
-		return AmbientOcclusionTexture;
+	Constants.WidthHeight.x = Width;
+	Constants.WidthHeight.y = Height;
+	Constants.InvWidthHeight.x = 1.0f / Width;
+	Constants.InvWidthHeight.y = 1.0f / Height;
 
-	return ZERNStage::GetOutput(Output);
+	DirtyFlags.RaiseFlags(ZERN_AODF_TEXTURE | ZERN_AODF_CONSTANT_BUFFER | ZERN_AODF_OUTPUT);
 }
 
 bool ZERNStageAO::Setup(ZEGRContext* Context)
@@ -678,10 +665,6 @@ ZERNStageAO::ZERNStageAO()
 
 	UseDeinterleavedTexturing = true;
 
-	DepthTexture = NULL;
-	NormalTexture = NULL;
-	AccumulationTexture = NULL;
-
 	Constants.SampleCount = ConvertSampleCount(SampleCount);
 	Constants.OcclusionRadius = 2.0f;
 	Constants.NormalBias = 0.05f;
@@ -695,4 +678,9 @@ ZERNStageAO::ZERNStageAO()
 	Constants.DistanceThreshold = 100.0f;
 
 	memset(&DeinterleavedConstants, 0, sizeof(DeinterleavedConstants));
+
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&NormalTexture), "GBufferNormal", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }

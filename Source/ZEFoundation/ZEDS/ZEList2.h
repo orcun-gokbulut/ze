@@ -53,7 +53,7 @@ class ZEList2
 		ZEList2IteratorConst<ZEItemType>	GetIterator() const;
 
 		ZEList2Iterator<ZEItemType>			GetIteratorEnd();
-		ZEList2IteratorConst<ZEItemType>	GetIteratorEndConst() const;
+		ZEList2IteratorConst<ZEItemType>	GetIteratorEnd() const;
 
 		ZESize								GetCount() const;
 
@@ -121,7 +121,7 @@ ZEList2Iterator<ZEItemType> ZEList2<ZEItemType>::GetIteratorEnd()
 }
 
 template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIteratorEndConst() const
+ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIteratorEnd() const
 {
 	return ZEList2IteratorConst<ZEItemType>(GetLast());
 }

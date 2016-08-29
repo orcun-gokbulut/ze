@@ -45,6 +45,7 @@
 #include "ZECore\ZECore.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGraphics\ZEGROutput.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZERenderer\ZERNStageGBuffer.h"
 #include "ZERenderer\ZERNStageShadowing.h"
@@ -131,22 +132,22 @@ bool ZEDViewport::UpdateRenderTarget()
 	if (Output == NULL)
 		return false;
 
-	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
-	Renderer.SetOutputRenderTarget(RenderTarget);
-
-	if (RenderTarget == NULL)
+	ZEGRTexture2D* OutputTexture = Output->GetTexture2D();
+	if (OutputTexture == NULL)
 		return false;
 
-	if (View.Viewport.GetWidth() == RenderTarget->GetWidth() &&
-		View.Viewport.GetHeight() == RenderTarget->GetHeight())
+	Renderer.SetOutputTexture(OutputTexture);
+
+	if (View.Viewport.GetWidth() == OutputTexture->GetWidth() &&
+		View.Viewport.GetHeight() == OutputTexture->GetHeight())
 	{
 		return true;
 	}
 
 	View.Viewport.SetX(0.0f);
 	View.Viewport.SetY(0.0f);
-	View.Viewport.SetWidth((float)RenderTarget->GetWidth());
-	View.Viewport.SetHeight((float)RenderTarget->GetHeight());
+	View.Viewport.SetWidth((float)OutputTexture->GetWidth());
+	View.Viewport.SetHeight((float)OutputTexture->GetHeight());
 
 	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
 
@@ -171,7 +172,7 @@ bool ZEDViewport::InitializeInternal()
 
 	zeCheckError(ViewportManager == NULL, false, "Cannot initialize. Viewport is not registered with a Viewport Manager.");
 	Window = ZEGRWindow::WrapHandle((void*)winId());
-	Renderer.SetOutputRenderTarget(Window->GetOutput()->GetRenderTarget());
+	Renderer.SetOutputTexture(Window->GetOutput()->GetTexture2D());
 	Renderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
 
 	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
@@ -195,8 +196,8 @@ bool ZEDViewport::InitializeInternal()
 	ZERNStageForwardTransparent* StageForwardTransparent = new ZERNStageForwardTransparent();
 	Renderer.AddStage(StageForwardTransparent);
 
-	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
-	Renderer.AddStage(StageParticleRendering);
+	//ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
+	//Renderer.AddStage(StageParticleRendering);
 
 	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
 	Renderer.AddStage(StagePostProcess);
@@ -205,14 +206,14 @@ bool ZEDViewport::InitializeInternal()
 	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
 	StageHDR->SetKey(0.18f);
 	StageHDR->SetAutoKey(false);
-	StageHDR->SetWhiteLevel(2.000000f);
+	StageHDR->SetWhiteLevel(2.0f);
 	StageHDR->SetBlurTextureSize(ZERN_HBTS_HALF);
 	StageHDR->SetBloomEnabled(true);
-	StageHDR->SetBloomFactor(2.000000f);
-	StageHDR->SetBloomThreshold(6.000000f);
-	StageHDR->SetLuminanceMin(0.100000f);
-	StageHDR->SetLuminanceMax(10.000000f);
-	StageHDR->SetSaturation(0.700000f);
+	StageHDR->SetBloomFactor(5.0f);
+	StageHDR->SetBloomThreshold(10.0f);
+	StageHDR->SetLuminanceMin(0.1f);
+	StageHDR->SetLuminanceMax(10.0f);
+	StageHDR->SetSaturation(0.7f);
 	Renderer.AddStage(StageHDR);
 
 	ZERNStageResolving* StageResolving = new ZERNStageResolving();
@@ -227,8 +228,8 @@ bool ZEDViewport::InitializeInternal()
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);
 
-	ZERNStageOutput* StageOutput = new ZERNStageOutput();
-	Renderer.AddStage(StageOutput);
+	//ZERNStageOutput* StageOutput = new ZERNStageOutput();
+	//Renderer.AddStage(StageOutput);
 
 	if (!Renderer.Initialize())
 		return false;
@@ -521,23 +522,8 @@ bool ZEDViewport::PreRender()
 	if (!isVisible())
 		return false;
 
-	if (Window == NULL)
-		return false;
-
-	ZEGROutput* Output = Window->GetOutput();
-	if (Output == NULL)
-		return false;
-
-	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
-	if (RenderTarget == NULL)
-		return false;
-
 	if (!Update())
 		return false;
-
-	Renderer.SetOutputRenderTarget(RenderTarget);
-	Renderer.SetView(View);
-
 
 	ZERNPreRenderParameters Parameters;
 	Parameters.Renderer = &Renderer;

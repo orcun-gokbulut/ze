@@ -52,76 +52,83 @@ class ZEGRContext;
 class ZEGRRenderTarget;
 class ZEGRConstantBuffer;
 class ZEGRSampler;
+class ZEGRTexture2D;
 
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
+	friend class ZERNStage;
 	private:
-		ZEGRContext*							Context;
-		ZERNView								View;
-		ZEGRRenderTarget*						OutputRenderTarget;
-		ZEHolder<ZEGRConstantBuffer>			ViewConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>			RendererConstantBuffer;
-		ZEList2<ZERNStage>						Stages;
-		ZEArray<ZEHolder<const ZEGRConstantBuffer>> SceneConstants;
+		ZERNView									View;
+		ZEList2<ZERNStage>							Stages;
+		ZEHolder<ZEGRConstantBuffer>				ViewConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>				RendererConstantBuffer;
+		ZEArray<ZEHolder<const ZEGRConstantBuffer>>	SceneConstants;
+
+		ZEGRContext*								Context;
+		ZEHolder<const ZEGRTexture2D>				OutputTexture;
+
+		bool										DirtyPipeline;
+		bool										Resized;
 
 		struct RendererConstants
 		{
-			float								Elapsedtime;
-			float								Time;
-			ZEUInt32							FrameId;
-			ZEUInt32							Reserved0;
-			ZEVector2							OutputSize;
-			ZEVector2							InvOutputSize;
-			ZEMatrix3x3Shader					ScreenTransform;
+			float									Elapsedtime;
+			float									Time;
+			ZEUInt32								FrameId;
+			ZEUInt32								Reserved0;
+			ZEVector2								OutputSize;
+			ZEVector2								InvOutputSize;
+			ZEMatrix3x3Shader						ScreenTransform;
 		} RendererConstants;
 
-		ZEHolder<ZEGRSampler>					SamplerLinearClamp;
-		ZEHolder<ZEGRSampler>					SamplerLinearWrap;
-		ZEHolder<ZEGRSampler>					SamplerLinearBorderZero;
-		ZEHolder<ZEGRSampler>					SamplerPointClamp;
-		ZEHolder<ZEGRSampler>					SamplerPointWrap;
-		ZEHolder<ZEGRSampler>					SamplerComparisonLinearPointClamp;
+		ZEHolder<ZEGRSampler>						SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>						SamplerLinearWrap;
+		ZEHolder<ZEGRSampler>						SamplerLinearBorderZero;
+		ZEHolder<ZEGRSampler>						SamplerPointClamp;
+		ZEHolder<ZEGRSampler>						SamplerPointWrap;
+		ZEHolder<ZEGRSampler>						SamplerComparisonLinearPointClamp;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual bool								InitializeInternal();
+		virtual bool								DeinitializeInternal();
 		
-		void									CreatePredefinedSamplers();
+		void										CreatePredefinedSamplers();
 
-		void									UpdateConstantBuffers();
+		void										UpdateConstantBuffers();
 
-		void									SortStageCommands();
-		void									RenderStage(ZERNStage* Queue);
-		void									RenderStages();
-
+		void										SortStageCommands();
+		void										RenderStages();
+		void										BindStages();
 
 	public:
-		void									SetContext(ZEGRContext* Context);
-		ZEGRContext*							GetContext();
+		void										SetContext(ZEGRContext* Context);
+		ZEGRContext*								GetContext();
 
-		void									SetView(const ZERNView& View);
-		const ZERNView&							GetView();
+		void										SetView(const ZERNView& View);
+		const ZERNView&								GetView();
 
-		void									SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*						GetOutputRenderTarget();
+		void										SetOutputTexture(const ZEGRTexture2D* OutputTexture);
+		const ZEGRTexture2D*						GetOutputTexture() const;
 
-		const ZEList2<ZERNStage>&				GetStages();
-		ZERNStage*								GetStage(ZERNStageID Id);
-		ZERNStage*								GetStage(ZEClass* Class);
-		void									AddStage(ZERNStage* Stage);
-		void									RemoveStage(ZERNStage* Stage);
-		void									CleanStages();
+		const ZEList2<ZERNStage>&					GetStages();
+		ZERNStage*									GetStage(ZERNStageID Id);
+		ZERNStage*									GetStage(ZEClass* Class);
+		void										AddStage(ZERNStage* Stage);
+		void										RemoveStage(ZERNStage* Stage);
+		void										CleanStages();
+		
+		void										MarkDirtyPipeline();
 
-		void									StartScene(const ZEGRConstantBuffer* ConstantBuffer);
-		void									EndScene();
+		void										StartScene(const ZEGRConstantBuffer* ConstantBuffer);
+		void										EndScene();
 
-		void									AddCommand(ZERNCommand* Command);
-		void									RemoveCommand(ZERNCommand* Command);
-		void									CleanCommands();
-		bool									ContainsCommand(ZERNCommand* Command);
+		void										AddCommand(ZERNCommand* Command);
+		void										RemoveCommand(ZERNCommand* Command);
+		void										CleanCommands();
+		bool										ContainsCommand(ZERNCommand* Command);
 
-		void									Render();
+		void										Render();
 
-												ZERNRenderer();
-		virtual									~ZERNRenderer();
+													ZERNRenderer();
+		virtual										~ZERNRenderer();
 };

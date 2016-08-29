@@ -36,10 +36,10 @@
 #pragma once
 
 #include "ZEGraphics/ZEGROutput.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZED11ComponentBase.h"
+#include "ZEPointer/ZEHolder.h"
 
 struct IDXGISwapChain1;
 class ZEGRRenderTarget;
@@ -53,7 +53,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 		void*								Handle;
 		mutable ZEGRMonitor*				Monitor;
 
-		ZEHolder<ZEGRRenderTarget>			RenderTarget;
+		ZEHolder<ZEGRTexture2D>				Texture;
 
 		IDXGISwapChain1*					SwapChain;
 
@@ -71,7 +71,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 
 	public:
 		virtual void*						GetHandle() const;
-		virtual ZEGRRenderTarget*			GetRenderTarget() const;
+		virtual ZEGRTexture2D*				GetTexture2D() const;
 
 		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor);
 		virtual ZEGRMonitor*				GetMonitor() const;

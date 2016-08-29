@@ -40,8 +40,33 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZERNRenderer.h"
+
+#define ZERN_2DDF_OUTPUT	1
+
+bool ZERNStage2D::DeinitializeInternal()
+{
+	DirtyFlags.RaiseAll();
+
+	OutputTexture = NULL;
+
+	return ZERNStage::DeinitializeInternal();
+}
+
+void ZERNStage2D::CreateOutput(const ZEString& Name)
+{
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
+	
+	if (Name == "Color")
+	{
+		if (DirtyFlags.GetFlags(ZERN_2DDF_OUTPUT))
+		{
+			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
+			DirtyFlags.UnraiseFlags(ZERN_2DDF_OUTPUT);
+		}
+	}
+}
 
 ZEInt ZERNStage2D::GetId() const
 {
@@ -50,8 +75,16 @@ ZEInt ZERNStage2D::GetId() const
 
 const ZEString& ZERNStage2D::GetName() const
 {
-	static const ZEString Name = "2D";
+	static const ZEString Name = "Stage 2D";
 	return Name;
+}
+
+void ZERNStage2D::Resized(ZEUInt Width, ZEUInt Height)
+{
+	Viewport.SetWidth((float)Width);
+	Viewport.SetHeight((float)Height);
+
+	DirtyFlags.RaiseFlags(ZERN_2DDF_OUTPUT);
 }
 
 bool ZERNStage2D::Setup(ZEGRContext* Context)
@@ -62,21 +95,7 @@ bool ZERNStage2D::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	const ZEGRRenderTarget* RenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (RenderTarget == NULL)
-	{
-		const ZEGRTexture2D* ColorOutput = GetPrevOutput(ZERN_SO_COLOR);
-		if (ColorOutput == NULL)
-			return false;
-
-		RenderTarget = ColorOutput->GetRenderTarget();
-	}
-
-	if (RenderTarget == NULL)
-		return false;
-
-	Viewport.SetWidth((float)RenderTarget->GetWidth());
-	Viewport.SetHeight((float)RenderTarget->GetHeight());
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
 
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
 	Context->SetViewports(1, &Viewport);
@@ -91,7 +110,9 @@ void ZERNStage2D::CleanUp(ZEGRContext* Context)
 
 ZERNStage2D::ZERNStage2D()
 {
+	DirtyFlags.RaiseAll();
 
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
 
 ZEGRRenderState ZERNStage2D::GetRenderState()
@@ -106,7 +127,6 @@ ZEGRRenderState ZERNStage2D::GetRenderState()
 		RenderState.SetDepthStencilFormat(ZEGR_TF_NONE);
 		RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
-		// Alpha Blending
 		ZEGRBlendState BlendingState;
 		BlendingState.SetBlendEnable(true);
 		ZEGRBlendRenderTarget RenderTargetBlend;
@@ -116,7 +136,6 @@ ZEGRRenderState ZERNStage2D::GetRenderState()
 		BlendingState.SetRenderTargetBlend(0, RenderTargetBlend);
  		RenderState.SetBlendState(BlendingState);
 
-		// Depth Stencil
 		ZEGRDepthStencilState DepthStencilState;
 		DepthStencilState.SetDepthTestEnable(false);
 		DepthStencilState.SetDepthWriteEnable(false);

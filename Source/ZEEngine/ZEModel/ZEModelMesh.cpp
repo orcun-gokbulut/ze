@@ -823,6 +823,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	ze_for_each(Draw, CurrentLOD->GetDraws())
 	{
+		Draw->RenderCommand.Entity = GetModel();
 		Draw->RenderCommand.Priority = 0;
 		Draw->RenderCommand.Order = DrawOrder;
 

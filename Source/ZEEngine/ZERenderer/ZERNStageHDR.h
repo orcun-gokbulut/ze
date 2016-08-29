@@ -89,7 +89,6 @@ class ZERNStageHDR : public ZERNStage
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
 		ZEHolder<ZEGRTexture2D>				BrightTexture;
 		ZEHolder<ZEGRTexture2D>				DownScaledTexture4x;
 		ZEHolder<ZEGRTexture2D>				DownScaledTexture8x;
@@ -99,11 +98,11 @@ class ZERNStageHDR : public ZERNStage
 
 		ZERNHDRBlurTextureSize				BlurTextureSize;
 
-		const ZEGRTexture2D*				InputTexture;
-		const ZEGRRenderTarget*				OutputRenderTarget;
+		ZEHolder<const ZEGRTexture2D>		InputColorTexture;
+		ZEHolder<const ZEGRTexture2D>		OutputColorTexture;
 
 		struct
-		{	
+		{
 			float							Key;
 			float							WhiteLevel;
 			float							BloomFactor;
@@ -134,6 +133,8 @@ class ZERNStageHDR : public ZERNStage
 		void								CalculateAdaptedLuminance(ZEGRContext* Context);
 		const ZEGRTexture2D*				CalculateBloom(ZEGRContext* Context);
 		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomTexture);
+
+		virtual void						CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt						GetId() const;
@@ -172,8 +173,7 @@ class ZERNStageHDR : public ZERNStage
 		void								SetBlurTextureSize(ZERNHDRBlurTextureSize Value);
 		ZERNHDRBlurTextureSize				GetBlurTextureSize() const;
 
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Output) const;
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

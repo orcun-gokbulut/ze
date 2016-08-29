@@ -35,87 +35,83 @@
 
 #include "ZERNStage.h"
 
-#include "ZEDS/ZEList2.h"
-
 #include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Input) const
+const ZEArray<ZERNStageResource>& ZERNStage::GetInputResources() const
 {
-	ZERNStage* PrevStage = GetPrevStage();
-	if (PrevStage == NULL)
-		return NULL;
-
-	return PrevStage->GetOutput(Input);
+	return InputResources;
 }
 
-const ZEGRRenderTarget* ZERNStage::GetNextProvidedInput(ZERNStageBuffer RenderTarget) const
+const ZEArray<ZERNStageResource>& ZERNStage::GetOutputResources() const
 {
-	ZERNStage* NextStage = GetNextStage();
-	if (NextStage == NULL)
-		return NULL;
-
-	return NextStage->GetProvidedInput(RenderTarget);
+	return OutputResources;
 }
 
-bool ZERNStage::BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRRenderTarget>& Target)
+void ZERNStage::AddInputResource(ZEHolder<const ZEGRResource>* ResourcePointer, const ZEString& Name, ZERNStageResourceUsageType Usage, ZEFlags CreationFlags)
 {
-	if (BothWay)
+	ZERNStageResource StageResource;
+	StageResource.Resource = ResourcePointer;
+	StageResource.Name = Name;
+	StageResource.Usage = Usage;
+	StageResource.CreationFlags = CreationFlags;
+
+	InputResources.AddByRef(StageResource);
+
+	if (Renderer != NULL)
+		Renderer->MarkDirtyPipeline();
+}
+
+void ZERNStage::AddOutputResource(ZEHolder<const ZEGRResource>* ResourcePointer, const ZEString& Name, ZERNStageResourceUsageType Usage, ZEFlags CreationFlags)
+{
+	ZERNStageResource StageResource;
+	StageResource.Resource = ResourcePointer;
+	StageResource.Name = Name;
+	StageResource.Usage = Usage;
+	StageResource.CreationFlags = CreationFlags;
+
+	OutputResources.AddByRef(StageResource);
+
+	if (Renderer != NULL)
+		Renderer->MarkDirtyPipeline();
+}
+
+void ZERNStage::RemoveInputResource(const ZEString& Name)
+{
+	ze_for_each(InputResource, InputResources)
 	{
-		ZEHolder<const ZEGRTexture2D> PrevOutput = GetPrevOutput(Output);
-		if (PrevOutput != NULL)
+		if (InputResource->Name == Name)
 		{
-			Buffer = PrevOutput;
-			Target = PrevOutput->GetRenderTarget(0);
-			return false;
+			InputResource->Resource->Release();
+			InputResources.Remove(InputResource.GetIndex());
+			break;
 		}
 	}
 
-	ZEHolder<const ZEGRRenderTarget> ProvidedRenderTarget = GetNextProvidedInput(Output);
-	if (ProvidedRenderTarget != NULL)
-	{
-		Buffer.Release();
-		Target = ProvidedRenderTarget;
-		return false;
-	}
-
-	const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
-	if (Buffer == NULL ||
-		Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
-		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
-	{
-		Buffer = ZEGRTexture2D::CreateResource(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
-		Target = Buffer->GetRenderTarget();
-	}
-
-	return true;
+	if (Renderer != NULL)
+		Renderer->MarkDirtyPipeline();
 }
 
-bool ZERNStage::BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRDepthStencilBuffer>& Target)
+void ZERNStage::RemoveOutputResource(const ZEString& Name)
 {
-	if (BothWay)
+	ze_for_each(OutputResource, OutputResources)
 	{
-		ZEHolder<const ZEGRTexture2D> PrevOutput = GetPrevOutput(Output);
-		if (PrevOutput != NULL)
+		if (OutputResource->Name == Name)
 		{
-			Buffer = PrevOutput;
-			Target = PrevOutput->GetDepthStencilBuffer();
-			return false;
+			OutputResource->Resource->Release();
+			OutputResources.Remove(OutputResource.GetIndex());
+			break;
 		}
 	}
 
-	const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
-	if (Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
-		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
-	{
-		Buffer = ZEGRTexture2D::CreateResource(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL).GetPointer();
-		Target = Buffer->GetDepthStencilBuffer(0);
-	}
+	if (Renderer != NULL)
+		Renderer->MarkDirtyPipeline();
+}
 
-	return true;
+void ZERNStage::CreateOutput(const ZEString& Name)
+{
+
 }
 
 ZERNRenderer* ZERNStage::GetRenderer() const
@@ -123,9 +119,15 @@ ZERNRenderer* ZERNStage::GetRenderer() const
 	return Renderer;
 }
 
-void ZERNStage::SetEnabled(bool Enable)
+void ZERNStage::SetEnabled(bool Enabled)
 {
-	this->Enabled = Enable;
+	if (this->Enabled == Enabled)
+		return;
+
+	this->Enabled = Enabled;
+
+	if (Renderer != NULL)
+		Renderer->MarkDirtyPipeline();
 }
 
 bool ZERNStage::GetEnabled() const
@@ -138,36 +140,37 @@ const ZEList2<ZERNCommand>& ZERNStage::GetCommands() const
 	return Commands;
 }
 
-ZERNStage* ZERNStage::GetPrevStage() const
+const ZEGRResource* ZERNStage::GetInput(const ZEString& ResourceName) const
 {
-	return (Link.GetPrev() != NULL ? Link.GetPrev()->GetItem() : NULL);
+	ze_for_each(InputResource, GetInputResources())
+	{
+		if (InputResource->Name == ResourceName)
+			return (*InputResource->Resource);
+	}
+
+	return NULL;
 }
 
-ZERNStage* ZERNStage::GetNextStage() const
+const ZEGRResource* ZERNStage::GetOutput(const ZEString& ResourceName) const
 {
-	return (Link.GetNext() != NULL ? Link.GetNext()->GetItem() : NULL);
+	ze_for_each(OutputResource, GetOutputResources())
+	{
+		if (OutputResource->Name == ResourceName)
+			return (*OutputResource->Resource);
+	}
+
+	return NULL;
 }
 
-const ZEGRTexture2D* ZERNStage::GetOutput(ZERNStageBuffer Output) const
+void ZERNStage::Resized(ZEUInt Width, ZEUInt Height)
 {
-	if (GetPrevStage() == NULL)
-		return NULL;
 
-	return GetPrevStage()->GetOutput(Output);
-}
-
-const ZEGRRenderTarget* ZERNStage::GetProvidedInput(ZERNStageBuffer Input) const
-{
-	if (GetNextStage() == NULL)
-		return NULL;
-	
-	return GetNextStage()->GetProvidedInput(Input);
 }
 
 bool ZERNStage::Setup(ZEGRContext* Context)
 {
-	if(Renderer == NULL || Context == NULL)
-		return false;
+	zeCheckError(Renderer == NULL, false, "Stage process failed. Owner renderer of the stage cannot be NULL. Stage: \"%s\"", GetName().ToCString());
+	zeCheckError(Context == NULL, false, "Stage process failed. Parameter context cannot be NULL. Stage: \"%s\"", GetName().ToCString());
 
 	return true;
 }

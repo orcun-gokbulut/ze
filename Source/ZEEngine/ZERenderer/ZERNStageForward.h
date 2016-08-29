@@ -37,7 +37,6 @@
 
 #include "ZERNStage.h"
 
-#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
@@ -59,29 +58,29 @@ class ZERNStageForward : public ZERNStage
 		ZEHolder<ZEGRComputeRenderStateData>	TiledForwardComputeRenderState;
 
 		ZEHolder<ZEGRStructuredBuffer>			TileLightStructuredBuffer;
-		
-		ZEHolder<ZEGRTexture2D>					OutputTexture;
 
-		const ZEGRTexture2D*					AccumulationTexture;
-		const ZEGRTexture2D*					DepthTexture;
-		const ZEGRTexture2D*					TransparentDepthTexture;
+		ZEHolder<const ZEGRTexture2D>			DepthTexture;
+		ZEHolder<const ZEGRTexture2D>			OpaqueDepthTexture;
+		ZEHolder<const ZEGRTexture2D>			AccumulationTexture;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 
 		bool									UpdateShaders();
 		bool									UpdateRenderStates();
-		bool									UpdateInputOutputs();
+		bool									UpdateTileLightBuffer();
 		bool									Update();
+
+		virtual void							CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt							GetId() const;
 		virtual const ZEString&					GetName() const;
 
+		virtual void							Resized(ZEUInt Width, ZEUInt Height);
+
 		virtual bool							Setup(ZEGRContext* Context);
 		virtual void							CleanUp(ZEGRContext* Context);
-
-		virtual const ZEGRTexture2D*			GetOutput(ZERNStageBuffer Output) const;
 
 												ZERNStageForward();
 

@@ -46,17 +46,18 @@ class ZERNStageShadowing : public ZERNStage
 	friend class ZELightProjective;
 	ZE_OBJECT
 	private:
+		ZEFlags							DirtyFlags;
 		ZEHolder<ZEGRTexture2D>			ProjectiveShadowMaps;
 		ZEUInt							ShadowMapCount;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
+		virtual void					CreateOutput(const ZEString& Name);
+
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
-
-		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool					Setup(ZEGRContext* Context);
 										

@@ -46,13 +46,13 @@ bool ZERNStageOutputTexture::Update()
 	if (!Dirty)
 		return true;
 
-	Texture = ZEGRTexture2D::CreateResource(Width, Height, 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-	if (Texture == NULL)
-		return false;
-
-	RenderTarget = Texture->GetRenderTarget();
-	if (RenderTarget == NULL)
-		return false;
+	//Texture = ZEGRTexture2D::CreateResource(Width, Height, 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	//if (Texture == NULL)
+	//	return false;
+	//
+	//RenderTarget = Texture->GetRenderTarget();
+	//if (RenderTarget == NULL)
+	//	return false;
 	
 	Dirty = false;
 
@@ -61,7 +61,7 @@ bool ZERNStageOutputTexture::Update()
 
 ZERNStageOutputTexture::ZERNStageOutputTexture()
 {
-	TargetBuffer = ZERN_SO_COLOR;
+	//TargetBuffer = ZERN_SO_COLOR;
 	Width = 0;
 	Height = 0;
 	Format = ZEGR_TF_NONE;
@@ -78,13 +78,13 @@ const ZEString& ZERNStageOutputTexture::GetName() const
 	return Name;
 }
 
-const ZEGRRenderTarget* ZERNStageOutputTexture::GetProvidedInput(ZERNStageBuffer Buffer) const
-{
-	if (Buffer == GetTargetBuffer())
-		return RenderTarget;
-	else
-		return ZERNStage::GetProvidedInput(Buffer);
-}
+//const ZEGRRenderTarget* ZERNStageOutputTexture::GetProvidedInput(ZERNStageBuffer Buffer) const
+//{
+//	if (Buffer == GetTargetBuffer())
+//		return RenderTarget;
+//	else
+//		return ZERNStage::GetProvidedInput(Buffer);
+//}
 
 void ZERNStageOutputTexture::SetWidth(ZEUInt Width)
 {
@@ -116,15 +116,15 @@ ZEUInt ZERNStageOutputTexture::GetHeight() const
 	return Height;
 }
 
-void ZERNStageOutputTexture::SetTargetBuffer(ZERNStageBuffer Buffer)
-{
-	TargetBuffer = Buffer;
-}
-
-ZERNStageBuffer ZERNStageOutputTexture::GetTargetBuffer() const
-{
-	return TargetBuffer;
-}
+//void ZERNStageOutputTexture::SetTargetBuffer(ZERNStageBuffer Buffer)
+//{
+//	TargetBuffer = Buffer;
+//}
+//
+//ZERNStageBuffer ZERNStageOutputTexture::GetTargetBuffer() const
+//{
+//	return TargetBuffer;
+//}
 
 void ZERNStageOutputTexture::SetFormat(ZEGRFormat Format)
 {

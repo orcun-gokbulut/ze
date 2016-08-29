@@ -39,21 +39,35 @@
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
+#define ZERN_SSDF_OUTPUT	1
+
 bool ZERNStageShadowing::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
-
-	ProjectiveShadowMaps = ZEGRTexture2D::CreateResource(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
 
 	return true;
 }
 
 bool ZERNStageShadowing::DeinitializeInternal()
 {
+	DirtyFlags.RaiseAll();
+
 	ProjectiveShadowMaps.Release();
 
 	return ZERNStage::DeinitializeInternal();
+}
+
+void ZERNStageShadowing::CreateOutput(const ZEString& Name)
+{
+	if (Name == "ProjectiveShadowMaps")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT))
+		{
+			ProjectiveShadowMaps = ZEGRTexture2D::CreateResource(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
+			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT);
+		}
+	}
 }
 
 ZEInt ZERNStageShadowing::GetId() const
@@ -63,16 +77,8 @@ ZEInt ZERNStageShadowing::GetId() const
 
 const ZEString& ZERNStageShadowing::GetName() const
 {
-	static const ZEString Name = "Shadowing";
+	static const ZEString Name = "Stage Shadowing";
 	return Name;
-}
-
-const ZEGRTexture2D* ZERNStageShadowing::GetOutput(ZERNStageBuffer Output) const
-{
-	if (GetEnabled() && (Output == ZERN_SO_PROJECTIVE_SHADOWMAPS))
-		return ProjectiveShadowMaps;
-
-	return ZERNStage::GetOutput(Output);
 }
 
 bool ZERNStageShadowing::Setup(ZEGRContext* Context)
@@ -90,5 +96,9 @@ bool ZERNStageShadowing::Setup(ZEGRContext* Context)
 
 ZERNStageShadowing::ZERNStageShadowing()
 {
+	DirtyFlags.RaiseAll();
+
 	ShadowMapCount = 0;
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }

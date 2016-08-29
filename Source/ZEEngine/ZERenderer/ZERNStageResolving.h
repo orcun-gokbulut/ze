@@ -68,16 +68,18 @@ class ZERNStageResolving : public ZERNStage
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEHolder<ZEGRTexture2D>			ResolvedInputTexture;
-		ZEHolder<ZEGRTexture2D>			ResolvedNormalTexture;
+		ZEHolder<ZEGRTexture2D>			ResolvedGBufferEmissive;
+		ZEHolder<ZEGRTexture2D>			ResolvedGBufferDiffuse;
+		ZEHolder<ZEGRTexture2D>			ResolvedGBufferNormal;
 		ZEHolder<ZEGRTexture2D>			ResolvedDepthTexture;
-		ZEHolder<ZEGRTexture2D>			ResolvedGbufferEmissive;
-		ZEHolder<ZEGRTexture2D>			ResolvedGbufferDiffuse;
 
-		const ZEGRTexture2D*			InputTexture;
-		const ZEGRTexture2D*			NormalTexture;
-		const ZEGRTexture2D*			DepthTexture;
-		const ZEGRTexture2D*			EmissiveTexture;
-		const ZEGRTexture2D*			DiffuseTexture;
+		ZEHolder<const ZEGRTexture2D>	InputTexture;
+		ZEHolder<const ZEGRTexture2D>	GBufferEmissive;
+		ZEHolder<const ZEGRTexture2D>	GBufferDiffuse;
+		ZEHolder<const ZEGRTexture2D>	GBufferNormal;
+		ZEHolder<const ZEGRTexture2D>	DepthTexture;
+
+		ZEString						CustomInputname;
 
 		bool							ResolveAllGbuffers;
 
@@ -87,13 +89,14 @@ class ZERNStageResolving : public ZERNStage
 			float						Reserved0[3];
 		} Constants;
 
-		virtual bool					InitializeInternal();						
+		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
 		bool							UpdateRenderStates();
 		bool							UpdateConstantBuffers();
-		bool							UpdateInputOutputs();
 		bool							Update();
+
+		virtual void					CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt					GetId() const;
@@ -105,10 +108,12 @@ class ZERNStageResolving : public ZERNStage
 		void							SetResolveAllGbuffers(bool ResolveAllGbuffers);
 		bool							GetResolveAllGbuffers() const;
 
+		void							SetCustomInput(const ZEString& Inputname);
+
+		virtual void					Resized(ZEUInt Width, ZEUInt Height);
+
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);
-
-		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
 
 										ZERNStageResolving();
 };

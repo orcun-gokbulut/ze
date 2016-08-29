@@ -41,9 +41,9 @@
 #include "ZEGRDefinitions.h"
 #include "ZEGRFormat.h"
 
-class ZEGRRenderTarget;
 class ZEGRMonitor;
 class ZEGRWindow;
+class ZEGRTexture2D;
 
 class ZEGROutput : public ZEGRResource
 {
@@ -59,7 +59,7 @@ class ZEGROutput : public ZEGRResource
 		virtual ZEGRResourceType			GetResourceType() const;
 
 		virtual void*						GetHandle() const = 0;
-		virtual ZEGRRenderTarget*			GetRenderTarget() const = 0;
+		virtual ZEGRTexture2D*				GetTexture2D() const = 0;
 
 		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor) = 0;
 		virtual ZEGRMonitor*				GetMonitor() const = 0;

@@ -561,7 +561,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 
 	memset(&Constants, 0, sizeof(Constants));
 
-	SetEntityFlags(ZE_EF_RENDERABLE);
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
@@ -647,14 +647,6 @@ ZEVector3 ZEATAtmosphere::GetTerrestrialMoonAmbientColor()
 
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
-
-}
-
-bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	if (!ZEEntity::PreRender(Parameters))
-		return false;
-
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
 	SunDirection.NormalizeSelf();
 	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
@@ -697,8 +689,8 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	}
 
 	ZEVector3 AmbientColor = ZEVector3(0.005f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
-	GetScene()->SetAmbientColor(AmbientColor);
-	GetScene()->SetAmbientFactor(1.0f);
+	//GetScene()->SetAmbientColor(AmbientColor);
+	//GetScene()->SetAmbientFactor(1.0f);
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
@@ -748,6 +740,12 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	ZEUInt SunsetHour = (ZEUInt)Sunset % 24;
 	ZEUInt SunsetMinute = (ZEUInt)(Sunset * 60.0) % 60;
+}
+
+bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
+{
+	if (!ZEEntity::PreRender(Parameters))
+		return false;
 
 	if (SunLight != NULL)
 	{
@@ -798,7 +796,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
+	const ZEGRTexture2D* DepthTexture = static_cast<const ZEGRTexture2D*>(Stage->GetInput("DepthTexture"));
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);

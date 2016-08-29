@@ -52,16 +52,6 @@
 
 void ZED11Output::SwitchToFullscreen()
 {
-	/*DXGI_MODE_DESC Description;
-	Description.Width = Mode->GetWidth();
-	Description.Height = Mode->GetWidth();
-	Description.RefreshRate.Numerator = Mode->GetRefreshRate().Numerator;
-	Description.RefreshRate.Denominator = Mode->GetRefreshRate().Denominator;
-	Description.Format = ConvertFormat(Mode->GetFormat());
-	Description.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	Description.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	SwapChain->ResizeTarget(&Description);*/
-
 	IDXGIOutput1* Output = NULL;
 	if(RestrictedToMonitor)
 		Output = static_cast<ZED11Monitor*>(Monitor)->GetOutput();
@@ -71,16 +61,17 @@ void ZED11Output::SwitchToFullscreen()
 
 void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
-	if (RenderTarget != NULL)
+	if (Texture != NULL)
 	{
-		RenderTarget.Cast<ZED11RenderTarget>()->ForcedRelease();
-		RenderTarget.Release();
+		ZED11Texture2D* D11Texture = static_cast<ZED11Texture2D*>(Texture.GetPointer());
+		const_cast<ZED11RenderTarget*>(static_cast<const ZED11RenderTarget*>(D11Texture->GetRenderTarget()))->ForcedRelease();
+		ZEGR_RELEASE(D11Texture->Texture2D);
 	}
 
 	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(Format), 0);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot resize swapchain buffers. Error: %d.", Result);
+		zeCriticalError("Cannot resize swapchain buffers. Error: 0x%X.", Result);
 		return;
 	}
 
@@ -93,15 +84,17 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 		return;
 	}
 
-	Result = GetDevice()->CreateRenderTargetView(BackBuffer, NULL, &RenderTargetView);
-	if(FAILED(Result))
-	{
-		zeCriticalError("Cannot create render target view. Error: %d.", Result);
-		return;
-	}
-	ZEGR_RELEASE(BackBuffer);
-
-	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
+	Texture = new ZED11Texture2D();
+	ZED11Texture2D* D11Texture = static_cast<ZED11Texture2D*>(Texture.GetPointer());
+	D11Texture->Width = Width;
+	D11Texture->Height = Height;
+	D11Texture->ArrayCount = 1;
+	D11Texture->SampleCount = 1;
+	D11Texture->SetFormat(Format);
+	D11Texture->SetLevelCount(1);
+	D11Texture->SetResourceBindFlags(ZEGR_RBF_RENDER_TARGET);
+	D11Texture->SetResourceUsage(ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	D11Texture->Texture2D = BackBuffer;
 
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
 	SetSize(Width * Height * FormatDefinition->BlockSize);
@@ -194,6 +187,7 @@ void ZED11Output::Deinitialize()
 
 ZED11Output::ZED11Output()
 {
+	Texture = NULL;
 	Handle = NULL;
 	Monitor = NULL;
 	SwapChain = NULL;
@@ -212,9 +206,9 @@ void* ZED11Output::GetHandle() const
 	return Handle;
 }
 
-ZEGRRenderTarget* ZED11Output::GetRenderTarget() const
+ZEGRTexture2D* ZED11Output::GetTexture2D() const
 {
-	return RenderTarget;
+	return Texture;
 }
 
 void ZED11Output::SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor)
@@ -294,13 +288,17 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 	if (Width == 0 || Height == 0)
 		return;
 
-	if (RenderTarget->GetWidth() == Width && RenderTarget->GetHeight() == Height)
+	if (Texture->GetWidth() == Width && Texture->GetHeight() == Height)
 		return;
 
-	UpdateRenderTarget(Width, Height, RenderTarget->GetFormat());
+	UpdateRenderTarget(Width, Height, Texture->GetFormat());
 }
 
 void ZED11Output::Present()
 {
+	LockContext();
+
 	SwapChain->Present(0, 0);
+
+	UnlockContext();
 }

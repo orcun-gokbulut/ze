@@ -48,6 +48,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	friend class ZED11Context;
+	friend class ZED11Output;
 
 	private:
 		ID3D11Texture2D*						Texture2D;

@@ -105,9 +105,9 @@ class ZERNStageAO : public ZERNStage
 
 		bool								UseDeinterleavedTexturing;
 
-		const ZEGRTexture2D*				DepthTexture;
-		const ZEGRTexture2D*				NormalTexture;
-		const ZEGRTexture2D*				AccumulationTexture;
+		ZEHolder<const ZEGRTexture2D>		DepthTexture;
+		ZEHolder<const ZEGRTexture2D>		NormalTexture;
+		ZEHolder<const ZEGRTexture2D>		AccumulationTexture;
 
 		struct
 		{
@@ -144,7 +144,6 @@ class ZERNStageAO : public ZERNStage
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();
 		bool								UpdateConstantBuffers();
-		bool								UpdateInputOutputs();
 		bool								UpdateTextures();
 		bool								Update();
 
@@ -155,6 +154,8 @@ class ZERNStageAO : public ZERNStage
 		void								DeinterleaveAmbientOcclusion(ZEGRContext* Context);
 		void								ReinterleaveAmbientOcclusion(ZEGRContext* Context);
 		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+
+		virtual void						CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt						GetId() const;
@@ -178,7 +179,7 @@ class ZERNStageAO : public ZERNStage
 		void								SetDeinterleavedTexturing(bool UseDeinterleavedTexturing);
 		bool								GetDeinterleavedTexturing() const;
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

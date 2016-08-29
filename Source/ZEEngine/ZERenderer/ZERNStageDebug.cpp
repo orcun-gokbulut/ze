@@ -56,6 +56,7 @@
 #define ZERN_SDDF_SHADERS			1
 #define ZERN_SDDF_RENDER_STATES		2
 #define ZERN_SDDF_CONSTANT_BUFFERS	4
+#define ZERN_SDDF_TEXTURE			8
 
 ZEGRVertexLayout GetPositionVertexLayout()
 {
@@ -169,11 +170,6 @@ bool ZERNStageDebug::Update()
 
 	return true;
 }
-
-//#include "ZEModel/ZEModel.h"
-//#include "ZEModel/ZEModelMesh.h"
-//#include "ZEModel/ZEModelMeshLOD.h"
-//#include "ZEDS/ZEArray.h"
 
 bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 {
@@ -304,6 +300,11 @@ bool ZERNStageDebug::GetCullBackface() const
 	return (bool)Constants.CullBackface;
 }
 
+void ZERNStageDebug::Resized(ZEUInt Width, ZEUInt Height)
+{
+	DepthMap = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
+}
+
 bool ZERNStageDebug::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
@@ -312,24 +313,14 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	ZEGRRenderTarget* RenderTarget = GetRenderer()->GetOutputRenderTarget();
-	if (RenderTarget == NULL)
-		return false;
-
-	ZEUInt Width = RenderTarget->GetWidth();
-	ZEUInt Height = RenderTarget->GetHeight();
-
-	if (DepthMap == NULL || 
-		DepthMap->GetWidth() != Width || DepthMap->GetHeight() != Height)
-	{
-		DepthMap = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
-	}
-
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();
 	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 0.0f, 0x00);
+
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
+
 	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	if (Constants.ShowBoundingBox)
 	{
@@ -365,4 +356,6 @@ ZERNStageDebug::ZERNStageDebug()
 	Constants.ShowBoundingBox = false;
 	Constants.ShowWireframe = true;
 	Constants.CullBackface = false;
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_OUTPUT);
 }

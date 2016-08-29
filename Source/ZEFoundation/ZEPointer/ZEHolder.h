@@ -119,7 +119,7 @@ template<typename Type>
 void ZEHolder<Type>::Copy(const ZEHolder<Type>& OtherHolder)
 {
 	Release();
-	
+
 	Pointer = OtherHolder.Pointer;
 	if (Pointer != NULL)
 		Pointer->Reference();
@@ -178,7 +178,9 @@ ZEHolder<Type>& ZEHolder<Type>::operator=(Type* RawPointer)
 template<typename Type>
 ZEHolder<Type>& ZEHolder<Type>::operator=(const ZEHolder<Type>& OtherHolder)
 {
-	Copy(OtherHolder);
+	if (this != &OtherHolder)
+		Copy(OtherHolder);
+
 	return *this;
 }
 

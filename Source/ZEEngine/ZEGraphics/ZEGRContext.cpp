@@ -693,3 +693,18 @@ void ZEGRContext::ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count)
 	for (ZEUInt I = 0; I < Count; I++)
 		UnorderedAccesses[Index + I] = NULL;
 }
+
+void ZEGRContext::ClearState()
+{
+	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
+	IndexBuffer = NULL;
+	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
+	memset(Samplers, NULL, sizeof(ZEGRSampler*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
+	memset(ShaderResources, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
+	memset(UnorderedAccesses, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_RWTEXTURE_SLOT);
+	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	DepthStencilBuffer = NULL;
+
+	memset(&Viewports, 0, sizeof(ZEGRViewport) * ZEGR_MAX_VIEWPORT_SLOT);
+	memset(&ScissorRects, 0, sizeof(ZEGRScissorRect) * ZEGR_MAX_SCISSOR_SLOT);
+}

@@ -35,43 +35,43 @@
 
 #include "ZERNStageRenderDepth.h"
 
-#include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZERNStageID.h"
+
+#define  ZERN_SRDF_OUTPUT	1
 
 bool ZERNStageRenderDepth::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	return UpdateInputOutputs();
+	return true;
 }
 
 bool ZERNStageRenderDepth::DeinitializeInternal()
 {
-	TransparentDepthBuffer.Release();
+	DirtyFlags.RaiseAll();
+
+	OpaqueDepthTexture.Release();
 
 	DepthTexture = NULL;
 
 	return ZERNStage::DeinitializeInternal();
 }
 
-bool ZERNStageRenderDepth::UpdateInputOutputs()
+void ZERNStageRenderDepth::CreateOutput(const ZEString& Name)
 {
-	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
-	if (DepthTexture == NULL)
-		return false;
-
-	ZEUInt Width = DepthTexture->GetWidth();
-	ZEUInt Height = DepthTexture->GetHeight();
-
-	if (TransparentDepthBuffer == NULL || 
-		TransparentDepthBuffer->GetWidth() != Width || TransparentDepthBuffer->GetHeight() != Height)
-		TransparentDepthBuffer = ZEGRTexture2D::CreateResource(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
-	
-	return true;
+	if (Name == "OpaqueDepthTexture")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT))
+		{
+			OpaqueDepthTexture = ZEGRTexture2D::CreateResource(DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
+			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT);
+		}
+	}
 }
 
 ZEInt ZERNStageRenderDepth::GetId() const
@@ -85,18 +85,9 @@ const ZEString& ZERNStageRenderDepth::GetName() const
 	return Name;
 }
 
-const ZEGRTexture2D* ZERNStageRenderDepth::GetOutput(ZERNStageBuffer Output) const
+void ZERNStageRenderDepth::Resized(ZEUInt Width, ZEUInt Height)
 {
-	if (GetEnabled())
-	{
-		if (Output == ZERN_SO_DEPTH)
-			return DepthTexture;
-
-		else if (Output == ZERN_SO_TRANSPARENT_DEPTH)
-			return TransparentDepthBuffer;
-	}
-
-	return ZERNStage::GetOutput(Output);
+	DirtyFlags.RaiseFlags(ZERN_SRDF_OUTPUT);
 }
 
 bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
@@ -104,15 +95,12 @@ bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	if (!UpdateInputOutputs())
-		return false;
-
-	Context->CopyResource(TransparentDepthBuffer, const_cast<ZEGRTexture2D*>(DepthTexture));
-
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	Context->SetRenderTargets(0, NULL, TransparentDepthBuffer->GetDepthStencilBuffer());
+	Context->CopyResource(OpaqueDepthTexture, DepthTexture);
+
+	Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer());
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
 	
 	return true;
@@ -125,7 +113,10 @@ void ZERNStageRenderDepth::CleanUp(ZEGRContext* Context)
 
 ZERNStageRenderDepth::ZERNStageRenderDepth()
 {
-	DepthTexture = NULL;
+	DirtyFlags.RaiseAll();
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OpaqueDepthTexture), "OpaqueDepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }
 
 ZEGRRenderState ZERNStageRenderDepth::GetRenderState()

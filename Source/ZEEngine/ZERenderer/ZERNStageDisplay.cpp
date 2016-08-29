@@ -42,8 +42,18 @@
 #include "ZERNShaderSlots.h"
 #include "ZERNStageMultiplexer.h"
 
-#define ZERN_SDDF_SAMPLER			0x01
-#define ZERN_SDDF_CONSTANT_BUFFER	0x02
+#define ZERN_SDDF_SAMPLER			1
+#define ZERN_SDDF_CONSTANT_BUFFER	2
+
+bool ZERNStageDisplay::InitializeInternal()
+{
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+
+	return true;
+}
 
 bool ZERNStageDisplay::DeinitializeInternal()
 {
@@ -53,47 +63,8 @@ bool ZERNStageDisplay::DeinitializeInternal()
 	Sampler.Release();
 
 	InputTexture = NULL;
-	OutputRenderTarget = NULL;
 
-	return ZERNStage::DeinitializeInternal();
-}
-
-bool ZERNStageDisplay::UpdateInputOutput()
-{
-	if (Input != ZERN_SO_NONE)
-	{
-		const ZEGRTexture2D* NewTexture = Owner->GetPrevOutput(Input);
-		if (NewTexture == NULL)
-		{
-			return false;
-		}
-		else if (InputTexture != NewTexture)
-		{
-			InputTexture = NewTexture;
-			DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
-		}
-	}
-
-	if (Owner != NULL)
-	{
-		if (OutputRenderTarget != Owner->OutputRenderTarget)
-		{
-			OutputRenderTarget = Owner->OutputRenderTarget;
-
-			ZEVector2 OutputSizeMod;
-			OutputSizeMod.x = (OutputSize.x <= 0 ? OutputRenderTarget->GetWidth() : OutputSize.x);
-			OutputSizeMod.y = (OutputSize.y <= 0 ? OutputRenderTarget->GetHeight() : OutputSize.y);
-
-			Viewport.SetX(OutputOffset.x);
-			Viewport.SetY(OutputOffset.y);
-			Viewport.SetWidth(OutputSizeMod.x);
-			Viewport.SetHeight(OutputSizeMod.y);
-
-			DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
-		}
-	}
-
-	return true;
+	return ZEInitializable::DeinitializeInternal();
 }
 
 bool ZERNStageDisplay::UpdateConstantBuffer()
@@ -101,22 +72,13 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	if (!DirtyFlags.GetFlags(ZERN_SDDF_CONSTANT_BUFFER))
 		return true;
 
-	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
-
-	if (ConstantBuffer.IsNull())
-		return false;
-
-	if (InputTexture == NULL)
-		return false;
-
 	ZEVector2 InputSizeMod;
 	InputSizeMod.x = (InputSize.x <= 0 ? InputTexture->GetWidth() : InputSize.x) - InputOffset.x;
 	InputSizeMod.y = (InputSize.y <= 0 ? InputTexture->GetHeight() : InputSize.y) - InputOffset.y;
 
 	ZEVector2 OutputSizeMod;
-	OutputSizeMod.x = (OutputSize.x <= 0 ? OutputRenderTarget->GetWidth() : OutputSize.x);
-	OutputSizeMod.y = (OutputSize.y <= 0 ? OutputRenderTarget->GetHeight() : OutputSize.y);
+	OutputSizeMod.x = (OutputSize.x <= 0 ? Viewport.GetWidth() : OutputSize.x);
+	OutputSizeMod.y = (OutputSize.y <= 0 ? Viewport.GetHeight() : OutputSize.y);
 
 	ZEVector2 PixelScale = ZEVector2(1.0f / InputTexture->GetWidth(), 1.0f / InputTexture->GetHeight());
 
@@ -195,10 +157,7 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	Constants.Transform2 = ZEVector4(Matrix.M[2][0], Matrix.M[2][1], Matrix.M[2][2], 0.0f);
 	Constants.InputSize = InputSizeMod * PixelScale;
 
-	void* Buffer;
-	ConstantBuffer->Lock(&Buffer);
-	memcpy(Buffer, &Constants, sizeof(Constants));
-	ConstantBuffer->Unlock();
+	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 
@@ -211,9 +170,9 @@ bool ZERNStageDisplay::UpdateSampler()
 		return true;
 
 	ZEGRSamplerDescription SamplerDescription;
-	SamplerDescription.MipFilter = Filter;
-	SamplerDescription.MagFilter = Filter;
 	SamplerDescription.MinFilter = Filter;
+	SamplerDescription.MagFilter = Filter;
+	SamplerDescription.MipFilter = Filter;
 	SamplerDescription.BorderColor = ZEVector4::Zero;
 	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
 	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
@@ -227,12 +186,6 @@ bool ZERNStageDisplay::UpdateSampler()
 
 bool ZERNStageDisplay::Update()
 {
-	if (Owner == NULL)
-		return false;
-
-	if (!UpdateInputOutput())
-		return false;
-
 	if (!UpdateConstantBuffer())
 		return false;
 
@@ -244,6 +197,15 @@ bool ZERNStageDisplay::Update()
 
 bool ZERNStageDisplay::Draw(ZEGRContext* Context)
 {
+	if (Owner == NULL)
+		return false;
+
+	if (InputTexture == NULL)
+		return false;
+
+	if (!Update())
+		return false;
+
 	Context->SetViewports(1, &Viewport);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, ConstantBuffer);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
@@ -254,44 +216,38 @@ bool ZERNStageDisplay::Draw(ZEGRContext* Context)
 	return true;
 }
 
-ZEInt ZERNStageDisplay::GetId() const
+ZERNStageDisplay::ZERNStageDisplay() : Link(this)
 {
-	return 0;
+	DirtyFlags.RaiseAll();
+
+	Owner = NULL;
+	InputOffset = ZEVector2::Zero;
+	InputSize = ZEVector2::Zero;
+	OutputOffset = ZEVector2::Zero;
+	OutputSize = ZEVector2::Zero;
+
+	ScaleMode = ZERN_SDSM_NONE;
+	FlipMode = ZERN_SDMF_NONE;
+	Zoom = ZEVector2::One;
+	Rotation = 0.0f;
+	Filter = ZEGR_TFM_LINEAR;
+
+	memset(&Constants, 0, sizeof(Constants));
 }
 
-const ZEString& ZERNStageDisplay::GetName() const
-{
-	return "ZERNStageDisplay";
-}
-
-void ZERNStageDisplay::SetInput(ZERNStageBuffer Input)
-{
-	this->Input = Input;
-}
-
-ZERNStageBuffer ZERNStageDisplay::GetInput() const
-{
-	return Input;
-}
-
-void ZERNStageDisplay::SetInputGlobal(const ZEString& Name)
+ZERNStageDisplay::~ZERNStageDisplay()
 {
 
 }
 
-const ZEString& ZERNStageDisplay::GetInputGlobal()
+void ZERNStageDisplay::SetInput(const ZEString& InputName)
 {
-	return ZEString::Empty;
+	this->InputName = InputName;
 }
 
-void ZERNStageDisplay::SetTexture(const ZEGRTexture2D* Texture)
+const ZEString& ZERNStageDisplay::GetInput() const
 {
-	this->InputTexture = Texture;
-}
-
-const ZEGRTexture2D* ZERNStageDisplay::GetTexture() const
-{
-	return InputTexture;
+	return InputName;
 }
 
 void ZERNStageDisplay::SetInputOffset(const ZEVector2& Offset)
@@ -384,7 +340,7 @@ const ZEVector2& ZERNStageDisplay::GetZoom() const
 	return Zoom;
 }
 
-void ZERNStageDisplay::SetRotate(float Rotation)
+void ZERNStageDisplay::SetRotation(float Rotation)
 {
 	if (this->Rotation == Rotation)
 		return;
@@ -429,55 +385,25 @@ ZEGRTextureFilter ZERNStageDisplay::GetFilter() const
 	return Filter;
 }
 
-bool ZERNStageDisplay::Setup(ZEGRContext* Context)
+void ZERNStageDisplay::SetViewport(const ZEGRViewport& Viewport)
 {
-	if (!Update())
-		return false;
+	if (this->Viewport.GetX() == Viewport.GetX() &&
+		this->Viewport.GetY() == Viewport.GetY() &&
+		this->Viewport.GetWidth() == Viewport.GetWidth() &&
+		this->Viewport.GetHeight() == Viewport.GetHeight())
+		return;
 
-	return Draw(Context);
+	this->Viewport = Viewport;
+
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
-bool ZERNStageDisplay::Setup(ZEGRContext* Context, const ZEGRViewport& MultiplexerViewport)
+const ZEGRViewport& ZERNStageDisplay::GetViewport() const
 {
-	if (!Update())
-		return false;
-
-	ZEVector2 OutputSizeMod;
-	OutputSizeMod.x = (OutputSize.x <= 0 ? OutputRenderTarget->GetWidth() : OutputSize.x);
-	OutputSizeMod.y = (OutputSize.y <= 0 ? OutputRenderTarget->GetHeight() : OutputSize.y);
-
-	if (Viewport.GetX() != MultiplexerViewport.GetX() ||
-		Viewport.GetY() != MultiplexerViewport.GetY() ||
-		Viewport.GetWidth() != MultiplexerViewport.GetWidth() ||
-		Viewport.GetHeight() != MultiplexerViewport.GetHeight())
-	{
-		Viewport = MultiplexerViewport;
-		DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
-		UpdateConstantBuffer();
-	}
-	
-	return Draw(Context);
+	return Viewport;
 }
 
-ZERNStageDisplay::ZERNStageDisplay() : StageLink(this)
+ZERNStageDisplay* ZERNStageDisplay::CreateInstance()
 {
-	DirtyFlags.RaiseAll();
-
-	Owner = NULL;
-	Input = ZERN_SO_NONE;
-	InputOffset = ZEVector2::Zero;
-	InputSize = ZEVector2::Zero;
-	OutputOffset = ZEVector2::Zero;
-	OutputSize = ZEVector2::Zero;
-
-	ScaleMode = ZERN_SDSM_NONE;
-	FlipMode = ZERN_SDMF_NONE;
-	Zoom = ZEVector2::One;
-	Rotation = 0.0f;
-	Filter = ZEGR_TFM_LINEAR;
-
-	memset(&Constants, 0, sizeof(Constants));
-
-	InputTexture = NULL;
-	OutputRenderTarget = NULL;
+	return new ZERNStageDisplay();
 }

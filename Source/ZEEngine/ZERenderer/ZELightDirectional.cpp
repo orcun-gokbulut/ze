@@ -205,6 +205,9 @@ ZELightDirectional::ZELightDirectional()
 	UseSunLight = false;
 	UseMoonLight = false;
 
+	TerrestrialColor = ZEVector3::Zero;
+	TerrestrialIntensity = 0.0f;
+
 	Command.Entity = this;
 	Command.Priority = 1;
 

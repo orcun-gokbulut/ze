@@ -41,7 +41,7 @@
 
 ZERNStageInputTexture::ZERNStageInputTexture()
 {
-	Buffer = ZERN_SO_COLOR;
+	//Buffer = ZERN_SO_COLOR;
 }
 
 ZEInt ZERNStageInputTexture::GetId() const
@@ -55,30 +55,30 @@ const ZEString& ZERNStageInputTexture::GetName() const
 	return Name;
 }
 
-void ZERNStageInputTexture::SetBuffer(ZERNStageBuffer Output)
-{
-	this->Buffer = Output;
-}
-
-ZERNStageBuffer ZERNStageInputTexture::GetBuffer() const
-{
-	return Buffer;
-}
-
-void ZERNStageInputTexture::SetTextures(const ZEGRTexture2D* Texture)
-{
-	this->Texture = Texture;
-}
-
-const ZEGRTexture2D* ZERNStageInputTexture::GetTexture() const
-{
-	return Texture;
-}
-
-const ZEGRTexture2D* ZERNStageInputTexture::GetOutput(ZERNStageBuffer Output) const
-{
-	if (GetBuffer() == Output)
-		return Texture;
-
-	return ZERNStage::GetOutput(Output);
-}
+//void ZERNStageInputTexture::SetBuffer(ZERNStageBuffer Output)
+//{
+//	this->Buffer = Output;
+//}
+//
+//ZERNStageBuffer ZERNStageInputTexture::GetBuffer() const
+//{
+//	return Buffer;
+//}
+//
+//void ZERNStageInputTexture::SetTextures(const ZEGRTexture2D* Texture)
+//{
+//	this->Texture = Texture;
+//}
+//
+//const ZEGRTexture2D* ZERNStageInputTexture::GetTexture() const
+//{
+//	return Texture;
+//}
+//
+//const ZEGRTexture2D* ZERNStageInputTexture::GetOutput(ZERNStageBuffer Output) const
+//{
+//	if (GetBuffer() == Output)
+//		return Texture;
+//
+//	return ZERNStage::GetOutput(Output);
+//}

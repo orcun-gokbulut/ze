@@ -187,20 +187,6 @@ struct ZERNFixedMaterial_PSOutput
 	#endif
 };
 
-struct ZERNFixedMaterial_ShadowMapGenerationStage_VSInput
-{
-	float3 Position			: POSITION0;
-	float3 Normal			: NORMAL0;
-	float3 Tangent			: TANGENT0;
-	float3 Binormal			: BINORMAL0;
-	float2 Texcoord         : TEXCOORD0;
-	
-	#ifdef ZERN_FM_SKIN_TRANSFORM
-		uint4 BoneIndices	: BLENDINDICES;
-		float4 BoneWeights	: BLENDWEIGHTS;
-	#endif
-};
-
 struct ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput
 {
 	float4 Position			: SV_Position;
@@ -412,7 +398,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 // SHADOW MAP GENERATION STAGE - VERTEX SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
-ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main(ZERNFixedMaterial_ShadowMapGenerationStage_VSInput Input)
+ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main(ZERNFixedMaterial_VSInput Input)
 {
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);

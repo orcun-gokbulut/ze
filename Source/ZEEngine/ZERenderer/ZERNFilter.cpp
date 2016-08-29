@@ -245,11 +245,9 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
 		TempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, ConstantBuffer);
-
 	if (PixelShader)
 	{
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, InputTexture->GetWidth(), InputTexture->GetHeight()));
 
 		const ZEGRRenderTarget* OutputRenderTarget = InputTexture->GetRenderTarget();
@@ -268,6 +266,8 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 	else
 	{
 		const ZEUInt GroupDimX = 320;
+
+		Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 9, ConstantBuffer);
 
 		Context->SetComputeRenderState(BlurHorizontalComputeRenderStateData);
 		Context->SetTexture(ZEGR_ST_COMPUTE, 5, InputTexture);

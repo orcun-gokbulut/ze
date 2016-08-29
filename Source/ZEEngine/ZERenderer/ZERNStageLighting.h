@@ -101,8 +101,12 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRTexture2D>					RandomVectorsTexture;
 		ZEHolder<ZEGRTexture2D>					TiledDeferredOutputTexture;
 
-		const ZEGRTexture2D*					AccumulationTexture;
-		const ZEGRTexture2D*					DepthTexture;
+		ZEHolder<const ZEGRTexture2D>			GBufferEmissive;
+		ZEHolder<const ZEGRTexture2D>			GBufferDiffuse;
+		ZEHolder<const ZEGRTexture2D>			GBufferNormal;
+		ZEHolder<const ZEGRTexture2D>			DepthTexture;
+		ZEHolder<const ZEGRTexture2D>			ProjectiveShadowMaps;
+		ZEHolder<const ZEGRTexture2D>			AccumulationTexture;
 
 		bool									ShowCascades;
 		bool									UseTiledDeferred;
@@ -189,7 +193,6 @@ class ZERNStageLighting : public ZERNStage
 
 		bool									UpdateShaders();
 		bool									UpdateRenderState();
-		bool									UpdateInputOutputs();
 		bool									UpdateLightBuffers();
 		bool									Update();
 
@@ -198,6 +201,8 @@ class ZERNStageLighting : public ZERNStage
 
 		void									DrawLights(ZEGRContext* Context, bool PerSample);
 		void									BlendTiledDeferred(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, bool PerSample);
+
+		virtual void							CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt							GetId() const;
@@ -209,7 +214,7 @@ class ZERNStageLighting : public ZERNStage
 		void									SetUseTiledDeferred(bool UseTiledDeferred);
 		bool									GetUseTiledDeferred() const;
 
-		virtual const ZEGRTexture2D*			GetOutput(ZERNStageBuffer Output) const;
+		virtual void							Resized(ZEUInt Width, ZEUInt Height);
 
 		virtual bool							Setup(ZEGRContext* Context);
 		virtual void							CleanUp(ZEGRContext* Context);

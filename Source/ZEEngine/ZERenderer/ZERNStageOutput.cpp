@@ -37,7 +37,6 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGRContext.h"
 
 ZEInt ZERNStageOutput::GetId() const
 {
@@ -48,19 +47,4 @@ const ZEString& ZERNStageOutput::GetName() const
 {
 	static const ZEString Name = "Output";
 	return Name;
-}
-
-const ZEGRRenderTarget* ZERNStageOutput::GetProvidedInput(ZERNStageBuffer Buffer) const
-{
-	if (Buffer == ZERN_SO_COLOR)
-	{
-		if (GetRenderer() == NULL)
-			return NULL;
-
-		return GetRenderer()->GetOutputRenderTarget();
-	}
-	else
-	{
-		return ZERNStage::GetProvidedInput(Buffer);
-	}
 }

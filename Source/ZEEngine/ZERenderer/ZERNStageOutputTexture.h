@@ -46,10 +46,10 @@ class ZERNStageOutputTexture : public ZERNStage
 	private:
 		bool								Dirty;
 
-		ZEHolder<ZEGRTexture2D>				Texture;
-		const ZEGRRenderTarget*				RenderTarget;
-
-		ZERNStageBuffer						TargetBuffer;
+		//ZEHolder<ZEGRTexture2D>				Texture;
+		//const ZEGRRenderTarget*				RenderTarget;
+		//
+		//ZERNStageBuffer						TargetBuffer;
 		ZEUInt								Width;
 		ZEUInt								Height;
 		ZEGRFormat							Format;
@@ -62,8 +62,8 @@ class ZERNStageOutputTexture : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		void								SetTargetBuffer(ZERNStageBuffer Buffer);
-		ZERNStageBuffer						GetTargetBuffer() const;
+		//void								SetTargetBuffer(ZERNStageBuffer Buffer);
+		//ZERNStageBuffer						GetTargetBuffer() const;
 
 		void								SetWidth(ZEUInt Width);
 		ZEUInt								GetWidth() const;
@@ -76,5 +76,5 @@ class ZERNStageOutputTexture : public ZERNStage
 
 		virtual bool						Setup(ZEGRContext* Context);
 
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
+		//virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
 };

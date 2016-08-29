@@ -1014,3 +1014,20 @@ void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZE
 
 	UnlockContext();
 }
+
+void ZED11Context::ClearState()
+{
+	ZEGRContext::ClearState();
+
+	GraphicsState->BlendState = NULL;
+	GraphicsState->DepthStencilState = NULL;
+	GraphicsState->PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+	GraphicsState->RasterizerState = NULL;
+
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		GraphicsState->Shaders[I] = NULL;
+
+	GraphicsState->VertexLayout = NULL;
+
+	ComputeState->ComputeShader = NULL;
+}
