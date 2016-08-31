@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVTestConverter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,25 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
 
-ze_set_project_folder("ZETools")
+#include "ZECVConverter.h"
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+class ZECVTestConverter : public ZECVConverter
+{
+	private:
+		ZECVVersion							SourceVersion;
+		ZECVVersion							DestinationVersion;
 
-find_package(Qt5 COMPONENTS Widgets)
+	public:
+		void								SetSourceVersion(ZECVVersion Version);
+		virtual ZECVVersion					GetSourceVersion() const;
 
-ze_add_module(ZE3dsMaxExporter)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZECrashReport)
-ze_add_module(ZESceneConverter)
-ze_add_module(ZEMaterialConverter)
-ze_add_module(ZECVConverter)
-ze_add_module(ZEMLEditor)
-ze_add_module(ZETerrainExporter)
-ze_add_module(ZELCLicenseTool)
-ze_add_module(ZEITIntegrityTool)
-ze_add_module(ZEDSHShaderEditor)
+		void								SetDestinationVersion(ZECVVersion Version);
+		virtual ZECVVersion					GetDestinationVersion() const;
 
-ze_add_cmake_project(ZETools)
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
+};

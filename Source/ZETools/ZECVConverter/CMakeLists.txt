@@ -33,25 +33,30 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZETools")
+ze_add_source(ZECVDefinitions.cpp			Sources)
+ze_add_source(ZECVDefinitions.h				Sources Headers)
+ze_add_source(ZECVAsset.cpp					Sources)
+ze_add_source(ZECVAsset.h					Sources Headers)
+ze_add_source(ZECVConverter.cpp				Sources)
+ze_add_source(ZECVConverter.h				Sources Headers)
+ze_add_source(ZECVProcessor.cpp				Sources)
+ze_add_source(ZECVProcessor.h				Sources Headers)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+ze_add_source(ZECVModelAsset.cpp			Sources)
+ze_add_source(ZECVModelAsset.h				Sources Headers)
+ze_add_source(ZECVModelConverterV2.cpp		Sources)
+ze_add_source(ZECVModelConverterV2.h		Sources Headers)
 
-find_package(Qt5 COMPONENTS Widgets)
+ze_add_source(ZECVTestAsset.cpp				Sources)
+ze_add_source(ZECVTestAsset.h				Sources Headers)
+ze_add_source(ZECVTestConverter.cpp			Sources)
+ze_add_source(ZECVTestConverter.h			Sources Headers)
 
-ze_add_module(ZE3dsMaxExporter)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZECrashReport)
-ze_add_module(ZESceneConverter)
-ze_add_module(ZEMaterialConverter)
-ze_add_module(ZECVConverter)
-ze_add_module(ZEMLEditor)
-ze_add_module(ZETerrainExporter)
-ze_add_module(ZELCLicenseTool)
-ze_add_module(ZEITIntegrityTool)
-ze_add_module(ZEDSHShaderEditor)
+ze_add_source(ZECVMain.cpp					Sources)
 
-ze_add_cmake_project(ZETools)
+ze_add_executable(TARGET ZECVConverter
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation libTootle)

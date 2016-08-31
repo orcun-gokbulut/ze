@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECVConverter.h
+ Zinek Engine - ZECVAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,20 +35,26 @@
 
 #pragma once
 
+#include "ZECVDefinitions.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 
-class ZEMLReaderNode;
-class ZEMLWriterNode;
+class ZECVConverter;
 
-class ZECVConverter
+class ZECVAsset
 {
 	public:
-		virtual const char*					GetName() = 0;
-		virtual const char*					GetExtension() = 0;
-		virtual ZEUInt						GetSourceVersion() = 0;
-		virtual ZEUInt						GetDestinationVersion() = 0;
-		virtual bool						GetMajorVersionConversion() = 0;
+		virtual const char*					GetName() const = 0;
+		virtual const char* const* 			GetFileExtensions() const = 0;
+		virtual ZESize						GetFileExtensionCount() const = 0;
 
-		virtual bool						Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) = 0;
+		virtual ZECVConverter* const* 		GetConverters() const = 0;
+		virtual ZESize						GetConverterCount() const = 0;
+
+		ZECVVersion							GetMinimumVersion() const;
+		ZECVVersion							GetCurrentVersion() const;
+
+		virtual ZECVResult					Check(const ZEString& SourceFileName, ZECVVersion& Version) const = 0;
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
 };

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVTestConverter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,42 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZECVTestConverter.h"
 
-ze_set_project_folder("ZETools")
+void ZECVTestConverter::SetSourceVersion(ZECVVersion Version)
+{
+	SourceVersion = Version;
+}
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
+ZECVVersion ZECVTestConverter::GetSourceVersion() const
+{
+	return SourceVersion;
+}
 
-find_package(Qt5 COMPONENTS Widgets)
+void ZECVTestConverter::SetDestinationVersion(ZECVVersion Version)
+{
+	DestinationVersion = Version;
+}
 
-ze_add_module(ZE3dsMaxExporter)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZECrashReport)
-ze_add_module(ZESceneConverter)
-ze_add_module(ZEMaterialConverter)
-ze_add_module(ZECVConverter)
-ze_add_module(ZEMLEditor)
-ze_add_module(ZETerrainExporter)
-ze_add_module(ZELCLicenseTool)
-ze_add_module(ZEITIntegrityTool)
-ze_add_module(ZEDSHShaderEditor)
+ZECVVersion ZECVTestConverter::GetDestinationVersion() const
+{
+	return DestinationVersion;
+}
 
-ze_add_cmake_project(ZETools)
+ZECVResult ZECVTestConverter::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName)
+{
+	FILE* File = fopen(DestinationFileName, "w");
+	if (File == NULL)
+		return ZECV_R_FAILED;
+
+	fprintf(File, "ZECVTestAsset\n");
+	fprintf(File, "%d.%d\n", DestinationVersion.Major, DestinationVersion.Minor, SourceVersion.Major, SourceVersion.Minor);
+	fprintf(File, "Converted from: %d.%d\n", SourceVersion.Major, SourceVersion.Minor);
+	
+	fclose(File);
+
+	return ZECV_R_DONE;
+}

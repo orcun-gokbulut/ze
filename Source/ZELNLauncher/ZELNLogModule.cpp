@@ -44,7 +44,7 @@ ZELN_MODULE_DECRIPTION(ZELNLogModule, "Log");
 void ZELNLogModule::LogCallback(const char* ModuleName, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	ZELNLogModule* Module = static_cast<ZELNLogModule*>(ExtraParameters);
-	const char* TypeString = ZELog::UtilityGetLogTypeString(Type);
+	const char* TypeString = ZELog::GetLogTypeString(Type);
 	Module->Form->txtConsole->appendHtml(
 		QString("[%1] <b>%2</b>: %3")
 		.arg(ModuleName)

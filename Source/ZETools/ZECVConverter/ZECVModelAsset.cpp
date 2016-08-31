@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVModelAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,67 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZECVModelAsset.h"
 
-ze_set_project_folder("ZETools")
+#include "ZEML/ZEMLReader.h"
+#include "ZECVModelConverterV2.h"
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
 
-find_package(Qt5 COMPONENTS Widgets)
+const char* ZECVModelAsset::GetName() const
+{
+	return "ZEModel";
+}
 
-ze_add_module(ZE3dsMaxExporter)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZECrashReport)
-ze_add_module(ZESceneConverter)
-ze_add_module(ZEMaterialConverter)
-ze_add_module(ZECVConverter)
-ze_add_module(ZEMLEditor)
-ze_add_module(ZETerrainExporter)
-ze_add_module(ZELCLicenseTool)
-ze_add_module(ZEITIntegrityTool)
-ze_add_module(ZEDSHShaderEditor)
+const char* const* ZECVModelAsset::GetFileExtensions() const
+{
+	static const char* Extensions[] =
+	{
+		".ZEModel"
+	};
 
-ze_add_cmake_project(ZETools)
+	return Extensions;
+}
+
+ZESize ZECVModelAsset::GetFileExtensionCount() const
+{
+	return 1;
+}
+
+ ZECVConverter* const* ZECVModelAsset::GetConverters() const
+{
+	static ZECVModelConverterV2 Version2;
+	static ZECVConverter* Converters[] =
+	{
+		&Version2
+	};
+
+	return Converters;
+}
+
+ZESize ZECVModelAsset::GetConverterCount() const
+{
+	return 1;
+}
+
+ZECVResult ZECVModelAsset::Check(const ZEString& SourceFileName, ZECVVersion& Version) const
+{
+	ZEMLReader Unserializer;
+	if (!Unserializer.Open(SourceFileName))
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	ZEMLReaderNode SourceModelNode = Unserializer.GetRootNode();
+	if (SourceModelNode.GetName() != "ZEModel")
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	Version.Major = SourceModelNode.ReadUInt8("MajorVersion");
+	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
+
+	if (Version.Major > 2 ||
+		Version.Major == 2 && Version.Minor >= 0)
+		return ZECV_R_LATEST_VERSION;
+
+	return ZECV_R_DONE;
+}

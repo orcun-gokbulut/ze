@@ -113,12 +113,9 @@ class ZECVModelConverterV2 : public ZECVConverter
 		static bool							ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serializer);
 
 	public:
-		virtual const char*					GetName();
-		virtual const char*					GetExtension();
-		virtual ZEUInt						GetSourceVersion();
-		virtual ZEUInt						GetDestinationVersion();
-		virtual bool						GetMajorVersionConversion();
+		virtual ZECVVersion					GetSourceVersion() const;
+		virtual ZECVVersion					GetDestinationVersion() const;
 
-		virtual bool						Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
 };
 
