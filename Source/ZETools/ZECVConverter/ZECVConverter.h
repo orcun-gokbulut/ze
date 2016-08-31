@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVConverter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,18 +30,24 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZECVMain.cpp					Sources)
-ze_add_source(ZECVConverter.cpp				Sources)
-ze_add_source(ZECVConverter.h				Sources Headers)
-ze_add_source(ZECVModelConverterV2.cpp		Sources)
-ze_add_source(ZECVModelConverterV2.h		Sources Headers)
+#include "ZECVDefinitions.h"
 
-ze_add_executable(TARGET ZEModelConverter
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation libTootle)
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
+
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+
+class ZECVConverter
+{
+	public:
+		virtual ZECVVersion					GetSourceVersion() const = 0;
+		virtual ZECVVersion					GetDestinationVersion() const= 0;
+
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) = 0;
+};

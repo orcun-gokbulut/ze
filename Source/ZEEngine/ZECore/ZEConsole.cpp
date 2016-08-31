@@ -417,7 +417,7 @@ bool ZEConsole::ParseInput(const char* Input)
 
 static void LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
-	zeOutput("[%s] %s: %s\n", Module, ZELog::UtilityGetLogTypeString(Type), LogText);
+	zeOutput("[%s] %s: %s\n", Module, ZELog::GetLogTypeString(Type), LogText);
 }
 
 void ZEConsole::SetConsoleInterface(ZEConsoleInterface* Interface)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathInfo.h
+ Zinek Engine - ZECVMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PATH_INFO_H__
-#define __ZE_PATH_INFO_H__
+#include "ZECVModelConverterV2.h"
 
-#include "ZETypes.h"
-#include "ZETimeStamp.h"
-#include "ZEFileCommon.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEDelegate.h"
+#include "ZEFile/ZEPathManager.h"
+#include "ZECVProcessor.h"
+#include "ZECVAsset.h"
+#include "ZECVConverter.h"
 
-class ZEPathTokenizer;
+#include <stdio.h>
+#include <stdlib.h>
 
-enum ZEPathOperationElement
+void Help()
 {
-	ZE_POE_NONE			= 0,
-	ZE_POE_FILE			= 1,
-	ZE_POE_DIRECTORY	= 2,
-	ZE_POE_ALL			= 3
-};
+	printf(
+		" This tool is provided for converting or upgrading files in old format to latest format.\n"
+		"\n"
+		" Usage:\n"
+		"   ZECVConverter [Old Format File] [Destination]\n"
+		"   ZECVConverter [Search Directory]\n"
+		"\n"
+		" Supported Assets:\n");
 
-typedef ZEDelegate<bool (const char*, ZEPathOperationElement)> ZEPathOperationFunction;
+	ZECVProcessor* Processor = ZECVProcessor::GetInstance();
 
-class ZEPathInfo
+	ZECVAsset* const* Assets = Processor->GetAssets();
+	ZESize AssetCount = Processor->GetAssetCount();
+	for (ZESize I = 0; I < AssetCount; I++)
+	{
+		ZECVAsset* Asset = Assets[I];
+
+		printf("  %s (Versions: ", Asset->GetName());
+
+		ZECVConverter* const* Converters = Asset->GetConverters();
+		ZESize ConverterCount = Asset->GetConverterCount();
+		for (ZESize N = 0; N < ConverterCount; N++)
+		{
+			ZECVConverter* Converter = Converters[N];
+
+			if (N != 0)
+				printf (", ");
+
+			ZECVVersion SourceVersion = Converter->GetSourceVersion();
+			printf("%d.%d", SourceVersion.Major, SourceVersion.Minor);
+		}
+
+		ZECVVersion DestinationVersion = Asset->GetCurrentVersion();
+		printf(") -> %d.%d\n", DestinationVersion.Major, DestinationVersion.Minor);
+	}
+}
+
+int main(int argc, char** argv)
 {
-	private:
-		ZEString					Path;
+	printf(" ZECVConverter - Zinek Engine Asset Converter/Updater \n");
+	printf("----------------------------------------------------------------------------------- \n");
 
-	public:
-		void						SetPath(const char* Path);
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 
-		const ZEString&				GetPath() const;
-		ZEString					GetFileName() const;
-		ZEString					GetName() const;
-		ZEString					GetExtension() const;
-		ZEString					GetParentDirectory() const;
-		ZEPathRoot					GetRoot() const;
-		ZEPathAccess				GetAccess() const;
-		ZERealPath					GetRealPath() const;
-
-		bool						IsExists() const;
-		bool						IsFile() const;
-		bool						IsDirectory() const;
-		bool						IsInsidePackage() const;
-
-		bool						IsParent(const char* ParentPath) const;
-		ZEString					GetRelativeTo(const char* ParentPath) const;
-
-		ZETimeStamp					GetCreationDate() const;
-		ZETimeStamp					GetModificationTime() const;
-
-		ZEString					Normalize();
-
-		bool						Equals(const ZEPathInfo& OtherPath) const;
-
-		static bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
-
-									ZEPathInfo();
-									ZEPathInfo(const char* Path);
-
-		static bool					Normalize(ZEPathTokenizer& Tokenizer);
-		static ZEString				CombineRelativePath(const char* ParentFilePath, const char* Path);
-};
-
-#endif
+	const char* Source = argv[1];
+	const char* Destination = argv[2];
+	if (argc == 3)
+	{
+		bool Result = ZECVProcessor::GetInstance()->Convert(Source, Destination);
+		return Result ? EXIT_SUCCESS : EXIT_FAILURE;
+	}
+	else if (argc == 2)
+	{
+		ZECVProcessor::GetInstance()->ConvertDirectory(Source);
+		return EXIT_SUCCESS;
+	}
+	else
+	{
+		Help();
+		return EXIT_FAILURE;
+	}
+}
