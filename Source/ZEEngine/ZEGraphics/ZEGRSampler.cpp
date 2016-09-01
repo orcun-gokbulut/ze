@@ -78,6 +78,7 @@ const ZEGRSamplerDescription& ZEGRSampler::GetDescription() const
 
 ZEHolder<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& SamplerDescription)
 {
+	SamplerCacheLock.Lock();
 	ze_for_each(Entry, SamplerCache)
 	{
 		if (Entry->Description.AddressU == SamplerDescription.AddressU &&
@@ -93,6 +94,7 @@ ZEHolder<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& Samp
 			Entry->Description.MipMapLODBias == SamplerDescription.MipMapLODBias &&
 			Entry->Description.BorderColor == SamplerDescription.BorderColor)
 		{
+			SamplerCacheLock.Unlock();
 			return &(*Entry);
 		}
 	}
@@ -103,10 +105,10 @@ ZEHolder<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& Samp
 	if (!Sampler->Initialize())
 	{
 		delete Sampler;
+		SamplerCacheLock.Unlock();
 		return NULL;
 	}
 
-	SamplerCacheLock.Lock();
 	SamplerCache.AddEnd(&Sampler->SamplerCacheLink);
 	SamplerCacheLock.Unlock();
 

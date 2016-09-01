@@ -43,23 +43,12 @@
 
 bool ZEGeographicEntity::CheckParent(ZEEntity* Parent)
 {
-// 	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Parent->GetClass()))
-// 		return false;
-// 
-// 	return true;
-
 	return false;
 }
 
 void ZEGeographicEntity::GeographicTransformChanged()
 {
 	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM | ZE_GEDF_LOCAL_TRANSFORM);
-
-// 	ZESectorManager* Parent = static_cast<ZESectorManager*>(GetParent());
-// 	if (Parent == NULL)
-// 		return;
-// 
-// 	Parent->UpdateTransformation(this);
 }
 
 ZEGeographicEntity::ZEGeographicEntity() : GeoLink(this)

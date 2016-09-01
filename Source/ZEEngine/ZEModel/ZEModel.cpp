@@ -202,6 +202,7 @@ ZEEntityResult ZEModel::LoadInternal()
 			return ZE_ER_DONE;
 		
 		Resource = ZEMDResource::LoadResourceShared(ModelFileName);
+		return ZE_ER_WAIT;
 	}
 
 	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled();
@@ -529,8 +530,13 @@ const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 
 void ZEModel::SetModelFile(const ZEString& FileName)
 {
-	ZERSHolder<const ZEMDResource> ModelResource = ZEMDResource::LoadResourceShared(FileName);
-	SetModelResource(ModelResource);
+	ModelFileName = FileName;
+
+	if (IsLoadedOrLoading())
+	{
+		ZERSHolder<const ZEMDResource> ModelResource = ZEMDResource::LoadResourceShared(FileName);
+		SetModelResource(ModelResource);
+	}
 }
 
 const ZEString& ZEModel::GetModelFile() const

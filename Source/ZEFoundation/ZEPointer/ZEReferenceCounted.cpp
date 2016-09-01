@@ -41,6 +41,8 @@ ZE_COPY_NO_ACTION_IMP(ZEReferenceCounted)
 
 void ZEReferenceCounted::Reference() const
 {
+	zeDebugCheck(Destroyed, "Trying to reference a destroyed object");
+
 	ReferenceCountLock.Lock();
 	ReferenceCount++;
 	ReferenceCountLock.Unlock();
@@ -52,8 +54,11 @@ void ZEReferenceCounted::Release() const
 	ReferenceCount--;
 	if (ReferenceCount <= 0)
 	{
-		ReferenceCountLock.Unlock();
+		#ifdef ZE_DEBUG_ENABLE
+		Destroyed = true;
+		#endif
 		Destroy();
+		ReferenceCountLock.Unlock();
 		return;
 	}
 	ReferenceCountLock.Unlock();
@@ -67,6 +72,9 @@ void ZEReferenceCounted::Destroy() const
 ZEReferenceCounted::ZEReferenceCounted()
 {
 	ReferenceCount = 0;
+	#ifdef ZE_DEBUG_ENABLE
+	Destroyed = false;
+	#endif
 }
 
 ZEReferenceCounted::~ZEReferenceCounted()

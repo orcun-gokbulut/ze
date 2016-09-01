@@ -46,6 +46,9 @@ class ZEReferenceCounted
 	friend class ZERSResourceManager;
 	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	private:
+		#ifdef ZE_DEBUG_ENABLE
+		mutable bool					Destroyed;
+		#endif
 		mutable ZELock					ReferenceCountLock;
 		mutable ZESSize					ReferenceCount;
 

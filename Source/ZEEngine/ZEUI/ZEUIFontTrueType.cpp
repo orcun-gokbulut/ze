@@ -291,7 +291,7 @@ ZEUIFontTrueType::~ZEUIFontTrueType()
 	Unregister();
 
 	delete FreeType;
-	FreeType = 0;
+	FreeType = NULL;
 }
 
 ZERSResource* ZEUIFontTrueType::Instanciator(const void* Parameters)

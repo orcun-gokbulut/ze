@@ -77,16 +77,26 @@ int ZEMLEditorElementWidget::GetTypeIndex(ZEValueType ValueType)
 			return 11;
 		case ZE_VRT_VECTOR2:
 			return 12;
-		case ZE_VRT_VECTOR3:
+		case ZE_VRT_VECTOR2D:
 			return 13;
-		case ZE_VRT_VECTOR4:
+		case ZE_VRT_VECTOR3:
 			return 14;
-		case ZE_VRT_QUATERNION:
+		case ZE_VRT_VECTOR3D:
 			return 15;
-		case ZE_VRT_MATRIX3X3:
+		case ZE_VRT_VECTOR4:
 			return 16;
-		case ZE_VRT_MATRIX4X4:
+		case ZE_VRT_VECTOR4D:
 			return 17;
+		case ZE_VRT_QUATERNION:
+			return 18;
+		case ZE_VRT_MATRIX3X3:
+			return 19;
+		case ZE_VRT_MATRIX3X3D:
+			return 20;
+		case ZE_VRT_MATRIX4X4:
+			return 21;
+		case ZE_VRT_MATRIX4X4D:
+			return 22;
 	}
 }
 
@@ -123,15 +133,25 @@ ZEValueType ZEMLEditorElementWidget::GetValueType(int Index)
 		case 12:
 			return ZE_VRT_VECTOR2;
 		case 13:
-			return ZE_VRT_VECTOR3;
+			return ZE_VRT_VECTOR2D;
 		case 14:
-			return ZE_VRT_VECTOR4;
+			return ZE_VRT_VECTOR3;
 		case 15:
-			return ZE_VRT_QUATERNION;
+			return ZE_VRT_VECTOR3D;
 		case 16:
-			return ZE_VRT_MATRIX3X3;
+			return ZE_VRT_VECTOR4;
 		case 17:
+			return ZE_VRT_VECTOR4D;
+		case 18:
+			return ZE_VRT_QUATERNION;
+		case 19:
+			return ZE_VRT_MATRIX3X3;
+		case 20:
+			return ZE_VRT_MATRIX3X3D;
+		case 21:
 			return ZE_VRT_MATRIX4X4;
+		case 22:
+			return ZE_VRT_MATRIX4X4D;
 	}
 }
 
@@ -233,6 +253,14 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat12->setVisible(true);
 		Form->txtValueFloat12->setText(QString::number(Value.y));
 	}
+	else if (Property->GetValueType() == ZEML_VT_VECTOR2D)
+	{
+		const ZEVector2d& Value = Property->GetValue().GetVector2d();
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Value.x, 'g', 14));
+		Form->txtValueFloat12->setVisible(true);
+		Form->txtValueFloat12->setText(QString::number(Value.y, 'g', 14));
+	}
 	else if (Property->GetValueType() == ZEML_VT_VECTOR3)
 	{
 		const ZEVector3& Value = Property->GetValue().GetVector3();
@@ -242,6 +270,16 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat12->setText(QString::number(Value.y));
 		Form->txtValueFloat13->setVisible(true);
 		Form->txtValueFloat13->setText(QString::number(Value.z));
+	}
+	else if (Property->GetValueType() == ZEML_VT_VECTOR3D)
+	{
+		const ZEVector3d& Value = Property->GetValue().GetVector3d();
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Value.x, 'g', 14));
+		Form->txtValueFloat12->setVisible(true);
+		Form->txtValueFloat12->setText(QString::number(Value.y, 'g', 14));
+		Form->txtValueFloat13->setVisible(true);
+		Form->txtValueFloat13->setText(QString::number(Value.z, 'g', 14));
 	}
 	else if (Property->GetValueType() == ZEML_VT_VECTOR4)
 	{
@@ -255,6 +293,19 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat13->setText(QString::number(Property->GetValue().GetVector4().z));
 		Form->txtValueFloat14->setVisible(true);
 		Form->txtValueFloat14->setText(QString::number(Property->GetValue().GetVector4().w));
+	}
+	else if (Property->GetValueType() == ZEML_VT_VECTOR4D)
+	{
+		const ZEVector4d& Value = Property->GetValue().GetVector4d();
+
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Property->GetValue().GetVector4().x, 'g', 14));
+		Form->txtValueFloat12->setVisible(true);
+		Form->txtValueFloat12->setText(QString::number(Property->GetValue().GetVector4().y, 'g', 14));
+		Form->txtValueFloat13->setVisible(true);
+		Form->txtValueFloat13->setText(QString::number(Property->GetValue().GetVector4().z, 'g', 14));
+		Form->txtValueFloat14->setVisible(true);
+		Form->txtValueFloat14->setText(QString::number(Property->GetValue().GetVector4().w, 'g', 14));
 	}
 	else if (Property->GetValueType() == ZEML_VT_QUATERNION)
 	{
@@ -293,6 +344,30 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat33->setText(QString::number(Value.M33));
 
 	}
+	else if (Property->GetValueType() == ZEML_VT_MATRIX3X3D)
+	{
+		const ZEMatrix3x3d& Value = Property->GetValue().GetMatrix3x3d();
+
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Value.M11, 'g', 14));
+		Form->txtValueFloat12->setVisible(true);
+		Form->txtValueFloat12->setText(QString::number(Value.M12, 'g', 14));
+		Form->txtValueFloat13->setVisible(true);
+		Form->txtValueFloat13->setText(QString::number(Value.M13, 'g', 14));
+		Form->txtValueFloat21->setVisible(true);
+		Form->txtValueFloat21->setText(QString::number(Value.M21, 'g', 14));
+		Form->txtValueFloat22->setVisible(true);
+		Form->txtValueFloat22->setText(QString::number(Value.M22, 'g', 14));
+		Form->txtValueFloat23->setVisible(true);
+		Form->txtValueFloat23->setText(QString::number(Value.M23, 'g', 14));
+		Form->txtValueFloat31->setVisible(true);
+		Form->txtValueFloat31->setText(QString::number(Value.M31, 'g', 14));
+		Form->txtValueFloat32->setVisible(true);
+		Form->txtValueFloat32->setText(QString::number(Value.M32, 'g', 14));
+		Form->txtValueFloat33->setVisible(true);
+		Form->txtValueFloat33->setText(QString::number(Value.M33, 'g', 14));
+
+	}
 	else if (Property->GetValueType() == ZEML_VT_MATRIX4X4)
 	{
 		const ZEMatrix4x4& Value = Property->GetValue().GetMatrix4x4();
@@ -302,7 +377,7 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat12->setVisible(true);
 		Form->txtValueFloat12->setText(QString::number(Value.M12));
 		Form->txtValueFloat13->setVisible(true);
-		Form->txtValueFloat13->setText(QString::number(Value.M14));
+		Form->txtValueFloat13->setText(QString::number(Value.M13));
 		Form->txtValueFloat14->setVisible(true);
 		Form->txtValueFloat14->setText(QString::number(Value.M14));
 		Form->txtValueFloat21->setVisible(true);
@@ -329,6 +404,43 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		Form->txtValueFloat43->setText(QString::number(Value.M43));
 		Form->txtValueFloat44->setVisible(true);
 		Form->txtValueFloat44->setText(QString::number(Value.M44));
+	}
+	else if (Property->GetValueType() == ZEML_VT_MATRIX4X4D)
+	{
+		const ZEMatrix4x4d& Value = Property->GetValue().GetMatrix4x4d();
+
+		Form->txtValueFloat11->setVisible(true);
+		Form->txtValueFloat11->setText(QString::number(Value.M11, 'g', 14));
+		Form->txtValueFloat12->setVisible(true);
+		Form->txtValueFloat12->setText(QString::number(Value.M12, 'g', 14));
+		Form->txtValueFloat13->setVisible(true);
+		Form->txtValueFloat13->setText(QString::number(Value.M13, 'g', 14));
+		Form->txtValueFloat14->setVisible(true);
+		Form->txtValueFloat14->setText(QString::number(Value.M14, 'g', 14));
+		Form->txtValueFloat21->setVisible(true);
+		Form->txtValueFloat21->setText(QString::number(Value.M21, 'g', 14));
+		Form->txtValueFloat22->setVisible(true);
+		Form->txtValueFloat22->setText(QString::number(Value.M22, 'g', 14));
+		Form->txtValueFloat23->setVisible(true);
+		Form->txtValueFloat23->setText(QString::number(Value.M23, 'g', 14));
+		Form->txtValueFloat24->setVisible(true);
+		Form->txtValueFloat24->setText(QString::number(Value.M24, 'g', 14));
+		Form->txtValueFloat31->setVisible(true);
+		Form->txtValueFloat31->setText(QString::number(Value.M31, 'g', 14));
+		Form->txtValueFloat32->setVisible(true);
+		Form->txtValueFloat32->setText(QString::number(Value.M32, 'g', 14));
+		Form->txtValueFloat33->setVisible(true);
+		Form->txtValueFloat33->setText(QString::number(Value.M33, 'g', 14));
+		Form->txtValueFloat34->setVisible(true);
+		Form->txtValueFloat34->setText(QString::number(Value.M34, 'g', 14));
+		Form->txtValueFloat41->setVisible(true);
+		Form->txtValueFloat41->setText(QString::number(Value.M41, 'g', 14));
+		Form->txtValueFloat42->setVisible(true);
+		Form->txtValueFloat42->setText(QString::number(Value.M42, 'g', 14));
+		Form->txtValueFloat43->setVisible(true);
+		Form->txtValueFloat43->setText(QString::number(Value.M43, 'g', 14));
+		Form->txtValueFloat44->setVisible(true);
+		Form->txtValueFloat44->setText(QString::number(Value.M44, 'g', 14));
 	}
 }
 
@@ -534,17 +646,35 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 		Vector.M[Column] = NewValue;
 		Property->SetVector2(Vector);
 	}
+	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR2D)
+	{
+		ZEVector2d Vector = Property->GetValue().GetVector2d();
+		Vector.M[Column] = NewValue;
+		Property->SetVector2d(Vector);
+	}
 	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR3)
 	{
 		ZEVector3 Vector = Property->GetValue().GetVector3();
 		Vector.M[Column] = NewValue;
 		Property->SetVector3(Vector);
 	}
+	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR3D)
+	{
+		ZEVector3d Vector = Property->GetValue().GetVector3d();
+		Vector.M[Column] = NewValue;
+		Property->SetVector3d(Vector);
+	}
 	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR4)
 	{
 		ZEVector4 Vector = Property->GetValue().GetVector4();
 		Vector.M[Column] = NewValue;
 		Property->SetVector4(Vector);
+	}
+	else if (Property->GetValue().GetType() == ZE_VRT_VECTOR4D)
+	{
+		ZEVector4d Vector = Property->GetValue().GetVector4d();
+		Vector.M[Column] = NewValue;
+		Property->SetVector4d(Vector);
 	}
 	else if (Property->GetValue().GetType() == ZE_VRT_QUATERNION)
 	{
@@ -558,11 +688,23 @@ void ZEMLEditorElementWidget::txtValueFloat_OnTextEdited(const QString& NewText)
 		Matrix.M[Column][Row] = NewValue;
 		Property->SetMatrix3x3(Matrix);
 	}
+	else if (Property->GetValue().GetType() == ZE_VRT_MATRIX3X3D)
+	{
+		ZEMatrix3x3d Matrix = Property->GetValue().GetMatrix3x3d();
+		Matrix.M[Column][Row] = NewValue;
+		Property->SetMatrix3x3d(Matrix);
+	}
 	else if (Property->GetValue().GetType() == ZE_VRT_MATRIX4X4)
 	{
 		ZEMatrix4x4 Matrix = Property->GetValue().GetMatrix4x4();
 		Matrix.M[Column][Row] = NewValue;
 		Property->SetMatrix4x4(Matrix);
+	}
+	else if (Property->GetValue().GetType() == ZE_VRT_MATRIX4X4D)
+	{
+		ZEMatrix4x4d Matrix = Property->GetValue().GetMatrix4x4d();
+		Matrix.M[Column][Row] = NewValue;
+		Property->SetMatrix4x4d(Matrix);
 	}
 
 	emit ValueChanged(Property, Property->GetValue(), OldValue);

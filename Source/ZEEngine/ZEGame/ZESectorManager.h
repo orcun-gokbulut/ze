@@ -40,24 +40,38 @@
 
 class ZESectorSelector;
 class ZEGeographicEntity;
+class ZEScene;
 
 class ZESectorManager : public ZEObject
 {
 	ZE_OBJECT;
 
 	protected:
+		ZEScene*							Scene;
 		ZESector* 							OriginSector;
+		ZEArray<ZESector*>					SectorCache;
+		ZEUInt32							CacheDepth;
+
 		ZEList2<ZEGeographicEntity>			Sectors;
 		ZEList2<ZEGeographicEntity>			Selectors;
 		ZEList2<ZEGeographicEntity>			GeographicEntities;
 
-		void								UpdateTransformation(ZEGeographicEntity* Entity);
+		void								AddToCache(ZESector* Sector);
+		void								RemoveFromCache(ZESector* Sector);
+
+		void								UpdateTransformation(ZEGeographicEntity* Entity, bool Forced = false);
 		void								UpdateTransformations();
 		void								UpdateActiveSectors();
 
 											ZESectorManager();
 
 	public:
+		void								SetScene(ZEScene* Scene);
+		ZEScene*							GetScene() const;
+
+		void								SetCacheDepth(ZESize Depth);
+		ZESize								GetCacheDepth() const;
+
 		const ZEList2<ZEGeographicEntity>&	GetSectors() const;
 		ZEArray<ZESector*>					GetSectors(const ZEVector3d& Position) const;
 		ZESector*							GetSector(const ZEGUID& Id) const;
@@ -76,5 +90,9 @@ class ZESectorManager : public ZEObject
 
 		virtual void						Process(float Time);
 
+		bool								Serialize(const ZEString& FileName);
+		bool								Unserialize(const ZEString& FileName);
+
+		virtual void						Destroy();
 		static ZESectorManager*				CreateInstance();
 };

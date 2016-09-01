@@ -40,48 +40,51 @@
 
 class ZESectorManager;
 
+struct ZESectorLink
+{
+	ZEGUID		Id;
+	ZEUInt32	Depth;
+};
+
 class ZESector : public ZEGeographicEntity
 {
 	friend class ZESectorManager;
 	ZE_OBJECT;
 	private:
-		ZEGUID						GUID;
-		ZEString					SectorFile;
-		ZESectorManager*			Manager;
-		ZESize						LoadingIndex;
-		ZELock						SectorLock;
+		ZEGUID							GUID;
+		ZEString						SectorFile;
+		ZESectorManager*				Manager;
+		ZELock							SectorLock;
+		ZEArray<ZESectorLink>			SectorLinks;
 
-		ZEArray<ZEGUID>				AdjacentSectorIds;
-		ZEInt8						AdjacencyDepth;
+		bool							CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck);
+		void							SetManager(ZESectorManager* Manager);				
 
-		void						SetManager(ZESectorManager* Manager);
-		
-		virtual ZEEntityResult		LoadInternal();
-		virtual ZEEntityResult		UnloadInternal();
+		virtual ZEEntityResult			LoadInternal();
 
-									ZESector();
+										ZESector();
+		virtual							~ZESector();
 
 	public:
-		void						SetGUID(const ZEGUID& GUID);
-		const ZEGUID&				GetGUID() const;
+		void							SetGUID(const ZEGUID& GUID);
+		const ZEGUID&					GetGUID() const;
 
-		void						SetSectorFile(const ZEString& FilePath);
-		const ZEString&				GetSectorFile() const;
+		void							SetSectorFile(const ZEString& FilePath);
+		const ZEString&					GetSectorFile() const;
 
-		ZESectorManager*			GetManager() const;
+		ZESectorManager*				GetManager() const;
+		bool							CheckLink(ZESector* TargetSector);
 
-		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
-		const ZEArray<ZEGUID>&		GetAdjacentSectorIds() const;
-		bool						AddAdjacentSector(ZESector* Sector);
-		bool						RemoveAdjacentSector(ZESector* Sector);
+		const ZEArray<ZESectorLink>&	GetSectorLinks() const;
+		bool							AddLink(const ZESector* Sector, ZEUInt32 Depth);
+		bool							AddLink(const ZEGUID& SectorId, ZEUInt32 Depth);
+		bool							RemoveLink(const ZESector* Sector);
+		bool							RemoveLink(const ZEGUID& SectorId);
 		
-		void						SetAdjacencyDepth(ZEInt8 Value);
-		ZEInt8						GetAdjacencyDepth() const;
+		bool							Save();
 
-		bool						Save();
+		virtual bool					Serialize(ZEMLWriterNode* Serializer);
+		virtual bool					Unserialize(ZEMLReaderNode* Unserializer);
 
-		virtual bool				Serialize(ZEMLWriterNode* Serializer);
-		virtual bool				Unserialize(ZEMLReaderNode* Unserializer);
-
-		static ZESector*			CreateInstance();
+		static ZESector*				CreateInstance();
 };

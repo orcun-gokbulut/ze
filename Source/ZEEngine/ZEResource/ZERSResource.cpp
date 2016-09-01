@@ -42,6 +42,7 @@
 void ZERSResource::Reference() const
 {
 	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+	zeDebugCheck(TargetState == ZERS_RS_DESTROYED, "Resource is destroyed but referenced.");
 
 	ReferenceCountLock.Lock();
 	if (Parent != NULL)
@@ -84,9 +85,8 @@ void ZERSResource::Destroy() const
 
 	Resource->TargetState = ZERS_RS_DESTROYED;
 	Resource->PreDestroy();
-	ReferenceCountLock.Unlock();
-
 	Resource->UpdateStateTask.Run();
+	ReferenceCountLock.Unlock();
 }
 
 void ZERSResource::UpdateMemoryConsumption()
