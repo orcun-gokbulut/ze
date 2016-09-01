@@ -37,15 +37,58 @@
 #include "ZESectorSelector.h"
 #include "ZEGeographicEntity.h"
 #include "ZEMath\ZEMath.h"
+#include "ZEScene.h"
+#include "ZEML\ZEMLWriter.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEMeta\ZEProvider.h"
 
 #define ZE_GEDF_LOCAL_TRANSFORM 0x0004
 
-void ZESectorManager::UpdateTransformation(ZEGeographicEntity* Entity)
+void ZESectorManager::AddToCache(ZESector* Sector)
+{
+	if (Sector == NULL)
+		return;
+
+	if (SectorCache.Exists(Sector))
+		return;
+
+	zeDebugLog("ZESectorManager Cache updated. Sector added. Sector: \"%s\"", Sector->GetName().ToCString());
+
+	Sector->Load();
+	SectorCache.Add(Sector);
+}
+
+void ZESectorManager::RemoveFromCache(ZESector* Sector)
+{
+	if (Sector == NULL)
+		return;
+
+	if (Sector->GetScene() == NULL || Sector->GetScene() != Scene)
+		return;
+
+	if (!SectorCache.Exists(Sector))
+		return;
+
+	zeDebugLog("ZESectorManager Cache updated. Sector removed. Sector: \"%s\"", Sector->GetName().ToCString());
+	zeDebugLog("ZESectorManager updated. Sector removed from Scene. Sector: \"%s\"", Sector->GetName().ToCString());
+
+	SectorCache.RemoveValue(Sector);
+	Scene->RemoveEntity(Sector);
+	Sector->Unload();
+}
+
+void ZESectorManager::UpdateTransformation(ZEGeographicEntity* Entity, bool Forced)
 {
 	if (OriginSector == NULL)
 		return;
 
-	if (Entity->GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_LOCAL_TRANSFORM))
+	if (Entity == NULL)
+		return;
+
+	if (Entity->GetScene() == NULL)
+		return;
+
+	if (Forced || Entity->GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_LOCAL_TRANSFORM))
 	{
 		ZEMatrix4x4d EntityLocalTransform;
 		ZEMatrix4x4d::Multiply(EntityLocalTransform, OriginSector->GetInvGeographicTransform(), Entity->GetGeographicTransform());
@@ -67,14 +110,14 @@ void ZESectorManager::UpdateTransformations()
 
 	ZESector* ResultSector = GetSector(GeographicRelativeOrigin, true);
 
-	if (OriginSector == ResultSector)
-		return;
+	if (OriginSector != ResultSector)
+	{
+		OriginSector = ResultSector;
+
+		ze_for_each(Sector, Sectors)
+			UpdateTransformation(Sector.GetPointer(), true);
+	}
 	
-	OriginSector = ResultSector;
-
-	ze_for_each(Sector, Sectors)
-		UpdateTransformation(Sector.GetPointer());
-
 	ze_for_each(Selector, Selectors)
 		UpdateTransformation(Selector.GetPointer());
 
@@ -96,14 +139,43 @@ void ZESectorManager::UpdateActiveSectors()
 
 		ze_for_each(Sector, Sectors)
 		{
-			ZESector* Temp = static_cast<ZESector*>(Sector.GetPointer());
-			bool Result = Temp->CheckAdjacency(CurrentSelectedSector, CurrentSelectedSector->GetAdjacencyDepth());
+			ZESector* CurrentSector = static_cast<ZESector*>(Sector.GetPointer());
+			bool NormalResult = CurrentSelectedSector->CheckLink(CurrentSector);
+			bool CacheResult = CurrentSelectedSector->CheckLinkInternal(CurrentSector, CacheDepth, false);
 
-			if (!Temp->GetEnabled()) //Investigate Possible bug
-				UpdateTransformation(Temp);
+			if (CacheResult)
+			{
+				AddToCache(CurrentSector);
+			}
+			else
+			{
+				RemoveFromCache(CurrentSector);
+			}
 
-			Temp->SetEnabled(Result);
-			Temp->SetVisible(Result);
+			if (NormalResult)
+			{
+				if (CurrentSector->GetScene() == NULL)
+				{
+					zeDebugLog("ZESectorManager updated. Sector added to scene. Sector: \"%s\"", Sector->GetName().ToCString());
+					Scene->AddEntity(CurrentSector);
+					UpdateTransformation(CurrentSector, true);
+				}
+
+				if (!CurrentSector->GetVisible())
+				{
+					CurrentSector->SetVisible(true);
+					zeDebugLog("ZESectorManager updated. Sector set as visible. Sector: \"%s\"", Sector->GetName().ToCString());
+					UpdateTransformation(CurrentSector, true);
+				}
+			}
+			else
+			{
+				if (CurrentSector->GetVisible())
+				{
+					CurrentSector->SetVisible(false);
+					zeDebugLog("ZESectorManager updated. Sector set as invisible. Sector: \"%s\"", Sector->GetName().ToCString());
+				}
+			}
 		}
 	}
 }
@@ -111,6 +183,30 @@ void ZESectorManager::UpdateActiveSectors()
 ZESectorManager::ZESectorManager()
 {
 	OriginSector = NULL;
+	CacheDepth = 8;
+}
+
+void ZESectorManager::SetScene(ZEScene* Scene)
+{
+	zeCheckError(Scene == NULL, ZE_VOID, "Cannot set scene to sector manager. Scene is NULL.");
+	this->Scene = Scene;
+}
+
+ZEScene* ZESectorManager::GetScene() const
+{
+	return Scene;
+}
+
+void ZESectorManager::SetCacheDepth(ZESize Depth)
+{
+	zeCheckError(Depth < 8, ZE_VOID, "ZESectorManager Cache Depth must be greater than 8. Value : \"%d\".", Depth);
+
+	CacheDepth = Depth;
+}
+
+ZESize ZESectorManager::GetCacheDepth() const
+{
+	return CacheDepth;
 }
 
 const ZEList2<ZEGeographicEntity>& ZESectorManager::GetSectors() const
@@ -273,6 +369,208 @@ void ZESectorManager::Process(float Time)
 	UpdateTransformations();
 
 	UpdateActiveSectors();
+}
+
+bool ZESectorManager::Serialize(const ZEString& FileName)
+{
+	zeLog("Saving ZESectorManager file \"%s\".", FileName.GetValue());
+
+	ZEMLWriter Writer;
+	zeCheckError(!Writer.Open(FileName), false, "Saving ZESectorManager failed. Cannot write to file. File Name: \"%s\".", FileName.ToCString());
+
+	ZEMLWriterNode SectorManagerNode;
+	Writer.OpenRootNode("ZESectorManager", SectorManagerNode);
+
+	SectorManagerNode.WriteUInt8("VersionMajor", 1);
+	SectorManagerNode.WriteUInt8("VersionMinor", 0);
+
+	ZEMLWriterNode PropertiesNode;
+	SectorManagerNode.OpenNode("Properties", PropertiesNode);
+	PropertiesNode.WriteUInt32("CacheDepth", CacheDepth);
+	PropertiesNode.CloseNode();
+
+	ZEMLWriterNode SelectorsNode;
+	SectorManagerNode.OpenNode("Selectors", SelectorsNode);
+
+	ze_for_each(Selector, Selectors)
+	{
+		zeCheckError(Selector->GetClass() == NULL, false, "Saving ZESectorManager file failed. Class for selector is not registered. Selector Name: \"%s\".", Selector->GetName().ToCString());
+
+		ZEMLWriterNode SelectorNode;
+		SelectorsNode.OpenNode("Selector", SelectorNode);
+		SelectorNode.WriteString("Class", Selector->GetClass()->GetName());
+
+		if (!Selector->Serialize(&SelectorNode))
+		{
+			zeError("Saving ZESectorManager file failed. Selector serialization failed. Selector Name: \"%s\".", Selector->GetName().ToCString());
+			SelectorNode.CloseNode();
+			SelectorsNode.CloseNode();
+			SectorManagerNode.CloseNode();
+			Writer.Close();
+			return false;
+		}
+
+		SelectorNode.CloseNode();
+	}
+
+	SelectorsNode.CloseNode();
+
+	ZEMLWriterNode SectorsNode;
+	SectorManagerNode.OpenNode("Sectors", SectorsNode);
+
+	ze_for_each(Sector, Sectors)
+	{
+		zeCheckError(Sector->GetClass() == NULL, false, "Saving ZESectorManager file failed. Class for sector is not registered. Sector Name: \"%s\".", Sector->GetName().ToCString());
+
+		ZEMLWriterNode SectorNode;
+		SectorsNode.OpenNode("Sector", SectorNode);
+		SectorNode.WriteString("Class", Sector->GetClass()->GetName());
+
+		if (!Sector->Serialize(&SectorNode))
+		{
+			zeError("Saving ZESectorManager file failed. Sector serialization failed. Sector Name: \"%s\".", Sector->GetName().ToCString());
+			SectorNode.CloseNode();
+			SectorsNode.CloseNode();
+			SectorManagerNode.CloseNode();
+			Writer.Close();
+			return false;
+		}
+
+		SectorNode.CloseNode();
+	}
+
+	SectorsNode.CloseNode();
+
+	ZEMLWriterNode GeoEntitiesNode;
+	SectorManagerNode.OpenNode("GeographicEntities", GeoEntitiesNode);
+
+	ze_for_each(GeographicEntity, GeographicEntities)
+	{
+		zeCheckError(GeographicEntity->GetClass() == NULL, false, "Saving ZESectorManager file failed. Class for geographic entity is not registered. Entity Name: \"%s\".", GeographicEntity->GetName().ToCString());
+
+		ZEMLWriterNode GeoEntityNode;
+		SelectorsNode.OpenNode("GeographicEntity", GeoEntityNode);
+		GeoEntityNode.WriteString("Class", GeographicEntity->GetClass()->GetName());
+
+		if (!GeographicEntity->Serialize(&GeoEntityNode))
+		{
+			zeError("Saving ZESectorManager file failed. Geographic entity serialization failed. Entity Name: \"%s\".", GeographicEntity->GetName().ToCString());
+			GeoEntityNode.CloseNode();
+			GeoEntitiesNode.CloseNode();
+			SectorManagerNode.CloseNode();
+			Writer.Close();
+			return false;
+		}
+
+		GeoEntityNode.CloseNode();
+	}
+
+	GeoEntitiesNode.CloseNode();
+	SectorManagerNode.CloseNode();
+	Writer.Close();	
+	zeLog("ZESectorManager file \"%s\" has been saved.", FileName.GetValue());
+
+	return true;
+}
+
+bool ZESectorManager::Unserialize(const ZEString& FileName)
+{
+	zeLog("Loading ZESectorManager file \"%s\".", FileName.GetValue());
+
+	ZEMLReader Reader;
+	zeCheckError(!Reader.Open(FileName), false, "Loading ZESectorManager failed. Cannot read from file. File Name: \"%s\".", FileName.ToCString());
+	ZEMLReaderNode SectorManagerNode = Reader.GetRootNode();
+
+	zeCheckError(SectorManagerNode.GetName() != "ZESectorManager", false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
+
+	ze_for_each(Selector, Selectors)
+		RemoveSelector(static_cast<ZESectorSelector*>(Selector.GetPointer()));
+
+	ze_for_each(Sector, Sectors)
+		RemoveSector(static_cast<ZESector*>(Sector.GetPointer()));
+
+	ze_for_each(GeographicEntity, GeographicEntities)
+		RemoveGeographicEntity(GeographicEntity.GetPointer());
+
+	ZEMLReaderNode PropertiesNode = SectorManagerNode.GetNode("Properties");
+	SetCacheDepth(PropertiesNode.ReadUInt32("CacheDepth", 8));
+
+	ZEMLReaderNode SelectorsNode = SectorManagerNode.GetNode("Selectors");
+	ZESize SelectorCount = SelectorsNode.GetNodeCount("Selector");
+
+	for (ZESize I = 0; I < SelectorCount; I++)
+	{
+		ZEMLReaderNode SelectorNode = SelectorsNode.GetNode("Selector", I);
+		zeCheckError(!SelectorNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
+
+
+		ZEClass* SelectorClass = ZEProvider::GetInstance()->GetClass(SelectorNode.ReadString("Class"));
+		if (SelectorClass == NULL)
+		{
+			zeWarning("Problem in loading ZESectorManager. Selector class is not registered. Class Name: \"%s\".", SelectorNode.ReadString("Class").ToCString());
+			continue;
+		}
+
+		ZESectorSelector* NewSelector = (ZESectorSelector*)SelectorClass->CreateInstance();
+		zeCheckError(NewSelector == NULL, false, "Loading ZESectorManager failed. Cannot create instance of a selector. Class Name: \"%s\".", SelectorNode.ReadString("Class").ToCString());
+		zeCheckError(!NewSelector->Unserialize(&SelectorNode), false, "Loading ZESectorManager failed. Unserialization of selector has failed. Class Name: \"%s\".", SelectorNode.ReadString("Class").ToCString());
+
+		AddSelector(NewSelector);
+	}
+
+	ZEMLReaderNode SectorsNode = SectorManagerNode.GetNode("Sectors");
+	ZESize SectorCount = SectorsNode.GetNodeCount("Sector");
+
+	for (ZESize I = 0; I < SectorCount; I++)
+	{
+		ZEMLReaderNode SectorNode = SectorsNode.GetNode("Sector", I);
+		zeCheckError(!SectorNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
+
+		ZEClass* SectorClass = ZEProvider::GetInstance()->GetClass(SectorNode.ReadString("Class"));
+
+		if (SectorClass == NULL)
+		{
+			zeWarning("Problem in loading ZESectorManager. Sector class is not registered. Class Name: \"%s\".", SectorNode.ReadString("Class").ToCString());
+			continue;
+		}
+
+		ZESector* NewSector = (ZESector*)SectorClass->CreateInstance();
+		zeCheckError(NewSector == NULL, false, "Loading ZESectorManager failed. Cannot create instance of a sector. Class Name: \"%s\".", SectorNode.ReadString("Class").ToCString());
+		zeCheckError(!NewSector->Unserialize(&SectorNode), false, "Loading ZESectorManager failed. Unserialization of sector has failed. Class Name: \"%s\".", SectorNode.ReadString("Class").ToCString());
+
+		AddSector(NewSector);
+	}
+
+	ZEMLReaderNode GeographicEntitiesNode = SectorManagerNode.GetNode("GeographicEntities");
+	ZESize GeographicEntityCount = GeographicEntitiesNode.GetNodeCount("GeographicEntity");
+
+	for (ZESize I = 0; I < GeographicEntityCount; I++)
+	{
+		ZEMLReaderNode GeographicEntityNode = GeographicEntitiesNode.GetNode("GeographicEntity", I);
+		zeCheckError(!GeographicEntityNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
+
+		ZEClass* GeographicEntityClass = ZEProvider::GetInstance()->GetClass(GeographicEntityNode.ReadString("Class"));
+
+		if (GeographicEntityClass == NULL)
+		{
+			zeWarning("Problem in loading ZESectorManager. GeographicEntity class is not registered. Class Name: \"%s\".", GeographicEntityNode.ReadString("Class").ToCString());
+			continue;
+		}
+
+		ZEGeographicEntity* NewGeographicEntity = (ZEGeographicEntity*)GeographicEntityClass->CreateInstance();
+		zeCheckError(NewGeographicEntity == NULL, false, "Loading ZESectorManager failed. Cannot create instance of a GeographicEntity. Class Name: \"%s\".", GeographicEntityNode.ReadString("Class").ToCString());
+		zeCheckError(!NewGeographicEntity->Unserialize(&GeographicEntityNode), false, "Loading ZESectorManager failed. Unserialization of GeographicEntity has failed. Class Name: \"%s\".", GeographicEntityNode.ReadString("Class").ToCString());
+
+		AddGeographicEntity(NewGeographicEntity);
+	}
+
+	zeLog("ZESectorManager file \"%s\" has been loaded.", FileName.GetValue());
+	return true;
+}
+
+void ZESectorManager::Destroy()
+{
+	delete this;
 }
 
 ZESectorManager* ZESectorManager::CreateInstance()

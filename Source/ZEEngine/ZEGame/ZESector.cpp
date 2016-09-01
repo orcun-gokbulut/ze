@@ -48,137 +48,7 @@ void ZESector::SetManager(ZESectorManager* Manager)
 	this->Manager = Manager;
 }
 
-ZEEntityResult ZESector::LoadInternal()
-{
-	if (SectorFile.IsEmpty())
-		return ZE_ER_DONE;
-
-	ZEFile CurrentSectorFile;
-	if (!CurrentSectorFile.Open(SectorFile, ZE_FOM_READ, ZE_FCM_NONE))
-	{
-		zeError("ZESector Load failed. Cannot open sector file. File Name: \"%s\".", SectorFile.ToCString());
-		return ZE_ER_FAILED;
-	}
-
-	ZEMLReader SectorReader;
-	SectorReader.Open(&CurrentSectorFile);
-	ZEMLReaderNode SectorNode = SectorReader.GetRootNode();
-
-	zeCheckError(!SectorNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
-
-	if (LoadingIndex == 0) // On initial load pass
-	{
-		ZEGUID Value;
-		Value.FromString(SectorNode.ReadString("GUID"));
-
-		if (Value == ZEGUID())
-			SetGUID(ZEGUID::Generate());
-		else
-			SetGUID(Value);
-
-		ZEMLReaderNode BoundingBoxNode = SectorNode.GetNode("BoundingBox");
-
-		zeCheckError(!BoundingBoxNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
-
-		ZEAABBox BoundingBox(BoundingBoxNode.ReadVector3("Min"), BoundingBoxNode.ReadVector3("Max"));
-		SetBoundingBox(BoundingBox);
-
-		ZEMLReaderNode AdjacentSectorsNode = SectorNode.GetNode("AdjacentSectors");
-
-		zeCheckError(!AdjacentSectorsNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
-
-		ZESize AdjacentSectorCount = AdjacentSectorsNode.GetNodeCount();
-		AdjacentSectorIds.SetCount(AdjacentSectorCount);
-
-		for (ZESize I = 0; I < AdjacentSectorCount; I++)
-			AdjacentSectorIds[I].FromString(AdjacentSectorsNode.GetNode(I).ReadString("GUID"));
-	
-		ZEMLReaderNode PropertiesNode = SectorNode.GetNode("Properties");
-
-		zeCheckError(!PropertiesNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
-
-		const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
-
-		for (ZESize I = 0; I < Elements.GetCount(); I++)
-		{
-			if (Elements[I].ElementType != ZEML_ET_PROPERTY)
-				continue;
-
-			if (!GetClass()->SetProperty(this, Elements[I].Name, ZEVariant(Elements[I].Value)))
-				zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Elements[I].Name.ToCString());
-		}
-
-	}
-
-	ZEMLReaderNode SubEntitiesNode = SectorNode.GetNode("ChildEntities");
-	zeCheckError(!SubEntitiesNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
-
-	ZESize ChildNodeCount = SubEntitiesNode.GetNodeCount("Entity");
-	zeCheckError(LoadingIndex >= ChildNodeCount, ZE_ER_FAILED, "ZESector Load failed. ZESector child loading index greater than child count. Sector Name: \"%s\".", GetName().ToCString());
-
-	ZESize ChildLoadPassCount = 5;
-	ZEClass* NewChildEntityClass = NULL;
-	ZEEntity* NewChildEntity = NULL;
-
-	while (ChildLoadPassCount != 0)
-	{
-		if (LoadingIndex < ChildNodeCount)
-		{
-			ZEMLReaderNode ChildEntityNode = SubEntitiesNode.GetNode("Entity", LoadingIndex);
-
-			NewChildEntityClass = ZEProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
-			zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
-				GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
-
-			NewChildEntity = static_cast<ZEEntity*>(NewChildEntityClass->CreateInstance());
-
-			if (NewChildEntity == NULL)
-			{
-				zeError("ZESector Load failed. Cannot create instance of a child entity. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
-				NewChildEntity->Destroy();
-				return ZE_ER_FAILED;
-			}
-
-			if (!NewChildEntity->Unserialize(&ChildEntityNode))
-			{
-				zeError("ZESector Load failed. Unserialization of child entity has failed. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
-				NewChildEntity->Destroy();
-				return ZE_ER_FAILED;
-			}
-
-			if (!AddChildEntity(NewChildEntity))
-			{
-				zeError("ZESector Load failed. Cannot add child entity. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
-				NewChildEntity->Destroy();
-				return ZE_ER_FAILED;
-			}
-		
-			LoadingIndex++;
-			ChildLoadPassCount--;
-		}
-		else
-		{
-			LoadingIndex++;
-			return ZE_ER_DONE;
-		}
-	}
-
-	return ZE_ER_WAIT;
-}
-
-ZEEntityResult ZESector::UnloadInternal()
-{
-	ClearChildEntities();
-	LoadingIndex = 0;
-	return ZE_ER_DONE;
-}
-
-ZESectorManager* ZESector::GetManager() const
-{
-	return Manager;
-}
-
-bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
+bool ZESector::CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck)
 {
 	if (TargetSector == NULL)
 		return false;
@@ -192,14 +62,102 @@ bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 	if (Depth == 0)
 		return false;
 
-	const ZEArray<ZEGUID>& SectorIds = TargetSector->GetAdjacentSectorIds();
-	ZESector* CurrentSector = NULL;
+	ZEUInt32 NextDepth = Depth - 1;
 
-	for (ZESize I = 0; I < SectorIds.GetCount(); I++)
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
 	{
-		CurrentSector = Manager->GetSector(SectorIds[I]);
+		ZESector* CurrentLinkedSector = Manager->GetSector(SectorLinks[I].Id);
 
-		if (CheckAdjacency(CurrentSector, (Depth - 1)))
+		if (CurrentLinkedSector == NULL)
+			continue;
+
+		if (DepthCheck && SectorLinks[I].Depth < NextDepth)
+			NextDepth = SectorLinks[I].Depth;
+			
+		if (CurrentLinkedSector->CheckLinkInternal(TargetSector, NextDepth, DepthCheck))
+			return true;
+	}
+
+	return false;
+}
+
+ZEEntityResult ZESector::LoadInternal()
+{
+	ZE_ENTITY_LOAD_CHAIN(ZEGeographicEntity);
+
+	if (SectorFile.IsEmpty())
+		return ZE_ER_DONE;
+
+	ZEMLReader SectorReader;
+	zeCheckError(!SectorReader.Open(SectorFile), ZE_ER_FAILED, "ZESector Load failed. Cannot open sector file. File Name: \"%s\".", SectorFile.ToCString());
+	ZEMLReaderNode SectorNode = SectorReader.GetRootNode();
+
+	zeCheckError(!SectorNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+
+	ZEMLReaderNode SubEntitiesNode = SectorNode.GetNode("ChildEntities");
+	zeCheckError(!SubEntitiesNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+
+	ZESize ChildNodeCount = SubEntitiesNode.GetNodeCount("Entity");
+
+	for (ZESize I = 0; I < ChildNodeCount; I++)
+	{
+		ZEMLReaderNode ChildEntityNode = SubEntitiesNode.GetNode("Entity", I);
+
+		ZEClass* NewChildEntityClass = ZEProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
+		zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
+			GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
+
+		ZEEntity* NewChildEntity = static_cast<ZEEntity*>(NewChildEntityClass->CreateInstance());
+
+		if (NewChildEntity == NULL)
+		{
+			zeError("ZESector Load failed. Cannot create instance of a child entity. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
+			NewChildEntity->Destroy();
+			return ZE_ER_FAILED;
+		}
+
+		if (!NewChildEntity->Unserialize(&ChildEntityNode))
+		{
+			zeError("ZESector Load failed. Unserialization of child entity has failed. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
+			NewChildEntity->Destroy();
+			return ZE_ER_FAILED;
+		}
+
+		if (!AddChildEntity(NewChildEntity))
+		{
+			zeError("ZESector Load failed. Cannot add child entity. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
+			NewChildEntity->Destroy();
+			return ZE_ER_FAILED;
+		}
+	}
+
+	return ZE_ER_DONE;
+}
+
+ZESectorManager* ZESector::GetManager() const
+{
+	return Manager;
+}
+
+bool ZESector::CheckLink(ZESector* TargetSector)
+{
+	zeCheckError(TargetSector == NULL, false, "Link check failed. Target Sector is NULL.");
+	zeCheckError(Manager == NULL, false, "Link check failed. Sector Manager is NULL. Sector Name: \"%s\".", GetName());
+
+	if (TargetSector == this)
+		return true;
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		if (SectorLinks[I].Depth == 0)
+			continue;
+
+		ZESector* CurrentLinkedSector = Manager->GetSector(SectorLinks[I].Id);
+
+		if (CurrentLinkedSector == NULL)
+			continue;
+
+		if (CurrentLinkedSector->CheckLinkInternal(TargetSector, SectorLinks[I].Depth - 1, true))
 			return true;
 	}
 
@@ -208,8 +166,17 @@ bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 
 ZESector::ZESector()
 {
-	LoadingIndex = 0;
-	AdjacencyDepth = 1;
+	GUID = ZEGUID::Zero;
+	Manager = NULL;
+}
+
+ZESector::~ZESector()
+{
+	if (Manager != NULL)
+		Manager->RemoveSector(this);
+
+	Manager = NULL;
+	SectorLinks.Clear();
 }
 
 void ZESector::SetGUID(const ZEGUID& GUID)
@@ -227,12 +194,10 @@ void ZESector::SetSectorFile(const ZEString& FilePath)
 	if (SectorFile.Hash() == FilePath.Hash())
 		return;
 
-	if (IsLoaded())
-		Unload();
-
 	SectorFile = FilePath;
 
-	Load();
+	if (IsLoaded())
+		Reload();
 }
 
 const ZEString& ZESector::GetSectorFile() const
@@ -240,117 +205,126 @@ const ZEString& ZESector::GetSectorFile() const
 	return SectorFile;
 }
 
-const ZEArray<ZEGUID>& ZESector::GetAdjacentSectorIds() const
+const ZEArray<ZESectorLink>& ZESector::GetSectorLinks() const
 {
-	return AdjacentSectorIds;
+	return SectorLinks;
 }
 
-bool ZESector::AddAdjacentSector(ZESector* Sector)
+bool ZESector::AddLink(const ZESector* Sector, ZEUInt32 Depth)
 {
-	zeCheckError(Sector == NULL, false, "Cannot add adjacent sector. Sector is NULL.");
-	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
-	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
-	zeCheckError(AdjacentSectorIds.Exists(Sector->GetGUID()), false, "Cannot add adjacent sector. Sector is already added as adjacent sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(Sector == NULL, false, "Cannot add sector link. Sector is NULL.");
+	zeCheckError(Sector == this, false, "Cannot add sector link. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(Depth == 0, false, "Cannot add sector link. Depth must be greater than 0. Sector Name: \"%s\".", Sector->GetName());
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		if (SectorLinks[I].Id == Sector->GetGUID())
+		{
+			zeError("Cannot add sector link. Sector is already added as link. Sector Name: \"%s\".", Sector->GetName());
+			return false;
+		}
+	}
 
 	ZE_LOCK_SECTION(SectorLock)
 	{
-		AdjacentSectorIds.Add(Sector->GetGUID());
+		ZESectorLink Link;
+		Link.Id = Sector->GetGUID();
+		Link.Depth = Depth;
+		SectorLinks.Add(Link);
 	}
 
 	return true;
 }
 
-bool ZESector::RemoveAdjacentSector(ZESector* Sector)
+bool ZESector::AddLink(const ZEGUID& SectorId, ZEUInt32 Depth)
 {
-	zeCheckError(Sector == NULL, false, "Cannot remove adjacent sector. Sector is NULL.");
-	zeCheckError(Sector == this, false, "Cannot remove adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
-	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
-	zeCheckError(!AdjacentSectorIds.Exists(Sector->GetGUID()), false, "Cannot remove adjacent sector. Sector is not added as adjacent sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(SectorId == ZEGUID::Zero, false, "Cannot add sector link. Sector Id is NULL.");
+	zeCheckError(SectorId == GetGUID(), false, "Cannot add sector link. Sector is same sector. Sector Id: \"%s\".", SectorId.ToString());
+	zeCheckError(Depth == 0, false, "Cannot add sector link. Depth must be greater than 0. Sector Id: \"%s\".", SectorId.ToString());
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		if (SectorLinks[I].Id == SectorId)
+		{
+			zeError("Cannot add sector link. Sector is already added as link. Sector Id: \"%s\".", SectorId.ToString());
+			return false;
+		}
+	}
 
 	ZE_LOCK_SECTION(SectorLock)
 	{
-		AdjacentSectorIds.RemoveValue(Sector->GetGUID());
+		ZESectorLink Link;
+		Link.Id = SectorId;
+		Link.Depth = Depth;
+		SectorLinks.Add(Link);
 	}
 
 	return true;
 }
 
-void ZESector::SetAdjacencyDepth(ZEInt8 Value)
+bool ZESector::RemoveLink(const ZESector* Sector)
 {
-	AdjacencyDepth = Value;
+	zeCheckError(Sector == NULL, false, "Cannot remove sector link. Sector is NULL.");
+	zeCheckError(Sector == this, false, "Cannot remove sector link. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+
+	bool IsLinkExists = false;
+	ZESize LinkIndex = 0;
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		if (SectorLinks[I].Id == Sector->GetGUID())
+		{
+			IsLinkExists = true;
+			LinkIndex = I;
+		}
+	}
+
+	zeCheckError(!IsLinkExists, false, "Cannot remove sector link. Sector is not a link. Sector Name: \"%s\".", Sector->GetName());
+
+	ZE_LOCK_SECTION(SectorLock)
+	{
+		SectorLinks.Remove(LinkIndex);
+	}
+
+	return true;
 }
 
-ZEInt8 ZESector::GetAdjacencyDepth() const
+bool ZESector::RemoveLink(const ZEGUID& SectorId)
 {
-	return AdjacencyDepth;
+	zeCheckError(SectorId == ZEGUID::Zero, false, "Cannot remove sector link. Sector Id is NULL.");
+	zeCheckError(SectorId == GetGUID(), false, "Cannot remove sector link. Sector is same sector. Sector Id: \"%s\".", SectorId.ToString());
+
+	bool IsLinkExists = false;
+	ZESize LinkIndex = 0;
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		if (SectorLinks[I].Id == SectorId)
+		{
+			IsLinkExists = true;
+			LinkIndex = I;
+		}
+	}
+
+	zeCheckError(!IsLinkExists, false, "Cannot remove sector link. Sector is not a link. Sector Id: \"%s\".", SectorId.ToString());
+
+	ZE_LOCK_SECTION(SectorLock)
+	{
+		SectorLinks.Remove(LinkIndex);
+	}
+
+	return true;
 }
 
 bool ZESector::Save()
 {
-	ZEFile CurrentSectorFile;
-	if (!CurrentSectorFile.Open(SectorFile, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-	{
-		zeError("Cannot write to sector file. File Name: \"%s\".", SectorFile.ToCString());
-		return false;
-	}
-
 	ZEMLWriter SectorWriter;
-	SectorWriter.Open(&CurrentSectorFile);
+	zeCheckError(!SectorWriter.Open(SectorFile), false, "Cannot write to sector file. File Name: \"%s\".", SectorFile.ToCString());
 	ZEMLWriterNode SectorNode;
 	SectorWriter.OpenRootNode("Sector", SectorNode);
 
-	SectorNode.WriteString("GUID", GetGUID().ToString());
-
-	ZEMLWriterNode BoundingBoxNode;
-	SectorNode.OpenNode("BoundingBox", BoundingBoxNode);
-	BoundingBoxNode.WriteVector3("Max", GetBoundingBox().Max);
-	BoundingBoxNode.WriteVector3("Min", GetBoundingBox().Min);
-	BoundingBoxNode.CloseNode();
-
-	ZEMLWriterNode AdjacentSectorsNode;
-	SectorNode.OpenNode("AdjacentSectors", AdjacentSectorsNode);
-
-	for (ZESize I = 0; I < AdjacentSectorIds.GetCount(); I++)
-	{
-		ZEMLWriterNode AdjSectorNode;
-		AdjacentSectorsNode.OpenNode("Sector", AdjSectorNode);
-		AdjSectorNode.WriteString("GUID", AdjacentSectorIds[I].ToString());
-		AdjSectorNode.CloseNode();
-	}
-
-	AdjacentSectorsNode.CloseNode();
-
-	ZEMLWriterNode PropertiesNode; 
-	SectorNode.OpenNode("Properties", PropertiesNode);
-
-	const ZEProperty* Properties = GetClass()->GetProperties();
-
-	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
-	{
-		const ZEProperty* Current = &Properties[I];
-		if (Current->Type.ContainerType != ZE_CT_NONE)
-			continue;
-
-		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
-			continue;
-
-		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
-			continue;
-
-		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
-			continue;
-
-		ZEVariant Variant;
-		GetClass()->GetProperty(this, Current->ID, Variant);
-
-		ZEValue Value = Variant.GetValue();
-		if (Value.IsNull())
-			continue;
-
-		PropertiesNode.WriteValue(Current->Name, Value);
-	}
-
-	PropertiesNode.CloseNode();
+	SectorNode.WriteUInt8("VersionMajor", 1);
+	SectorNode.WriteUInt8("VersionMinor", 0);
 
 	const ZEArray<ZEEntity*>& SectorChildEntities = GetChildEntities();
 
@@ -379,7 +353,55 @@ bool ZESector::Serialize(ZEMLWriterNode* Serializer)
 {
 	ZEMLWriterNode PropertiesNode;
 	Serializer->OpenNode("Properties", PropertiesNode);
-	PropertiesNode.WriteString("SectorFile", SectorFile.ToCString());
+
+	PropertiesNode.WriteString("GUID", GetGUID().ToString());
+
+	ZEMLWriterNode BoundingBoxNode;
+	PropertiesNode.OpenNode("BoundingBox", BoundingBoxNode);
+	BoundingBoxNode.WriteVector3("Max", GetBoundingBox().Max);
+	BoundingBoxNode.WriteVector3("Min", GetBoundingBox().Min);
+	BoundingBoxNode.CloseNode();
+
+	const ZEProperty* Properties = GetClass()->GetProperties();
+
+	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
+	{
+		const ZEProperty* Current = &Properties[I];
+		if (Current->Type.ContainerType != ZE_CT_NONE)
+			continue;
+
+		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+			continue;
+
+		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+			continue;
+
+		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
+			continue;
+
+		ZEVariant Variant;
+		GetClass()->GetProperty(this, Current->ID, Variant);
+
+		ZEValue Value = Variant.GetValue();
+		if (Value.IsNull())
+			continue;
+
+		PropertiesNode.WriteValue(Current->Name, Value);
+	}
+
+	ZEMLWriterNode LinksNode;
+	PropertiesNode.OpenNode("Links", LinksNode);
+
+	for (ZESize I = 0; I < SectorLinks.GetCount(); I++)
+	{
+		ZEMLWriterNode LinkNode;
+		LinksNode.OpenNode("Link", LinkNode);
+		LinkNode.WriteString("GUID", SectorLinks[I].Id.ToString());
+		LinkNode.WriteUInt32("Depth", SectorLinks[I].Depth);
+		LinkNode.CloseNode();
+	}
+
+	LinksNode.CloseNode();
 	PropertiesNode.CloseNode();
 
 	return true;
@@ -388,7 +410,49 @@ bool ZESector::Serialize(ZEMLWriterNode* Serializer)
 bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 {
 	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
-	SetSectorFile(PropertiesNode.ReadString("SectorFile"));
+
+	ZEGUID Value;
+	Value.FromString(PropertiesNode.ReadString("GUID"));
+
+	if (Value == ZEGUID())
+		SetGUID(ZEGUID::Generate());
+	else
+		SetGUID(Value);
+
+	ZEMLReaderNode BoundingBoxNode = PropertiesNode.GetNode("BoundingBox");
+
+	zeCheckError(!BoundingBoxNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+
+	ZEAABBox BoundingBox(BoundingBoxNode.ReadVector3("Min"), BoundingBoxNode.ReadVector3("Max"));
+	SetBoundingBox(BoundingBox);
+
+	const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
+
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
+	{
+		if (Elements[I].ElementType != ZEML_ET_PROPERTY)
+			continue;
+
+		if (!GetClass()->SetProperty(this, Elements[I].Name, ZEVariant(Elements[I].Value)))
+			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Elements[I].Name.ToCString());
+	}
+
+	ZEMLReaderNode LinksNode = PropertiesNode.GetNode("Links");
+
+	zeCheckError(!LinksNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+
+	ZESize LinkCount = LinksNode.GetNodeCount();
+	SectorLinks.SetCount(LinkCount);
+
+	for (ZESize I = 0; I < LinkCount; I++)
+	{
+		ZESectorLink Link;
+		ZEMLReaderNode LinkNode = LinksNode.GetNode(I);
+
+		Link.Id.FromString(LinkNode.ReadString("GUID"));
+		Link.Depth = LinkNode.ReadUInt32("Depth", 1);
+		SectorLinks[I] = Link;
+	}
 
 	return true;
 }

@@ -328,10 +328,10 @@ void ZEEntity::SetScene(ZEScene* NewScene)
 
 	if (Scene != NULL)
 	{
-		if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM))
+		if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE) || GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM))
 			Scene->RemoveFromTickList(this);
 
-		if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM))
+		if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) || GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM))
 			Scene->RemoveFromRenderList(this);
 	}
 
@@ -734,7 +734,6 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	InvWorldTransform = ZEMatrix4x4::Identity;
 	BoundingBox = ZEAABBox::Zero;
 	WorldBoundingBox = ZEAABBox::Zero;
-	
 	RenderListOctree = NULL;
 
 	LocalTransformChanged();

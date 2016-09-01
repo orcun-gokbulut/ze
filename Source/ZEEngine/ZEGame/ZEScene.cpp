@@ -219,7 +219,7 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 
 void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 {
-	if (!Entity->RenderListLink.GetInUse())
+	if (!Entity->RenderListLink.GetInUse() && Entity->RenderListOctree == NULL)
 		return;
 
 	ZE_LOCK_SECTION(RenderListLock)
@@ -233,7 +233,8 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 		}
 		else
 		{
-			RenderList.Remove(&Entity->RenderListLink);
+			if (RenderList.Exists(&Entity->RenderListLink))
+				RenderList.Remove(&Entity->RenderListLink);
 		}
 	}
 }
