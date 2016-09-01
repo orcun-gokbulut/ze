@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVSceneConverterV1.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,16 +30,18 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZESceneConverter.cpp		Sources)
-ze_add_source(ZESceneConverter.h		Sources Headers)
-ze_add_source(ZEMain.cpp				Sources)
+#include "ZECVConverter.h"
 
-ze_add_executable(TARGET ZESceneConverter
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation)
+class ZECVSceneConverterV1 : public ZECVConverter
+{
+	public:
+		virtual ZECVVersion					GetSourceVersion() const;
+		virtual ZECVVersion					GetDestinationVersion() const;
+
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
+};

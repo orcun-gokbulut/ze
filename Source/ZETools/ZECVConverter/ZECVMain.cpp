@@ -42,6 +42,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "ZEFile/ZEDirectoryInfo.h"
 
 void Help()
 {
@@ -62,7 +63,7 @@ void Help()
 	{
 		ZECVAsset* Asset = Assets[I];
 
-		printf("  %s (Versions: ", Asset->GetName());
+		printf("  %s (Version(s): ", Asset->GetName());
 
 		ZECVConverter* const* Converters = Asset->GetConverters();
 		ZESize ConverterCount = Asset->GetConverterCount();
@@ -98,6 +99,13 @@ int main(int argc, char** argv)
 	}
 	else if (argc == 2)
 	{
+		ZEDirectoryInfo Info(Source);
+		if (!Info.IsDirectory())
+		{
+			zeError("Directory does not exists. Directory Name: \"%s\".", Source);
+			return EXIT_FAILURE;
+		}
+
 		ZECVProcessor::GetInstance()->ConvertDirectory(Source);
 		return EXIT_SUCCESS;
 	}

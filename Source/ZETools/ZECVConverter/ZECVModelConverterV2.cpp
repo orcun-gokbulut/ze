@@ -621,24 +621,6 @@ void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, co
 			DegenerateFaceDetected = true;
 		}
 
-		/*ZETriangle TriangleTexcoords;
-		TriangleTexcoords.V0 = ZEVector3(Input[I].Texcoords, 0.0f);
-		TriangleTexcoords.V1 = ZEVector3(Input[I + 1].Texcoords, 0.0f);
-		TriangleTexcoords.V2 = ZEVector3(Input[I + 2].Texcoords, 0.0f);
-		Area = ZETriangle::GetArea(TriangleTexcoords);
-		if (Area <= FLT_EPSILON)
-		{
-			zeError("Degenerate triangle (texcoords) detected. Triangle Index: %u. Vertex Indexes: %u, %u, %u.", I / 3, I, I + 1, I + 2);
-			DegenerateFaceDetected = true;
-		}
-
-		if (!ZETriangle::GenerateVertexTangentBinormal(TrianglePosition, TriangleTexcoords, TriangleTangent, TriangleBinormal))
-		{
-			TriangleTangent =  Input[I].Tangent;
-			TriangleBinormal = Input[I].Binormal;
-		}*/
-		
-
 		ConvertVertexBase(Output[I], Input[I]);
 		ConvertVertexNormals(Input[I], Output[I], I, TriangleTangent, TriangleBinormal);
 		VerifyVertexNormals(Input[I], Output[I], I);
@@ -1079,20 +1061,13 @@ ZECVResult ZECVModelConverterV2::Convert(const ZEString& SourceFileName, const Z
 		return ZECV_R_FAILED;
 	}
 
-	zeLog("Checking source version.\n");
-
-	ZEUInt8 SourceFileMajorVersion = SourceModelNode.ReadUInt8("MajorVersion");
-	ZEUInt8 SourceFileMinorVersion = SourceModelNode.ReadUInt8("MinorVersion");
-
-	ZEFile DestinationFile;
-	if (!DestinationFile.Open(DestinationFileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	ZEMLWriter Serializer;
+	if (!Serializer.Open(DestinationFileName))
 	{
 		zeError("Cannot open destination ZEModel file. File Name: \"%s\".", DestinationFileName.ToCString());
 		return ZECV_R_FAILED;
 	}
 
-	ZEMLWriter Serializer;
-	Serializer.Open(DestinationFileName);
 	ZEMLWriterNode DestinationModelNode;
 	Serializer.OpenRootNode("ZEModel", DestinationModelNode);
 
@@ -1100,14 +1075,12 @@ ZECVResult ZECVModelConverterV2::Convert(const ZEString& SourceFileName, const Z
 	DestinationModelNode.WriteUInt8("MinorVersion", 0);
 
 	if (!ConvertModel(&SourceModelNode, &DestinationModelNode))
-	{
-		zeError("Conversation has failed. File Name: \"%s\".", DestinationFileName.ToCString());
 		return ZECV_R_FAILED;
-	}
 
 	DestinationModelNode.CloseNode();
-	Serializer.Close();
+
 	Unserializer.Close();
+	Serializer.Close();
 
 	return ZECV_R_DONE;
 }

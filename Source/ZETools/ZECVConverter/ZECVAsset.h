@@ -56,5 +56,4 @@ class ZECVAsset
 		ZECVVersion							GetCurrentVersion() const;
 
 		virtual ZECVResult					Check(const ZEString& SourceFileName, ZECVVersion& Version) const = 0;
-		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
 };

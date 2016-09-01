@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESceneConverter.h
+ Zinek Engine - ZECVMaterialAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,8 +35,17 @@
 
 #pragma once
 
-class ZESceneConverter
+#include "ZECVAsset.h"
+
+class ZECVMaterialAsset: public ZECVAsset
 {
 	public:
-		static bool Convert(const char* Source, const char* Destination);
+		virtual const char*					GetName() const;
+		virtual const char* const* 			GetFileExtensions() const;
+		virtual ZESize						GetFileExtensionCount() const;
+
+		virtual ZECVConverter* const* 		GetConverters() const;
+		virtual ZESize						GetConverterCount() const;
+
+		virtual ZECVResult					Check(const ZEString& SourceFileName, ZECVVersion& Version) const;
 };

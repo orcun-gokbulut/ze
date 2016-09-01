@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZECVSceneAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMaterialConverter.h"
+#pragma once
 
-#include "ZEFile/ZEPathInfo.h"
-#include "ZEFile/ZEFileInfo.h"
-#include "ZEDS/ZEFormat.h"
-#include "ZEFile/ZEPathManager.h"
+#include "ZECVAsset.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-static bool Operation(const char* Path, ZEPathOperationElement Element)
+class ZECVSceneAsset: public ZECVAsset
 {
-	ZEPathInfo PathInfo(Path);
+	public:
+		virtual const char*					GetName() const;
+		virtual const char* const* 			GetFileExtensions() const;
+		virtual ZESize						GetFileExtensionCount() const;
 
-	if (PathInfo.GetExtension().Upper() == ".ZEMATERIAL")
-	{
-		ZEString TempDestination = ZEFormat::Format("{0}/{1}.new.ZEMaterial", 
-			PathInfo.GetParentDirectory(),
-			PathInfo.GetName());
+		virtual ZECVConverter* const* 		GetConverters() const;
+		virtual ZESize						GetConverterCount() const;
 
-		printf("Converting ZEMaterial file:\n");
-		printf(" Source File: %s.\n", Path);
-		printf(" Destination File: %s.\n", Path);
-
-		if (!ZEMaterialConverter::Convert(Path, TempDestination))
-			return false;
-
-		ZEFileInfo FileInfo(TempDestination);
-
-		if (!FileInfo.IsExists())
-			return false;
-
-		FileInfo.Rename(PathInfo.GetFileName().ToCString());
-	}
-
-	return true;
-}
-
-int main(int argc, char** argv)
-{
-	printf(" Zinek Engine Material Converter\n");
-	printf("----------------------------------------------------------------------------------- \n");
-
-	if (argc == 1 || argc > 3)
-	{
-		printf(" This tool is provided for converting files in old format ZEMaterial v1.0 to new ZERNStandardMaterial v2.0\n");
-		printf(" format.\n");
-		printf("\n");
-		printf(" Usage:\n");
-		printf("   ZEMaterialConverter [Old Format Material File] [ZERNStandardMaterial v2.0 Material File]\n");
-		printf("   ZEMaterialConverter [Search Directory]\n");
-
-		return EXIT_FAILURE;
-	}
-
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	const char* Source = argv[1];
-	const char* Destination = argv[2];
-	if (argc == 3)
-		return ZEMaterialConverter::Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
-	else if (argc == 2)
-		ZEPathInfo(Source).Operate(Source, ZEPathOperationFunction::Create<Operation>(), ZE_POE_FILE, true);
-
-	return EXIT_SUCCESS;
-}
+		virtual ZECVResult					Check(const ZEString& SourceFileName, ZECVVersion& Version) const;
+};

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECVMaterialAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,16 +30,71 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZECVMaterialAsset.h"
 
-ze_add_source(ZEMaterialConverter.cpp		Sources)
-ze_add_source(ZEMaterialConverter.h		Sources Headers)
-ze_add_source(ZEMain.cpp			Sources)
+#include "ZEML/ZEMLReader.h"
+#include "ZECVMaterialConverterV2.h"
 
-ze_add_executable(TARGET ZEMaterialConverter
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation)
+
+const char* ZECVMaterialAsset::GetName() const
+{
+	return "ZERNMaterial";
+}
+
+const char* const* ZECVMaterialAsset::GetFileExtensions() const
+{
+	static const char* Extensions[] =
+	{
+		".ZEMaterial",
+		".ZERNMaterial",
+		".ZERNStandardMaterial"
+	};
+
+	return Extensions;
+}
+
+ZESize ZECVMaterialAsset::GetFileExtensionCount() const
+{
+	return 3;
+}
+
+ ZECVConverter* const* ZECVMaterialAsset::GetConverters() const
+{
+	static ZECVMaterialConverterV2 Version2;
+	static ZECVConverter* Converters[] =
+	{
+		&Version2
+	};
+
+	return Converters;
+}
+
+ZESize ZECVMaterialAsset::GetConverterCount() const
+{
+	return 1;
+}
+
+ZECVResult ZECVMaterialAsset::Check(const ZEString& SourceFileName, ZECVVersion& Version) const
+{
+	ZEMLReader Unserializer;
+	if (!Unserializer.Open(SourceFileName))
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	ZEMLReaderNode SourceModelNode = Unserializer.GetRootNode();
+	if (SourceModelNode.GetName() != "Material" && SourceModelNode.GetName() != "ZERNMaterial" && SourceModelNode.GetName() != "ZERNStandardMaterial")
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	Version.Major = SourceModelNode.ReadUInt8("MajorVersion");
+	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
+
+	if (Version.Major > 2 ||
+		Version.Major == 2 && Version.Minor >= 0)
+		return ZECV_R_LATEST_VERSION;
+
+	Unserializer.Close();
+
+	return ZECV_R_DONE;
+}

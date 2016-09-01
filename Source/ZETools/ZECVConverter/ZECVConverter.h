@@ -47,7 +47,7 @@ class ZECVConverter
 {
 	public:
 		virtual ZECVVersion					GetSourceVersion() const = 0;
-		virtual ZECVVersion					GetDestinationVersion() const= 0;
+		virtual ZECVVersion					GetDestinationVersion() const = 0;
 
 		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) = 0;
 };

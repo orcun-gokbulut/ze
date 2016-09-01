@@ -343,6 +343,14 @@ time_t ZETimeStamp::ToCTime() const
 	return Value / 1000;
 }
 
+ZEString ZETimeStamp::ToString(const char* Format) const
+{
+	char Output[128];
+	tm TM = ToTM();
+	strftime(Output, 128, Format, &TM);
+	return Output;
+}
+
 void ZETimeStamp::FromTM(const tm& TM)
 {
 	Value = (ZEInt64)mktime(const_cast<tm*>(&TM)) * 1000LL * 1000LL;

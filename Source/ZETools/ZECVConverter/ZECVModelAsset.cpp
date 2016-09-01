@@ -48,7 +48,8 @@ const char* const* ZECVModelAsset::GetFileExtensions() const
 {
 	static const char* Extensions[] =
 	{
-		".ZEModel"
+		".ZEModel",
+		".ZEMDModel"
 	};
 
 	return Extensions;
@@ -56,7 +57,7 @@ const char* const* ZECVModelAsset::GetFileExtensions() const
 
 ZESize ZECVModelAsset::GetFileExtensionCount() const
 {
-	return 1;
+	return 2;
 }
 
  ZECVConverter* const* ZECVModelAsset::GetConverters() const
@@ -91,6 +92,8 @@ ZECVResult ZECVModelAsset::Check(const ZEString& SourceFileName, ZECVVersion& Ve
 	if (Version.Major > 2 ||
 		Version.Major == 2 && Version.Minor >= 0)
 		return ZECV_R_LATEST_VERSION;
+
+	Unserializer.Close();
 
 	return ZECV_R_DONE;
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialConverter.h
+ Zinek Engine - ZECVSceneAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,89 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECVSceneAsset.h"
 
-class ZEMaterialConverter
+#include "ZEML/ZEMLReader.h"
+#include "ZECVSceneConverterV1.h"
+
+
+const char* ZECVSceneAsset::GetName() const
 {
-	public:
-		static bool Convert(const char* Source, const char* Destination);
-};
+	return "ZEScene";
+}
+
+const char* const* ZECVSceneAsset::GetFileExtensions() const
+{
+	static const char* Extensions[] =
+	{
+		".ZEScene"
+	};
+
+	return Extensions;
+}
+
+ZESize ZECVSceneAsset::GetFileExtensionCount() const
+{
+	return 1;
+}
+
+ ZECVConverter* const* ZECVSceneAsset::GetConverters() const
+{
+	static ZECVSceneConverterV1 Version1;
+	static ZECVConverter* Converters[] =
+	{
+		&Version1
+	};
+
+	return Converters;
+}
+
+ZESize ZECVSceneAsset::GetConverterCount() const
+{
+	return 1;
+}
+
+ZECVResult ZECVSceneAsset::Check(const ZEString& SourceFileName, ZECVVersion& Version) const
+{
+	ZEFile SceneFile;
+	if (!SceneFile.Open(SourceFileName, ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot open source ZEScene file. File Name: \"%s\"", SourceFileName.ToCString());
+		return ZECV_R_FAILED;
+	}
+
+	char Identifier[4];
+	if (SceneFile.Read(Identifier, 4, 1) == 1)
+	{
+		if (Identifier[0] != 'Z' &&
+			Identifier[1] != 'E' &&
+			Identifier[2] != 'M' &&
+			Identifier[3] != 'L')
+		{
+			Version.Minor = 0;
+			Version.Major = 0;
+			return ZECV_R_DONE;
+		}
+	}
+
+	SceneFile.Seek(0, ZE_SF_BEGINING);
+
+	ZEMLReader Reader;
+	if (!Reader.Open(&SceneFile))
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	ZEMLReaderNode SourceSceneNode = Reader.GetRootNode();
+	if (SourceSceneNode.GetName() != "ZEScene")
+		return ZECV_R_UNKNOWN_FORMAT;
+
+	Version.Major = SourceSceneNode.ReadUInt8("MajorVersion");
+	Version.Minor = SourceSceneNode.ReadUInt8("MinorVersion");
+
+	if (Version.Major > 1 ||
+		Version.Major == 1 && Version.Minor >= 0)
+		return ZECV_R_LATEST_VERSION;
+
+	SceneFile.Close();
+
+	return ZECV_R_DONE;
+}
