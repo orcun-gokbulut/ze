@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialConverter.cpp
+ Zinek Engine - ZECVMaterialConverterV2.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMaterialConverter.h"
+#include "ZECVMaterialConverterV2.h"
 
-#include "ZEML/ZEMLWriter.h"
-#include "ZEML/ZEMLReader.h"
+#include "ZEError.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEError.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
 
-static void ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serializer)
+bool ZECVMaterialConverterV2::ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serializer)
 {
 	if (!Unserializer->IsValid())
-		return;
+		return false;
 
 	ZEMLReaderNode ConfigurationNode = Unserializer->GetNode("Configuration");
 
 	if (!ConfigurationNode.IsValid())
-		return;
+		return false;
 
 	Serializer->WriteUInt8("VersionMajor", 2);
 	Serializer->WriteUInt8("VersionMinor", 0);
@@ -159,64 +159,66 @@ static void ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serial
 	PropertiesNode.WriteFloat("DetailNormalMapAttenuationFactor", ConfigurationNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.01f));
 
 	PropertiesNode.CloseNode();
+
+	return true;
 }
 
-bool ZEMaterialConverter::Convert(const char* Source, const char* Destination)
+ZECVVersion ZECVMaterialConverterV2::GetSourceVersion() const
 {
-	ZEFile SourceFile;
-	if (!SourceFile.Open(Source, ZE_FOM_READ, ZE_FCM_NONE))
+	ZECVVersion Version;
+	Version.Major = 1;
+	Version.Minor = 0;
+	return Version;
+}
+
+ZECVVersion ZECVMaterialConverterV2::GetDestinationVersion() const
+{
+	ZECVVersion Version;
+	Version.Major = 2;
+	Version.Minor = 0;
+	return Version;
+}
+
+ZECVResult ZECVMaterialConverterV2::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName)
+{
+	ZEMLReader Unserializer;
+	if (!Unserializer.Open(SourceFileName))
 	{
-		zeError("Cannot open source material file. File Name: \"%s\".", Source);
-		return false;
+		zeError("Cannot open source material file. File Name: \"%s\".", SourceFileName.ToCString());
+		return ZECV_R_FAILED;
 	}
 
-	ZEMLReader Unserializer;
-	Unserializer.Open(&SourceFile);
 	ZEMLReaderNode SourceMaterialNode = Unserializer.GetRootNode();
-
 	if (SourceMaterialNode.GetName() != "Material")
 	{
-		zeError("Cannot load material. Corrupted material file. File Name: \"%s\".", Source);
-		SourceFile.Close();
-		return false;
-	}
-
-	printf(" Checking source version.\n");
-
-	ZEUInt8 SourceFileMajorVersion = SourceMaterialNode.ReadUInt8("MajorVersion");
-	ZEUInt8 SourceFileMinorVersion = SourceMaterialNode.ReadUInt8("MinorVersion");
-
-	if (SourceFileMajorVersion != 1 || SourceFileMinorVersion != 0)
-	{
-		if (SourceFileMajorVersion == 2 && SourceFileMinorVersion == 0)
-		{
-			printf("Material file is already converted.\n");
-			return true;
-		}
-
-		zeError("Cannot load material. Different material file version detected. File Name: \"%s\".", Source);
-		SourceFile.Close();
-		return false;
-	}
-
-	ZEFile DestinationFile;
-	if (!DestinationFile.Open(Destination, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-	{
-		zeError("Cannot open destination ZERNMaterial file. File Name: \"%s\".", Destination);
-		return false;
+		zeError("Cannot load material. Corrupted model file. File Name: \"%s\".", SourceFileName.ToCString());
+		Unserializer.Close();
+		return ZECV_R_FAILED;
 	}
 
 	ZEMLWriter Serializer;
-	Serializer.Open(Destination);
+	if (!Serializer.Open(DestinationFileName))
+	{
+		zeError("Cannot open destination material file. File Name: \"%s\".", DestinationFileName.ToCString());
+		return ZECV_R_FAILED;
+	}
+	
 	ZEMLWriterNode DestinationMaterialNode;
 	Serializer.OpenRootNode("ZERNMaterial", DestinationMaterialNode);
 
-	ConvertMaterial(&SourceMaterialNode, &DestinationMaterialNode);
+	DestinationMaterialNode.WriteUInt8("MajorVersion", 2);
+	DestinationMaterialNode.WriteUInt8("MinorVersion", 0);
+
+	if (!ConvertMaterial(&SourceMaterialNode, &DestinationMaterialNode))
+	{
+		zeError("Conversation has failed. File Name: \"%s\".", DestinationFileName.ToCString());
+		return ZECV_R_FAILED;
+	}
 	
 	DestinationMaterialNode.CloseNode();
-	Serializer.Close();
 
+	Serializer.Close();
 	Unserializer.Close();
 
-	return true;
+	return ZECV_R_DONE;
 }

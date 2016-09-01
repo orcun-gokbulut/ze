@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZECVMaterialConverterV2.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESceneConverter.h"
+#pragma once
 
-#include "ZEFile/ZEPathInfo.h"
-#include "ZEDS/ZEFormat.h"
-#include "ZEFile/ZEPathManager.h"
+#include "ZECVConverter.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-
-static bool Operation(const char* Path, ZEPathOperationElement Element)
+class ZECVMaterialConverterV2 : public ZECVConverter
 {
-	ZEPathInfo PathInfo(Path);
+	private:
+		static bool							ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serializer);
 
-	if (PathInfo.GetExtension().Upper() == ".ZESCENE")
-	{
-		ZEString Destination = ZEFormat::Format("{0}/{1}.new.ZEScene", 
-			PathInfo.GetParentDirectory(),
-			PathInfo.GetName());
+	public:
+		virtual ZECVVersion					GetSourceVersion() const;
+		virtual ZECVVersion					GetDestinationVersion() const;
 
-		printf("Converting ZEScene file:\n");
-		printf(" Source File: %s.\n", Path);
-		printf(" Destination File: %s.\n", Destination.ToCString());
-
-		return ZESceneConverter::Convert(Path, Destination);
-	}
-
-	return true;
-}
-
-int main(int argc, char** argv)
-{
-	printf(" Zinek Engine Scene Converter\n");
-	printf("----------------------------------------------------------------------------------- \n");
-
-	if (argc == 2 && argc == 3)
-	{
-		printf(" This tool is provided for converting old format zeScene to new ZEML based zeScene\n");
-		printf(" format.\n");
-		printf("\n");
-		printf(" Usage:\n");
-		printf("   ZESceneConverter [Old Format Scene File] [ZEML Based Scene File]\n");
-		printf("   ZESceneConverter [Search Directory]\n");
-
-		return EXIT_FAILURE;
-	}
-
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	const char* Source = argv[1];
-	const char* Destination = argv[2];
-	if (argc == 3)
-		return ZESceneConverter::Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
-	else if (argc == 2)
-		ZEPathInfo(Source).Operate(Source, ZEPathOperationFunction::Create<Operation>(), ZE_POE_FILE, true);
-
-	return EXIT_SUCCESS;
-}
+		virtual ZECVResult					Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName);
+};

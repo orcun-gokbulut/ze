@@ -49,6 +49,16 @@ ze_add_source(ZECVModelAsset.h				Sources Headers)
 ze_add_source(ZECVModelConverterV2.cpp		Sources)
 ze_add_source(ZECVModelConverterV2.h		Sources Headers)
 
+ze_add_source(ZECVMaterialAsset.cpp			Sources)
+ze_add_source(ZECVMaterialAsset.h			Sources Headers)
+ze_add_source(ZECVMaterialConverterV2.cpp	Sources)
+ze_add_source(ZECVMaterialConverterV2.h		Sources Headers)
+
+ze_add_source(ZECVSceneAsset.cpp			Sources)
+ze_add_source(ZECVSceneAsset.h				Sources Headers)
+ze_add_source(ZECVSceneConverterV1.cpp		Sources)
+ze_add_source(ZECVSceneConverterV1.h		Sources Headers)
+
 ze_add_source(ZECVTestAsset.cpp				Sources)
 ze_add_source(ZECVTestAsset.h				Sources Headers)
 ze_add_source(ZECVTestConverter.cpp			Sources)

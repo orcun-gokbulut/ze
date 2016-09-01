@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include <time.h>
+#include "ZEDS\ZEString.h"
 
 #define ZE_INVALID_TIME ((ZEInt64)-1)
 class ZETimeStamp
@@ -107,6 +108,7 @@ class ZETimeStamp
 
 		tm						ToTM() const;
 		time_t					ToCTime() const;
+		ZEString				ToString(const char* Format = "%d-%m-%Y %H:%M:%S") const;
 
 		void					FromTM(const tm& TM);
 		void					FromCTime(time_t Time);

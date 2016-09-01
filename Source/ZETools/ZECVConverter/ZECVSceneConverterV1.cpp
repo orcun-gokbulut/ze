@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESceneConverter.cpp
+ Zinek Engine - ZECVSceneConverterV1.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESceneConverter.h"
+#include "ZECVSceneConverterV1.h"
 
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEPathManager.h"
@@ -79,7 +79,8 @@ static bool ConvertProperty(const char* Name, ZEMLWriterNode* Serializer, ZEFile
 		default:
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
-			break;
+			zeError("Corrupted ZEScene file. Unknown property type.");
+			return false;
 
 		case ZE_VRT_FLOAT:
 			Unserializer->Read(&Value.Float, sizeof(float), 1);
@@ -181,10 +182,11 @@ static bool ConvertProperty(const char* Name, ZEMLWriterNode* Serializer, ZEFile
 			Serializer->WriteMatrix4x4(Name, *(ZEMatrix4x4*)&Value.Matrix4x4);
 			break;
 	}
+
 	return true;
 }
 
-static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
+static bool ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 {
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 	Unserializer->Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
@@ -205,21 +207,24 @@ static void ConvertEntity(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 
 	if (ClassChunk.Header != ZE_CLSF_CLASS_CHUNKID)
 	{
-		printf("Corrupted zeScene file.\n");
-		exit(EXIT_FAILURE);
+		zeError("Corrupted ZEScene file. Chunk header is not correct.");
+		return false;
 	}
 
 	for (ZESize I = 0; I < ClassChunk.PropertyCount; I++)
 	{
 		char PropertyName[ZE_MAX_NAME_SIZE];
 		Unserializer->Read(PropertyName, sizeof(char), ZE_MAX_NAME_SIZE);
-		ConvertProperty(PropertyName, &PropertiesNode, Unserializer);
+		if (!ConvertProperty(PropertyName, &PropertiesNode, Unserializer))
+			return false;
 	}
 
 	PropertiesNode.CloseNode();
+
+	return false;
 }
 
-static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
+static bool ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 {
 	ZEUInt32 EntityCount;
 	ZEUInt LastEntityId;
@@ -238,56 +243,58 @@ static void ConvertScene(ZEFile* Unserializer, ZEMLWriterNode* Serializer)
 	{
 		ZEMLWriterNode EntityNode;
 		EntitiesNode.OpenNode("Entity", EntityNode);
-		ConvertEntity(Unserializer, &EntityNode);
+		if (!ConvertEntity(Unserializer, &EntityNode))
+			return false;
 		EntityNode.CloseNode();
 	}
 
 	EntitiesNode.CloseNode();
-}
-
-bool ZESceneConverter::Convert(const char* Source, const char* Destination)
-{
-	ZEFile Unserializer;
-	if (!Unserializer.Open(Source, ZE_FOM_READ, ZE_FCM_NONE))
-	{
-		zeError("Cannot open source ZEScene file. File Name: \"%s\"", Source);
-		return false;
-	}
-
-	printf(" Checking source version.\n");
-	char Identifier[4];
-	if (Unserializer.Read(Identifier, 4, 1) == 1)
-	{
-		if (Identifier[0] == 'Z' ||
-			Identifier[0] == 'E' ||
-			Identifier[0] == 'M' ||
-			Identifier[0] == 'L')
-		{
-			printf(" Scene file is already converted.\n");
-			return true;
-		}
-	}
-
-	Unserializer.Seek(0, ZE_SF_BEGINING);
-
-	ZEFile DestinationFile;
-	if (!DestinationFile.Open(Destination, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-	{
-		zeError("Cannot open destination ZEScene file. File Name: \"%s\".", Destination);
-		return false;
-	}
-
-	ZEMLWriter Serializer;
-	Serializer.Open(Destination);
-	ZEMLWriterNode SceneNode;
-	Serializer.OpenRootNode("ZEScene", SceneNode);
-
-	ConvertScene(&Unserializer, &SceneNode);
-	
-	SceneNode.CloseNode();
-	Serializer.Close();
-
-	Unserializer.Close();
 
 	return true;
+}
+
+ZECVVersion ZECVSceneConverterV1::GetSourceVersion() const
+{
+	ZECVVersion Version;
+	Version.Major = 0;
+	Version.Minor = 0;
+	return Version;
+}
+
+ZECVVersion ZECVSceneConverterV1::GetDestinationVersion() const
+{
+	ZECVVersion Version;
+	Version.Major = 1;
+	Version.Minor = 0;
+	return Version;
+}
+
+
+ZECVResult ZECVSceneConverterV1::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName)
+{
+	ZEFile SourceFile;
+	if (!SourceFile.Open(SourceFileName, ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot open source ZEScene file. File Name: \"%s\"", SourceFileName.ToCString());
+		return ZECV_R_FAILED;
+	}
+
+	ZEMLWriter DestinationFile;
+	if (!DestinationFile.Open(DestinationFileName))
+	{
+		zeError("Cannot open destination ZEScene file. File Name: \"%s\".", DestinationFileName.ToCString());
+		return ZECV_R_FAILED;
+	}
+
+	ZEMLWriterNode SceneNode;
+	DestinationFile.OpenRootNode("ZEScene", SceneNode);
+
+	if (!ConvertScene(&SourceFile, &SceneNode))
+		return ZECV_R_FAILED;
+	
+	SceneNode.CloseNode();
+	DestinationFile.Close();
+	SourceFile.Close();
+
+	return ZECV_R_DONE;
 }
