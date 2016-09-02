@@ -556,7 +556,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		{
 			zeDebugCheck(!DeinitializeInternalChainCheck, "DeinitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
-			State = ZE_ES_NONE;
+			State = ZE_ES_LOADED;
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
