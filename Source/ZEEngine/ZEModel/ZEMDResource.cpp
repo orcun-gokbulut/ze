@@ -274,7 +274,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 
 ZETaskResult ZEMDResource::UnloadInternal()
 {
-	while (Bones.GetFirst() != NULL)
+	while (Meshes.GetFirst() != NULL)
 	{
 		ZEMDResourceMesh* Mesh = Meshes.GetFirst()->GetItem();
 		RemoveMesh(Mesh);

@@ -171,7 +171,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 		 }
 		 else if (TargetState == ZERS_RS_DESTROYED)
 		 {
-			 State = ZERS_RS_DESTROYING;
+			 State = ZERS_RS_UNLOADING;
 		 }
 	}
 	else if (State < 0)

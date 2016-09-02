@@ -57,8 +57,8 @@ void ZEReferenceCounted::Release() const
 		#ifdef ZE_DEBUG_ENABLE
 		Destroyed = true;
 		#endif
-		Destroy();
 		ReferenceCountLock.Unlock();
+		Destroy();
 		return;
 	}
 	ReferenceCountLock.Unlock();
