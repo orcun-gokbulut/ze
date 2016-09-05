@@ -43,6 +43,7 @@
 #include "ZECVSceneAsset.h"
 #include "ZECVConverter.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZELogSession.h"
 
 ZECVAsset* const* ZECVProcessor::GetAssets() const
 {
@@ -89,6 +90,9 @@ ZECVAsset* ZECVProcessor::FindAsset(const ZEString& Extension) const
 
 bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const
 {
+	ZELogSession ItemLogSessin;
+	ItemLogSessin.BeginSession();
+
 	zeLog("Processing file. \n"
 		"  Source File Name: \"%s\"\n"
 		"  Destination File Name: \"%s\"", SourceFileName.ToCString(), DestinationFileName.ToCString());
@@ -135,7 +139,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 	}
 
 	ZEString LogFileName = ZEFormat::Format("{0}.ZECVConvert-{1}.log", SourceFileName, ZETimeStamp::Now().ToString("%Y%m%d%H%M"));
-	ZEString Header = ZEFormat::Format(
+	ZEString LogFileHeader = ZEFormat::Format(
 		" ZECVConvert v1.0 Log File\n"
 		"----------------------------------------------------\n"
 		"   Source File      : {0}\n"
@@ -149,7 +153,10 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 		FileVersion.Major, FileVersion.Minor,
 		Asset->GetCurrentVersion().Major, Asset->GetCurrentVersion().Minor,
 		ZETimeStamp::Now().ToString("%d-%m-%Y %H:%M:%S"));
-	ZELog::GetInstance()->BeginSession(ZE_LOG_INFO, LogFileName, Header, false);
+
+	ZELogSession ConvertLogSession;
+	ConvertLogSession.BeginSession();
+	ConvertLogSession.OpenLogFile(LogFileName, LogFileHeader, false);
 
 	zeLog("Converting %s asset. File Name: \"%s\".", Asset->GetName(), SourceFileName.ToCString());
 
@@ -182,7 +189,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 			// Backup File
 			if (SourceDestinationSame)
 			{
-				ZEString BackupFileName = ZEFormat::Format("{0}.ZECVConvert.{0}.{1}.bak", SourceFileName, OriginalVersion.Major, OriginalVersion.Minor);
+				ZEString BackupFileName = ZEFormat::Format("{0}.ZECVConvert.{1}.{2}.bak", SourceFileName, OriginalVersion.Major, OriginalVersion.Minor);
 				zeLog("Creating backup. Version: %d.%d. Backup File Name: \"%s\".", OriginalVersion.Major, OriginalVersion.Minor, BackupFileName.ToCString());
 				SourceFileInfo.Copy(BackupFileName);
 			}
@@ -218,7 +225,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 
 			if (!ZEFileInfo(OutputFileName).Move(InputFileName))
 			{
-				zeError("Conversion failed. Cannot rename temporary file. File Name: \"%s\".", SourceFileName.ToCString());
+				zeError("Conversion failed. Cannot rename temporary file. File Name: \"%s\".", SourceFileName.ToCString());	
 				return false;
 			}
 		}
@@ -242,21 +249,19 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 		FileVersion = DestinationVersion;
 	}
 
-	zeLog("Conversion of %s asset to newest version (%d.%d ->%d.%d) has been completed succesfuly. File Name: \"%s\".", Asset->GetName(), 
+	zeLog("Conversion of %s asset to newest version (%d.%d -> %d.%d) has been completed succesfuly. File Name: \"%s\".", Asset->GetName(), 
 		OriginalVersion.Major, OriginalVersion.Minor, FileVersion.Major, FileVersion.Minor, SourceFileName.ToCString());
 
-	ZELog::GetInstance()->EndSession();
-
+	ConvertLogSession.EndSession();
+	ItemLogSessin.EndSession();
 	return true;
 }
 
 
-static bool OperationWarpper(const char* Path, ZEPathOperationElement Element)
+static bool OperationWarpper(const char* Path, ZEPathOperationElement Element, void* Parameters)
 {
-	if (Element != ZE_POE_FILE)
-		return true;
-
-	ZECVProcessor::GetInstance()->Convert(Path, Path);
+	ZESmartArray<ZEString>* FileList = reinterpret_cast<ZESmartArray<ZEString>*>(Parameters);
+	FileList->Add(Path);
 	return true;
 }
 
@@ -272,12 +277,25 @@ void ZECVProcessor::ConvertDirectory(const ZEString& DirectoryName) const
 		DirectoryName,
 		ZETimeStamp::Now().ToString("%d-%m-%Y %H:%M:%S"));
 	
-	ZELog::GetInstance()->BeginSession(ZE_LOG_INFO, LogFileName, Header, false);
-	
-	zeLog("Converting Directory... Directory Name: \"%s\".", DirectoryName.ToCString());
-	ZEPathInfo::Operate(DirectoryName, ZEPathOperationFunction::Create<OperationWarpper>(), ZE_POE_FILE, true);
+	ZELogSession LogSession;
+	LogSession.BeginSession();
+	LogSession.OpenLogFile(LogFileName, Header, false);
 
-	ZELog::GetInstance()->EndSession();
+	zeLog("Converting Directory... Directory Name: \"%s\".", DirectoryName.ToCString());
+	
+	zeLog("Creating list of files. Directory Name: \"%s\".", DirectoryName.ToCString());
+	ZESmartArray<ZEString> FileNames;
+	ZEPathInfo::Operate(DirectoryName, ZEPathOperationFunction::Create<OperationWarpper>(), ZE_POE_FILE, true, &FileNames);
+
+	zeLog("Processing files...");
+	#pragma omp parallel
+	{
+		#pragma omp for schedule(dynamic)
+		for (ZESSize I = 0; I < FileNames.GetCount(); I++)
+			Convert(FileNames[I], FileNames[I]);
+	}
+
+	LogSession.EndSession();
 }
 
 ZECVProcessor* ZECVProcessor::GetInstance()

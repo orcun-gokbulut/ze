@@ -59,7 +59,6 @@ enum ZELogType
     #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
-typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 #define zeLog(...)\
 	do\
 	{\
@@ -72,8 +71,6 @@ typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* Lo
 #define zeDebugLog(...)\
 	do\
 	{\
-		if (ZELog::GetInstance()->GetMinimumLevel() > ZE_LOG_DEBUG)\
-			break;\
 		char __MODULE__[256];\
 		ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
 		ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
@@ -83,8 +80,6 @@ typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* Lo
 #define zeDebugLogOnce(...)\
 	do\
 	{\
-		if (ZELog::GetInstance()->GetMinimumLevel() > ZE_LOG_DEBUG)\
-			break;\
 		static bool Logged = false; \
 		if (Logged)\
 			break;\
@@ -98,8 +93,6 @@ typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* Lo
 #define zeDebugLogOccured(Times, ...)\
 	do\
 	{\
-		if (ZELog::GetInstance()->GetMinimumLevel() > ZE_LOG_DEBUG) \
-			break;\
 		static int Count = 0;\
 		if (Count == 0)\
 		{\
@@ -116,8 +109,6 @@ typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* Lo
 #define zeDebugLogPerFrame(Times, ...)\
 	do\
 	{\
-		if (ZELog::GetInstance()->GetMinimumLevel() > ZE_LOG_DEBUG) \
-			break;\
 		static int LastFrame = -1;\
 		if (LastFrame == ZECore::GetInstance()->GetFrameId())\
 			break;\
@@ -128,64 +119,36 @@ typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* Lo
 	}\
 	while(false)
 
-struct ZELogSession
-{
-	void*							LogFile;
-	ZEString						LogFilePath;
-	ZELogType						LogFileMinimumLevel;
-};
+class ZELogSession;
 
 class ZELog
 {
+	friend ZELogSession;
 	private:
 		ZELock						Lock;
-		ZELogType					MinimumLogLevel;
-
-		ZELogCallback				Callback;
-		void*						CallbackParameter;
-
-		void*						LogFile;
-		bool						LogFileEnabled;
-		ZEString					LogFilePath;
-		ZELogType					LogFileMinimumLevel;
-
-		ZELogSession				Sessions[ZE_LOG_MAX_SESSION_COUNT];
-		ZESize						SessionCount;
-
-		void						OpenLogFile();
+		ZELogSession*				RootSession;
+		ZELogSession*				SessionCount;	
+		ZESize						LastSessionId;
+	
 		void						LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args);
 
 									ZELog();
 									~ZELog();
 
 	public:
-		void						SetMinimumLevel(ZELogType Level);
-		ZELogType					GetMinimumLevel();
+		ZELogSession*				GetRootSession();
+		ZELogSession*				GetCurrentSession();
+		ZESize						GetSessionCount();
 
-		void						SetCallback(ZELogCallback Callback);
-		ZELogCallback				GetCallback();
-
-		void						SetCallbackParameter(void* Parameter);
-		void*						GetCallbackParameter();
-
-		void						SetLogFileEnabled(bool Enabled);
-		bool						GetLogFileEnabled();
-
-		void						SetLogFilePath(const ZEString& FileName);
-		const char*					GetLogFilePath();
-
-		void						SetLogFileMinimumLevel(ZELogType Level);
-		ZELogType					GetLogFileMinimumLevel();
-
-		void						Log(const char* Module, ZELogType Type, const char* Format, ...);
-        void						Log(const char* Module, const char* Format, ...);
-
-		void						BeginSession(ZELogType MinimumLogLevel, const ZEString& FileName, const ZEString& Header, bool Append);
+		void						BeginSession(ZELogSession* Session);
 		void						EndSession();
+
+		void						Log(const char* Module, const char* Format, ...);
+		void						Log(const char* Module, ZELogType Type, const char* Format, ...);
 
 		ZE_ENGINE_EXPORT 
 		static ZELog*				GetInstance();
-		
+
 		static void					GetModuleName(char* Output, const char* FileName, const char* Function);
 		static const char*			GetLogTypeString(ZELogType Type);
 };

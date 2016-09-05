@@ -355,7 +355,7 @@ bool ZEPathInfo::Equals(const ZEPathInfo& OtherPath) const
 	return (RealPath.Path == OtherRealPath.Path);
 }
 
-bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements, bool Recursive)
+bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements, bool Recursive, void* Parameters)
 {
 	ZEDirectoryInfo TargetDirectoryInfo(TargetDirectory);
 
@@ -370,11 +370,11 @@ bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Fu
 			ZEString SubDirectoryPath = ZEFormat::Format("{0}/{1}", TargetDirectory, SubDirectories[I]);
 			if (Elements & ZE_POE_DIRECTORY)
 			{
-				if (!Function(SubDirectoryPath, ZE_POE_DIRECTORY))
+				if (!Function(SubDirectoryPath, ZE_POE_DIRECTORY, Parameters))
 					return false;
 			}
 
-			if (!Operate(SubDirectoryPath, Function, Elements, Recursive))
+			if (!Operate(SubDirectoryPath, Function, Elements, Recursive, Parameters))
 				return false;
 		}
 	}
@@ -385,7 +385,7 @@ bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Fu
 		for (ZESize I = 0; I < Files.GetSize(); I++)
 		{
 			ZEString FilePath = ZEFormat::Format("{0}/{1}", TargetDirectory, Files[I]);
-			if (!Function(FilePath, ZE_POE_FILE))
+			if (!Function(FilePath, ZE_POE_FILE, Parameters))
 				return false;
 		}
 	}

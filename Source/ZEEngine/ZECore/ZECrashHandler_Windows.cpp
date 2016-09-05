@@ -43,6 +43,7 @@
 #include <windows.h>
 #include "ZEVersion.h"
 #include "ZELog.h"
+#include "ZELogSession.h"
 
 ZECrashHandler::ZECrashHandler()
 {
@@ -101,7 +102,7 @@ void ZECrashHandler::Crashed()
 		Data.ProcessId = GetCurrentProcessId();
 		Data.CreateDump = GetCreateCrashDump();
 		Data.DumpType = GetCrashDumpType();
-		Data.LogFile = ZELog::GetInstance()->GetLogFileEnabled();
+		Data.LogFile = !ZELog::GetInstance()->GetRootSession()->GetLogFileName().IsEmpty();
 		//strcpy(Data.LogFilePath, ZELog::GetInstance()->GetLogFileName());
 		strcpy(Data.URL, "http://localhost:8080/puttest/test.dat");
 		Data.Version = ZEVersion::GetZinekVersion();

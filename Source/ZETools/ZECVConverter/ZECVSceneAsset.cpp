@@ -108,8 +108,8 @@ ZECVResult ZECVSceneAsset::Check(const ZEString& SourceFileName, ZECVVersion& Ve
 	if (SourceSceneNode.GetName() != "ZEScene")
 		return ZECV_R_UNKNOWN_FORMAT;
 
-	Version.Major = SourceSceneNode.ReadUInt8("MajorVersion");
-	Version.Minor = SourceSceneNode.ReadUInt8("MinorVersion");
+	Version.Major = SourceSceneNode.ReadUInt8("MajorVersion", 1);
+	Version.Minor = SourceSceneNode.ReadUInt8("MinorVersion", 0);
 
 	if (Version.Major > 1 ||
 		Version.Major == 1 && Version.Minor >= 0)

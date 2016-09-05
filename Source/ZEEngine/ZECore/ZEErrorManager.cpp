@@ -36,7 +36,11 @@
 #include "ZEErrorManager.h"
 
 #include "ZECore.h"
+#include "ZELogSession.h"
+#include "ZETimeStamp.h"
 #include "ZEError.h"
+#include "ZEDS/ZEFormat.h"
+
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
 #include "ZEOptionManager.h"
@@ -47,45 +51,65 @@
 #include <assert.h>
 #include <crtdbg.h>
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 static ZEOptionSection ErrorOptions; 
 
 void ZEErrorManager::OnOptionChanged(ZEOption* Option)
 {
+	ZELogSession* RootSession = ZELog::GetInstance()->GetRootSession();
+
 	if (Option->GetName() == "MinimumLevel")
 	{
 		ZEString Value = Option->GetValue().GetString().Lower().Trim();
 		if (Value == "critical" || Value == "critical error" || Value == "criticalerror")
-			ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_CRITICAL_ERROR);
+			RootSession->SetMinimumLevel(ZE_LOG_CRITICAL_ERROR);
 		else if (Value == "error")
-			ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_ERROR);
+			RootSession->SetMinimumLevel(ZE_LOG_ERROR);
 		else if (Value == "warning")
-				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_WARNING);
+			RootSession->SetMinimumLevel(ZE_LOG_WARNING);
 		else if (Value == "info")
-				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_INFO);
+			RootSession->SetMinimumLevel(ZE_LOG_INFO);
 		else if (Value == "debug")
-				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_DEBUG);
+			RootSession->SetMinimumLevel(ZE_LOG_DEBUG);
 	}
 	else if (Option->GetName() == "LogFileEnabled")
 	{
-		ZELog::GetInstance()->SetLogFileEnabled(Option->GetValue().GetBoolean());
+		if (Option->GetValue().GetBoolean())
+		{		
+			char ComputerName[256];
+			DWORD Size = sizeof(ComputerName);
+			GetComputerNameA(ComputerName, &Size);
+
+			ZEString TimeStamp = ZETimeStamp::Now().ToString("%Y%m%d%H%M");
+			ZEString LogFile = ZEOptionManager::GetInstance()->GetOption("Error", "LogFilePath")->GetValue().GetString();
+			ZEString Header = ZELogSession::GenerateLogFileHeader();
+
+			RootSession->OpenLogFile(ZEFormat::Format(LogFile, TimeStamp, ComputerName), Header, true);
+		}
+		else
+		{
+			RootSession->CloseLogFile();
+		}
 	}
 	else if (Option->GetName() == "LogFilePath")
 	{
-		ZELog::GetInstance()->SetLogFilePath(Option->GetValue().GetString());
+
 	}
 	else if (Option->GetName() == "LogFileMinimumLevel")
 	{
 		ZEString Value = Option->GetValue().GetString().Lower().Trim();
 		if (Value == "critical" || Value == "critical error" || Value == "criticalerror")
-			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_CRITICAL_ERROR);
+			RootSession->SetLogFileMinLevel(ZE_LOG_CRITICAL_ERROR);
 		else if (Value == "error")
-			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_ERROR);
+			RootSession->SetLogFileMinLevel(ZE_LOG_ERROR);
 		else if (Value == "warning")
-			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_WARNING);
+			RootSession->SetLogFileMinLevel(ZE_LOG_WARNING);
 		else if (Value == "info")
-			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_INFO);
+			RootSession->SetLogFileMinLevel(ZE_LOG_INFO);
 		else if (Value == "debug")
-			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_DEBUG);
+			RootSession->SetLogFileMinLevel(ZE_LOG_DEBUG);
 	}
 }
 

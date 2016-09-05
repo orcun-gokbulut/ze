@@ -36,20 +36,21 @@
 #include "ZELog.h"
 
 #include "ZEPlatform.h"
-#include "ZEFile\ZEPathManager.h"
-#include "ZEDS\ZEFormat.h"
-#include "ZETimeStamp.h"
-#include "ZECore\ZECore.h"
+#include "ZELogSession.h"
+#include "ZEDS/ZEList2.h"
+#include "ZEThread/ZEThread.h"
 
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
 #include <memory.h>
+#include <time.h>
 
 #ifdef ZE_PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+
+static ZEList2<ZELogSession> Sessions;
 
 static void DefaultCallback(const char* Module, ZELogType Level, const char* LogText);
 
@@ -83,19 +84,19 @@ static void SetColor(int Type)
 	#elif defined(ZE_PLATFORM_UNIX)
 		switch(Type)
 		{
-            case ZE_LOG_ERROR:
+			case ZE_LOG_ERROR:
 				printf("\033[01;31m");
 				break;
 
-            case ZE_LOG_WARNING:
+			case ZE_LOG_WARNING:
 				printf("\033[01;33m");
 				break;
 
-            case ZE_LOG_INFO:
+			case ZE_LOG_INFO:
 				printf("\033[01;37m");
 				break;
 
-            case ZE_LOG_SUCCESS:
+			case ZE_LOG_SUCCESS:
 				printf("\033[01;32m");
 				break;
 
@@ -107,12 +108,15 @@ static void SetColor(int Type)
 	#endif
 }
 
-static void DefaultCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+static void DefaultCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	SetColor(-1);
 	printf("[");
 
 	SetColor(-2);
+	if (Session != NULL)
+		printf("%d:", Session->GetSessionID());
+
 	printf("%s",  Module);
 	
 	SetColor(-1);
@@ -125,264 +129,111 @@ static void DefaultCallback(const char* Module, ZELogType Type, const char* LogT
 	printf(": %s\n", LogText);
 }
 
-void ZELog::OpenLogFile()
-{
-	Lock.Lock();
-
-	if (LogFile != NULL)
-	{
-		fclose((FILE*)LogFile);
-		LogFile = NULL;
-	}
-
-	if (!LogFileEnabled || LogFilePath.IsEmpty())
-	{
-		Lock.Unlock();
-		return;
-	}
-
-	char ComputerName[256];
-	DWORD Size = sizeof(ComputerName);
-	GetComputerNameA(ComputerName, &Size);
-
-	ZETimeStamp TimeStamp = ZETimeStamp::Now();
-	ZEString Date = ZEFormat::Format("{0:d:04}{1:d:02}{2:d:02}", TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay());
-	ZERealPath Path = ZEPathManager::GetInstance()->TranslateToRealPath(ZEFormat::Format(LogFilePath, Date, ComputerName));
-	if ((Path.Access & ZE_PA_WRITE) == 0)
-	{
-		Lock.Unlock();
-		return;
-	}
-
-	LogFile = fopen(Path.Path, "a");
-	if (LogFile == NULL)
-	{
-		Lock.Unlock();
-		return;
-	}
-
-	if (ftell((FILE*)LogFile) != 0)
-		fprintf((FILE*)LogFile, "\n\n");
-
-	fprintf((FILE*)LogFile, 
-		"##########################################################\n"
-		"## Zinek Engine Log \n"
-		"## Computer Name : %s\n"
-		"## Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n"
-		"##########################################################\n",
-		ComputerName,
-		TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay(),
-		TimeStamp.GetHour(), TimeStamp.GetMinute(), TimeStamp.GetSecond());
-
-	Lock.Unlock();
-}
-
 void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args)
 {
-	#if !defined(ZE_PLATFORM_WINDOWS) || defined(ZE_DEBUG_ENABLE)
-	if ((Type < GetMinimumLevel() || Callback == NULL) &&
-		(Type < GetLogFileMinimumLevel() || LogFile == NULL))
-		return;
-	#endif
-
-	Lock.Lock();
-	
 	char Buffer[4096];
 	vsprintf(Buffer, Format, args);
 
-	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(Type), Buffer);
-		OutputDebugString(DebugBuffer);
-	#endif
-
-	if (Type >= GetMinimumLevel() && Callback != NULL)
-		Callback(Module, Type, Buffer,CallbackParameter);
-
-	time_t Temp = time(NULL);                          
+	time_t Temp = time(NULL);
 	tm TimeStamp;
 	memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
-	if (LogFile != NULL && Type >= GetLogFileMinimumLevel())
+	ZESize ThreadId = ZEThread::GetCurrentThreadId();
+	ZELogSession* CurrentSession = NULL;
+	ZELogSession* CurrentSinkSession = NULL;
+	ze_for_each_reverse(Session, Sessions)
 	{
-		fprintf((FILE*)LogFile, 
-			"%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
+		if (Type < Session->MinimumLevel)
+			continue;
+
+		if (Session->Block)
+			break;
+
+		if (Session->Sink && Session->ThreadID != ThreadId)
+			continue;
+
+		if (CurrentSession == NULL || CurrentSession->GetThreadID() != ThreadId)
+			CurrentSession = Session.GetPointer();
+
+		if (Session->Callback != NULL)
+			Session->Callback(CurrentSession, Module, Type, Buffer, Session->CallbackParameter);
+
+		if (Session->LogFile == NULL)
+			continue;
+
+		if (CurrentSession != NULL)
+			fprintf((FILE*)Session->LogFile, "%d", CurrentSession->SessionID);
+
+		fprintf((FILE*)Session->LogFile, 
+			"%02d-%02d-%04d %02d:%02d:%02d [%s] %s: %s\n",
 			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
 			Module, GetLogTypeString(Type), Buffer);
-		fflush((FILE*)LogFile);
+		
+		fflush((FILE*)Session->LogFile);
 	}
 
-	ZESize EffectiveSessionCount = SessionCount >= ZE_LOG_MAX_SESSION_COUNT ? ZE_LOG_MAX_SESSION_COUNT : SessionCount;
-	for (ZESize I = 0; I < EffectiveSessionCount; I++)
-	{
-		ZELogSession& Session = Sessions[I];
-
-		if (Type < Session.LogFileMinimumLevel)
-			continue;
-
-		if (Session.LogFile == NULL)
-			continue;
-
-		fprintf((FILE*)Session.LogFile, 
-			"%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
-			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
-			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			Module, GetLogTypeString(Type), Buffer);
-		fflush((FILE*)Session.LogFile);
-	}
-
-	Lock.Unlock();
+	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		char DebugBuffer[4096];
+		sprintf(DebugBuffer, "(%d, %d) [%s] %s : %s \r\n", CurrentSession->GetSessionID(), ZEThread::GetCurrentThreadId(), Module, ZELog::GetLogTypeString(Type), Buffer);
+		OutputDebugString(DebugBuffer);
+	#endif
 }
-
 
 ZELog::ZELog()
 {
-	MinimumLogLevel = ZE_LOG_INFO;
-	Callback = DefaultCallback;
-	CallbackParameter = NULL;
-	LogFile = NULL;
-	LogFileEnabled = false;
-	LogFileMinimumLevel = ZE_LOG_INFO;
+	LastSessionId = 0;
+	RootSession = new ZELogSession();
+	RootSession->SetCallback(DefaultCallback);
+	BeginSession(RootSession);
 }
 
 ZELog::~ZELog()
 {
-	if (LogFile != NULL)
-	{
-		fprintf((FILE*)LogFile, "END OF LOG\n");
-		fflush((FILE*)LogFile);
-		fclose((FILE*)LogFile);
-	}
+	EndSession();
+	delete RootSession;
 }
 
-void ZELog::SetMinimumLevel(ZELogType Level)
+ZELogSession* ZELog::GetRootSession()
 {
-	if (Level > ZE_LOG_CRITICAL_ERROR)
-		Level = ZE_LOG_CRITICAL_ERROR;
-
-	MinimumLogLevel = Level;
+	return RootSession;
 }
 
-ZELogType ZELog::GetMinimumLevel()
-{
-	return MinimumLogLevel;
-}
-
-void ZELog::SetCallback(ZELogCallback Callback)
-{
-	this->Callback = Callback;
-}
-
-ZELogCallback ZELog::GetCallback()
-{
-	return Callback;
-}
-
-void ZELog::SetCallbackParameter(void* Parameter)
-{
-	CallbackParameter = Parameter;
-}
-
-void* ZELog::GetCallbackParameter()
-{
-	return CallbackParameter;
-}
-
-void ZELog::SetLogFileEnabled(bool Enabled)
-{
-	if (LogFileEnabled == Enabled)
-		return;
-
-	LogFileEnabled = Enabled;
-	OpenLogFile();
-}
-
-bool ZELog::GetLogFileEnabled()
-{
-	return LogFileEnabled;
-}
-
-void ZELog::SetLogFilePath(const ZEString& FileName)
-{
-	if (LogFilePath == FileName)
-		return;
-
-	LogFilePath = FileName;
-	OpenLogFile();
-}
-
-const char* ZELog::GetLogFilePath()
-{
-	return LogFilePath;
-}
-
-
-void ZELog::SetLogFileMinimumLevel(ZELogType Level)
-{
-	LogFileMinimumLevel = Level;
-}
-
-ZELogType ZELog::GetLogFileMinimumLevel()
-{
-	return LogFileMinimumLevel;
-}
-
-void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
-{
-	va_list VList;
-	va_start(VList, Format);
-	LogInternal(Module, Type, Format, VList);
-	va_end(VList);
-}
-
-void ZELog::Log(const char* Module, const char* Format, ...)
-{
-	va_list VList;
-	va_start(VList, Format);
-	LogInternal(Module, ZE_LOG_INFO, Format, VList);
-	va_end(VList);
-}
-
-void ZELog::BeginSession(ZELogType MinimumLogLevel, const ZEString& FileName, const ZEString& Header, bool Append)
+ZELogSession* ZELog::GetCurrentSession()
 {
 	Lock.Lock();
 
-	SessionCount++;
-	if (SessionCount >= ZE_LOG_MAX_SESSION_COUNT)
+	ze_for_each_reverse(Session, Sessions)
+	{
+		if (GetCurrentSession()->ThreadID == ZEThread::GetCurrentThreadId())
+		{
+			Lock.Unlock();
+			return Session.GetPointer();
+		}
+	}
+	Lock.Unlock();
+
+	return NULL;
+}
+
+ZESize ZELog::GetSessionCount()
+{
+	return Sessions.GetCount();
+}
+
+void ZELog::BeginSession(ZELogSession* Session)
+{
+	Lock.Lock();
+
+	if (Session->Link.GetInUse())
 	{
 		Lock.Unlock();
 		return;
 	}
 
-	ZERealPath RealPath = ZEPathManager::GetInstance()->TranslateToRealPath(FileName);
-	if ((RealPath.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-	{
-		Lock.Unlock();
-		return;
-	}
-
-	ZELogSession& Session = Sessions[SessionCount - 1];
-	Session.LogFilePath = FileName;
-	Session.LogFileMinimumLevel = MinimumLogLevel;
-	Session.LogFile = NULL;
-
-	const char* Mode = "w";
-	if (Append)
-		Mode = "a";
-
-	Session.LogFile = fopen(RealPath.Path, "a");
-	if (Session.LogFile == NULL)
-	{
-		Lock.Unlock();
-		return;
-	}
-
-	if (!Header.IsEmpty())
-	{
-		fprintf((FILE*)Session.LogFile, "%s", Header.ToCString());
-		fflush((FILE*)Session.LogFile);
-	}
+	Sessions.AddEnd(&Session->Link);
+	Session->ThreadID = ZEThread::GetCurrentThreadId();
+	Session->SessionID = LastSessionId++;
 
 	Lock.Unlock();
 }
@@ -390,30 +241,48 @@ void ZELog::BeginSession(ZELogType MinimumLogLevel, const ZEString& FileName, co
 void ZELog::EndSession()
 {
 	Lock.Lock();
-
-	if (SessionCount == 0)
-	{
-		Lock.Unlock();
-	}
-
-	if (SessionCount >= ZE_LOG_MAX_SESSION_COUNT)
-	{
-		SessionCount--;
-		Lock.Unlock();
-		return;
-	}
-
-	SessionCount--;
-	ZELogSession& Session = Sessions[SessionCount];
-
-	if (Session.LogFile == NULL)
+	if (Sessions.GetCount() <= 1)
 	{
 		Lock.Unlock();
 		return;
 	}
 
-	fclose((FILE*)Session.LogFile);
-	
+	ze_for_each_reverse(Session, Sessions)
+	{
+		Session->CloseLogFile();
+
+		if (Session->ThreadID != ZEThread::GetCurrentThreadId())
+			continue;
+
+		Sessions.Remove(&Session->Link);
+
+		Session->SessionID = 0;
+		Session->ThreadID = 0;
+	}
+	Lock.Unlock();
+}
+
+void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
+{
+	Lock.Lock();
+
+	va_list VList;
+	va_start(VList, Format);
+	LogInternal(Module, Type, Format, VList);
+	va_end(VList);
+
+	Lock.Unlock();
+}
+
+void ZELog::Log(const char* Module, const char* Format, ...)
+{
+	Lock.Lock();
+
+	va_list VList;
+	va_start(VList, Format);
+	LogInternal(Module, ZE_LOG_INFO, Format, VList);
+	va_end(VList);
+
 	Lock.Unlock();
 }
 
@@ -422,7 +291,6 @@ ZELog* ZELog::GetInstance()
 	static ZELog Instance;
 	return &Instance;
 }
-
 
 void ZELog::GetModuleName(char* Output, const char* FileName, const char* Function)
 {
@@ -469,31 +337,31 @@ const char* ZELog::GetLogTypeString(ZELogType Type)
 {
 	switch(Type)
 	{
-	case ZE_LOG_CRITICAL_ERROR:
-		return "CRITICAL ERROR";
-		break;
+		case ZE_LOG_CRITICAL_ERROR:
+			return "CRITICAL ERROR";
+			break;
 
-	case ZE_LOG_ERROR:
-		return "ERROR";
-		break;
+		case ZE_LOG_ERROR:
+			return "ERROR";
+			break;
 
-	case ZE_LOG_WARNING:
-		return "Warning";
-		break;
+		case ZE_LOG_WARNING:
+			return "Warning";
+			break;
 
-	case ZE_LOG_INFO:
-		return "Info";
-		break;
+		case ZE_LOG_INFO:
+			return "Info";
+			break;
 
-	case ZE_LOG_SUCCESS:
-		return "Success";
-		break;
+		case ZE_LOG_SUCCESS:
+			return "Success";
+			break;
 
-	case ZE_LOG_DEBUG:
-		return "Debug";
-		break;
+		case ZE_LOG_DEBUG:
+			return "Debug";
+			break;
 
-	default:
-		return "Unknown";
+		default:
+			return "Unknown";
 	}
 }

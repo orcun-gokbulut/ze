@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECVModelAsset.cpp
+ Zinek Engine - ZELogSession.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,67 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECVModelAsset.h"
+#pragma once
 
-#include "ZEML/ZEMLReader.h"
-#include "ZECVModelConverterV2.h"
+#include "ZELog.h"
+#include "ZEDS/ZELink.h"
 
+typedef void (*ZELogCallback)(const ZELogSession*, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 
-const char* ZECVModelAsset::GetName() const
+class ZELogSession
 {
-	return "ZEModel";
-}
+	friend class ZELog;
+	private:
+		ZELink<ZELogSession>			Link;
+		ZESize							SessionID;
+		ZESize							ThreadID;
+		ZELogType						MinimumLevel;
+		bool							Sink;
+		bool							Block;
+		ZELogType						LogFileMinLevel;
+		void*							LogFile;
+		ZEString						LogFileName;
+		ZELogCallback					Callback;
+		void*							CallbackParameter;
 
-const char* const* ZECVModelAsset::GetFileExtensions() const
-{
-	static const char* Extensions[] =
-	{
-		".ZEModel",
-		".ZEMDModel"
-	};
+	public:
+		ZESize							GetSessionID() const;
+		ZESize							GetThreadID() const;
 
-	return Extensions;
-}
+		void							SetMinimumLevel(ZELogType Level);
+		ZELogType						GetMinimumLevel() const;
 
-ZESize ZECVModelAsset::GetFileExtensionCount() const
-{
-	return 2;
-}
+		void							SetBlock(bool Block);
+		bool							GetBlock() const;
 
- ZECVConverter* const* ZECVModelAsset::GetConverters() const
-{
-	static ZECVModelConverterV2 Version2;
-	static ZECVConverter* Converters[] =
-	{
-		&Version2
-	};
+		void							SetSink(bool Sink);
+		bool							GetSink() const;
 
-	return Converters;
-}
+		void							SetCallback(ZELogCallback Callback);
+		ZELogCallback					GetCallback() const;
 
-ZESize ZECVModelAsset::GetConverterCount() const
-{
-	return 1;
-}
+		void							SetCallbackParameter(void* Parameter);
+		void*							GetCallbackParameter() const;
 
-ZECVResult ZECVModelAsset::Check(const ZEString& SourceFileName, ZECVVersion& Version) const
-{
-	ZEMLReader Unserializer;
-	if (!Unserializer.Open(SourceFileName))
-		return ZECV_R_UNKNOWN_FORMAT;
+		const ZEString&					GetLogFileName() const;
 
-	ZEMLReaderNode SourceModelNode = Unserializer.GetRootNode();
-	if (SourceModelNode.GetName() != "ZEModel")
-		return ZECV_R_UNKNOWN_FORMAT;
+		void							SetLogFileMinLevel(ZELogType Level);
+		ZELogType						GetLogFileMinLevel() const;				
 
-	Version.Major = SourceModelNode.ReadUInt8("MajorVersion", 1);
-	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
+		bool							OpenLogFile(const ZEString& FileName, const ZEString& Header, bool Append);
+		void							CloseLogFile();
 
-	if (Version.Major > 2 ||
-		Version.Major == 2 && Version.Minor >= 0)
-		return ZECV_R_LATEST_VERSION;
+		void							BeginSession();
+		void							EndSession();
 
-	Unserializer.Close();
+										ZELogSession();
+										~ZELogSession();
 
-	return ZECV_R_DONE;
-}
+		static ZEString					GenerateLogFileName(const ZEString& BaseName);
+		static ZEString					GenerateLogFileHeader(const ZEString& ApplicationName = ZEString::Empty);
+};
