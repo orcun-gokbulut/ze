@@ -536,7 +536,6 @@ void ZECVModelConverterV2::VerifyVertexNormals(const ZEVertexTypeV1& InputVertex
 
 	// Calculated Binormal
 	float BinormalDirection = (2.0f * (OutputVertex.Tangent[1] & 0x0001) - 1.0f);
-
 	ZEVector3 CalculatedBinormal;
 	ZEVector3::CrossProduct(CalculatedBinormal, InputVertex.Tangent, InputVertex.Normal);
 	CalculatedBinormal *= BinormalDirection;
@@ -545,8 +544,8 @@ void ZECVModelConverterV2::VerifyVertexNormals(const ZEVertexTypeV1& InputVertex
 		zeWarning("Validation check failed. Calculated binormal is not valid. Index: %u.", Index);
 
 	float ErrorCalculatedBinormal = (InputVertex.Binormal - CalculatedBinormal).Abs().Sum();
-	/*if (ErrorCalculatedBinormal >= 0.2f)
-		zeWarning("Validation check failed. Calculated binormal is not equals to original binormal. Index: %u, Error: %f.", Index, ErrorCalculatedBinormal);*/
+	if (ErrorCalculatedBinormal >= 0.2f)
+		zeWarning("Validation check failed. Calculated binormal is not equals to original binormal. Index: %u, Error: %f.", Index, ErrorCalculatedBinormal);
 
 
 	// Regenerated Binormal
@@ -623,15 +622,15 @@ void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, co
 
 		ConvertVertexBase(Output[I], Input[I]);
 		ConvertVertexNormals(Input[I], Output[I], I, TriangleTangent, TriangleBinormal);
-		VerifyVertexNormals(Input[I], Output[I], I);
+		//VerifyVertexNormals(Input[I], Output[I], I);
 
 		ConvertVertexBase(Output[I + 1], Input[I + 1]);
 		ConvertVertexNormals(Input[I + 1], Output[I + 1], I + 1, TriangleTangent, TriangleBinormal);
-		VerifyVertexNormals(Input[I + 1], Output[I + 1], I);
+		//VerifyVertexNormals(Input[I + 1], Output[I + 1], I);
 
 		ConvertVertexBase(Output[I + 2], Input[I + 2]);
 		ConvertVertexNormals(Input[I + 2], Output[I + 2], I + 2, TriangleTangent, TriangleBinormal);
-		VerifyVertexNormals(Input[I + 2], Output[I + 2], I);
+		//VerifyVertexNormals(Input[I + 2], Output[I + 2], I);
 	}
 }
 

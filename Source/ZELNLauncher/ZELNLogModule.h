@@ -39,6 +39,7 @@
 
 enum ZELogType;
 class Ui_ZELNLogWidget;
+class ZELogSession;
 
 class ZELNLogModule  : public ZELNModule
 {
@@ -48,7 +49,7 @@ class ZELNLogModule  : public ZELNModule
 		QWidget*					Widget;
 		Ui_ZELNLogWidget*			Form;
 
-		static void					LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
+		static void					LogCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 		
 		virtual bool				InitializeInternal();
 		virtual bool				DeinitializeInternal();

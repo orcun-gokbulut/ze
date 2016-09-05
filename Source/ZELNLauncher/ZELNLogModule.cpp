@@ -38,10 +38,13 @@
 #include "ui_ZELNLogWidget.h"
 
 #include "ZELog.h"
+#include "ZELogSession.h"
+
+static ZELogSession Session;
 
 ZELN_MODULE_DECRIPTION(ZELNLogModule, "Log");
 
-void ZELNLogModule::LogCallback(const char* ModuleName, ZELogType Type, const char* LogText, void* ExtraParameters)
+void ZELNLogModule::LogCallback(const ZELogSession* Session, const char* ModuleName, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	ZELNLogModule* Module = static_cast<ZELNLogModule*>(ExtraParameters);
 	const char* TypeString = ZELog::GetLogTypeString(Type);
@@ -61,16 +64,17 @@ bool ZELNLogModule::InitializeInternal()
 	Form = new Ui_ZELNLogWidget();
 	Form->setupUi(Widget);
 
-	ZELog::GetInstance()->SetCallbackParameter(this);
-	ZELog::GetInstance()->SetCallback(&LogCallback);
+	Session.SetCallback(LogCallback);
+	Session.SetCallbackParameter(this);
+	Session.SetSink(true);
+	Session.BeginSession();
 	
 	return true;
 }
 
 bool ZELNLogModule::DeinitializeInternal()
 {
-	ZELog::GetInstance()->SetCallbackParameter(NULL);
-	ZELog::GetInstance()->SetCallback(NULL);
+	Session.EndSession();
 
 	delete Widget;
 	Widget = NULL;

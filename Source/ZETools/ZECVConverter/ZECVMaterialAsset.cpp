@@ -87,7 +87,7 @@ ZECVResult ZECVMaterialAsset::Check(const ZEString& SourceFileName, ZECVVersion&
 	if (SourceModelNode.GetName() != "Material" && SourceModelNode.GetName() != "ZERNMaterial" && SourceModelNode.GetName() != "ZERNStandardMaterial")
 		return ZECV_R_UNKNOWN_FORMAT;
 
-	Version.Major = SourceModelNode.ReadUInt8("MajorVersion");
+	Version.Major = SourceModelNode.ReadUInt8("MajorVersion", 1);
 	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
 
 	if (Version.Major > 2 ||

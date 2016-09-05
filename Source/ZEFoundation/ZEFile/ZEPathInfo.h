@@ -54,7 +54,7 @@ enum ZEPathOperationElement
 	ZE_POE_ALL			= 3
 };
 
-typedef ZEDelegate<bool (const char*, ZEPathOperationElement)> ZEPathOperationFunction;
+typedef ZEDelegate<bool (const char*, ZEPathOperationElement, void*)> ZEPathOperationFunction;
 
 class ZEPathInfo
 {
@@ -88,7 +88,7 @@ class ZEPathInfo
 
 		bool						Equals(const ZEPathInfo& OtherPath) const;
 
-		static bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
+		static bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true, void* Parameters = NULL);
 
 									ZEPathInfo();
 									ZEPathInfo(const char* Path);

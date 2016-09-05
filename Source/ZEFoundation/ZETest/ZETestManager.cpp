@@ -45,6 +45,7 @@
 #endif
 
 #include <string.h>
+#include "ZELogSession.h"
 
 void ZETestManager::SetVisualStudioOutput(bool Enabled)
 {
@@ -73,10 +74,13 @@ const char* ZETestManager::GetPackageName()
 
 bool ZETestManager::RunTests()
 {
+	ZELogSession LogSession;
+	LogSession.SetMinimumLevel(ZE_LOG_ERROR);
+	LogSession.BeginSession();
+
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(false);
-	ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_ERROR);
 
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
@@ -100,7 +104,8 @@ bool ZETestManager::RunTests()
 		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 	}
 
-	ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_INFO);
+	LogSession.EndSession();
+
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(true);

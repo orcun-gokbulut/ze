@@ -39,6 +39,7 @@
 #include "ZEConsole.h"
 #include "ZECommandManager.h"
 #include "ZEOptionManager.h"
+#include "ZELogSession.h"
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -415,9 +416,12 @@ bool ZEConsole::ParseInput(const char* Input)
 	return false;		
 }
 
-static void LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+static void LogCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
-	zeOutput("[%s] %s: %s\n", Module, ZELog::GetLogTypeString(Type), LogText);
+	if (Session != NULL)
+		zeOutput("%s [%s] %s: %s\n", Session->GetSessionID(), Module, ZELog::GetLogTypeString(Type), LogText);
+	else
+		zeOutput("[%s] %s: %s\n", Module, ZELog::GetLogTypeString(Type), LogText);
 }
 
 void ZEConsole::SetConsoleInterface(ZEConsoleInterface* Interface)
@@ -544,7 +548,6 @@ ZEConsole::ZEConsole()
 	Visible = false;
 	Instance = this;
 	ConsoleInterface = NULL;
-	ZELog::GetInstance()->SetCallback(LogCallback);
 }
 
 ZEConsole::~ZEConsole()
