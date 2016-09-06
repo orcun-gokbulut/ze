@@ -101,7 +101,7 @@ enum ZELogType
 			ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
 		}\
 		Count++;\
-		if (Count >= Times)\
+		if (Count >= (Times))\
 			Count = 0;\
 	}\
 	while(false)
@@ -120,6 +120,7 @@ enum ZELogType
 	while(false)
 
 class ZELogSession;
+template <typename ZEItemType> class ZEList2;
 
 class ZELog
 {
@@ -129,7 +130,8 @@ class ZELog
 		ZELogSession*				RootSession;
 		ZELogSession*				SessionCount;	
 		ZESize						LastSessionId;
-	
+		ZEList2<ZELogSession>*		Sessions;
+
 		void						LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args);
 
 									ZELog();
@@ -141,7 +143,7 @@ class ZELog
 		ZESize						GetSessionCount();
 
 		void						BeginSession(ZELogSession* Session);
-		void						EndSession();
+		void						EndSession(ZELogSession* Session);
 
 		void						Log(const char* Module, const char* Format, ...);
 		void						Log(const char* Module, ZELogType Type, const char* Format, ...);

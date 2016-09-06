@@ -80,6 +80,7 @@ void ZELogSession::SetSink(bool Sink)
 {
 	this->Sink = Sink;
 }
+
 bool ZELogSession::GetSink() const
 {
 	return Sink;
@@ -129,12 +130,14 @@ bool ZELogSession::OpenLogFile(const ZEString& FileName, const ZEString& Header,
 	if (Append)
 		Mode = "a";
 
-	LogFile = fopen(Path.Path, "a");
-	if (LogFile == NULL)
+	void* LogFileInternal = fopen(Path.Path, "a");
+	if (LogFileInternal == NULL)
 		return false;
 
+	fprintf((FILE*)LogFileInternal, "%s\n\n", Header.ToCString());
+
+	this->LogFile = LogFileInternal;
 	LogFileName = FileName;
-	fprintf((FILE*)LogFile, "%s\n\n", Header.ToCString());
 
 	return true;
 }
@@ -150,25 +153,17 @@ void ZELogSession::CloseLogFile()
 
 void ZELogSession::BeginSession()
 {
-	if (SessionID != 0)
-		return;
-
 	ZELog::GetInstance()->BeginSession(this);
 }
 
 void ZELogSession::EndSession()
 {
-	CloseLogFile();
-
-	if (SessionID == 0)
-		return;
-	
-	ZELog::GetInstance()->EndSession();
+	ZELog::GetInstance()->EndSession(this);
 }
 
 ZELogSession::ZELogSession() : Link(this)
 {
-	SessionID = 0;
+	SessionID = -1;
 	ThreadID = 0;
 	MinimumLevel = ZE_LOG_INFO;
 	Sink = false;

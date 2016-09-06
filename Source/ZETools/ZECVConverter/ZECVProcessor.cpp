@@ -90,12 +90,11 @@ ZECVAsset* ZECVProcessor::FindAsset(const ZEString& Extension) const
 
 bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const
 {
-	ZELogSession ItemLogSessin;
-	ItemLogSessin.BeginSession();
+	ZELogSession ItemLogSession;
+	ItemLogSession.BeginSession();
 
-	zeLog("Processing file. \n"
-		"  Source File Name: \"%s\"\n"
-		"  Destination File Name: \"%s\"", SourceFileName.ToCString(), DestinationFileName.ToCString());
+	zeLog("Processing file. Source File Name: \"%s\". Destination File Name: \"%s\".", 
+		SourceFileName.ToCString(), DestinationFileName.ToCString());
 
 	ZEFileInfo SourceFileInfo(SourceFileName);
 	ZEString Extension = SourceFileInfo.GetExtension();
@@ -147,7 +146,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 		"   File Version     : {2}.{3}\n"
 		"   Target Version   : {4}.{5}\n"
 		"   Time Stamp       : {6}\n"
-		"----------------------------------------------------\n\n", 
+		"----------------------------------------------------", 
 		SourceFileName,
 		DestinationFileName,
 		FileVersion.Major, FileVersion.Minor,
@@ -253,7 +252,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 		OriginalVersion.Major, OriginalVersion.Minor, FileVersion.Major, FileVersion.Minor, SourceFileName.ToCString());
 
 	ConvertLogSession.EndSession();
-	ItemLogSessin.EndSession();
+	ItemLogSession.EndSession();
 	return true;
 }
 
@@ -273,11 +272,12 @@ void ZECVProcessor::ConvertDirectory(const ZEString& DirectoryName) const
 		"----------------------------------------------------\n"
 		"   Directory  : {0}\n"
 		"   Time Stamp : {1}\n"
-		"----------------------------------------------------\n\n", 
+		"----------------------------------------------------", 
 		DirectoryName,
 		ZETimeStamp::Now().ToString("%d-%m-%Y %H:%M:%S"));
 	
 	ZELogSession LogSession;
+	LogSession.SetSink(true);
 	LogSession.BeginSession();
 	LogSession.OpenLogFile(LogFileName, Header, false);
 

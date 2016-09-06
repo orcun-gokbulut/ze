@@ -191,7 +191,7 @@ ZECVResult ZECVMaterialConverterV2::Convert(const ZEString& SourceFileName, cons
 	ZEMLReaderNode SourceMaterialNode = Unserializer.GetRootNode();
 	if (SourceMaterialNode.GetName() != "Material")
 	{
-		zeError("Cannot load material. Corrupted model file. File Name: \"%s\".", SourceFileName.ToCString());
+		zeError("Cannot load material. Corrupted material file. File Name: \"%s\".", SourceFileName.ToCString());
 		Unserializer.Close();
 		return ZECV_R_FAILED;
 	}

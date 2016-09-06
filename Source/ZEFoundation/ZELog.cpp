@@ -50,8 +50,6 @@
 #include <windows.h>
 #endif
 
-static ZEList2<ZELogSession> Sessions;
-
 static void DefaultCallback(const char* Module, ZELogType Level, const char* LogText);
 
 static void SetColor(int Type)
@@ -110,13 +108,13 @@ static void SetColor(int Type)
 
 static void DefaultCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
+	if (Session != NULL)
+		printf("(%d) ", Session->GetSessionID());
+
 	SetColor(-1);
 	printf("[");
 
 	SetColor(-2);
-	if (Session != NULL)
-		printf("%d:", Session->GetSessionID());
-
 	printf("%s",  Module);
 	
 	SetColor(-1);
@@ -141,7 +139,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 	ZESize ThreadId = ZEThread::GetCurrentThreadId();
 	ZELogSession* CurrentSession = NULL;
 	ZELogSession* CurrentSinkSession = NULL;
-	ze_for_each_reverse(Session, Sessions)
+	ze_for_each_reverse(Session, *Sessions)
 	{
 		if (Type < Session->MinimumLevel)
 			continue;
@@ -149,7 +147,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 		if (Session->Block)
 			break;
 
-		if (Session->Sink && Session->ThreadID != ThreadId)
+		if (!Session->Sink && Session->ThreadID != ThreadId)
 			continue;
 
 		if (CurrentSession == NULL || CurrentSession->GetThreadID() != ThreadId)
@@ -161,11 +159,9 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 		if (Session->LogFile == NULL)
 			continue;
 
-		if (CurrentSession != NULL)
-			fprintf((FILE*)Session->LogFile, "%d", CurrentSession->SessionID);
-
 		fprintf((FILE*)Session->LogFile, 
-			"%02d-%02d-%04d %02d:%02d:%02d [%s] %s: %s\n",
+			"(%d) %04d-%02d-%02d %02d:%02d:%02d [%s] %s: %s\n",
+			CurrentSession->SessionID,
 			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
 			Module, GetLogTypeString(Type), Buffer);
@@ -175,7 +171,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 
 	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "(%d, %d) [%s] %s : %s \r\n", CurrentSession->GetSessionID(), ZEThread::GetCurrentThreadId(), Module, ZELog::GetLogTypeString(Type), Buffer);
+		sprintf(DebugBuffer, "(S:%d, T:%d) [%s] %s: %s \r\n", CurrentSession->GetSessionID(), ZEThread::GetCurrentThreadId(), Module, ZELog::GetLogTypeString(Type), Buffer);
 		OutputDebugString(DebugBuffer);
 	#endif
 }
@@ -183,15 +179,18 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 ZELog::ZELog()
 {
 	LastSessionId = 0;
+	Sessions = new ZEList2<ZELogSession>();
 	RootSession = new ZELogSession();
+	RootSession->SetSink(true);
 	RootSession->SetCallback(DefaultCallback);
 	BeginSession(RootSession);
 }
 
 ZELog::~ZELog()
 {
-	EndSession();
+	EndSession(RootSession);
 	delete RootSession;
+	delete Sessions;
 }
 
 ZELogSession* ZELog::GetRootSession()
@@ -203,9 +202,9 @@ ZELogSession* ZELog::GetCurrentSession()
 {
 	Lock.Lock();
 
-	ze_for_each_reverse(Session, Sessions)
+	ze_for_each_reverse(Session, *Sessions)
 	{
-		if (GetCurrentSession()->ThreadID == ZEThread::GetCurrentThreadId())
+		if (Session->ThreadID == ZEThread::GetCurrentThreadId())
 		{
 			Lock.Unlock();
 			return Session.GetPointer();
@@ -218,7 +217,7 @@ ZELogSession* ZELog::GetCurrentSession()
 
 ZESize ZELog::GetSessionCount()
 {
-	return Sessions.GetCount();
+	return Sessions->GetCount();
 }
 
 void ZELog::BeginSession(ZELogSession* Session)
@@ -231,34 +230,30 @@ void ZELog::BeginSession(ZELogSession* Session)
 		return;
 	}
 
-	Sessions.AddEnd(&Session->Link);
+	Sessions->AddEnd(&Session->Link);
 	Session->ThreadID = ZEThread::GetCurrentThreadId();
 	Session->SessionID = LastSessionId++;
 
 	Lock.Unlock();
 }
 
-void ZELog::EndSession()
+void ZELog::EndSession(ZELogSession* Session)
 {
 	Lock.Lock();
-	if (Sessions.GetCount() <= 1)
+
+	Session->CloseLogFile();
+
+	if (Session->SessionID == -1)
 	{
 		Lock.Unlock();
 		return;
 	}
 
-	ze_for_each_reverse(Session, Sessions)
-	{
-		Session->CloseLogFile();
+	Session->CloseLogFile();
+	Sessions->Remove(&Session->Link);
+	Session->SessionID = -1;
+	Session->ThreadID = 0;
 
-		if (Session->ThreadID != ZEThread::GetCurrentThreadId())
-			continue;
-
-		Sessions.Remove(&Session->Link);
-
-		Session->SessionID = 0;
-		Session->ThreadID = 0;
-	}
 	Lock.Unlock();
 }
 

@@ -35,9 +35,11 @@
 
 #pragma once
 
-#define ze_for_each(Variable, Container) for (auto Variable = Container.GetIterator(); Variable.IsValid(); ++Variable)
-#define ze_for_each_reverse(Variable, Container) for (auto Variable = Container.GetIteratorEnd(); Variable.IsValid(); --Variable)
-#define ze_for_each_iterator(Variable, Iterator) for (auto Variable = Iterator; Variable.IsValid(); ++Variable)
+#define ze_for_each(Variable, Container) for (auto Variable = (Container).GetIterator(); Variable.IsValid(); ++Variable)
+#define ze_for_each_reverse(Variable, Container) for (auto Variable = (Container).GetIteratorEnd(); Variable.IsValid(); --Variable)
+
+#define ze_for_each_iterator(Variable, Iterator) for (auto Variable = (Iterator); Variable.IsValid(); ++Variable)
+#define ze_for_each_iterator_reverse(Variable, Iterator) for (auto Variable = (Iterator); Variable.IsValid(); --Variable)
 
 template<typename ZEItemType>
 class ZEIterator
