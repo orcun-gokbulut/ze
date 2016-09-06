@@ -48,27 +48,6 @@
 
 #include "tootlelib.h"
 
-enum ZEMDVertexType
-{
-	ZEMD_VT_NORMAL		= 0,
-	ZEMD_VT_SKINNED		= 1
-};
-
-enum ZEMDVertexIndexType
-{
-	ZEMD_VIT_NONE		= 0,
-	ZEMD_VIT_16BIT		= 16,
-	ZEMD_VIT_32BIT		= 32
-};
-
-struct ZEModelConverterMaterialDefinition
-{
-	ZEString Name;
-	ZEString FilePath;
-};
-
-static ZEArray<ZEModelConverterMaterialDefinition> Materials;
-
 bool ZECVModelConverterV2::ConvertPhysicalBody(ZEMLReaderNode* SourcePhysicalBodyNode, ZEMLWriterNode* DestinationPhysicalBodyNode)
 {
 	zeDebugCheck(SourcePhysicalBodyNode == NULL || DestinationPhysicalBodyNode == NULL || !SourcePhysicalBodyNode->IsValid(), "Invalid arguments.");
@@ -634,7 +613,7 @@ void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, co
 	}
 }
 
-bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode)
+bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode, const ZEArray<ZEModelConverterMaterialDefinition>& Materials)
 {
 	zeDebugCheck(SourceLODNode == NULL || DestinationLODNode == NULL || !SourceLODNode->IsValid(), "Invalid parameters");
 	zeLog("Processing LOD: %d.", SourceLODNode->ReadInt32("LODLevel", 0));
@@ -710,14 +689,14 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 		}
 
 		float GainRatio = (float)IndexedVertexBufferSize / (float)VertexBufferSize;
-		if (GainRatio <= 0.85f)
+		if (GainRatio <= 0.90f)
 		{
-			zeLog("Indexing Accepted. Gain ratio: %f (Limit: 0.85), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
+			zeLog("Indexing Accepted. Gain ratio: %f (Limit: 0.90), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
 			IsIndexed = true;
 		}
 		else
 		{		
-			zeLog("Indexing Rejected. Gain ratio: %f (Limit: 0.85), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
+			zeLog("Indexing Rejected. Gain ratio: %f (Limit: 0.90), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
 			IsIndexed = false;
 		}
 
@@ -822,7 +801,6 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 	DrawNode.WriteUInt32("Count", (ZEUInt32)VertexCount);
 
 	ZEInt32 MaterialID = SourceLODNode->ReadInt32("MaterialId");
-
 	if (MaterialID < Materials.GetCount())
 	{
 		DrawNode.WriteString("MaterialName", Materials[MaterialID].Name);
@@ -835,7 +813,7 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 	return true;
 }
 
-bool ZECVModelConverterV2::ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode)
+bool ZECVModelConverterV2::ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode, const ZEArray<ZEModelConverterMaterialDefinition>& Materials)
 {
 	zeDebugCheck(SourceMeshNode == NULL || DestinationMeshNode == NULL || !SourceMeshNode->IsValid(), "Invalid paramters");
 
@@ -882,7 +860,7 @@ bool ZECVModelConverterV2::ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWrite
 	{
 		ZEMLWriterNode DestinationLODNode;
 		DestinationLODsNode.OpenNode("LOD", DestinationLODNode);
-		if (!ConvertMeshLOD(&SourceLODsNode.GetNode("LOD", I), &DestinationLODNode))
+		if (!ConvertMeshLOD(&SourceLODsNode.GetNode("LOD", I), &DestinationLODNode, Materials))
 			return false;
 
 		DestinationLODNode.CloseNode();
@@ -940,6 +918,8 @@ bool ZECVModelConverterV2::ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriter
 {
 	zeDebugCheck(!Unserializer->IsValid(), "Invalid parameters");
 
+	ZEArray<ZEModelConverterMaterialDefinition> Materials;
+
 	Serializer->WriteUInt8("VersionMajor", 2);
 	Serializer->WriteUInt8("VersionMinor", 0);
 
@@ -992,7 +972,7 @@ bool ZECVModelConverterV2::ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriter
 			ZEMLWriterNode DestinationMeshNode;
 			DestinationMeshesNode.OpenNode("Mesh", DestinationMeshNode);
 			
-			if (!ConvertMesh(&SourceMeshesNode.GetNode("Mesh", I), &DestinationMeshNode))
+			if (!ConvertMesh(&SourceMeshesNode.GetNode("Mesh", I), &DestinationMeshNode, Materials))
 			{
 				TootleCleanup();
 				return false;

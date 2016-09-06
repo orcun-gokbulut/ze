@@ -71,15 +71,15 @@ enum ZEErrorType
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#define ZE_BREAK_ON_ERROR_INTERNAL(...) if (ZEError::GetInstance()->GetBreakOnErrorEnabled()) { ZE_BREAK_DIALOG_INTERNAL(__VA_ARGS__); }
+	#define ZE_BREAK_ON_ERROR_INTERNAL(...) do {if (ZEError::GetInstance()->GetBreakOnErrorEnabled()) { ZE_BREAK_DIALOG_INTERNAL(__VA_ARGS__); }} while(false)
 #else
-	#define ZE_BREAK_ON_ERROR_INTERNAL(...)
+	#define ZE_BREAK_ON_ERROR_INTERNAL(...) do { } while(false)
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_WARNING)
-	#define ZE_BREAK_ON_WARNING_INTERNAL(...) if (ZEError::GetInstance()->GetBreakOnWarningEnabled()) { ZE_BREAK_DIALOG_INTERNAL(__VA_ARGS__); }
+	#define ZE_BREAK_ON_WARNING_INTERNAL(...) do {if (ZEError::GetInstance()->GetBreakOnWarningEnabled()) { ZE_BREAK_DIALOG_INTERNAL(__VA_ARGS__); }} while(false)
 #else
-	#define ZE_BREAK_ON_WARNING_INTERNAL(...) 
+	#define ZE_BREAK_ON_WARNING_INTERNAL(...) do { } while(false)
 #endif
 
 #ifdef ZE_DEBUG_ENABLE

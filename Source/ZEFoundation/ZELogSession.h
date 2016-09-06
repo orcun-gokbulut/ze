@@ -45,7 +45,7 @@ class ZELogSession
 	friend class ZELog;
 	private:
 		ZELink<ZELogSession>			Link;
-		ZESize							SessionID;
+		ZESSize							SessionID;
 		ZESize							ThreadID;
 		ZELogType						MinimumLevel;
 		bool							Sink;

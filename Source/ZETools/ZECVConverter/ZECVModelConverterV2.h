@@ -41,6 +41,18 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 
+enum ZEMDVertexType
+{
+	ZEMD_VT_NORMAL		= 0,
+	ZEMD_VT_SKINNED		= 1
+};
+
+enum ZEMDVertexIndexType
+{
+	ZEMD_VIT_NONE		= 0,
+	ZEMD_VIT_16BIT		= 16,
+	ZEMD_VIT_32BIT		= 32
+};
 
 ZEPackStruct(
 struct ZEMDVertexV1
@@ -85,6 +97,12 @@ struct ZEMDVertexSkinV2
 	ZEVector4						Weights;
 });
 
+struct ZEModelConverterMaterialDefinition
+{
+	ZEString Name;
+	ZEString FilePath;
+};
+
 class ZECVModelConverterV2 : public ZECVConverter
 {
 	private:
@@ -106,8 +124,8 @@ class ZECVModelConverterV2 : public ZECVConverter
 		static bool							ConvertPhysicalJoint(ZEMLReaderNode* SourceJointNode, ZEMLWriterNode* DestinationJointNode);
 		static bool							ConvertBone(ZEMLReaderNode* SourceBoneNode, ZEMLWriterNode* DestinationBoneNode);
 		static bool							ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationBoundingBoxNode);
-		static bool							ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode);
-		static bool							ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode);
+		static bool							ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode, const ZEArray<ZEModelConverterMaterialDefinition>& Materials);
+		static bool							ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* DestinationMeshNode, const ZEArray<ZEModelConverterMaterialDefinition>& Materials);
 		static bool							ConvertHelper(ZEMLReaderNode* SourceHelperNode, ZEMLWriterNode* DestinationHelperNode);
 		static bool							ConvertAnimation(ZEMLReaderNode* SourceAnimationNode, ZEMLWriterNode* DestinationAnimationNode);
 		static bool							ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serializer);

@@ -159,7 +159,7 @@ void ZEEntity::ParentTransformChanged()
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 		ChildEntities[I]->ParentTransformChanged();
 
-	if (GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && GetStatic() && GetScene() != NULL)
+	if (GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && GetStatic() && GetScene() != NULL && IsLoaded())
 		GetScene()->UpdateOctree(this);
 }
 
