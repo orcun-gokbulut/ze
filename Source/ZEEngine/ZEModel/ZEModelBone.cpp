@@ -637,7 +637,8 @@ void ZEModelBone::AddChildBone(ZEModelBone* Bone)
 {
 	zeCheckError(Bone == NULL, ZE_VOID, "Bone cannot be null.");
 	zeCheckError(Bone->GetParent() != NULL, ZE_VOID, "Bone is already added to another bone or model.");
-	zeCheckError(Bone->GetModel() != NULL, ZE_VOID, "Bone is already used by a model.");
+	zeCheckError(Bone->GetModel() != GetModel(), ZE_VOID, "Bone is already used by a different model.");
+	zeCheckError(ChildBones.Exists(&Bone->ParentLink), ZE_VOID, "Bone is already a child of this bone.");
 
 	Bone->SetParent(this);
 	ChildBones.AddEnd(&Bone->ParentLink);
@@ -646,7 +647,7 @@ void ZEModelBone::AddChildBone(ZEModelBone* Bone)
 void ZEModelBone::RemoveChildBone(ZEModelBone* Bone)
 {
 	zeCheckError(Bone == NULL, ZE_VOID, "Bone cannot be null.");
-	zeCheckError(!ChildBones.Exists(&Bone->ParentLink), ZE_VOID, "Bone is not a child of this mesh.");
+	zeCheckError(!ChildBones.Exists(&Bone->ParentLink), ZE_VOID, "Bone is not a child of this bone.");
 
 	Bone->SetParent(NULL);
 	ChildBones.Remove(&Bone->ParentLink);

@@ -218,7 +218,7 @@ ZEEntityResult ZEModel::LoadInternal()
 
 	for (ZESize I = 0; I < Resource->GetMeshes().GetCount(); I++)
 	{
-		if (Resource->GetMeshes()[I]->GetParentMeshId() != -1 || Resource->GetMeshes()[I]->GetParentMeshId() >= Meshes.GetCount())
+		if (Resource->GetMeshes()[I]->GetParentMeshId() < 0 || (ZESize)Resource->GetMeshes()[I]->GetParentMeshId() >= Meshes.GetCount())
 			continue;
 
 		Meshes[(ZESize)Resource->GetMeshes()[I]->GetParentMeshId()]->AddChildMesh(Meshes[I]);
@@ -234,7 +234,7 @@ ZEEntityResult ZEModel::LoadInternal()
 
 	for (ZESize I = 0; I < Resource->GetBones().GetCount(); I++)
 	{
-		if (Resource->GetBones()[I]->GetParentBoneId() != -1 || Resource->GetBones()[I]->GetParentBoneId() >= Bones.GetCount())
+		if (Resource->GetBones()[I]->GetParentBoneId() < 0 || (ZESize)Resource->GetBones()[I]->GetParentBoneId() >= Bones.GetCount())
 			continue;
 
 		Bones[(ZESize)Resource->GetBones()[I]->GetParentBoneId()]->AddChildBone(Bones[I]);

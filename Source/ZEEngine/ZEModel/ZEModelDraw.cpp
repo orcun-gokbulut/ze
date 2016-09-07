@@ -35,6 +35,7 @@
 
 #include "ZEModelDraw.h"
 
+#include "ZEModel.h"
 #include "ZEModelMesh.h"
 #include "ZEModelMeshLOD.h"
 #include "ZEMDResourceDraw.h"
@@ -113,7 +114,15 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	if (GetLOD()->GetIndexType() != ZEMD_VIT_NONE)
 		Context->SetIndexBuffer(GetLOD()->GetIndexBuffer());
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetLOD()->GetMesh()->ConstantBuffer);
+	if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
+	{
+		ZEGRConstantBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetLOD()->GetMesh()->GetModel()->ConstantBufferBoneTransforms};
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
+	}
+	else
+	{
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetLOD()->GetMesh()->ConstantBuffer);
+	}
 
 	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage))
 		return;

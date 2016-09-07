@@ -70,6 +70,7 @@ class ZEModel : public ZEEntity
 	friend class ZEModelMesh;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
+	friend class ZEModelDraw;
 	private:
 		ZEString								ModelFileName;
 
