@@ -176,6 +176,7 @@ bool ZEMDResourceBone::Unserialize(const ZEMLReaderNode& BoneNode)
 	ZEAABBox BoundingBox;
 	BoundingBox.Max = BoundingBoxNode.ReadVector3("Max", ZEVector3::Zero);
 	BoundingBox.Min = BoundingBoxNode.ReadVector3("Min", ZEVector3::Zero);
+	SetBoundingBox(BoundingBox);
 
 	ZEMLReaderNode PhysicalJointNode = BoneNode.GetNode("PhysicalJoint");
 	if (PhysicalJointNode.IsValid())

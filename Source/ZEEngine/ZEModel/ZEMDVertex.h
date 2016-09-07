@@ -69,7 +69,7 @@ struct ZEMDVertex
 });
 
 ZEPackStruct(
-struct ZEMDVertexSkin : public ZEMDVertex
+struct ZEMDVertexSkin
 {
 	ZEVector3						Position;
 	ZEUInt8_4						Indices;

@@ -699,7 +699,8 @@ void ZEModelMesh::AddChildMesh(ZEModelMesh* Mesh)
 {
 	zeCheckError(Mesh == NULL, ZE_VOID, "Mesh cannot be null.");
 	zeCheckError(Mesh->GetParent() != NULL, ZE_VOID, "Mesh is already added to another mesh.");
-	zeCheckError(Mesh->GetModel() != NULL, ZE_VOID, "Mesh is already used by a model.");
+	zeCheckError(Mesh->GetModel() != GetModel(), ZE_VOID, "Mesh is already used by a different model.");
+	zeCheckError(ChildMeshes.Exists(&Mesh->ParentLink), ZE_VOID, "Mesh is already a child of this mesh.");
 
 	Mesh->SetParent(this);
 	ChildMeshes.AddEnd(&Mesh->ParentLink);
