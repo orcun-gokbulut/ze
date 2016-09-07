@@ -275,7 +275,6 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 
 	ProgressDialog->SetTitle("Interior Export Progress");
 	ProgressDialog->SetProgressBarVisibility(false);
-	ProgressDialog->SetFileLoggingEnabled(OptionsDialog->GetFileLoggingEnabled());
 	ProgressDialog->SetLogFilePath(OptionsDialog->GetLogFilePath());
 	ProgressDialog->Start();
 	ProgressDialog->OpenTask("Interior Exporter", true);

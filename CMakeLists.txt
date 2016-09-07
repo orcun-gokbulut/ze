@@ -71,20 +71,40 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
+	# /EH Exception Handling
+	# /GL Whole Program Optimization
+	# /GS Security Checks
+	# /GR Runtime Type Information
+	# /GT Support Fiber-Safe Thread-Local Storage
+	# /O2 Optimization Performance
+	# /Ot Favor for Fast Code
+	# /Oi Enable Instrint Functions
+	# /ZI Debug Information Format /Zi (PDB) /ZI (PDB with Edit and Continue)
+	
 	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
 	endif()
-	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	
+	#string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	#add_definitions("-D_HAS_EXCEPTIONS=0")
+
 	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
+	
+	string(REPLACE "/GS" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GS-")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR- /EHsc-")
+	string(REPLACE "/GT" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /GT /O2 /Ot /Oi")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
+	
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /IGNORE:4099")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF /OPT:ICF")
+	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF /OPT:ICF")
+	set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG")
 
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF,ICF")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF,ICF")
-
-	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 endif()
 
 
@@ -97,7 +117,6 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_definitions(-DFREEIMAGE_LIB)
 
 ## Source Files
 #########################################################################################
