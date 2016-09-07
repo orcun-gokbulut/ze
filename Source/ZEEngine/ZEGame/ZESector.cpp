@@ -421,7 +421,7 @@ bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 
 	ZEMLReaderNode BoundingBoxNode = PropertiesNode.GetNode("BoundingBox");
 
-	zeCheckError(!BoundingBoxNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+	zeCheckError(!BoundingBoxNode.IsValid(), false, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
 
 	ZEAABBox BoundingBox(BoundingBoxNode.ReadVector3("Min"), BoundingBoxNode.ReadVector3("Max"));
 	SetBoundingBox(BoundingBox);
@@ -439,7 +439,7 @@ bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 
 	ZEMLReaderNode LinksNode = PropertiesNode.GetNode("Links");
 
-	zeCheckError(!LinksNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
+	zeCheckError(!LinksNode.IsValid(), false, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
 
 	ZESize LinkCount = LinksNode.GetNodeCount();
 	SectorLinks.SetCount(LinkCount);

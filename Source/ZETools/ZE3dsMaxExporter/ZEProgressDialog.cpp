@@ -42,7 +42,7 @@
 #include "ZEFile\ZEFile.h"
 #include <QFile>
 
-void LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+void LogCallback(ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	ZEProgressDialog::GetInstance()->Message(Type, LogText);
 }
@@ -53,7 +53,6 @@ ZEProgressDialog::ZEProgressDialog()
 {
 	Instance = this;
 	QApplicationCreated = false;
-	LogFile = NULL;
 
 	if (QApplication::instance() == NULL)
 	{
@@ -81,10 +80,6 @@ ZEProgressDialog::ZEProgressDialog()
 	CurrentTask = NULL;
 	SignalHandler = new ZEProgressDialogSignalHandler(this, this->Dialog);
 
-	OldErrorCallback = ZEError::GetInstance()->GetCallBack();
-	OldLogCallBack = ZELog::GetInstance()->GetCallback();
-
-	ZELog::GetInstance()->SetCallback(LogCallback);
 	ZEError::GetInstance()->SetCallback(NULL);
 }
 
@@ -98,18 +93,6 @@ ZEProgressDialog::~ZEProgressDialog()
 
 	Tasks.Clear();
 
-	if (LogFile != NULL)
-	{
-		if (LogFile->IsOpen())
-		{
-			LogFile->Close();
-			delete LogFile;
-			LogFile = NULL;
-		}
-	}
-
-	ZELog::GetInstance()->SetCallback(OldLogCallBack);
-	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 	Instance = NULL;
 
 	TasksTreeWidget->hide();
@@ -177,6 +160,9 @@ void ZEProgressDialog::CloseTask()
 
 void ZEProgressDialog::Start()
 {
+	LogSession.BeginSession();
+	LogSession.OpenLogFile(LogFilePath, "", false);
+
 	Dialog->setWindowModality(Qt::WindowModality::WindowModal);
 	Dialog->show();
 }
@@ -185,6 +171,8 @@ void ZEProgressDialog::End()
 {
 	Form->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
 	Form->lblCurrentTaskName->setText("Finished");
+
+	LogSession.EndSession();
 
 	if (!IsWaitForClose)
 		Dialog->close();
@@ -234,23 +222,6 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 	TextCursor.insertBlock(BlockFormat);
 	QTextCharFormat CharFormat;
 	TextCursor.insertText(Text, CharFormat);
-
-	if (LogFile == NULL && IsFileLoggingEnabled == true)
-		LogFile = new ZEFile();
-
-	if (LogFile != NULL)
-	{
-		if (LogFile->IsOpen() == false)
-			LogFile->Open(LogFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
-
-		if (LogFile->IsOpen())
-		{
-			ZEString LogMessage;
-			LogMessage = Text;
-			LogMessage = "\n" + LogMessage;
-			LogFile->Write(LogMessage.ToCString(), LogMessage.GetLength(), 1);
-		}
-	}
 }
 
 ZEProgressDialog* ZEProgressDialog::GetInstance()
@@ -305,14 +276,4 @@ void ZEProgressDialog::SetLogFilePath(const ZEString& FilePath)
 const ZEString& ZEProgressDialog::GetLogFilePath()
 {
 	return LogFilePath;
-}
-
-void ZEProgressDialog::SetFileLoggingEnabled(bool Enabled)
-{
-	IsFileLoggingEnabled = Enabled;
-}
-
-bool ZEProgressDialog::GetFileLoggingEnabled() const
-{
-	return IsFileLoggingEnabled;
 }

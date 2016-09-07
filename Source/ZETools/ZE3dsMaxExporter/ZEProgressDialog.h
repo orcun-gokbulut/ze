@@ -42,6 +42,7 @@
 #include "ZEDS\ZEArray.h"
 
 #include <QDialog>
+#include "ZELogSession.h"
 
 namespace Ui
 {
@@ -75,17 +76,13 @@ class ZEProgressDialog
 		ZEProgressDialogTask*			RootTask;
 		ZEProgressDialogTask*			CurrentTask;
 
-		ZEErrorCallback					OldErrorCallback;
-		ZELogCallback					OldLogCallBack;
-
-		bool							IsFileLoggingEnabled;
-		ZEFile*							LogFile;
+		ZELogSession					LogSession;
 		ZEString						LogFilePath;
+
 
 										ZEProgressDialog();
 
 	public:
-
 		void							SetTitle(const ZEString& Title);
 
 		void							SetProgressBarVisibility(bool IsVisible);
@@ -96,9 +93,6 @@ class ZEProgressDialog
 
 		void							SetLogFilePath(const ZEString& FilePath);
 		const ZEString&					GetLogFilePath();
-
-		void							SetFileLoggingEnabled(bool Enabled);
-		bool							GetFileLoggingEnabled() const;
 
  		void							Start(); 
 		ZEProgressDialogTask*			OpenTask(const ZEString& Name, bool IsTitle = false);
