@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVectorSSE3.cpp
+ Zinek Engine - ZEVectorSSE.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,6 +40,10 @@ extern "C"
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 };
+
+#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+#include <smmintrin.h>
+#endif
 
 // MMX Register Loads
 inline __m128 LoadVector2(const ZEVector2 &A)
@@ -98,10 +102,14 @@ float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)
 {
 	__m128 mmxA = LoadVector2(A);
 	__m128 mmxB = LoadVector2(B);
-	
-	mmxA = _mm_mul_ps(mmxA, mmxB);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxA = _mm_dp_ps(mmxA, mmxB, 0x31);	
+	#else	
+		mmxA = _mm_mul_ps(mmxA, mmxB);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -114,9 +122,14 @@ float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
 	__m128 mmxB = LoadVector2(B);
 	
 	mmxA = _mm_sub_ps(mmxA, mmxB);
-	mmxA = _mm_mul_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+	
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxA = _mm_dp_ps(mmxA, mmxA, 0x31);
+	#else
+		mmxA = _mm_mul_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -128,10 +141,14 @@ void ZEVector2::Normalize(ZEVector2 &Out, const ZEVector2 &A)
 	__m128 mmxA = LoadVector2(A);
 	__m128 mmxLength; 
 	
-	mmxLength = _mm_mul_ps(mmxA, mmxA);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxLength = _mm_dp_ps(mmxA, mmxA, 0x33);
+	#else
+		mmxLength = _mm_mul_ps(mmxA, mmxA);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
+	#endif
 	
 	mmxLength = _mm_sqrt_ps(mmxLength);
 	mmxA = _mm_div_ps(mmxA, mmxLength);
@@ -204,10 +221,14 @@ float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B)
 {
 	__m128 mmxA = LoadVector3(A);
 	__m128 mmxB = LoadVector3(B);
-
-	mmxA = _mm_mul_ps(mmxA, mmxB);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+	
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxA = _mm_dp_ps(mmxA, mmxB, 0x71);
+	#else
+		mmxA = _mm_mul_ps(mmxA, mmxB);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -235,9 +256,14 @@ float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)
 	__m128 mmxB = LoadVector3(B);
 	
 	mmxA = _mm_sub_ps(mmxA, mmxB);
-	mmxA = _mm_mul_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+	
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxA = _mm_dp_ps(mmxA, mmxA, 0x71);
+	#else
+		mmxA = _mm_mul_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -249,11 +275,14 @@ void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)
 	__m128 mmxA = LoadVector3(Vector);
 	__m128 mmxLength;
 	
-	mmxLength = _mm_mul_ps(mmxA, mmxA);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
-	
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxLength = _mm_dp_ps(mmxA, mmxA, 0x77);
+	#else
+		mmxLength = _mm_mul_ps(mmxA, mmxA);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
+	#endif
 	mmxLength = _mm_sqrt_ps(mmxLength);
 	mmxA = _mm_div_ps(mmxA, mmxLength);
 	StoreVector3(Out, mmxA);
@@ -400,9 +429,14 @@ float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B)
 {
 	__m128 mmxA = LoadVector4(A);
 	__m128 mmxB = LoadVector4(B);
-	mmxA = _mm_mul_ps(mmxA, mmxB);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+	
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxA = _mm_dp_ps(mmxA, mmxB, 0xF1);
+	#else
+		mmxA = _mm_mul_ps(mmxA, mmxB);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -414,9 +448,14 @@ float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
 	__m128 mmxA = LoadVector4(A);
 	__m128 mmxB = LoadVector4(B);
 	mmxA = _mm_sub_ps(mmxA, mmxB);
-	mmxA = _mm_mul_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
-	mmxA = _mm_hadd_ps(mmxA, mmxA);
+
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4	
+		mmxA = _mm_dp_ps(mmxA, mmxA, 0xF1);
+	#else
+		mmxA = _mm_mul_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+		mmxA = _mm_hadd_ps(mmxA, mmxA);
+	#endif
 
 	float Temp;
 	_mm_store_ss(&Temp, mmxA);
@@ -428,10 +467,14 @@ void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
 	__m128 mmxA = LoadVector4(Vector);
 	__m128 mmxLength;
 	
-	mmxLength = _mm_mul_ps(mmxA, mmxA);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
-	mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
+	#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+		mmxLength = _mm_dp_ps(mmxA, mmxA, 0xFF);
+	#else
+		mmxLength = _mm_mul_ps(mmxA, mmxA);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_hadd_ps(mmxLength, mmxLength);
+		mmxLength = _mm_shuffle_ps(mmxLength, mmxLength, 0x00);
+	#endif
 	
 	mmxLength = _mm_sqrt_ps(mmxLength);
 	mmxA = _mm_div_ps(mmxA, mmxLength);

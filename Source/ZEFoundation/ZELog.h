@@ -59,65 +59,18 @@ enum ZELogType
     #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
-#define zeLog(...)\
-	do\
-	{\
-		char __MODULE__[256];\
-        ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
-		ZELog::GetInstance()->Log(__MODULE__, __VA_ARGS__);\
-	}\
-	while(false)
-
-#define zeDebugLog(...)\
-	do\
-	{\
-		char __MODULE__[256];\
-		ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
-		ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
-	}\
-	while(false)
-
-#define zeDebugLogOnce(...)\
-	do\
-	{\
-		static bool Logged = false; \
-		if (Logged)\
-			break;\
-		Logged = true;\
-		char __MODULE__[256];\
-		ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
-		ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
-	}\
-	while(false)
-
-#define zeDebugLogOccured(Times, ...)\
-	do\
-	{\
-		static int Count = 0;\
-		if (Count == 0)\
-		{\
-			char __MODULE__[256];\
-			ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
-			ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
-		}\
-		Count++;\
-		if (Count >= (Times))\
-			Count = 0;\
-	}\
-	while(false)
-
-#define zeDebugLogPerFrame(Times, ...)\
-	do\
-	{\
-		static int LastFrame = -1;\
-		if (LastFrame == ZECore::GetInstance()->GetFrameId())\
-			break;\
-		char __MODULE__[256];\
-		ZELog::GetModuleName(__MODULE__, __FILE__, __ZINEK_FUNCTION__);\
-		ZELog::GetInstance()->Log(__MODULE__, ZE_LOG_DEBUG, __VA_ARGS__);\
-		LastFrame = ZECore::GetInstance()->GetFrameId(); \
-	}\
-	while(false)
+#define zeLog(...) do {char Module[256]; ZELog::GetModuleName(Module, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(Module, __VA_ARGS__);} while(false)
+#ifdef ZE_DEBUG_ENABLE
+	#define zeDebugLog(...) do {char Module[256]; ZELog::GetModuleName(Module, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(Module, ZE_LOG_DEBUG, __VA_ARGS__);} while(false)
+	#define zeDebugLogOnce(...) do {static bool Logged = false; if (Logged) break; Logged = true; zeDebugLog(__VA_ARGS__);} while(false)
+	#define zeDebugLogOccured(Times, ...) do {static int Count = 0; if (Count == 0) {zeDebugLog(__VA_ARGS__); } Count++; if (Count >= (Times)) Count = 0;} while(false)
+	#define zeDebugLogPerFrame(Times, ...) do {static int LastFrame = -1; if (LastFrame == ZECore::GetInstance()->GetFrameId()) break; zeDebugLog(__VA_ARGS__);	LastFrame = ZECore::GetInstance()->GetFrameId();} while(false)
+#else
+	#define zeDebugLog(...) do { } while(false)
+	#define zeDebugLogOnce(...) do { } while(false)
+	#define zeDebugLogOccured(Times, ...) do { } while(false)
+	#define zeDebugLogPerFrame(Times, ...) do { } while(false)
+#endif
 
 class ZELogSession;
 template <typename ZEItemType> class ZEList2;

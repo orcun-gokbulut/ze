@@ -53,7 +53,7 @@
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRSampler.h"
 
-static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
+ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
 	if (A->SceneIndex < B->SceneIndex)
 	{
