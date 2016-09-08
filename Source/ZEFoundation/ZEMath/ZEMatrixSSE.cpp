@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMatrixSSE3.cpp
+ Zinek Engine - ZEMatrixSSE.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -42,6 +42,7 @@ extern "C"
 #include <xmmintrin.h>
 #include <pmmintrin.h>
 };
+#include <smmintrin.h>
 
 // MMX Register Loads
 inline __m128 LoadFloat3(const float *F)
@@ -156,16 +157,27 @@ void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatri
 		// Load Column of B to mmx5
 		mmx5 = LoadFloat3(B.MA + 3 * i);		
 
-		// 1st Couple
-		mmx3 = _mm_mul_ps(mmxMatrixA[0], mmx5);
-		mmx4 = _mm_mul_ps(mmxMatrixA[1], mmx5);
-		mmx3 = _mm_hadd_ps(mmx3, mmx4);
-		mmx3 = _mm_hadd_ps(mmx3, mmx3);					// -, -, Ry, Rx
-		
-		// Z Only
-		mmx5 = _mm_mul_ps(mmxMatrixA[2], mmx5);
-		mmx5 = _mm_hadd_ps(mmx5, mmx5);
-		mmx5 = _mm_hadd_ps(mmx5, mmx5);					// -, -, Rz, Rz
+		#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+			// Dot Products to calculate the Corresponding Column
+			mmx3 = _mm_dp_ps(mmxMatrixA[0], mmx5, 0xF1);	// 0, 0, 0, Rx
+			mmx4 = _mm_dp_ps(mmxMatrixA[1], mmx5, 0xF2);	// 0, 0, Ry, 0
+			mmx5 = _mm_dp_ps(mmxMatrixA[2], mmx5, 0xF4);	// 0, Rz, 0, 0
+
+			// Joining Dot Product Results
+			mmx4 = _mm_add_ps(mmx4, mmx3);
+			mmx5 = _mm_add_ps(mmx5, mmx4);
+		#else
+			// 1st Couple
+			mmx3 = _mm_mul_ps(mmxMatrixA[0], mmx5);
+			mmx4 = _mm_mul_ps(mmxMatrixA[1], mmx5);
+			mmx3 = _mm_hadd_ps(mmx3, mmx4);
+			mmx3 = _mm_hadd_ps(mmx3, mmx3);					// -, -, Ry, Rx
+
+			// Z Only
+			mmx5 = _mm_mul_ps(mmxMatrixA[2], mmx5);
+			mmx5 = _mm_hadd_ps(mmx5, mmx5);
+			mmx5 = _mm_hadd_ps(mmx5, mmx5);					// -, -, Rz, Rz
+		#endif
 
 		// Join
 		mmx5 = _mm_shuffle_ps(mmx3, mmx5, 0x44);		// Rz, Rz, Ry, Rx
@@ -443,21 +455,35 @@ void ZEMatrix4x4::Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatri
 		// Load Column of B to mmx7
 		mmx7 = _mm_loadu_ps(B.MA + 4 * i);
 		
-		// 1st Couple
-		mmx4 = _mm_mul_ps(mmxMatrixA[0], mmx7);
-		mmx5 = _mm_mul_ps(mmxMatrixA[1], mmx7);
-		mmx4 = _mm_hadd_ps(mmx4, mmx5);
-		mmx4 = _mm_hadd_ps(mmx4, mmx4);					// -, -, Ry, Rx
-
-		// 2nd Couple
-		mmx6 = _mm_mul_ps(mmxMatrixA[2], mmx7);
-		mmx7 = _mm_mul_ps(mmxMatrixA[3], mmx7);
-		mmx6 = _mm_hadd_ps(mmx6, mmx7);
-		mmx6 = _mm_hadd_ps(mmx6, mmx6);					// -, -, Rw, Rz
+		#ifdef ZE_PLATFORM_ARCHITECTURE_SSE4
+			// Dot Products to calculate the Corresponding Column
+			mmx4 = _mm_dp_ps(mmxMatrixA[0], mmx7, 0xF1);	// 0, 0, 0, Rx
+			mmx5 = _mm_dp_ps(mmxMatrixA[1], mmx7, 0xF2);	// 0, 0, Ry, 0
+			mmx6 = _mm_dp_ps(mmxMatrixA[2], mmx7, 0xF4);	// 0, Rz, 0, 0
+			mmx7 = _mm_dp_ps(mmxMatrixA[3], mmx7, 0xF8);	// Rw, 0, 0, 0
+			
+			// Joining Dot Product Results
+			mmx5 = _mm_add_ps(mmx5, mmx4);
+			mmx6 = _mm_add_ps(mmx6, mmx5);
+			mmx7 = _mm_add_ps(mmx7, mmx6);					// Rw, Rz, Ry, Rx
 		
-		// Joining Couples
-		mmx7 = _mm_shuffle_ps(mmx4, mmx6, 0x44);		// Rw, Rz, Ry, Rx
+		#else
+			// 1st Couple
+			mmx4 = _mm_mul_ps(mmxMatrixA[0], mmx7);
+			mmx5 = _mm_mul_ps(mmxMatrixA[1], mmx7);
+			mmx4 = _mm_hadd_ps(mmx4, mmx5);
+			mmx4 = _mm_hadd_ps(mmx4, mmx4);					// -, -, Ry, Rx
 
+			// 2nd Couple
+			mmx6 = _mm_mul_ps(mmxMatrixA[2], mmx7);
+			mmx7 = _mm_mul_ps(mmxMatrixA[3], mmx7);
+			mmx6 = _mm_hadd_ps(mmx6, mmx7);
+			mmx6 = _mm_hadd_ps(mmx6, mmx6);					// -, -, Rw, Rz
+			
+			// Joining Couples
+			mmx7 = _mm_shuffle_ps(mmx4, mmx6, 0x44);		// Rw, Rz, Ry, Rx
+		#endif
+		
 		// Storing the Column to "Out"
 		_mm_storeu_ps(OutColumnIndex + 4 * i, mmx7);
 	}

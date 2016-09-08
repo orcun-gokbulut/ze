@@ -219,13 +219,13 @@ Type ZEMath::Saturate(Type Value)
 }
 
 template <typename Type>
-static Type ZEMath::DivideFloor(Type Value, Type PositiveDivider)
+Type ZEMath::DivideFloor(Type Value, Type PositiveDivider)
 {
 	return Value / PositiveDivider - (Value % PositiveDivider < 0 ? 1 : 0);
 }
 
 template <typename Type>
-static Type ZEMath::CircularMod(Type Value, Type Modulo)
+Type ZEMath::CircularMod(Type Value, Type Modulo)
 {
 	Type Output = Value % Modulo;
 	return (Output < 0) ? Output + Modulo : Output;

@@ -50,7 +50,7 @@
 #include "ZERenderer/ZERNStage2D.h"
 
 
-static ZEInt CompareRectangle(const ZEUIRectangle* A, const ZEUIRectangle* B)
+ZEInt CompareRectangle(const ZEUIRectangle* A, const ZEUIRectangle* B)
 {
 	if(A->ZOrder > B->ZOrder)
 	{

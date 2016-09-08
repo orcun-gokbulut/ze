@@ -223,6 +223,8 @@ void ZEOctree<ZEItemType>::Expand()
 template<typename ZEItemType>
 void ZEOctree<ZEItemType>::Shrink()
 {
+	return;
+
 	if (Items.GetCount() != 0)
 		return;
 

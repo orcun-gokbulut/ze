@@ -337,8 +337,8 @@ bool ZECore::InitializeModule(ZEModule* Module)
 	if (Module->Initialize() == false)
 	{
 		Module->Destroy();
-		zeError("Can not initialize module. Module Name : \"%s\".",
-			(const char*)Module->GetClass()->GetName());
+		const char* ModuleName =  Module->GetClass()->GetName();
+		zeError("Can not initialize module. Module Name : \"%s\".", ModuleName);
 		return false;
 	}
 	return true;
