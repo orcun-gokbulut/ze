@@ -248,7 +248,7 @@ bool ZELCLicense::CheckValid() const
 
 void ZELCLicense::Load(ZEMLReaderNode* Reader)
 {
-	GUID = ZEGUID(Reader->ReadString("GUID"));
+	GUID = ZEGUID::FromString(Reader->ReadString("GUID"));
 	ApplicationName = Reader->ReadString("ApplicationName");
 	LicenseeName = Reader->ReadString("LicenseeName");
 	SerialKey = Reader->ReadString("SerialKey");

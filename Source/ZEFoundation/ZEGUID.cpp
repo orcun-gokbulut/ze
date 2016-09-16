@@ -115,7 +115,7 @@ ZEGUID::ZEGUID()
 
 ZEGUID::ZEGUID(const ZEString& String)
 {
-	FromString(String);
+	*this = FromString(String);
 }
 
 ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)
