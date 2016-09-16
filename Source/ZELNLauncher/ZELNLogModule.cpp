@@ -40,8 +40,6 @@
 #include "ZELog.h"
 #include "ZELogSession.h"
 
-static ZELogSession Session;
-
 ZELN_MODULE_DECRIPTION(ZELNLogModule, "Log");
 
 void ZELNLogModule::LogCallback(const ZELogSession* Session, const char* ModuleName, ZELogType Type, const char* LogText, void* ExtraParameters)

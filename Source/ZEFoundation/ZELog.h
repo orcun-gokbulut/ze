@@ -59,9 +59,9 @@ enum ZELogType
     #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
-#define zeLog(...) do {char Module[256]; ZELog::GetModuleName(Module, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(Module, __VA_ARGS__);} while(false)
+#define zeLog(...) do {char ModuleName_Buffer_F23A328C[256]; ZELog::GetModuleName(ModuleName_Buffer_F23A328C, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(ModuleName_Buffer_F23A328C, __VA_ARGS__);} while(false)
 #ifdef ZE_DEBUG_ENABLE
-	#define zeDebugLog(...) do {char Module[256]; ZELog::GetModuleName(Module, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(Module, ZE_LOG_DEBUG, __VA_ARGS__);} while(false)
+	#define zeDebugLog(...) do {char ModuleName_Buffer_F23A328C[256]; ZELog::GetModuleName(ModuleName_Buffer_F23A328C, __FILE__, __ZINEK_FUNCTION__); ZELog::GetInstance()->Log(ModuleName_Buffer_F23A328C, ZE_LOG_DEBUG, __VA_ARGS__);} while(false)
 	#define zeDebugLogOnce(...) do {static bool Logged = false; if (Logged) break; Logged = true; zeDebugLog(__VA_ARGS__);} while(false)
 	#define zeDebugLogOccured(Times, ...) do {static int Count = 0; if (Count == 0) {zeDebugLog(__VA_ARGS__); } Count++; if (Count >= (Times)) Count = 0;} while(false)
 	#define zeDebugLogPerFrame(Times, ...) do {static int LastFrame = -1; if (LastFrame == ZECore::GetInstance()->GetFrameId()) break; zeDebugLog(__VA_ARGS__);	LastFrame = ZECore::GetInstance()->GetFrameId();} while(false)

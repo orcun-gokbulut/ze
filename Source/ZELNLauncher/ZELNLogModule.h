@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZELNModule.h"
+#include "ZELogSession.h"
 
 enum ZELogType;
 class Ui_ZELNLogWidget;
@@ -48,6 +49,7 @@ class ZELNLogModule  : public ZELNModule
 	private:
 		QWidget*					Widget;
 		Ui_ZELNLogWidget*			Form;
+		ZELogSession				Session;
 
 		static void					LogCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 		
