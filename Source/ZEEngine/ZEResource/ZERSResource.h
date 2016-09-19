@@ -75,6 +75,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		ZEArray<ZERSResource*>					ChildResources;
 		ZEArray<const ZERSResource*>			ExternalResources;
 
+		ZESize									Index;
 		mutable bool							Shared;
 		ZESize									MemoryUsageSelf[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
@@ -127,6 +128,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		const ZERSResourceManager*				GetManager() const;
 		const ZERSResourceGroup*				GetGroup() const;
 
+		ZESize									GetIndex() const;
 		const ZEGUID&							GetGUID() const;
 		const ZEString&							GetFileName() const;
 		ZEUInt32								GetFileNameHash() const;

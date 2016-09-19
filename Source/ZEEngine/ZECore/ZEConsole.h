@@ -37,9 +37,12 @@
 #ifndef	__ZE_CONSOLE_H__
 #define __ZE_CONSOLE_H__
 
+#include "ZEInitializable.h"
+
+#include "ZELogSession.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEValue.h"
-#include <string.h>
+#include "ZEThread/ZELock.h"
 
 #define zeOutput(...) ZEConsole::GetInstance()->Output(__VA_ARGS__)
 
@@ -63,21 +66,26 @@ class ZEConsoleInterface
 		virtual					~ZEConsoleInterface();
 };
 
-class ZEConsole
+class ZEConsole : public ZEInitializable
 {	
 	friend class ZECore;
 	private:
 		static ZEConsole*		Instance;
 
+		ZELogSession			LogSession;
+		ZELock					ConsoleLock;
+
 		ZEConsoleInterface*		ConsoleInterface;
 		bool					InputEnabled;
 		bool					Visible;
+
+		virtual bool			InitializeInternal();
+		virtual bool			DeinitializeInternal();
 
 								ZEConsole();
 								~ZEConsole();
 
 	public:
-		ZEArray<char*>			OutputHistory;
 		ZEArray<char*>			InputHistory;
 	
 		void					SetConsoleInterface(ZEConsoleInterface* Interface);
@@ -93,6 +101,7 @@ class ZEConsole
 
 		void					Log(const char* Module, const char* Format, ...);
 		void					Output(const char* Format, ...);
+		void					OutputRaw(const char* String);
 		void					Input(const char* Input);
 
 		void					Process();

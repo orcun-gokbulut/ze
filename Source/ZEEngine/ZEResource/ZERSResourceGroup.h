@@ -46,6 +46,7 @@ class ZERSResourceGroup : public ZEObject
 	ZE_OBJECT
 	friend class ZERSResourceManager;
 	public:
+		ZESize									Index;
 		ZERSResourceGroup*						Parent;
 		ZEClass*								ResourceClass;
 		ZEArray<ZERSResourceGroup*>				ChildGroups;
@@ -74,6 +75,7 @@ class ZERSResourceGroup : public ZEObject
 												~ZERSResourceGroup();
 
 	public:
+		ZESize									GetIndex() const;
 		ZERSResourceGroup*						GetParent() const;
 		ZEClass*								GetResourceClass() const;
 		const ZEArray<ZERSResourceGroup*>		GetChildGroups() const;
@@ -83,6 +85,5 @@ class ZERSResourceGroup : public ZEObject
 
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool) const;
 		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool) const;
-		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool) const;
 		ZESize									GetMemoryUsageTotal() const;
 };

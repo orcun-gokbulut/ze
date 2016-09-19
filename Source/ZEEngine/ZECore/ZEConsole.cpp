@@ -419,7 +419,7 @@ bool ZEConsole::ParseInput(const char* Input)
 static void LogCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	if (Session != NULL)
-		zeOutput("%s [%s] %s: %s\n", Session->GetSessionID(), Module, ZELog::GetLogTypeString(Type), LogText);
+		zeOutput("%d [%s] %s: %s\n", Session->GetSessionID(), Module, ZELog::GetLogTypeString(Type), LogText);
 	else
 		zeOutput("[%s] %s: %s\n", Module, ZELog::GetLogTypeString(Type), LogText);
 }
@@ -481,6 +481,8 @@ void ZEConsole::DisableInput()
 
 void ZEConsole::Log(const char* Module, const char* Format, ...)
 {
+	ConsoleLock.Lock();
+
 	char Buffer[32768];
 	va_list vlist;
 	va_start(vlist, Format);
@@ -490,43 +492,64 @@ void ZEConsole::Log(const char* Module, const char* Format, ...)
 	char Buffer2[32768];
 	sprintf_s(Buffer2, 32768, "[%s] %s\r\n", Module, Buffer);
 
-	char* HistBuffer = new char[strlen(Buffer2) + 1];
-	strncpy(HistBuffer, Buffer2, strlen(Buffer2) + 1);  
-	OutputHistory.Add(HistBuffer);
 	if (ConsoleInterface != NULL)
 		ConsoleInterface->Output(Buffer2);
+	
 	#ifdef ZE_DEBUG_CHECK_HEAP
 		if (!_CrtCheckMemory())
 			OutputDebugString("Jackpot");
 	#endif
+
+	ConsoleLock.Unlock();
 }
 
 void ZEConsole::Output(const char* Format, ...)
 {
+	ConsoleLock.Lock();
+
 	char Buffer[32768];
 	va_list vlist;
 	va_start(vlist, Format);
 	vsprintf_s(Buffer, 32768, Format, vlist);
 	va_end(vlist);
 
-	char* HistBuffer = new char[strlen(Buffer) + 1];
-	strncpy(HistBuffer, Buffer, strlen(Buffer) + 1);  
-	OutputHistory.Add(HistBuffer);
 	if (ConsoleInterface != NULL)
 		ConsoleInterface->Output(Buffer);
+	
 	#ifdef ZE_DEBUG_CHECK_HEAP
 		if (!_CrtCheckMemory())
 			OutputDebugString("Jackpot");
 	#endif
+
+	ConsoleLock.Unlock();
+}
+
+
+void ZEConsole::OutputRaw(const char* String)
+{
+	ConsoleLock.Lock();
+
+	if (ConsoleInterface != NULL)
+		ConsoleInterface->Output(String);
+	
+	#ifdef ZE_DEBUG_CHECK_HEAP
+		if (!_CrtCheckMemory())
+			OutputDebugString("Jackpot");
+	#endif
+
+	ConsoleLock.Unlock();
 }
 
 void ZEConsole::Input(const char* Input)
 {
 	if(InputEnabled)
 	{
+		ConsoleLock.Lock();
 		char* HistBuffer = new char[strlen(Input) + 1];
 		strncpy(HistBuffer, Input, strlen(Input));  
 		InputHistory.Add(HistBuffer);
+		ConsoleLock.Unlock();
+
 		ParseInput(Input);
 	}
 }
@@ -542,6 +565,24 @@ ZEConsole* ZEConsole::GetInstance()
 	return ZECore::GetInstance()->GetConsole();
 }
 
+bool ZEConsole::InitializeInternal()
+{
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
+	LogSession.SetCallback(LogCallback);
+	LogSession.SetSink(true);
+	LogSession.BeginSession();
+
+	return true;
+}
+
+bool ZEConsole::DeinitializeInternal()
+{
+	LogSession.EndSession();
+	return ZEInitializable::DeinitializeInternal();
+}
+
 ZEConsole::ZEConsole()
 {
 	InputEnabled = true;
@@ -552,16 +593,14 @@ ZEConsole::ZEConsole()
 
 ZEConsole::~ZEConsole()
 {
-	for (ZESize I = 0; I < OutputHistory.GetCount(); I++)
-		delete[] OutputHistory[I];
-	OutputHistory.Clear();
-
 	for (ZESize I = 0; I < InputHistory.GetCount(); I++)
 		delete[] InputHistory[I];
 	InputHistory.Clear();
+
 	#ifdef ZE_DEBUG_CHECK_HEAP
 		if (!_CrtCheckMemory())
 			OutputDebugString("Jackpot");
 	#endif
+	
 	Instance = NULL;
 }
