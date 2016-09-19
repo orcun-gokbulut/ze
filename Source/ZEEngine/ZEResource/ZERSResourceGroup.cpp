@@ -119,6 +119,7 @@ void ZERSResourceGroup::UnshareResource(const ZERSResource* Resource)
 
 ZERSResourceGroup::ZERSResourceGroup()
 {
+	Index = 0;
 	Parent = NULL;
 	ResourceClass = NULL;
 
@@ -135,6 +136,11 @@ ZERSResourceGroup::ZERSResourceGroup()
 ZERSResourceGroup::~ZERSResourceGroup()
 {
 
+}
+
+ZESize ZERSResourceGroup::GetIndex() const
+{
+	return Index;
 }
 
 ZERSResourceGroup* ZERSResourceGroup::GetParent() const
@@ -172,11 +178,6 @@ ZESize ZERSResourceGroup::GetMemoryUsageShared(ZERSMemoryPool Pool) const
 {
 	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Unknown memory pool.");
 	return MemoryUsageShared[Pool];
-}
-
-ZESize ZERSResourceGroup::GetMemoryUsageTotal(ZERSMemoryPool Pool) const
-{
-	return GetMemoryUsage(Pool) + GetMemoryUsageShared(Pool);
 }
 
 ZESize ZERSResourceGroup::GetMemoryUsageTotal() const

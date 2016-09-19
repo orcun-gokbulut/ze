@@ -81,10 +81,13 @@ class ZEList2
 		void								Remove(ZELink<ZEItemType>* Link);
 		void								Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
 
+		void								MergeBegin(ZEList2<ZEItemType>& OtherList);
+		void								MergeEnd(ZEList2<ZEItemType>& OtherList);
+
 		void								Reverse();
 		template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
 		void								Sort();
-		void								Clean();
+		void								Clear();
 
 		ZEItemType*							operator[](ZESize Index) const;
 
@@ -411,9 +414,76 @@ void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 		Last = A;
 }
 
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
+{
+	if (OtherList.GetFirst() == NULL)
+		return;
+
+	if (First != NULL)
+	{
+		First->Prev = OtherList.Last;
+		OtherList.Last->Next = First;
+		First = OtherList.First;
+	}
+	else
+	{
+		First = OtherList.First;
+		Last = OtherList.Last;
+	}
+
+	Count += OtherList.Count;
+	
+	OtherList.First = NULL;
+	OtherList.Last = NULL;
+	OtherList.Count = 0;
+	
+	#ifdef ZE_DEBUG_ENABLE
+		ZELink<ZEItemType>* Link = OtherList.GetFirst();
+		while(Link != NULL)
+		{
+			Link->List = this;
+			Link = Link->Next;	
+		}
+	#endif
+}
 
 template<typename ZEItemType>
-inline void ZEList2<ZEItemType>::Clean()
+void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
+{
+	if (OtherList.GetLast() == NULL)
+		return;
+
+	if (Last != NULL)
+	{
+		Last->Next = OtherList.First;
+		OtherList.First->Prev = Last;
+		Last = OtherList.Last;
+	}
+	else
+	{
+		First = OtherList.First;
+		Last = OtherList.Last;
+	}
+
+	Count += OtherList.Count;
+	
+	OtherList.First = NULL;
+	OtherList.Last = NULL;
+	OtherList.Count = 0;
+	
+	#ifdef ZE_DEBUG_ENABLE
+		ZELink<ZEItemType>* Link = OtherList.GetFirst();
+		while(Link != NULL)
+		{
+			Link->List = this;
+			Link = Link->Next;	
+		}
+	#endif
+}
+
+template<typename ZEItemType>
+inline void ZEList2<ZEItemType>::Clear()
 {
 	ZELink<ZEItemType>* Link = First;
 	while(Link != NULL)
@@ -488,7 +558,7 @@ ZEList2<ZEItemType>::ZEList2()
 template<typename ZEItemType>
 ZEList2<ZEItemType>::~ZEList2()
 {
-	Clean();
+	Clear();
 }
 
 template<typename ZEItemType>

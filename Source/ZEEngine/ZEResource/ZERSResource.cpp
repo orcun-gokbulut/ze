@@ -401,6 +401,7 @@ void ZERSResource::PreDestroy()
 
 ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 {
+	Index = 0;
 	Manager = NULL;
 	Group = NULL;
 	GUID = ZEGUID::Zero;
@@ -451,6 +452,12 @@ const ZERSResourceManager* ZERSResource::GetManager() const
 const ZERSResourceGroup* ZERSResource::GetGroup() const
 {
 	return Group;
+}
+
+
+ZESize ZERSResource::GetIndex() const
+{
+	return Index;
 }
 
 void ZERSResource::SetGUID(const ZEGUID& GUID)
@@ -594,11 +601,13 @@ void ZERSResource::Load(const ZEString& FileName)
 	if (Destroying)
 		return;
 
+	ResourceLock.Lock();
 	this->FileName = ZEPathInfo(FileName).Normalize();
 	FileNameHash = this->FileName.Lower().Hash();
-	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-
 	TargetState = ZERS_RS_LOADED;
+	ResourceLock.Unlock();
+
+	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
 	UpdateStateTask.Run();
 }
 

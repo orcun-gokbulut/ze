@@ -37,9 +37,18 @@
 
 #include "ZERSResource.h"
 #include "ZERSResourceGroup.h"
+
 #include "ZEError.h"
+#include "ZEDS/ZEFormat.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZERegEx/ZERegEx.h"
+#include "ZECore/ZECommandSection.h"
+#include "ZECore/ZECommand.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEDS/ZEFastDelegate.h"
+#include "ZECore/ZECommandManager.h"
+
 
 static __declspec(thread) bool StagingInstanciator = false;
 
@@ -75,6 +84,8 @@ ZERSResourceGroup* ZERSResourceManager::CreateResourceGroup(ZEClass* ResourceCla
 	ZERSResourceGroup* ResourceGroup = new ZERSResourceGroup();
 	ResourceGroup->ResourceClass = ResourceClass;
 	ResourceGroup->Parent = ParentGroup;
+	ResourceGroup->Index = ResourceGroupIndex;
+	ResourceGroupIndex++;
 	ResourceGroups.Add(ResourceGroup);
 
 	if (ResourceGroup->Parent != NULL)
@@ -100,12 +111,12 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 	if (Group == NULL)
 		return NULL;
 
-	ZEFileInfo FileInfo(FileName);
-	ZEString FileNameNormalized = FileInfo.Normalize();
+	ZEString FileNameNormalized = ZEFileInfo(FileName).Normalize();
+	ZEUInt64 Hash = FileNameNormalized.Lower().Hash();
+
 	if (FileNameNormalized.IsEmpty())
 		return NULL;
 
-	ZEUInt64 Hash = FileName.Lower().Hash();
 	ze_for_each(Resource, Group->SharedResources)
 	{
 		Resource->ResourceLock.Lock();
@@ -115,7 +126,8 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 			continue;
 		}
 
-		if (Resource->GetFileNameHash() == Hash && Resource->GetFileName() == FileNameNormalized)
+		if (Resource->GetFileNameHash() == Hash && 
+			Resource->GetFileName().EqualsIncase(FileNameNormalized))
 		{
 			ZERSHolder<const ZERSResource> Output;
 			Output.Overwrite(Resource.GetPointer());
@@ -124,6 +136,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 
 			return Output;
 		}
+
 		Resource->ResourceLock.Unlock();
 	}
 
@@ -169,7 +182,9 @@ void ZERSResourceManager::RegisterResourceInternal(ZERSResource* Resource)
 
 	Resource->Manager = this;
 	Resource->Group = Group;
+	Resource->Index = ResourceIndex;
 	ResourceCount++;
+	ResourceIndex++;
 
 	Group->RegisterResource(Resource);
 
@@ -234,15 +249,72 @@ void ZERSResourceManager::DestroyResource(const ZERSResource* Resource)
 	delete Resource;
 }
 
+static bool CommandSpitAndGlue(ZECommand* Command, const ZECommandParameterList* Parameters)
+{
+	ZERSResourceManager* Manager = ZERSResourceManager::GetInstance();
+	ZEConsole* Console = ZEConsole::GetInstance();
+	ZEValue Parameter = Parameters->GetCount() != 0 ? Parameters->GetItem(0) : ZEValue();
+
+	if (Command->GetName() == "ShowStats")
+	{
+		Console->OutputRaw(Manager->ShowStats().ToCString());
+	}
+	else if (Command->GetName() == "ListResources")
+	{
+		if (Parameters->GetCount() == 0)
+			Console->OutputRaw(Manager->ListResources().ToCString());
+		else
+			Console->OutputRaw(Manager->ListResources(Parameter.GetString()));
+	}
+	else if (Command->GetName() == "ShowResource")
+	{
+		if (Parameters->GetCount() == 0)
+			Console->OutputRaw("Command Error: Missing arguments.");
+		else
+			Console->OutputRaw(Manager->ShowResource(Parameter.GetInt32()));
+	}
+	else if (Command->GetName() == "ListResourceGroups")
+	{
+		if (Parameters->GetCount() == 0)
+			Console->OutputRaw(Manager->ListResourceGroups().ToCString());
+		else
+			Console->OutputRaw(Manager->ListResourceGroups(Parameter.GetString()));
+	}
+	else if (Command->GetName() == "ShowResourceGroup")
+	{
+		if (Parameters->GetCount() == 0)
+			Console->OutputRaw("Command Error: Missing arguments.");
+		else
+			Console->OutputRaw(Manager->ShowResourceGroup(Parameter.GetInt32()));
+	}
+
+	return true;
+}
+
+static ZECommandSection Commands;
+
 ZERSResourceManager::ZERSResourceManager()
 {
+	ResourceIndex = 0;
+	ResourceGroupIndex = 0;
+	ResourceCount = 0;
+	SharedResourceCount = 0;
+
 	memset(MemoryUsage, 0, sizeof(MemoryUsage));
 	memset(MemoryUsageShared, 0, sizeof(MemoryUsageShared));
+
+	Commands.SetName("ResourceManager");
+	Commands.AddCommand(new ZECommand("ShowStats",			&CommandSpitAndGlue));
+	Commands.AddCommand(new ZECommand("ListResources",		&CommandSpitAndGlue));
+	Commands.AddCommand(new ZECommand("ShowResource",		&CommandSpitAndGlue));
+	Commands.AddCommand(new ZECommand("ListResourceGroups", &CommandSpitAndGlue));
+	Commands.AddCommand(new ZECommand("ShowResourceGroup",	&CommandSpitAndGlue));
+	ZECommandManager::GetInstance()->RegisterSection(&Commands);
 }
 
 ZERSResourceManager::~ZERSResourceManager()
 {
-	
+	ZECommandManager::GetInstance()->UnregisterSection(&Commands);	
 }
 
 ZEArray<const ZERSResourceGroup*> ZERSResourceManager::GetResourceGroups()
@@ -277,9 +349,9 @@ ZESize ZERSResourceManager::GetMemoryUsageShared(ZERSMemoryPool Pool)
 	return MemoryUsageShared[Pool];
 }
 
-ZESize ZERSResourceManager::GetMemoryUsageTotal(ZERSMemoryPool Pool)
+ZESize ZERSResourceManager::GetMemoryUsageTotal()
 {
-	return GetMemoryUsage(Pool) + GetMemoryUsageShared(Pool);
+	return GetMemoryUsage(ZERS_MP_CPU) + GetMemoryUsage(ZERS_MP_GPU);
 }
 
 ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* ResourceClass, const ZEGUID& GUID)
@@ -420,6 +492,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* Resou
 
 		NewResouce->FileName = ZEPathInfo(FileName).Normalize();
 		NewResouce->FileNameHash = NewResouce->FileName.Lower().Hash();
+		//zeBreak(NewResouce->FileName == "#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Rail_Material.ZEMaterial");
 		NewResouce->State = ZERS_RS_STAGING;
 		NewResouce->TargetState = ZERS_RS_STAGED;
 		ShareResourceInternal(NewResouce);
@@ -436,6 +509,214 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* Resou
 		*StagingResource = NULL;
 		return Resource;
 	}
+}
+
+
+ZEString ZERSResourceManager::ShowStats()
+{
+	ManagerLock.Lock();
+
+	ZEString Output = ZEFormat::Format(
+		"ZERSResourceManager Stats:\n"
+		"  Resource Count: {0}\n"
+		"  Shared Resource Count: {1}\n"
+		"  Resource Group Count: {2}\n"
+		"  CPU Memory Usage:{3}\n"
+		"  GPU Memory Usage:{4}\n"
+		"  CPU Shared Memory Usage:{5}\n"
+		"  GPU Shared Memory Usage:{6}\n"
+		"  Total Memory Usage:{7}\n",
+		ResourceCount, 
+		SharedResourceCount,
+		ResourceGroups.GetCount(),
+		MemoryUsage[ZERS_MP_CPU],
+		MemoryUsage[ZERS_MP_GPU],
+		MemoryUsageShared[ZERS_MP_CPU],
+		MemoryUsageShared[ZERS_MP_GPU],
+		GetMemoryUsageTotal());
+
+	ManagerLock.Unlock();
+
+	return Output;
+}
+
+ZEString ZERSResourceManager::ListResources(const ZEString& Filter)
+{
+	ZEWildcard Matcher;
+	bool FilterEnabled = !Filter.IsEmpty();
+	if (FilterEnabled)
+		FilterEnabled = Matcher.Compile(Filter);
+	
+	ZESize ResourceCount = 0;
+	ZEString Output;
+	ManagerLock.Lock();
+	for (ZESize I = 0; I < ResourceGroups.GetCount(); I++)
+	{
+		ZERSResourceGroup* Group = ResourceGroups[I];
+		
+		bool GroupNameMatched = true;
+		if (FilterEnabled)
+			GroupNameMatched = Matcher.Match(Group->GetResourceClass()->GetName());
+
+		ze_for_each(Resource, Group->Resources)
+		{
+			if (FilterEnabled && !GroupNameMatched && !Matcher.Match(Resource->GetFileName()))
+				continue;
+
+			Output += ZEFormat::Format(
+				"{0} "
+				"{1}, "
+				"{2}, "
+				"RefCount: {3}",
+				Resource->GetIndex(),
+				Resource->GetClass()->GetName(),
+				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				Resource->GetReferenceCount());
+
+			if (!Resource->GetGUID().Equals(ZEGUID::Zero))
+				Output += ZEFormat::Format(", GUID: {0}", Resource->GetGUID().ToString());
+
+			if (!Resource->GetFileName().IsEmpty())
+				Output += ZEFormat::Format(", File Name: {0}", Resource->GetFileName());
+
+			Output += "\n";
+
+			ResourceCount++;
+		}
+	}
+	ManagerLock.Unlock();
+
+	if (ResourceCount != 0)
+		Output += ZEFormat::Format("{0} resource listed.", ResourceCount);
+	else
+		Output = "No matching resource has been found.";
+
+	return Output;
+}
+
+ZEString ZERSResourceManager::ShowResource(ZESize Index)
+{
+	ZEString Output;
+	ManagerLock.Lock();
+	for (ZESize I = 0; I < ResourceGroups.GetCount(); I++)
+	{
+		ZERSResourceGroup* Group = ResourceGroups[I];
+		ze_for_each(Resource, Group->Resources)
+		{
+			if (Resource->GetIndex() != Index)
+				continue;
+
+			Output = ZEFormat::Format(
+				"Index: {0}\n"
+				"Class: {1}\n"
+				"GUID: {2}\n"
+				"File Name: {3}\n"
+				"Hash: {4}\n"
+				"State: {5}\n"
+				"Shared: {6}\n"
+				"Reference Count: {7}\n"
+				"CPU Memory Usage: {8}\n"
+				"GPU Memory Usage: {9}\n",
+				Resource->Index,
+				Resource->GetClass()->GetName(),
+				Resource->GetGUID().ToString(),
+				Resource->GetFileName(),
+				Resource->GetFileNameHash(),
+				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				Resource->IsShared(),
+				Resource->GetReferenceCount(),
+				Resource->GetMemoryUsage(ZERS_MP_CPU),
+				Resource->GetMemoryUsage(ZERS_MP_GPU),
+				Resource->GetTotalMemoryUsage());
+
+			break;
+		}
+	}
+	ManagerLock.Unlock();
+
+	if (Output.IsEmpty())
+		Output = "Resource not found.\n";
+
+	return Output;
+}
+
+
+ZEString ZERSResourceManager::ListResourceGroups(const ZEString& Filter)
+{
+	ZEWildcard Matcher;
+	bool FilterEnabled = !Filter.IsEmpty();
+	if (FilterEnabled)
+		FilterEnabled = Matcher.Compile(Filter);
+
+	ZESize ResourceGroupCount = 0;
+	ZEString Output;
+	ManagerLock.Lock();
+	for (ZESize I = 0; I < ResourceGroups.GetCount(); I++)
+	{
+		ZERSResourceGroup* Group = ResourceGroups[I];
+		
+		if (FilterEnabled && !Matcher.Match(Filter))
+			continue;
+
+		Output += ZEFormat::Format("{0} {1}\n", Group->GetIndex(), Group->GetResourceClass()->GetName());
+
+		ResourceGroupCount++;
+	}
+	ManagerLock.Unlock();
+
+	if (ResourceGroupCount != 0)
+		Output += ZEFormat::Format("{0} resource group listed.", ResourceGroupCount);
+	else
+		Output = "No matching resource group has been found.";
+
+	return Output;
+}
+
+ZEString ZERSResourceManager::ShowResourceGroup(ZESize Index)
+{
+	ZEString Output;
+	ManagerLock.Lock();
+	for (ZESize I = 0; I < ResourceGroups.GetCount(); I++)
+	{
+		ZERSResourceGroup* Group = ResourceGroups[I];
+		if (Group->Index != Index)
+			continue;
+
+		Output = ZEFormat::Format(
+			"Index: {0}\n"
+			"Class: {1}\n"
+			"Parent Class: {2}\n"
+			"Resource Count: {3}\n"
+			"Shared Resource Count: {4}\n"
+			"CPU Memory Usage: {5}\n"
+			"GPU Memory Usage: {6}\n"
+			"Shared CPU Memory Usage: {7}\n"
+			"Shared GPU Memory Usage: {8}\n"
+			"Total Memory Usage: {9}\n"
+			"\n"
+			"Child Groups:",
+			Group->GetIndex(),
+			Group->GetResourceClass()->GetName(),
+			(Group->GetParent() != NULL ? Group->GetParent()->GetResourceClass()->GetName() : ""),
+			Group->GetResourceCount(),
+			Group->GetSharedResourceCount(),
+			Group->GetMemoryUsage(ZERS_MP_CPU),
+			Group->GetMemoryUsage(ZERS_MP_GPU),
+			Group->GetMemoryUsageShared(ZERS_MP_CPU),
+			Group->GetMemoryUsageShared(ZERS_MP_GPU),
+			Group->GetMemoryUsageTotal());
+
+		for (ZESize I = 0; I < Group->GetChildGroups().GetCount(); I++)
+			Output += ZEFormat::Format("  {0}\n", Group->GetChildGroups()[I]->GetResourceClass()->GetName());
+
+		break;
+	}
+	ManagerLock.Unlock();
+
+	if (Output.IsEmpty())
+		Output = "Resource Group not found\n";
+
+	return Output;
 }
 
 ZERSResourceManager* ZERSResourceManager::GetInstance()

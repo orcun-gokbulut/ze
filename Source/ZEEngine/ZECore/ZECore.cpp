@@ -487,6 +487,7 @@ bool ZECore::StartUp(void* WindowHandle)
 
 	FrameId = 0;
 
+	Console->Initialize();
 	Console->DisableInput();
 	
 	DebugMode = true;
@@ -577,6 +578,7 @@ void ZECore::ShutDown()
 	zeLog("Core deinitialized.");
 	zeLog("Terminating engine.");
 
+	Console->Deinitialize();
 	CrashHandler->Deinitialize();
 
 	TerminateProcess(GetCurrentProcess(), EXIT_SUCCESS);

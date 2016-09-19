@@ -52,8 +52,10 @@ class ZERSResourceManager : public ZEObject
 	ZE_DISALLOW_COPY(ZERSResourceManager)
 	friend class ZERSResource;
 	private:
+		ZESize									ResourceGroupIndex;
 		ZEArray<ZERSResourceGroup*>				ResourceGroups;
 
+		ZESize									ResourceIndex;
 		ZESize									ResourceCount;
 		ZESize									SharedResourceCount;
 
@@ -91,7 +93,7 @@ class ZERSResourceManager : public ZEObject
 
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool);
 		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool);
-		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool);
+		ZESize									GetMemoryUsageTotal();
 
 		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEGUID& GUID);
 		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEString& FileName);
@@ -104,11 +106,14 @@ class ZERSResourceManager : public ZEObject
 		ZERSHolder<const ZERSResource>			StageResource(ZEClass* ResourceClass, const ZEGUID& GUID, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
 		ZERSHolder<const ZERSResource>			StageResource(ZEClass* ResourceClass, const ZEString& FileName, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
 
+		// Commands
+		ZEString								ShowStats();
 
-		/*ZEString								ListResources(const ZEString& GroupName = "", bool DisplayLikeTree = true);
-		ZEString								ListResourceGroups(const ZEString& GroupName = "", bool DisplayLikeTree = true);
-		ZEString								ShowResource(const ZEString& GUIDOrFileName);
-		ZEString								ShowResourceGroup(const ZEString& GUIDOrFileName);*/
+		ZEString								ListResources(const ZEString& Filter = ZEString::Empty);
+		ZEString								ShowResource(ZESize Index);
+		
+		ZEString								ListResourceGroups(const ZEString& Filter = ZEString::Empty);
+		ZEString								ShowResourceGroup(ZESize Index);
 
 		static ZERSResourceManager*				GetInstance();
 };

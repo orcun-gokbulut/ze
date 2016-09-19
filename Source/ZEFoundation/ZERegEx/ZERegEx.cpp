@@ -38,6 +38,10 @@
 #include "ZEDS/ZEString.h"
 #include "TRE/regex.h"
 
+
+// ZERegEx
+//////////////////////////////////////////////////////////////////////////////////////
+
 bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 {
 	if (Code != NULL)
@@ -67,6 +71,15 @@ bool ZERegEx::IsValid()
 {
 	return Code != NULL;
 }
+
+bool ZERegEx::Match(const ZEString& String)
+{
+	if (Code == NULL)
+		return false;
+	
+	return (regexec((regex_t*)Code, String.ToCString(), 0, NULL, 0) == REG_OK);
+}
+
 
 bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Flags, ZERegExMatch* OldMatch)
 {
@@ -126,4 +139,79 @@ ZERegEx::~ZERegEx()
 {
 	if (Code != NULL)
 		delete Code;
+}
+
+
+// ZEWildcard
+//////////////////////////////////////////////////////////////////////////////////////
+
+bool ZEWildcard::Compile(const ZEString& Pattern)
+{
+	this->Pattern = Pattern;
+	return true;
+}
+
+bool ZEWildcard::Match(const ZEString& Input)
+{
+	if (Pattern.IsEmpty())
+		return false;
+
+	if (Input.IsEmpty())
+		return false;
+
+	const char* pat = Pattern.GetValue();
+	const char* str = Input.GetValue();
+	const char* s;
+	const char* p;
+	bool star = false;
+
+	loopStart:
+	   for (s = str, p = pat; *s; ++s, ++p) 
+	   {
+		  switch (*p) 
+		  {
+			 case '?':
+				if (*s == '.') goto starCheck;
+				break;
+			
+			 case '*':
+				star = true;
+				str = s, pat = p;
+				if (!*++pat) 
+					return true;
+				goto loopStart;
+			 
+			 default:
+				if (toupper(*s) != toupper(*p))
+				   goto starCheck;
+				break;
+		  }
+	   }
+	   
+	   if (*p == '*') 
+		   ++p;
+	   
+	   return (!*p);
+
+	starCheck:
+	   if (!star)
+		   return false;
+	   
+	   str++;
+	   goto loopStart;
+}
+
+ZEWildcard::ZEWildcard()
+{
+
+}
+
+ZEWildcard::ZEWildcard(const ZEString& Pattern)
+{
+	Compile(Pattern);
+}
+
+ZEWildcard::~ZEWildcard()
+{
+
 }
