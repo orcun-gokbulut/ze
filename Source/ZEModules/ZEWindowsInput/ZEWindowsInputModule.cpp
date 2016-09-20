@@ -128,14 +128,15 @@ void ZEWindowsInputModule::Process()
 {
 	KeyboardDevice->State.Advance();
 	MouseDevice->State.Advance();
+
 	for (ZESize I = 0; I < MouseDevice->State.Axises.CurrentValues.GetCount(); I++)
 		MouseDevice->State.Axises.CurrentValues[I] = 0.0f;
 
 	for (ZESize I = 0; I < RawInputCount; I++)
 	{
-		if (RawInputs[I].header.dwType== RIM_TYPEMOUSE)
+		if (RawInputs[I].header.dwType== RIM_TYPEMOUSE && MouseDevice->IsAcquired())
 			MouseDevice->Process(RawInputs[I]);
-		else if (RawInputs[I].header.dwType== RIM_TYPEKEYBOARD)
+		else if (RawInputs[I].header.dwType== RIM_TYPEKEYBOARD && KeyboardDevice->IsAcquired())
 			KeyboardDevice->Process(RawInputs[I]);
 	}
 

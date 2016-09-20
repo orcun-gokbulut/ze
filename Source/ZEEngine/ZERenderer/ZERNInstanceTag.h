@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputKeyboardDevice.cpp
+ Zinek Engine - ZERNInstanceTag.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEWindowsInputKeyboardDevice.h"
+#pragma once
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEError.h"
+#include "ZEMeta/ZEObject.h"
 
-#include "ZECore/ZESystemMessageHandler.h"
-#include "ZECore/ZESystemMessageManager.h"
-
-#include "ZEInput/ZEInputDefinitions.h"
-
-#define WINDIWS_LEAN_AND_MEAN
-#include <windows.h>
-#include "ZEDS/ZEFormat.h"
-#include "ZEDS/ZEHashGenerator.h"
-
-
-void ZEWindowsInputKeyboardDevice::UnAcquire()
+class ZERNInstanceTag : public ZEObject
 {
-	State.Reset();
-	ZEInputDevice::UnAcquire();
-}
+	ZE_OBJECT
+	public:
+		ZESize							Hash;
 
-bool ZEWindowsInputKeyboardDevice::InitializeInternal()
-{	
-	if (!ZEInputDevice::InitializeInternal())
-		return false;
+		virtual bool					Check(const ZERNInstanceTag* Other) const;
 
-	Description.Type = ZE_IDT_KEYBOARD;
-	Description.FullName = "Keyboard";
-	Description.Sink = true;
-	Description.SinkName = "Keyboard";
-	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
-	Description.ButtonCount = 256;
-
-	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_KEYBOARD);
-	Description.Name = ZEFormat::Format("Keyboard{0:d:02}", Description.Index);
-	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
-
-	State.Initialize(Description);
-	State.Reset();
-
-	Acquire();
-
-	return true;
-}
-
-void ZEWindowsInputKeyboardDevice::Process(const RAWINPUT& Data)
-{   
-	if ((Data.data.keyboard.Flags & 0x01) == RI_KEY_MAKE)
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = true;
-	else
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = false;
-}
+										ZERNInstanceTag();
+		virtual							~ZERNInstanceTag();
+		
+		static ZESize					GenerateHash(const void* Data, ZESize Hash);
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputKeyboardDevice.cpp
+ Zinek Engine - ZERNInstanceTag.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEWindowsInputKeyboardDevice.h"
+#include "ZERNInstanceTag.h"
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEError.h"
-
-#include "ZECore/ZESystemMessageHandler.h"
-#include "ZECore/ZESystemMessageManager.h"
-
-#include "ZEInput/ZEInputDefinitions.h"
-
-#define WINDIWS_LEAN_AND_MEAN
-#include <windows.h>
-#include "ZEDS/ZEFormat.h"
-#include "ZEDS/ZEHashGenerator.h"
-
-
-void ZEWindowsInputKeyboardDevice::UnAcquire()
+ZESize ZERNInstanceTag::GenerateHash(const void* Data, ZESize Size)
 {
-	State.Reset();
-	ZEInputDevice::UnAcquire();
+	Size /= 8;
+	ZESize Hash = 0x14650FB0739D0383UL;
+	for (ZESize I = 0; I < Size; I++)
+	{
+		Hash ^= ((ZEUInt32*)Data)[I];
+		Hash = 0x84222325cbf29ce4UL * Hash;
+	}
+
+	return Hash;
 }
 
-bool ZEWindowsInputKeyboardDevice::InitializeInternal()
-{	
-	if (!ZEInputDevice::InitializeInternal())
-		return false;
-
-	Description.Type = ZE_IDT_KEYBOARD;
-	Description.FullName = "Keyboard";
-	Description.Sink = true;
-	Description.SinkName = "Keyboard";
-	Description.SinkNameHash = ZEHashGenerator::Hash(Description.SinkName);
-	Description.ButtonCount = 256;
-
-	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(ZE_IDT_KEYBOARD);
-	Description.Name = ZEFormat::Format("Keyboard{0:d:02}", Description.Index);
-	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
-
-	State.Initialize(Description);
-	State.Reset();
-
-	Acquire();
-
-	return true;
+bool ZERNInstanceTag::Check(const ZERNInstanceTag* Other) const
+{
+	return (Hash == Other->Hash && Other->GetClass() == GetClass());
 }
 
-void ZEWindowsInputKeyboardDevice::Process(const RAWINPUT& Data)
-{   
-	if ((Data.data.keyboard.Flags & 0x01) == RI_KEY_MAKE)
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = true;
-	else
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = false;
+ZERNInstanceTag::ZERNInstanceTag()
+{
+
+}
+
+ZERNInstanceTag::~ZERNInstanceTag()
+{
+	
 }

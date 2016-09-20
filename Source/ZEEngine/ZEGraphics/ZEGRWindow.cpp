@@ -36,6 +36,8 @@
 #include "ZEGRWindow.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGROutput.h"
+#include "ZECore/ZECore.h"
+#include "ZEInput/ZEInputModule.h"
 
 static ZEUInt NextWindowId = 0;
 ZEUInt ZEGRWindow::WindowCount = 0;
@@ -54,11 +56,25 @@ void ZEGRWindow::OnDestroy()
 void ZEGRWindow::OnFocusGain()
 {
 	zeLog("Window gained focus.");
+
+	if (ManageInputAcquisition)
+	{
+		ZEInputModule* InputModule = ZECore::GetInstance()->GetInputModule();
+		if (InputModule != NULL)
+			InputModule->Acquire();
+	}
 }
 
 void ZEGRWindow::OnFocusLoose()
 {
 	zeLog("Window lost focus.");
+	
+	if (ManageInputAcquisition)
+	{
+		ZEInputModule* InputModule = ZECore::GetInstance()->GetInputModule();
+		if (InputModule != NULL)
+			InputModule->UnAcquire();
+	}
 }
 
 void ZEGRWindow::OnEnabled()
@@ -298,8 +314,32 @@ bool ZEGRWindow::GetCursorVisible() const
 
 bool ZEGRWindow::GetCursorLocked() const
 {
-	//return CursorLocked;
 	return LastCursorLock == this;
+}
+
+void ZEGRWindow::SetManageInputAcquisition(bool Enabled)
+{
+	if (ManageInputAcquisition == Enabled)
+		return;
+
+	ManageInputAcquisition = Enabled;
+
+	if (!ManageInputAcquisition)
+		return;
+
+	ZEInputModule* InputModule = ZECore::GetInstance()->GetInputModule();
+	if (InputModule == NULL)
+		return;
+
+	if (Focused)
+		InputModule->Acquire();
+	else
+		InputModule->UnAcquire();
+}
+
+bool ZEGRWindow::GetManageInputAcquisition() const
+{
+	return ManageInputAcquisition;
 }
 
 bool ZEGRWindow::GetVSynchEnabled() const
@@ -371,6 +411,7 @@ ZEGRWindow::ZEGRWindow()
 	ValidateQuit = true;
 	CursorVisible = false;
 	CursorLocked = false;
+	ManageInputAcquisition = true;
 
 	Enabled = true;
 	Focused = false;
