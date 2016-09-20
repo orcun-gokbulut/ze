@@ -111,7 +111,21 @@ ZEModel* ZEModelMeshLOD::GetModel()
 		return NULL;
 }
 
+const ZEModel* ZEModelMeshLOD::GetModel() const
+{
+	if (Mesh != NULL)
+		return Mesh->GetModel();
+	else
+		return NULL;
+}
+
+
 ZEModelMesh* ZEModelMeshLOD::GetMesh()
+{
+	return Mesh;
+}
+
+const ZEModelMesh* ZEModelMeshLOD::GetMesh() const
 {
 	return Mesh;
 }

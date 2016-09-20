@@ -39,12 +39,13 @@
 #include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEDelegate.h"
 
-#define ZERN_MAX_COMMAND_STAGE 5
+#define ZERN_MAX_COMMAND_LINK 7
 
 ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
 ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
 
 class ZERNCommand;
+class ZERNInstanceTag;
 
 typedef ZEDelegate<void (const ZERNRenderParameters*, const ZERNCommand*)> ZERNCommandCallback;
 
@@ -54,7 +55,12 @@ class ZERNCommand : public ZEObject
 	//ZE_DISALLOW_COPY(ZERNCommand);
 	friend class ZERNRenderer;
 	private:
-		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
+		ZELink<ZERNCommand>				Links[ZERN_MAX_COMMAND_LINK];
+		ZEList2<ZERNCommand>			InstancesPrevious;
+
+		void							PushInstances();
+		void							PopInstances();
+		ZELink<ZERNCommand>*			GetFreeLink();
 
 	public:
 		ZERNCommandCallback				Callback;
@@ -65,6 +71,8 @@ class ZERNCommand : public ZEObject
 		ZEInt							SceneIndex;
 		ZEUInt							StageMask;
 		void*							ExtraParameters;
+		ZEList2<ZERNCommand>			Instances;
+		ZERNInstanceTag*				InstanceTag;
 
 		virtual void					Execute(const ZERNRenderParameters* Parameters);
 

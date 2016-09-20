@@ -64,6 +64,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEHolder<ZEGRConstantBuffer>				ViewConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>				RendererConstantBuffer;
 		ZEArray<ZEHolder<const ZEGRConstantBuffer>>	SceneConstants;
+		ZEList2<ZERNCommand>						CommandList;
+		ZEList2<ZERNCommand>						CommandListInstanced;
 
 		ZEGRContext*								Context;
 		ZEHolder<const ZEGRTexture2D>				OutputTexture;
@@ -96,7 +98,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 
 		void										UpdateConstantBuffers();
 
-		void										SortStageCommands();
+		void										PopulateStageCommands();
 		void										RenderStages();
 		void										BindStages();
 
@@ -123,9 +125,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void										EndScene();
 
 		void										AddCommand(ZERNCommand* Command);
-		void										RemoveCommand(ZERNCommand* Command);
 		void										CleanCommands();
-		bool										ContainsCommand(ZERNCommand* Command);
 
 		void										Render();
 

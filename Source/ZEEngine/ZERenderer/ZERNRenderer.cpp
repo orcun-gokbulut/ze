@@ -37,8 +37,10 @@
 
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
+#include "ZERNInstanceTag.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNRenderParameters.h"
+
 #include "ZECore\ZECore.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEEntity.h"
@@ -179,10 +181,23 @@ void ZERNRenderer::UpdateConstantBuffers()
 	RendererConstantBuffer->SetData(&RendererConstants);
 }
 
-void ZERNRenderer::SortStageCommands()
+void ZERNRenderer::PopulateStageCommands()
 {
-	ze_for_each(Stage, Stages)
-		Stage->Commands.Sort<CompareCommands>();
+	CommandList.MergeEnd(CommandListInstanced);
+	CommandList.Sort<CompareCommands>();
+
+	ze_for_each(Command, CommandList)
+	{
+		ze_for_each(Stage, Stages)
+		{
+			if ((Command->StageMask & Stage->GetId()) == 0)
+				continue;
+
+			Stage->Commands.AddEnd(Command->GetFreeLink());
+		}
+	}
+
+	CommandList.Clear();
 }
 
 void ZERNRenderer::RenderStages()
@@ -254,8 +269,6 @@ void ZERNRenderer::RenderStages()
 
 		Stage->CleanUp(Context);
 	}
-
-	CleanCommands();
 
 	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, PrevViewConstantBuffer, PrevSceneConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
@@ -515,59 +528,50 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
 	if (!IsInitialized())
 		return;
+	
+	Command->InstancesPrevious.Clear();
+	Command->InstancesPrevious.MergeBegin(Command->Instances);
 
 	Command->SceneIndex = (ZEInt)SceneConstants.GetCount() - 1;
-	
 	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
 
-	ze_for_each(Stage, Stages)
+	if (Command->InstanceTag != NULL)
 	{
-		if ((Command->StageMask & Stage->GetId()) == 0)
-			continue;
-
-		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
+		bool Found = false;
+		ze_for_each(CurrentCommand, CommandListInstanced)
 		{
-			ZELink<ZERNCommand>* LinkCommand = &Command->StageQueueLinks[I];
-			if (LinkCommand->GetInUse())
+			if (CurrentCommand->InstanceTag == NULL ||
+				!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+			{
 				continue;
-
-			Stage->Commands.AddEnd(LinkCommand);
+			}
+			
+			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());			
+			Found = true;
 			break;
 		}
-	}
-}
 
-void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
-{
-	ze_for_each(Stage, Stages)
+		if (!Found)
+			CommandListInstanced.AddEnd(Command->GetFreeLink());
+
+	}
+	else
 	{
-		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-		{
-			if (Stage->Commands.Exists(&Command->StageQueueLinks[I]))
-				Stage->Commands.Remove(&Command->StageQueueLinks[I]);
-		}
+		CommandList.AddEnd(Command->GetFreeLink());
 	}
 }
 
 void ZERNRenderer::CleanCommands()
 {
+	ze_for_each(Command, CommandList)
+		Command->PopInstances();
+
+	CommandList.Clear();
+	CommandListInstanced.Clear();
 	SceneConstants.Clear();
-	ze_for_each(Stage, Stages)
-		Stage->Commands.Clean();
-}
 
-bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
-{
 	ze_for_each(Stage, Stages)
-	{
-		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-		{
-			if (Stage->Commands.Exists(&Command->StageQueueLinks[I]))
-				return true;
-		}
-	}
-
-	return false;
+		Stage->Commands.Clear();
 }
 
 void ZERNRenderer::Render()
@@ -575,8 +579,9 @@ void ZERNRenderer::Render()
 	if (!IsInitialized())
 		return;
 
-	SortStageCommands();
+	PopulateStageCommands();
 	RenderStages();
+	CleanCommands();
 }
 
 ZERNRenderer::ZERNRenderer()

@@ -63,6 +63,7 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 	ZE_DISALLOW_COPY(ZEModelMeshLOD)
 	friend class ZEModelMesh;
 	friend class ZEModelDraw;
+	friend class ZEMDInstanceTag;
 	private:
 		ZEModelMesh*								Mesh;
 		ZELink<ZEModelMeshLOD>						MeshLink;
@@ -86,7 +87,10 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 
 	public:
 		ZEModel*									GetModel();
+		const ZEModel*								GetModel() const;
+
 		ZEModelMesh*								GetMesh();
+		const ZEModelMesh*							GetMesh() const;
 
 		const ZEArray<ZEModelDraw>&					GetDraws();
 		void										AddDraw(const ZEModelDraw& Draw);

@@ -90,7 +90,7 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool							ValidateQuit;
 		bool							CursorVisible;
 		bool							CursorLocked;
-		
+		bool							ManageInputAcquisition;
 		bool							CursorVisibleState;
 		bool							CursorLockedState;
 
@@ -197,6 +197,9 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void							SetCursorLocked(bool Enabled);
 		bool							GetCursorLocked() const;
+
+		void							SetManageInputAcquisition(bool Enabled);
+		bool							GetManageInputAcquisition() const;
 
 		ZEGRMonitor*					GetContainingMonitor() const;
 		ZEGROutput*						GetOutput() const;

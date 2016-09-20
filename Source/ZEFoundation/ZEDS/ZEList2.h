@@ -420,6 +420,15 @@ void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 	if (OtherList.GetFirst() == NULL)
 		return;
 
+	#ifdef ZE_DEBUG_ENABLE
+		ZELink<ZEItemType>* Link = OtherList.GetFirst();
+		while(Link != NULL)
+		{
+			Link->List = this;
+			Link = Link->Next;	
+		}
+	#endif
+
 	if (First != NULL)
 	{
 		First->Prev = OtherList.Last;
@@ -437,7 +446,14 @@ void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 	OtherList.First = NULL;
 	OtherList.Last = NULL;
 	OtherList.Count = 0;
-	
+}
+
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
+{
+	if (OtherList.GetLast() == NULL)
+		return;
+
 	#ifdef ZE_DEBUG_ENABLE
 		ZELink<ZEItemType>* Link = OtherList.GetFirst();
 		while(Link != NULL)
@@ -446,13 +462,6 @@ void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 			Link = Link->Next;	
 		}
 	#endif
-}
-
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
-{
-	if (OtherList.GetLast() == NULL)
-		return;
 
 	if (Last != NULL)
 	{
@@ -471,15 +480,6 @@ void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
 	OtherList.First = NULL;
 	OtherList.Last = NULL;
 	OtherList.Count = 0;
-	
-	#ifdef ZE_DEBUG_ENABLE
-		ZELink<ZEItemType>* Link = OtherList.GetFirst();
-		while(Link != NULL)
-		{
-			Link->List = this;
-			Link = Link->Next;	
-		}
-	#endif
 }
 
 template<typename ZEItemType>

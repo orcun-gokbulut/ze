@@ -39,35 +39,57 @@
 
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZERNInstanceTag.h"
 
+class ZEModel;
 class ZEModelMesh;
 class ZEModelMeshLOD;
+class ZEModelDraw;
 class ZEMDResourceDraw;
 
 ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
+
+class ZEMDInstanceTag : public ZERNInstanceTag
+{
+	ZE_OBJECT
+	public:
+		ZEModelDraw*								Draw;
+
+		void										Update();
+
+		virtual bool								Check(const ZERNInstanceTag* Other) const;
+};
 
 class ZEModelDraw : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEModelMesh;
 	friend class ZEModelMeshLOD;
+	friend class ZEMDInstanceTag;
 	private:
 		const ZEMDResourceDraw*						Resource;
 		ZEModelMeshLOD*								LOD;
-		ZESize										Offset;
-		ZESize										Count;
+		ZEUInt32									Offset;
+		ZEUInt32									Count;
 		ZEHolder<const ZERNMaterial>				Material;
 		mutable ZERNCommand							RenderCommand;
+		ZEMDInstanceTag								InstanceTag;
 
 	public:
+		ZEModel*									GetModel();
+		const ZEModel*								GetModel() const;
+
+		ZEModelMesh*								GetMesh();
+		const ZEModelMesh*							GetMesh() const;
+
 		ZEModelMeshLOD*								GetLOD();
 		const ZEModelMeshLOD*						GetLOD() const;
 
-		void										SetOffset(ZESize Offset);
-		ZESize										GetOffset() const;
+		void										SetOffset(ZEUInt32 Offset);
+		ZEUInt32									GetOffset() const;
 
-		void										SetCount(ZESize Count);
-		ZESize										GetCount() const;
+		void										SetCount(ZEUInt32 Count);
+		ZEUInt32									GetCount() const;
 
 		void										SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>				GetMaterial() const;

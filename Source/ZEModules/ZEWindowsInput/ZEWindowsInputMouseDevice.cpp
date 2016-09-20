@@ -50,6 +50,7 @@
 void ZEWindowsInputMouseDevice::UnAcquire()
 {
 	State.Reset();
+	ZEInputDevice::UnAcquire();
 }
 
 bool ZEWindowsInputMouseDevice::InitializeInternal()

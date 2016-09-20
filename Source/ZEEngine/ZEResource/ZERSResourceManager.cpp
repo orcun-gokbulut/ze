@@ -119,25 +119,14 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 
 	ze_for_each(Resource, Group->SharedResources)
 	{
-		Resource->ResourceLock.Lock();
 		if (Resource->GetFileNameHash() == 0)
-		{
-			Resource->ResourceLock.Unlock();
 			continue;
-		}
 
 		if (Resource->GetFileNameHash() == Hash && 
 			Resource->GetFileName().EqualsIncase(FileNameNormalized))
 		{
-			ZERSHolder<const ZERSResource> Output;
-			Output.Overwrite(Resource.GetPointer());
-			Resource->ReferenceCount++;
-			Resource->ResourceLock.Unlock();
-
-			return Output;
+			return Resource.GetPointer();
 		}
-
-		Resource->ResourceLock.Unlock();
 	}
 
 	return NULL;

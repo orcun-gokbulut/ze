@@ -34,7 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNCommand.h"
+
 #include "ZEGame\ZEEntity.h"
+
+void ZERNCommand::PushInstances()
+{
+	InstancesPrevious.Clear();
+	InstancesPrevious.MergeEnd(Instances);
+}
+
+void ZERNCommand::PopInstances()
+{
+	Instances.Clear();
+	Instances.MergeEnd(InstancesPrevious);
+}
+
+ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
+{
+	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
+		if (!Links[I].GetInUse())
+			return &Links[I];
+
+	zeBreak(true);
+	return NULL;
+}
 
 void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 {
@@ -51,7 +74,8 @@ ZERNCommand::ZERNCommand()
 	Order = 0;
 	StageMask = 0;
 	ExtraParameters = NULL;
+	InstanceTag = NULL;
 
-	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-		new (&StageQueueLinks[I]) ZELink<ZERNCommand>(this);
+	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
+		new (&Links[I]) ZELink<ZERNCommand>(this);
 }
