@@ -173,7 +173,7 @@ void ZEEntity::BoundingBoxChanged()
 	if (!GetStatic())
 		return;
 
-	if (GetScene() != NULL)
+	if (GetScene() == NULL)
 		return;
 
 	if (!GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !IsLoaded())

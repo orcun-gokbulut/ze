@@ -106,6 +106,7 @@ struct ZEModelConverterMaterialDefinition
 class ZECVModelConverterV2 : public ZECVConverter
 {
 	private:
+		static void							ConvertBoneIndexes(ZEArray<ZEMDVertexSkinV2>& Vertexes, const ZEArray<ZEUInt32>& AffectingBoneIds);
 		static void							ConvertVertexBase(ZEMDVertexV2& Output, const ZEMDVertexV1& Input);
 		static void							ConvertVertexBase(ZEMDVertexSkinV2& Output, const ZEMDVertexSkinV1& Input);
 		template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
