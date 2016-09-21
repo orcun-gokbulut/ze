@@ -463,6 +463,17 @@ void ZECVModelConverterV2::GenerateIndices(const ZEArray<ZEVertexType>& Vertices
 		IndexedVertices[I] = Vertices[VertexMapping[I]];
 }
 
+void ZECVModelConverterV2::ConvertBoneIndexes(ZEArray<ZEMDVertexSkinV2>& Vertexes, const ZEArray<ZEUInt32>& AffectingBoneIds)
+{
+	for (ZESize I = 0; I < Vertexes.GetCount(); I++)
+	{
+		Vertexes[I].Indices[0] = AffectingBoneIds[Vertexes[I].Indices[0]];
+		Vertexes[I].Indices[1] = AffectingBoneIds[Vertexes[I].Indices[1]];
+		Vertexes[I].Indices[2] = AffectingBoneIds[Vertexes[I].Indices[2]];
+		Vertexes[I].Indices[3] = AffectingBoneIds[Vertexes[I].Indices[3]];
+	}
+}
+
 void ZECVModelConverterV2::ConvertVertexBase(ZEMDVertexV2& Output, const ZEMDVertexV1& Input)
 {
 	Output.Position = Input.Position;
@@ -660,6 +671,12 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 
 		zeLog("Converting to new skinned vertex format. vertex Count: %d.", VerticesSkinV1.GetCount());
 		ConvertVertexData(VerticesSkin, VerticesSkinV1, DegenerateFaceDetected);
+
+		ZEArray<ZEUInt32> AffectingBoneIds;
+		AffectingBoneIds.SetCount(SourceLODNode->ReadDataSize("AffectingBoneIds") / sizeof(ZEUInt32));
+		if (!SourceLODNode->ReadDataItems("AffectingBoneIds", AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), AffectingBoneIds.GetCount()))
+			return false;
+		ConvertBoneIndexes(VerticesSkin, AffectingBoneIds);
 
 		VertexCount = VerticesSkin.GetCount();
 		VertexBufferSize = VerticesSkin.GetCount() * sizeof(ZEMDVertexSkinV2);

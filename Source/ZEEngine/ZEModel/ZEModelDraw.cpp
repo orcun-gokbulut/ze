@@ -73,6 +73,8 @@ void ZEMDInstanceTag::Update()
 
 bool ZEMDInstanceTag::Check(const ZERNInstanceTag* Other) const
 {
+	return false;
+
 	if (!ZERNInstanceTag::Check(Other))
 		return false;
 
