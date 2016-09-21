@@ -39,7 +39,7 @@
 #include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEDelegate.h"
 
-#define ZERN_MAX_COMMAND_LINK 7
+#define ZERN_MAX_COMMAND_LINK 24
 
 ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
 ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");

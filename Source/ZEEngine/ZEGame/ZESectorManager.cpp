@@ -116,14 +116,21 @@ void ZESectorManager::UpdateTransformations()
 
 		ze_for_each(Sector, Sectors)
 			UpdateTransformation(Sector.GetPointer(), true);
-	}
-	
-	ze_for_each(Selector, Selectors)
-		UpdateTransformation(Selector.GetPointer());
 
-	ze_for_each(Entity, GeographicEntities)
-		UpdateTransformation(Entity.GetPointer());
-	
+		ze_for_each(Selector, Selectors)
+			UpdateTransformation(Selector.GetPointer(), true);
+
+		ze_for_each(Entity, GeographicEntities)
+			UpdateTransformation(Entity.GetPointer(), true);
+	}
+	else
+	{
+		ze_for_each(Selector, Selectors)
+			UpdateTransformation(Selector.GetPointer());
+
+		ze_for_each(Entity, GeographicEntities)
+			UpdateTransformation(Entity.GetPointer());
+	}
 }
 
 void ZESectorManager::UpdateActiveSectors()

@@ -1279,6 +1279,9 @@ bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
 			continue;
 
+		if (Current->CheckAttributeHasValue("ZEMeta.Serialization", "false"))
+			continue;
+
 		ZEVariant Variant;
 		GetClass()->GetProperty(this, Current->ID, Variant);
 

@@ -88,6 +88,9 @@ ZEEntityResult ZESector::LoadInternal()
 	if (SectorFile.IsEmpty())
 		return ZE_ER_DONE;
 
+	if (IsSectorFileLoaded)
+		return ZE_ER_DONE;
+
 	ZEMLReader SectorReader;
 	zeCheckError(!SectorReader.Open(SectorFile), ZE_ER_FAILED, "ZESector Load failed. Cannot open sector file. File Name: \"%s\".", SectorFile.ToCString());
 	ZEMLReaderNode SectorNode = SectorReader.GetRootNode();
@@ -131,6 +134,7 @@ ZEEntityResult ZESector::LoadInternal()
 		}
 	}
 
+	IsSectorFileLoaded = true;
 	return ZE_ER_DONE;
 }
 
@@ -168,6 +172,7 @@ ZESector::ZESector()
 {
 	GUID = ZEGUID::Zero;
 	Manager = NULL;
+	IsSectorFileLoaded = false;
 }
 
 ZESector::~ZESector()
