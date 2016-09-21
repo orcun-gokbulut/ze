@@ -985,6 +985,26 @@ bool ZECVModelConverterV2::ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriter
 		DestinationMeshesNode.CloseNode();
 	}
 
+	ZEMLReaderNode SourceHelpersNode = Unserializer->GetNode("Helpers");
+	if (SourceHelpersNode.IsValid())
+	{
+		ZEMLWriterNode DestinationHelpersNode;
+		Serializer->OpenNode("Helpers", DestinationHelpersNode);
+		ZESize HelperCount = SourceHelpersNode.GetNodeCount("Helper");
+		for (ZESize I = 0; I < HelperCount; I++)
+		{
+			ZEMLWriterNode DestinationHelperNode;
+			DestinationHelpersNode.OpenNode("Helper", DestinationHelperNode);
+
+			if (!ConvertHelper(&SourceHelpersNode.GetNode("Helper", I), &DestinationHelperNode))
+				return false;
+
+			DestinationHelperNode.CloseNode();
+		}
+
+		DestinationHelpersNode.CloseNode();
+	}
+
 	ZEMLReaderNode SourceAnimationsNode = Unserializer->GetNode("Animations");
 
 	if (SourceAnimationsNode.IsValid())

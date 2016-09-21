@@ -484,7 +484,7 @@ void ZEModel::AddAnimationTrack(ZEModelAnimationTrack* Track)
 	zeCheckError(Track == NULL, ZE_VOID, "Cannot add animation track. Track is NULL.");
 	zeCheckError(Track->GetModel() != NULL, ZE_VOID, "Can not add animation track. Track is already added to a model.");
 
-	AnimationTrack->Model = this;
+	Track->Model = this;
 	AnimationTracks.AddEnd(&Track->ModelLink);
 }
 
@@ -493,7 +493,7 @@ void ZEModel::RemoveAnimationTrack(ZEModelAnimationTrack* Track)
 	zeCheckError(Track == NULL, ZE_VOID, "Cannot remove animation track. Track is NULL.");
 	zeCheckError(Track->GetModel() != this, ZE_VOID, "Can not remove animation track. Track belongs to another model.");
 
-	AnimationTrack->Model = NULL;
+	Track->Model = NULL;
 	AnimationTracks.Remove(&Track->ModelLink);
 }
 

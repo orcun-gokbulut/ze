@@ -49,7 +49,7 @@ struct ZESectorLink
 class ZESector : public ZEGeographicEntity
 {
 	friend class ZESectorManager;
-	ZE_OBJECT;
+	ZE_OBJECT
 	private:
 		ZEGUID							GUID;
 		ZEString						SectorFile;
@@ -57,9 +57,12 @@ class ZESector : public ZEGeographicEntity
 		ZELock							SectorLock;
 		ZEArray<ZESectorLink>			SectorLinks;
 
+		bool							IsSectorFileLoaded;
+
 		bool							CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck);
 		void							SetManager(ZESectorManager* Manager);				
 
+	protected:
 		virtual ZEEntityResult			LoadInternal();
 
 										ZESector();

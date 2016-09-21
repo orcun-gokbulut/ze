@@ -46,6 +46,8 @@ bool ZEModelHelper::Load(const ZEMDResourceHelper* Resource)
 	if (Resource == NULL)
 		return true;
 
+	Name = Resource->GetName();
+	ParentType = static_cast<ZEModelHelperParentType>(Resource->GetOwnerType());
 	Position = Resource->GetPosition();
 	Rotation = Resource->GetRotation();
 	Scale = Resource->GetScale();
