@@ -136,7 +136,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 	tm TimeStamp;
 	memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
-	ZESize ThreadId = ZEThread::GetCurrentThreadId();
+	ZEUInt32 ThreadId = ZEThread::GetCurrentThreadId();
 	ZELogSession* CurrentSession = NULL;
 	ZELogSession* CurrentSinkSession = NULL;
 	ze_for_each_reverse(Session, *Sessions)

@@ -72,6 +72,6 @@ source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZEMLEditor 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation)
+	LIBS ZEFoundation Qt5::WinMain)
 	
 qt5_use_modules(ZEMLEditor Widgets)

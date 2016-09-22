@@ -42,18 +42,15 @@
 #define  WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <combaseapi.h>
+#endif
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main(int argc, char** argv)
 {
-	int argc = 1;
-	char* argv[] =
-	{
-		"ZELCLicenseTool.exe"
-	};
-
-
 	QApplication Application(argc, argv);
+
+	#ifdef ZE_PLATFORM_WINDOWS
 	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
+	#endif
 
 	QFile File(":/Zinek/ZEThemeDark/ZEThemeDark.qss");
 	File.open(QFile::ReadOnly);
@@ -65,22 +62,3 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	return Application.exec();
 }
-#else
-int Main(int argc, char** argv)
-{
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	
-	QApplication Application(argc, argv);
-
-
-	QFile File(":/qdarkstyle/style.qss");
-	File.open(QFile::ReadOnly);
-	QString StyleSheet = QLatin1String(File.readAll());
-	qApp->setStyleSheet(StyleSheet);
-
-	ZELCLicenseToolWindow Window;
-	Window.show();
-
-	return Application.exec();
-}
-#endif

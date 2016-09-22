@@ -46,12 +46,10 @@ class ZELock
 {
 	ZE_COPY_NO_ACTION(ZELock)
 	private:
-		#ifdef ZE_DEBUG_ENABLE
-		ZEUInt64				OwnerThreadId;
-		#endif
-		
 		volatile ZEInt32		CurrentNumber;
 		volatile ZEInt32		NextNumber;
+		volatile ZEUInt32		OwnerThreadId;
+		volatile ZEInt32		NestingCount;
 
 	public:
 		bool					IsLocked() const;
@@ -64,6 +62,7 @@ class ZELock
 
 		// Sync Methods
 		void					Lock();
+		void					LockNested();
 		void					Wait() const;
 		void					Unlock();
 
@@ -78,8 +77,8 @@ class ZELockHolder
 		ZELock*					TargetLock;
 
 	public:
-								void Lock(ZELock& Lock);
-								void Unlock();
+		void					Lock(ZELock& Lock);
+		void					Unlock();
 
 								ZELockHolder();
 								ZELockHolder(ZELock& Lock);

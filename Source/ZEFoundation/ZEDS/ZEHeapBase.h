@@ -40,11 +40,11 @@
 #include "ZETypes.h"
 #include "ZEArray.h"
 
-template<typename Type, typename Allocator_>
+template<typename Type, typename ZEAllocatorType>
 class ZEHeapBase
 {
 	protected:
-		ZEArray<Type, Allocator_> Heap;
+		ZEArray<Type, ZEAllocatorType> Heap;
 
 	public:
 		ZESize GetParentIndex(ZESize Index) const
@@ -112,7 +112,7 @@ class ZEHeapBase
 			Heap.Clear();
 		}
 
-		const ZEArray<Type, Allocator_>& GetArray() const
+		const ZEArray<Type, ZEAllocatorType>& GetArray() const
 		{
 			return Heap;
 		}

@@ -36,33 +36,20 @@
 #include "ZEDSHMainWindow.h"
 
 #include "ZEFile/ZEPathManager.h"
-#include "ZEGraphics\ZEGRShaderCompileOptions.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
 #include <QApplication>
 #include <QMessageBox>
 
-#ifdef ZE_PLATFORM_WINDOWS
-	#define  WIN32_LEAN_AND_MEAN
-	#include <windows.h>
+int main(int argc, char** argv)
+{
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 
-	int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-	{
-		int argc = 1;
-		char* argv[] =
-		{
-			"ZEDSHShaderEditor.exe"
-		};
-#else
-	int Main(int argc, char** argv)
-	{
-#endif
-		ZEPathManager::GetInstance()->SetAccessControl(false);
-
-		QApplication Application(argc, argv);
-		ZEDSHMainWindow MainWindow;
-		MainWindow.show();
-		return Application.exec();
-	}
+	QApplication Application(argc, argv);
+	ZEDSHMainWindow MainWindow;
+	MainWindow.show();
+	return Application.exec();
+}
 
 void ZEDSHEditor_RunEditor(ZEGRShaderCompileOptions& Options)
 {
@@ -83,9 +70,5 @@ void ZEDSHEditor_RunEditor(ZEGRShaderCompileOptions& Options)
 		MainWindow.Load(Options);
 		MainWindow.show();
 		Application.exec();
-	}
-	else
-	{
-		return;
 	}
 }

@@ -46,7 +46,7 @@ class ZELogSession
 	private:
 		ZELink<ZELogSession>			Link;
 		ZESSize							SessionID;
-		ZESize							ThreadID;
+		ZEUInt32						ThreadID;
 		ZELogType						MinimumLevel;
 		bool							Sink;
 		bool							Block;
@@ -58,7 +58,7 @@ class ZELogSession
 
 	public:
 		ZESize							GetSessionID() const;
-		ZESize							GetThreadID() const;
+		ZEUInt32						GetThreadID() const;
 
 		void							SetMinimumLevel(ZELogType Level);
 		ZELogType						GetMinimumLevel() const;

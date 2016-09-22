@@ -70,29 +70,35 @@ bool ZELock::IsLocked() const
 
 ZEUInt32 ZELock::Queue()
 {
+	zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
 	return AtomicIncrement(&NextNumber);
 }
 
 bool ZELock::Check(ZEUInt32 Number) const
 {
-	return (Number != CurrentNumber);
+	return (Number == CurrentNumber);
 }
 
 void ZELock::Wait(ZEUInt32 Number) const
 {
-	while(Check(Number))
-	{
-		zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
-	}
+	while(!Check(Number));
 }
 
 void ZELock::Release(ZEUInt32 Number)
 {
-	zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
+	zeDebugCheck(OwnerThreadId == 0, "Lock cannot be release because it is not locked.");
 	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acquired yet by given number.");
+	zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
 	
-	#ifdef ZE_DEBUG_ENABLE
+	NestingCount--;
+
+	if (NestingCount != 0)
+		return;
+
 	OwnerThreadId = 0;
+	
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_releasing(this);
 	#endif
 
 	CurrentNumber++;
@@ -100,14 +106,13 @@ void ZELock::Release(ZEUInt32 Number)
 
 void ZELock::Wait() const
 {
-	while(IsLocked())
-	{
-		zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
-	}
+	while(IsLocked());
 }
 
 void ZELock::Lock()
 {
+	zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
+
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_prepare(this);
 	#endif
@@ -115,9 +120,31 @@ void ZELock::Lock()
 	ZEInt32 MyNumber = Queue();
 	Wait(MyNumber);
 
-	#ifdef ZE_DEBUG_ENABLE
+	NestingCount++;
 	OwnerThreadId = ZEThread::GetCurrentThreadId();
+
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_acquired(this);
 	#endif
+}
+
+void ZELock::LockNested()
+{
+	if (OwnerThreadId == ZEThread::GetCurrentThreadId())
+	{
+		NestingCount++;
+		return;
+	}
+
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_prepare(this);
+	#endif
+
+	ZEInt32 MyNumber = Queue();
+	Wait(MyNumber);
+
+	OwnerThreadId = ZEThread::GetCurrentThreadId();
+	NestingCount++;
 
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_acquired(this);
@@ -126,10 +153,6 @@ void ZELock::Lock()
 
 void ZELock::Unlock()
 {
-	#ifdef ZE_VTUNE_ENABLED
-	__itt_sync_releasing(this);
-	#endif
-	
 	Release(CurrentNumber);
 }
 
@@ -139,12 +162,14 @@ ZELock::ZELock()
 	__itt_sync_create(this, "ZELock", "", 0);
 	#endif
 
+	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&NextNumber, 4), "ZELock memory alignmnet is not correct.");
+	bool Aligned = !ZE_CHECK_ALIGNMENT(&NextNumber, 4);
+	zeBreak(Aligned);
+
 	CurrentNumber = 1;
 	NextNumber = 0;
-
-	#ifdef ZE_DEBUG_ENABLE
+	NestingCount = 0;
 	OwnerThreadId = 0;
-	#endif
 }
 
 ZELock::~ZELock()

@@ -40,8 +40,8 @@
 #include "ZETypes.h"
 #include "ZEHeapBase.h"
 
-template<typename Type, typename Allocator_ = ZEAllocatorBase<Type> >
-class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
+template<typename Type, typename ZEAllocatorType = ZEAllocatorBase<Type> >
+class ZEMinHeap : public ZEHeapBase<Type, ZEAllocatorType>
 {
 	private:
 		void Swap(Type& One, Type& Two)
@@ -130,13 +130,13 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 			Remove(0);
 		}
 
-		ZEMinHeap<Type, Allocator_>& operator=(const ZEMinHeap<Type, Allocator_>& Other)
+		ZEMinHeap<Type, ZEAllocatorType>& operator=(const ZEMinHeap<Type, ZEAllocatorType>& Other)
 		{
 			this->Heap.CopyFrom(Other.Heap);
 			return *this;
 		}
 
-		ZEMinHeap(const ZEMinHeap<Type, Allocator_>& Other)
+		ZEMinHeap(const ZEMinHeap<Type, ZEAllocatorType>& Other)
 		{
 			this->Heap.CopyFrom(Other.Heap);
 		}

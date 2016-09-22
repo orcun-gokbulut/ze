@@ -60,11 +60,11 @@ source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZEDSHShaderEditor
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
-	LIBS ZEFoundation ZEGraphics ZEDirect3D11)
+	LIBS ZEFoundation ZEGraphics ZEDirect3D11 Qt5::WinMain)
 
 qt5_use_modules(ZEDSHShaderEditor Widgets)
 
-ze_add_source(ZEDSHShaderEditor.def			SourcesDLL)
+ze_add_source(ZEDSHShaderEditor.def SourcesDLL)
 ze_add_library(TARGET ZEDSHShaderEditorDLL
 	SOURCES ${SourcesDLL} ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation ZEEngine ZEDirect3D11

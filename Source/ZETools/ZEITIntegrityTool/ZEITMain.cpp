@@ -32,55 +32,16 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZEPlatform.h"
-#include "ZEFile/ZEPathManager.h"
 #include "ZEITIntegrityToolWindow.h"
 
 #include <QApplication>
-#include <QFile>
 
-#ifdef ZE_PLATFORM_WINDOWS
-#define  WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <combaseapi.h>
-
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main(int argc, char** argv)
 {
-	int argc = 1;
-	char* argv[] =
-	{
-		"ZELCLicenseTool.exe"
-	};
-
 	QApplication Application(argc, argv);
-	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
-
-	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
-	File.open(QFile::ReadOnly);
-	QString StyleSheet = QLatin1String(File.readAll());
-	qApp->setStyleSheet(StyleSheet);
 
 	ZEITIntegrityToolWindow Window;
 	Window.show();
 
 	return Application.exec();
 }
-#else
-int Main(int argc, char** argv)
-{
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	
-	QApplication Application(argc, argv);
-
-
-	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
-	File.open(QFile::ReadOnly);
-	QString StyleSheet = QLatin1String(File.readAll());
-	qApp->setStyleSheet(StyleSheet);
-
-	ZEITIntegrityToolWindow Window;
-	Window.show();
-
-	return Application.exec();
-}
-#endif
