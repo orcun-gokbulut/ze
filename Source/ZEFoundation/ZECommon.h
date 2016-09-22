@@ -68,3 +68,5 @@
 #define ZE_COPY_NO_ACTION_IMP(ClassName) \
 	ClassName::ClassName(const ClassName&) {new (this) ClassName();} \
 	ClassName& ClassName::operator=(const ClassName&) {return *this;}
+
+#define ZE_CHECK_ALIGNMENT(Pointer, Alignment) (((ZESize)(const void*)(Pointer)) % (Alignment) == 0)

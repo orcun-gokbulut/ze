@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_ALLOCATOR_H__
-#define __ZE_ALLOCATOR_H__
 
 #ifndef NULL
 #define NULL 0
@@ -44,180 +42,219 @@
 #include "ZETypes.h"
 #include <math.h>
 
-template <typename Type>
+
+template <typename ZEItemType>
 class ZEAllocatorBase
 {
 	public:
-		ZESize				Size;
+		ZESize							Size;
 
 	public:	
-		inline static void ObjectCopy(Type* Destination, const Type* Source, ZESize Count)
-		{
-			const Type* SourceEnd = Source + Count;
-			while(Source != SourceEnd)
-			{
-				*Destination = *Source;
-				Destination++;
-				Source++;
-			} 
-		}
+		inline static void				ObjectCopy(ZEItemType* Destination, const ZEItemType* Source, ZESize Count);
 
-		inline ZESize GetSize() const
-		{
-			return Size;
-		}
-
-		inline void Deallocate(Type** Pointer)
-		{
-			if (*Pointer == NULL)
-				return;
-
-			Size = 0;
-			delete[] *Pointer;
-			*Pointer = NULL;
-		}
-	
-		inline bool Allocate(Type** Pointer, ZESize NewSize)
-		{
-			if (Size == NewSize)
-				return false;
-
-			if (NewSize == 0)
-			{
-				Deallocate(Pointer);
-				return false;
-			}
-
-			Size = NewSize;
-			*Pointer = new Type[NewSize];
-
-			return true;
-		}
-
-		inline void Reallocate(Type** Pointer, ZESize NewSize)
-		{
-			if (Size == NewSize)
-				return;
-
-			if (NewSize == 0)
-			{
-				Deallocate(Pointer);
-				return;
-			}
-			
-			ZESize OldSize = Size;
-			Type* NewPointer = new Type[NewSize];
-			if (*Pointer != NULL)
-			{
-				ObjectCopy(NewPointer, *Pointer, (OldSize > NewSize ? NewSize : OldSize));
-				delete[] *Pointer;
-			}
-
-			Size = NewSize;
-			*Pointer = NewPointer;
-		}
+		inline ZESize					GetSize() const;
+		inline bool						Allocate(ZEItemType** Pointer, ZESize NewSize);
+		inline void						Reallocate(ZEItemType** Pointer, ZESize NewSize);
+		inline void						Deallocate(ZEItemType** Pointer);
 		
-		ZEAllocatorBase()
-		{
-			Size = 0;
-		}
+										ZEAllocatorBase();
 };
 
-template <typename Type, ZEInt ChunkSize>
-class ZEChunkAllocator : public ZEAllocatorBase<Type>
+
+template <typename ZEItemType, ZEInt ChunkSize>
+class ZEChunkAllocator : public ZEAllocatorBase<ZEItemType>
 {
 	public:
-		inline bool Allocate(Type** Pointer, ZESize NewSize)
-		{
-			ZESize OldSize;
-			if (NewSize != 0)
-			{
-				if ((this->Size < NewSize) || (this->Size - NewSize > ChunkSize))
-				{
-					OldSize = this->Size;
-					if (NewSize < ChunkSize)
-						this->Size = ChunkSize;
-					else
-						this->Size = ((NewSize / ChunkSize) + 1) * ChunkSize;
-
-					*Pointer = new Type[this->Size];
-					return true;
-				}
-				else
-					return false;
-			}
-			else
-			{
-				this->Size = 0;
-				if (*Pointer != NULL)
-				{
-					delete[] *Pointer;
-					*Pointer = NULL;
-				}
-				return false;
-			}
-		}
-
-		inline void Reallocate(Type** Pointer, ZESize NewSize)
-		{
-			Type* OldPointer = *Pointer;
-			ZESize OldSize = this->Size;
-			if (Allocate(Pointer, NewSize))
-			{	
-				if (OldPointer != NULL)		
-				{
-					ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
-					delete[] OldPointer;
-				}
-			}
-		}
+		inline bool						Allocate(ZEItemType** Pointer, ZESize NewSize);
+		inline void						Reallocate(ZEItemType** Pointer, ZESize NewSize);
 };
 
-template <typename Type, ZESize Exponent = 2>
-class ZESmartAllocator : public ZEAllocatorBase<Type>
+
+template <typename ZEItemType, ZESize Exponent = 2>
+class ZESmartAllocator : public ZEAllocatorBase<ZEItemType>
 {
 	private:
 		ZESize LowerLimit;
 
 	public:
-		inline bool Allocate(Type** Pointer, ZESize NewSize)
-		{
-			if (NewSize != 0)
-			{
-				if ((NewSize > this->Size) || (NewSize < LowerLimit))
-				{
-					this->Size = (ZESize)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
-					LowerLimit = this->Size / Exponent;
-					*Pointer = new Type[this->Size];
-					return true;
-				}
-				else
-					return false;
-			}
-			else
-			{
-				this->Size = 0;
-				if (*Pointer != NULL)
-				{
-					delete[] *Pointer;
-					*Pointer = NULL;
-				}
-				return false;
-			}
-		}
-
-		inline void Reallocate(Type** Pointer, ZESize NewSize)
-		{
-			ZESize OldSize = this->Size;
-			Type* OldPointer = *Pointer;
-			if (Allocate(Pointer, NewSize))
-			{	
-				if (OldPointer != NULL)		
-				{
-                    ZEAllocatorBase<Type>::ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
-					delete[] OldPointer;
-				}
-			}
-		}
+		inline bool						Allocate(ZEItemType** Pointer, ZESize NewSize);
+		inline void						Reallocate(ZEItemType** Pointer, ZESize NewSize);
 };
-#endif
+
+
+// ZEAllocatorBase
+//////////////////////////////////////////////////////////////////////////////////////
+
+template <typename ZEItemType>
+void ZEAllocatorBase<ZEItemType>::ObjectCopy(ZEItemType* Destination, const ZEItemType* Source, ZESize Count)
+{
+	const ZEItemType* SourceEnd = Source + Count;
+	while(Source != SourceEnd)
+	{
+		*Destination = *Source;
+		Destination++;
+		Source++;
+	} 
+}
+
+template <typename ZEItemType>
+ZESize ZEAllocatorBase<ZEItemType>::GetSize() const
+{
+	return Size;
+}
+
+template <typename ZEItemType>
+void ZEAllocatorBase<ZEItemType>::Deallocate(ZEItemType** Pointer)
+{
+	if (*Pointer == NULL)
+		return;
+
+	Size = 0;
+	delete[] *Pointer;
+	*Pointer = NULL;
+}
+
+template <typename ZEItemType>
+bool ZEAllocatorBase<ZEItemType>::Allocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	if (Size == NewSize)
+		return false;
+
+	if (NewSize == 0)
+	{
+		Deallocate(Pointer);
+		return false;
+	}
+
+	Size = NewSize;
+	*Pointer = new ZEItemType[NewSize];
+
+	return true;
+}
+
+template <typename ZEItemType>
+void ZEAllocatorBase<ZEItemType>::Reallocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	if (Size == NewSize)
+		return;
+
+	if (NewSize == 0)
+	{
+		Deallocate(Pointer);
+		return;
+	}
+
+	ZESize OldSize = Size;
+	ZEItemType* NewPointer = new ZEItemType[NewSize];
+	if (*Pointer != NULL)
+	{
+		ObjectCopy(NewPointer, *Pointer, (OldSize > NewSize ? NewSize : OldSize));
+		delete[] *Pointer;
+	}
+
+	Size = NewSize;
+	*Pointer = NewPointer;
+}
+
+template <typename ZEItemType>
+ZEAllocatorBase<ZEItemType>::ZEAllocatorBase()
+{
+	Size = 0;
+}
+
+
+// ZEChunkAllocator
+//////////////////////////////////////////////////////////////////////////////////////
+
+template <typename ZEItemType, ZEInt ChunkSize>
+bool ZEChunkAllocator<ZEItemType, ChunkSize>::Allocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	ZESize OldSize;
+	if (NewSize != 0)
+	{
+		if ((this->Size < NewSize) || (this->Size - NewSize > ChunkSize))
+		{
+			OldSize = this->Size;
+			if (NewSize < ChunkSize)
+				this->Size = ChunkSize;
+			else
+				this->Size = ((NewSize / ChunkSize) + 1) * ChunkSize;
+
+			*Pointer = new ZEItemType[this->Size];
+			return true;
+		}
+		else
+			return false;
+	}
+	else
+	{
+		this->Size = 0;
+		if (*Pointer != NULL)
+		{
+			delete[] *Pointer;
+			*Pointer = NULL;
+		}
+		return false;
+	}
+}
+
+template <typename ZEItemType, ZEInt ChunkSize>
+void ZEChunkAllocator<ZEItemType, ChunkSize>::Reallocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	ZEItemType* OldPointer = *Pointer;
+	ZESize OldSize = this->Size;
+	if (Allocate(Pointer, NewSize))
+	{	
+		if (OldPointer != NULL)		
+		{
+			ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
+			delete[] OldPointer;
+		}
+	}
+}
+
+
+// ZESmartAllocator
+//////////////////////////////////////////////////////////////////////////////////////
+
+template <typename ZEItemType, ZESize Exponent>
+bool ZESmartAllocator<ZEItemType, Exponent>::Allocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	if (NewSize != 0)
+	{
+		if ((NewSize > this->Size) || (NewSize < LowerLimit))
+		{
+			this->Size = (ZESize)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
+			LowerLimit = this->Size / Exponent;
+			*Pointer = new ZEItemType[this->Size];
+			return true;
+		}
+		else
+			return false;
+	}
+	else
+	{
+		this->Size = 0;
+		if (*Pointer != NULL)
+		{
+			delete[] *Pointer;
+			*Pointer = NULL;
+		}
+		return false;
+	}
+}
+
+template <typename ZEItemType, ZESize Exponent>
+void ZESmartAllocator<ZEItemType, Exponent>::Reallocate(ZEItemType** Pointer, ZESize NewSize)
+{
+	ZESize OldSize = this->Size;
+	ZEItemType* OldPointer = *Pointer;
+	if (Allocate(Pointer, NewSize))
+	{	
+		if (OldPointer != NULL)		
+		{
+			ZEAllocatorBase<ZEItemType>::ObjectCopy(*Pointer, OldPointer, (OldSize > NewSize ? NewSize : OldSize));
+			delete[] OldPointer;
+		}
+	}
+}

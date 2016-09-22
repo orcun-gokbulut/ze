@@ -99,5 +99,5 @@ class ZEThread
 		virtual 					~ZEThread();
 
 		static ZEThread*			GetCurrentThread();
-		static ZEUInt64				GetCurrentThreadId();
+		static ZEUInt32				GetCurrentThreadId();
 };

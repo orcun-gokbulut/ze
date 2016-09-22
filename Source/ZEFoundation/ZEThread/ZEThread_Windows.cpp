@@ -187,7 +187,7 @@ ZEThread::~ZEThread()
 	Terminate();
 }
 
-ZEUInt64 ZEThread::GetCurrentThreadId()
+ZEUInt32 ZEThread::GetCurrentThreadId()
 {
 	return ::GetCurrentThreadId();
 }

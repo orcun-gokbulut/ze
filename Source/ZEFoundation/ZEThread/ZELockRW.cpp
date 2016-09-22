@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELockRW.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,27 +30,55 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZELCMain.cpp								Sources)
-ze_add_source(ZELCLicenseToolWindow.cpp					Sources)
-ze_add_source(ZELCLicenseToolWindow.h					Sources QtMocs)
-ze_add_source(ZELCLicenseToolWindow.ui					Sources QtUIs)
-ze_add_source(../CommonResources/ZEZinekIcon.qrc		Sources QtResources)
-ze_add_source(../CommonResources/ZEThemeDark/ZEThemeDark.qrc Sources QtResources)
+#include "ZELockRW.h"
 
-qt5_wrap_ui(QtUIOutputs ${QtUIs})
-qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
-qt5_add_resources(QtResourceOutputs ${QtResources})
+#include "ZEError.h"
 
-source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
+void ZELockRW::LockRead()
+{
+	Lock.Lock();
+	if (ReaderCount == 0)
+		AccessLock.Lock();
+	ReaderCount++;
+	Lock.Unlock();
+}
 
-ze_add_executable(TARGET ZELCLicensingTool
-	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect Qt5::WinMain)
+void ZELockRW::UnlockRead()
+{
+	Lock.Lock();
+	zeDebugCheck(ReaderCount <= 0, "Lock is not locked for reading.");
+	ReaderCount--;
+	if (ReaderCount == 0)
+		AccessLock.Unlock();
 	
-qt5_use_modules(ZELCLicensingTool Widgets)
-source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})
+	Lock.Unlock();
+}
+
+void ZELockRW::LockWrite()
+{
+	AccessLock.Lock();
+	ReaderCount = -1;
+
+}
+
+void ZELockRW::UnlockWrite()
+{
+	zeDebugCheck(ReaderCount != -1, "Lock is not locked for writing.");
+	AccessLock.Unlock();
+}
+
+ZELockRW::ZELockRW()
+{
+	ReaderCount = 0;
+}
+
+ZELockRW::~ZELockRW()
+{
+	zeDebugCheck(ReaderCount == -1, "Destroying ZELockRW. Lock is still locked for writing.");
+	zeDebugCheck(ReaderCount != 0, "Destroying ZELockRW. Lock is still locked for reading.");
+}

@@ -40,8 +40,8 @@
 #include "ZETypes.h"
 #include "ZEHeapBase.h"
 
-template< typename Type, typename Allocator_ = ZEChunkAllocator<Type, 100> >
-class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
+template< typename Type, typename ZEAllocatorType = ZEChunkAllocator<Type, 100> >
+class  ZEMaxHeap : public ZEHeapBase<Type, ZEAllocatorType>
 {
 	private:
 		void Swap(Type& One, Type& Two)
@@ -129,13 +129,13 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			Remove(0);
 		}
 
-		ZEMaxHeap<Type, Allocator_>& operator=(const ZEMaxHeap<Type, Allocator_>& Other)
+		ZEMaxHeap<Type, ZEAllocatorType>& operator=(const ZEMaxHeap<Type, ZEAllocatorType>& Other)
 		{
 			this->Heap.CopyFrom(Other.Heap);
 			return *this;
 		}
 
-		ZEMaxHeap(const ZEMaxHeap<Type, Allocator_>& Other)
+		ZEMaxHeap(const ZEMaxHeap<Type, ZEAllocatorType>& Other)
 		{
 			this->Heap.CopyFrom(Other.Heap);
 		}

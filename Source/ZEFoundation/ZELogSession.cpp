@@ -51,7 +51,7 @@ ZESize ZELogSession::GetSessionID() const
 	return SessionID;
 }
 
-ZESize ZELogSession::GetThreadID() const
+ZEUInt32 ZELogSession::GetThreadID() const
 {
 	return ThreadID;
 }
