@@ -88,7 +88,7 @@ void ZELock::Release(ZEUInt32 Number)
 {
 	zeDebugCheck(OwnerThreadId == 0, "Lock cannot be release because it is not locked.");
 	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acquired yet by given number.");
-	zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
+	//zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
 	
 	NestingCount--;
 
@@ -163,8 +163,7 @@ ZELock::ZELock()
 	#endif
 
 	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&NextNumber, 4), "ZELock memory alignmnet is not correct.");
-	bool Aligned = !ZE_CHECK_ALIGNMENT(&NextNumber, 4);
-	zeBreak(Aligned);
+	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&CurrentNumber, 4), "ZELock memory alignmnet is not correct.");
 
 	CurrentNumber = 1;
 	NextNumber = 0;

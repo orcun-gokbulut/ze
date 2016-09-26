@@ -39,6 +39,7 @@
 #include "ZEAllocator.h"
 #include "ZEArrayIterator.h"
 #include "ZEError.h"
+#include "ZEThread/ZELockRW.h"
 
 #include <stdlib.h>
 
@@ -52,6 +53,7 @@ class ZEArray
 		ZESize							Count;
 		ZEAllocatorType					Allocator;
 		ZEItemType*						Items;
+		mutable ZELockRW				Lock;
 
 	public:
 		inline void						SetCount(ZESize Count);
@@ -84,19 +86,25 @@ class ZEArray
 		inline void						AddByRef(const ZEItemType& NewItem);
 		inline void						Add(ZEItemType NewItem);
 		inline ZEItemType*				MassAdd(ZESize ItemCount);
-		inline ZEItemType*				MassAdd(const ZEItemType* NewItems, ZESize ItemCount);
+		inline void						MassAdd(const ZEItemType* NewItems, ZESize ItemCount);
+		template<typename ZEAllocatorTypeOther>
+		inline void						MassAdd(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
-		inline void						Insert(ZESize Index);
+		inline ZEItemType*				Insert(ZESize Index);
 		inline void						Insert(ZESize Index, ZEItemType NewItem);
 		inline ZEItemType*				MassInsert(ZESize Index, ZESize ItemCount);
-		inline ZEItemType*				MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
+		inline void						MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
+		template<typename ZEAllocatorTypeOther>
+		inline void						MassInsert(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
 		inline void						Remove(ZESize Index);
 		inline void						RemoveRange(ZESize Index, ZESize Count);
 		inline void						RemoveValue(ZEItemType Value);
 		
+		template<typename ZEAllocatorTypeOther>
+		inline void						Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+
 		inline void						Clear();
-		inline void						Clear(bool PreserveAllocation);
 		
 		inline void						Enqueue(ZEItemType Value);
 		inline ZEItemType				Dequeue();
@@ -116,29 +124,36 @@ class ZEArray
 		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEItemType&, ZESearchValueType)>
 		ZESSize							BinarySearch(ZESearchValueType TargetValue) const;
 		inline ZESSize					BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*));
-
-		void							CopyTo(ZEArray<ZEItemType, ZEAllocatorType>& OtherArray) const;
-		void							CopyTo(ZEItemType* OtherArray, ZESize Count) const;
-		void							CopyFrom(const ZEItemType* OtherArray, ZESize Count);
-		void							CopyFrom(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
-		void							Combine(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
-		
+	
 		inline ZEItemType&				operator[](ZESize Index);	
 		inline const ZEItemType&		operator[](ZESize Index) const;
 
-		inline ZEArray					operator+(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
-		inline ZEArray&					operator+=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
+		template<typename ZEAllocatorTypeOther>
+		inline ZEArray					operator+(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		template<typename ZEAllocatorTypeOther>
+		inline ZEArray&					operator+=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
-		inline bool						operator==(const ZEArray<ZEItemType, ZEAllocatorType>& Other);
-		inline bool						operator!=(const ZEArray<ZEItemType, ZEAllocatorType>& Other);
+		template<typename ZEAllocatorTypeOther>
+		inline bool						operator==(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		template<typename ZEAllocatorTypeOther>
+		inline bool						operator!=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
-		inline void						operator=(const ZEArray<ZEItemType, ZEAllocatorType>& Other);
+		template<typename ZEAllocatorTypeOther>
+		inline void						operator=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		inline void						operator=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
+
+		void							LockRead() const;
+		void							UnlockRead() const;
+
+		void							LockWrite();
+		void							UnlockWrite();
 
 										ZEArray();
-										ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& C);
+										template<typename ZEAllocatorTypeOther>
+										ZEArray(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+										ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
 										~ZEArray();
 };
-
 
 template <typename ZEItemType, ZEInt Exponent = 2>
 class ZESmartArray : public ZEArray<ZEItemType, ZESmartAllocator<ZEItemType, Exponent> >
@@ -155,17 +170,26 @@ class ZEChunkArray : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, Chu
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::SetCount(ZESize Count)
 {
+	Lock.LockWriteNested();
+
 	if (Count == this->Count)
+	{
+		Lock.UnlockWrite();
 		return;
+	}
 
 	this->Count = Count;
 
 	ZEItemType* OldItems = Items;
 	if (Allocator.Allocate(&Items, Count))
+	{
 		if (OldItems != NULL)
 			delete[] OldItems;
+	}
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -177,27 +201,44 @@ ZESize ZEArray<ZEItemType, ZEAllocatorType>::GetCount() const
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Resize(ZESize Count)
 {
+	Lock.LockWriteNested();
+
 	if (Count == this->Count)
+	{
+		Lock.UnlockWrite();
 		return;
+	}
 
 	if (Count == 0)
 	{
 		SetCount(0);
+		Lock.UnlockWrite();
 		return;
 	}
 
 	Allocator.Reallocate(&Items, Count);
-
 	this->Count = Count;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+ZESize ZEArray<ZEItemType, ZEAllocatorType>::GetSize() const
+{
+	return Allocator.GetSize();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::SetItem(ZESize Index, ZEItemType Value)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	this->Items[Index] = Value;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -269,12 +310,6 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::GetCArray()
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArray<ZEItemType, ZEAllocatorType>::GetSize() const
-{
-	return Allocator.GetSize();
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
 const ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::GetConstCArray() const
 {
 	return Items;
@@ -283,9 +318,18 @@ const ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::GetConstCArray() const
 template<typename ZEItemType, typename ZEAllocatorType>
 ZESSize ZEArray<ZEItemType, ZEAllocatorType>::FindIndex(ZEItemType Item, ZESize StartIndex = 0) const
 {
+	Lock.LockRead();
+
 	for(ZESize I = StartIndex; I < Count; I++)
+	{
 		if (Items[I] == Item)
+		{
+			Lock.UnlockRead();
 			return I;
+		}
+	}
+
+	Lock.UnlockRead();
 
 	return -1;	
 }
@@ -305,16 +349,22 @@ ZESize ZEArray<ZEItemType, ZEAllocatorType>::Circular(ZESSize Index) const
 		return (CircularIndex == 0 ? 0 : Count - CircularIndex);
 	}
 	else
+	{
 		return Index % Count;
+	}
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Add()
 {
+	Lock.LockWriteNested();
+
 	Count++;
-	Allocator.Reallocate(&Items, Count); 
+	Allocator.Reallocate(&Items, Count);
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 
 	return &Items[Count - 1];
 }
@@ -322,44 +372,65 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Add()
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Add(ZEItemType NewItem)
 {
+	Lock.LockWriteNested();
+	
 	Count++;
-	Allocator.Reallocate(&Items, Count);
+	Allocator.Reallocate(&Items, Count); 
 	Items[Count - 1] = NewItem;
+
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::AddByRef(const ZEItemType& NewItem)
 {
+	Lock.LockWriteNested();
+
 	Count++;
-	Allocator.Reallocate(&Items, Count);
+	Allocator.Reallocate(&Items, Count); 
 	Items[Count - 1] = NewItem;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(ZESize ItemCount)
 {
 	Resize(Count + ItemCount);
-
 	return &Items[Count - ItemCount];
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEItemType* NewItems, ZESize ItemCount)
+void ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEItemType* NewItems, ZESize ItemCount)
 {
+	Lock.LockWriteNested();
+
 	Resize(Count + ItemCount);
 	ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items + Count - ItemCount, NewItems, ItemCount);
 
 	ZEDebugCheckMemory();
 
-	return &Items[Count - ItemCount];
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index)
+template<typename ZEAllocatorTypeOther>
+void ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
+	OtherArray.LockRead();
+	MassAdd(OtherArray.GetConstCArray(), OtherArray.GetCount());
+	OtherArray.UnlockRead();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index)
+{
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Index > Count, "Index is out of range.");
 	ZEItemType* TempPointer = this->Items;
 	bool Changed = Allocator.Allocate(&Items, Count + 1);
@@ -377,21 +448,30 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index)
 	}
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
+
+	return &Items[Index];
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index, ZEItemType NewItem)
 {
+	Lock.LockWriteNested();
 
 	Insert(Index);
 	Items[Index] = NewItem;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZESize ItemCount)
 {
+	Lock.LockWriteNested();
+
 	ZEItemType* NewBuffer;
 	if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
 	{
@@ -401,51 +481,61 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZESiz
 		Items = NewBuffer;
 	}
 	else
+	{
 		ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items + Index + ItemCount, this->Items + Index, Count - Index);
+	}
 
 	Count += ItemCount;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 
 	return &Items[Index];
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
+void ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
 {
-	ZEItemType* NewBuffer;
-	if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
-	{
-		ZEAllocatorBase<ZEItemType>::ObjectCopy(NewBuffer, this->Items, Index);
-		ZEAllocatorBase<ZEItemType>::ObjectCopy(NewBuffer + Index + ItemCount, this->Items + Index, Count - Index);
-		delete[] Items;
-		Items = NewBuffer;
-	}
-	else
-		ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items + Index + ItemCount, this->Items + Index, Count - Index);
+	Lock.LockWriteNested();
 
+	MassInsert(Index, ItemCount);
 	ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items + Index, NewItems, ItemCount);
-
-	Count += ItemCount;
 
 	ZEDebugCheckMemory();
 
-	return &Items[Index];
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+template<typename ZEAllocatorTypeOther>
+void ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+{
+	OtherArray.LockRead();
+	MassInsert(Index, OtherArray.GetConstCArray(), OtherArray.GetCount());
+	OtherArray.UnlockRead();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Remove(ZESize Index)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	ZEItemType* TempPointer = this->Items;
 	bool Changed;
 
 	if (Count > 1)
+	{
 		Changed = Allocator.Allocate(&Items, Count - 1);
+	}
 	else
 	{
 		Allocator.Deallocate(&Items);
 		Count = 0;
+		ZEDebugCheckMemory();
+		Lock.UnlockWrite();
+		
 		return;
 	}
 
@@ -462,11 +552,15 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Remove(ZESize Index)
 	Count--;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::RemoveRange(ZESize Index, ZESize Count)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Index + Count >= Count, "Index and Count is out of range.");
 
 	ZEItemType* TempPointer = this->Items;
@@ -480,6 +574,9 @@ void ZEArray<ZEItemType, ZEAllocatorType>::RemoveRange(ZESize Index, ZESize Coun
 	{
 		Allocator.Deallocate(&Items);
 		this->Count = 0;
+		ZEDebugCheckMemory();
+		Lock.UnlockWrite();
+		
 		return;
 	}
 
@@ -496,40 +593,61 @@ void ZEArray<ZEItemType, ZEAllocatorType>::RemoveRange(ZESize Index, ZESize Coun
 	this->Count -= Count;
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::RemoveValue(ZEItemType Value)
 {
+	Lock.LockWriteNested();
+
 	ZESize N = 0, OldCount = Count;
 
 	for(ZEItemType* I = Items; I < Items + OldCount; I++)
+	{
 		if (*I != Value)
-		{
 			Items[N++] = *I;
-		}
 		else
 			Count--;
+	}
 
 	Allocator.Reallocate(&Items, Count);
 
 	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+template<typename ZEAllocatorTypeOther>
+void ZEArray<ZEItemType, ZEAllocatorType>::Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+{
+	OtherArray.LockRead();
+
+	Lock.LockWriteNested();
+	
+	SetCount(OtherArray.GetCount());
+	ZEAllocatorBase<ZEItemType>::ObjectCopy(Items, OtherArray.GetConstCArray(), OtherArray.GetCount());
+	
+	ZEDebugCheckMemory();
+
+	Lock.UnlockWrite();
+
+	OtherArray.UnlockRead();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Clear()
 {
+	Lock.LockWriteNested();
+
 	Allocator.Deallocate(&Items);
 	Count = 0;
-}
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Clear(bool PreserveAllocation)
-{
-	if (PreserveAllocation)
-		Allocator.Deallocate(&Items);
+	ZEDebugCheckMemory();
 
-	Count = 0;
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -541,9 +659,14 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Enqueue(ZEItemType Value)
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Dequeue()
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Count == 0, "There is no item in the queue.");
 	ZEItemType Temp = Items[0];
 	Remove(0);
+
+	Lock.UnlockWrite();
+
 	return Temp;			
 }
 
@@ -556,84 +679,75 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Push(ZEItemType Value)
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Pop()
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Count == 0, "There is no item in the stack.");
 	ZEItemType Temp = Items[Count - 1];
 	Remove(Count - 1);
+	
+	Lock.UnlockWrite();
+
 	return Temp;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Fill(ZEItemType Value)
 {
+	Lock.LockWriteNested();
+
 	for (ZESize I = 0; I < Count; I++)
 		Items[I] = Value;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::Traverse()
 {
+	Lock.LockWriteNested();
+
 	for (ZESize I = 0; I < Count / 2; I++)
 	{
 		ZEItemType Temp = Items[I];
 		Items[I] = Items[Count - I - 1];
 		Items[Count - I - 1] = Temp;
 	}
-}
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::CopyTo(ZEArray<ZEItemType, ZEAllocatorType>& OtherArray) const
-{
-	OtherArray.SetCount(Count);
-	ZEAllocatorBase<ZEItemType>::ObjectCopy(OtherArray.Items, this->Items, Count);
-	ZEDebugCheckMemory();
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::CopyTo(ZEItemType* OtherArray, ZESize Count) const
-{
-	ZEAllocatorBase<ZEItemType>::ObjectCopy(OtherArray, this->Items, Count > this->Count ? this->Count : Count);
-	ZEDebugCheckMemory();
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::CopyFrom(const ZEItemType* OtherArray, ZESize Count)
-{
-	this->SetCount(Count);
-	ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items, OtherArray, Count);	
-
-	ZEDebugCheckMemory();
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::CopyFrom(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
-{
-	CopyFrom(OtherArray.GetConstCArray(), OtherArray.Count);
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Combine(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
-{
-	MassAdd(OtherArray.Items, OtherArray.Count);
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
 void ZEArray<ZEItemType, ZEAllocatorType>::Sort()
 {
+	Lock.LockWriteNested();
 	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 template<ZEInt CompareFunction(const ZEItemType&, const ZEItemType&)>
 void ZEArray<ZEItemType, ZEAllocatorType>::Sort2()
 {
+	Lock.LockWriteNested();
 	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+void ZEArray<ZEItemType, ZEAllocatorType>::Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
+{
+	Lock.LockWriteNested();
+	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 template<typename ZESearchValueType, ZEInt CompareFunction(const ZEItemType&, ZESearchValueType)>
 ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(ZESearchValueType TargetValue) const
 {
+	Lock.LockRead();
+
 	ZESSize Low = 0;
 	ZESSize High = Count;
 	while (Low <= High) 
@@ -641,29 +755,40 @@ ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(ZESearchValueType Tar
 		ZESSize Middle = Low + (High - Low) / 2;
 		ZEInt Result = CompareFunction(Items[Middle], TargetValue);
 		if (Result > 0)
+		{
 			Low = Middle + 1;
+		}
 		else if (Result < 0)
+		{
 			High = Middle - 1;
+		}
 		else
+		{
+			Lock.UnlockRead();
 			return Middle;
+		}
 	}
-	return -1;
-}
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
-{
-	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
+	Lock.UnlockRead();
+	return -1;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
 {
+	Lock.LockRead();
 	void* Result = bsearch(&Element, Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))(CompareFunction));
 	if (Result == NULL)
+	{
+		Lock.UnlockRead();
 		return -1;
+	}
 	else
-		return ((ZEItemType*)Result - Items);
+	{
+		ZESize Output = ((ZEItemType*)Result - Items); 
+		Lock.UnlockRead();
+		return Output;
+	}
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -681,51 +806,110 @@ const ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::operator[](ZESize Index)
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::operator+(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
+template<typename ZEAllocatorTypeOther>
+ZEArray<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::operator+(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
 	ZEArray Temp;
-	Temp.MassAdd(Items, Count);
-	Temp.MassAdd(OtherArray.Items, OtherArray.Count);
+	Temp.MassAdd(*this);
+	Temp.MassAdd(OtherArray);
 	return Temp;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType>& ZEArray<ZEItemType, ZEAllocatorType>::operator+=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
+template<typename ZEAllocatorTypeOther>
+ZEArray<ZEItemType, ZEAllocatorType>& ZEArray<ZEItemType, ZEAllocatorType>::operator+=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
-	this->MassAdd(OtherArray.Items, OtherArray.Count);
+	MassAdd(OtherArray);
 	return *this;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArray<ZEItemType, ZEAllocatorType>::operator==(const ZEArray<ZEItemType, ZEAllocatorType>& Other)
+template<typename ZEAllocatorTypeOther>
+bool ZEArray<ZEItemType, ZEAllocatorType>::operator==(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
-	if (Count != Other.Count)
+	Lock.LockRead();
+
+	if (Count != OtherArray.Count)
+	{
+		Lock.UnlockRead();
 		return false;
+	}
 
 	for (ZESize I = 0; I < Count; I++)
-		if (Items[I] != Other.Items[I])
+	{
+		if (Items[I] != OtherArray.Items[I])
+		{
+			Lock.UnlockRead();
 			return false;
+		}
+	}
+
+	Lock.UnlockRead();
 
 	return true;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArray<ZEItemType, ZEAllocatorType>::operator!=(const ZEArray<ZEItemType, ZEAllocatorType>& Other)
+template<typename ZEAllocatorTypeOther>
+bool ZEArray<ZEItemType, ZEAllocatorType>::operator!=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
-	if (Count != Other.Count)
+	Lock.LockRead();
+
+	if (Count != OtherArray.Count)
+	{
+		Lock.UnlockRead();
 		return true;
+	}
 
 	for (ZESize I = 0; I < Count; I++)
-		if (Items[I] != Other.Items[I])
-			return true;
+	{
+		if (Items[I] == OtherArray.Items[I])
+		{
+			Lock.UnlockRead();
+			return false;
+		}
+	}
 
-	return false;
+	Lock.UnlockRead();
+
+	return true;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::operator=(const ZEArray<ZEItemType, ZEAllocatorType>& Other)
+void ZEArray<ZEItemType, ZEAllocatorType>::LockRead() const
 {
-	CopyFrom(Other);
+	Lock.LockRead();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+void ZEArray<ZEItemType, ZEAllocatorType>::UnlockRead() const
+{
+	Lock.UnlockRead();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+void ZEArray<ZEItemType, ZEAllocatorType>::LockWrite()
+{
+	Lock.LockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+void ZEArray<ZEItemType, ZEAllocatorType>::UnlockWrite()
+{
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+void ZEArray<ZEItemType, ZEAllocatorType>::operator=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
+{
+	Copy(OtherArray);
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+template<typename ZEAllocatorTypeOther>
+void ZEArray<ZEItemType, ZEAllocatorType>::operator=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+{
+	Copy(OtherArray);
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -736,15 +920,24 @@ ZEArray<ZEItemType, ZEAllocatorType>::ZEArray()
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType>::ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& C)
+ZEArray<ZEItemType, ZEAllocatorType>::ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
 {
 	Items = NULL;
 	Count = 0;
-	CopyFrom(C);
+	Copy(OtherArray);
+}
+
+template<typename ZEItemType, typename ZEAllocatorType>
+template<typename ZEAllocatorTypeOther>
+ZEArray<ZEItemType, ZEAllocatorType>::ZEArray(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+{
+	Items = NULL;
+	Count = 0;
+	Copy(OtherArray);
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEArray<ZEItemType, ZEAllocatorType>::~ZEArray()
 {
-	Allocator.Deallocate(&Items);
+	Clear();
 }
