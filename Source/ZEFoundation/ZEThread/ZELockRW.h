@@ -41,15 +41,17 @@ class ZELockRW
 {
 	ZE_COPY_NO_ACTION(ZELockRW)
 	private:
-		ZELock					Lock;
+		ZELock					ReaderLock;
 		ZELock					AccessLock;
-		ZEInt32					ReaderCount;
+		volatile ZEInt32		ReaderCount;
+		volatile ZEInt32		WriterCount;
 
 	public:
 		void					LockRead();
 		void					UnlockRead();
 
 		void					LockWrite();
+		void					LockWriteNested();
 		void					UnlockWrite();
 
 								ZELockRW();

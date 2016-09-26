@@ -318,13 +318,13 @@ ZESize ZETextureSurface::GetSize()
 ZETextureSurface::ZETextureSurface()
 {
 	Owner = NULL;
-	Levels.Clear(false);
+	Levels.Clear();
 }
 
 // Dest
 ZETextureSurface::~ZETextureSurface()
 {
-	Levels.Clear(false);
+	Levels.Clear();
 }
 
 // Creates the texture by allocating surface, levels and enough memory based on texture type
@@ -495,12 +495,12 @@ void ZETextureData::Destroy()
 		// Clear surface data
 		Surfaces[I].Surface = 0;
 		Surfaces[I].Owner	= NULL;
-		Surfaces[I].Levels.Clear(false);
+		Surfaces[I].Levels.Clear();
 
 	}
 
 	// Clear surfaces
-	Surfaces.Clear(false);
+	Surfaces.Clear();
 
 	// Clear texture data
 	this->Info.Width		= 0;
@@ -620,13 +620,13 @@ ZETextureData::ZETextureData()
 	Info.Type			= ZEGR_TT_2D;
 	Info.PixelFormat	= ZEGR_TF_NONE;
 
-	Surfaces.Clear(false);
+	Surfaces.Clear();
 }
 
 //Dest
 ZETextureData::~ZETextureData()
 {
-	Surfaces.Clear(false);
+	Surfaces.Clear();
 }
 
 // Converts a single surface, single level texture data to 6 surface texture data

@@ -199,12 +199,12 @@ void ZELCLicenseManager::LoadLicenses()
 	ZEArray<ZELCLicense> SystemWideLicenses = LoadLicenseFile("#S:/License.ZELicense");
 	for(ZESize I = 0; I < SystemWideLicenses.GetCount(); I++)
 		SystemWideLicenses[I].SetSystemWide(true);
-	Licenses.Combine(SystemWideLicenses);
+	Licenses.MassAdd(SystemWideLicenses);
 
 	ZEArray<ZELCLicense> InstanceLicenses = LoadLicenseFile("#US:/License.ZELicense");
 	for(ZESize I = 0; I < InstanceLicenses.GetCount(); I++)
 		InstanceLicenses[I].SetSystemWide(false);
-	Licenses.Combine(InstanceLicenses);
+	Licenses.MassAdd(InstanceLicenses);
 }
 
 void ZELCLicenseManager::SaveLicenses()

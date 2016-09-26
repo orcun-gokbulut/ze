@@ -39,46 +39,66 @@
 
 #include "ZEError.h"
 
+ZE_COPY_NO_ACTION_IMP(ZELockRW)
+
 void ZELockRW::LockRead()
 {
-	Lock.Lock();
+	ReaderLock.Lock();
+
 	if (ReaderCount == 0)
 		AccessLock.Lock();
 	ReaderCount++;
-	Lock.Unlock();
+	
+	ReaderLock.Unlock();
 }
 
 void ZELockRW::UnlockRead()
 {
-	Lock.Lock();
-	zeDebugCheck(ReaderCount <= 0, "Lock is not locked for reading.");
+	ReaderLock.Lock();
+	
+	zeDebugCheck(ReaderCount == 0, "Lock is not locked for reading.");
+	zeDebugCheck(WriterCount > 0, "ZELockRW::UnloadRead failed. Lock is not locked for reading.");
+	
 	ReaderCount--;
 	if (ReaderCount == 0)
 		AccessLock.Unlock();
-	
-	Lock.Unlock();
+
+	ReaderLock.Unlock();
 }
 
 void ZELockRW::LockWrite()
 {
 	AccessLock.Lock();
-	ReaderCount = -1;
+	WriterCount++;
 
+	zeDebugCheck(ReaderCount != 0, "Reader count still not zero after write lock");
+}
+
+void ZELockRW::LockWriteNested()
+{
+	AccessLock.LockNested();
+	WriterCount++;
+
+	zeDebugCheck(ReaderCount != 0, "Reader count still not zero after write lock");
 }
 
 void ZELockRW::UnlockWrite()
 {
-	zeDebugCheck(ReaderCount != -1, "Lock is not locked for writing.");
+	zeDebugCheck(ReaderCount > 0, "Lock is not locked for writing. It is locked for reading.");
+	zeDebugCheck(WriterCount == 0, "Lock is not locked for writing.");
+	
+	WriterCount--;
 	AccessLock.Unlock();
 }
 
 ZELockRW::ZELockRW()
 {
 	ReaderCount = 0;
+	WriterCount = 0;
 }
 
 ZELockRW::~ZELockRW()
 {
-	zeDebugCheck(ReaderCount == -1, "Destroying ZELockRW. Lock is still locked for writing.");
-	zeDebugCheck(ReaderCount != 0, "Destroying ZELockRW. Lock is still locked for reading.");
+	zeDebugCheck(ReaderCount < 0, "Destroying ZELockRW. Lock is still locked for writing.");
+	zeDebugCheck(ReaderCount > 0, "Destroying ZELockRW. Lock is still locked for reading.");
 }
