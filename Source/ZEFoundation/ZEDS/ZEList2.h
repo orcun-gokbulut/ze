@@ -39,6 +39,7 @@
 #include "ZEError.h"
 #include "ZELink.h"
 #include "ZEList2Iterator.h"
+#include "ZEThread\ZELockRW.h"
 
 template<typename ZEItemType>
 class ZEList2
@@ -47,6 +48,7 @@ class ZEList2
 		ZELink<ZEItemType>*					First;
 		ZELink<ZEItemType>*					Last;
 		ZESize								Count;
+		mutable ZELockRW					Lock;
 
 	public:
 		ZEList2Iterator<ZEItemType>			GetIterator();
@@ -89,9 +91,15 @@ class ZEList2
 		void								Sort();
 		void								Clear();
 
-		ZEItemType*							operator[](ZESize Index) const;
+		void								LockRead() const;
+		void								UnlockRead() const;
+
+		void								LockWrite();
+		void								UnlockWrite();
 
 		const ZEList2<const ZEItemType>&	ToInspector() const;
+
+		ZEItemType*							operator[](ZESize Index) const;
 
 											//ZE_COPY_NO_ACTION
 											ZEList2& operator=(const ZEList2& Other);
@@ -163,6 +171,8 @@ ZESize ZEList2<ZEItemType>::GetCount() const
 template<typename ZEItemType>
 ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink)
 {
+	Lock.LockRead();
+
 	zeDebugCheck(StartLink != NULL && !Exists(StartLink), "Start link is not in this list.");
 
 	ZELink<ZEItemType>* Cursor = First;
@@ -172,17 +182,23 @@ ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, ZELink<ZEI
 	while(Cursor != NULL)
 	{
 		if (Cursor->GetItem() == Item)
+		{
+			Lock.UnlockRead();
 			return Cursor;
+		}
 
 		Cursor = Cursor->Next;
 	}
 
+	Lock.UnlockRead();
 	return NULL;
 }
 
 template<typename ZEItemType>
 const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink) const
 {
+	Lock.LockRead();
+
 	zeDebugCheck(StartLink != NULL && !Exists(StartLink), "Start link is not in this list.");
 
 	const ZELink<ZEItemType>* Cursor = First;
@@ -192,31 +208,44 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, cons
 	while(Cursor != NULL)
 	{
 		if (Cursor->GetItem() == Item)
+		{
+			Lock.UnlockRead();
 			return Cursor;
+		}
 
 		Cursor = Cursor->Next;
 	}
 
+	Lock.UnlockRead();
 	return NULL;
 }
 
 template<typename ZEItemType>
 ZESSize ZEList2<ZEItemType>::FindIndex(ZELink<ZEItemType>* Link) const
 {
+	Lock.LockRead();
+
 	if (!Link->InUse)
+	{
+		Lock.UnlockRead();
 		return -1;
+	}
 
 	ZESize Index = 0;
 	const ZELink<ZEItemType>* Cursor = First;
 	while(Cursor != NULL)
 	{
 		if (Cursor == Link)
+		{
+			Lock.UnlockRead();
 			return Index;
+		}
 
 		Cursor = Cursor->Next;
 		Index++;
 	}
 
+	Lock.UnlockRead();
 	return -1;
 }
 
@@ -229,6 +258,8 @@ bool ZEList2<ZEItemType>::Exists(ZELink<ZEItemType>* Link)
 template<typename ZEItemType>
 ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index)
 {
+	Lock.LockRead();
+
 	zeDebugCheck(Index >= Count, "Index parameter is out of range.");
 	ZELink<ZEItemType>* Cursor = First;
 	while(Index != 0)
@@ -237,12 +268,15 @@ ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index)
 		Index--;
 	}
 
+	Lock.UnlockRead();
 	return Cursor;
 }
 
 template<typename ZEItemType>
 const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index) const
 {
+	Lock.LockRead();
+
 	zeDebugCheck(Index >= Count, "Index parameter is out of range.");
 	const ZELink<ZEItemType>* Cursor = First;
 	while(Index != 0)
@@ -251,6 +285,7 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index) const
 		Index--;
 	}
 
+	Lock.UnlockRead();
 	return Cursor;
 }
 
@@ -263,6 +298,8 @@ ZEItemType* ZEList2<ZEItemType>::GetItem(ZESize Index) const
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
 	zeDebugCheck(Link->List != NULL, "Link already cointained in a list.");
@@ -281,11 +318,15 @@ void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
 	{
 		InsertBefore(First, Link);
 	}
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
 	zeDebugCheck(Link->List != NULL, "Link already cointained in a list.");
@@ -305,11 +346,15 @@ void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 	{
 		InsertAfter(Last, Link);
 	}
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
@@ -331,11 +376,15 @@ void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemTy
 	Link->Prev = NewLink;
 
 	Count++;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
@@ -357,11 +406,15 @@ void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemTyp
 	Link->Next = NewLink;
 
 	Count++;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 
@@ -383,11 +436,15 @@ void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 	#endif
 
 	Count--;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 {
+	Lock.LockWriteNested();
+
 	zeDebugCheck(A == NULL, "A parameter cannot be null.");
 	zeDebugCheck(!Exists(A), "A link is not in this list.");
 
@@ -412,13 +469,20 @@ void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 		Last = B;
 	else if (Last == B)
 		Last = A;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 {
+	Lock.LockWriteNested();
+
 	if (OtherList.GetFirst() == NULL)
+	{
+		Lock.UnlockWrite();
 		return;
+	}
 
 	#ifdef ZE_DEBUG_ENABLE
 		ZELink<ZEItemType>* Link = OtherList.GetFirst();
@@ -446,13 +510,20 @@ void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 	OtherList.First = NULL;
 	OtherList.Last = NULL;
 	OtherList.Count = 0;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
 {
+	Lock.LockWriteNested();
+
 	if (OtherList.GetLast() == NULL)
+	{
+		Lock.UnlockWrite();
 		return;
+	}
 
 	#ifdef ZE_DEBUG_ENABLE
 		ZELink<ZEItemType>* Link = OtherList.GetFirst();
@@ -480,11 +551,15 @@ void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
 	OtherList.First = NULL;
 	OtherList.Last = NULL;
 	OtherList.Count = 0;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
 inline void ZEList2<ZEItemType>::Clear()
 {
+	Lock.LockWriteNested();
+
 	ZELink<ZEItemType>* Link = First;
 	while(Link != NULL)
 	{
@@ -501,6 +576,32 @@ inline void ZEList2<ZEItemType>::Clear()
 	First = NULL;
 	Last = NULL;
 	Count = 0;
+
+	Lock.UnlockWrite();
+}
+
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::LockRead() const
+{
+	Lock.LockRead();
+}
+
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::UnlockRead() const
+{
+	Lock.UnlockRead();
+}
+
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::LockWrite()
+{
+	Lock.LockWrite();
+}
+
+template<typename ZEItemType>
+void ZEList2<ZEItemType>::UnlockWrite()
+{
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
@@ -512,6 +613,8 @@ const ZEList2<const ZEItemType>& ZEList2<ZEItemType>::ToInspector() const
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::Reverse()
 {
+	Lock.LockWriteNested();
+
 	ZELink<ZEItemType>* Temp;
 
 	ZELink<ZEItemType>* Link = First;
@@ -527,6 +630,8 @@ void ZEList2<ZEItemType>::Reverse()
 	Temp = First;
 	First = Last;
 	Last = Temp;
+
+	Lock.UnlockWrite();
 }
 
 template<typename ZEItemType>
@@ -565,8 +670,9 @@ template<typename ZEItemType>
 template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
 void ZEList2<ZEItemType>::Sort()
 {
-	// Source: ideasman42/linked_list_sort.c - https://gist.github.com/ideasman42/5921b0edfc6aa41a9ce0
+	Lock.LockWriteNested();
 
+	// Source: ideasman42/linked_list_sort.c - https://gist.github.com/ideasman42/5921b0edfc6aa41a9ce0
 	int BlockSize = 1, BlockCount;
 	do 
 	{
@@ -623,4 +729,6 @@ void ZEList2<ZEItemType>::Sort()
 		BlockSize <<= 1;
 	} 
 	while (BlockCount > 1);
+
+	Lock.UnlockWrite();
 }
