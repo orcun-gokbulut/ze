@@ -300,9 +300,9 @@ bool ZECVModelConverterV2::ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode
 
 	if (Skinned)
 	{
-		ZEArray<ZEMDVertexSkinV2>	VerticesSkin;
-		VerticesSkin.SetCount(MainLODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexSkinV2));
-		if (!MainLODNode.ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkinV2), VerticesSkin.GetCount()))
+		ZEArray<ZEMDVertexSkinV1>	VerticesSkin;
+		VerticesSkin.SetCount(MainLODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexSkinV1));
+		if (!MainLODNode.ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkinV1), VerticesSkin.GetCount()))
 			return false;
 
 		if (VerticesSkin.GetCount() == 0)
@@ -311,7 +311,7 @@ bool ZECVModelConverterV2::ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode
 		}
 		else
 		{
-			BoundingBox.Min = BoundingBox.Max = VerticesSkin[0].Position;
+			BoundingBox = ZEAABBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
 
 			for (ZESize I = 0; I < VerticesSkin.GetCount(); I++)
 			{
@@ -327,9 +327,9 @@ bool ZECVModelConverterV2::ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode
 	}
 	else
 	{
-		ZEArray<ZEMDVertexV2>	Vertices;
-		Vertices.SetCount(MainLODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexV2));
-		if (!MainLODNode.ReadDataItems("Vertices", Vertices.GetCArray(), sizeof(ZEMDVertexV2), Vertices.GetCount()))
+		ZEArray<ZEMDVertexV1>	Vertices;
+		Vertices.SetCount(MainLODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexV1));
+		if (!MainLODNode.ReadDataItems("Vertices", Vertices.GetCArray(), sizeof(ZEMDVertexV1), Vertices.GetCount()))
 		{
 			zeError("Cannot read LOD vertex data.");
 			return false;
@@ -341,7 +341,7 @@ bool ZECVModelConverterV2::ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode
 		}
 		else
 		{
-			BoundingBox.Min = BoundingBox.Max = Vertices[0].Position;
+			BoundingBox = ZEAABBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
 
 			for (ZESize I = 0; I < Vertices.GetCount(); I++)
 			{

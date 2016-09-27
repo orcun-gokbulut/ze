@@ -313,7 +313,7 @@ const ZEMatrix4x4& ZEModelBone::GetInitialModelTransform() const
 	if (DirtyFlags.GetFlags(ZEMD_BDF_INITIAL_MODEL_TRANSFORM))
 	{
 		if (Parent == NULL)
-			InitialModelTransform = GetTransform();
+			InitialModelTransform = GetInitialTransform();
 		else
 			ZEMatrix4x4::Multiply(InitialModelTransform, Parent->GetInitialModelTransform(), GetInitialTransform());
 
