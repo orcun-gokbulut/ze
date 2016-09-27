@@ -71,6 +71,7 @@ bool ZELock::IsLocked() const
 ZEUInt32 ZELock::Queue()
 {
 	zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
+
 	return AtomicIncrement(&NextNumber);
 }
 
@@ -86,9 +87,9 @@ void ZELock::Wait(ZEUInt32 Number) const
 
 void ZELock::Release(ZEUInt32 Number)
 {
-	zeDebugCheck(OwnerThreadId == 0, "Lock cannot be release because it is not locked.");
+	zeDebugCheck(CurrentNumber == NextNumber + 1, "Lock cannot be release because it is not locked.");
 	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acquired yet by given number.");
-	//zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
+	zeDebugCheck(OwnerThreadId != 0 && OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
 	
 	NestingCount--;
 
@@ -144,6 +145,25 @@ void ZELock::LockNested()
 	Wait(MyNumber);
 
 	OwnerThreadId = ZEThread::GetCurrentThreadId();
+	NestingCount++;
+
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_acquired(this);
+	#endif
+}
+
+void ZELock::LockInterthreaded()
+{
+	zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
+
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_prepare(this);
+	#endif
+
+	ZEInt32 MyNumber = Queue();
+	Wait(MyNumber);
+
+	OwnerThreadId = 0;
 	NestingCount++;
 
 	#ifdef ZE_VTUNE_ENABLED

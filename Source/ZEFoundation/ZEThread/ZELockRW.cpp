@@ -46,7 +46,8 @@ void ZELockRW::LockRead()
 	ReaderLock.Lock();
 
 	if (ReaderCount == 0)
-		AccessLock.Lock();
+		AccessLock.LockInterthreaded();
+
 	ReaderCount++;
 	
 	ReaderLock.Unlock();

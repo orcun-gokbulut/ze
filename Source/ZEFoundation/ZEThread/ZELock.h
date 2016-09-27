@@ -45,6 +45,7 @@
 class ZELock
 {
 	ZE_COPY_NO_ACTION(ZELock)
+	friend class ZELockRW;
 	private:
 		volatile ZEInt32		CurrentNumber;
 		volatile ZEInt32		NextNumber;
@@ -63,6 +64,7 @@ class ZELock
 		// Sync Methods
 		void					Lock();
 		void					LockNested();
+		void					LockInterthreaded();
 		void					Wait() const;
 		void					Unlock();
 
