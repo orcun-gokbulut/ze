@@ -245,7 +245,7 @@ void ZENavigationMeshGenerator::RemoveUnwalkable(ZEArray<ZEPolygon>& Output, con
 		if (ZEVector3::DotProduct(Input[I].GetNormal(), Up) > CosMaxDegree)
 			Count++;
 
-	Output.MassAdd(Count);
+	Output.AddMultiple(Count);
 	ZESize Index = 0;
 	for (ZESize I = 0; I < Input.GetCount(); I++)
 		if (ZEVector3::DotProduct(Input[I].GetNormal(), Up) > CosMaxDegree)
@@ -402,7 +402,7 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 				if (CheckInternalAngle(GetVertex(A, I), Mesh.Normals[A.NormalIndex], GetVertex(A, I - 1), GetVertex(B, N + 1)) &&
 					CheckInternalAngle(GetVertex(A, I + 1), Mesh.Normals[A.NormalIndex], GetVertex(B, N - 2), GetVertex(A, I + 2)))
 				{
-					Output.VertexIndices.MassAdd(A.VertexIndices.GetCount() + B.VertexIndices.GetCount() - 2);
+					Output.VertexIndices.AddMultiple(A.VertexIndices.GetCount() + B.VertexIndices.GetCount() - 2);
 					Output.NormalIndex = A.NormalIndex;
 
 					ZESize Index = 0;

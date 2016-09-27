@@ -404,7 +404,7 @@ void ZEMCParser::ProcessMemberAttributes(ZEMCDeclaration* Declaration, Decl* Cla
 			ZEMCAttribute NewAttribute;
 			NewAttribute.Owner = Declaration;
 			NewAttribute.Name = ClassAttributes[I].Values[0];
-			NewAttribute.Values.MassAdd(ClassAttributes[I].Values.GetCArray() + 1, ClassAttributes[I].Values.GetCount() - 1);
+			NewAttribute.Values.AddMultiple(ClassAttributes[I].Values.GetCArray() + 1, ClassAttributes[I].Values.GetCount() - 1);
 			Declaration->AttributeStack.Add(NewAttribute);
 		}
 	}

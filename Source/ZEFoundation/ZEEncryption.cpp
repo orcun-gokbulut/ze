@@ -62,7 +62,7 @@ void ZELCEncryption::AESEncrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESi
 	Output.SetCount(InputSize);
 	Encryption.ProcessData(Output.GetCArray(), (const byte*)Input, InputSize);
 	
-	Output.MassInsert(0, iv, CryptoPP::AES::BLOCKSIZE);
+	Output.InsertMultiple(0, iv, CryptoPP::AES::BLOCKSIZE);
 }
 
 void ZELCEncryption::AESDecrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* Key, ZESize KeySize)

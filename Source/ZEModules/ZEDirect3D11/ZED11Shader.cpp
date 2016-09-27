@@ -44,32 +44,32 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary
 	{
 		case ZEGR_ST_VERTEX:
 			Result = GetDevice()->CreateVertexShader(ShaderBinary, Size, NULL, &VertexShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_DOMAIN:
 			Result = GetDevice()->CreateDomainShader(ShaderBinary, Size, NULL, &DomainShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_HULL:
 			Result = GetDevice()->CreateHullShader(ShaderBinary, Size, NULL, &HullShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_GEOMETRY:
 			Result = GetDevice()->CreateGeometryShader(ShaderBinary, Size, NULL, &GeometryShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_PIXEL:
 			Result = GetDevice()->CreatePixelShader(ShaderBinary, Size, NULL, &PixelShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_COMPUTE:
 			Result = GetDevice()->CreateComputeShader(ShaderBinary, Size, NULL, &ComputeShader);
-			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
+			ByteCode.AddMultiple((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		default:

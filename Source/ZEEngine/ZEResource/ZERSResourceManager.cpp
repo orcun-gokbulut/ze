@@ -310,7 +310,7 @@ ZEArray<const ZERSResourceGroup*> ZERSResourceManager::GetResourceGroups()
 {
 	ManagerLock.Lock();
 	ZEArray<const ZERSResourceGroup*> Snapshot;
-	Snapshot.MassAdd(ResourceGroups.GetCArray(), ResourceGroups.GetCount());
+	Snapshot.AddMultiple(ResourceGroups.GetCArray(), ResourceGroups.GetCount());
 	ManagerLock.Unlock();
 
 	return Snapshot;
