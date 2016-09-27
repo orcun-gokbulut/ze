@@ -126,7 +126,7 @@ class ZEGraph
 
 		void MassAddNode(ZESize Count)
 		{
-			Nodes.MassAdd(Count);
+			Nodes.AddMultiple(Count);
 		}
 
 		void RemoveNode(ZESize NodeIndex)

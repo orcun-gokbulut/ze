@@ -85,20 +85,20 @@ class ZEArray
 		inline ZEItemType*				Add();
 		inline void						AddByRef(const ZEItemType& NewItem);
 		inline void						Add(ZEItemType NewItem);
-		inline ZEItemType*				MassAdd(ZESize ItemCount);
-		inline void						MassAdd(const ZEItemType* NewItems, ZESize ItemCount);
+		inline ZEItemType*				AddMultiple(ZESize ItemCount);
+		inline void						AddMultiple(const ZEItemType* NewItems, ZESize ItemCount);
 		template<typename ZEAllocatorTypeOther>
-		inline void						MassAdd(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		inline void						AddMultiple(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
 		inline ZEItemType*				Insert(ZESize Index);
 		inline void						Insert(ZESize Index, ZEItemType NewItem);
-		inline ZEItemType*				MassInsert(ZESize Index, ZESize ItemCount);
-		inline void						MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
+		inline ZEItemType*				InsertMultiple(ZESize Index, ZESize ItemCount);
+		inline void						InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
 		template<typename ZEAllocatorTypeOther>
-		inline void						MassInsert(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		inline void						InsertMultiple(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
 
 		inline void						Remove(ZESize Index);
-		inline void						RemoveRange(ZESize Index, ZESize Count);
+		inline void						RemoveMultiple(ZESize Index, ZESize Count);
 		inline void						RemoveValue(ZEItemType Value);
 		
 		template<typename ZEAllocatorTypeOther>
@@ -398,14 +398,14 @@ void ZEArray<ZEItemType, ZEAllocatorType>::AddByRef(const ZEItemType& NewItem)
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(ZESize ItemCount)
+ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(ZESize ItemCount)
 {
 	Resize(Count + ItemCount);
 	return &Items[Count - ItemCount];
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEItemType* NewItems, ZESize ItemCount)
+void ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(const ZEItemType* NewItems, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
@@ -419,10 +419,10 @@ void ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEItemType* NewItems, Z
 
 template<typename ZEItemType, typename ZEAllocatorType>
 template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::MassAdd(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+void ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
 	OtherArray.LockRead();
-	MassAdd(OtherArray.GetConstCArray(), OtherArray.GetCount());
+	AddMultiple(OtherArray.GetConstCArray(), OtherArray.GetCount());
 	OtherArray.UnlockRead();
 }
 
@@ -468,7 +468,7 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index, ZEItemType NewIt
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZESize ItemCount)
+ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
@@ -495,11 +495,11 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZESiz
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
+void ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
-	MassInsert(Index, ItemCount);
+	InsertMultiple(Index, ItemCount);
 	ZEAllocatorBase<ZEItemType>::ObjectCopy(this->Items + Index, NewItems, ItemCount);
 
 	ZEDebugCheckMemory();
@@ -509,10 +509,10 @@ void ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, ZEItemType* 
 
 template<typename ZEItemType, typename ZEAllocatorType>
 template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::MassInsert(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+void ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
 	OtherArray.LockRead();
-	MassInsert(Index, OtherArray.GetConstCArray(), OtherArray.GetCount());
+	InsertMultiple(Index, OtherArray.GetConstCArray(), OtherArray.GetCount());
 	OtherArray.UnlockRead();
 }
 
@@ -557,7 +557,7 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Remove(ZESize Index)
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::RemoveRange(ZESize Index, ZESize Count)
+void ZEArray<ZEItemType, ZEAllocatorType>::RemoveMultiple(ZESize Index, ZESize Count)
 {
 	Lock.LockWriteNested();
 
@@ -604,7 +604,7 @@ void ZEArray<ZEItemType, ZEAllocatorType>::RemoveValue(ZEItemType Value)
 
 	ZESize N = 0, OldCount = Count;
 
-	for(ZEItemType* I = Items; I < Items + OldCount; I++)
+	for (ZEItemType* I = Items; I < Items + OldCount; I++)
 	{
 		if (*I != Value)
 			Items[N++] = *I;
@@ -819,7 +819,7 @@ template<typename ZEItemType, typename ZEAllocatorType>
 template<typename ZEAllocatorTypeOther>
 ZEArray<ZEItemType, ZEAllocatorType>& ZEArray<ZEItemType, ZEAllocatorType>::operator+=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
 {
-	MassAdd(OtherArray);
+	AddMultiple(OtherArray);
 	return *this;
 }
 

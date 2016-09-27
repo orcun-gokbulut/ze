@@ -256,12 +256,12 @@ void ZEMDAnimationData::AddKey(const ZEMDAnimationKey* Key)
 	switch (Key->GetType())
 	{
 		case ZEMD_AKT_RAW:
-			Keys.MassAdd(reinterpret_cast<const ZEBYTE*>(Key), sizeof(ZEMDAnimationKeyRaw));
+			Keys.AddMultiple(reinterpret_cast<const ZEBYTE*>(Key), sizeof(ZEMDAnimationKeyRaw));
 			break;
 
 
 		case ZEMD_AKT_QUANTIZED:
-			Keys.MassAdd(reinterpret_cast<const ZEBYTE*>(Key), sizeof(ZEMDAnimationKeyQuantized));
+			Keys.AddMultiple(reinterpret_cast<const ZEBYTE*>(Key), sizeof(ZEMDAnimationKeyQuantized));
 		
 		default:
 			zeError("Cannot add key to animation. Unknown key type.");
@@ -280,7 +280,7 @@ void ZEMDAnimationData::RemoveKey(ZESize Index)
 	
 	zeCheckError(KeySize == 0, ZE_VOID, "Cannot get key. Corrupted key data (unknwon key type). Animation Name: \"%s\".", GetName().ToCString());
 
-	Keys.RemoveRange(reinterpret_cast<ZEBYTE*>(AnimationKey) - Keys.GetCArray(), KeySize);
+	Keys.RemoveMultiple(reinterpret_cast<ZEBYTE*>(AnimationKey) - Keys.GetCArray(), KeySize);
 
 	UpdateCounters();
 }
