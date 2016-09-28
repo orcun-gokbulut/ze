@@ -167,8 +167,7 @@ void ZEModel::AnimationStateChanged()
 	{
 		if (AnimationTrack != NULL && AnimationTrack->GetState() == ZE_MAS_PLAYING)
 		{
-			SetStatic(false);
-			SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
+			SetEntityFlags((GetEntityFlags() | ZE_EF_TICKABLE) & ~ZE_EF_STATIC_SUPPORT);
 			return;
 		}
 
@@ -176,8 +175,7 @@ void ZEModel::AnimationStateChanged()
 		{
 			if (AnimationTracks[I]->GetState() == ZE_MAS_PLAYING)
 			{
-				SetStatic(false);
-				SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
+				SetEntityFlags((GetEntityFlags() | ZE_EF_TICKABLE) & ~ZE_EF_STATIC_SUPPORT);
 				return;
 			}
 			
@@ -305,7 +303,8 @@ ZEModel::ZEModel()
 	DirtyBoundingBox = true;
 	DirtyConstantBufferSkin = true;
 
-	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE);
+	SetStatic(true);
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE | ZE_EF_STATIC_SUPPORT);
 }
 
 ZEModel::~ZEModel()

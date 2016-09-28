@@ -68,11 +68,14 @@ class ZEList2
 		ZELink<ZEItemType>*					GetLink(ZESize Index);
 		const ZELink<ZEItemType>*			GetLink(ZESize Index) const;
 
-		ZELink<ZEItemType>*					Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink = NULL);
+		ZELink<ZEItemType>*					Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink = NULL);
 		const ZELink<ZEItemType>*			Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink = NULL) const;
-		ZESSize								FindIndex(ZELink<ZEItemType>* Link) const;
 
-		bool								Exists(ZELink<ZEItemType>* Link);
+		ZESSize								FindIndex(const ZEItemType* Item) const;
+		ZESSize								FindIndex(const ZELink<ZEItemType>* Link) const;
+
+		bool								Exists(const ZEItemType* Item) const;
+		bool								Exists(const ZELink<ZEItemType>* Link) const;
 
 		void								AddBegin(ZELink<ZEItemType>* Link);
 		void								AddEnd(ZELink<ZEItemType>* Link);
@@ -169,7 +172,7 @@ ZESize ZEList2<ZEItemType>::GetCount() const
 }
 
 template<typename ZEItemType>
-ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink)
+ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink)
 {
 	Lock.LockRead();
 
@@ -221,7 +224,7 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, cons
 }
 
 template<typename ZEItemType>
-ZESSize ZEList2<ZEItemType>::FindIndex(ZELink<ZEItemType>* Link) const
+ZESSize ZEList2<ZEItemType>::FindIndex(const ZELink<ZEItemType>* Link) const
 {
 	Lock.LockRead();
 
@@ -250,7 +253,42 @@ ZESSize ZEList2<ZEItemType>::FindIndex(ZELink<ZEItemType>* Link) const
 }
 
 template<typename ZEItemType>
-bool ZEList2<ZEItemType>::Exists(ZELink<ZEItemType>* Link)
+ZESSize ZEList2<ZEItemType>::FindIndex(const ZEItemType* Item) const
+{
+	Lock.LockRead();
+
+	if (Item == NULL)
+	{
+		Lock.UnlockRead();
+		return -1;
+	}
+
+	ZESize Index = 0;
+	const ZELink<ZEItemType>* Cursor = First;
+	while(Cursor != NULL)
+	{
+		if (Cursor->GetItem() == Item)
+		{
+			Lock.UnlockRead();
+			return Index;
+		}
+
+		Cursor = Cursor->Next;
+		Index++;
+	}
+
+	Lock.UnlockRead();
+	return -1;
+}
+
+template<typename ZEItemType>
+bool ZEList2<ZEItemType>::Exists(const ZEItemType* Item) const
+{
+	return FindIndex(Item) != -1;
+}
+
+template<typename ZEItemType>
+bool ZEList2<ZEItemType>::Exists(const ZELink<ZEItemType>* Link) const
 {
 	return FindIndex(Link) != -1;
 }

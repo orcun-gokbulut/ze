@@ -73,11 +73,6 @@ void ZEMDInstanceTag::Update()
 
 bool ZEMDInstanceTag::Check(const ZERNInstanceTag* Other) const
 {
-	return false;
-
-	if (!ZERNInstanceTag::Check(Other))
-		return false;
-
 	const ZEMDInstanceTag* OtherMD = static_cast<const ZEMDInstanceTag*>(Other);
 	return (Draw->GetLOD()->VertexBuffer == OtherMD->Draw->GetLOD()->VertexBuffer &&
 		Draw->GetLOD()->IndexBuffer == OtherMD->Draw->GetLOD()->IndexBuffer &&
@@ -196,7 +191,7 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	{
 		ze_for_each(Instance, Command->Instances)
 		{
-			ZEMDInstanceTag* ModelInstance = static_cast<ZEMDInstanceTag*>(Instance->InstanceTag);
+			const ZEMDInstanceTag* ModelInstance = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag);
 
 			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ModelInstance->Draw->GetMesh()->ConstantBuffer);
 		

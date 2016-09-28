@@ -71,16 +71,17 @@ class ZEOctree;
 typedef ZEFlags ZEEntityFlags;
 ZE_ENUM(ZEEntityFlag)
 {
-	ZE_EF_NONE						= 0x00,
-	ZE_EF_TICKABLE					= 0x01,
-	ZE_EF_TICKABLE_CUSTOM			= 0x02,
-	ZE_EF_RENDERABLE				= 0x04,
-	ZE_EF_RENDERABLE_CUSTOM			= 0x08,
-	ZE_EF_CULLABLE					= 0x10,
-	ZE_EF_RAY_CASTABLE				= 0x20,
-	ZE_EF_RAY_CASTABLE_CUSTOM		= 0x20,
-	ZE_EF_VOLUME_CASTABLE			= 0x40,
-	ZE_EF_VOLUME_CASTABLE_CUSTOM	= 0x80
+	ZE_EF_NONE						= 0x000,
+	ZE_EF_TICKABLE					= 0x001,
+	ZE_EF_TICKABLE_CUSTOM			= 0x002,
+	ZE_EF_RENDERABLE				= 0x004,
+	ZE_EF_RENDERABLE_CUSTOM			= 0x008,
+	ZE_EF_CULLABLE					= 0x010,
+	ZE_EF_STATIC_SUPPORT			= 0x020,
+	ZE_EF_RAY_CASTABLE				= 0x040,
+	ZE_EF_RAY_CASTABLE_CUSTOM		= 0x080,
+	ZE_EF_VOLUME_CASTABLE			= 0x100,
+	ZE_EF_VOLUME_CASTABLE_CUSTOM	= 0x200
 };
 
 ZE_ENUM(ZEEntityResult)
@@ -179,7 +180,7 @@ class ZEEntity : public ZEObject
 		void									SetScene(ZEScene* Scene);
 		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
-		void									UpdateRenderabilityState();
+		void									UpdateRenderabilityState(bool Forced = false);
 		void									UpdateTickabilityState();
 
 		void									ParentVisibleChanged();

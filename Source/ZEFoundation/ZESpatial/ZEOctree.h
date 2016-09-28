@@ -106,7 +106,7 @@ class ZEOctree
 		bool									RemoveItem(const ZEItemType& Item, const ZEVector3& Point);
 		bool									RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume);
 
-		void									Check();
+		bool									Check() const;
 
 		void									Clear();
 
@@ -115,6 +115,7 @@ class ZEOctree
 												ZEOctree();
 												~ZEOctree();
 };
+
 
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
@@ -223,8 +224,6 @@ void ZEOctree<ZEItemType>::Expand()
 template<typename ZEItemType>
 void ZEOctree<ZEItemType>::Shrink()
 {
-	return;
-
 	if (Items.GetCount() != 0)
 		return;
 
@@ -500,6 +499,8 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 	if (ItemOctant == ZE_OO_MULTIPLE)
 	{
 		Items.Add(Item);
+		zeDebugCheck(!ZEAABBox::IntersectionTest(GetBoundingBox(), Volume), "Aha");
+
 		UpdateItemCount(1);
 		return this;
 	}
@@ -520,6 +521,7 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 		if (MaxDepth == 0)
 		{
 			Items.Add(Item);
+			zeDebugCheck(!ZEAABBox::IntersectionTest(GetBoundingBox(), Volume), "Aha");
 			UpdateItemCount(1);
 			return this;
 		}
@@ -624,10 +626,42 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Vo
 }
 
 template<typename ZEItemType>
+bool ZEOctree<ZEItemType>::Check() const
+{
+	// Check Counts
+	ZESize ItemCount = 0;
+	ZESize NodeCount = 0;
+
+	for (int I = 0; I < 8; I++)
+	{
+		if (Nodes[I] == NULL)
+			continue;
+
+		if (!Nodes[I]->Check())
+			return false;
+
+		NodeCount++;
+
+		ItemCount += Nodes[I]->GetTotalItemCount();
+		NodeCount += Nodes[I]->GetTotalNodeCount();
+	}
+
+	ItemCount += Items.GetCount();
+
+	if (TotalNodeCount != NodeCount)
+		return false;
+
+	if (TotalItemCount != ItemCount)
+		return false;
+
+	return true;
+}
+
+template<typename ZEItemType>
 void ZEOctree<ZEItemType>::Clear()
 {
-	UpdateNodeCount(-TotalNodeCount);
-	UpdateItemCount(-TotalItemCount);
+	UpdateNodeCount(-(ZESSize)TotalNodeCount);
+	UpdateItemCount(-(ZESSize)TotalItemCount);
 
 	Items.Clear();
 	for (ZEInt I = 0; I < 8; I++)

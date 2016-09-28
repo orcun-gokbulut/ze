@@ -827,6 +827,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		Draw->RenderCommand.Entity = GetModel();
 		Draw->RenderCommand.Priority = 0;
 		Draw->RenderCommand.Order = DrawOrder;
+		Draw->RenderCommand.InstanceTag = (CurrentLOD->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
 
 		if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->IsLoaded())
 			continue;

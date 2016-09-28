@@ -448,7 +448,8 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		PointLightStruct* DestPointLights;
 		if (!PointLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestPointLights)))
 			return false;
-			memcpy(DestPointLights, PointLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, PointLights.GetCount()) * sizeof(PointLightStruct));
+		
+		memcpy(DestPointLights, PointLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, PointLights.GetCount()) * sizeof(PointLightStruct));
 		PointLightStructuredBuffer->Unlock();
 	}
 
@@ -457,7 +458,8 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		ProjectiveLightStruct* DestProjectiveLights;
 		if (!ProjectiveLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestProjectiveLights)))
 			return false;
-			memcpy(DestProjectiveLights, ProjectiveLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, ProjectiveLights.GetCount()) * sizeof(ProjectiveLightStruct));
+		
+		memcpy(DestProjectiveLights, ProjectiveLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, ProjectiveLights.GetCount()) * sizeof(ProjectiveLightStruct));
 		ProjectiveLightStructuredBuffer->Unlock();
 	}
 

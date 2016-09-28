@@ -422,6 +422,7 @@ void ZEMDResource::AddHelper(ZEMDResourceHelper* Helper)
 	zeCheckError(Helper == NULL, ZE_VOID, "Cannot add helper. Helper is NULL.");
 	zeCheckError(Helper->Resource != NULL, ZE_VOID, "Helper already added to a resource.");
 
+	Helper->Resource = this;
 	Helpers.AddEnd(&Helper->Link);
 }
 
@@ -430,6 +431,7 @@ void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 	zeCheckError(Helper == NULL, ZE_VOID, "Cannot remove helper. Helper is NULL.");
 	zeCheckError(Helper->Resource != this, ZE_VOID, "Cannot remove helper. Helper does not belong to this resource.");
 
+	Helper->Resource = NULL;
 	Helpers.Remove(&Helper->Link);
 }
 

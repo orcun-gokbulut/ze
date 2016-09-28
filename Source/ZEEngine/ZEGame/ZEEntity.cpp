@@ -74,7 +74,7 @@ void ZEEntity::UpdateTickabilityState()
 		GetScene()->RemoveFromTickList(this);
 }
 
-void ZEEntity::UpdateRenderabilityState()
+void ZEEntity::UpdateRenderabilityState(bool Forced)
 {
 	if (GetScene() == NULL)
 		return;
@@ -83,12 +83,14 @@ void ZEEntity::UpdateRenderabilityState()
 		(GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) && IsLoaded() ||
 		 GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM));
 
+	if (Forced)
+		GetScene()->RemoveFromRenderList(this);
+
 	if (Renderable)
 		GetScene()->AddToRenderList(this);
 	else
 		GetScene()->RemoveFromRenderList(this);
 }
-
 
 void ZEEntity::ParentVisibleChanged()
 {
@@ -654,18 +656,8 @@ void ZEEntity::SetEntityFlags(ZEEntityFlags Flags)
 
 	EntityFlags = Flags;
 
-	if (Scene == NULL)
-		return;
-
-	if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE))
-		GetScene()->AddToTickList(this);
-	else
-		GetScene()->RemoveFromTickList(this);
-
-	if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE))
-		GetScene()->AddToTickList(this);
-	else
-		GetScene()->RemoveFromTickList(this);
+	UpdateRenderabilityState(true);
+	UpdateTickabilityState();
 }
 
 void ZEEntity::SetSerialOperation(bool SerialOperation)
@@ -788,6 +780,7 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	Visible = true;
 	VisibleFlattened = true;
 	EntityFlags = ZE_EF_NONE;
+	Static = false;
 	
 	Transform = ZEMatrix4x4::Identity;
 	InvTransform = ZEMatrix4x4::Identity;
@@ -1181,7 +1174,12 @@ bool ZEEntity::GetVisible() const
 
 void ZEEntity::SetStatic(bool Static)
 {
+	if (this->Static == Static)
+		return;
+
 	this->Static = Static;
+	
+	UpdateRenderabilityState(true);
 }
 
 bool ZEEntity::GetStatic()
