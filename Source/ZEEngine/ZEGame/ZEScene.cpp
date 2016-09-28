@@ -174,28 +174,25 @@ bool ZEScene::DeinitializeInternal()
 
 void ZEScene::AddToTickList(ZEEntity* Entity)
 {
-	bool Custom = Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM);
-	bool Initialized = Entity->IsInitialized();
-
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
 	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
 
-	if (Entity->TickListLink.GetInUse())
-		return;
-
 	ZE_LOCK_SECTION(TickListLock)
 	{
+		if (Entity->TickListLink.GetInUse())
+			return;
+
 		TickList.AddEnd(&Entity->TickListLink);
 	}
 }
 
 void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 {
-	if (!Entity->TickListLink.GetInUse())
-		return;
-
 	ZE_LOCK_SECTION(TickListLock)
 	{
+		if (!Entity->TickListLink.GetInUse())
+			return;
+
 		TickList.Remove(&Entity->TickListLink);
 	}
 }
@@ -205,25 +202,31 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
 	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
 
-	if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
-		return;
-
 	ZE_LOCK_SECTION(RenderListLock)
 	{
-		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
+		if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
+			return;
+
+		if (SpatialDatabase && 
+			Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
+			Entity->GetStatic())
+		{
 			Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		}
 		else
+		{
 			RenderList.AddEnd(&Entity->RenderListLink);
+		}
 	}
 }
 
 void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 {
-	if (!Entity->RenderListLink.GetInUse() && Entity->RenderListOctree == NULL)
-		return;
-
 	ZE_LOCK_SECTION(RenderListLock)
 	{
+		if (!Entity->RenderListLink.GetInUse() && Entity->RenderListOctree == NULL)
+			return;
+
 		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
 		{
 			if (Entity->RenderListOctree != NULL)
@@ -247,10 +250,13 @@ void ZEScene::UpdateOctree(ZEEntity* Entity)
 
 	ZE_LOCK_SECTION(RenderListLock)
 	{
+		if (!SpatialDatabase)
+			return;
+
 		if (Entity->RenderListOctree != NULL)
 			Entity->RenderListOctree->RemoveItem(Entity);
 
-		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());	
+		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
 	}
 }
 
@@ -331,6 +337,20 @@ const ZEVector3& ZEScene::GetAmbientColor() const
 {
 	return AmbientColor;
 }
+
+void ZEScene::SetSpatialDatabase(bool Enabled)
+{
+	if (SpatialDatabase == Enabled)
+		return;
+
+	SpatialDatabase = Enabled;
+}
+
+bool ZEScene::GetSpatialDatabase()
+{
+	return SpatialDatabase;
+}
+
 
 ZEUInt ZEScene::GetLoadingPercentage()
 {
@@ -472,8 +492,8 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 		}
 
 		OctreeCulledEntity = RenderListOctree.GetTotalItemCount() - OctreeProcessedEntity;
-		OctreeCullRatio = (float)OctreeCulledEntity / (float)TotalRenderableEntity;
-		OctreePerformanceRatio = (float)OctreeCulledEntity / (float)OctreeVisitedNodeCount;
+		OctreeCullRatio = (float)OctreeCulledEntity / (float)RenderListOctree.GetTotalItemCount();
+		OctreePerformanceRatio = 1.0f - (float)(OctreeProcessedEntity + OctreeVisitedNodeCount) / (float)RenderListOctree.GetTotalItemCount();
 
 		ze_for_each(Entity, RenderList)
 		{
@@ -482,12 +502,11 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 			else
 				ViewTestCulledEntity++;
 		}
+		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)RenderList.GetCount();
 
 		RenderRatio = (float)RenderedEntity / (float)TotalRenderableEntity;
-
 		CulledEntity = TotalRenderableEntity - RenderedEntity;
 		CullRatio = (float)CulledEntity / (float)TotalRenderableEntity;
-		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)TotalRenderableEntity;
 	}
 
 	Parameters->Renderer->EndScene();
@@ -653,6 +672,7 @@ ZEScene::ZEScene()
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.0f;
+	SpatialDatabase = false;
 	
 	RenderListOctree.SetBoundingBox(ZEAABBox(-32000.0f * ZEVector3::One, 32000.0f * ZEVector3::One));
 	RenderListOctree.SetMaxDepth(8);

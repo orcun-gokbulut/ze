@@ -77,6 +77,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
 		ZELock									SceneLock;
+		bool									SpatialDatabase;
 
 		ZELock									TickListLock;
 		ZEList2<ZEEntity>						TickList;
@@ -132,6 +133,9 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void									SetAmbientColor(ZEVector3 Color);
 		const ZEVector3&						GetAmbientColor() const;
+
+		void									SetSpatialDatabase(bool Enabled);
+		bool									GetSpatialDatabase();
 
 		ZEUInt									GetLoadingPercentage();
 

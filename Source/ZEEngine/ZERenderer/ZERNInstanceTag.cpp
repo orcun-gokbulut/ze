@@ -48,11 +48,6 @@ ZESize ZERNInstanceTag::GenerateHash(const void* Data, ZESize Size)
 	return Hash;
 }
 
-bool ZERNInstanceTag::Check(const ZERNInstanceTag* Other) const
-{
-	return (Hash == Other->Hash && Other->GetClass() == GetClass());
-}
-
 ZERNInstanceTag::ZERNInstanceTag()
 {
 

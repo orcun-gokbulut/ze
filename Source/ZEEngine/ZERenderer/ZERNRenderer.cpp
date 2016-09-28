@@ -188,6 +188,7 @@ void ZERNRenderer::PopulateStageCommands()
 
 	ze_for_each(Command, CommandList)
 	{
+		Command->Instances.Sort<CompareCommands>();
 		ze_for_each(Stage, Stages)
 		{
 			if ((Command->StageMask & Stage->GetId()) == 0)
@@ -196,8 +197,6 @@ void ZERNRenderer::PopulateStageCommands()
 			Stage->Commands.AddEnd(Command->GetFreeLink());
 		}
 	}
-
-	CommandList.Clear();
 }
 
 void ZERNRenderer::RenderStages()
@@ -529,8 +528,7 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (!IsInitialized())
 		return;
 	
-	Command->InstancesPrevious.Clear();
-	Command->InstancesPrevious.MergeBegin(Command->Instances);
+	Command->PushInstances();
 
 	Command->SceneIndex = (ZEInt)SceneConstants.GetCount() - 1;
 	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
@@ -541,11 +539,13 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 		ze_for_each(CurrentCommand, CommandListInstanced)
 		{
 			if (CurrentCommand->InstanceTag == NULL ||
+				CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
+				CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
 				!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
 			{
 				continue;
 			}
-			
+
 			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());			
 			Found = true;
 			break;
@@ -553,10 +553,10 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 
 		if (!Found)
 			CommandListInstanced.AddEnd(Command->GetFreeLink());
-
 	}
 	else
 	{
+		zeDebugCheck(CommandList.Exists(Command), "AHA !");
 		CommandList.AddEnd(Command->GetFreeLink());
 	}
 }
@@ -566,12 +566,10 @@ void ZERNRenderer::CleanCommands()
 	ze_for_each(Command, CommandList)
 		Command->PopInstances();
 
-	CommandList.Clear();
-	CommandListInstanced.Clear();
-	SceneConstants.Clear();
-
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clear();
+
+	CommandList.Clear();
 }
 
 void ZERNRenderer::Render()
@@ -582,6 +580,8 @@ void ZERNRenderer::Render()
 	PopulateStageCommands();
 	RenderStages();
 	CleanCommands();
+
+	SceneConstants.Clear();
 }
 
 ZERNRenderer::ZERNRenderer()

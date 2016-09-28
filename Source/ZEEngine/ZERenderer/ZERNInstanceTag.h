@@ -43,7 +43,7 @@ class ZERNInstanceTag : public ZEObject
 	public:
 		ZESize							Hash;
 
-		virtual bool					Check(const ZERNInstanceTag* Other) const;
+		virtual bool					Check(const ZERNInstanceTag* Other) const = NULL;
 
 										ZERNInstanceTag();
 		virtual							~ZERNInstanceTag();

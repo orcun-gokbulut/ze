@@ -39,7 +39,7 @@
 #include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEDelegate.h"
 
-#define ZERN_MAX_COMMAND_LINK 24
+#define ZERN_MAX_COMMAND_LINK 8
 
 ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
 ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
@@ -72,7 +72,7 @@ class ZERNCommand : public ZEObject
 		ZEUInt							StageMask;
 		void*							ExtraParameters;
 		ZEList2<ZERNCommand>			Instances;
-		ZERNInstanceTag*				InstanceTag;
+		const ZERNInstanceTag*			InstanceTag;
 
 		virtual void					Execute(const ZERNRenderParameters* Parameters);
 
