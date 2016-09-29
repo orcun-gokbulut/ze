@@ -527,8 +527,6 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
 	if (!IsInitialized())
 		return;
-	
-	Command->PushInstances();
 
 	Command->SceneIndex = (ZEInt)SceneConstants.GetCount() - 1;
 	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
@@ -556,7 +554,6 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	}
 	else
 	{
-		zeDebugCheck(CommandList.Exists(Command), "AHA !");
 		CommandList.AddEnd(Command->GetFreeLink());
 	}
 }
@@ -564,12 +561,24 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 void ZERNRenderer::CleanCommands()
 {
 	ze_for_each(Command, CommandList)
-		Command->PopInstances();
+		Command->Instances.Clear();
 
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clear();
 
 	CommandList.Clear();
+}
+
+void ZERNRenderer::BeginNestedRenderer()
+{
+	ze_for_each(Command, CommandList)
+		Command->PushInstances();
+}
+
+void ZERNRenderer::EndNestedRenderer()
+{
+	ze_for_each(Command, CommandList)
+		Command->PopInstances();
 }
 
 void ZERNRenderer::Render()
