@@ -481,7 +481,6 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* Resou
 
 		NewResouce->FileName = ZEPathInfo(FileName).Normalize();
 		NewResouce->FileNameHash = NewResouce->FileName.Lower().Hash();
-		//zeBreak(NewResouce->FileName == "#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Rail_Material.ZEMaterial");
 		NewResouce->State = ZERS_RS_STAGING;
 		NewResouce->TargetState = ZERS_RS_STAGED;
 		ShareResourceInternal(NewResouce);

@@ -375,13 +375,14 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		View.ViewProjectionTransform = Cascades[CascadeIndex].ProjectionTransform * Cascades[CascadeIndex].ViewTransform;
 		ShadowRenderer.SetView(View);
 
-		ZERNPreRenderParameters Parameters;
-		Parameters.Renderer = &ShadowRenderer;
-		Parameters.View = &View;
-		Parameters.Type = ZERN_PRT_SHADOW;
+		ZERNPreRenderParameters ShadowParameters;
+		ShadowParameters.Renderer = &ShadowRenderer;
+		ShadowParameters.View = &View;
+		ShadowParameters.Type = ZERN_PRT_SHADOW;
 		
+		Parameters->Renderer->BeginNestedRenderer();
 		ShadowRenderer.StartScene(GetScene()->GetConstantBuffer());
-			GetScene()->PreRender(&Parameters);
+			GetScene()->PreRender(&ShadowParameters);
 		ShadowRenderer.EndScene();
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
@@ -390,6 +391,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
 		ShadowRenderer.Render();
+		Parameters->Renderer->EndNestedRenderer();
 	}
 }
 

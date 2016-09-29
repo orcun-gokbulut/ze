@@ -127,6 +127,9 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void										AddCommand(ZERNCommand* Command);
 		void										CleanCommands();
 
+		void										BeginNestedRenderer();
+		void										EndNestedRenderer();
+
 		void										Render();
 
 													ZERNRenderer();
