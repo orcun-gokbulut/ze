@@ -37,7 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_cmake_project(CMakeScripts
 	SOURCES	
-		ze.cmake
+		ze_modules.cmake
 		ze_check.cmake
 		ze_debugging.cmake
 		ze_dependency.cmake
@@ -52,4 +52,5 @@ ze_add_cmake_project(CMakeScripts
 		ze_target.cmake
 		ze_unit_test.cmake
 		ze_utility.cmake
-		ze_version.cmake)
+		ze_version.cmake
+		ze_compiler_linker.cmake)

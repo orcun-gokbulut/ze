@@ -195,6 +195,8 @@ ZEEntityResult ZELightDirectional::UnloadInternal()
 	Cascades.Clear();
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
+
+	return ZE_ER_DONE;
 }
 
 ZELightDirectional::ZELightDirectional()

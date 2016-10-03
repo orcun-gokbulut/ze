@@ -67,7 +67,6 @@ class ZEHolder
 		ZEHolder<Type>&						operator=(const ZEHolder<Type>& OtherHolder);
 
 											operator Type*() const;
-											operator ZEHolder<const Type>() const;
 
 											ZEHolder();
 											ZEHolder(Type* RawPointer);
@@ -188,12 +187,6 @@ template<typename Type>
 ZEHolder<Type>::operator Type*() const
 {
 	return GetPointer();
-}
-
-template<typename Type>
-ZEHolder<Type>::operator ZEHolder<const Type>() const
-{
-	return ZEHolder<const Type>(GetPointer());
 }
 
 template<typename Type>

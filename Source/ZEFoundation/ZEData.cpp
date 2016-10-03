@@ -33,3 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEData.h"
+
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

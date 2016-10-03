@@ -197,3 +197,5 @@ macro (ze_external_init)
 		message(STATUS "")
 	endif()
 endmacro()
+
+ze_external_init()

@@ -33,24 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-macro (ze_platform_init)
-	if (NOT ZEBUILD_HAVE_TOOLCHAIN_FILE)
-		ze_platform_auto_init()
-	endif()
-
-	if (EXISTS "${CMAKE_BINARY_DIR}/ZEPlatform.txt")
-		file(READ "${CMAKE_BINARY_DIR}/ZEPlatform.txt" ZEPLATFORM_TXT)
-		if (NOT(ZEPLATFORM_TXT STREQUAL ZEBUILD_PLATFORM_NAME))
-			ze_platform_generate_zeplatform_h()
-		endif()	
-	else()
-		ze_platform_generate_zeplatform_h()
-	endif()
-	
-	message(STATUS "")
-	message(STATUS "")
-endmacro()
-
 macro (ze_platform_auto_init)
 	message(STATUS "[ZEBuild] Detecting platform...")
 
@@ -140,7 +122,7 @@ macro (ze_platform_auto_init)
 		else()
 			if (CMAKE_CXX_COMPILER MATCHES "cl")
 				set(ZEBUILD_PLATFORM_COMPILER "MSVC")
-				set(ZEBUILD_PLATFORM_TOOLSET ${CMAKE_VS_PLATFORM_TOOLSET})
+				set(ZEBUILD_PLATFORM_TOOLSET "v110")  #${CMAKE_VS_PLATFORM_TOOLSET})
 			else()
 				message(WARNING "[ZEBuild] Warning: Compiler is not supported. Compiler Name : ${CMAKE_CXX_COMPILER}")
 				set(ZEBUILD_PLATFORM_COMPILER "UNKNOWN")
@@ -377,3 +359,23 @@ macro(ze_platform_generate_definitions)
 		ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_PLATFORM_PS3)
     endif()
 endmacro()
+
+macro (ze_platform_init)
+	if (NOT ZEBUILD_HAVE_TOOLCHAIN_FILE)
+		ze_platform_auto_init()
+	endif()
+
+	if (EXISTS "${CMAKE_BINARY_DIR}/ZEPlatform.txt")
+		file(READ "${CMAKE_BINARY_DIR}/ZEPlatform.txt" ZEPLATFORM_TXT)
+		if (NOT(ZEPLATFORM_TXT STREQUAL ZEBUILD_PLATFORM_NAME))
+			ze_platform_generate_zeplatform_h()
+		endif()	
+	else()
+		ze_platform_generate_zeplatform_h()
+	endif()
+	
+	message(STATUS "")
+	message(STATUS "")
+endmacro()
+
+ze_platform_init()

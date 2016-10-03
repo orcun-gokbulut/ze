@@ -77,11 +77,12 @@ ZEVector3 ZEFrustum::GetUp() const
 
 const ZEPlane& ZEFrustum::GetPlane(ZEFrustumPlane Plane) const
 {
+	static ZEPlane None(ZEVector3::Zero, ZEVector3::Zero);
 	switch(Plane)
 	{
 		default:
 			zeDebugCheck(true, "Wrong frustum plane");
-			return ZEPlane(ZEVector3::Zero, ZEVector3::Zero);
+			return None;
 
 		case ZE_FP_LEFT:
 			return LeftPlane;

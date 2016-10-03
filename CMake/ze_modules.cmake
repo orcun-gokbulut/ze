@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEModelDebugDrawer.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_modules.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,49 +30,24 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_MODEL_DEBUG_DRAWER_H__
-#define __ZE_MODEL_DEBUG_DRAWER_H__
-
-#include "ZEGame/ZEDebugDrawer.h"
-
-class ZEModelDebugDrawer : public ZEDebugDrawer
-{
-	private:
-		ZEVector4					MeshBoundingBoxColor;
-		ZEVector4					BonePositionColor;
-		ZEVector4					BonePathColor;
-
-		ZERNMaterial*				ModelMaterial;
-		ZECanvas					ModelDrawCanvas;
-		ZERNCommand					ModelRenderCommand;
-
-	protected:
-		virtual void				DebugDrawEntity();
-
-		virtual bool				InitializeSelf();
-		virtual	bool				DeinitializeSelf();
-
-									ZEModelDebugDrawer();
-		virtual						~ZEModelDebugDrawer();
-
-	public:
-		virtual void				SetTarget(ZEEntity* Target);
-
-		void						SetMeshBoundingBoxColor(ZEVector4 Color);
-		ZEVector4					GetMeshBoundingBoxColor() const;
-		void						SetBonePositionColor(ZEVector4 Color);
-		ZEVector4					GetBonePositionColor() const;
-		void						SetBonePathColor(ZEVector4 Color);
-		ZEVector4					GetBonePathColor() const;
-
-		virtual void				Draw(ZERNDrawParameters* DrawParameters);
-
-		static ZEModelDebugDrawer*	CreateInstance();
-
-};
-
-#endif
+macro (ze_modules_init)
+	include(External/parse_arguments)
+	include(ze_check)
+	include(ze_dependency)
+	include(ze_utility)
+	include(ze_meta)
+	include(ze_file_compiler)
+	include(ze_target)
+	include(ze_platform)
+	include(ze_version)
+	include(ze_compiler_linker)
+	include(ze_external)
+	include(ze_debugging)
+	include(ze_static_check)
+	include(ze_unit_test)
+	include(ze_symbol_server)
+	include(ze_merge_libraries)
+endmacro()

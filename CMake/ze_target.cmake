@@ -83,7 +83,6 @@ function(ze_link)
 	endforeach()
 endfunction()
 
-
 function(ze_add_source)
 	parse_arguments(PARAMETER "${ze_source_processors};${ze_check_parameters}" "" ${ARGV})
 
@@ -110,7 +109,6 @@ function(ze_add_source)
 	set(${PARAMETER_SOURCE_LIST} ${${PARAMETER_SOURCE_LIST}} PARENT_SCOPE)
 endfunction()
 
-
 set(ze_process_source_parameters "ZEMC;ZEFC")
 macro(ze_process_sources)
 	if (PARAMETER_ZEMC)
@@ -121,7 +119,6 @@ macro(ze_process_sources)
 		ze_file_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEFC})
 	endif()
 endmacro()
-
 
 function(ze_add_executable)
 	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;DESCRIPTION;DESTINATION;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})

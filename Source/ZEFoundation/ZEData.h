@@ -34,15 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef ZE_DATA_H_
-#define ZE_DATA_H_
 
 #include "ZETypes.h"
+
 class ZEData
 {
 	public:
-		virtual void* GetData() = 0;
-		virtual ZESize GetSize() = 0;
+		virtual void*		GetData() = 0;
+		virtual ZESize		GetSize() = 0;
 };
-
-#endif
