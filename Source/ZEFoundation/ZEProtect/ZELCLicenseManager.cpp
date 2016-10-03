@@ -161,7 +161,10 @@ ZEArray<ZELCLicense> ZELCLicenseManager::LoadLicenseFile(const ZEString& FileNam
 	ZESize LicenseCount = RootNode.GetNodeCount("License");
 	Output.SetCount(LicenseCount);
 	for (ZESize I = 0; I < LicenseCount; I++)
-		Output[I].Load(&RootNode.GetNode("License", I));
+	{
+		ZEMLReaderNode LicenseNode = RootNode.GetNode("License", I);
+		Output[I].Load(&LicenseNode);
+	}
 
 	return Output;
 }

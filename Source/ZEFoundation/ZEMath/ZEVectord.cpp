@@ -49,13 +49,13 @@ const ZEVector2d ZEVector2d::MaxValue = ZEVector2d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX)
 
 ZE_VECTOR_SWIZZLE_2D_IMPLEMENTATION(ZEVector2d, ZEVector2d);
 
-inline void ZEVector2d::Create(ZEVector2d& Out, double x, double y)
+void ZEVector2d::Create(ZEVector2d& Out, double x, double y)
 {
 	Out.x = x;
 	Out.y = y;
 }
 
-inline void ZEVector2d::Create(ZEVector2d& Out, const ZEVector2d& Start, const ZEVector2d& End)
+void ZEVector2d::Create(ZEVector2d& Out, const ZEVector2d& Start, const ZEVector2d& End)
 {
 	Out.x = End.x - Start.x;
 	Out.y = End.y - Start.y;
@@ -162,7 +162,7 @@ void ZEVector2d::NormalizeSelf()
 	ZEVector2d::Normalize(*this, *this);
 }
 
-inline double ZEVector2d::Length() const
+double ZEVector2d::Length() const
 {
 	return ZEMath::Sqrtd(ZEVector2d::DotProduct(*this, *this));
 }
@@ -389,14 +389,14 @@ const ZEVector3d ZEVector3d::MaxValue = ZEVector3d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX,
 
 ZE_VECTOR_SWIZZLE_3D_IMPLEMENTATION(ZEVector3d, ZEVector2d);
 
-inline void ZEVector3d::Create(ZEVector3d& Out, double x, double y, double z)
+void ZEVector3d::Create(ZEVector3d& Out, double x, double y, double z)
 {
 	Out.x = x;
 	Out.y = y;
 	Out.z = z;
 }
 
-inline void ZEVector3d::Create(ZEVector3d& Out, const ZEVector3d& Start, const ZEVector3d& End)
+void ZEVector3d::Create(ZEVector3d& Out, const ZEVector3d& Start, const ZEVector3d& End)
 {
 	Out.x = End.x - Start.x;
 	Out.y = End.y - Start.y;
@@ -526,7 +526,7 @@ void ZEVector3d::Lerp(ZEVector3d& Out, const ZEVector3d& A, const ZEVector3d& B,
 	Out.z = A.z + (B.z - A.z) * Factor;
 }
 
-inline double ZEVector3d::Length() const
+double ZEVector3d::Length() const
 {
 	return ZEMath::Sqrtd(ZEVector3d::DotProduct(*this, *this));
 }
@@ -835,7 +835,7 @@ const ZEVector4d ZEVector4d::MaxValue = ZEVector4d(ZE_DOUBLE_MAX, ZE_DOUBLE_MAX,
 
 ZE_VECTOR_SWIZZLE_4D_IMPLEMENTATION(ZEVector4d, ZEVector3d, ZEVector2d);
 
-inline void ZEVector4d::Create(ZEVector4d& Out, double x, double y, double z, double w)
+void ZEVector4d::Create(ZEVector4d& Out, double x, double y, double z, double w)
 {
 	Out.x = x;
 	Out.y = y;
@@ -843,7 +843,7 @@ inline void ZEVector4d::Create(ZEVector4d& Out, double x, double y, double z, do
 	Out.w = w;
 }
 
-inline void ZEVector4d::Create(ZEVector4d& Out, const ZEVector4d& Start, const ZEVector4d& End)
+void ZEVector4d::Create(ZEVector4d& Out, const ZEVector4d& Start, const ZEVector4d& End)
 {
 	Out.x = End.x - Start.x;
 	Out.y = End.y - Start.y;
@@ -892,7 +892,7 @@ bool ZEVector4d::IsNormalized() const
 	return ZEMath::Abs(Length() - 1.0) < 0.001;
 }
 
-inline double ZEVector4d::Length() const
+double ZEVector4d::Length() const
 {
 	return ZEMath::Sqrtd(ZEVector4d::DotProduct(*this, *this));
 }

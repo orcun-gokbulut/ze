@@ -107,7 +107,7 @@ ZETaskManager::ZETaskManager()
 
 	ConcurrentPool.SetId(ZE_TPI_CONCURENT);
 	ConcurrentPool.SetName("Concurrent Pool");
-	ConcurrentPool.SetThreadCount(4);
+	ConcurrentPool.SetThreadCount(8);
 	Pools.Add(&ConcurrentPool);
 }
 

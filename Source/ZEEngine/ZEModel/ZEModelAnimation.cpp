@@ -34,6 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelAnimation.h"
-#include "ZECommon.h"
 
+#include "ZECommon.h"
 ZE_SUPPRESS_LNK4221

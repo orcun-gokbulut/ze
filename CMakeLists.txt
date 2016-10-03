@@ -33,79 +33,51 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8.10)
-
-if(POLICY CMP0043)
-	cmake_policy(SET CMP0043 OLD)
-endif()
+cmake_minimum_required(VERSION 3.6.0)
  
 project(ZinekEngine)
 
+
+
+## CMake Policies
+#########################################################################################
+if(POLICY CMP0043)
+	cmake_policy(SET CMP0043 OLD)
+endif()
+
+	
+## Edition Configuration
+#########################################################################################
 set(ZEBUILD_EDITION "Development" CACHE STRING "Determines Zinek Engine Edition.")
 set_property(CACHE ZEBUILD_EDITION PROPERTY STRINGS "Standard" "Development" "Demo")
 string(TOUPPER ${ZEBUILD_EDITION} ZEBUILD_EDITION_UPPER)
 add_definitions(-DZE_EDITION_${ZEBUILD_EDITION_UPPER})
 add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
 
+
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/External" "${PROJECT_SOURCE_DIR}/CMake" "${CMAKE_MODULE_PATH}")
 set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
+set_property(DIRECTORY ${CMAKE_SOURCE_DIR} APPEND PROPERTY COMPILE_DEFINITIONS ZE_ZINEK)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include(ze)
-ze_init()
-ze_version_init()
-ze_platform_init()
-ze_external_init()
-ze_debugging_init()
-ze_unit_test_init()
-ze_static_check_init()
-ze_symbol_server_init()
+
+## Out of source build
+#########################################################################################
+include(External/build_dir_check)
+macro_ensure_out_of_source_build("[ZEBuild] Error : Project requires an out of source build.")
+
+
+## ZEBuild Modules
+#########################################################################################
+include(ze_modules)
+ze_modules_init()
 
 
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
-
-
-## Compiler & Linker Options
-#########################################################################################
-if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
-	# /EH Exception Handling
-	# /GL Whole Program Optimization
-	# /GS Security Checks
-	# /GR Runtime Type Information
-	# /GT Support Fiber-Safe Thread-Local Storage
-	# /O2 Optimization Performance
-	# /Ot Favor for Fast Code
-	# /Oi Enable Instrint Functions
-	# /ZI Debug Information Format /Zi (PDB) /ZI (PDB with Edit and Continue)
-	
-	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
-		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
-	endif()
-	
-	#string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	#add_definitions("-D_HAS_EXCEPTIONS=0")
-
-	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
-	
-	string(REPLACE "/GS" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GS-")
-
-	string(REPLACE "/GT" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /GT /O2 /Ot /Oi")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi")
-	
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /IGNORE:4099")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF /OPT:ICF")
-	set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF /OPT:ICF")
-	set(CMAKE_STATIC_LINKER_FLAGS_RELEASE "${CMAKE_STATIC_LINKER_FLAGS_RELEASE} /LTCG")
-
-	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
-endif()
 
 
 ## Directories

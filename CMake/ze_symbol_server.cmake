@@ -38,3 +38,5 @@ macro(ze_symbol_server_init)
 	set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols" CACHE STRING "Symbol server address.")
 	set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX FALSE CACHE BOOL "Index code in sybols with svn address.")
 endmacro()
+
+ze_symbol_server_init()

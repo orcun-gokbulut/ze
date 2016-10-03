@@ -158,7 +158,6 @@ void ZEMDAnimationKeyQuantized::SetPosition(const ZEVector3& Position, const ZEV
 	Data[0] = (ZEInt)Quantized.x;
 	Data[1] = (ZEInt)Quantized.x;
 	Data[2] = (ZEInt)Quantized.x;
-	Data[3] = 0;
 }
 
 ZEVector3 ZEMDAnimationKeyQuantized::GetPosition(const ZEVector3& Initial, const ZEVector3& Delta) const
@@ -305,7 +304,6 @@ void ZEMDAnimationKeyQuantized::SetScale(const ZEVector3& Scale, const ZEVector3
 	Data[0] = (ZEInt)Quantized.x;
 	Data[1] = (ZEInt)Quantized.x;
 	Data[2] = (ZEInt)Quantized.x;
-	Data[3] = 0;
 }
 
 ZEVector3 ZEMDAnimationKeyQuantized::GetScale(const ZEVector3& Initial, const ZEVector3& Delta) const

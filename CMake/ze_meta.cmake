@@ -33,8 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-set(ZEBUILD_USE_STOCK_META_COMPILER TRUE CACHE BOOL "Use the ZEMetaCompiler at Tools directory which is already compiled in release configuration. (For faster builds)")
-
 function(ze_meta_compiler)
 	parse_arguments(PARAMETER "TARGET;FILES;GENERATED;OUTPUTS" "" ${ARGV})
 	
@@ -143,3 +141,9 @@ function(ze_meta_register)
 	endforeach()
 	file(WRITE "${PARAMETER_OUTPUT_FILE}" "${VARIABLE_OUTPUT_FILE_CONTENT}")
 endfunction()
+
+function(ze_meta_init)
+	set(ZEBUILD_USE_STOCK_META_COMPILER TRUE CACHE BOOL "Use the ZEMetaCompiler at Tools directory which is already compiled in release configuration. (For faster builds)")
+endfunction()
+
+ze_meta_init()

@@ -61,8 +61,6 @@ ze_add_source(ZEModelDraw.cpp				Sources)
 ze_add_source(ZEModelDraw.h					Sources Headers ZEMC)
 ze_add_source(ZEModelHelper.cpp				Sources)
 ze_add_source(ZEModelHelper.h				Sources Headers ZEMC)
-ze_add_source(ZEModelDebugDrawer.cpp		Sources)
-ze_add_source(ZEModelDebugDrawer.h			Sources Headers)
 
 ze_add_source(ZEMDResource.cpp				Sources)
 ze_add_source(ZEMDResource.h				Sources Headers ZEMC)

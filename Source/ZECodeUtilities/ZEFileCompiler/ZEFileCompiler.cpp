@@ -52,7 +52,7 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 	unsigned int FileSize = ftell(InputFile);
 	fseek(InputFile, 0, SEEK_SET);
 
-	if (FileSize > 16 * 1024 * 1024)
+	if (FileSize > 16 * ZE_SIZE_MB)
 	{
 		zeError("File size is too big. Allowed max file size is 16 MB.");
 		return false;

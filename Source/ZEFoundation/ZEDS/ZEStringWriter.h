@@ -43,7 +43,6 @@
 
 class ZEStringWriter
 {
-	friend class ZEStringWriter;
 	private:
 		char*					Buffer;
 		ZESize					Size;

@@ -74,34 +74,6 @@ macro(ze_version_get_revision_number)
 	endif()
 endmacro()
 
-macro(ze_version_init)
-	message(STATUS "[ZEBuild] Collecting version information...")
-
-	ze_version_get(${CMAKE_SOURCE_DIR})
-	ze_version_get_revision_number(${CMAKE_SOURCE_DIR})
-	ze_version_get_branch(${CMAKE_SOURCE_DIR})
-
-	set(ZEBUILD_VERSION_MAJOR ${VERSION_MAJOR})
-	set(ZEBUILD_VERSION_MINOR ${VERSION_MINOR})
-	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
-	set(ZEBUILD_VERSION_REVISION ${VERSION_REVISION})
-	set(ZEBUILD_VERSION_BRANCH ${VERSION_BRANCH})
-	set(ZEBUILD_VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} - Rev:${ZEBUILD_VERSION_REVISION} (Branch:${ZEBUILD_VERSION_BRANCH})")
-
-	message(STATUS "[ZEBuild] Version           : ${ZEBUILD_VERSION}")
-	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
-	message(STATUS "[ZEBuild] Minor Version     : ${ZEBUILD_VERSION_MINOR}")
-	message(STATUS "[ZEBuild] Internal Version  : ${ZEBUILD_VERSION_INTERNAL}")
-	message(STATUS "[ZEBuild] Build             : ${ZEBUILD_VERSION_REVISION}")
-	message(STATUS "[ZEBuild] Branch            : ${ZEBUILD_VERSION_BRANCH}")
-	message(STATUS "[ZEBuild] Version information has been collected.")
-	
-	ze_version_generate_files()
-	
-	message(STATUS "")
-	message(STATUS "")
-endmacro()
-
 macro(ze_version_generate_version_txt)
 	message(STATUS "[ZEBuild] Generating Version.txt.")
 	file(WRITE "${CMAKE_SOURCE_DIR}/Rundir/Version.txt"
@@ -162,3 +134,33 @@ macro(ze_version_generate_definitions)
 		ZE_VERSION_REVISION=${ZEBUILD_VERSION_REVISION}
 		ZE_VERSION_BRANCH="${ZEBUILD_VERSION_BRANCH}")
 endmacro()
+
+macro(ze_version_init)
+	message(STATUS "[ZEBuild] Collecting version information...")
+
+	ze_version_get(${CMAKE_SOURCE_DIR})
+	ze_version_get_revision_number(${CMAKE_SOURCE_DIR})
+	ze_version_get_branch(${CMAKE_SOURCE_DIR})
+
+	set(ZEBUILD_VERSION_MAJOR ${VERSION_MAJOR})
+	set(ZEBUILD_VERSION_MINOR ${VERSION_MINOR})
+	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
+	set(ZEBUILD_VERSION_REVISION ${VERSION_REVISION})
+	set(ZEBUILD_VERSION_BRANCH ${VERSION_BRANCH})
+	set(ZEBUILD_VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} - Rev:${ZEBUILD_VERSION_REVISION} (Branch:${ZEBUILD_VERSION_BRANCH})")
+
+	message(STATUS "[ZEBuild] Version           : ${ZEBUILD_VERSION}")
+	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
+	message(STATUS "[ZEBuild] Minor Version     : ${ZEBUILD_VERSION_MINOR}")
+	message(STATUS "[ZEBuild] Internal Version  : ${ZEBUILD_VERSION_INTERNAL}")
+	message(STATUS "[ZEBuild] Build             : ${ZEBUILD_VERSION_REVISION}")
+	message(STATUS "[ZEBuild] Branch            : ${ZEBUILD_VERSION_BRANCH}")
+	message(STATUS "[ZEBuild] Version information has been collected.")
+	
+	ze_version_generate_files()
+	
+	message(STATUS "")
+	message(STATUS "")
+endmacro()
+
+ze_version_init()

@@ -33,19 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-macro(ze_unit_test_init)
-	set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
-	set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE    FALSE CACHE BOOL "Enables code coverage instrumentation.")
-	
-	if (ZEBUILD_UNIT_TESTS_ENABLE)
-		ENABLE_TESTING()
-	endif()
-	
-	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
-		include(External/test_cocoon)
-	endif()
-endmacro()
-
 function (ze_add_test)
 	if (NOT ZEBUILD_UNIT_TESTS_ENABLE)
 		return()
@@ -81,3 +68,18 @@ function (ze_add_test)
 	source_group("" FILES ${PARAMETER_SOURCES})		
 	add_test(${PARAMETER_TARGET}Test ${PARAMETER_TARGET})
 endfunction()
+
+macro(ze_unit_test_init)
+	set(ZEBUILD_UNIT_TESTS_ENABLE             FALSE CACHE BOOL "Enable unit tests.")
+	set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE    FALSE CACHE BOOL "Enables code coverage instrumentation.")
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE)
+		ENABLE_TESTING()
+	endif()
+	
+	if (ZEBUILD_UNIT_TESTS_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE)
+		include(External/test_cocoon)
+	endif()
+endmacro()
+
+ze_unit_test_init()

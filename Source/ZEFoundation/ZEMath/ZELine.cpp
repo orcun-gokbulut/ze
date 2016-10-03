@@ -49,7 +49,7 @@
 // ZELine
 //////////////////////////////////////////////////////////////////////////////////////
 
-inline void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
+void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
 {
 	ZEVector3::Sub(Line.v, P1, P0);
 	Line.v = Line.v.Normalize();

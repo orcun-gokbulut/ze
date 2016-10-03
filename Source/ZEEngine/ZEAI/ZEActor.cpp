@@ -44,7 +44,6 @@
 
 ZEActor::ZEActor()
 {
-	static ZEInt Index		= 0;
 	MinLinearAcceleration	= 0.01f;
 	MinAngularAcceleration	= 0.01f;
 	MaxAngularVelocity		= ZE_PI_2;

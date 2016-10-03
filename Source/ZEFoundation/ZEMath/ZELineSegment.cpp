@@ -48,7 +48,7 @@
 // ZELineSegment
 //////////////////////////////////////////////////////////////////////////////////////
 
-inline void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
+void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
 {
 	ZEVector3::Sub(LineSegment.v, End, Start);
 	LineSegment.Length = LineSegment.v.Length();

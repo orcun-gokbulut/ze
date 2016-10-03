@@ -56,7 +56,7 @@ const ZEMatrix3x3 ZEMatrix3x3::Identity = ZEMatrix3x3(1.0f, 0.0f, 0.0f,
 													  0.0f, 1.0f, 0.0f,
 													  0.0f, 0.0f, 1.0f);
 
-inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13,
+void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13,
 														float M21, float M22, float M23,
 														float M31, float M32, float M33)
 {
@@ -65,7 +65,7 @@ inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float
 	Matrix.M31 = M31; Matrix.M32 = M32; Matrix.M33 = M33;
 }
 
-inline void ZEMatrix3x3::Create(ZEMatrix3x3& Matrix, float M[9])
+void ZEMatrix3x3::Create(ZEMatrix3x3& Matrix, float M[9])
 {
 	memcpy(Matrix.M, M, sizeof(ZEMatrix3x3));
 }
@@ -578,7 +578,7 @@ const ZEMatrix4x4 ZEMatrix4x4::Identity = ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
 													  0.0f, 0.0f, 1.0f, 0.0f,
 													  0.0f, 0.0f, 0.0f, 1.0f);
 
-inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix,
+void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix,
 				float M11, float M12, float M13, float M14,
 				float M21, float M22, float M23, float M24,
 				float M31, float M32, float M33, float M34,
@@ -590,7 +590,7 @@ inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix,
 	Matrix.M14 = M14; Matrix.M24 = M24; Matrix.M34 = M34; Matrix.M44 = M44;
 }
 
-inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix, float M[16])
+void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix, float M[16])
 {
 	memcpy(Matrix.M, M, sizeof(ZEMatrix4x4));
 }
