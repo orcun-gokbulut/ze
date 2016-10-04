@@ -258,7 +258,7 @@ void ZERNRenderer::RenderStages()
 		{
 			if (Command->SceneIndex != LastSceneIndex)
 			{
-				Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstants[Command->SceneIndex]);
+				Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, Scenes[Command->SceneIndex]->GetConstantBuffer());
 				LastSceneIndex = Command->SceneIndex;
 			}
 
@@ -513,9 +513,10 @@ void ZERNRenderer::BindStages()
 	}
 }
 
-void ZERNRenderer::StartScene(const ZEGRConstantBuffer* ConstantBuffer)
+void ZERNRenderer::StartScene(ZEScene* Scene)
 {
-	SceneConstants.Add(ConstantBuffer);
+	Scenes.Enqueue(Scene);
+	Scene->RenderListLock.LockNested();
 }
 
 void ZERNRenderer::EndScene()
@@ -528,7 +529,7 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (!IsInitialized())
 		return;
 
-	Command->SceneIndex = (ZEInt)SceneConstants.GetCount() - 1;
+	Command->SceneIndex = (ZEInt)Scenes.GetCount() - 1;
 	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
 
 	if (Command->InstanceTag != NULL)
@@ -590,7 +591,10 @@ void ZERNRenderer::Render()
 	RenderStages();
 	CleanCommands();
 
-	SceneConstants.Clear();
+	for (ZESize I = 0; I < Scenes.GetCount(); I++)
+		Scenes[I]->RenderListLock.Unlock();
+
+	Scenes.Clear();
 }
 
 ZERNRenderer::ZERNRenderer()
