@@ -63,7 +63,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEList2<ZERNStage>							Stages;
 		ZEHolder<ZEGRConstantBuffer>				ViewConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>				RendererConstantBuffer;
-		ZEArray<ZEHolder<const ZEGRConstantBuffer>>	SceneConstants;
+		ZEArray<ZEScene*>							Scenes;
 		ZEList2<ZERNCommand>						CommandList;
 		ZEList2<ZERNCommand>						CommandListInstanced;
 
@@ -121,7 +121,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		
 		void										MarkDirtyPipeline();
 
-		void										StartScene(const ZEGRConstantBuffer* ConstantBuffer);
+		void										StartScene(ZEScene* Scene);
 		void										EndScene();
 
 		void										AddCommand(ZERNCommand* Command);

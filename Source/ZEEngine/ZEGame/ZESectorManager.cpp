@@ -63,7 +63,7 @@ void ZESectorManager::RemoveFromCache(ZESector* Sector)
 	if (Sector == NULL)
 		return;
 
-	if (Sector->GetScene() == NULL || Sector->GetScene() != Scene)
+	if (Sector->GetScene() != NULL && Sector->GetScene() != Scene)
 		return;
 
 	if (!SectorCache.Exists(Sector))
@@ -73,7 +73,10 @@ void ZESectorManager::RemoveFromCache(ZESector* Sector)
 	zeDebugLog("ZESectorManager updated. Sector removed from Scene. Sector: \"%s\"", Sector->GetName().ToCString());
 
 	SectorCache.RemoveValue(Sector);
-	Scene->RemoveEntity(Sector);
+
+	if (Sector->GetScene() != NULL)
+		Scene->RemoveEntity(Sector);
+
 	Sector->Unload();
 }
 

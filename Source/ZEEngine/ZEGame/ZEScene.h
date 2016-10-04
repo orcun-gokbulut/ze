@@ -66,6 +66,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEEntity;
+	friend class ZERNRenderer;
 	private:
 		ZEFlags									SceneDirtyFlags;
 		ZEUInt									LastEntityId;
