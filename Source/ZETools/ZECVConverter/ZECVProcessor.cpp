@@ -257,7 +257,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 }
 
 
-static bool OperationWarpper(const char* Path, ZEPathOperationElement Element, void* Parameters)
+bool OperationWarpper(const char* Path, ZEPathOperationElement Element, void* Parameters)
 {
 	ZESmartArray<ZEString>* FileList = reinterpret_cast<ZESmartArray<ZEString>*>(Parameters);
 	FileList->Add(Path);
