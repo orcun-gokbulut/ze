@@ -41,8 +41,15 @@ macro (ze_compiler_linker_msvc)
 	# /GS Security Checks
 	# /GR Runtime Type Information
 	# /GT Support Fiber-Safe Thread-Local Storage
-	# /O2 Optimization Performance
+	# /GF Eliminate Duplicate Strings
+	# /Gy Enable Function Level Linking
+	# /Gs[n] Control Stack Checking Calls. /Gs == /Gs0 == Disable
+	# /O2 Optimization Performance - /Ob2 /Og /Oi /Ot /Oy /Gs /GF /Gy
+	# /Ox Full Optmization - /Ob2 /Ot /Oi /Ot /Oy
+	# /Ob[n] Inline Function Expension (0 - none, 1 - marked with inline or __forceinline, 2 - any applicaple)
 	# /Ot Favor for Fast Code
+	# /Og Global Optimization
+	# /Oy Omit Frame-Pointer
 	# /Oi Enable Instrint Functions
 	# /ZI Debug Information Format /Zi (PDB) /ZI (PDB with Edit and Continue)
 	# /IGNORE:4099 Ignore PDB file not found problem
@@ -52,18 +59,14 @@ macro (ze_compiler_linker_msvc)
 	endif()
 
 	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GR-")
 	string(REPLACE "/GS" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GS-")
-
 	string(REPLACE "/GR" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /GR-")
 	string(REPLACE "/GS" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /GS-")
 
 	string(REPLACE "/GT" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /GT /O2 /Ot /Oi /Zi")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /GL /GT /GS- /GR- /Zi")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox /Ob2 /Og /Oi /Ot /Oy /Gs /GF /Gy")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 	
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /IGNORE:4099")
@@ -94,7 +97,7 @@ macro (ze_compiler_linker_msvc_icc)
 	
 	string(REPLACE "/O2" "" CMAKE_C_RELEASE "${CMAKE_C_RELEASE}")
 	string(REPLACE "/O2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /Qipo /Qunroll /GA /Qdiag-disable:10120 /Quse-intel-optimized-headers /QaxSSE4.2 /QxSSE4.2 ")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O3 /Qipo /Qunroll /GA /Qdiag-disable:10120 /Quse-intel-optimized-headers /QaxSSE4.2 /QxSSE4.2")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
 

@@ -39,10 +39,7 @@ project(ZinekEngine)
 
 ze_set_project_folder("ZEEngine")
 
-set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
-
-ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK_ENGINE)
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ZE_ZINEK_ENGINE)
 
 add_subdirectory(ZEAI)
 add_subdirectory(ZECore)
