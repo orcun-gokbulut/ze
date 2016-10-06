@@ -33,14 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_INDEX_BUFFER_H__
-#define __ZE_D3D11_INDEX_BUFFER_H__
+#pragma once
 
-#include <d3d11.h>
+#include "ZEGraphics/ZEGRIndexBuffer.h"
+#include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRIndexBuffer.h"
 
 class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 {
@@ -53,14 +51,12 @@ class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 		virtual bool			Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data);
 		virtual void			Deinitialize();
 
+		ID3D11Buffer*			GetBuffer() const;
+		
 								ZED11IndexBuffer();
 		virtual					~ZED11IndexBuffer();
 
 	public:
-		ID3D11Buffer*			GetBuffer() const;
-
-		virtual void			Unlock();
 		virtual bool			Lock(void** Data);
+		virtual void			Unlock();
 };
-
-#endif

@@ -48,7 +48,6 @@ class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 	friend class ZED11Context;
 	private:
 		ID3D11Buffer*				Buffer;
-		ZELock						MapLock;
 
 		virtual bool				Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
 		virtual void				Deinitialize();
