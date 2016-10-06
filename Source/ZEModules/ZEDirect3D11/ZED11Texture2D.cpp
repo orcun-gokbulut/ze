@@ -43,58 +43,58 @@
 
 static DXGI_FORMAT ConvertDepthStencilFormat(ZEGRFormat Format)
 {
-	switch(Format)
+	switch (Format)
 	{
-		default:
-		case ZEGR_TF_NONE:
-			return DXGI_FORMAT_UNKNOWN;
+	default:
+	case ZEGR_TF_NONE:
+		return DXGI_FORMAT_UNKNOWN;
 
-		case ZEGR_TF_D16_UNORM:
-			return DXGI_FORMAT_R16_TYPELESS;
+	case ZEGR_TF_D16_UNORM:
+		return DXGI_FORMAT_R16_TYPELESS;
 
-		case ZEGR_TF_D24_UNORM_S8_UINT:
-			return DXGI_FORMAT_R24G8_TYPELESS;
+	case ZEGR_TF_D24_UNORM_S8_UINT:
+		return DXGI_FORMAT_R24G8_TYPELESS;
 
-		case ZEGR_TF_D32_FLOAT:
-			return DXGI_FORMAT_R32_TYPELESS;
+	case ZEGR_TF_D32_FLOAT:
+		return DXGI_FORMAT_R32_TYPELESS;
 	}
 }
 
 static DXGI_FORMAT ConvertToDepthStencilViewFormat(ZEGRFormat Format)
 {
-	switch(Format)
+	switch (Format)
 	{
-		default:
-		case ZEGR_TF_NONE:
-			return DXGI_FORMAT_UNKNOWN;
+	default:
+	case ZEGR_TF_NONE:
+		return DXGI_FORMAT_UNKNOWN;
 
-		case ZEGR_TF_D16_UNORM:
-			return DXGI_FORMAT_D16_UNORM;
+	case ZEGR_TF_D16_UNORM:
+		return DXGI_FORMAT_D16_UNORM;
 
-		case ZEGR_TF_D24_UNORM_S8_UINT:
-			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+	case ZEGR_TF_D24_UNORM_S8_UINT:
+		return DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-		case ZEGR_TF_D32_FLOAT:
-			return DXGI_FORMAT_D32_FLOAT;
+	case ZEGR_TF_D32_FLOAT:
+		return DXGI_FORMAT_D32_FLOAT;
 	}
 }
 
 static DXGI_FORMAT ConvertToShaderResourceViewFormat(ZEGRFormat Format)
 {
-	switch(Format)
+	switch (Format)
 	{
-		default:
-		case ZEGR_TF_NONE:
-			return DXGI_FORMAT_UNKNOWN;
+	default:
+	case ZEGR_TF_NONE:
+		return DXGI_FORMAT_UNKNOWN;
 
-		case ZEGR_TF_D16_UNORM:
-			return DXGI_FORMAT_R16_UNORM;
+	case ZEGR_TF_D16_UNORM:
+		return DXGI_FORMAT_R16_UNORM;
 
-		case ZEGR_TF_D24_UNORM_S8_UINT:
-			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	case ZEGR_TF_D24_UNORM_S8_UINT:
+		return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
 
-		case ZEGR_TF_D32_FLOAT:
-			return DXGI_FORMAT_R32_FLOAT;
+	case ZEGR_TF_D32_FLOAT:
+		return DXGI_FORMAT_R32_FLOAT;
 	}
 }
 
@@ -226,12 +226,7 @@ void ZED11Texture2D::Deinitialize()
 
 ID3D11Resource* ZED11Texture2D::GetResource() const
 {
-	ID3D11Resource* Resource = NULL;
-
-	if (Texture2D != NULL)
-		Texture2D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
-
-	return Resource;
+	return Texture2D;
 }
 
 ID3D11Texture2D* ZED11Texture2D::GetTexture() const
@@ -355,7 +350,7 @@ const ZEGRDepthStencilBuffer* ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnl
 			DepthStencilViewDesc.Texture2DMSArray.FirstArraySlice = ArrayIndex;
 		}
 		else
-		{	
+		{
 			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 			DepthStencilViewDesc.Texture2DArray.ArraySize = 1;
 			DepthStencilViewDesc.Texture2DArray.FirstArraySlice = ArrayIndex;
@@ -364,7 +359,7 @@ const ZEGRDepthStencilBuffer* ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnl
 	}
 	else
 	{
-		if(SampleCount > 1)
+		if (SampleCount > 1)
 		{
 			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
 		}
@@ -377,7 +372,7 @@ const ZEGRDepthStencilBuffer* ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnl
 
 	ID3D11DepthStencilView* DepthStencilView = NULL;
 	HRESULT Result = GetDevice()->CreateDepthStencilView(Texture2D, &DepthStencilViewDesc, &DepthStencilView);
-	if(FAILED(Result))
+	if (FAILED(Result))
 	{
 		zeError("Texture 2D depth stencil creation failed. ErrorCode: %d.", Result);
 		return NULL;

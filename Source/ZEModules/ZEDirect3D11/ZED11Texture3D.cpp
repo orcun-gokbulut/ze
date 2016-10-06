@@ -132,12 +132,7 @@ void ZED11Texture3D::Deinitialize()
 
 ID3D11Resource* ZED11Texture3D::GetResource() const
 {
-	ID3D11Resource* Resource = NULL;
-
-	if (Texture3D != NULL)
-		Texture3D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
-
-	return Resource;
+	return Texture3D;
 }
 
 ID3D11Texture3D* ZED11Texture3D::GetTexture() const

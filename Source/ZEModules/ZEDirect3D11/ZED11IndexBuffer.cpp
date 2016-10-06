@@ -33,10 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZED11IndexBuffer.h"
-#include "ZED11Module.h"
-#include <d3d11.h>
+
 #include "ZEPointer\ZEPointer.h"
 
 inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
@@ -48,11 +46,6 @@ inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 		4	// ZE_IBF_INDEX32
 	};
 	return FormatToIndexSize[Format];
-}
-
-ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
-{
-	return Buffer;
 }
 
 bool ZED11IndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRResourceUsage Usage, const void* Data)
@@ -94,9 +87,20 @@ void ZED11IndexBuffer::Deinitialize()
 	ZEGRIndexBuffer::Deinitialize();
 }
 
+ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
+{
+	return Buffer;
+}
+
+
 ZED11IndexBuffer::ZED11IndexBuffer()
 {
 	Buffer = NULL;
+}
+
+ZED11IndexBuffer::~ZED11IndexBuffer()
+{
+	Deinitialize();
 }
 
 bool ZED11IndexBuffer::Lock(void** Data)
@@ -120,9 +124,4 @@ void ZED11IndexBuffer::Unlock()
 	LockContext();
 	GetMainContext()->Unmap(Buffer, 0);
 	UnlockContext();
-}
-
-ZED11IndexBuffer::~ZED11IndexBuffer()
-{
-	Deinitialize();
 }

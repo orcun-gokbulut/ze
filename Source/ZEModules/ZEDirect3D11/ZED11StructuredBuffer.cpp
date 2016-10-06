@@ -42,13 +42,12 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 {	
 	ZESize BufferSize = ElementCount * ElementSize;
 	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	//zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
 
 	D3D11_BUFFER_DESC Desc;
 	Desc.ByteWidth = (UINT)BufferSize;
 	Desc.Usage = ConvertUsage(Usage);
 	Desc.BindFlags = ConvertBindFlags(BindFlags);
-	Desc.CPUAccessFlags = (Usage == ZEGR_RU_CPU_READ_WRITE) ? (D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE) : (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
+	Desc.CPUAccessFlags = ConvertUsageToCpuAccessFlags(Usage);
 	Desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	Desc.StructureByteStride = ElementSize;
 
@@ -148,6 +147,7 @@ bool ZED11StructuredBuffer::Lock(void** Buffer)
 
 	return true;
 }
+
 void ZED11StructuredBuffer::Unlock()
 {
 	zeCheckError(this->Buffer == NULL, ZE_VOID, "Structured buffer is not initialized.");
