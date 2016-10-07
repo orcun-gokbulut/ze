@@ -85,7 +85,7 @@ class ZEModel : public ZEEntity
 		ZEModelAnimationTrack*					AnimationTrack;
 
 		bool									DirtyConstantBufferSkin;
-		ZEHolder<ZEGRConstantBuffer>			ConstantBufferBoneTransforms;
+		ZEHolder<ZEGRBuffer>					ConstantBufferBoneTransforms;
 
 		mutable bool							DirtyBoundingBox;
 		bool									BoundingBoxIsUserDefined;

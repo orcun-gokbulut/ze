@@ -38,7 +38,7 @@
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 
 bool ZERNStageOutputTexture::Update()

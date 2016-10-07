@@ -35,8 +35,8 @@
 
 #include "ZECanvasBrush.h"
 #include "ZEError.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNMaterial.h"
@@ -61,20 +61,20 @@ void ZECanvasBrush::UpdateCanvas()
 	if (OldVertexCount != Canvas.GetVertexCount())
 	{
 		OldVertexCount = Canvas.GetVertexCount();
-		VertexBuffer = VertexBuffer->CreateResource(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
+		VertexBuffer = VertexBuffer->CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetVertexCount() * sizeof(ZECanvasVertex), sizeof(ZECanvasVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 		if (VertexBuffer != NULL)
 			zeCriticalError("Can not create Static Vertex Buffer.");
 	}
 	
 	void* Buffer = NULL; 
-	if (!VertexBuffer->Lock(&Buffer))
+	if (!VertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer))
 	{
 		zeError("Cannot lock vertex buffer.");
 		return;
 	}
 
 	memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetBufferSize());
-	VertexBuffer->Unlock();
+	VertexBuffer->Unmap();
 	
 	ZEAABBox BoundingBox;
 	Canvas.CalculateBoundingBox(BoundingBox);

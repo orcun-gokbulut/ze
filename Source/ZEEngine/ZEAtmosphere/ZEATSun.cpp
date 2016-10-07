@@ -42,12 +42,12 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
@@ -150,7 +150,7 @@ ZEEntityResult ZEATSun::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 	
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	if (!Update())

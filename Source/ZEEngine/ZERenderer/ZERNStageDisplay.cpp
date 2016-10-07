@@ -35,8 +35,8 @@
 
 #include "ZERNStageDisplay.h"
 
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZEGraphics\ZEGRBuffer.h"
+#include "ZEGraphics\ZEGRTexture.h"
 #include "ZEGraphics\ZEGRContext.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZERNShaderSlots.h"
@@ -50,7 +50,7 @@ bool ZERNStageDisplay::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return true;
 }

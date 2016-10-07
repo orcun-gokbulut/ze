@@ -49,8 +49,7 @@ class ZEMLReaderNode;
 class ZEMLWriterNode;
 
 ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
-ZE_META_FORWARD_DECLARE(ZEGRVertexBuffer, "ZERenderer/ZEGRVertexBuffer.h");
-ZE_META_FORWARD_DECLARE(ZEGRIndexBuffer, "ZERenderer/ZEGRIndexBuffer.h");
+ZE_META_FORWARD_DECLARE(ZEGRBuffer, "ZERenderer/ZEGRBuffer.h");
 
 class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 {
@@ -76,8 +75,8 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZEArray<ZEUInt16>						Indices;
 		ZEArray<ZEUInt32>						Indices32;
 
-		ZEHolder<const ZEGRVertexBuffer>		VertexBuffer;
-		ZEHolder<const ZEGRIndexBuffer>			IndexBuffer;
+		ZEHolder<const ZEGRBuffer>				VertexBuffer;
+		ZEHolder<const ZEGRBuffer>				IndexBuffer;
 		
 												ZEMDResourceLOD();
 		virtual									~ZEMDResourceLOD();
@@ -116,11 +115,11 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		void									SetIndices32(const ZEArray<ZEUInt32>& Indices);
 		const ZEArray<ZEUInt32>&				GetIndices32() const;
 
-		void									SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>		GetVertexBuffer() const;
+		void									SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer);
+		ZEHolder<const ZEGRBuffer>				GetVertexBuffer() const;
 
-		void									SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
-		ZEHolder<const ZEGRIndexBuffer>			GetIndexBuffer() const;
+		void									SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer);
+		ZEHolder<const ZEGRBuffer>				GetIndexBuffer() const;
 
 		const ZEArray<ZEMDResourceDraw>&		GetDraws() const;
 		void									AddDraw(const ZEMDResourceDraw& Draw);

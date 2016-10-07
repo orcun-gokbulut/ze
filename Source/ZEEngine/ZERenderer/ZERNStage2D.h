@@ -41,7 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStage2D : public ZERNStage
 {
@@ -50,7 +50,7 @@ class ZERNStage2D : public ZERNStage
 		ZEFlags								DirtyFlags;
 		ZEGRViewport						Viewport;
 
-		ZEHolder<const ZEGRTexture2D>		OutputTexture;
+		ZEHolder<const ZEGRTexture>			OutputTexture;
 
 		virtual bool						DeinitializeInternal();
 

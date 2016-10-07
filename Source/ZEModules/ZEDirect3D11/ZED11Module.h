@@ -43,16 +43,6 @@
 #include "ZED11Tracer.h"
 #include "ZED11Context.h"
 
-class ZEGRContext;
-class ZEGRSampler;
-class ZEGRTexture2D;
-class ZEGRTexture3D;
-class ZEGRTextureCube;
-class ZEGRIndexBuffer;
-class ZEGRVertexBuffer;
-class ZEGRShaderCompiler;
-class ZEGRStructuredBuffer;
-
 class ZED11Module : public ZEGRGraphicsModule
 {
 	ZE_OBJECT
@@ -78,17 +68,12 @@ class ZED11Module : public ZEGRGraphicsModule
 		virtual ZEGRContext*					GetMainContext();
 		virtual ZEGRAdapter*					GetCurrentAdapter();
 
-		virtual ZEGRSampler*					CreateSamplerState();
 		virtual ZEGROutput*						CreateOutput();
-		virtual ZEGRContext*					CreateContext();
-		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
-		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
 		virtual ZEGRShader*						CreateShader();
-		virtual ZEGRConstantBuffer*				CreateConstantBuffer();
-		virtual ZEGRStructuredBuffer*			CreateStructuredBuffer();
-		virtual ZEGRTexture2D*					CreateTexture2D();
-		virtual ZEGRTexture3D*					CreateTexture3D();
-		virtual ZEGRTextureCube*				CreateTextureCube();
+		virtual ZEGRBuffer*						CreateBuffer();
+		virtual ZEGRTexture*					CreateTexture();
+		virtual ZEGRContext*					CreateContext();
+		virtual ZEGRSampler*					CreateSamplerState();
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
 		virtual ZEGRRenderStateData*			CreateRenderStateData();
 		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData();

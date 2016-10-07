@@ -102,8 +102,8 @@ bool ZEDSceneEditor::InitializeInternal()
 
  	ZEModel* Trial = ZEModel::CreateInstance();
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Track-100.new.ZEMODEL");
-	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector001/Sector001.new.ZEMODEL");
-	Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.new.ZEMODEL");
+	Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
+	//Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.new.ZEMODEL");
 	Scene->AddEntity(Trial);
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();

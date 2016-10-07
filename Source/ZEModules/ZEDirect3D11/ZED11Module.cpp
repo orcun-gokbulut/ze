@@ -36,23 +36,15 @@
 #include "ZED11Module.h"
 
 #include "ZEError.h"
-#include "ZED11Shader.h"
-#include "ZED11StatePool.h"
-#include "ZED11Texture2D.h"
-#include "ZED11Texture3D.h"
 #include "ZED11Tracer.h"
-#include "ZED11TextureCube.h"
-#include "ZED11Tracer.h"
-#include "ZED11IndexBuffer.h"
-#include "ZED11VertexBuffer.h"
-#include "ZED11RenderTarget.h"
+#include "ZED11Buffer.h"
+#include "ZED11Texture.h"
 #include "ZED11ComponentBase.h"
 #include "ZED11Context.h"
+#include "ZED11Shader.h"
 #include "ZED11ShaderCompiler.h"
-#include "ZED11ConstantBuffer.h"
-#include "ZED11StructuredBuffer.h"
 #include "ZED11Adapter.h"
-#include "ZED11DepthStencilBuffer.h"
+#include "ZED11StatePool.h"
 #include "ZED11RenderStateData.h"
 #include "ZED11Output.h"
 #include "ZED11Sampler.h"
@@ -93,7 +85,7 @@ static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device* Device)
 		DXGIFactory->Release();
 		return NULL;
 	}
-
+	
 	DXGIDevice->Release();
 	DXGIAdapter->Release();
 
@@ -155,7 +147,7 @@ bool ZED11Module::InitializeInternal()
 	CurrentAdapter = new ZED11Adapter(Adapter);
 
 	UINT DeviceFlags = 0;
-	#ifdef _DEBUG
+	#ifdef ZE_DEBUG_ENABLE
 		DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 	#else
 		DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
@@ -241,11 +233,6 @@ ZEGRContext* ZED11Module::GetMainContext()
 	return &Context;
 }
 
-ZEGRSampler* ZED11Module::CreateSamplerState()
-{
-	return new ZED11Sampler();
-}
-
 ZEGROutput* ZED11Module::CreateOutput()
 {
 	return new ZED11Output();
@@ -263,9 +250,14 @@ ZEGRContext* ZED11Module::CreateContext()
 	return Context;
 }
 
-ZEGRIndexBuffer* ZED11Module::CreateIndexBuffer()
+ZEGRBuffer* ZED11Module::CreateBuffer()
 {
-	return new ZED11IndexBuffer();
+	return new ZED11Buffer();
+}
+
+ZEGRTexture* ZED11Module::CreateTexture()
+{
+	return new ZED11Texture();
 }
 
 ZEGRShader* ZED11Module::CreateShader()
@@ -273,34 +265,14 @@ ZEGRShader* ZED11Module::CreateShader()
 	return new ZED11Shader();
 }
 
-ZEGRConstantBuffer* ZED11Module::CreateConstantBuffer()
+ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 {
-	return new ZED11ConstantBuffer();
+	return new ZED11ShaderCompiler();
 }
 
-ZEGRStructuredBuffer* ZED11Module::CreateStructuredBuffer()
+ZEGRSampler* ZED11Module::CreateSamplerState()
 {
-	return new ZED11StructuredBuffer();
-}
-
-ZEGRVertexBuffer* ZED11Module::CreateVertexBuffer()
-{
-	return new ZED11VertexBuffer();
-}
-
-ZEGRTexture2D* ZED11Module::CreateTexture2D()
-{
-	return new ZED11Texture2D();
-}
-
-ZEGRTexture3D* ZED11Module::CreateTexture3D()
-{
-	return new ZED11Texture3D();
-}
-
-ZEGRTextureCube* ZED11Module::CreateTextureCube()
-{
-	return new ZED11TextureCube();
+	return new ZED11Sampler();
 }
 
 ZEGRRenderStateData* ZED11Module::CreateRenderStateData()
@@ -311,11 +283,6 @@ ZEGRRenderStateData* ZED11Module::CreateRenderStateData()
 ZEGRComputeRenderStateData* ZED11Module::CreateComputeRenderStateData()
 {
 	return new ZED11ComputeRenderStateData();
-}
-
-ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
-{
-	return new ZED11ShaderCompiler();
 }
 
 ZED11Module* ZED11Module::CreateInstance()

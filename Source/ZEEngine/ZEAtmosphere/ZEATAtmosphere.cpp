@@ -50,15 +50,13 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics/ZEGRStructuredBuffer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -95,7 +93,7 @@ void ZEATAtmosphere::CreateRandomVectors()
 		SphereSamples[I].w = 0.0f;
 	}
 
-	RandomVectorsTexture = ZEGRTexture2D::CreateResource(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, SphereSamples.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, 128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, SphereSamples.GetConstCArray());
 }
 
 bool ZEATAtmosphere::UpdateShaders()
@@ -266,7 +264,7 @@ ZEVector3 ZEATAtmosphere::GetAmbientColorFromLUT(float CosLightZenith)
 
 void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 {
-	ZEHolder<ZEGRConstantBuffer> PrecomputeConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(PrecomputeConstants));
+	ZEHolder<ZEGRBuffer> PrecomputeConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(PrecomputeConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ZEArray<const ZEGRRenderTarget*> MultipleScatteringRenderTargets;
 	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
@@ -291,8 +289,8 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
-	ZEHolder<ZEGRTexture3D> PrecomputedHighOrderScatteringBuffer = ZEGRTexture3D::CreateResource(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT);
-	ZEHolder<ZEGRTexture3D> PrecomputedHighOrderInScatteringBuffer = ZEGRTexture3D::CreateResource(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT);
+	ZEHolder<ZEGRTexture> PrecomputedHighOrderScatteringBuffer = ZEGRTexture::CreateResource(ZEGR_TT_3D, 32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 64 * 16);
+	ZEHolder<ZEGRTexture> PrecomputedHighOrderInScatteringBuffer = ZEGRTexture::CreateResource(ZEGR_TT_3D, 32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 64 * 16);
 
 	for (ZEUInt S = 1; S < OrderCount; S++)
 	{
@@ -352,7 +350,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
-	ZEHolder<ZEGRTexture2D> PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateResource(1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	ZEHolder<ZEGRTexture> PrecomputedSkyAmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC);
 	const ZEGRRenderTarget* SkyAmbientRenderTarget = PrecomputedSkyAmbientBuffer->GetRenderTarget();
 
 	Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
@@ -362,14 +360,14 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 
 	Context->Draw(3, 0);
 
-	ZEHolder<ZEGRTexture2D> AmbientBuffer = ZEGRTexture2D::CreateResource(1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_CPU_READ_WRITE, ZEGR_RBF_NONE);
+	ZEHolder<ZEGRTexture> AmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STAGING, ZEGR_RBF_NONE);
 
 	Context->CopyResource(AmbientBuffer, PrecomputedSkyAmbientBuffer);
 
 	float* Data;
-	AmbientBuffer->Lock(reinterpret_cast<void**>(&Data));
+	AmbientBuffer->Map(ZEGR_RMT_WRITE, reinterpret_cast<void**>(&Data));
 		memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
-	AmbientBuffer->Unlock();
+	AmbientBuffer->Unmap();
 
 	PrecomputeExtinctionPixelShader.Release();
 	PrecomputeSingleScatteringPixelShader.Release();
@@ -460,10 +458,11 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 
 	CreateRandomVectors();
 
-	SkyConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	SkyConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
-	ZEGRTexture3DOptions TextureOptions;
-	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::LoadResource("#R:/ZEEngine/ZEATAtmosphere/MultipleScatteringLUT.dds", TextureOptions);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_3D;
+	PrecomputedMultipleScatteringBuffer = ZEGRTexture::LoadResource("#R:/ZEEngine/ZEATAtmosphere/MultipleScatteringLUT.dds", TextureOptions);
 
 	Sun = ZEATSun::CreateInstance();
 	AddComponent(Sun);
@@ -706,7 +705,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Moon->SetColor(TerrestrialMoonColor * 1.0f);
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
-	//Moon->SetVisible(!SunVisible);
+	Moon->SetVisible(MoonVisible);
 
 	if (SunVisible)
 	{
@@ -796,7 +795,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRTexture2D* DepthTexture = static_cast<const ZEGRTexture2D*>(Stage->GetInput("DepthTexture"));
+	const ZEGRTexture* DepthTexture = static_cast<const ZEGRTexture*>(Stage->GetInput("DepthTexture"));
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);

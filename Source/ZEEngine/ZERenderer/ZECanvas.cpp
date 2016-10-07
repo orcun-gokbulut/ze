@@ -35,13 +35,10 @@
 
 #include "ZECanvas.h"
 
-#include "ZEError.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
-
-#include <stdio.h>
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
 	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
@@ -83,7 +80,7 @@ void ZECanvas::PopTransformation()
 	Transformation = TransformationStack.Pop();
 }
 
-void ZECanvas::SetTransfomation(const ZEMatrix4x4& Matrix)
+void ZECanvas::SetTransformation(const ZEMatrix4x4& Matrix)
 {
 	Transformation = Matrix;
 }
@@ -753,13 +750,24 @@ bool ZECanvas::IsEmpty()
 
 void ZECanvas::Clean()
 {
-	Translation = ZEVector3::Zero;
-	Scale = ZEVector3::One;
-	TransformationStack.Clear();
-	Transformation = ZEMatrix4x4::Identity;
-	Rotation = ZEQuaternion::Identity;
-
 	Vertices.Clear();
+	TransformationStack.Clear();
+
+	Transformation = ZEMatrix4x4::Identity;
+	Color = ZEVector4::One;
+
+	Translation = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+}
+
+void ZECanvas::ResetTransforms()
+{
+	Transformation = ZEMatrix4x4::Identity;
+
+	Translation = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
 }
 
 bool ZECanvas::LoadFromFile(const ZEString& FileName)
@@ -802,12 +810,6 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 
 	return true;
 }
-
-ZEHolder<ZEGRVertexBuffer> ZECanvas::CreateVertexBuffer()
-{
-	return  ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZECanvasVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
-}
-
 
 ZESize ZECanvas::GetVertexCount()
 {

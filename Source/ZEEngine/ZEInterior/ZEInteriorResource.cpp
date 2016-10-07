@@ -71,7 +71,7 @@ ZEGRVertexLayout* ZEInteriorVertex::GetVertexLayout()
 	return &VertexLayout;
 }
 
-const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
+const ZEGRTexture* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;

@@ -44,7 +44,7 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureLoader.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZETextureTools
 {

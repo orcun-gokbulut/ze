@@ -680,7 +680,7 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 
 		VertexCount = VerticesSkin.GetCount();
 		VertexBufferSize = VerticesSkin.GetCount() * sizeof(ZEMDVertexSkinV2);
-		OriginalVertexBufferSize = VerticesSkin.GetCount() * sizeof(ZEMDVertexV1);
+		OriginalVertexBufferSize = VerticesSkin.GetCount() * sizeof(ZEMDVertexSkinV1);
 	}
 
 	bool IsIndexed = false;
@@ -804,7 +804,7 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 		}
 
 		float Gain = (float)VertexBufferSize / (float)OriginalVertexBufferSize;
-		zeLog("Vertex Data (Includes Indexes) Size Optimization Gain: %f. Original Size: %Iu, New Size: %Iu.", Gain, OriginalVertexBufferSize, VertexBufferSize);
+		zeLog("Vertex Data Size Optimization Gain: %f. Original Size: %Iu, New Size: %Iu.", Gain, OriginalVertexBufferSize, VertexBufferSize);
 	}
 
 	if (SourceLODNode->IsSubNodeExists("Draws"))

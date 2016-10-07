@@ -49,7 +49,7 @@
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 
 void ZEInterior::LoadInteriorResource()

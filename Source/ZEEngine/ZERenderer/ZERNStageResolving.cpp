@@ -38,10 +38,10 @@
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNRenderer.h"
@@ -60,7 +60,7 @@ bool ZERNStageResolving::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -170,7 +170,7 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT0))
 		{
-			ResolvedInputTexture = ZEGRTexture2D::CreateResource(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat());
+			ResolvedInputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat());
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT0);
 		}
 	}
@@ -179,7 +179,7 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT1))
 		{
 			if (ResolveAllGbuffers)
-				ResolvedGBufferEmissive = ZEGRTexture2D::CreateResource(GBufferEmissive->GetWidth(), GBufferEmissive->GetHeight(), 1, GBufferEmissive->GetFormat());
+				ResolvedGBufferEmissive = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferEmissive->GetWidth(), GBufferEmissive->GetHeight(), 1, GBufferEmissive->GetFormat());
 			else
 				ResolvedGBufferEmissive = NULL;
 
@@ -191,7 +191,7 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT2))
 		{
 			if (ResolveAllGbuffers)
-				ResolvedGBufferDiffuse = ZEGRTexture2D::CreateResource(GBufferDiffuse->GetWidth(), GBufferDiffuse->GetHeight(), 1, GBufferDiffuse->GetFormat());
+				ResolvedGBufferDiffuse = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferDiffuse->GetWidth(), GBufferDiffuse->GetHeight(), 1, GBufferDiffuse->GetFormat());
 			else
 				ResolvedGBufferDiffuse = NULL;
 
@@ -202,7 +202,7 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT3))
 		{
-			ResolvedGBufferNormal = ZEGRTexture2D::CreateResource(GBufferNormal->GetWidth(), GBufferNormal->GetHeight(), 1, GBufferNormal->GetFormat());
+			ResolvedGBufferNormal = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferNormal->GetWidth(), GBufferNormal->GetHeight(), 1, GBufferNormal->GetFormat());
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT3);
 		}
 	}
@@ -210,7 +210,7 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT4))
 		{
-			ResolvedDepthTexture = ZEGRTexture2D::CreateResource(DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+			ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT4);
 		}
 	}

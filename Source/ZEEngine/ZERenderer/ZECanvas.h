@@ -37,13 +37,10 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
 
 class ZEGRVertexLayout;
 
@@ -54,7 +51,7 @@ class ZECanvasVertex
 
 	public:
 		ZEVector3						Position;
-		ZEVector3						Normal;		
+		ZEVector3						Normal;
 		ZEVector2						Texcoord;
 		ZEVector4						Color;
 
@@ -77,7 +74,7 @@ class ZECanvas
 		void							PushTransformation();
 		void							PopTransformation();
 
-		void							SetTransfomation(const ZEMatrix4x4& Matrix);
+		void							SetTransformation(const ZEMatrix4x4& Matrix);
 		const ZEMatrix4x4&				GetTransformation();
 
 		void							SetTranslation(const ZEVector3& Translation);
@@ -136,8 +133,7 @@ class ZECanvas
 
 		bool							IsEmpty();
 		void							Clean();
-
-		ZEHolder<ZEGRVertexBuffer>		CreateVertexBuffer();
+		void							ResetTransforms();
 
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);

@@ -42,7 +42,7 @@
 #include "ZERenderer/ZERNCommand.h"
 
 class ZERNMaterial;
-class ZEGRVertexBuffer;
+class ZEGRBuffer;
 class ZEGRRenderStateData;
 
 class ZECanvasBrush : public ZEEntity
@@ -53,7 +53,7 @@ class ZECanvasBrush : public ZEEntity
 		ZERNCommand						RenderCommand;
 		ZESize							OldVertexCount;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEHolder<ZEGRBuffer>			VertexBuffer;
 		ZEHolder<ZERNMaterial>			Material;
 		ZECanvas						Canvas;
 

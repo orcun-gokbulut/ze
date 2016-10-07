@@ -43,7 +43,7 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZELineSegment.h"
 
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNView.h"
@@ -205,7 +205,7 @@ bool ZEDGizmo::DrawRotateGizmo(const ZERNView& View)
 
 	// Small Axis
 	GizmoLines.PushTransformation();
-	GizmoLines.SetTransfomation(GetWorldTransform());
+	GizmoLines.SetTransformation(GetWorldTransform());
 
 	// Small Axis X
 	if (HoveredAxis == ZED_GA_X_AXIS || HoveredAxis == ZED_GA_XY_AXIS || HoveredAxis == ZED_GA_XZ_AXIS)
@@ -496,7 +496,7 @@ bool ZEDGizmo::DrawScaleGizmo(const ZERNView& View)
 
 	if (HoveredAxis == ZED_GA_XYZ_AXIS)
 	{
-		GizmoTriangles.SetTransfomation(ZEMatrix4x4::Identity);
+		GizmoTriangles.SetTransformation(ZEMatrix4x4::Identity);
 		GizmoTriangles.AddTriangle(ZEVector3::Zero, ZEVector3(AxisLength_2, 0.0f, 0.0f), ZEVector3(0.0f, AxisLength_2, 0.0f));
 		GizmoTriangles.AddTriangle(ZEVector3::Zero, ZEVector3(AxisLength_2, 0.0f, 0.0f), ZEVector3(0.0f, 0.0f, AxisLength_2));
 		GizmoTriangles.AddTriangle(ZEVector3::Zero, ZEVector3(0.0f, AxisLength_2, 0.0f), ZEVector3(0.0f, 0.0f, AxisLength_2));
@@ -606,16 +606,16 @@ bool ZEDGizmo::UpdateVertexBuffer()
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
-		VertexBuffer = ZEGRVertexBuffer::CreateResource(VertexBufferSize / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
+		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, VertexBufferSize, sizeof(ZECanvasVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 		if (VertexBuffer.IsNull())
 			return false;
 	}
 
 	void* Buffer;
-	VertexBuffer->Lock(&Buffer);
+	VertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer);
 		memcpy(Buffer, GizmoLines.GetBuffer(), GizmoLines.GetBufferSize());
 		memcpy((ZEBYTE*)Buffer + GizmoLines.GetBufferSize(), GizmoTriangles.GetBuffer(), GizmoTriangles.GetBufferSize());
-	VertexBuffer->Unlock();
+	VertexBuffer->Unmap();
 
 	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_VERTEX_BUFFER);
 
@@ -628,7 +628,7 @@ bool ZEDGizmo::UpdateConstantBuffer()
 		return true;
 
 	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+		ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	if (GetMode() == ZED_GM_ROTATE)
 		ConstantBuffer->SetData(&ZEMatrix4x4::Identity);
@@ -1021,7 +1021,7 @@ ZEEntityResult ZEDGizmo::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();

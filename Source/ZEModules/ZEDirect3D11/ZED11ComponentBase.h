@@ -43,6 +43,7 @@
 class ZED11Module;
 enum ZEGRFormat;
 enum ZEGRResourceUsage;
+enum ZEGRResourceMapType;
 
 class ZED11ComponentBase
 {
@@ -55,15 +56,16 @@ class ZED11ComponentBase
 
 	public:
 		static ZED11Module*				GetModule();
-		ID3D11Device*					GetDevice() const;
-		ID3D11DeviceContext*			GetMainContext() const;
+		static ID3D11Device*			GetDevice();
+		static ID3D11DeviceContext*		GetMainContext();
 
-		void							LockContext();
-		void							UnlockContext();
+		static void						LockContext();
+		static void						UnlockContext();
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 		static ZEGRFormat				ConvertDXGIFormat(DXGI_FORMAT Format);
 		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
 		static UINT						ConvertBindFlags(ZEFlags BindFlags);
 		static UINT						ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage);
+		static D3D11_MAP				ConvertMapType(ZEGRResourceMapType MapType);
 };

@@ -40,7 +40,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStagePostProcess : public ZERNStage
 {
@@ -48,8 +48,8 @@ class ZERNStagePostProcess : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		ColorTexture;
-		ZEHolder<const ZEGRTexture2D>		DepthTexture;
+		ZEHolder<const ZEGRTexture>			ColorTexture;
+		ZEHolder<const ZEGRTexture>			DepthTexture;
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();

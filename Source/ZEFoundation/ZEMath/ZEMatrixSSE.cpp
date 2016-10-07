@@ -177,10 +177,10 @@ void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatri
 			mmx5 = _mm_mul_ps(mmxMatrixA[2], mmx5);
 			mmx5 = _mm_hadd_ps(mmx5, mmx5);
 			mmx5 = _mm_hadd_ps(mmx5, mmx5);					// -, -, Rz, Rz
-		#endif
 
-		// Join
-		mmx5 = _mm_shuffle_ps(mmx3, mmx5, 0x44);		// Rz, Rz, Ry, Rx
+			// Join
+			mmx5 = _mm_shuffle_ps(mmx3, mmx5, 0x44);		// Rz, Rz, Ry, Rx
+		#endif
 
 		// Storing the Column to "Out"
 		StoreFloat3(OutColumnIndex + 3 * i, mmx5);

@@ -42,8 +42,8 @@
 
 class ZEGRShader;
 class ZEGRSampler;
-class ZEGRTexture2D;
-class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 class ZEGRContext;
 class ZEGRRenderStateData;
 class ZERNRenderer;
@@ -65,19 +65,19 @@ class ZERNStageResolving : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>	ResolveAllGBuffersRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	ResolveCustomRenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>			ResolvedInputTexture;
-		ZEHolder<ZEGRTexture2D>			ResolvedGBufferEmissive;
-		ZEHolder<ZEGRTexture2D>			ResolvedGBufferDiffuse;
-		ZEHolder<ZEGRTexture2D>			ResolvedGBufferNormal;
-		ZEHolder<ZEGRTexture2D>			ResolvedDepthTexture;
+		ZEHolder<ZEGRTexture>			ResolvedInputTexture;
+		ZEHolder<ZEGRTexture>			ResolvedGBufferEmissive;
+		ZEHolder<ZEGRTexture>			ResolvedGBufferDiffuse;
+		ZEHolder<ZEGRTexture>			ResolvedGBufferNormal;
+		ZEHolder<ZEGRTexture>			ResolvedDepthTexture;
 
-		ZEHolder<const ZEGRTexture2D>	InputTexture;
-		ZEHolder<const ZEGRTexture2D>	GBufferEmissive;
-		ZEHolder<const ZEGRTexture2D>	GBufferDiffuse;
-		ZEHolder<const ZEGRTexture2D>	GBufferNormal;
-		ZEHolder<const ZEGRTexture2D>	DepthTexture;
+		ZEHolder<const ZEGRTexture>		InputTexture;
+		ZEHolder<const ZEGRTexture>		GBufferEmissive;
+		ZEHolder<const ZEGRTexture>		GBufferDiffuse;
+		ZEHolder<const ZEGRTexture>		GBufferNormal;
+		ZEHolder<const ZEGRTexture>		DepthTexture;
 
 		ZEString						CustomInputname;
 

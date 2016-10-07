@@ -40,7 +40,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEDefinitions.h"
 #include "ZEGRShader.h"
-#include "ZEGRVertexBuffer.h"
+#include "ZEGRBuffer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRShaderMeta.h"
 

@@ -45,12 +45,10 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -63,7 +61,7 @@ void ZELightProjective::UpdateShadowMap()
 		return;
 
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
-	ShadowMap = ZEGRTexture2D::CreateResource(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL);
+	ShadowMap = ZEGRTexture::CreateResource(ZEGR_TT_2D, Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
@@ -73,12 +71,13 @@ void ZELightProjective::LoadProjectionTexture()
 	if (ProjectionTextureFileName.IsEmpty())
 		return;
 
-	ZEGRTexture2DOptions TextureOptions;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_2D;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = true;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
-	ProjectionTexture = ZEGRTexture2D::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
+	ProjectionTexture = ZEGRTexture::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
 }
 
 ZEEntityResult ZELightProjective::LoadInternal()
@@ -178,7 +177,7 @@ const ZEString& ZELightProjective::GetProjectionTextureFile() const
 	return ProjectionTextureFileName;
 }
 
-void ZELightProjective::SetProjectionTexture(const ZEGRTexture2D* Texture)
+void ZELightProjective::SetProjectionTexture(const ZEGRTexture* Texture)
 {
 	if (ProjectionTexture == Texture)
 		return;
@@ -187,7 +186,7 @@ void ZELightProjective::SetProjectionTexture(const ZEGRTexture2D* Texture)
 	ProjectionTextureFileName = Texture->GetFileName();
 }
 
-const ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const
+const ZEGRTexture* ZELightProjective::GetProjectionTexture() const
 {
 	return ProjectionTexture;
 }
@@ -268,8 +267,8 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	ShadowRenderer.EndScene();
 
 	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
-	this->ShadowMapIndex = StageShadowing->ShadowMapCount;
-	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, const_cast<ZERNStageShadowing*>(StageShadowing)->ShadowMapCount++);
+	this->ShadowMapIndex = const_cast<ZERNStageShadowing*>(StageShadowing)->ProjectiveShadowMapCount++;
+	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, this->ShadowMapIndex);
 
 	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
 	Context->SetRenderTargets(0, NULL, DepthBuffer);

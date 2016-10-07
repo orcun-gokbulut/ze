@@ -105,6 +105,17 @@ ZEUInt ZETimeStamp::GetDayOfTheYear() const
 	return Temp.tm_yday;
 }
 
+ZEInt ZETimeStamp::GetTimeZone() const
+{
+	time_t LocalTimeValue = ToCTime();
+	tm UTCTime = *gmtime(&LocalTimeValue);
+	time_t UTCTimeValue = mktime(&UTCTime);
+
+	ZEInt TimeZoneOffset = (ZEInt)difftime(LocalTimeValue, UTCTimeValue) / 3600;
+
+	return UTCTime.tm_isdst ? (TimeZoneOffset + 1) : TimeZoneOffset;
+}
+
 void ZETimeStamp::SetYear(ZEUInt Year)
 {
 	SetDateTime(Year, GetMonth(), GetDay(), GetHour(), GetMinute(), GetSecond(), GetMillisecond(), GetMicrosecond());
@@ -221,16 +232,16 @@ void ZETimeStamp::SetTime(ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Mill
 
 void ZETimeStamp::SetDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond, ZEUInt Microsecond)
 {
-	tm TempTM;
+	time_t CurrTime;
+	time(&CurrTime);
+
+	tm TempTM = *localtime(&CurrTime);
     TempTM.tm_year = Year - 1900;
 	TempTM.tm_mon = Month - 1;
     TempTM.tm_mday = Day;
 	TempTM.tm_hour = Hour;
 	TempTM.tm_min = Minute;
 	TempTM.tm_sec = Second;
-    TempTM.tm_wday = 0;
-    TempTM.tm_yday = 0;
-    TempTM.tm_isdst = 0;
 
 	FromTM(TempTM);
 	if (Value != 0)
@@ -340,7 +351,7 @@ tm ZETimeStamp::ToTM() const
 
 time_t ZETimeStamp::ToCTime() const
 {
-	return Value / 1000;
+	return Value / (1000LL * 1000LL);
 }
 
 ZEString ZETimeStamp::ToString(const char* Format) const

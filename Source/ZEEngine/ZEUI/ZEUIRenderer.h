@@ -44,7 +44,7 @@
 
 #include "ZEUIRectangle.h"
 
-class ZEGRVertexBuffer;
+class ZEGRBuffer;
 class ZEGRRenderStateData;
 class ZEGRSampler;
 class ZERNRenderer;
@@ -63,7 +63,7 @@ class ZEUIRendererBatch
 	public:
 		ZEUInt								Offset;
 		ZEUInt								Count;
-		ZEHolder<const ZEGRTexture2D>		Texture;
+		ZEHolder<const ZEGRTexture>			Texture;
 		ZERNCommand*						CustomCommand;
 
 											ZEUIRendererBatch();
@@ -75,7 +75,7 @@ class ZEUIRenderer : public ZEInitializable
 		ZERNCommand							Command;
 		ZEArray<ZEUIRectangle>				Rectangles;
 		ZESmartArray<ZEUIRendererBatch>		Batches;
-		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRBuffer>				VertexBuffer;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 		ZEHolder<ZEGRSampler>				Sampler;
 

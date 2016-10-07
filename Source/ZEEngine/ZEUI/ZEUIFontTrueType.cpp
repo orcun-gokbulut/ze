@@ -102,7 +102,7 @@ ZETaskResult ZEUIFontTrueType::UnloadInternal()
 void ZEUIFontTrueType::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height) const
 {
 	Textures.Add();
-	Textures.GetLastItem() = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	Textures.GetLastItem() = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE);
 }
 
 ZEUIFontType ZEUIFontTrueType::GetFontResourceType() const
@@ -232,7 +232,7 @@ ZEUIFontCharacter ZEUIFontTrueType::GetCharacter(char Character, char PreviousCh
 		DestRect.y = LastCharacterPosition.y;
 		DestRect.Width = FTBitmap.width;
 		DestRect.Height = FTBitmap.rows;
-		Textures[LastTextureId]->UpdateSubResource(0, 0, &DestRect, Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32));
+		Textures[LastTextureId]->Update(Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32), 0, 0, 0, &DestRect);
 
 		FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
 		FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();

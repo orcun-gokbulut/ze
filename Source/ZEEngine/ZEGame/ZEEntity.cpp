@@ -516,10 +516,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		LoadInternalChainCheck = false;
 		#endif
 		
-		EntityLock.Lock();
 		ZEEntityResult Result = LoadInternal();	
-		EntityLock.Unlock();
-
 		if (Result == ZE_ER_DONE)
 		{
 			zeDebugCheck(!LoadInternalChainCheck, "LoadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
@@ -533,9 +530,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		}
 		else if (Result == ZE_ER_FAILED_CLEANUP)
 		{
-			EntityLock.Lock();
 			UnloadInternal();
-			EntityLock.Unlock();
 			State = ZE_ES_ERROR_LOADING;
 			return ZE_TR_FAILED;
 		}
@@ -551,10 +546,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		UnloadInternalChainCheck = false;
 		#endif
 
-		EntityLock.Lock();
 		ZEEntityResult Result = UnloadInternal();
-		EntityLock.Unlock();
-
 		if (Result == ZE_ER_DONE)
 		{
 			zeDebugCheck(!UnloadInternalChainCheck, "UnloadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
@@ -578,10 +570,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		InitializeInternalChainCheck = false;
 		#endif
 
-		EntityLock.Lock();
 		ZEEntityResult Result = InitializeInternal();
-		EntityLock.Unlock();
-
 		if (Result == ZE_ER_DONE)
 		{
 			zeDebugCheck(!InitializeInternalChainCheck, "InitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
@@ -611,10 +600,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		DeinitializeInternalChainCheck = false;
 		#endif
 
-		EntityLock.Lock();
 		ZEEntityResult Result = DeinitializeInternal();
-		EntityLock.Unlock();
-
 		if (Result == ZE_ER_DONE)
 		{
 			zeDebugCheck(!DeinitializeInternalChainCheck, "DeinitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());

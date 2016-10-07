@@ -38,8 +38,9 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZELight.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStageShadowing : public ZERNStage
 {
@@ -47,8 +48,20 @@ class ZERNStageShadowing : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
-		ZEHolder<ZEGRTexture2D>			ProjectiveShadowMaps;
-		ZEUInt							ShadowMapCount;
+		ZERNRenderer					ShadowRenderer;
+
+		ZEUInt							CascadeCount;
+		ZEUInt							DirectionalShadowMapCount;
+		ZEUInt							ProjectiveShadowMapCount;
+
+		ZEUInt							DirectionalShadowMapIndex;
+		ZEUInt							ProjectiveShadowMapIndex;
+
+		ZELightShadowResolution			DirectionalShadowMapsResolution;
+		ZELightShadowResolution			ProjectiveShadowMapsResolution;
+
+		ZEHolder<ZEGRTexture>			DirectionalShadowMaps;
+		ZEHolder<ZEGRTexture>			ProjectiveShadowMaps;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
@@ -58,6 +71,21 @@ class ZERNStageShadowing : public ZERNStage
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
+
+		void							SetCascadeShadowMapsResolution(ZELightShadowResolution ShadowResolution);
+		ZELightShadowResolution			GetCascadeShadowMapsResolution() const;
+
+		void							SetProjectiveShadowMapsResolution(ZELightShadowResolution ShadowResolution);
+		ZELightShadowResolution			GetProjectiveShadowMapsResolution() const;
+
+		void							SetCascadeCount(ZEUInt CascadeCount);
+		ZEUInt							GetCascadeCount() const;
+
+		void							SetDirectionalShadowMapCount(ZEUInt DirectionalShadowMapCount);
+		ZEUInt							GetDirectionalShadowMapCount() const;
+
+		void							SetProjectiveShadowMapCount(ZEUInt ProjectiveShadowMapCount);
+		ZEUInt							GetProjectiveShadowMapCount() const;
 
 		virtual bool					Setup(ZEGRContext* Context);
 										

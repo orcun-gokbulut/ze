@@ -71,8 +71,7 @@ ZE_ENUM(ZEParticleBillboardType)
 
 class ZEParticleEffect;
 class ZEParticleModifier;
-class ZEGRConstantBuffer;
-class ZEGRStructuredBuffer;
+class ZEGRBuffer;
 class ZERNView;
 class ZERNParticleMaterial;
 class ZERNRenderParameters;
@@ -131,8 +130,8 @@ class ZEParticleEmitter : public ZEObject
 		ZEHolder<ZERNParticleMaterial>		Material;
 		ZERNCommand							RenderCommand;
 		ZEParticleBillboardType				BillboardType;
-		ZEHolder<ZEGRConstantBuffer>		InstanceBuffer;
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				InstanceBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
 
 		bool								Initialize();

@@ -40,7 +40,7 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZEFile;
-class ZEGRTexture3D;
+class ZEGRTexture;
 
 struct ZETextureOptions;
 
@@ -49,7 +49,7 @@ class ZETexture3DResource : public ZETextureResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZETexture3DResource)
 	private:
-		ZEHolder<ZEGRTexture3D>			Texture;
+		ZEHolder<ZEGRTexture>				Texture;
 
 	protected:
 											ZETexture3DResource();
@@ -60,7 +60,7 @@ class ZETexture3DResource : public ZETextureResource
 		virtual ZEGRTextureType				GetTextureType() const;
 
 		virtual ZEGRTexture*				GetTexture() const;
-		ZEGRTexture3D*						GetTexture3D() const;
+		ZEGRTexture*						GetTexture3D() const;
 
 		static void							CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);

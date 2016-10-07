@@ -41,10 +41,9 @@
 #include "ZEInterior.h"
 #include "ZEInteriorResource.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -286,7 +285,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEInteriorTransformConstants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEInteriorTransformConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	
 	ZESize PolygonCount = Resource->Polygons.GetCount();
 
@@ -326,7 +325,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		}
 	}
 
-	VertexBuffer = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEInteriorVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEInteriorVertex), sizeof(ZEInteriorVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray());
 
 	ZESize DrawCount = Draws.GetCount();
 	for (ZESize I = 0; I < DrawCount; I++)

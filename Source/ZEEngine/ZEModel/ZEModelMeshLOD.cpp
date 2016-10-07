@@ -39,11 +39,10 @@
 #include "ZEModelDraw.h"
 #include "ZEMDResourceLOD.h"
 
-#include "ZEResource/ZERSHolder.h"
-#include "ZERenderer/ZERNMaterial.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRIndexBuffer.h"
+#include "ZERenderer/ZERNMaterial.h"
+#include "ZEResource/ZERSHolder.h"
 
 bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 {
@@ -157,12 +156,12 @@ ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
 	return VertexType;
 }
 
-void ZEModelMeshLOD::SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+void ZEModelMeshLOD::SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer)
 {
 	this->VertexBuffer = VertexBuffer;
 }
 
-ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBuffer() const
+ZEHolder<const ZEGRBuffer> ZEModelMeshLOD::GetVertexBuffer() const
 {
 	return VertexBuffer;
 }
@@ -177,12 +176,12 @@ ZEMDVertexIndexType ZEModelMeshLOD::GetIndexType() const
 	return IndexType;
 }
 
-void ZEModelMeshLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
+void ZEModelMeshLOD::SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer)
 {
 	this->IndexBuffer = IndexBuffer;
 }
 
-ZEHolder<const ZEGRIndexBuffer> ZEModelMeshLOD::GetIndexBuffer() const
+ZEHolder<const ZEGRBuffer> ZEModelMeshLOD::GetIndexBuffer() const
 {
 	return IndexBuffer;
 }

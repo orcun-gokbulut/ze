@@ -37,27 +37,27 @@
 
 #include "ZERandom.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZECore/ZECore.h"
 
 #include "ZEParticleEffect.h"
 #include "ZEParticleModifier.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRStructuredBuffer.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZERenderer/ZERNStageID.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNParticleMaterial.h"
 #include "ZERenderer/ZERNShaderSlots.h"
-#include "ZERenderer/ZERNStageGBuffer.h"
-#include "ZECore/ZECore.h"
+#include "ZERenderer/ZERNStage.h"
 
 bool ZEParticleEmitter::Initialize()
 {
-	InstanceBuffer = ZEGRConstantBuffer::CreateResource(sizeof(InstanceAttributes) * 1000);
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	InstanceBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, sizeof(InstanceAttributes) * 1000, sizeof(InstanceAttributes), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_BT_CONSTANT_BUFFER);
+
 	return true;
 }
 
@@ -606,7 +606,7 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	}
 
 	InstanceAttributes* InstanceAttribute;
-	InstanceBuffer->Lock(reinterpret_cast<void**>(&InstanceAttribute));
+	InstanceBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceAttribute));
 	ZESize ParticleCount = ParticlePool.GetCount();
 	for (ZESize I = 0; I < ParticleCount; I++)
 	{
@@ -618,7 +618,7 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 			InstanceAttribute[I].Color = ParticlePool[I].Color;
 		}
 	}
-	InstanceBuffer->Unlock();
+	InstanceBuffer->Unmap();
 
 	const ZEGRTexture* DepthMap = static_cast<const ZEGRTexture*>(Stage->GetInput("DepthTexture"));
 

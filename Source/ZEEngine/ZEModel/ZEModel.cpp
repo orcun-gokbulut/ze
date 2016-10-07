@@ -43,7 +43,7 @@
 #include "ZEError.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRResource.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 
@@ -111,7 +111,7 @@ void ZEModel::UpdateConstantBufferBoneTransforms()
 		return;
 
 	void* Buffer;
-	ConstantBufferBoneTransforms->Lock(&Buffer);
+	ConstantBufferBoneTransforms->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer);
 
 		ZESize BufferIndex = 0;
 
@@ -121,7 +121,7 @@ void ZEModel::UpdateConstantBufferBoneTransforms()
 			BufferIndex++;
 		}
 
-	ConstantBufferBoneTransforms->Unlock();
+	ConstantBufferBoneTransforms->Unmap();
 
 	DirtyConstantBufferSkin = false;
 }
@@ -249,7 +249,7 @@ ZEEntityResult ZEModel::LoadInternal()
 	DirtyConstantBufferSkin = true;
 	DirtyBoundingBox = true;
 
-	ConstantBufferBoneTransforms = ZEGRConstantBuffer::CreateResource(150 * sizeof(ZEMatrix4x4));
+	ConstantBufferBoneTransforms = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, 150 * sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return ZE_ER_DONE;
 }

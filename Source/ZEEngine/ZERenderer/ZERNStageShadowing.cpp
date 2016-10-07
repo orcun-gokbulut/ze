@@ -37,9 +37,11 @@
 
 #include "ZERNStageID.h"
 #include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
-#define ZERN_SSDF_OUTPUT	1
+#define ZERN_SSDF_OUTPUT0		1
+#define ZERN_SSDF_OUTPUT1		2
+#define ZERN_SSDF_OUTPUT_ALL	(ZERN_SSDF_OUTPUT0 | ZERN_SSDF_OUTPUT1)
 
 bool ZERNStageShadowing::InitializeInternal()
 {
@@ -53,19 +55,42 @@ bool ZERNStageShadowing::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
+	DirectionalShadowMaps.Release();
 	ProjectiveShadowMaps.Release();
+
+	CascadeCount = 4;
+	DirectionalShadowMapCount = 1;
+	ProjectiveShadowMapCount = 4;
+
+	DirectionalShadowMapIndex = 0;
+	ProjectiveShadowMapIndex = 0;
+
+	DirectionalShadowMapsResolution = ZE_LSR_HIGH;
+	ProjectiveShadowMapsResolution = ZE_LSR_MEDIUM;
 
 	return ZERNStage::DeinitializeInternal();
 }
 
 void ZERNStageShadowing::CreateOutput(const ZEString& Name)
 {
-	if (Name == "ProjectiveShadowMaps")
+	if (Name == "DirectionalShadowMaps")
 	{
-		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT0))
 		{
-			ProjectiveShadowMaps = ZEGRTexture2D::CreateResource(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
-			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT);
+			ZEUInt ShadowMapRes = ZELight::ConvertShadowResolution(DirectionalShadowMapsResolution);
+			ZEUInt ArrayCount = DirectionalShadowMapCount * CascadeCount;
+			DirectionalShadowMaps = ZEGRTexture::CreateResource(ZEGR_TT_2D, ShadowMapRes, ShadowMapRes, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, ArrayCount);
+			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT0);
+		}
+	}
+	else if (Name == "ProjectiveShadowMaps")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT1))
+		{
+			ZEUInt ShadowMapRes = ZELight::ConvertShadowResolution(ProjectiveShadowMapsResolution);
+			ZEUInt ArrayCount = ProjectiveShadowMapCount;
+			ProjectiveShadowMaps = ZEGRTexture::CreateResource(ZEGR_TT_2D, ShadowMapRes, ShadowMapRes, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, ArrayCount);
+			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT1);
 		}
 	}
 }
@@ -81,6 +106,81 @@ const ZEString& ZERNStageShadowing::GetName() const
 	return Name;
 }
 
+void ZERNStageShadowing::SetCascadeShadowMapsResolution(ZELightShadowResolution ShadowResolution)
+{
+	if (DirectionalShadowMapsResolution == ShadowResolution)
+		return;
+
+	DirectionalShadowMapsResolution = ShadowResolution;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
+}
+
+ZELightShadowResolution ZERNStageShadowing::GetCascadeShadowMapsResolution() const
+{
+	return DirectionalShadowMapsResolution;
+}
+
+void ZERNStageShadowing::SetProjectiveShadowMapsResolution(ZELightShadowResolution ShadowResolution)
+{
+	if (ProjectiveShadowMapsResolution == ShadowResolution)
+		return;
+
+	ProjectiveShadowMapsResolution = ShadowResolution;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT1);
+}
+
+ZELightShadowResolution ZERNStageShadowing::GetProjectiveShadowMapsResolution() const
+{
+	return ProjectiveShadowMapsResolution;
+}
+
+void ZERNStageShadowing::SetCascadeCount(ZEUInt CascadeCount)
+{
+	if (this->CascadeCount == CascadeCount)
+		return;
+
+	this->CascadeCount = CascadeCount;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
+}
+
+ZEUInt ZERNStageShadowing::GetCascadeCount() const
+{
+	return CascadeCount;
+}
+
+void ZERNStageShadowing::SetDirectionalShadowMapCount(ZEUInt DirectionalShadowMapCount)
+{
+	if (this->DirectionalShadowMapCount == DirectionalShadowMapCount)
+		return;
+
+	this->DirectionalShadowMapCount = DirectionalShadowMapCount;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
+}
+
+ZEUInt ZERNStageShadowing::GetDirectionalShadowMapCount() const
+{
+	return DirectionalShadowMapCount;
+}
+
+void ZERNStageShadowing::SetProjectiveShadowMapCount(ZEUInt ProjectiveShadowMapCount)
+{
+	if (this->ProjectiveShadowMapCount == ProjectiveShadowMapCount)
+		return;
+
+	this->ProjectiveShadowMapCount = ProjectiveShadowMapCount;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT1);
+}
+
+ZEUInt ZERNStageShadowing::GetProjectiveShadowMapCount() const
+{
+	return ProjectiveShadowMapCount;
+}
+
 bool ZERNStageShadowing::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
@@ -89,7 +189,66 @@ bool ZERNStageShadowing::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	ShadowMapCount = 0;
+	DirectionalShadowMapIndex = 0;
+	ProjectiveShadowMapIndex = 0;
+
+	//ShadowRenderer.SetContext(Context);
+	//
+	//ze_for_each(Command, GetCommands())
+	//{
+	//	if (Command->Entity == NULL)
+	//		continue;
+	//
+	//	if (ZEClass::IsDerivedFrom(ZELight::Class(), Command->Entity->GetClass()))
+	//	{
+	//		zeWarning("Non-light entity had been added to stage shadowing");
+	//		continue;
+	//	}
+	//
+	//	ZELight* Light = static_cast<ZELight*>(Command->Entity);
+	//	ZERNView View = ShadowRenderer.GetView();
+	//	View.Position = RenderParameters->View->Position;
+	//	View.Rotation = Light->GetWorldRotation();
+	//	View.Direction = Light->GetWorldFront();
+	//	View.U = Light->GetWorldRight();
+	//	View.V = Light->GetWorldUp();
+	//	View.N = Light->GetWorldFront();
+	//
+	//	switch (Light->GetLightType())
+	//	{
+	//		case ZE_LT_DIRECTIONAL:
+	//			{
+	//				for (ZEUInt I = 0; I < CascadeCount; I++)
+	//				{
+	//
+	//				}
+	//			}
+	//			break;
+	//		case ZE_LT_PROJECTIVE:
+	//			{
+	//
+	//			}
+	//			break;
+	//		default:
+	//			break;
+	//	}
+	//
+	//	ZERNPreRenderParameters PreRenderParameters;
+	//	PreRenderParameters.Renderer = &ShadowRenderer;
+	//	PreRenderParameters.View = &View;
+	//	PreRenderParameters.Type = ZERN_PRT_SHADOW;
+	//
+	//	ShadowRenderer.StartScene(RenderParameters->Scene->GetConstantBuffer());
+	//	RenderParameters->Scene->PreRender(&Parameters);
+	//	ShadowRenderer.EndScene();
+	//
+	//	const ZEGRDepthStencilBuffer* DepthBuffer = DirectionalShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
+	//	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+	//	Context->SetRenderTargets(0, NULL, DepthBuffer);
+	//	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+	//
+	//	ShadowRenderer.Render();
+	//}
 
 	return true;
 }
@@ -98,7 +257,16 @@ ZERNStageShadowing::ZERNStageShadowing()
 {
 	DirtyFlags.RaiseAll();
 
-	ShadowMapCount = 0;
+	CascadeCount = 4;
+	DirectionalShadowMapCount = 1;
+	ProjectiveShadowMapCount = 4;
+	
+	DirectionalShadowMapIndex = 0;
+	ProjectiveShadowMapIndex = 0;
 
+	DirectionalShadowMapsResolution = ZE_LSR_HIGH;
+	ProjectiveShadowMapsResolution = ZE_LSR_MEDIUM;
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DirectionalShadowMaps), "DirectionalShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }

@@ -44,7 +44,7 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 
 class ZEATFog : public ZEEntity
 {
@@ -56,7 +56,7 @@ class ZEATFog : public ZEEntity
 		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
 		ZEHolder<ZEGRShader>			PixelShader;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		float							Density;
 

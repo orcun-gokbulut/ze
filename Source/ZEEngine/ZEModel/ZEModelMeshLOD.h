@@ -48,9 +48,7 @@
 
 class ZEModel;
 class ZEModelMesh;
-class ZEGRVertexBuffer;
-class ZEGRIndexBuffer;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZERNMaterial;
 class ZERNRenderer;
 class ZERNRenderParameters;
@@ -72,10 +70,10 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		float										EndDistance;
 
 		ZEMDVertexType								VertexType;
-		ZEHolder<const ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<const ZEGRBuffer>					VertexBuffer;
 
 		ZEMDVertexIndexType							IndexType;
-		ZEHolder<const ZEGRIndexBuffer>				IndexBuffer;
+		ZEHolder<const ZEGRBuffer>					IndexBuffer;
 
 		ZEArray<ZEModelDraw>						Draws;
 
@@ -99,14 +97,14 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		void										SetVertexType(ZEMDVertexType Type);
 		ZEMDVertexType								GetVertexType() const;
 
-		void										SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>			GetVertexBuffer() const;
+		void										SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer);
+		ZEHolder<const ZEGRBuffer>					GetVertexBuffer() const;
 
 		void										SetIndexType(ZEMDVertexIndexType Type);
 		ZEMDVertexIndexType							GetIndexType() const;
 
-		void										SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
-		ZEHolder<const ZEGRIndexBuffer>				GetIndexBuffer() const;
+		void										SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer);
+		ZEHolder<const ZEGRBuffer>					GetIndexBuffer() const;
 
 		void										SetStartDistance(float Distance);
 		float										GetStartDistance() const;

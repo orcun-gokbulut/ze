@@ -46,7 +46,7 @@
 #include "ZEEntity.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZECamera.h"
@@ -152,7 +152,7 @@ bool ZEScene::InitializeInternal()
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Initialize();
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	SceneDirtyFlags.RaiseAll();
 
 	return true;
@@ -260,7 +260,7 @@ void ZEScene::UpdateConstantBuffer()
 	SceneDirtyFlags.UnraiseFlags(ZE_SDF_CONSTANT_BUFFER);
 }
 
-const ZEGRConstantBuffer* ZEScene::GetConstantBuffer()
+const ZEGRBuffer* ZEScene::GetConstantBuffer()
 {
 	UpdateConstantBuffer();
 	return ConstantBuffer;

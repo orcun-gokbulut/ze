@@ -85,8 +85,8 @@ void ZERSResource::Destroy() const
 
 	Resource->TargetState = ZERS_RS_DESTROYED;
 	Resource->PreDestroy();
-	Resource->UpdateStateTask.Run();
 	ReferenceCountLock.Unlock();
+	Resource->UpdateStateTask.Run();
 }
 
 void ZERSResource::UpdateMemoryConsumption()

@@ -43,10 +43,10 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNFilter.h"
 #include "ZERNStageID.h"
@@ -87,7 +87,7 @@ void ZERNStageAO::CreateRandomVectors()
 		RandomVectors[I] = ZEVector4(Vector, 0.0f);
 	}
 
-	RandomVectorsTexture = ZEGRTexture2D::CreateResource(RandomVectorSize, RandomVectorSize, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, RandomVectorSize, RandomVectorSize, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageAO::CreateSphereSamples()
@@ -263,16 +263,16 @@ bool ZERNStageAO::UpdateTextures()
 	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	AmbientOcclusionTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
-	BlurTempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	AmbientOcclusionTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	BlurTempTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
 	
 	if (UseDeinterleavedTexturing)
-		ResolvedDepthTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R32_FLOAT);
+		ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R32_FLOAT);
 	else
-		ResolvedDepthTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+		ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
 
-	DeinterleavedDepthtexture = ZEGRTexture2D::CreateResource(Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
-	DeinterleavedAmbientOcclusionTexture = ZEGRTexture2D::CreateResource(Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
+	DeinterleavedDepthtexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
+	DeinterleavedAmbientOcclusionTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 
@@ -350,7 +350,7 @@ void ZERNStageAO::DeinterleaveDepth(ZEGRContext* Context)
 	ZEArray<const ZEGRRenderTarget*> RenderTargets;
 	RenderTargets.SetCount(16);
 	for (ZEUInt I = 0; I < 16; I++)
-		RenderTargets[I] = DeinterleavedDepthtexture->GetRenderTarget(0, I);
+		RenderTargets[I] = DeinterleavedDepthtexture->GetRenderTarget(I);
 
 	for (ZEUInt I = 0; I < 2; I++)
 	{
@@ -379,7 +379,7 @@ void ZERNStageAO::DeinterleaveAmbientOcclusion(ZEGRContext* Context)
 		DeinterleavedConstants.Offset = ZEVector2(I % 4, I / 4) + ZEVector2(0.5f, 0.5f);
 		DeinterleavedConstantBuffer->SetData(&DeinterleavedConstants);
 
-		const ZEGRRenderTarget* RenderTarget = DeinterleavedAmbientOcclusionTexture->GetRenderTarget(0, I);
+		const ZEGRRenderTarget* RenderTarget = DeinterleavedAmbientOcclusionTexture->GetRenderTarget(I);
 		Context->SetRenderTargets(1, &RenderTarget, NULL);
 		Context->Draw(3, 0);
 	}
@@ -400,7 +400,7 @@ void ZERNStageAO::ReinterleaveAmbientOcclusion(ZEGRContext* Context)
 	Context->Draw(3, 0);
 }
 
-void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
+void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
 	Viewport.SetWidth((float)(InputTexture->GetWidth()));
 	Viewport.SetHeight((float)(InputTexture->GetHeight()));
@@ -435,8 +435,8 @@ bool ZERNStageAO::InitializeInternal()
 	CreateSphereSamples();
 	CreateRandomVectors();
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
-	DeinterleavedConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(DeinterleavedConstants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	DeinterleavedConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(DeinterleavedConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -495,7 +495,7 @@ void ZERNStageAO::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_AODF_OUTPUT))
 		{
-			AccumulationTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			AccumulationTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_AODF_OUTPUT);
 		}
 	}
@@ -624,7 +624,7 @@ bool ZERNStageAO::Setup(ZEGRContext* Context)
 
 	Context->ClearRenderTarget(AmbientOcclusionTexture->GetRenderTarget(), ZEVector4::One);
 
-	const ZEGRConstantBuffer* ConstantBuffers[] = {ConstantBuffer, DeinterleavedConstantBuffer};
+	const ZEGRBuffer* ConstantBuffers[] = {ConstantBuffer, DeinterleavedConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 2, ConstantBuffers);
 
 	const ZEGRTexture* Textures[] = {NormalTexture, DepthTexture};

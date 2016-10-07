@@ -52,17 +52,12 @@ class ZEGRCounter
 	//ZE_DISALLOW_COPY(ZEGRCounter);
 
 	friend class ZEGRGraphicsModule;
-	friend class ZEGRVertexBuffer;
-	friend class ZEGRIndexBuffer;
-	friend class ZEGRConstantBuffer;
+	friend class ZEGRBuffer;
 	friend class ZEGRShader;
 	friend class ZEGRRenderTarget;
 	friend class ZEGRRenderState;
 	friend class ZEGRDepthStencilBuffer;
-	friend class ZEGRTexture2D;
-	friend class ZEGRTexture3D;
-	friend class ZEGRTextureCube;
-	friend class ZEGRStructuredBuffer;
+	friend class ZEGRTexture;
 
 	private:
 		ZELock						UpdateLock;

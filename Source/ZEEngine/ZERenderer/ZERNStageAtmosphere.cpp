@@ -36,7 +36,7 @@
 #include "ZERNStageAtmosphere.h"
 
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
@@ -72,7 +72,7 @@ void ZERNStageAtmosphere::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SADF_OUTPUT))
 		{
-			AccumulationTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			AccumulationTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SADF_OUTPUT);
 		}
 	}

@@ -35,6 +35,9 @@
 
 #include "ZEGRDepthStencilBuffer.h"
 
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRContext.h"
+
 void ZEGRDepthStencilBuffer::SetOwner(const ZEGRTexture* OwnerTexture)
 {
 	this->Owner = OwnerTexture;
@@ -104,9 +107,17 @@ ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGR
 
 ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
 {
-	if (Owner != NULL)
+	ZEGRGraphicsModule* GraphicsModule = ZEGRGraphicsModule::GetInstance();
+	if (GraphicsModule != NULL)
 	{
+		ZEGRContext* Context = GraphicsModule->GetMainContext();
+		if (Context != NULL && Bound)
+		{
+			ZEGRRenderTarget* CurrentRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT] = {};
+			Context->GetRenderTargets(ZEGR_MAX_RENDER_TARGET_SLOT, CurrentRenderTargets);
 
+			Context->SetRenderTargets(ZEGR_MAX_RENDER_TARGET_SLOT, CurrentRenderTargets, NULL);
+		}
 	}
 
 	Owner = NULL;

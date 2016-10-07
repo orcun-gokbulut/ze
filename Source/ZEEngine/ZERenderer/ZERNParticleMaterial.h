@@ -46,7 +46,7 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZEGRSampler;
 
 class ZERNParticleMaterial : public ZERNMaterial
@@ -62,7 +62,7 @@ class ZERNParticleMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRShader>			StageParticleRendering_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageParticleRendering_RenderState;
 
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
 
 		ZERNMap									DiffuseMap;

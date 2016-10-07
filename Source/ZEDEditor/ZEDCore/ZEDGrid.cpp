@@ -42,7 +42,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 
 void ZEDGrid::GenerateGrid()
 {
@@ -97,20 +97,20 @@ void ZEDGrid::GenerateGrid()
 
 	MajorGridCount = Canvas.GetVertexCount() - MajorGridOffset;	
 
-	VertexBuffer = Canvas.CreateVertexBuffer();
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_BT_VERTEX_BUFFER, ZEGR_TF_NONE, Canvas.GetBuffer());
 }
 
 ZEEntityResult ZEDGrid::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ConstantBufferAxisTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferAxisTransform = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBufferAxisTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 	
-	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferMinorGridTransform = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBufferMinorGridTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 	
-	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferMajorGridTransform = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBufferMajorGridTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	Material = ZERNSimpleMaterial::CreateInstance();

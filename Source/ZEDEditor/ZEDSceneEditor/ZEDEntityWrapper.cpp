@@ -37,8 +37,7 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
@@ -86,12 +85,12 @@ bool ZEDEntityWrapper::UpdateGraphics()
 
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < Canvas.GetBufferSize())
-		VertexBuffer = ZEGRVertexBuffer::CreateResource(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
+		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 
 	void* Buffer;
-	VertexBuffer->Lock(&Buffer);
-	memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetVertexCount() * sizeof(ZECanvasVertex));
-	VertexBuffer->Unlock();
+	VertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer);
+	memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetBufferSize());
+	VertexBuffer->Unmap();
 
 	Dirty = false;
 
@@ -108,8 +107,9 @@ bool ZEDEntityWrapper::InitializeInternal()
 	Material->SetVertexColorEnabled(true);
 	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 	Material->SetDepthTestDisabled(false);
+	Material->Update();
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	NamePlate = new ZEUIControl();
 
@@ -372,7 +372,7 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 
 	Context->SetVertexBuffer(0, VertexBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexStride(), 0);
+	Context->Draw(VertexBuffer->GetElementCount(), 0);
 
 	Material->CleanupMaterial(Context, Parameters->Stage);
 }

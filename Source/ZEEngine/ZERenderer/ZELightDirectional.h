@@ -41,8 +41,8 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 
-class ZEGRTexture2D;
-class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 
 class ZELightDirectional : public ZELight
 {
@@ -62,7 +62,7 @@ class ZELightDirectional : public ZELight
 											ZECascade();
 		};
 
-		ZEHolder<ZEGRTexture2D>				CascadeShadowMaps;
+		ZEHolder<ZEGRTexture>				CascadeShadowMaps;
 
 		ZEArray<ZECascade>					Cascades;
 

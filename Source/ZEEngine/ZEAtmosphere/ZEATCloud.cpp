@@ -38,11 +38,10 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -106,7 +105,7 @@ void ZEATCloud::CreatePlane()
 		{ ZEVector3(10.0f, 0.0f, -10.0f), ZEVector2(1.0f, 1.0f) }
 	};
 
-	PlaneVertexBuffer = ZEGRVertexBuffer::CreateResource(16, sizeof(Vertex), ZEGR_RU_GPU_READ_ONLY, Vertices);
+	PlaneVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, 16 * sizeof(Vertex), sizeof(Vertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices);
 }
 
 bool ZEATCloud::UpdateShaders()
@@ -214,10 +213,10 @@ ZEEntityResult ZEATCloud::LoadInternal()
 
 	CreatePlane();
 
-	PlaneTransformConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	PlaneTransformConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(PlaneTransformConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	if (!Update())
@@ -269,13 +268,14 @@ ZEATCloud::~ZEATCloud()
 
 void ZEATCloud::SetCloudTexture(const ZEString& FileName)
 {
-	ZEGRTexture2DOptions TextureOptions;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_2D;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC3_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
 
-	CloudTexture = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+	CloudTexture = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 }
 
 const ZEString& ZEATCloud::GetCloudTexture() const
@@ -418,7 +418,7 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffer(0, PlaneVertexBuffer);
 
-	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
+	Context->Draw(PlaneVertexBuffer->GetElementCount(), 0);
 }
 
 ZEATCloud* ZEATCloud::CreateInstance()

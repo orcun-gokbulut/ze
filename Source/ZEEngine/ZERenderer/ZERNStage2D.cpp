@@ -37,7 +37,7 @@
 
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZERNRenderer.h"
@@ -62,7 +62,7 @@ void ZERNStage2D::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_2DDF_OUTPUT))
 		{
-			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
+			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_2DDF_OUTPUT);
 		}
 	}

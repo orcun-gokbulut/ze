@@ -39,6 +39,7 @@
 
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEPointer/ZEHolder.h"
 
 enum ZEDGizmoMode
 {
@@ -62,8 +63,8 @@ enum ZEDGizmoAxis
 	ZED_GA_SCREEN_AXIS
 };
 
-class ZEGRVertexBuffer;
-class ZEGRConstantBuffer;
+
+class ZEGRBuffer;
 class ZERNSimpleMaterial;
 class ZERNView;
 
@@ -86,8 +87,8 @@ class ZEDGizmo : public ZEEntity
 		ZECanvas						GizmoLines;
 		ZECanvas						GizmoTriangles;
 		
-		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRBuffer>			VertexBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>	MaterialLines;
 		ZEHolder<ZERNSimpleMaterial>	MaterialTriangles;
 

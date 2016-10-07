@@ -39,10 +39,8 @@
 #include "ZEMDResourceMesh.h"
 
 #include "ZEML\ZEMLReader.h"
-#include "ZEGraphics\ZEGRVertexBuffer.h"
-#include "ZEGraphics\ZEGRIndexBuffer.h"
+#include "ZEGraphics\ZEGRBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
-#include "ZEUI\ZEUTextEditControl.h"
 
 ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 {
@@ -180,22 +178,22 @@ const ZEArray<ZEUInt32>& ZEMDResourceLOD::GetIndices32() const
 	return Indices32;
 }
 
-void ZEMDResourceLOD::SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer)
 {
 	this->VertexBuffer = VertexBuffer;
 }
 
-ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBuffer() const
+ZEHolder<const ZEGRBuffer> ZEMDResourceLOD::GetVertexBuffer() const
 {
 	return VertexBuffer;
 }
 
-void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
+void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer)
 {
 	this->IndexBuffer = IndexBuffer;
 }
 
-ZEHolder<const ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
+ZEHolder<const ZEGRBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 {
 	return IndexBuffer;
 }
@@ -220,14 +218,14 @@ void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 void ZEMDResourceLOD::GenerateBuffers()
 {
 	if (GetIndexType() == ZEMD_VIT_16BIT)
-		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices.GetCount(), ZEGR_IBF_INDEX16, ZEGR_RU_GPU_READ_ONLY, Indices.GetConstCArray()).GetPointer();
+		IndexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices.GetCount() * sizeof(ZEUInt16), sizeof(ZEUInt16), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R16_UINT, Indices.GetConstCArray()).GetPointer();
 	else if (GetIndexType() == ZEMD_VIT_32BIT)
-		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices32.GetCount(), ZEGR_IBF_INDEX32, ZEGR_RU_GPU_READ_ONLY, Indices32.GetConstCArray()).GetPointer();
+		IndexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices32.GetCount() * sizeof(ZEUInt32), sizeof(ZEUInt32), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R32_UINT, Indices32.GetConstCArray()).GetPointer();
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
-		VertexBuffer = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray()).GetPointer();
+		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEMDVertex), sizeof(ZEMDVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray()).GetPointer();
 	else if (GetVertexType() == ZEMD_VT_SKINNED)
-		VertexBuffer = ZEGRVertexBuffer::CreateResource(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray()).GetPointer();
+		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin), sizeof(ZEMDVertexSkin), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, VerticesSkin.GetCArray()).GetPointer();
 
 }
 

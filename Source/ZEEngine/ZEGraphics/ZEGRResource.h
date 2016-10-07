@@ -35,37 +35,33 @@
 
 #pragma once
 
-#include "ZEPointer/ZEReferenceCounted.h"
 #include "ZEResource/ZERSResource.h"
 
-#include "ZEGRDefinitions.h"
 #include "ZECommon.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGRDefinitions.h"
+#include "ZEGRFormat.h"
 
 
 ZE_ENUM(ZEGRResourceType)
 {
 	ZEGR_RT_NONE						= 0,
-	ZEGR_RT_VERTEX_BUFFER				= 1,
-	ZEGR_RT_INDEX_BUFFER				= 2,
-	ZEGR_RT_CONSTANT_BUFFER				= 3,
-	ZEGR_RT_TEXTURE						= 4,
-	ZEGR_RT_RENDER_TARGET				= 5,
-	ZEGR_RT_DEPTH_STENCIL_BUFFER		= 6,
-	ZEGR_RT_SHADER						= 7,
-	ZEGR_RT_RENDER_STATE				= 8,
-	ZEGR_RT_OUTPUT						= 9,
-	ZEGR_RT_MATERIAL					= 10,
-	ZEGR_RT_STRUCTURED_BUFFER			= 11
+	ZEGR_RT_BUFFER						= 1,
+	ZEGR_RT_TEXTURE						= 2,
+	ZEGR_RT_RENDER_TARGET				= 3,
+	ZEGR_RT_DEPTH_STENCIL_BUFFER		= 4,
+	ZEGR_RT_SHADER						= 5,
+	ZEGR_RT_OUTPUT						= 6
 };
 
 ZE_ENUM(ZEGRResourceUsage)
 {
-	ZEGR_RU_GPU_READ_ONLY				= 0,
-	ZEGR_RU_GPU_READ_WRITE_CPU_WRITE	= 1,
-	ZEGR_RU_GPU_READ_CPU_WRITE			= 2,
-	ZEGR_RU_CPU_READ_WRITE				= 3
+	ZEGR_RU_IMMUTABLE					= 0,
+	ZEGR_RU_STATIC						= 1,
+	ZEGR_RU_DYNAMIC						= 2,
+	ZEGR_RU_STAGING						= 3
 };
 
 ZE_ENUM(ZEGRResourceBindFlag)
@@ -76,24 +72,52 @@ ZE_ENUM(ZEGRResourceBindFlag)
 	ZEGR_RBF_DEPTH_STENCIL				= 4,
 	ZEGR_RBF_UNORDERED_ACCESS			= 8,
 	ZEGR_RBF_VERTEX_BUFFER				= 16,
-	ZEGR_RBF_INDEX_BUFFER				= 32
+	ZEGR_RBF_INDEX_BUFFER				= 32,
+	ZEGR_RBF_CONSTANT_BUFFER			= 64,
+	ZEGR_RBF_INDIRECT_ARGS				= 128
 };
+
+ZE_ENUM(ZEGRResourceMapType)
+{
+	ZEGR_RMT_READ						= 0, 
+	ZEGR_RMT_WRITE						= 1, 
+	ZEGR_RMT_READ_WRITE					= 2, 
+	ZEGR_RMT_WRITE_DISCARD				= 3,
+	ZEGR_RMT_WRITE_NO_OVERWRITE			= 4
+};
+
+typedef ZEFlags ZEGRResourceBindFlags;
 
 class ZEGRResource : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRResource)
 	friend class ZEGRGraphicsModule;
+	friend class ZEGRContext;
 	private:
 		ZEString						Name;
 		ZESize							Size;
 		ZEGRResourceUsage				Usage;
-		ZEFlags							BindFlags;
+		ZEGRResourceBindFlags			BindFlags;
+		ZEGRFormat						Format;
+
+		struct BoundStage
+		{
+			bool						BoundAsShaderResource;
+			bool						BoundAsUnorderedAccess;
+			ZEInt						Slot;
+		};
+		
+		ZEArray<BoundStage>				BoundStages;
 
 	protected:
+		void							SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource = true, bool BoundAsUnorderedAccess = false);
+		const ZEArray<BoundStage>&		GetBoundStages() const;
+
 		void							SetSize(ZESize Size);
 		void							SetResourceUsage(ZEGRResourceUsage Usage);
-		void							SetResourceBindFlags(ZEFlags BindFlags);
+		void							SetResourceBindFlags(ZEGRResourceBindFlags BindFlags);
+		void							SetFormat(ZEGRFormat Format);
 
 										ZEGRResource();
 		virtual 						~ZEGRResource();
@@ -106,5 +130,6 @@ class ZEGRResource : public ZERSResource
 
 		ZESize							GetSize() const;
 		ZEGRResourceUsage				GetResourceUsage() const;
-		ZEFlags							GetResourceBindFlags() const;
+		ZEGRResourceBindFlags			GetResourceBindFlags() const;
+		ZEGRFormat						GetFormat() const;
 };

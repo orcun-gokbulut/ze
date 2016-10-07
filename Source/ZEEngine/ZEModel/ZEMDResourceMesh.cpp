@@ -36,8 +36,7 @@
 #include "ZEMDResourceMesh.h"
 
 #include "ZEML\ZEMLReader.h"
-#include "ZEGraphics\ZEGRVertexBuffer.h"
-#include "ZEGraphics\ZEGRIndexBuffer.h"
+#include "ZEGraphics\ZEGRBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
 #include "ZEMDResource.h"
 #include "ZEMDResourceLOD.h"

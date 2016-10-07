@@ -35,7 +35,7 @@
 
 #include "ZEUTextEditControl.h"
 #include "ZEUIFont.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
 void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
 {

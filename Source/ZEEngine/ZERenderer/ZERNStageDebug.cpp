@@ -38,41 +38,26 @@
 #include "ZERNStageID.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEModel/ZEMDResource.h"
 #include "ZERNCommand.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEModel/ZEModel.h"
+#include "ZERNRenderParameters.h"
+#include "ZEMath/ZEAngle.h"
 
 #define ZERN_SDDF_SHADERS			1
 #define ZERN_SDDF_RENDER_STATES		2
 #define ZERN_SDDF_CONSTANT_BUFFERS	4
 #define ZERN_SDDF_TEXTURE			8
-
-ZEGRVertexLayout GetPositionVertexLayout()
-{
-	static ZEGRVertexLayout VertexLayout;
-	if (VertexLayout.GetElementCount() == 0)
-	{
-		ZEGRVertexElement ElementArray[] = 
-		{
-			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT_3, 0, 0, ZEGR_VU_PER_VERTEX, 0},
-		};
-
-		VertexLayout.SetElements(ElementArray, 1);
-	}
-
-	return VertexLayout;
-}
 
 bool ZERNStageDebug::UpdateShaders()
 {
@@ -99,15 +84,17 @@ bool ZERNStageDebug::UpdateShaders()
 	PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Cannot set pixel shader.");
 
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_DEBUG_SKIN_TRANSFORM"));
 	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNDebug_BoundingBox_VertexShader_Main";
-	BoundingBoxVertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(BoundingBoxVertexShader == NULL, false, "Cannot set vertex shader.");
-	
-	Options.Type = ZEGR_ST_GEOMETRY;
-	Options.EntryPoint = "ZERNDebug_BoundingBox_GeometryShader_Main";
-	BoundingBoxGeometryShader = ZEGRShader::Compile(Options);
-	zeCheckError(BoundingBoxGeometryShader == NULL, false, "Cannot set geometry shader.");
+	Options.EntryPoint = "ZERNDebug_VertexShader_Main";
+	SkinnedVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(SkinnedVertexShader == NULL, false, "Cannot set skinned vertex shader.");
+	Options.Definitions.Clear();
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNDebug_Canvas_VertexShader_Main";
+	CanvasVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(CanvasVertexShader == NULL, false, "Cannot set vertex shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_SDDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SDDF_RENDER_STATES);
@@ -131,14 +118,28 @@ bool ZERNStageDebug::UpdateRenderStates()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set debug render state.");
 	
+	RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
+	RenderState.SetShader(ZEGR_ST_VERTEX, SkinnedVertexShader);
+	SkinnedRenderStateData = RenderState.Compile();
+	zeCheckError(SkinnedRenderStateData == NULL, false, "Cannot set skinned debug render state.");
+
 	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
-	RenderState.SetVertexLayout(GetPositionVertexLayout());
-	
-	RenderState.SetShader(ZEGR_ST_VERTEX, BoundingBoxVertexShader);
-	RenderState.SetShader(ZEGR_ST_GEOMETRY, BoundingBoxGeometryShader);
-	
-	BoundingBoxRenderStateData = RenderState.Compile();
-	zeCheckError(BoundingBoxRenderStateData == NULL, false, "Cannot set debug render state.");
+	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
+
+	RenderState.SetShader(ZEGR_ST_VERTEX, CanvasVertexShader);
+	RenderState.SetShader(ZEGR_ST_GEOMETRY, NULL);
+
+	LineRenderStateData = RenderState.Compile();
+	zeCheckError(LineRenderStateData == NULL, false, "Cannot set line debug render state.");
+
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+
+	ZEGRRasterizerState RasterizerStateNoCull;
+	RasterizerStateNoCull.SetCullMode(ZEGR_CMD_NONE);
+	RenderState.SetRasterizerState(RasterizerStateNoCull);
+
+	TriangleRenderStateData = RenderState.Compile();
+	zeCheckError(TriangleRenderStateData == NULL, false, "Cannot set triangle debug render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_SDDF_RENDER_STATES);
 
@@ -171,33 +172,156 @@ bool ZERNStageDebug::Update()
 	return true;
 }
 
-bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
+void ZERNStageDebug::ProcessCommands(ZEGRContext* Context)
 {
-	const ZEList2<ZERNCommand>& Commands = GetCommands();
+	ZERNRenderParameters RenderParameters;
+	RenderParameters.Context = Context;
+	RenderParameters.Renderer = GetRenderer();
+	RenderParameters.Stage = this;
 
-	ZESmartArray<ZEVector3> Vertices;
-	ze_for_each(Command, Commands)
+	ze_for_each(Command, GetCommands())
 	{
 		ZEEntity* Entity = Command->Entity;
-		if (Entity != NULL && Entity->GetClass() == ZEModel::Class())
+		if (Entity != NULL)
 		{
-			ZEAABBox Box = Entity->GetWorldBoundingBox();
-			Vertices.Add(Box.Min);
-			Vertices.Add(Box.Max);
+			if (Entity->GetClass() == ZEModel::Class() && !Constants.ShowBoundingBox)
+			{
+				ZEModel* Model = static_cast<ZEModel*>(Entity);
+				bool Skinned = Model->GetBones().GetCount() > 0;
+
+				Context->SetRenderState(Skinned ? SkinnedRenderStateData : RenderStateData);
+
+				RenderParameters.Command = Command.GetPointer();
+				Command->Execute(&RenderParameters);
+			}
+
+			GatherVertices(Entity);
 		}
 	}
 
-	ZESize VertexCount = Vertices.GetCount();
-	if (VertexCount == 0)
-		return false;
-
-	if (BoundingBoxVertexBuffer == NULL || 
-		BoundingBoxVertexBuffer->GetVertexCount() != VertexCount)
+	if (LineCanvas.GetVertexCount() > 0)
 	{
-		BoundingBoxVertexBuffer = ZEGRVertexBuffer::CreateResource(VertexCount, sizeof(ZEVector3), ZEGR_RU_GPU_READ_ONLY, &Vertices[0]);
+		if (LineVertexBuffer == NULL || 
+			LineVertexBuffer->GetElementCount() < LineCanvas.GetVertexCount())
+			LineVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, LineCanvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, LineCanvas.GetBuffer());
+		else
+		{
+			void* Buffer;
+			LineVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer);
+			memcpy(Buffer, LineCanvas.GetBuffer(), LineCanvas.GetBufferSize());
+			LineVertexBuffer->Unmap();
+			//LineVertexBuffer->Update(LineCanvas.GetBuffer(), LineCanvas.GetBufferSize(), 0, LineCanvas.GetBufferSize());
+		}
+
+		Context->SetRenderState(LineRenderStateData);
+
+		Context->SetVertexBuffer(0, LineVertexBuffer);
+		Context->Draw(LineCanvas.GetVertexCount(), 0);
 	}
 
-	return true;
+	if (TriangleCanvas.GetVertexCount() > 0)
+	{
+		if (TriangleVertexBuffer == NULL || 
+			TriangleVertexBuffer->GetElementCount() < TriangleCanvas.GetVertexCount())
+			TriangleVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, TriangleCanvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_STATIC, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, TriangleCanvas.GetBuffer());
+		else
+			TriangleVertexBuffer->Update(TriangleCanvas.GetBuffer(), TriangleCanvas.GetBufferSize(), 0, TriangleCanvas.GetBufferSize());
+	
+		Context->SetRenderState(TriangleRenderStateData);
+
+		Context->SetVertexBuffer(0, TriangleVertexBuffer);
+		Context->Draw(TriangleCanvas.GetVertexCount(), 0);
+	}
+
+	LineCanvas.Clean();
+	TriangleCanvas.Clean();
+}
+
+void ZERNStageDebug::GatherVertices(ZEEntity* Entity)
+{
+	if (Constants.ShowBoundingBox)
+	{
+		ZEAABBox EntityAABB = Entity->GetWorldBoundingBox();
+
+		LineCanvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+		LineCanvas.SetTranslation(EntityAABB.GetCenter());
+		ZEVector3 WidthHeightLength = EntityAABB.Max - EntityAABB.Min;
+		LineCanvas.AddWireframeBox(WidthHeightLength.x, WidthHeightLength.y, WidthHeightLength.z);
+
+		if (Entity->GetClass() == ZEModel::Class())
+		{
+			ZEModel* Model = static_cast<ZEModel*>(Entity);
+
+			LineCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
+			ze_for_each(Mesh, Model->GetMeshes())
+			{
+				ZEAABBox MeshAABB = Mesh->GetWorldBoundingBox();
+				LineCanvas.SetTranslation(MeshAABB.GetCenter());
+				WidthHeightLength = MeshAABB.Max - MeshAABB.Min;
+				LineCanvas.AddWireframeBox(WidthHeightLength.x, WidthHeightLength.y, WidthHeightLength.z);
+			}
+
+			LineCanvas.SetColor(ZEVector4(0.0f, 1.0f, 0.0f, 1.0f));
+			ze_for_each(Bone, Model->GetBones())
+			{
+				ZEAABBox BoneAABB = Bone->GetWorldBoundingBox();
+				LineCanvas.SetTranslation(BoneAABB.GetCenter());
+				WidthHeightLength = BoneAABB.Max - BoneAABB.Min;
+				LineCanvas.AddWireframeBox(WidthHeightLength.x, WidthHeightLength.y, WidthHeightLength.z);
+			}
+		}
+	}
+	else
+	{
+		if (Entity->GetClass() == ZEModel::Class())
+		{
+			LineCanvas.ResetTransforms();
+			TriangleCanvas.ResetTransforms();
+
+			ZEModel* Model = static_cast<ZEModel*>(Entity);
+
+			ze_for_each(Bone, Model->GetBones())
+			{
+				ZEVector3 LineStart = Bone->GetWorldPosition();
+
+				TriangleCanvas.SetColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+				TriangleCanvas.SetTranslation(LineStart);
+				TriangleCanvas.AddSphere(0.05f, 4, 1);
+
+				LineCanvas.SetColor(ZEVector4(1.0f, 0.0f, 1.0f, 1.0f));
+				ze_for_each(ChildBone, Bone->GetChildBones())
+				{
+					ZEVector3 LineEnd = ChildBone->GetWorldPosition();
+
+					LineCanvas.AddPoint(LineStart);
+					LineCanvas.AddPoint(LineEnd);
+				}
+			}
+
+			TriangleCanvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+			ze_for_each(Mesh, Model->GetMeshes())
+			{
+				for (ZESize I = 0; I < Mesh->GetClippingPlaneCount(); I++)
+				{
+					ZEVector3 PositionWorld;
+					ZEVector3 NormalWorld;
+					ZEMatrix4x4::Transform(PositionWorld, Mesh->GetWorldTransform(), Mesh->GetClippingPlane(I).p);
+					ZEMatrix4x4::Transform3x3(NormalWorld, Mesh->GetWorldTransform(), Mesh->GetClippingPlane(I).n);
+					ZEVector3::Normalize(NormalWorld, NormalWorld);
+
+					ZEQuaternion RotationWorld;
+					ZEQuaternion::CreateFromDirection(RotationWorld, NormalWorld);
+					TriangleCanvas.SetRotation(RotationWorld * ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
+					TriangleCanvas.SetTranslation(PositionWorld);
+					TriangleCanvas.AddPlane(10.0f, 10.0f);
+
+					LineCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
+					LineCanvas.AddPoint(PositionWorld);
+					LineCanvas.AddPoint(PositionWorld + NormalWorld * 1.0f);
+				}
+			}
+		}
+	}
 }
 
 bool ZERNStageDebug::InitializeInternal()
@@ -205,7 +329,7 @@ bool ZERNStageDebug::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -218,13 +342,18 @@ bool ZERNStageDebug::DeinitializeInternal()
 	RenderStateData.Release();
 	ConstantBuffer.Release();
 
-	BoundingBoxVertexShader.Release();
-	BoundingBoxGeometryShader.Release();
-	BoundingBoxRenderStateData.Release();
+	SkinnedVertexShader.Release();
+	SkinnedRenderStateData.Release();
 
-	BoundingBoxVertexBuffer.Release();
+	LineVertexBuffer.Release();
+	TriangleVertexBuffer.Release();
+
+	CanvasVertexShader.Release();
+	LineRenderStateData.Release();
+	TriangleRenderStateData.Release();
 
 	DepthMap.Release();
+	OutputTexture.Release();
 
 	return ZERNStage::DeinitializeInternal();
 }
@@ -302,7 +431,7 @@ bool ZERNStageDebug::GetCullBackface() const
 
 void ZERNStageDebug::Resized(ZEUInt Width, ZEUInt Height)
 {
-	DepthMap = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
+	DepthMap = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_STATIC, ZEGR_RBF_DEPTH_STENCIL);
 }
 
 bool ZERNStageDebug::Setup(ZEGRContext* Context)
@@ -321,26 +450,10 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	
+	ProcessCommands(Context);
 
-	if (Constants.ShowBoundingBox)
-	{
-		if (SetupBoundingBoxVertexBuffer())
-		{
-			Context->SetRenderState(BoundingBoxRenderStateData);
-			Context->SetVertexBuffer(0, BoundingBoxVertexBuffer);
-			Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
-
-			CleanUp(Context);
-		}
-
-		return false;
-	}
-	else
-	{
-		Context->SetRenderState(RenderStateData);
-	}
-
-	return true;
+	return false;
 }
 
 void ZERNStageDebug::CleanUp(ZEGRContext* Context)

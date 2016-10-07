@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Texture2D.h
+ Zinek Engine - ZEGRBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,42 +35,50 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZED11ComponentBase.h"
+#include "ZEGRResource.h"
 
-#include "ZETypes.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
+ZE_ENUM(ZEGRBufferType)
 {
-	friend class ZED11Module;
-	friend class ZED11Context;
-	friend class ZED11Output;
+	ZEGR_BT_NONE,
+	ZEGR_BT_VERTEX_BUFFER,
+	ZEGR_BT_INDEX_BUFFER,
+	ZEGR_BT_CONSTANT_BUFFER,
+	ZEGR_BT_STRUCTURED_BUFFER,
+	ZEGR_BT_RAW_BUFFER,
+	ZEGR_BT_BUFFER
+};
 
-	private:
-		ID3D11Texture2D*						Texture2D;
-		ID3D11ShaderResourceView*				ShaderResourceView;
-		ID3D11UnorderedAccessView*				UnorderedAccessView;
+class ZEGRBuffer : public ZEGRResource
+{
+	protected:
+		ZESize								SizeInBytes;
+		ZESize								StrideInBytes;
+		ZEUInt								ElementCount;
+		ZEGRBufferType						Type;
 
-		virtual bool							Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);
-		virtual void							Deinitialize();
+		virtual bool						Initialize(ZEGRBufferType BufferType, ZESize SizeInBytes, ZESize StrideInBytes, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEGRFormat Format, const void* Data);
+		virtual void						Deinitialize();
 
-		ID3D11Resource*							GetResource() const;
-		ID3D11Texture2D*						GetTexture() const;
-		ID3D11ShaderResourceView*				GetShaderResourceView() const;
-		ID3D11UnorderedAccessView*				GetUnorderedAccessView() const;
-
-												ZED11Texture2D();
-		virtual									~ZED11Texture2D();
+											ZEGRBuffer();
+		virtual								~ZEGRBuffer();
 
 	public:
-		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level = 0, ZEUInt ArrayIndex = 0) const;
-		virtual const ZEGRDepthStencilBuffer*	GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
+		ZESize								GetSizeInBytes() const;
+		ZESize								GetStrideInBytes() const;
+		ZEUInt								GetElementCount() const;
 
-		virtual void							UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
-		virtual bool							Lock(void** Buffer, ZESize* RowPitch = NULL, ZESize* SlicePitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0);
-		virtual void							Unlock();
+		ZEGRBufferType						GetBufferType() const;
+		virtual ZEGRResourceType			GetResourceType() const;
+
+		void								SetData(const void* Data);
+
+		virtual bool						Map(ZEGRResourceMapType MapType, void** Buffer, ZESize* SizeInBytes = NULL) = 0;
+		virtual void						Unmap() = 0;
+		
+		virtual void						Update(const void* SrcData, ZESize SrcSizeInBytes, ZEUInt DestOffsetInBytes = 0, ZESize DestSizeInBytes = 0) = 0;
+
+		static ZEHolder<ZEGRBuffer>			CreateResource(ZEGRBufferType BufferType, ZESize SizeInBytes, ZESize StrideInBytes, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEGRFormat Format = ZEGR_TF_NONE, const void* Data = NULL);
+		static ZEHolder<const ZEGRBuffer>	CreateResourceShared(const ZEGUID& GUID, ZEGRBufferType BufferType, ZESize SizeInBytes, ZESize StrideInBytes, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEGRFormat Format = ZEGR_TF_NONE, const void* Data = NULL, ZEGRBuffer** StagingResource = NULL);
 };

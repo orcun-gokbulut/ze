@@ -35,12 +35,12 @@
 
 #include "ZERNStageAntiAliasing.h"
 
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNRenderer.h"
@@ -152,10 +152,10 @@ bool ZERNStageAntiAliasing::UpdateTextures()
 	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	EdgeTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	EdgeTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	EdgeRenderTarget = EdgeTexture->GetRenderTarget();
 
-	BlendTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	BlendTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	BlendRenderTarget = BlendTexture->GetRenderTarget();
 
 	DirtyFlags.UnraiseFlags(ZERN_AADF_TEXTURE);
@@ -169,7 +169,7 @@ bool ZERNStageAntiAliasing::UpdateConstantBuffers()
 		return true;
 
 	if (ConstantBuffer == NULL)
-		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+		ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ConstantBuffer->SetData(&Constants);
 
@@ -242,8 +242,8 @@ bool ZERNStageAntiAliasing::InitializeInternal()
 	SamplerDescriptionPointClamp.MipFilter = ZEGR_TFM_POINT;
 	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescriptionPointClamp);
 
-	AreaTexture = ZEGRTexture2D::CreateResource(AREATEX_WIDTH, AREATEX_HEIGHT, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, areaTexBytes);
-	SearchTexture = ZEGRTexture2D::CreateResource(SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, 1, ZEGR_TF_R8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, searchTexBytes);
+	AreaTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, AREATEX_WIDTH, AREATEX_HEIGHT, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, areaTexBytes);
+	SearchTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, 1, ZEGR_TF_R8_UNORM, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, searchTexBytes);
 
 	return Update();
 }
@@ -292,7 +292,7 @@ void ZERNStageAntiAliasing::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_AADF_OUTPUT))
 		{
-			OutputTexture = ZEGRTexture2D::CreateResource(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat()).GetPointer();
+			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat()).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_AADF_OUTPUT);
 		}
 	}

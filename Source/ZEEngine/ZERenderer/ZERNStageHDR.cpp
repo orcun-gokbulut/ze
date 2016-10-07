@@ -46,9 +46,9 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompiler.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
@@ -166,9 +166,9 @@ bool ZERNStageHDR::UpdateTextures()
 	ZEUInt CurrentWidth = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt CurrentHeight = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	BrightTexture = ZEGRTexture2D::CreateResource(CurrentWidth / 2, CurrentHeight / 2, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture4x = ZEGRTexture2D::CreateResource(CurrentWidth / 4, CurrentHeight / 4, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture8x = ZEGRTexture2D::CreateResource(CurrentWidth / 8, CurrentHeight / 8, 1, ZEGR_TF_R11G11B10_FLOAT);
+	BrightTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 2, CurrentHeight / 2, 1, ZEGR_TF_R11G11B10_FLOAT);
+	DownScaledTexture4x = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 4, CurrentHeight / 4, 1, ZEGR_TF_R11G11B10_FLOAT);
+	DownScaledTexture8x = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 8, CurrentHeight / 8, 1, ZEGR_TF_R11G11B10_FLOAT);
 
 	ZEInt ExponentWidth = (ZEInt)(ZEMath::Log10((float)CurrentWidth) / ZEMath::Log10(2.0f));
 	ZEInt ExponentHeight = (ZEInt)(ZEMath::Log10((float)CurrentHeight) / ZEMath::Log10(2.0f));
@@ -180,14 +180,14 @@ bool ZERNStageHDR::UpdateTextures()
 	for (ZEInt I = (LevelCount - 1); I >= 0; I--)
 	{
 		ZEUInt Size = (ZEUInt)ZEMath::Power(2.0f, (float)I);
-		LuminanceTextures[Index++] = ZEGRTexture2D::CreateResource(Size, Size, 1, ZEGR_TF_R16_FLOAT);
+		LuminanceTextures[Index++] = ZEGRTexture::CreateResource(ZEGR_TT_2D, Size, Size, 1, ZEGR_TF_R16_FLOAT);
 	}
 
-	CurrentAdaptedLuminance = ZEGRTexture2D::CreateResource(1, 1, 1, ZEGR_TF_R16_FLOAT);
-	PreviousAdaptedLuminance = ZEGRTexture2D::CreateResource(1, 1, 1, ZEGR_TF_R16_FLOAT);
+	CurrentAdaptedLuminance = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1, 1, 1, ZEGR_TF_R16_FLOAT);
+	PreviousAdaptedLuminance = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1, 1, 1, ZEGR_TF_R16_FLOAT);
 
 	ZEUInt16 One = 1;
-	PreviousAdaptedLuminance->UpdateSubResource(0, 0, NULL, &One, 1);
+	PreviousAdaptedLuminance->Update(&One, 1);
 
 	DirtyFlags.UnraiseFlags(ZERN_SHDF_TEXTURE);
 
@@ -245,7 +245,7 @@ void ZERNStageHDR::CalculateAdaptedLuminance(ZEGRContext* Context)
 	Context->Draw(3, 0);
 }
 
-const ZEGRTexture2D* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
+const ZEGRTexture* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
 {
 	const ZEGRRenderTarget* RenderTarget = BrightTexture->GetRenderTarget();
 
@@ -269,7 +269,7 @@ const ZEGRTexture2D* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
 	return DownScaledTexture4x;
 }
 
-void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomTexture)
+void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture* BloomTexture)
 {
 	Viewport.SetWidth((float)OutputColorTexture->GetWidth());
 	Viewport.SetHeight((float)OutputColorTexture->GetHeight());
@@ -292,7 +292,7 @@ void ZERNStageHDR::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SHDF_OUTPUT))
 		{
-			OutputColorTexture = ZEGRTexture2D::CreateResource(InputColorTexture->GetWidth(), InputColorTexture->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
+			OutputColorTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputColorTexture->GetWidth(), InputColorTexture->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SHDF_OUTPUT);
 		}
 	}
@@ -303,7 +303,7 @@ bool ZERNStageHDR::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 	
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	Filter.Initialize();
 
@@ -530,10 +530,10 @@ bool ZERNStageHDR::Setup(ZEGRContext* Context)
 
 	CalculateAverageLuminance(Context);
 	CalculateAdaptedLuminance(Context);
-	const ZEGRTexture2D* BloomTexture = (Constants.BloomEnabled) ? CalculateBloom(Context) : NULL;
+	const ZEGRTexture* BloomTexture = (Constants.BloomEnabled) ? CalculateBloom(Context) : NULL;
 	ToneMapping(Context, BloomTexture);
 
-	ZEHolder<ZEGRTexture2D> Temp = PreviousAdaptedLuminance;
+	ZEHolder<ZEGRTexture> Temp = PreviousAdaptedLuminance;
 	PreviousAdaptedLuminance = CurrentAdaptedLuminance;
 	CurrentAdaptedLuminance = Temp;
 

@@ -158,6 +158,12 @@ void ZEModelBone::TransformChangedLocal()
 
 	ze_for_each(ChildBone, ChildBones)
 		ChildBone->TransformChangedModel();
+
+	if (Model != NULL)
+	{
+		Model->ChildBoundingBoxChanged();
+		Model->DirtyConstantBufferSkin = true;
+	}
 }
 
 void ZEModelBone::TransformChangedModel()

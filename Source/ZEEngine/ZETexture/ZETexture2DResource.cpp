@@ -46,7 +46,7 @@
 #include "ZETextureCacheDataIdentifier.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
 #include "ZEPointer/ZEPointer.h"
 #include "ZEMath/ZEMath.h"
@@ -66,7 +66,7 @@ ZEGRTexture* ZETexture2DResource::GetTexture() const
 	return Texture;
 }
 
-ZEGRTexture2D* ZETexture2DResource::GetTexture2D() const
+ZEGRTexture* ZETexture2DResource::GetTexture2D() const
 {
 	return Texture;
 }
@@ -246,7 +246,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	ZEGRFormat Format = sRGB ? ZEGR_TF_R8G8B8A8_UNORM_SRGB : ZEGR_TF_R8G8B8A8_UNORM;
 
 	ZEPointer<ZETexture2DResource, ZEDeletorRelease<ZETexture2DResource>> TextureResource = new ZETexture2DResource();	
-	TextureResource->Texture = ZEGRTexture2D::CreateResource(TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, Format);
+	TextureResource->Texture = ZEGRTexture::CreateResource(ZEGR_TT_2D, TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, Format, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE);
 	if (TextureResource->Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
@@ -255,7 +255,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	}
 
 	ZETextureLevel& TextureLevel = TextureData.GetSurfaces()[0].GetLevels()[0];
-	TextureResource->Texture->UpdateSubResource(0, 0, NULL, TextureLevel.GetData(), TextureLevel.GetPitch());
+	TextureResource->Texture->Update(TextureLevel.GetData(), TextureLevel.GetPitch());
 
 	if (FinalOptions.MaximumMipmapLevel > 1)
 		ZEGRGraphicsModule::GetInstance()->GetMainContext()->GenerateMipMaps(TextureResource->Texture);
