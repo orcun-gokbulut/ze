@@ -46,8 +46,8 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
-class ZEGRTexture3D;
+class ZEGRBuffer;
+class ZEGRTexture;
 
 class ZEATMoon : public ZEEntity
 {
@@ -60,9 +60,9 @@ class ZEATMoon : public ZEEntity
 		ZEHolder<ZEGRShader>				PixelShader;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
-		ZEHolder<const ZEGRTexture3D>		PhaseTexture;
+		ZEHolder<const ZEGRTexture>			PhaseTexture;
 
 		ZEVector3							Direction;
 		float								DiskRadius;

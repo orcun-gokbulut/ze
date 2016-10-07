@@ -45,7 +45,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -224,7 +224,7 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 	SetScale(Resource->GetScale());
 	SetVisible(Resource->GetVisible());
 	SetBoundingBox(Resource->GetBoundingBox());
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEModelMeshConstants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEModelMeshConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ze_for_each(ResourceLOD, Resource->GetLODs())
 	{
@@ -241,6 +241,8 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 bool ZEModelMesh::Unload()
 {
 	DirtyFlags.RaiseAll();
+
+	ConstantBuffer.Release();
 
 	while (LODs.GetFirst() != NULL)
 	{

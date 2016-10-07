@@ -58,6 +58,7 @@ class ZETimeStamp
 		ZEUInt					GetYear() const;
 		ZEUInt					GetDayOfTheWeek() const;
 		ZEUInt					GetDayOfTheYear() const;
+		ZEInt					GetTimeZone() const;
 
 		void					SetYear(ZEUInt Month);
 		void					SetMonth(ZEUInt Month);

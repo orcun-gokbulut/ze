@@ -49,7 +49,7 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZERNPreRenderParameters;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZERayCastParameters;
 class ZERayCastReport;
 
@@ -95,7 +95,7 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		bool									CustomDrawOrderEnabled;
 		ZEUInt8									CustomDrawOrder;
 		ZEArray<ZEPlane>						ClippingPlanes;
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
 		const ZEMDResourceMesh*					Resource;
 

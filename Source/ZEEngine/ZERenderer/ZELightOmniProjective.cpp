@@ -36,8 +36,7 @@
 #include "ZELightOmniProjective.h"
 
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
-#include "ZETexture/ZETextureCubeResource.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -49,12 +48,13 @@ void ZELightOmniProjective::LoadProjectionTexture()
 	if (ProjectionTextureFileName.IsEmpty())
 		return;
 
-	ZEGRTextureCubeOptions TextureOptions;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_CUBE;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = true;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
-	ProjectionTexture = ZEGRTextureCube::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
+	ProjectionTexture = ZEGRTexture::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
 }
 
 ZEEntityResult ZELightOmniProjective::LoadInternal()
@@ -112,12 +112,12 @@ const ZEString& ZELightOmniProjective::GetProjectionTextureFile() const
 	return ProjectionTextureFileName;
 }
 
-const ZEGRTextureCube* ZELightOmniProjective::GetProjectionTexture()
+const ZEGRTexture* ZELightOmniProjective::GetProjectionTexture()
 {
 	return ProjectionTexture;
 }
 
-void ZELightOmniProjective::SetProjectionTexture(const ZEGRTextureCube* Texture)
+void ZELightOmniProjective::SetProjectionTexture(const ZEGRTexture* Texture)
 {
 	ProjectionTexture = Texture;
 }

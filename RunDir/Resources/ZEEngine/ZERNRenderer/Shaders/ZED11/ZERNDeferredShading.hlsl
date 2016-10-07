@@ -44,9 +44,9 @@
 struct ZERNDeferredShading_VertexShader_Input
 {
 	float3	Position			: POSITION0;
-	float2	Texcoord			: TEXCOORD0;
 	float3	Normal				: NORMAL0;
-	float4	Color				: COLOR0;	
+	float2	Texcoord			: TEXCOORD0;
+	float4	Color				: COLOR0;
 };
 
 struct ZERNDeferredShading_VertexShader_Output
@@ -161,7 +161,7 @@ void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport 
 		Surfaces[S].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, S));
 		Surfaces[S].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, S);
 	
-		EdgePixel = EdgePixel || (abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > 0.1f) || (dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < 0.99f);
+		EdgePixel = EdgePixel || (abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > 20.0f) || (dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < 0.9f);
 	}
 	
 	if (!EdgePixel)

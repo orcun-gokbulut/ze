@@ -41,14 +41,12 @@
 #include "ZETypes.h"
 
 struct ID3D11DepthStencilView;
-struct ID3D11Texture2D;
 
 class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11ComponentBase
 {
 	friend class ZED11Module;
-	friend class ZED11Output;
-	friend class ZED11Texture2D;
 	friend class ZED11Context;
+	friend class ZED11Texture;
 
 	private:
 		ID3D11DepthStencilView*			View;

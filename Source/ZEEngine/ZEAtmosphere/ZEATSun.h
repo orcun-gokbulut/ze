@@ -46,7 +46,7 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 
 class ZEATSun : public ZEEntity
 {
@@ -59,7 +59,7 @@ class ZEATSun : public ZEEntity
 		ZEHolder<ZEGRShader>			PixelShader;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		ZEVector3						Direction;
 		float							DiskRadius;

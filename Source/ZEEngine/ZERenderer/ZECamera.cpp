@@ -39,11 +39,11 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZERay.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRDefinitions.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGROutput.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 #define ZE_CDF_VIEW								0x0001
 #define ZE_CDF_VIEW_FRUSTUM						0x0002

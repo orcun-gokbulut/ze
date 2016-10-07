@@ -47,9 +47,8 @@ class ZEGRRenderStateData;
 class ZEGRShader;
 class ZEGRSampler;
 class ZEGRContext;
-class ZEGRConstantBuffer;
-class ZEGRTexture2D;
-class ZEGRTexture3D;
+class ZEGRBuffer;
+class ZEGRTexture;
 class ZEATSun;
 class ZEATMoon;
 class ZEATFog;
@@ -79,7 +78,7 @@ class ZEATAtmosphere : public ZEEntity
 
 		ZEHolder<ZEGRShader>			SkyPixelShader;
 		ZEHolder<ZEGRRenderStateData>	SkyRenderStateData;
-		ZEHolder<ZEGRConstantBuffer>	SkyConstantBuffer;
+		ZEHolder<ZEGRBuffer>			SkyConstantBuffer;
 
 		ZEHolder<ZEGRShader>			PrecomputeExtinctionPixelShader;
 		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
@@ -95,11 +94,11 @@ class ZEATAtmosphere : public ZEEntity
 		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
 
-		ZEHolder<ZEGRTexture3D>			PrecomputedSingleScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>			PrecomputedMultipleScatteringBuffer;
-		ZEHolder<ZEGRTexture2D>			PrecomputedExtinctionBuffer;
+		ZEHolder<ZEGRTexture>			PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture>			PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture>			PrecomputedExtinctionBuffer;
 
-		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
+		ZEHolder<ZEGRTexture>			RandomVectorsTexture;
 
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;

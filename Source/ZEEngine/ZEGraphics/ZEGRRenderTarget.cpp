@@ -80,13 +80,17 @@ ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Forma
 
 ZEGRRenderTarget::~ZEGRRenderTarget()
 {
-	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
-	if (Context != NULL && Bound)
+	ZEGRGraphicsModule* GraphicsModule = ZEGRGraphicsModule::GetInstance();
+	if (GraphicsModule != NULL)
 	{
-		ZEGRDepthStencilBuffer* CurrentDepthStencilBuffer;
-		Context->GetDepthStencilBuffer(&CurrentDepthStencilBuffer);
+		ZEGRContext* Context = GraphicsModule->GetMainContext();
+		if (Context != NULL && Bound)
+		{
+			ZEGRDepthStencilBuffer* CurrentDepthStencilBuffer;
+			Context->GetDepthStencilBuffer(&CurrentDepthStencilBuffer);
 
-		Context->SetRenderTargets(0, NULL, CurrentDepthStencilBuffer);
+			Context->SetRenderTargets(0, NULL, CurrentDepthStencilBuffer);
+		}
 	}
 
 	Owner = NULL;

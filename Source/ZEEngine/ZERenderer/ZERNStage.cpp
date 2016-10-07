@@ -38,6 +38,7 @@
 #include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRContext.h"
 
 const ZEArray<ZERNStageResource>& ZERNStage::GetInputResources() const
 {
@@ -172,12 +173,14 @@ bool ZERNStage::Setup(ZEGRContext* Context)
 	zeCheckError(Renderer == NULL, false, "Stage process failed. Owner renderer of the stage cannot be NULL. Stage: \"%s\"", GetName().ToCString());
 	zeCheckError(Context == NULL, false, "Stage process failed. Parameter context cannot be NULL. Stage: \"%s\"", GetName().ToCString());
 
+	Context->BeginEvent(GetName());
+
 	return true;
 }
 
 void ZERNStage::CleanUp(ZEGRContext* Context)
 {
-
+	Context->EndEvent();
 }
 
 ZERNStage::ZERNStage() : Link(this)

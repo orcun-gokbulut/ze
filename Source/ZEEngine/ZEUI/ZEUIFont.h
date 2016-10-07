@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
 
-ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZEGRTexture2D.h");
+ZE_META_FORWARD_DECLARE(ZEGRTexture, "ZEGraphics/ZEGRTexture.h");
 
 ZE_ENUM(ZEUIFontType)
 {
@@ -71,7 +71,7 @@ class ZEUIFontCharacterMetric : public ZEObject
 class ZEUIFontCharacter : public ZEObject
 {
 	public:
-		ZEHolder<const ZEGRTexture2D>		Texture;
+		ZEHolder<const ZEGRTexture>			Texture;
 		ZEUInt32							GlyphIndex;
 		char								Character;
 		ZEUIFontCharacterMetric				CharacterMetric;

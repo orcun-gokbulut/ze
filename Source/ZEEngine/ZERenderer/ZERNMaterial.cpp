@@ -37,7 +37,7 @@
 
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZERNStageID.h"
 
 ZERNMaterial::ZERNMaterial()
 {
@@ -67,10 +67,10 @@ bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
-	if (!IsInitialized() || !IsLoaded())
+	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
 
-	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
+	if (!IsInitialized() || (Stage->GetId() != ZERN_STAGE_FORWARD_POST_HDR && !IsLoaded()))
 		return false;
 
 	return true;

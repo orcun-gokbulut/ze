@@ -40,7 +40,7 @@
 #include "ZEUI/ZEUILabel.h"
 
 class ZERNMaterial;
-class ZEGRVertexBuffer;
+class ZEGRBuffer;
 class ZEUIFontTrueType;
 class ZEUIManager;
 

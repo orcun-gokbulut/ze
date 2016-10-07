@@ -39,15 +39,14 @@
 
 #include "ZEMath/ZEBSphere.h"
 
-class ZEGRTextureCube;
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZETextureCubeResource;
 
 class ZELightOmniProjective : public ZELight
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<const ZEGRTextureCube>	ProjectionTexture;
+		ZEHolder<const ZEGRTexture>		ProjectionTexture;
 		ZEString						ProjectionTextureFileName;
 		mutable ZEViewSphere			ViewVolume;
 
@@ -66,8 +65,8 @@ class ZELightOmniProjective : public ZELight
 		void							SetProjectionTextureFile(const ZEString& Filename);
 		const ZEString&					GetProjectionTextureFile() const;
 
-		void							SetProjectionTexture(const ZEGRTextureCube* Texture);
-		const ZEGRTextureCube*			GetProjectionTexture();
+		void							SetProjectionTexture(const ZEGRTexture* Texture);
+		const ZEGRTexture*				GetProjectionTexture();
 		
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;

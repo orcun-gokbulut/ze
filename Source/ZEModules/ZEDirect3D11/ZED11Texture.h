@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11StructuredBuffer.h
+ Zinek Engine - ZED11Texture.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,34 +35,33 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRStructuredBuffer.h"
+#include "ZEGraphics\ZEGRTexture.h"
 #include "ZED11ComponentBase.h"
 
-struct ID3D11Buffer;
-struct ID3D11ShaderResourceView;
-struct ID3D11UnorderedAccessView;
-
-class ZED11StructuredBuffer : public ZEGRStructuredBuffer, public ZED11ComponentBase
+class ZED11Texture : public ZEGRTexture, public ZED11ComponentBase
 {
 	friend class ZED11Context;
 	friend class ZED11Module;
+	friend class ZED11Output;
+	private:
+		ID3D11Resource*							Resource;
+		ID3D11ShaderResourceView*				ShaderResourceView;
+		ID3D11UnorderedAccessView*				UnorderedAccessView;
 
-	protected:
-		ID3D11Buffer*				Buffer;	
-		ID3D11ShaderResourceView*	ShaderResourceView;
-		ID3D11UnorderedAccessView*	UnorderedAccessView;
+		bool									Initialize2D(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);
+		bool									Initialize3D(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEUInt Depth, ZEUInt SampleCount, const void* Data);
 
-		virtual bool				Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags);
-		virtual void				Deinitialize();
+		virtual bool							Initialize(ZEGRTextureType TextureType, ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEUInt DepthOrArrayCount, ZEUInt SampleCount, const void* Data);
+		virtual void							Deinitialize();
 
-									ZED11StructuredBuffer();
-		virtual						~ZED11StructuredBuffer();
+		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt ArrayIndex = 0, ZEUInt Level = 0) const;
+		virtual const ZEGRDepthStencilBuffer*	GetDepthStencilBuffer(bool ReadOnly, ZEUInt DepthOrArrayIndex) const;
 
-		ID3D11Buffer*				GetBuffer() const;
-		ID3D11ShaderResourceView*	GetShaderResourceView() const;
-		ID3D11UnorderedAccessView*	GetUnorderedAccessView() const;
+		virtual bool							Map(ZEGRResourceMapType MapType, void** Buffer, ZESize* RowPitch = NULL, ZESize* DepthPitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0);
+		virtual void							Unmap(ZEUInt ArrayIndex = 0, ZEUInt Level = 0);
 
-	public:
-		virtual bool				Lock(void** Buffer);
-		virtual void				Unlock();
+		virtual void							Update(const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch = 0, ZEUInt DestArrayIndex = 0, ZEUInt DestLevel = 0, const ZERect* DestRect = NULL);
+
+												ZED11Texture();
+		virtual									~ZED11Texture();
 };

@@ -45,16 +45,17 @@
 
 class ZED11RenderStateData;
 class ZED11ComputeRenderStateData;
-class ZEGRTexture;
 struct ID3D11Buffer;
 struct ID3D11SamplerState;
 struct ID3D11ShaderResourceView;
+struct ID3DUserDefinedAnnotation;
 
 class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	protected:
 		ID3D11DeviceContext*							Context;
+		ID3DUserDefinedAnnotation*						UserDefinedAnnotation;
 
 		ZEFlags											DirtyFlags;
 		ZEVector4										BlendFactors;
@@ -78,14 +79,14 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									SetRenderState(const ZEGRRenderStateData* State);
 		virtual void									SetComputeRenderState(const ZEGRComputeRenderStateData* State);
 
-		virtual void									SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers);
-		virtual void									SetIndexBuffer(const ZEGRIndexBuffer* Buffer);
-		virtual void									SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers);
+		virtual void									SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* Offsets);
+		virtual void									SetIndexBuffer(const ZEGRBuffer* Buffer, ZEUInt Offset = 0);
+		virtual void									SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
 
-		virtual void									SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffer);
-		virtual void									SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Texture);
+		virtual void									SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
+		virtual void									SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures);
 
-		virtual void									SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers);
+		virtual void									SetRWBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
 		virtual void									SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures);
 
 		virtual void									SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers);
@@ -100,11 +101,12 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									SetBlendMask(ZEUInt Mask);
 
 		virtual void									CopyResource(const ZEGRResource* DestResource, const ZEGRResource* SrcResource);
-		virtual void									ResolveSubresource(const ZEGRResource* DestResource, ZEUInt DestSubresource, const ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format);
+		virtual void									ResolveSubresource(const ZEGRTexture* DestTexture, ZEUInt DestSubresource, const ZEGRTexture* SrcTexture, ZEUInt SrcSubresource, ZEGRFormat Format);
 
 		virtual void									Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
 		virtual void									DrawIndexed(ZEUInt IndexCount, ZEUInt IndexOffset, ZEUInt VertexOffset);
 		virtual void									DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
+		virtual void									DrawIndexedInstanced(ZEUInt IndexCount, ZEUInt IndexOffset, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
 
 		virtual void									Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ);
 
@@ -115,4 +117,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor);
 
 		virtual void									ClearState();
+
+		virtual void									BeginEvent(const ZEString& Name);
+		virtual void									EndEvent();
 };

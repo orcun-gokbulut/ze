@@ -37,11 +37,12 @@
 
 #include "ZEDCore/ZEDObjectWrapper.h"
 
+#include "ZEPointer/ZEHolder.h"
+
 class ZEUIControl;
 class ZEUIFrameControl;
 class ZEUILabel;
-class ZEGRVertexBuffer;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZERNSimpleMaterial;
 
 class ZEDEntityWrapper : public ZEDObjectWrapper
@@ -49,8 +50,8 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 	ZE_OBJECT
 	private:
 		bool								Dirty;
-		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				VertexBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>		Material;
 		ZERNCommand							Command;
 	

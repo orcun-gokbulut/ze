@@ -61,8 +61,8 @@ ZE_ENUM(ZERNStageDisplayFlipMode)
 };
 
 class ZEGRContext;
-class ZEGRTexture2D;
-class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 class ZEGRRenderTarget;
 class ZERNStageMultiplexer;
 
@@ -99,10 +99,10 @@ class ZERNStageDisplay : public ZEObject, public ZEInitializable
 			ZEVector2							Reserved0;
 		} Constants;							
 												
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
 
-		ZEHolder<const ZEGRTexture2D>			InputTexture;
+		ZEHolder<const ZEGRTexture>				InputTexture;
 
 		ZELink<ZERNStageDisplay>				Link;
 

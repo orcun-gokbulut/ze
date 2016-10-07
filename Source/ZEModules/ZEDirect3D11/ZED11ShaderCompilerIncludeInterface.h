@@ -38,7 +38,7 @@
 #include <d3dcommon.h>
 #include "ZEDS\ZEString.h"
 
-struct ZEGRShaderCompileOptions;
+class ZEGRShaderCompileOptions;
 
 class ZED11ShaderCompilerIncludeInterface : public ID3DInclude
 {

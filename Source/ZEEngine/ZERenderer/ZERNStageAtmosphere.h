@@ -37,7 +37,7 @@
 
 #include "ZERNStage.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStageAtmosphere : public ZERNStage
 {
@@ -45,10 +45,10 @@ class ZERNStageAtmosphere : public ZERNStage
 	private:
 		ZEFlags							DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>	AccumulationTexture;
-		ZEHolder<const ZEGRTexture2D>	DepthTexture;
+		ZEHolder<const ZEGRTexture>		AccumulationTexture;
+		ZEHolder<const ZEGRTexture>		DepthTexture;
 
-		virtual bool					InitializeInternal();						
+		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
 		virtual void					CreateOutput(const ZEString& Name);

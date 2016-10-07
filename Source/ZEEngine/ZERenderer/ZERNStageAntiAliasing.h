@@ -42,13 +42,13 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
 class ZEGRShader;
 class ZEGRSampler;
 class ZEGRContext;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZERNRenderer;
 
 class ZERNStageAntiAliasing  : public ZERNStage
@@ -68,12 +68,12 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		BlendingWeightCalculationPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		NeighborhoodBlendingPassRenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>				EdgeTexture;
-		ZEHolder<ZEGRTexture2D>				BlendTexture;
-		ZEHolder<ZEGRTexture2D>				AreaTexture;
-		ZEHolder<ZEGRTexture2D>				SearchTexture;
+		ZEHolder<ZEGRTexture>				EdgeTexture;
+		ZEHolder<ZEGRTexture>				BlendTexture;
+		ZEHolder<ZEGRTexture>				AreaTexture;
+		ZEHolder<ZEGRTexture>				SearchTexture;
 
 		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 		ZEHolder<ZEGRSampler>				SamplerPointClamp;
@@ -86,10 +86,10 @@ class ZERNStageAntiAliasing  : public ZERNStage
 			ZEVector2						Reserved0;
 		} Constants;
 
-		ZEHolder<const ZEGRTexture2D>		InputTexture;
-		ZEHolder<const ZEGRTexture2D>		GBufferNormal;
-		ZEHolder<const ZEGRTexture2D>		DepthTexture;
-		ZEHolder<const ZEGRTexture2D>		OutputTexture;
+		ZEHolder<const ZEGRTexture>			InputTexture;
+		ZEHolder<const ZEGRTexture>			GBufferNormal;
+		ZEHolder<const ZEGRTexture>			DepthTexture;
+		ZEHolder<const ZEGRTexture>			OutputTexture;
 
 		const ZEGRRenderTarget*				EdgeRenderTarget;
 		const ZEGRRenderTarget*				BlendRenderTarget;

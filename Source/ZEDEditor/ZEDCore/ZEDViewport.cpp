@@ -45,8 +45,9 @@
 #include "ZECore\ZECore.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGraphics\ZEGROutput.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZEGraphics\ZEGRTexture.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZERenderer\ZERNStageGBuffer.h"
 #include "ZERenderer\ZERNStageShadowing.h"
 #include "ZERenderer\ZERNStageLighting.h"
@@ -61,7 +62,6 @@
 #include "ZERenderer\ZERNStageRenderDepth.h"
 #include "ZERenderer\ZERNStageResolving.h"
 #include "ZERenderer\ZERNRenderParameters.h"
-#include "ZEGraphics\ZEGRGraphicsModule.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -132,7 +132,7 @@ bool ZEDViewport::UpdateRenderTarget()
 	if (Output == NULL)
 		return false;
 
-	ZEGRTexture2D* OutputTexture = Output->GetTexture2D();
+	ZEGRTexture* OutputTexture = Output->GetTexture();
 	if (OutputTexture == NULL)
 		return false;
 
@@ -172,7 +172,7 @@ bool ZEDViewport::InitializeInternal()
 
 	zeCheckError(ViewportManager == NULL, false, "Cannot initialize. Viewport is not registered with a Viewport Manager.");
 	Window = ZEGRWindow::WrapHandle((void*)winId());
-	Renderer.SetOutputTexture(Window->GetOutput()->GetTexture2D());
+	Renderer.SetOutputTexture(Window->GetOutput()->GetTexture());
 	Renderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
 
 	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
@@ -227,9 +227,6 @@ bool ZEDViewport::InitializeInternal()
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);
-
-	//ZERNStageOutput* StageOutput = new ZERNStageOutput();
-	//Renderer.AddStage(StageOutput);
 
 	if (!Renderer.Initialize())
 		return false;

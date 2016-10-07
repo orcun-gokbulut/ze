@@ -45,13 +45,12 @@
 #include "ZELightOmniProjective.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRStructuredBuffer.h"
 
 #define MAX_LIGHT					512
 #define TILE_DIMENSION				16
@@ -133,7 +132,7 @@ bool ZERNStageForward::UpdateTileLightBuffer()
 	ZEUInt TileCountX = (Width + TILE_DIMENSION - 1) / TILE_DIMENSION;
 	ZEUInt TileCountY = (Height + TILE_DIMENSION - 1) / TILE_DIMENSION;
 	
-	TileLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(TileCountX * TileCountY * (MAX_LIGHT + 2), sizeof(ZEUInt), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
+	TileLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, TileCountX * TileCountY * (MAX_LIGHT + 2) * sizeof(ZEUInt), sizeof(ZEUInt), ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 
 	DirtyFlags.UnraiseFlags(ZERN_SFDF_TILE_LIGHT_BUFFER);
 
@@ -163,7 +162,7 @@ void ZERNStageForward::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SFDF_OUTPUT))
 		{
-			AccumulationTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			AccumulationTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SFDF_OUTPUT);
 		}
 	}
@@ -205,8 +204,8 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (GetId() == ZERN_STAGE_FORWARD_TRANSPARENT)
 	{
 		Context->SetComputeRenderState(TiledForwardComputeRenderState);
-		ZEGRStructuredBuffer* TileLightStructuredBufferPointer = TileLightStructuredBuffer;
-		Context->SetRWStructuredBuffers(0, 1, &TileLightStructuredBufferPointer);
+		ZEGRBuffer* TileLightStructuredBufferPointer = TileLightStructuredBuffer;
+		Context->SetRWBuffers(0, 1, &TileLightStructuredBufferPointer);
 		Context->SetTexture(ZEGR_ST_COMPUTE, 4, DepthTexture);
 
 		ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
@@ -214,7 +213,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 
 		Context->Dispatch(TileCountX, TileCountY, 1);
 
-		Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 16, TileLightStructuredBuffer);
+		Context->SetBuffer(ZEGR_ST_PIXEL, 16, TileLightStructuredBuffer);
 		Context->SetRenderTargets(1, &RenderTarget, OpaqueDepthTexture->GetDepthStencilBuffer(true));
 	}
 	else if (GetId() == ZERN_STAGE_FORWARD_POST_HDR)

@@ -222,8 +222,8 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
-	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Tangent, 0.0f)).xyz;
-	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Binormal, 0.0f)).xyz;
+	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Tangent, 0.0f)).xyz;
+	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Binormal, 0.0f)).xyz;
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(float4(NormalWorld, 0.0f));

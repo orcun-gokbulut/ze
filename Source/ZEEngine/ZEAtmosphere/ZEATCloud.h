@@ -45,13 +45,12 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
-class ZEGRVertexBuffer;
+class ZEGRBuffer;
 class ZEGRSampler;
 class ZEGRContext;
 class ZEGRDepthStencilBuffer;
 class ZEGRRenderTarget;
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZEATCloud : public ZEEntity
 {
@@ -65,12 +64,12 @@ class ZEATCloud : public ZEEntity
 		ZEHolder<ZEGRShader>					PlaneDomainShader;
 		ZEHolder<ZEGRShader>					PlanePixelShader;
 		ZEHolder<ZEGRRenderStateData>			PlaneRenderStateData;
-		ZEHolder<ZEGRVertexBuffer>				PlaneVertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>			PlaneTransformConstantBuffer;
+		ZEHolder<ZEGRBuffer>					PlaneVertexBuffer;
+		ZEHolder<ZEGRBuffer>					PlaneTransformConstantBuffer;
 
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
-		ZEHolder<const ZEGRTexture2D>			CloudTexture;
+		ZEHolder<const ZEGRTexture>				CloudTexture;
 
 		struct  
 		{

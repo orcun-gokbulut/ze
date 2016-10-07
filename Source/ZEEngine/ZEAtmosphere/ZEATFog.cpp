@@ -38,12 +38,12 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
 
 #define	ZEAT_FDF_SHADERS			1
@@ -137,7 +137,7 @@ ZEEntityResult ZEATFog::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	if (!Update())
@@ -240,7 +240,7 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = static_cast<const ZEGRTexture2D*>(Stage->GetOutput("ColorTexture"))->GetRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = static_cast<const ZEGRTexture*>(Stage->GetOutput("ColorTexture"))->GetRenderTarget();
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);

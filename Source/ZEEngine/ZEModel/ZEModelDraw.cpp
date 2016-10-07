@@ -40,10 +40,8 @@
 #include "ZEModelMeshLOD.h"
 #include "ZEMDResourceDraw.h"
 
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZEGraphics/ZEGRIndexBuffer.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
@@ -55,8 +53,8 @@ void ZEMDInstanceTag::Update()
 
 	struct  
 	{
-		const ZEGRVertexBuffer* VertexBuffer;
-		const ZEGRIndexBuffer* IndexBuffer;
+		const ZEGRBuffer* VertexBuffer;
+		const ZEGRBuffer* IndexBuffer;
 		const ZERNMaterial* Material;
 		ZEUInt32 Offset;
 		ZEUInt32 Count;
@@ -204,7 +202,7 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 
 	if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
 	{
-		ZEGRConstantBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetMesh()->GetModel()->ConstantBufferBoneTransforms};
+		ZEGRBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetMesh()->GetModel()->ConstantBufferBoneTransforms};
 		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
 	}
 	else

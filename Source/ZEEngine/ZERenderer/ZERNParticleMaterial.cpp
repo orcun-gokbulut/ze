@@ -37,10 +37,10 @@
 
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNStageParticleRendering.h"
 #include "ZERNShaderSlots.h"
@@ -138,7 +138,7 @@ bool ZERNParticleMaterial::InitializeInternal()
 	if (!ZERNMaterial::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	if (!UpdateShaders())
 		return false;

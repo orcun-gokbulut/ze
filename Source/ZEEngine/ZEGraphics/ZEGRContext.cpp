@@ -36,40 +36,13 @@
 #include "ZEGRContext.h"
 
 #include "ZEError.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRVertexBuffer.h"
-#include "ZEGRIndexBuffer.h"
-#include "ZEGRConstantBuffer.h"
-#include "ZEGRStructuredBuffer.h"
+#include "ZEGRBuffer.h"
 #include "ZEGRTexture.h"
 #include "ZEGRRenderTarget.h"
 #include "ZEGRDepthStencilBuffer.h"
+#include "ZEGRGraphicsModule.h"
 
-ZEGRContext::ZEGRContext()
-{
-	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
-	IndexBuffer = NULL;
-	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(Samplers, NULL, sizeof(ZEGRSampler*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
-	memset(ShaderResources, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
-	memset(UnorderedAccesses, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_RWTEXTURE_SLOT);
-	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
-	DepthStencilBuffer = NULL;
-}
-
-ZEGRContext::~ZEGRContext()
-{
-	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
-	IndexBuffer = NULL;
-	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(Samplers, NULL, sizeof(ZEGRSampler*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
-	memset(ShaderResources, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
-	memset(UnorderedAccesses, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_RWTEXTURE_SLOT);
-	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
-	DepthStencilBuffer = NULL;
-}
-
-bool ZEGRContext::CheckVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers)
+bool ZEGRContext::CheckVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers)
 {
 	zeDebugCheck(Index >= ZEGR_MAX_VERTEX_BUFFER_SLOT, "Vertex buffer index exceeds the max slot count.");
 	zeDebugCheck(Count > (ZEGR_MAX_VERTEX_BUFFER_SLOT - Index), "Vertex buffer count is too much.");
@@ -110,7 +83,7 @@ bool ZEGRContext::CheckVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVerte
 	return Dirty;
 }
 
-bool ZEGRContext::CheckIndexBuffer(const ZEGRIndexBuffer* Buffer)
+bool ZEGRContext::CheckIndexBuffer(const ZEGRBuffer* Buffer)
 {
 	bool Dirty = false;
 
@@ -134,7 +107,7 @@ bool ZEGRContext::CheckIndexBuffer(const ZEGRIndexBuffer* Buffer)
 	return Dirty;
 }
 
-bool ZEGRContext::CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers)
+bool ZEGRContext::CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers)
 {
 	zeDebugCheck(Index >= ZEGR_MAX_CONSTANT_BUFFER_SLOT, "Constant buffer index exceeds the max slot count.");
 	zeDebugCheck(Count > (ZEGR_MAX_CONSTANT_BUFFER_SLOT - Index), "Constant buffer count is too much.");
@@ -257,26 +230,15 @@ bool ZEGRContext::CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUI
 					continue;
 
 				Dirty = true;
+
 				if (DestResource != NULL)
-				{
-					if (DestResource->GetResourceType() == ZEGR_RT_TEXTURE)
-					{
-						ZEGRTexture* Texture = const_cast<ZEGRTexture*>(static_cast<const ZEGRTexture*>(DestResource));
-						Texture->SetBoundStage((ZEGRShaderType)J, Slot, false);
-					}
-					else if (DestResource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
-					{
-						ZEGRStructuredBuffer* StructuredBuffer = const_cast<ZEGRStructuredBuffer*>(static_cast<const ZEGRStructuredBuffer*>(DestResource));
-						StructuredBuffer->SetBoundStage((ZEGRShaderType)J, Slot, false);
-					}
-				}
+					const_cast<ZEGRResource*>(DestResource)->SetBoundStage((ZEGRShaderType)J, Slot, false);
+
 				DestResource = SrcResource;
 
 				if (DestResource->GetResourceType() == ZEGR_RT_TEXTURE)
 				{
-					const ZEGRTexture* DestTexture = static_cast<const ZEGRTexture*>(DestResource);
-
-					ze_for_each(Stage, DestTexture->GetBoundStages())
+					ze_for_each(Stage, DestResource->GetBoundStages())
 					{
 						if (Stage->BoundAsShaderResource && Stage.GetIndex() == J)
 							SetTextures((ZEGRShaderType)J, Stage->Slot, 1, NULL);
@@ -284,6 +246,8 @@ bool ZEGRContext::CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUI
 						else if (Stage->BoundAsUnorderedAccess)
 							SetRWTextures(Stage->Slot, 1, NULL);
 					}
+
+					const ZEGRTexture* DestTexture = static_cast<const ZEGRTexture*>(DestResource);
 
 					ze_for_each(RenderTarget, DestTexture->GetRenderTargets())
 					{
@@ -298,24 +262,20 @@ bool ZEGRContext::CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUI
 						if (Item != NULL && Item->GetBound() && !Item->GetReadOnly())
 							SetRenderTargets(ZEGR_MAX_RENDER_TARGET_SLOT, this->RenderTargets, NULL);
 					}
-
-					const_cast<ZEGRTexture*>(DestTexture)->SetBoundStage((ZEGRShaderType)J, Slot);
 				}
-				else if (DestResource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
+				else if (DestResource->GetResourceType() == ZEGR_RT_BUFFER)
 				{
-					const ZEGRStructuredBuffer* DestStructuredBuffer = static_cast<const ZEGRStructuredBuffer*>(DestResource);
-
-					ze_for_each(Stage, DestStructuredBuffer->GetBoundStages())
+					ze_for_each(Stage, DestResource->GetBoundStages())
 					{
 						if (Stage->BoundAsShaderResource && Stage.GetIndex() == J)
-							SetStructuredBuffers((ZEGRShaderType)J, Stage->Slot, 1, NULL);
+							SetBuffers((ZEGRShaderType)J, Stage->Slot, 1, NULL);
 
 						else if (Stage->BoundAsUnorderedAccess)
-							SetRWStructuredBuffers(Stage->Slot, 1, NULL);
+							SetRWBuffers(Stage->Slot, 1, NULL);
 					}
-
-					const_cast<ZEGRStructuredBuffer*>(DestStructuredBuffer)->SetBoundStage((ZEGRShaderType)J, Slot);
 				}
+
+				const_cast<ZEGRResource*>(DestResource)->SetBoundStage((ZEGRShaderType)J, Slot);
 			}
 		}
 	}
@@ -330,16 +290,7 @@ bool ZEGRContext::CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUI
 				if (Resource != NULL)
 				{
 					Dirty = true;
-					if (Resource->GetResourceType() == ZEGR_RT_TEXTURE)
-					{
-						ZEGRTexture* Texture = const_cast<ZEGRTexture*>(static_cast<const ZEGRTexture*>(Resource));
-						Texture->SetBoundStage((ZEGRShaderType)J, Slot, false);
-					}
-					else if (Resource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
-					{
-						ZEGRStructuredBuffer* StructuredBuffer = const_cast<ZEGRStructuredBuffer*>(static_cast<const ZEGRStructuredBuffer*>(Resource));
-						StructuredBuffer->SetBoundStage((ZEGRShaderType)J, Slot, false);
-					}
+					const_cast<ZEGRResource*>(Resource)->SetBoundStage((ZEGRShaderType)J, Slot, false);
 					Resource = NULL;
 				}
 			}
@@ -368,26 +319,15 @@ bool ZEGRContext::CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRR
 				continue;
 
 			Dirty = true;
+
 			if (DestResource != NULL)
-			{
-				if (DestResource->GetResourceType() == ZEGR_RT_TEXTURE)
-				{
-					ZEGRTexture* Texture = const_cast<ZEGRTexture*>(static_cast<const ZEGRTexture*>(DestResource));
-					Texture->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
-				}
-				else if (DestResource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
-				{
-					ZEGRStructuredBuffer* StructuredBuffer = const_cast<ZEGRStructuredBuffer*>(static_cast<const ZEGRStructuredBuffer*>(DestResource));
-					StructuredBuffer->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
-				}
-			}
+				const_cast<ZEGRResource*>(DestResource)->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
+
 			DestResource = SrcResource;
 
 			if (DestResource->GetResourceType() == ZEGR_RT_TEXTURE)
 			{
-				const ZEGRTexture* DestTexture = static_cast<const ZEGRTexture*>(DestResource);
-
-				ze_for_each(Stage, DestTexture->GetBoundStages())
+				ze_for_each(Stage, DestResource->GetBoundStages())
 				{
 					if (Stage->BoundAsShaderResource)
 						SetTextures((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1, NULL);
@@ -395,6 +335,8 @@ bool ZEGRContext::CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRR
 					else if (Stage->BoundAsUnorderedAccess)
 						SetRWTextures(Stage->Slot, 1, NULL);
 				}
+
+				const ZEGRTexture* DestTexture = static_cast<const ZEGRTexture*>(DestResource);
 
 				ze_for_each(RenderTarget, DestTexture->GetRenderTargets())
 				{
@@ -409,24 +351,20 @@ bool ZEGRContext::CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRR
 					if (Item != NULL && Item->GetBound() && !Item->GetReadOnly())
 						SetRenderTargets(ZEGR_MAX_RENDER_TARGET_SLOT, this->RenderTargets, NULL);
 				}
-
-				const_cast<ZEGRTexture*>(DestTexture)->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, true);
 			}
-			else if (DestResource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
+			else if (DestResource->GetResourceType() == ZEGR_RT_BUFFER)
 			{
-				const ZEGRStructuredBuffer* DestStructuredBuffer = static_cast<const ZEGRStructuredBuffer*>(DestResource);
-
-				ze_for_each(Stage, DestStructuredBuffer->GetBoundStages())
+				ze_for_each(Stage, DestResource->GetBoundStages())
 				{
 					if (Stage->BoundAsShaderResource)
-						SetStructuredBuffers((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1, NULL);
+						SetBuffers((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1, NULL);
 
 					else if (Stage->BoundAsUnorderedAccess)
-						SetRWStructuredBuffers(Stage->Slot, 1, NULL);
+						SetRWBuffers(Stage->Slot, 1, NULL);
 				}
-
-				const_cast<ZEGRStructuredBuffer*>(DestStructuredBuffer)->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, true);
 			}
+
+			const_cast<ZEGRResource*>(DestResource)->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, true);
 		}
 	}
 	else
@@ -439,16 +377,7 @@ bool ZEGRContext::CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRR
 			if (Resource != NULL)
 			{
 				Dirty = true;
-				if (Resource->GetResourceType() == ZEGR_RT_TEXTURE)
-				{
-					ZEGRTexture* Texture = const_cast<ZEGRTexture*>(static_cast<const ZEGRTexture*>(Resource));
-					Texture->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
-				}
-				else if (Resource->GetResourceType() == ZEGR_RT_STRUCTURED_BUFFER)
-				{
-					ZEGRStructuredBuffer* StructuredBuffer = const_cast<ZEGRStructuredBuffer*>(static_cast<const ZEGRStructuredBuffer*>(Resource));
-					StructuredBuffer->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
-				}
+				const_cast<ZEGRResource*>(Resource)->SetBoundStage(ZEGR_ST_COMPUTE, Slot, false, false);
 				Resource = NULL;
 			}
 		}
@@ -474,13 +403,15 @@ bool ZEGRContext::CheckRenderTargetsAndDepthStencilBuffer(ZEUInt Count, const ZE
 			if (SrcRenderTarget == NULL || DestRenderTarget == SrcRenderTarget)
 				continue;
 
-			DirtyRenderTarget = true;		
+			DirtyRenderTarget = true;
+
 			if (DestRenderTarget != NULL)
 				const_cast<ZEGRRenderTarget*>(DestRenderTarget)->SetBound(false);
+
 			DestRenderTarget = SrcRenderTarget;
 
 			const ZEGRTexture* Texture = DestRenderTarget->GetOwner();
-			if (Texture != NULL)
+			if (Texture != NULL)//TODO: unnecessary anymore
 			{
 				ze_for_each(Stage, Texture->GetBoundStages())
 				{
@@ -529,13 +460,16 @@ bool ZEGRContext::CheckRenderTargetsAndDepthStencilBuffer(ZEUInt Count, const ZE
 		if (DestDepthStencilBuffer != SrcDepthStencilBuffer)
 		{
 			DirtyDepthStencilBuffer = true;
+
 			if (DestDepthStencilBuffer != NULL)
 				const_cast<ZEGRDepthStencilBuffer*>(DestDepthStencilBuffer)->SetBound(false);
+
 			DestDepthStencilBuffer = SrcDepthStencilBuffer;
 
-			const ZEGRTexture* Texture = DestDepthStencilBuffer->GetOwner();
 			if (!DestDepthStencilBuffer->GetReadOnly())
 			{
+				const ZEGRTexture* Texture = DestDepthStencilBuffer->GetOwner();
+
 				ze_for_each(Stage, Texture->GetBoundStages())
 				{
 					if (Stage->BoundAsShaderResource)
@@ -598,27 +532,51 @@ bool ZEGRContext::CheckScissorRects(ZEUInt Count, const ZEGRScissorRect* Scissor
 	return Dirty;
 }
 
-void ZEGRContext::SetVertexBuffer(ZEUInt Index, const ZEGRVertexBuffer* Buffer)
+ZEGRContext::ZEGRContext()
 {
-	SetVertexBuffers(Index, 1, &Buffer);
+	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
+	IndexBuffer = NULL;
+	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
+	memset(Samplers, NULL, sizeof(ZEGRSampler*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
+	memset(ShaderResources, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
+	memset(UnorderedAccesses, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_RWTEXTURE_SLOT);
+	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	DepthStencilBuffer = NULL;
 }
 
-void ZEGRContext::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRConstantBuffer* Buffer)
+ZEGRContext::~ZEGRContext()
+{
+	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
+	IndexBuffer = NULL;
+	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
+	memset(Samplers, NULL, sizeof(ZEGRSampler*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
+	memset(ShaderResources, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
+	memset(UnorderedAccesses, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_RWTEXTURE_SLOT);
+	memset(RenderTargets, NULL, sizeof(ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	DepthStencilBuffer = NULL;
+}
+
+void ZEGRContext::SetVertexBuffer(ZEUInt Index, const ZEGRBuffer* Buffer, const ZEUInt Offset)
+{
+	SetVertexBuffers(Index, 1, &Buffer, &Offset);
+}
+
+void ZEGRContext::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer)
 {
 	SetConstantBuffers(Shader, Index, 1, &Buffer);
 }
 
-void ZEGRContext::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer)
+void ZEGRContext::GetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRBuffer** Buffers)
 {
-	zeCheckError(Buffer == NULL, ZE_VOID,"Constant buffer cannot be NULL.");
+	zeCheckError(Buffers == NULL, ZE_VOID, "Buffers out parameter cannot be NULL.");
 	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL.");
 
-	*Buffer = static_cast<ZEGRConstantBuffer*>(const_cast<ZEGRResource*>(ConstantBuffers[Shader][Index]));
+	memcpy(Buffers, &ConstantBuffers[Shader][Index], sizeof(ZEGRBuffer*) * Count);
 }
 
-void ZEGRContext::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
+void ZEGRContext::SetBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer)
 {
-	SetStructuredBuffers(Shader, Index, 1, &Buffer);
+	SetBuffers(Shader, Index, 1, &Buffer);
 }
 
 void ZEGRContext::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
@@ -626,12 +584,12 @@ void ZEGRContext::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRText
 	SetTextures(Shader, Index, 1, &Texture);
 }
 
-void ZEGRContext::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture)
+void ZEGRContext::GetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRTexture** Textures)
 {
-	zeCheckError(Texture == NULL, ZE_VOID, "Texture cannot be NULL");
+	zeCheckError(Textures == NULL, ZE_VOID, "Textures out parameter cannot be NULL");
 	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL");
 
-	*Texture = static_cast<ZEGRTexture*>(const_cast<ZEGRResource*>(ShaderResources[Shader][Index]));
+	memcpy(Textures, &ShaderResources[Shader][Index], sizeof(ZEGRTexture*) * Count);
 }
 
 void ZEGRContext::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler)
@@ -654,12 +612,12 @@ void ZEGRContext::GetDepthStencilBuffer(ZEGRDepthStencilBuffer** DepthStencilBuf
 	*DepthStencilBuffer = const_cast<ZEGRDepthStencilBuffer*>(this->DepthStencilBuffer);
 }
 
-void ZEGRContext::SetRWStructuredBuffer(ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
+void ZEGRContext::SetRWBuffer(ZEUInt Index, const ZEGRBuffer*Buffer)
 {
-	SetRWStructuredBuffers(Index, 1, &Buffer);
+	SetRWBuffers(Index, 1, &Buffer);
 }
 
-void ZEGRContext::SetRWTexture(ZEUInt8 Index, const ZEGRTexture* Texture)
+void ZEGRContext::SetRWTexture(ZEUInt Index, const ZEGRTexture* Texture)
 {
 	SetRWTextures(Index, 1, &Texture);
 }

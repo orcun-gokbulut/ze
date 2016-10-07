@@ -42,12 +42,12 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
@@ -150,7 +150,7 @@ ZEEntityResult ZEATMoon::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	if (!Update())
@@ -230,15 +230,16 @@ const ZEVector3& ZEATMoon::GetColor() const
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	ZEGRTexture3DOptions TextureOptions;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_3D;
+	TextureOptions.HorizontalTileCount = HorizTileCount;
+	TextureOptions.VerticalTileCount = VertTileCount;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
-	TextureOptions.HorizontalTileCount = HorizTileCount;
-	TextureOptions.VerticalTileCount = VertTileCount;
 
-	PhaseTexture = ZEGRTexture3D::LoadResourceShared(FileName, TextureOptions);
+	PhaseTexture = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 }
 
 const ZEString& ZEATMoon::GetTextureFile() const

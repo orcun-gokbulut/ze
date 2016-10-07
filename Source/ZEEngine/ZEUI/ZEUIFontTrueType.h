@@ -41,7 +41,7 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEPointer\ZEHolder.h"
 #include "ZEUI\ZEUIRectangle.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZEGraphics\ZEGRTexture.h"
 
 struct ZEFreeType;
 
@@ -67,7 +67,7 @@ class ZEUIFontTrueType : public ZEUIFont
 		mutable ZEUInt32							LastTextureId;
 		mutable ZEUInt32							LastTextureLine;
 
-		mutable ZEArray<ZEHolder<ZEGRTexture2D>>	Textures;
+		mutable ZEArray<ZEHolder<ZEGRTexture>>		Textures;
 
 		mutable ZELock								Lock;
 

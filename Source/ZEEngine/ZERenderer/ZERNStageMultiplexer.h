@@ -49,7 +49,7 @@ ZE_ENUM(ZERNStageMultiplexerMode)
 	ZERN_SMM_CUSTOM
 };
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;
 class ZERNStageDisplay;
@@ -64,7 +64,7 @@ class ZERNStageMultiplexer : public ZERNStage
 
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 		
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
+		ZEHolder<ZEGRTexture>				OutputTexture;
 
 		const ZEGRRenderTarget*				OutputRenderTarget;
 

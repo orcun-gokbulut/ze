@@ -38,13 +38,10 @@
 #include "ZEError.h"
 
 #include "ZEGraphics\ZEGRDefinitions.h"
-#include "ZEGraphics\ZEGRRenderTarget.h"
-#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 
-#include "ZED11Texture2D.h"
+#include "ZED11Texture.h"
 #include "ZED11RenderTarget.h"
-#include "ZED11DepthStencilBuffer.h"
 #include "ZED11Adapter.h"
 
 #include <d3d11.h>
@@ -63,9 +60,9 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 {
 	if (Texture != NULL)
 	{
-		ZED11Texture2D* D11Texture = static_cast<ZED11Texture2D*>(Texture.GetPointer());
+		ZED11Texture* D11Texture = static_cast<ZED11Texture*>(Texture.GetPointer());
 		const_cast<ZED11RenderTarget*>(static_cast<const ZED11RenderTarget*>(D11Texture->GetRenderTarget()))->ForcedRelease();
-		ZEGR_RELEASE(D11Texture->Texture2D);
+		ZEGR_RELEASE(D11Texture->Resource);
 	}
 
 	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(Format), 0);
@@ -75,26 +72,26 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 		return;
 	}
 
-	ID3D11RenderTargetView* RenderTargetView;
 	ID3D11Texture2D* BackBuffer;
 	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer));
 	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
+		zeCriticalError("Cannot get swapchain buffers. Error: 0x%X.", Result);
 		return;
 	}
 
-	Texture = new ZED11Texture2D();
-	ZED11Texture2D* D11Texture = static_cast<ZED11Texture2D*>(Texture.GetPointer());
+	Texture = new ZED11Texture();
+	ZED11Texture* D11Texture = static_cast<ZED11Texture*>(Texture.GetPointer());
+	D11Texture->Type = ZEGR_TT_2D;
 	D11Texture->Width = Width;
 	D11Texture->Height = Height;
-	D11Texture->ArrayCount = 1;
+	D11Texture->DepthOrArrayCount = 1;
 	D11Texture->SampleCount = 1;
-	D11Texture->SetFormat(Format);
-	D11Texture->SetLevelCount(1);
+	D11Texture->LevelCount = 1;
 	D11Texture->SetResourceBindFlags(ZEGR_RBF_RENDER_TARGET);
-	D11Texture->SetResourceUsage(ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-	D11Texture->Texture2D = BackBuffer;
+	D11Texture->SetResourceUsage(ZEGR_RU_STATIC);
+	D11Texture->SetFormat(Format);
+	D11Texture->Resource = BackBuffer;
 
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
 	SetSize(Width * Height * FormatDefinition->BlockSize);
@@ -206,7 +203,7 @@ void* ZED11Output::GetHandle() const
 	return Handle;
 }
 
-ZEGRTexture2D* ZED11Output::GetTexture2D() const
+ZEGRTexture* ZED11Output::GetTexture() const
 {
 	return Texture;
 }
@@ -297,8 +294,6 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 void ZED11Output::Present()
 {
 	LockContext();
-
 	SwapChain->Present(0, 0);
-
 	UnlockContext();
 }

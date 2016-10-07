@@ -43,8 +43,8 @@
 #include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRShader;
-class ZEGRTexture2D;
-class ZEGRStructuredBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 class ZEGRComputeRenderStateData;
 
 class ZERNStageForward : public ZERNStage
@@ -57,11 +57,11 @@ class ZERNStageForward : public ZERNStage
 		ZEHolder<ZEGRShader>					TiledForwardComputeShader;
 		ZEHolder<ZEGRComputeRenderStateData>	TiledForwardComputeRenderState;
 
-		ZEHolder<ZEGRStructuredBuffer>			TileLightStructuredBuffer;
+		ZEHolder<ZEGRBuffer>					TileLightStructuredBuffer;
 
-		ZEHolder<const ZEGRTexture2D>			DepthTexture;
-		ZEHolder<const ZEGRTexture2D>			OpaqueDepthTexture;
-		ZEHolder<const ZEGRTexture2D>			AccumulationTexture;
+		ZEHolder<const ZEGRTexture>				DepthTexture;
+		ZEHolder<const ZEGRTexture>				OpaqueDepthTexture;
+		ZEHolder<const ZEGRTexture>				AccumulationTexture;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();

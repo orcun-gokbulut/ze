@@ -37,6 +37,7 @@
 
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZED11ComponentBase.h"
+
 #include "ZETypes.h"
 
 struct ID3D11RenderTargetView;
@@ -44,11 +45,9 @@ struct ID3D11RenderTargetView;
 class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 {
 	friend class ZED11Module;
-	friend class ZED11Output;
-	friend class ZED11Texture2D;
-	friend class ZED11Texture3D;
-	friend class ZED11TextureCube;
 	friend class ZED11Context;
+	friend class ZED11Texture;
+	friend class ZED11Output;
 
 	private:
 		ID3D11RenderTargetView*			View;

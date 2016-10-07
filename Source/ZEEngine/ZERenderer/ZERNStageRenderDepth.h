@@ -39,16 +39,16 @@
 
 #include "ZEPointer/ZEHolder.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStageRenderDepth : public ZERNStage
 {
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
-		ZEHolder<ZEGRTexture2D>			OpaqueDepthTexture;
+		ZEHolder<ZEGRTexture>			OpaqueDepthTexture;
 
-		ZEHolder<const ZEGRTexture2D>	DepthTexture;
+		ZEHolder<const ZEGRTexture>		DepthTexture;
 
 		virtual bool					InitializeInternal();						
 		virtual bool					DeinitializeInternal();

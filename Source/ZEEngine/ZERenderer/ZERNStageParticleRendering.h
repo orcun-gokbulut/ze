@@ -40,7 +40,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStageParticleRendering : public ZERNStage
 {
@@ -49,8 +49,8 @@ class ZERNStageParticleRendering : public ZERNStage
 		ZEFlags							DirtyFlags;
 		ZEGRViewport					Viewport;
 
-		ZEHolder<const ZEGRTexture2D>	AccumulationTexture;
-		ZEHolder<const ZEGRTexture2D>	DepthTexture;
+		ZEHolder<const ZEGRTexture>		AccumulationTexture;
+		ZEHolder<const ZEGRTexture>		DepthTexture;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();

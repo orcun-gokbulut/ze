@@ -59,7 +59,7 @@ ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 
 class ZEPhysicalWorld;
 class ZERNRenderer;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZERNPreRenderParameters;
 
 class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
@@ -94,7 +94,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 			float								Reserved0;
 		} Constants;
 
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
 		void									AddToTickList(ZEEntity* Entity);
 		void									RemoveFromTickList(ZEEntity* Entity);
@@ -117,7 +117,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		virtual									~ZEScene();
 
 	public:
-		const ZEGRConstantBuffer*				GetConstantBuffer();
+		const ZEGRBuffer*						GetConstantBuffer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);

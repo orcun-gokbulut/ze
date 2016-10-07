@@ -40,10 +40,10 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZERenderer/ZERNStageID.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
@@ -87,13 +87,13 @@ void ZEUIRenderer::UpdateBatches()
 	if (VertexBuffer == NULL ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
-		VertexBuffer = ZEGRVertexBuffer::CreateResource((ZEUInt)Rectangles.GetCount() * 6, sizeof(ZEUIVertex));
+		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Rectangles.GetCount() * 6 * sizeof(ZEUIVertex), sizeof(ZEUIVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 	}
 
 	Batches.Clear();
 
 	ZEUIVertex* Vertices;
-	VertexBuffer->Lock((void**)&Vertices);
+	VertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&Vertices));
 	{
 		ZEUIRendererBatch* LastBatch = NULL;
 		ze_for_each(Rectangle, Rectangles)
@@ -121,7 +121,7 @@ void ZEUIRenderer::UpdateBatches()
 			LastBatch->Count += 6;
 		}
 	}
-	VertexBuffer->Unlock();
+	VertexBuffer->Unmap();
 }
 
 bool ZEUIRenderer::InitializeInternal()

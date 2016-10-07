@@ -40,8 +40,8 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZECamera.h"
@@ -60,12 +60,13 @@ void ZEATSkyBox::LoadTexture()
 	if (TextureFileName.IsEmpty())
 		return;
 
-	ZEGRTextureCubeOptions TextureOptions;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_CUBE;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
-	SkyTexture = ZEGRTextureCube::LoadResourceShared(TextureFileName, TextureOptions);
+	SkyTexture = ZEGRTexture::LoadResourceShared(TextureFileName, TextureOptions);
 }
 
 ZEEntityResult ZEATSkyBox::LoadInternal()
@@ -82,13 +83,14 @@ ZEEntityResult ZEATSkyBox::LoadInternal()
 
 	ZECanvas SkyBox;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
-	VertexBuffer = SkyBox.CreateVertexBuffer();
+
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, SkyBox.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, SkyBox.GetBuffer());
 	zeCheckError(VertexBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	ConstantBufferTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferTransform = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBufferTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	LoadTexture();
@@ -293,7 +295,7 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture);
 	Context->SetVertexBuffer(0, VertexBuffer);
 
-	Context->Draw(VertexBuffer->GetVertexCount(), 0);
+	Context->Draw(VertexBuffer->GetElementCount(), 0);
 }
 
 ZEATSkyBox* ZEATSkyBox::CreateInstance()

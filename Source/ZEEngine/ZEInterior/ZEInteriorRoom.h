@@ -48,8 +48,8 @@ ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
 
 struct ZEInteriorResourceRoom;
 class ZEPhysicalMesh;
-class ZEGRVertexBuffer;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
+class ZEGRBuffer;
 class ZERNMaterial;
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
@@ -76,8 +76,8 @@ class ZEInteriorRoom : public ZEObject
 		ZEArray<ZEInteriorDoor*>				Doors;
 		ZESmartArray<ZEInteriorRoomDraw>		Draws;
 
-		ZEHolder<ZEGRVertexBuffer>				VertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				VertexBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		bool									CullPass;
 		bool									IsDrawn;

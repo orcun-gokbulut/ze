@@ -39,13 +39,10 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZETexture/ZETextureCubeResource.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
@@ -267,7 +264,7 @@ bool ZERNStandardMaterial::Update()
 		return false;
 
 	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+		ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	if (!UpdateStageMask())
 		return false;
@@ -614,7 +611,7 @@ bool ZERNStandardMaterial::GetSubSurfaceScatteringMapEnabled() const
 	return SubSurfaceScatteringMapEnabled;
 }
 
-void ZERNStandardMaterial::SetSubSurfaceScatteringMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSubSurfaceScatteringMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(Texture);
 	SubSurfaceScatteringMap = Texture;
@@ -622,7 +619,7 @@ void ZERNStandardMaterial::SetSubSurfaceScatteringMap(const ZEGRTexture2D* Textu
 	SubSurfaceScatteringMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetSubSurfaceScatteringMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetSubSurfaceScatteringMap() const
 {
 	return SubSurfaceScatteringMap;
 }
@@ -637,13 +634,14 @@ void ZERNStandardMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileNa
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 		UnregisterExternalResource(SubSurfaceScatteringMap);
-		SubSurfaceScatteringMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		SubSurfaceScatteringMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(SubSurfaceScatteringMap);
 	}
 }
@@ -668,7 +666,7 @@ bool ZERNStandardMaterial::GetBaseMapEnabled() const
 	return BaseMapEnabled;
 }
 
-void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture2D* Map)
+void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture* Map)
 {
 	UnregisterExternalResource(BaseMap);
 	BaseMap = Map;
@@ -676,7 +674,7 @@ void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture2D* Map)
 	BaseMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetBaseMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetBaseMap() const
 {
 	return BaseMap;
 }
@@ -690,14 +688,15 @@ void ZERNStandardMaterial::SetBaseMapFile(const ZEString& FileName)
 
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(BaseMap);
-		BaseMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		BaseMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(BaseMap);
 	}
 }
@@ -887,7 +886,7 @@ bool ZERNStandardMaterial::GetSpecularMapEnabled() const
 	return SpecularMapEnabled;		
 }
 
-void ZERNStandardMaterial::SetSpecularMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(SpecularMap);
 	SpecularMap = Texture;
@@ -895,7 +894,7 @@ void ZERNStandardMaterial::SetSpecularMap(const ZEGRTexture2D* Texture)
 	SpecularMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetSpecularMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetSpecularMap() const
 {
 	return SpecularMap;
 }
@@ -910,14 +909,15 @@ void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(SpecularMap);
-		SpecularMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		SpecularMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(SpecularMap);
 	}
 }
@@ -942,7 +942,7 @@ bool ZERNStandardMaterial::GetSpecularGlossMapEnabled() const
 	return SpecularGlossMapEnabled;
 }
 
-void ZERNStandardMaterial::SetSpecularGlossMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularGlossMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(SpecularGlossMap);
 	SpecularGlossMap = Texture;
@@ -950,7 +950,7 @@ void ZERNStandardMaterial::SetSpecularGlossMap(const ZEGRTexture2D* Texture)
 	SpecularGlossMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetSpecularGlossMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetSpecularGlossMap() const
 {
 	return SpecularGlossMap;
 }
@@ -965,14 +965,15 @@ void ZERNStandardMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
 		UnregisterExternalResource(SpecularGlossMap);
-		SpecularGlossMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		SpecularGlossMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(SpecularGlossMap);
 	}
 }
@@ -1042,7 +1043,7 @@ bool ZERNStandardMaterial::GetEmissiveMapEnabled() const
 	return EmissiveMapEnabled;
 }
 
-void ZERNStandardMaterial::SetEmissiveMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEmissiveMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(EmissiveMap);
 	EmissiveMap = Texture;
@@ -1050,7 +1051,7 @@ void ZERNStandardMaterial::SetEmissiveMap(const ZEGRTexture2D* Texture)
 	EmissiveMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetEmissiveMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetEmissiveMap() const
 {
 	return EmissiveMap;
 }
@@ -1065,14 +1066,15 @@ void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(EmissiveMap);
-		EmissiveMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		EmissiveMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(EmissiveMap);
 	}
 }
@@ -1097,13 +1099,13 @@ bool ZERNStandardMaterial::GetNormalMapEnabled() const
 	return NormalMapEnabled;
 }
 
-void ZERNStandardMaterial::SetNormalMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetNormalMap(const ZEGRTexture* Texture)
 {
 	NormalMap = Texture;
 	NormalMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetNormalMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetNormalMap() const
 {
 	return NormalMap;
 }
@@ -1118,14 +1120,15 @@ void ZERNStandardMaterial::SetNormalMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
 		UnregisterExternalResource(NormalMap);
-		NormalMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		NormalMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(NormalMap);
 	}
 }
@@ -1195,7 +1198,7 @@ float ZERNStandardMaterial::GetHeightMapScale() const
 	return Constants.HeightMapScale;
 }
 
-void ZERNStandardMaterial::SetHeightMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetHeightMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(HeightMap);
 	HeightMap = Texture;
@@ -1203,7 +1206,7 @@ void ZERNStandardMaterial::SetHeightMap(const ZEGRTexture2D* Texture)
 	HeightMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetHeightMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetHeightMap() const
 {
 	return HeightMap;
 }
@@ -1218,14 +1221,15 @@ void ZERNStandardMaterial::SetHeightMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
 		UnregisterExternalResource(HeightMap);
-		HeightMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		HeightMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(HeightMap);
 	}
 }
@@ -1264,13 +1268,13 @@ bool ZERNStandardMaterial::GetOpacityMapEnabled() const
 	return OpacityMapEnabled;
 }
 
-void ZERNStandardMaterial::SetOpacityMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetOpacityMap(const ZEGRTexture* Texture)
 {
 	OpacityMap = Texture;
 	OpacityMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetOpacityMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetOpacityMap() const
 {
 	return OpacityMap;
 }
@@ -1285,14 +1289,15 @@ void ZERNStandardMaterial::SetOpacityMapFile(const ZEString& FileName)
 	ZERSResourceState State = GetState();
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(OpacityMap);
-		OpacityMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		OpacityMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(OpacityMap);
 	}
 }
@@ -1317,13 +1322,13 @@ bool ZERNStandardMaterial::GetEnvironmentMapEnabled() const
 	return EnvironmentMapEnabled;
 }
 
-void ZERNStandardMaterial::SetEnvironmentMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEnvironmentMap(const ZEGRTexture* Texture)
 {
 	EnvironmentMap = Texture;
 	EnvironmentMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetEnvironmentMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetEnvironmentMap() const
 {
 	return EnvironmentMap;
 }
@@ -1337,14 +1342,15 @@ void ZERNStandardMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(EnvironmentMap);
-		EnvironmentMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		EnvironmentMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(EnvironmentMap);
 	}
 }
@@ -1550,7 +1556,7 @@ float ZERNStandardMaterial::GetDetailBaseMapAttenuationFactor() const
 	return Constants.DetailBaseMapAttenuationFactor;
 }
 
-void ZERNStandardMaterial::SetDetailBaseMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailBaseMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(DetailBaseMap);
 	DetailBaseMap = Texture;
@@ -1558,7 +1564,7 @@ void ZERNStandardMaterial::SetDetailBaseMap(const ZEGRTexture2D* Texture)
 	DetailBaseMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetDetailBaseMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetDetailBaseMap() const
 {
 	return DetailBaseMap;
 }
@@ -1572,14 +1578,15 @@ void ZERNStandardMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(DetailBaseMap);
-		DetailBaseMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		DetailBaseMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(DetailBaseMap);
 	}
 }
@@ -1664,7 +1671,7 @@ float ZERNStandardMaterial::GetDetailNormalMapAttenuationFactor() const
 	return Constants.DetailNormalMapAttenuationFactor;
 }
 
-void ZERNStandardMaterial::SetDetailNormalMap(const ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailNormalMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(DetailNormalMap);
 	DetailNormalMap = Texture;
@@ -1672,7 +1679,7 @@ void ZERNStandardMaterial::SetDetailNormalMap(const ZEGRTexture2D* Texture)
 	DetailNormalMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNStandardMaterial::GetDetailNormalMap() const
+const ZEGRTexture* ZERNStandardMaterial::GetDetailNormalMap() const
 {
 	return DetailNormalMap;
 }
@@ -1686,14 +1693,15 @@ void ZERNStandardMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 
 	if (IsLoadedOrLoading())
 	{
-		ZEGRTexture2DOptions TextureOptions;
+		ZEGRTextureOptions TextureOptions;
+		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
 		UnregisterExternalResource(DetailNormalMap);
-		DetailNormalMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		DetailNormalMap = ZEGRTexture::LoadResourceShared(FileName, TextureOptions);
 		RegisterExternalResource(DetailNormalMap);
 	}
 }

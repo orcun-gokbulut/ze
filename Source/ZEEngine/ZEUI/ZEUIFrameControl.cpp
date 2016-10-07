@@ -37,7 +37,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEUICheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
@@ -73,7 +73,7 @@ void ZEUIFrameControl::SetHeight(float Height)
 	Frame.Positions.SetHeight(Height);
 }
 
-void ZEUIFrameControl::SetTexture(const ZEGRTexture2D* Texture)
+void ZEUIFrameControl::SetTexture(const ZEGRTexture* Texture)
 {
 	if (Frame.Texture == Texture)
 		return;
@@ -88,7 +88,7 @@ void ZEUIFrameControl::SetTexture(const ZEGRTexture2D* Texture)
 	Frame.Texture = Texture;
 }
 
-const ZEGRTexture2D* ZEUIFrameControl::GetTexture()
+const ZEGRTexture* ZEUIFrameControl::GetTexture()
 {
 	return Frame.Texture;
 }

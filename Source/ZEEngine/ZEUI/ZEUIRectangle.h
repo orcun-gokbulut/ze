@@ -42,7 +42,7 @@
 #include "ZEPointer/ZEHolder.h"
 
 struct ZEUIVertex;
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZEUIRectangle
 {
@@ -53,7 +53,7 @@ class ZEUIRectangle
 	public:
 		ZERectangle						Positions;
 		ZERectangle						Texcoords;
-		ZEHolder<const ZEGRTexture2D>	Texture;
+		ZEHolder<const ZEGRTexture>		Texture;
 		ZEVector4						Color;
 		ZEInt32							ZOrder;
 

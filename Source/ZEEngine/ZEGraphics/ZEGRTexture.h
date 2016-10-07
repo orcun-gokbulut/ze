@@ -40,7 +40,6 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGRFormat.h"
 
 enum ZEGRTextureType
 {
@@ -60,6 +59,9 @@ class ZEGRTextureOptions : public ZEObject
 {
 	ZE_OBJECT
 	public:
+		ZEGRTextureType				Type;
+		ZEUInt						HorizontalTileCount;
+		ZEUInt						VerticalTileCount;
 		ZEGRFormat					CompressionFormat;
 		ZEUInt						MaximumMipmapLevel;
 		bool						GenerateMipMaps;
@@ -76,40 +78,60 @@ class ZEGRTexture : public ZEGRResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTexture)
 	friend class ZEGRContext;
+	friend class ZEGRGraphicsModule;
+	friend class ZERSTemplates;
 	private:
-		ZEGRFormat											Format;
-		ZEUInt												LevelCount;
-
-		struct BoundStage
-		{
-			bool											BoundAsShaderResource;
-			bool											BoundAsUnorderedAccess;
-			ZEInt											Slot;
-		};
+		ZESize												CalculateSize();
 
 	protected:
-		ZEArray<BoundStage>									BoundStages;
+		ZEUInt												Width;
+		ZEUInt												Height;
+		ZEUInt												LevelCount;
+		ZEUInt												CurrentLevel;
+		ZEUInt												SampleCount;
+		ZEUInt												DepthOrArrayCount;
+		ZEGRTextureType										Type;
+		ZEGRTextureOptions									TextureOptions;
+
 		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>			RenderTargets;
 		mutable ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>	DepthStencilBuffers;
-
-		void												SetFormat(ZEGRFormat Format);
-		void												SetLevelCount(ZEUInt LevelCount);
-
-		void												SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource = true, bool BoundAsUnorderedAccess = false);
-		const ZEArray<BoundStage>&							GetBoundStages() const;
 
 		const ZEArray<ZEHolder<ZEGRRenderTarget>>&			GetRenderTargets() const;
 		const ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>&	GetDepthStencilBuffers() const;
 
-		static ZESize										CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
-		static ZESize										CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		virtual bool										Initialize(ZEGRTextureType TextureType, ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEUInt DepthOrArrayCount, ZEUInt SampleCount, const void* Data);
+		virtual void										Deinitialize();
+
+		ZETaskResult										LoadInternal();
+		ZETaskResult										UnloadInternal();
 
 															ZEGRTexture();
 		virtual												~ZEGRTexture();
 
-	public:
-		ZEGRFormat											GetFormat() const;
-		ZEUInt												GetLevelCount() const;
+		static ZERSResource*								Instanciator(const void* Parameters);
 
-		virtual ZEGRTextureType								GetTextureType() const = 0;
+	public:
+		ZEUInt												GetWidth() const;
+		ZEUInt												GetHeight() const;
+		ZEUInt												GetLevelCount() const;
+		ZEUInt												GetCurrentLevel() const;
+		ZEUInt												GetSampleCount() const;
+		ZEUInt												GetDepthOrArrayCount() const;
+		ZEGRTextureType										GetTextureType() const;
+		
+		virtual ZEGRResourceType							GetResourceType() const;
+
+		virtual const ZEGRRenderTarget*						GetRenderTarget(ZEUInt DepthOrArrayIndex = 0, ZEUInt Level = 0) const = 0;
+		virtual const ZEGRDepthStencilBuffer*				GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const = 0;
+
+		virtual bool										Map(ZEGRResourceMapType MapType, void** Buffer, ZESize* RowPitch = NULL, ZESize* DepthPitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0) = 0;
+		virtual void										Unmap(ZEUInt ArrayIndex = 0, ZEUInt Level = 0) = 0;
+		
+		virtual void										Update(const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch = 0, ZEUInt DestArrayIndex = 0, ZEUInt DestLevel = 0, const ZERect* DestRect = NULL) = 0;
+
+		static ZEHolder<ZEGRTexture>						CreateResource(ZEGRTextureType TextureType, ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_STATIC, ZEGRResourceBindFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, ZEUInt DepthOrArrayCount = 1, ZEUInt SampleCount = 1, const void* Data = NULL);
+		static ZEHolder<const ZEGRTexture>					CreateResourceShared(const ZEGUID& GUID, ZEGRTextureType TextureType, ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEUInt DepthOrArrayCount = 1, ZEUInt SampleCount = 1, const void* Data = NULL, ZEGRTexture** StagingResource = NULL);
+
+		static ZEHolder<ZEGRTexture>						LoadResource(const ZEString& FileName, const ZEGRTextureOptions& TextureOptions);
+		static ZEHolder<const ZEGRTexture>					LoadResourceShared(const ZEString& FileName, const ZEGRTextureOptions& TextureOptions);
 };

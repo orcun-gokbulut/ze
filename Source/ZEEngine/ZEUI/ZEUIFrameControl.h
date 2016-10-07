@@ -54,8 +54,8 @@ class ZEUIFrameControl : public ZEUIControl
 		virtual void				SetWidth(float Width);
 		virtual void				SetHeight(float Height);
 
-		virtual void				SetTexture(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*		GetTexture();
+		virtual void				SetTexture(const ZEGRTexture* Texture);
+		const ZEGRTexture*			GetTexture();
 
 		virtual void				SetTexturePath(const ZEString& Path);
 		const ZEString&				GetTexturePath();

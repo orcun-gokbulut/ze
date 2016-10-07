@@ -41,33 +41,41 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZECanvas.h"
 
 class ZEGRShader;
+class ZEGRBuffer;
+class ZEGRTexture;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
-class ZEGRVertexBuffer;
-class ZEGRTexture2D;
+class ZEEntity;
 
 class ZERNStageDebug : public ZERNStage
 {
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
+		ZECanvas						LineCanvas;
+		ZECanvas						TriangleCanvas;
+
+		ZEHolder<ZEGRBuffer>			LineVertexBuffer;
+		ZEHolder<ZEGRBuffer>			TriangleVertexBuffer;
 
 		ZEHolder<ZEGRShader>			VertexShader;
 		ZEHolder<ZEGRShader>			GeometryShader;
 		ZEHolder<ZEGRShader>			PixelShader;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
-		ZEHolder<ZEGRShader>			BoundingBoxVertexShader;
-		ZEHolder<ZEGRShader>			BoundingBoxGeometryShader;
-		ZEHolder<ZEGRRenderStateData>	BoundingBoxRenderStateData;
-		ZEHolder<ZEGRVertexBuffer>		BoundingBoxVertexBuffer;
+		ZEHolder<ZEGRShader>			SkinnedVertexShader;
+		ZEHolder<ZEGRRenderStateData>	SkinnedRenderStateData;
 
-		ZEHolder<ZEGRTexture2D>			DepthMap;
+		ZEHolder<ZEGRShader>			CanvasVertexShader;
+		ZEHolder<ZEGRRenderStateData>	LineRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	TriangleRenderStateData;
 
-		ZEHolder<const ZEGRTexture2D>	OutputTexture;
+		ZEHolder<ZEGRTexture>			DepthMap;
+
+		ZEHolder<const ZEGRTexture>		OutputTexture;
 
 		struct  
 		{
@@ -82,7 +90,8 @@ class ZERNStageDebug : public ZERNStage
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
-		bool							SetupBoundingBoxVertexBuffer();
+		void							ProcessCommands(ZEGRContext* Context);
+		void							GatherVertices(ZEEntity* Entity);
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();

@@ -39,10 +39,10 @@
 #include "ZEMath/ZEAngle.h"
 
 #include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
@@ -66,7 +66,7 @@ bool ZERNFilter::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(FilterConstants));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(FilterConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -222,7 +222,7 @@ bool ZERNFilter::Update()
 	return true;
 }
 
-void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader)
+void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader)
 {
 	zeDebugCheck(Context == NULL, "Context cannot be null");
 	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
@@ -243,7 +243,7 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 
 	if (TempTexture == NULL || 
 		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
-		TempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
+		TempTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
 
 	if (PixelShader)
 	{
@@ -285,7 +285,7 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 	}
 }
 
-void ZERNFilter::ApplyScale(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRRenderTarget* OutputRenderTarget)
+void ZERNFilter::ApplyScale(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRRenderTarget* OutputRenderTarget)
 {
 	zeDebugCheck(Context == NULL, "Context cannot be null");
 	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
@@ -307,8 +307,8 @@ void ZERNFilter::ApplyScale(ZEGRContext* Context, const ZEGRTexture2D* InputText
 void ZERNFilter::ApplyEdgeDetection(ZEGRContext* Context, float StencilRef)
 {
 	ZEGRTexture* DepthTexture;
-	Context->GetTexture(ZEGR_ST_PIXEL, 4, &DepthTexture);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = static_cast<ZEGRTexture2D*>(DepthTexture)->GetDepthStencilBuffer(true);
+	Context->GetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthTexture);
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = static_cast<ZEGRTexture*>(DepthTexture)->GetDepthStencilBuffer(true);
 
 	Viewport.SetWidth(DepthStencilBuffer->GetWidth());
 	Viewport.SetHeight(DepthStencilBuffer->GetHeight());

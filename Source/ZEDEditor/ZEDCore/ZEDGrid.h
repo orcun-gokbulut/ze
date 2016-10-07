@@ -40,8 +40,8 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 
-class ZEGRVertexBuffer;
-class ZEGRConstantBuffer;
+
+class ZEGRBuffer;
 class ZERNSimpleMaterial;
 
 class ZEDGrid : public ZEEntity
@@ -50,10 +50,10 @@ class ZEDGrid : public ZEEntity
 	private:
 		ZERNCommand						RenderCommand;
 
-		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
+		ZEHolder<ZEGRBuffer>			VertexBuffer;
+		ZEHolder<ZEGRBuffer>			ConstantBufferAxisTransform;
+		ZEHolder<ZEGRBuffer>			ConstantBufferMinorGridTransform;
+		ZEHolder<ZEGRBuffer>			ConstantBufferMajorGridTransform;
 		ZEHolder<ZERNSimpleMaterial>	Material;
 
 		ZESize							MinorGridOffset;

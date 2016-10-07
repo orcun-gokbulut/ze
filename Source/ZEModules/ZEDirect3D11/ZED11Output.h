@@ -42,8 +42,6 @@
 #include "ZEPointer/ZEHolder.h"
 
 struct IDXGISwapChain1;
-class ZEGRRenderTarget;
-class ZED11Monitor;
 
 class ZED11Output : public ZEGROutput, ZED11ComponentBase
 {
@@ -53,7 +51,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 		void*								Handle;
 		mutable ZEGRMonitor*				Monitor;
 
-		ZEHolder<ZEGRTexture2D>				Texture;
+		ZEHolder<ZEGRTexture>				Texture;
 
 		IDXGISwapChain1*					SwapChain;
 
@@ -71,7 +69,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 
 	public:
 		virtual void*						GetHandle() const;
-		virtual ZEGRTexture2D*				GetTexture2D() const;
+		virtual ZEGRTexture*				GetTexture() const;
 
 		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor);
 		virtual ZEGRMonitor*				GetMonitor() const;

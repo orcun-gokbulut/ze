@@ -47,11 +47,11 @@
 #include "ZEGraphics\ZEGRShader.h"
 #include "ZEGraphics\ZEGRContext.h"
 #include "ZEGraphics\ZEGRViewport.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZEGraphics\ZEGRBuffer.h"
+#include "ZEGraphics\ZEGRTexture.h"
 #include "ZEGraphics\ZEGRRenderState.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRSampler.h"
 
@@ -122,7 +122,7 @@ void ZERNRenderer::CreatePredefinedSamplers()
 void ZERNRenderer::UpdateConstantBuffers()
 {
 	ZERNViewConstantBuffer* Buffer;
-	if (!ViewConstantBuffer->Lock((void**)&Buffer))
+	if (!ViewConstantBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&Buffer)))
 		return;
 
 	memset(Buffer, 0, sizeof(ZERNViewConstantBuffer));
@@ -156,7 +156,7 @@ void ZERNRenderer::UpdateConstantBuffers()
 	Buffer->ShadowDistance = View.ShadowDistance;
 	Buffer->ShadowFadeDistance = View.ShadowFadeDistance;
 
-	ViewConstantBuffer->Unlock();
+	ViewConstantBuffer->Unmap();
 
 	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
 	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
@@ -217,14 +217,10 @@ void ZERNRenderer::RenderStages()
 	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
 	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
 
-	ZEGRConstantBuffer* PrevRendererConstantBuffer;
-	ZEGRConstantBuffer* PrevViewConstantBuffer;
-	ZEGRConstantBuffer* PrevSceneConstantBuffer;
-	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, &PrevRendererConstantBuffer);
-	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
-	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_SCENE, &PrevSceneConstantBuffer);
+	ZEGRBuffer* PrevConstantBuffers[3] = {};
+	Context->GetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 
-	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
+	ZEGRBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
 
 	if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
@@ -269,7 +265,6 @@ void ZERNRenderer::RenderStages()
 		Stage->CleanUp(Context);
 	}
 
-	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, PrevViewConstantBuffer, PrevSceneConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 }
 
@@ -287,8 +282,8 @@ bool ZERNRenderer::InitializeInternal()
 		}
 	}
 
-	ViewConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZERNViewConstantBuffer));
-	RendererConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(RendererConstants));
+	ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	CreatePredefinedSamplers();
 
@@ -329,7 +324,7 @@ const ZERNView& ZERNRenderer::GetView()
 	return View;
 }
 
-void ZERNRenderer::SetOutputTexture(const ZEGRTexture2D* OutputTexture)
+void ZERNRenderer::SetOutputTexture(const ZEGRTexture* OutputTexture)
 {
 	if (this->OutputTexture == NULL || 
 		this->OutputTexture->GetWidth() != OutputTexture->GetWidth() || 
@@ -339,7 +334,7 @@ void ZERNRenderer::SetOutputTexture(const ZEGRTexture2D* OutputTexture)
 	this->OutputTexture = OutputTexture;
 }
 
-const ZEGRTexture2D* ZERNRenderer::GetOutputTexture() const
+const ZEGRTexture* ZERNRenderer::GetOutputTexture() const
 {
 	return OutputTexture;
 }

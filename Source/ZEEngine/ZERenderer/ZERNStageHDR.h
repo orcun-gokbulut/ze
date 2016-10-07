@@ -44,8 +44,8 @@
 
 class ZEGRShader;
 class ZEGRSampler;
-class ZEGRTexture2D;
-class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 class ZEGRContext;
 class ZEGRRenderStateData;
 class ZERNRenderer;
@@ -87,19 +87,19 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		CalculateBrightnessRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		ToneMappingRenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>				BrightTexture;
-		ZEHolder<ZEGRTexture2D>				DownScaledTexture4x;
-		ZEHolder<ZEGRTexture2D>				DownScaledTexture8x;
-		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceTextures;
-		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
-		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
+		ZEHolder<ZEGRTexture>				BrightTexture;
+		ZEHolder<ZEGRTexture>				DownScaledTexture4x;
+		ZEHolder<ZEGRTexture>				DownScaledTexture8x;
+		ZEArray<ZEHolder<ZEGRTexture>>		LuminanceTextures;
+		ZEHolder<ZEGRTexture>				CurrentAdaptedLuminance;
+		ZEHolder<ZEGRTexture>				PreviousAdaptedLuminance;
 
 		ZERNHDRBlurTextureSize				BlurTextureSize;
 
-		ZEHolder<const ZEGRTexture2D>		InputColorTexture;
-		ZEHolder<const ZEGRTexture2D>		OutputColorTexture;
+		ZEHolder<const ZEGRTexture>			InputColorTexture;
+		ZEHolder<const ZEGRTexture>			OutputColorTexture;
 
 		struct
 		{
@@ -131,8 +131,8 @@ class ZERNStageHDR : public ZERNStage
 
 		void								CalculateAverageLuminance(ZEGRContext* Context);
 		void								CalculateAdaptedLuminance(ZEGRContext* Context);
-		const ZEGRTexture2D*				CalculateBloom(ZEGRContext* Context);
-		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomTexture);
+		const ZEGRTexture*					CalculateBloom(ZEGRContext* Context);
+		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture* BloomTexture);
 
 		virtual void						CreateOutput(const ZEString& Name);
 

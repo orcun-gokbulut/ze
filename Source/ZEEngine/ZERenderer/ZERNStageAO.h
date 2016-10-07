@@ -46,9 +46,9 @@
 
 class ZEGRShader;
 class ZEGRSampler;
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZEGRRenderTarget;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 class ZEGRRenderStateData;
 class ZEGRDepthStencilBuffer;
 
@@ -93,21 +93,21 @@ class ZERNStageAO : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurXRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurYRenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>		DeinterleavedConstantBuffer;
+		ZEHolder<ZEGRBuffer>				ConstantBuffer;
+		ZEHolder<ZEGRBuffer>				DeinterleavedConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>				AmbientOcclusionTexture;
-		ZEHolder<ZEGRTexture2D>				BlurTempTexture;
-		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
-		ZEHolder<ZEGRTexture2D>				ResolvedDepthTexture;
-		ZEHolder<ZEGRTexture2D>				DeinterleavedDepthtexture;
-		ZEHolder<ZEGRTexture2D>				DeinterleavedAmbientOcclusionTexture;
+		ZEHolder<ZEGRTexture>				AmbientOcclusionTexture;
+		ZEHolder<ZEGRTexture>				BlurTempTexture;
+		ZEHolder<ZEGRTexture>				RandomVectorsTexture;
+		ZEHolder<ZEGRTexture>				ResolvedDepthTexture;
+		ZEHolder<ZEGRTexture>				DeinterleavedDepthtexture;
+		ZEHolder<ZEGRTexture>				DeinterleavedAmbientOcclusionTexture;
 
 		bool								UseDeinterleavedTexturing;
 
-		ZEHolder<const ZEGRTexture2D>		DepthTexture;
-		ZEHolder<const ZEGRTexture2D>		NormalTexture;
-		ZEHolder<const ZEGRTexture2D>		AccumulationTexture;
+		ZEHolder<const ZEGRTexture>			DepthTexture;
+		ZEHolder<const ZEGRTexture>			NormalTexture;
+		ZEHolder<const ZEGRTexture>			AccumulationTexture;
 
 		struct
 		{
@@ -153,7 +153,7 @@ class ZERNStageAO : public ZERNStage
 		void								DeinterleaveDepth(ZEGRContext* Context);
 		void								DeinterleaveAmbientOcclusion(ZEGRContext* Context);
 		void								ReinterleaveAmbientOcclusion(ZEGRContext* Context);
-		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
 
 		virtual void						CreateOutput(const ZEString& Name);
 

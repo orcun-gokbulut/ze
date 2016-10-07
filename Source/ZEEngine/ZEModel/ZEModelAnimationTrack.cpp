@@ -215,7 +215,10 @@ void ZEModelAnimationTrack::SetResource(const ZEMDResourceAnimation* ResourceAni
 		return;
 
 	Stop();
-	Resource = ResourceAnimation->GetResource();
+
+	if (ResourceAnimation != NULL)
+		Resource = ResourceAnimation->GetResource();
+
 	this->ResourceAnimation = ResourceAnimation;
 
 	ApplyLimits();

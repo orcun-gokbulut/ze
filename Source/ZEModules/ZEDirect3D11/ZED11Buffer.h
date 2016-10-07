@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11TextureCube.h
+ Zinek Engine - ZED11Buffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,34 +35,26 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics\ZEGRBuffer.h"
 #include "ZED11ComponentBase.h"
 
-#include "ZETypes.h"
-
-struct ID3D11Texture2D;
-struct ID3D11ShaderResourceView;
-class ZEGRRenderTarget;
-
-class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
+class ZED11Buffer : public ZEGRBuffer, public ZED11ComponentBase
 {
-	friend class ZED11Module;
 	friend class ZED11Context;
-	private:
-		ID3D11Texture2D*			Texture;
+	friend class ZED11Module;
+	protected:
+		ID3D11Buffer*				Buffer;
 		ID3D11ShaderResourceView*	ShaderResourceView;
+		ID3D11UnorderedAccessView*	UnorderedAccessView;
 
-		virtual bool				Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data);
+		virtual bool				Initialize(ZEGRBufferType BufferType, ZESize SizeInBytes, ZESize StrideInBytes, ZEGRResourceUsage Usage, ZEGRResourceBindFlags BindFlags, ZEGRFormat Format, const void* Data);
 		virtual void				Deinitialize();
 
-		ID3D11Texture2D*			GetTexture() const;
-		ID3D11ShaderResourceView*	GetShaderResourceView() const;
+		virtual bool				Map(ZEGRResourceMapType MapType, void** Buffer, ZESize* SizeInBytes = NULL);
+		virtual void				Unmap();
+	
+		virtual void				Update(const void* SrcData, ZESize SrcSizeInBytes, ZEUInt DestOffsetInBytes = 0, ZESize DestSizeInBytes = 0);
 
-									ZED11TextureCube();
-		virtual						~ZED11TextureCube();
-
-	public:
-		virtual void				UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
-
-		const ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const;
+									ZED11Buffer();
+		virtual						~ZED11Buffer();
 };

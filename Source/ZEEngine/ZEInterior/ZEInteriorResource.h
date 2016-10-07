@@ -49,7 +49,7 @@
 
 class ZERNMaterial;
 class ZEMLReaderNode;
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZETexture2DResource;
 class ZEGRVertexLayout;
 struct ZEInteriorResourceDoor;
@@ -155,7 +155,7 @@ class ZEInteriorResource : public ZEResource
 		bool											ReadHelpers(ZEMLReaderNode* HelpersNode);
 		bool											ReadMaterials(ZEMLReaderNode* MaterialsNode);
 
-		const ZEGRTexture2D*							ManageInteriorMaterialTextures(const ZEString& FileName);
+		const ZEGRTexture*							ManageInteriorMaterialTextures(const ZEString& FileName);
 		bool  											ReadInteriorFromFile(ZEFile* ResourceFile);
 
 		virtual											~ZEInteriorResource();

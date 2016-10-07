@@ -38,12 +38,6 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOption.h"
 #include "ZECore/ZEOptionManager.h"
-#include "ZEGRIndexBuffer.h"
-#include "ZEGRTextureCube.h"
-#include "ZEGRRenderTarget.h"
-#include "ZEGRVertexBuffer.h"
-#include "ZEGRConstantBuffer.h"
-#include "ZEGRDepthStencilBuffer.h"
 
 #include <FreeImage.h>
 

@@ -45,8 +45,8 @@
 
 class ZEGRShader;
 class ZEGRContext;
-class ZEGRTexture2D;
-class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRBuffer;
 class ZEGRRenderStateData;
 class ZEGRComputeRenderStateData;
 class ZEGRRenderTarget;
@@ -73,9 +73,9 @@ class ZERNFilter : public ZEInitializable
 		ZEHolder<ZEGRComputeRenderStateData>	BlurHorizontalComputeRenderStateData;
 		ZEHolder<ZEGRComputeRenderStateData>	BlurVerticalComputeRenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>					TempTexture;
+		ZEHolder<ZEGRTexture>					TempTexture;
 
 		struct FilterConstants
 		{
@@ -92,8 +92,8 @@ class ZERNFilter : public ZEInitializable
 		bool									Update();
 
 	public:
-		void									ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader = true);
-		void									ApplyScale(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRRenderTarget* OutputRenderTarget);
+		void									ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader = true);
+		void									ApplyScale(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRRenderTarget* OutputRenderTarget);
 		void									ApplyEdgeDetection(ZEGRContext* Context, float StencilRef);
 
 												ZERNFilter();

@@ -38,13 +38,23 @@
 
 #include "ZERNTransformations.hlsl"
 #include "ZERNDecodeNormals.hlsl"
+#include "ZERNSkin.hlsl"
 
 struct ZERNDebug_VertexShader_Input
 {
-	float3		Position		: POSITION0;
-	int2		NormalEncoded	: NORMAL0;
-	int2		TangentEncoded	: TANGENT0;
-	float2		TexCoord		: TEXCOORD0;
+	float3 Position			: POSITION0;
+
+	#ifdef ZERN_DEBUG_SKIN_TRANSFORM
+		uint4 BoneIndices	: BLENDINDICES;
+	#endif
+
+	int2 NormalEncoded		: NORMAL0;
+	int2 TangentEncoded		: TANGENT0;
+	float2 Texcoord			: TEXCOORD0;
+
+	#ifdef ZERN_DEBUG_SKIN_TRANSFORM
+		float4 BoneWeights	: BLENDWEIGHTS;
+	#endif
 };
 
 struct ZERNDebug_GeometryShader_Input
@@ -59,6 +69,14 @@ struct ZERNDebug_PixelShader_Input
 {
 	float4		Position	: SV_Position;
 	float3		Color		: COLOR0;
+};
+
+struct ZERNDebug_CanvasVertex
+{
+	float3		Position	: POSITION0;
+	float3		Normal		: NORMAL0;
+	float2		Texcoord	: TEXCOORD0;
+	float4		Color		: COLOR0;
 };
 
 cbuffer ZERNDebug_Constant_Draw_Transform	: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
@@ -84,7 +102,8 @@ static const float3 ZERNDebug_ColorWireframe	= float3(0.0f, 0.0f, 1.0f);
 static const float3 ZERNDebug_ColorNormal		= float3(1.0f, 1.0f, 1.0f);
 static const float3 ZERNDebug_ColorTangent		= float3(1.0f, 0.0f, 0.0f);
 static const float3 ZERNDebug_ColorBinormal		= float3(0.0f, 1.0f, 0.0f);
-static const float3 ZERNDebug_ColorBoundingBox	= float3(1.0f, 1.0f, 0.0f);
+
+
 
 ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShader_Input Input)
 {
@@ -94,6 +113,14 @@ ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShade
 	DecodeTangentBinormal(Input.TangentEncoded, Normal, Tangent, Binormal);
 	
 	ZERNDebug_GeometryShader_Input Output;
+	
+	#ifdef ZERN_DEBUG_SKIN_TRANSFORM
+		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
+		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
+		Normal = mul(SkinTransform, float4(Normal, 0.0f)).xyz;
+		Tangent = mul(SkinTransform, float4(Tangent, 0.0f)).xyz;
+		Binormal = mul(SkinTransform, float4(Binormal, 0.0f)).xyz;
+	#endif
 	
 	Output.Position = mul(ZERNDebug_WorldTransform, float4(Input.Position, 1.0f)).xyz;
 	Output.Normal = mul(ZERNDebug_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
@@ -231,68 +258,13 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 	}
 }
 
-float3 ZERNDebug_BoundingBox_VertexShader_Main(float3 MinMax : POSITION0) : POSITION0
-{
-	return MinMax;
-}
-
-[maxvertexcount(18)]
-void ZERNDebug_BoundingBox_GeometryShader_Main(line float3 MinMax[2] : POSITION0, inout LineStream<ZERNDebug_PixelShader_Input> OutputStream)
+ZERNDebug_PixelShader_Input ZERNDebug_Canvas_VertexShader_Main(ZERNDebug_CanvasVertex Input)
 {
 	ZERNDebug_PixelShader_Input Output;
+	Output.Position = ZERNTransformations_WorldToProjection(float4(Input.Position, 1.0f));
+	Output.Color = Input.Color.rgb;
 	
-	Output.Color = ZERNDebug_ColorBoundingBox;
-	
-	float3 Min = MinMax[0];
-	float3 Max = MinMax[1];
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Max.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Max.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Min.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Max.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Max.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Min.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Max.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Max.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Max.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Max.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Min.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Max.x, Min.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
-	
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Min.z), 1.0f));
-	OutputStream.Append(Output);
-	Output.Position = ZERNTransformations_WorldToProjection(float4(float3(Min.x, Min.y, Max.z), 1.0f));
-	OutputStream.Append(Output);
-	OutputStream.RestartStrip();
+	return Output;
 }
 
 float3 ZERNDebug_PixelShader_Main(ZERNDebug_PixelShader_Input Input) : SV_Target0

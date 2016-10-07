@@ -49,26 +49,27 @@ ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
 
 class ZERNCommand;
 class ZEGRContext;
-class ZEGRRenderTarget;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
+class ZEGRTexture;
 class ZEGRSampler;
-class ZEGRTexture2D;
+class ZEGRRenderTarget;
 
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStage;
+	friend class ZEGRTestModule;
 	private:
 		ZERNView									View;
 		ZEList2<ZERNStage>							Stages;
-		ZEHolder<ZEGRConstantBuffer>				ViewConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>				RendererConstantBuffer;
+		ZEHolder<ZEGRBuffer>						ViewConstantBuffer;
+		ZEHolder<ZEGRBuffer>						RendererConstantBuffer;
 		ZEArray<ZEScene*>							Scenes;
 		ZEList2<ZERNCommand>						CommandList;
 		ZEList2<ZERNCommand>						CommandListInstanced;
 
 		ZEGRContext*								Context;
-		ZEHolder<const ZEGRTexture2D>				OutputTexture;
+		ZEHolder<const ZEGRTexture>					OutputTexture;
 
 		bool										DirtyPipeline;
 		bool										Resized;
@@ -109,8 +110,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void										SetView(const ZERNView& View);
 		const ZERNView&								GetView();
 
-		void										SetOutputTexture(const ZEGRTexture2D* OutputTexture);
-		const ZEGRTexture2D*						GetOutputTexture() const;
+		void										SetOutputTexture(const ZEGRTexture* OutputTexture);
+		const ZEGRTexture*							GetOutputTexture() const;
 
 		const ZEList2<ZERNStage>&					GetStages();
 		ZERNStage*									GetStage(ZERNStageID Id);

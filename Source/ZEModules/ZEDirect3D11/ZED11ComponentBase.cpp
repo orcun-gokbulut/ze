@@ -47,12 +47,12 @@ ZED11Module* ZED11ComponentBase::GetModule()
 	return Module;
 }
 
-ID3D11Device* ZED11ComponentBase::GetDevice() const
+ID3D11Device* ZED11ComponentBase::GetDevice()
 {
 	return Device;
 }
 
-ID3D11DeviceContext* ZED11ComponentBase::GetMainContext() const
+ID3D11DeviceContext* ZED11ComponentBase::GetMainContext()
 {
 	return Context;
 }
@@ -240,6 +240,18 @@ DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
 
 		case ZEGR_TF_BC7_UNORM_SRGB:
 			return DXGI_FORMAT_BC7_UNORM_SRGB;
+
+		case ZEGR_TF_D16_UNORM:
+			return DXGI_FORMAT_D16_UNORM;
+
+		case ZEGR_TF_D24_UNORM_S8_UINT:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		case ZEGR_TF_D32_FLOAT:
+			return DXGI_FORMAT_D32_FLOAT;
+
+		case ZEGR_TF_D32_FLOAT_S8X24_UINT:
+			return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 	}
 }
 
@@ -423,17 +435,17 @@ D3D11_USAGE ZED11ComponentBase::ConvertUsage(ZEGRResourceUsage Usage)
 {
 	switch (Usage)
 	{
-		case ZEGR_RU_GPU_READ_ONLY:
+		case ZEGR_RU_IMMUTABLE:
 			return D3D11_USAGE_IMMUTABLE;
 			
 		default:
-		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
+		case ZEGR_RU_STATIC:
 			return D3D11_USAGE_DEFAULT;
 
-		case ZEGR_RU_GPU_READ_CPU_WRITE:
+		case ZEGR_RU_DYNAMIC:
 			return D3D11_USAGE_DYNAMIC;
 
-		case ZEGR_RU_CPU_READ_WRITE:
+		case ZEGR_RU_STAGING:
 			return D3D11_USAGE_STAGING;
 	}
 }
@@ -457,6 +469,15 @@ UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 	if (BindFlags.GetFlags(ZEGR_RBF_UNORDERED_ACCESS))
 		Flags |= D3D11_BIND_UNORDERED_ACCESS;
 
+	if (BindFlags.GetFlags(ZEGR_RBF_VERTEX_BUFFER))
+		Flags |= D3D11_BIND_VERTEX_BUFFER;
+
+	if (BindFlags.GetFlags(ZEGR_RBF_INDEX_BUFFER))
+		Flags |= D3D11_BIND_INDEX_BUFFER;
+
+	if (BindFlags.GetFlags(ZEGR_RBF_CONSTANT_BUFFER))
+		Flags |= D3D11_BIND_CONSTANT_BUFFER;
+
 	return Flags;
 }
 
@@ -464,14 +485,39 @@ UINT ZED11ComponentBase::ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage)
 {
 	switch (Usage)
 	{
-		case ZEGR_RU_GPU_READ_ONLY:
-		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
+		default:
+		case ZEGR_RU_IMMUTABLE:
+		case ZEGR_RU_STATIC:
 			return 0;
 
-		case ZEGR_RU_GPU_READ_CPU_WRITE:
+		case ZEGR_RU_DYNAMIC:
 			return D3D11_CPU_ACCESS_WRITE;
 
-		case ZEGR_RU_CPU_READ_WRITE:
+		case ZEGR_RU_STAGING:
 			return D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+	}
+}
+
+D3D11_MAP ZED11ComponentBase::ConvertMapType(ZEGRResourceMapType MapType)
+{
+	switch (MapType)
+	{
+		case ZEGR_RMT_READ:
+			return D3D11_MAP_READ;
+
+		case ZEGR_RMT_WRITE:
+			return D3D11_MAP_WRITE;
+
+		case ZEGR_RMT_READ_WRITE:
+			return D3D11_MAP_READ_WRITE;
+
+		case ZEGR_RMT_WRITE_DISCARD:
+			return D3D11_MAP_WRITE_DISCARD;
+
+		case ZEGR_RMT_WRITE_NO_OVERWRITE:
+			return D3D11_MAP_WRITE_NO_OVERWRITE;
+
+		default:
+			return (D3D11_MAP)0;
 	}
 }

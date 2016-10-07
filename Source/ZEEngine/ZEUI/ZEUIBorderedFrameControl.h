@@ -84,12 +84,12 @@ struct ZEUIControlStyle
 	ZEVector2						MainAreaUVLeftUp;
 	ZEVector2						MainAreaUVRightDown;
 
-	ZEGRTexture2D*					BackgroundTexture;
-	ZEGRTexture2D*					BorderCornerTexture;
-	ZEGRTexture2D*					BorderEdgeTexture;
-	ZEGRTexture2D*					HoveredTexture;
-	ZEGRTexture2D*					PressedTexture;
-	ZEGRTexture2D*					DisabledTexture;
+	ZEGRTexture*					BackgroundTexture;
+	ZEGRTexture*					BorderCornerTexture;
+	ZEGRTexture*					BorderEdgeTexture;
+	ZEGRTexture*					HoveredTexture;
+	ZEGRTexture*					PressedTexture;
+	ZEGRTexture*					DisabledTexture;
 
 	ZEUIFont*					Font;
 

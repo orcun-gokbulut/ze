@@ -34,12 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGROutput.h"
+
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRWindow.h"
 
 ZEGROutput::ZEGROutput()
 {
 	Register();
+}
+
+ZEGROutput::~ZEGROutput()
+{
+	Unregister();
 }
 
 ZEGRResourceType ZEGROutput::GetResourceType() const

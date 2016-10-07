@@ -47,7 +47,7 @@
 
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
+class ZEGRBuffer;
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
@@ -66,7 +66,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRShader>			VertexShader;
 		mutable ZEHolder<ZEGRShader>			PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		mutable ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		mutable ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		ZERNMap									TextureMap;
 

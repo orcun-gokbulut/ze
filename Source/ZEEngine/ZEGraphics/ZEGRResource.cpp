@@ -35,6 +35,23 @@
 
 #include "ZEGRResource.h"
 
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRContext.h"
+
+void ZEGRResource::SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource, bool BoundAsUnorderedAccess)
+{
+	zeDebugCheck(BoundAsShaderResource && BoundAsUnorderedAccess, "A resource cannot be bound as both shader resource and unordered access");
+
+	BoundStages[Shader].BoundAsShaderResource = BoundAsShaderResource;
+	BoundStages[Shader].BoundAsUnorderedAccess = BoundAsUnorderedAccess;
+	BoundStages[Shader].Slot = Slot;
+}
+
+const ZEArray<ZEGRResource::BoundStage>& ZEGRResource::GetBoundStages() const
+{
+	return BoundStages;
+}
+
 void ZEGRResource::SetSize(ZESize Size)
 {
 	this->Size = Size;
@@ -51,16 +68,50 @@ void ZEGRResource::SetResourceBindFlags(ZEFlags BindFlags)
 	this->BindFlags = BindFlags;
 }
 
+void ZEGRResource::SetFormat(ZEGRFormat Format)
+{
+	this->Format = Format;
+}
+
 ZEGRResource::ZEGRResource()
 {
 	Size = 0;
-	Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE;
+	Usage = ZEGR_RU_STATIC;
 	BindFlags = ZEGR_RBF_SHADER_RESOURCE;
+	Format = ZEGR_TF_NONE;
+
+	BoundStages.SetCount(ZEGR_SHADER_TYPE_COUNT);
+	BoundStage Stage;
+	Stage.BoundAsShaderResource = false;
+	Stage.BoundAsUnorderedAccess = false;
+	Stage.Slot = -1;
+	BoundStages.Fill(Stage);
+
 }
 
 ZEGRResource::~ZEGRResource()
 {
 	SetSize(0);
+	Usage = ZEGR_RU_STATIC;
+	BindFlags = ZEGR_RBF_SHADER_RESOURCE;
+	Format = ZEGR_TF_NONE;
+
+	ZEGRGraphicsModule* GraphicsModule = ZEGRGraphicsModule::GetInstance();
+	if (GraphicsModule != NULL)
+	{
+		ZEGRContext* Context = GraphicsModule->GetMainContext();
+		if (Context != NULL)
+		{
+			ze_for_each(Stage, BoundStages)
+			{
+				if (Stage->BoundAsShaderResource)
+					Context->ClearShaderResources((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1);
+
+				else if (Stage->BoundAsUnorderedAccess)
+					Context->ClearUnorderedAccesses(Stage->Slot, 1);
+			}
+		}
+	}
 }
 
 void ZEGRResource::SetName(const ZEString& Name)
@@ -86,4 +137,9 @@ ZEGRResourceUsage ZEGRResource::GetResourceUsage() const
 ZEFlags ZEGRResource::GetResourceBindFlags() const
 {
 	return BindFlags;
+}
+
+ZEGRFormat ZEGRResource::GetFormat() const
+{
+	return Format;
 }

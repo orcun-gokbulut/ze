@@ -41,7 +41,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZERNStageID.h"
 #include "ZERNRenderer.h"
-#include "ZERNStageGBuffer.h"
+#include "ZERNStage.h"
 #include "ZECanvas.h"
 #include "ZELightPoint.h"
 #include "ZELightDirectional.h"
@@ -53,11 +53,9 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRStructuredBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
@@ -66,7 +64,6 @@
 
 #define ZERN_SLDF_SHADERS		1
 #define ZERN_SLDF_RENDER_STATE	2
-#define ZERN_SLDF_OUTPUT		4
 
 void ZERNStageLighting::CreateRandomVectors()
 {
@@ -79,7 +76,7 @@ void ZERNStageLighting::CreateRandomVectors()
 		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 	}
 	
-	RandomVectorsTexture = ZEGRTexture2D::CreateResource(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, 128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageLighting::CreateLightGeometries()
@@ -111,7 +108,7 @@ void ZERNStageLighting::CreateLightGeometries()
 	Canvas.SetTranslation(ZEVector3::UnitZ);
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 
-	DeferredLightVertexBuffer = Canvas.CreateVertexBuffer();
+	DeferredLightVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Canvas.GetBuffer());
 }
 
 bool ZERNStageLighting::UpdateShaders()
@@ -446,21 +443,21 @@ bool ZERNStageLighting::UpdateLightBuffers()
 	if (PointLights.GetCount() > 0)
 	{
 		PointLightStruct* DestPointLights;
-		if (!PointLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestPointLights)))
+		if (!PointLightStructuredBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&DestPointLights)))
 			return false;
 		
 		memcpy(DestPointLights, PointLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, PointLights.GetCount()) * sizeof(PointLightStruct));
-		PointLightStructuredBuffer->Unlock();
+		PointLightStructuredBuffer->Unmap();
 	}
 
 	if (ProjectiveLights.GetCount() > 0)
 	{
 		ProjectiveLightStruct* DestProjectiveLights;
-		if (!ProjectiveLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestProjectiveLights)))
+		if (!ProjectiveLightStructuredBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&DestProjectiveLights)))
 			return false;
 		
 		memcpy(DestProjectiveLights, ProjectiveLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, ProjectiveLights.GetCount()) * sizeof(ProjectiveLightStruct));
-		ProjectiveLightStructuredBuffer->Unlock();
+		ProjectiveLightStructuredBuffer->Unmap();
 	}
 
 	PointLights.Clear();
@@ -491,9 +488,19 @@ bool ZERNStageLighting::InitializeInternal()
 	CreateRandomVectors();
 	CreateLightGeometries();
 
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
-	PointLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(MAX_LIGHT, sizeof(PointLightStruct));
-	ProjectiveLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(MAX_LIGHT, sizeof(ProjectiveLightStruct));
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	PointLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(PointLightStruct), sizeof(PointLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
+	ProjectiveLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(ProjectiveLightStruct), sizeof(ProjectiveLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
+
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
+	if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
+	{
+		Width *= 2;
+		Height *= 2;
+	}
+
+	TiledDeferredOutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 
 	return Update();
 }
@@ -576,22 +583,6 @@ void ZERNStageLighting::BlendTiledDeferred(ZEGRContext* Context, const ZEGRRende
 	}
 }
 
-void ZERNStageLighting::CreateOutput(const ZEString& Name)
-{
-	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
-
-	if (Name == "TiledDeferredColorTexture")
-	{
-		if (DirtyFlags.GetFlags(ZERN_SLDF_OUTPUT))
-		{
-			//TODO: Set multiplier of two according to sample count
-			TiledDeferredOutputTexture = ZEGRTexture2D::CreateResource(Width * 2, Height * 2, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
-			DirtyFlags.UnraiseFlags(ZERN_SLDF_OUTPUT);
-		}
-	}
-}
-
 ZEInt ZERNStageLighting::GetId() const
 {
 	return ZERN_STAGE_LIGHTING;
@@ -623,11 +614,6 @@ bool ZERNStageLighting::GetUseTiledDeferred() const
 	return UseTiledDeferred;
 }
 
-void ZERNStageLighting::Resized(ZEUInt Width, ZEUInt Height)
-{
-	DirtyFlags.RaiseFlags(ZERN_SLDF_OUTPUT);
-}
-
 bool ZERNStageLighting::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
@@ -643,10 +629,10 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, ConstantBuffer);
 
-	const ZEGRStructuredBuffer* StructuredBuffers[] = {PointLightStructuredBuffer, ProjectiveLightStructuredBuffer};
-	Context->SetStructuredBuffers(ZEGR_ST_VERTEX, 14, 2, StructuredBuffers);
-	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 14, 2, StructuredBuffers);
-	Context->SetStructuredBuffers(ZEGR_ST_COMPUTE, 14, 2, StructuredBuffers);
+	const ZEGRBuffer* Buffers[] = {PointLightStructuredBuffer, ProjectiveLightStructuredBuffer};
+	Context->SetBuffers(ZEGR_ST_VERTEX, 14, 2, Buffers);
+	Context->SetBuffers(ZEGR_ST_PIXEL, 14, 2, Buffers);
+	Context->SetBuffers(ZEGR_ST_COMPUTE, 14, 2, Buffers);
 
 	const ZEGRTexture* GBuffers[] = {GBufferEmissive, GBufferDiffuse, GBufferNormal, DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, GBuffers);
@@ -665,7 +651,6 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 		Context->SetComputeRenderState(TiledDeferredComputeRenderState);
 		Context->SetRWTexture(0, TiledDeferredOutputTexture);
 		Context->SetTextures(ZEGR_ST_COMPUTE, 1, 4, GBuffers);
-		Context->SetTextures(ZEGR_ST_COMPUTE, 10, 1, &ProjectiveLightTexture);
 
 		ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 		ZEUInt TileCountY = (AccumulationTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
@@ -703,8 +688,6 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 		DrawLights(Context, true);
 	}
 
-	CleanUp(Context);
-
 	return false;
 }
 
@@ -735,5 +718,4 @@ ZERNStageLighting::ZERNStageLighting()
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&TiledDeferredOutputTexture), "TiledDeferredColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }

@@ -36,7 +36,7 @@
 #include "ZERNStageRenderDepth.h"
 
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERNStageID.h"
@@ -68,7 +68,7 @@ void ZERNStageRenderDepth::CreateOutput(const ZEString& Name)
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT))
 		{
-			OpaqueDepthTexture = ZEGRTexture2D::CreateResource(DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
+			OpaqueDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT);
 		}
 	}

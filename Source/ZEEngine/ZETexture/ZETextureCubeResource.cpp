@@ -44,9 +44,8 @@
 #include "ZETextureLoader.h"
 #include "ZETextureQualityManager.h"
 #include "ZETextureCacheDataIdentifier.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
 
 void ZETextureCubeResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
@@ -224,7 +223,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 	// Create TextureCubeResource 
 	ZEPointer<ZETextureCubeResource, ZEDeletorRelease<ZETextureCubeResource>> TextureResource = new ZETextureCubeResource();
-	TextureResource->Texture = ZEGRTextureCube::CreateResource(TextureDataCube.GetWidth(), TextureDataCube.GetLevelCount(), TextureDataCube.GetPixelFormat(), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, Data);
+	TextureResource->Texture = ZEGRTexture::CreateResource(ZEGR_TT_CUBE, TextureDataCube.GetWidth(), TextureDataCube.GetHeight(), TextureDataCube.GetLevelCount(), 
+		TextureDataCube.GetPixelFormat(), ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 6, 1, Data);
 
 	if (TextureResource->Texture == NULL)
 	{
@@ -260,7 +260,7 @@ ZEGRTexture* ZETextureCubeResource::GetTexture() const
 	return Texture;
 }
 
-ZEGRTextureCube* ZETextureCubeResource::GetTextureCube() const
+ZEGRTexture* ZETextureCubeResource::GetTextureCube() const
 {
 	return Texture;
 }

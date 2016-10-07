@@ -52,20 +52,28 @@ cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_T
 
 TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
 
+struct ZERNSkyBox_VertexShader_Input
+{
+	float3	Position			: POSITION0;
+	float3	Normal				: NORMAL0;
+	float2	Texcoord			: TEXCOORD0;
+	float4	Color				: COLOR0;
+};
+
 struct ZERNSkyBox_PixelShader_Input
 {
 	float4			Position						: SV_Position;
 	float3			CubeTexcoord					: TEXCOORD0;
 };
 
-ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
+ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(ZERNSkyBox_VertexShader_Input Input)
 {
 	ZERNSkyBox_PixelShader_Input Output;
 
-	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
+	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Input.Position, 1.0f));
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Position.z = 0.0f;
-	Output.CubeTexcoord = Position;
+	Output.CubeTexcoord = Input.Position;
 	
 	return Output;
 }

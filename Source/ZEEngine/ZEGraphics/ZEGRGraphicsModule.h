@@ -44,22 +44,16 @@
 #include "ZEGRRenderState.h"
 #include "ZEGRCounter.h"
 
-class ZEGRRenderState;
-class ZEGRTexture2D;
-class ZEGRTexture3D;
-class ZEGRTextureCube;
-class ZEGRIndexBuffer;
-class ZEGRVertexBuffer;
-class ZEGRVertexLayout;
 class ZEGRContext;
-class ZEGRWindow;
 class ZEGRShader;
 class ZEGRSampler;
-class ZEGRShaderCompiler;
-class ZEGRConstantBuffer;
 class ZEGRTracer;
 class ZEGROutput;
-class ZEGRStructuredBuffer;
+class ZEGRBuffer;
+class ZEGRTexture;
+class ZEGRRenderState;
+class ZEGRVertexLayout;
+class ZEGRShaderCompiler;
 
 class ZEGRGraphicsModule : public ZEModule
 {
@@ -92,14 +86,9 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRSampler*					CreateSamplerState() = 0;
 		virtual ZEGROutput*						CreateOutput() = 0;
 		virtual ZEGRContext*					CreateContext() = 0;
-		virtual ZEGRVertexBuffer*				CreateVertexBuffer() = 0;
-		virtual ZEGRIndexBuffer*				CreateIndexBuffer() = 0;
 		virtual ZEGRShader*						CreateShader() = 0;
-		virtual ZEGRConstantBuffer*				CreateConstantBuffer() = 0;
-		virtual ZEGRStructuredBuffer*			CreateStructuredBuffer() = 0;
-		virtual ZEGRTexture2D*					CreateTexture2D() = 0;
-		virtual ZEGRTexture3D*					CreateTexture3D() = 0;
-		virtual ZEGRTextureCube*				CreateTextureCube() = 0;
+		virtual ZEGRBuffer*						CreateBuffer() = 0;
+		virtual ZEGRTexture*					CreateTexture() = 0;
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
 		virtual ZEGRRenderStateData*			CreateRenderStateData() = 0;
 		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData() = 0;

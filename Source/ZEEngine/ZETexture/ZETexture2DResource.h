@@ -39,14 +39,14 @@
 
 #include "ZEPointer/ZEHolder.h"
 
-ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture, "ZEGraphics/ZETexture2D.h")
 
 class ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZETexture2DResource)
 	private:
-		ZEHolder<ZEGRTexture2D>				Texture;
+		ZEHolder<ZEGRTexture>				Texture;
 
 	protected:
 											ZETexture2DResource();
@@ -57,7 +57,7 @@ class ZETexture2DResource : public ZETextureResource
 		virtual ZEGRTextureType				GetTextureType() const;
 
 		virtual ZEGRTexture*				GetTexture() const;
-		ZEGRTexture2D*						GetTexture2D() const;
+		ZEGRTexture*						GetTexture2D() const;
 
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 

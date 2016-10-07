@@ -209,7 +209,7 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 	}
 	else if (FileOpenMode == ZE_FOM_WRITE && (RealPath.Access & ZE_PA_WRITE) == 0)
 	{
-		zeError("File read access denied. File: \"%s\".", FilePath.ToCString());
+		zeError("File write access denied. File: \"%s\".", FilePath.ToCString());
 		return false;
 	}
 

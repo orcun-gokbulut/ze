@@ -41,7 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 
 class ZERNStageGBuffer : public ZERNStage
 {
@@ -49,11 +49,11 @@ class ZERNStageGBuffer : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<ZEGRTexture2D>				GBuffer0;
-		ZEHolder<ZEGRTexture2D>				GBuffer1;
-		ZEHolder<ZEGRTexture2D>				GBuffer2;
-		ZEHolder<ZEGRTexture2D>				GBuffer3;
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
+		ZEHolder<ZEGRTexture>				GBuffer0;
+		ZEHolder<ZEGRTexture>				GBuffer1;
+		ZEHolder<ZEGRTexture>				GBuffer2;
+		ZEHolder<ZEGRTexture>				GBuffer3;
+		ZEHolder<ZEGRTexture>				DepthStencilBuffer;
 
 		ZEGRViewport						Viewport;
 
