@@ -58,7 +58,7 @@
 	} \
 	else
 
-#define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn, LoadPercentageStart, LoadPercentageEnd) \
+#define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn) \
 	if (Resource != NULL) \
 	{ \
 		if (Resource->IsFailed()) \
@@ -67,9 +67,6 @@
 		} \
 		else if (Resource->GetState() < TargetState) \
 		{ \
-			ZEUInt Percentage = LoadPercentageStart + (Resource->GetLoadPercentage() * (LoadPercentageEnd - LoadPercentageStart)) / 100; \
-			if (Percentage < GetLocalLoadingPercentage()) \
-				SetLocalLoadingPercentage(Percentage); \
 			return ZE_ER_WAIT; \
 		} \
 	} \
