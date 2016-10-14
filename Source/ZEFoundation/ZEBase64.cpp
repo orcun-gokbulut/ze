@@ -37,6 +37,7 @@
 
 #include <string>
 #include "ZEMath\ZEMath.h"
+#include "ZEDS\ZEArray.h"
 
 static char EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char DecodingTable[128] = 
@@ -140,53 +141,60 @@ bool ZEBase64::Decode(void* Output, const void* Input, ZESize InputSize)
 {
 	if (InputSize == 0)
 		return true;
-	
-	if (InputSize % 4 != 0)
+
+	ZEBYTE* OutputByte = reinterpret_cast<ZEBYTE*>(Output);
+	const ZEBYTE* Current = reinterpret_cast<const ZEBYTE*>(Input);
+	const ZEBYTE* End = Current + InputSize;
+
+	ZEUInt Index = 0;
+	ZEBYTE Buffer[4];
+	while(Current < End)
+	{
+		if (*Current == ' ' || *Current == '\t' || *Current == '\r' || *Current == '\n')
+		{
+			Current++;
+			continue;
+		}
+
+		Buffer[Index] = *Current;
+		Current++;
+		Index++;
+
+		if (Index == 4)
+		{
+			Index = 0;
+			if (Buffer[3] == '=' && Buffer[2] == '=')
+			{
+				if (!IsBase64(Buffer[0]) || !IsBase64(Buffer[1]))
+					return false;
+
+				OutputByte[0] = (DecodingTable[Buffer[0]] << 2) | (DecodingTable[Buffer[1]] >> 4);
+				OutputByte++;
+			}
+			else if (Buffer[3] == '=')
+			{
+				if (!IsBase64(Buffer[0]) || !IsBase64(Buffer[1]) || !IsBase64(Buffer[2]))
+					return false;
+
+				OutputByte[0] = (DecodingTable[Buffer[0]] << 2) | (DecodingTable[Buffer[1]] >> 4);
+				OutputByte[1] = (DecodingTable[Buffer[1]] << 4) | (DecodingTable[Buffer[2]] >> 2);
+				OutputByte += 2;
+			}
+			else
+			{
+				if (!IsBase64(Buffer[0]) || !IsBase64(Buffer[1]) || !IsBase64(Buffer[2]) || !IsBase64(Buffer[3]))
+					return false;
+
+				OutputByte[0] = (DecodingTable[Buffer[0]] << 2) | (DecodingTable[Buffer[1]] >> 4);
+				OutputByte[1] = (DecodingTable[Buffer[1]] << 4) | (DecodingTable[Buffer[2]] >> 2);
+				OutputByte[2] = (DecodingTable[Buffer[2]] << 6) | (DecodingTable[Buffer[3]]);
+				OutputByte += 3;
+			}
+		}
+	}
+
+	if (Index != 0)
 		return false;
-
-	ZESize I;
-	for (I = 0; I < (InputSize / 4) - 1; I++)
-	{
-		ZEBYTE* InputByte = (ZEBYTE*)Input + I * 4;
-		ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 3;
-
-		if (!IsBase64(InputByte[0]) || !IsBase64(InputByte[1]) || !IsBase64(InputByte[2]) || !IsBase64(InputByte[3]))
-			return false;
-				
-		OutputByte[0] = (DecodingTable[InputByte[0]] << 2) | (DecodingTable[InputByte[1]] >> 4);
-		OutputByte[1] = (DecodingTable[InputByte[1]] << 4) | (DecodingTable[InputByte[2]] >> 2);
-		OutputByte[2] = (DecodingTable[InputByte[2]] << 6) | (DecodingTable[InputByte[3]]);
-	}
 	
-	ZEBYTE* InputByte = (ZEBYTE*)Input + I * 4;
-	ZEBYTE* OutputByte = (ZEBYTE*)Output + I * 3;
-
-
-
-	if (InputByte[3] == '=' && InputByte[2] == '=')
-	{
-		if (!IsBase64(InputByte[0]) || !IsBase64(InputByte[1]))
-			return false;
-
-		OutputByte[0] = (DecodingTable[InputByte[0]] << 2) | (DecodingTable[InputByte[1]] >> 4);
-	}
-	else if (InputByte[3] == '=')
-	{
-		if (!IsBase64(InputByte[0]) || !IsBase64(InputByte[1]) || !IsBase64(InputByte[2]))
-			return false;
-
-		OutputByte[0] = (DecodingTable[InputByte[0]] << 2) | (DecodingTable[InputByte[1]] >> 4);
-		OutputByte[1] = (DecodingTable[InputByte[1]] << 4) | (DecodingTable[InputByte[2]] >> 2);
-	}
-	else
-	{
-		if (!IsBase64(InputByte[0]) || !IsBase64(InputByte[1]) || !IsBase64(InputByte[2]) || !IsBase64(InputByte[3]))
-			return false;
-
-		OutputByte[0] = (DecodingTable[InputByte[0]] << 2) | (DecodingTable[InputByte[1]] >> 4);
-		OutputByte[1] = (DecodingTable[InputByte[1]] << 4) | (DecodingTable[InputByte[2]] >> 2);
-		OutputByte[2] = (DecodingTable[InputByte[2]] << 6) | (DecodingTable[InputByte[3]]);
-	}
-
 	return true;
 }
