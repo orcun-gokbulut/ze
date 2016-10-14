@@ -753,7 +753,7 @@ bool ZEMLFormatXMLV1::ReadData(ZEFile* File, const ZEMLFormatElement& Element, v
 	
 	if (Offset == 0 && Size == Element.Size)
 	{
-		if (!ZEBase64::Decode(Buffer, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
+		if (!ZEBase64::Decode(Buffer, DataElement->GetText(), strlen(DataElement->GetText())))
 		{
 			FormatError("Base64 decoding has failed.");
 			return false;
@@ -762,7 +762,7 @@ bool ZEMLFormatXMLV1::ReadData(ZEFile* File, const ZEMLFormatElement& Element, v
 	else
 	{
 		ZEPointer<ZEBYTE> Data = new ZEBYTE[Element.Size];
-		if (!ZEBase64::Decode(Data, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
+		if (!ZEBase64::Decode(Data, DataElement->GetText(), strlen(DataElement->GetText())))
 		{
 			FormatError("Base64 decoding has failed.");
 			return false;
