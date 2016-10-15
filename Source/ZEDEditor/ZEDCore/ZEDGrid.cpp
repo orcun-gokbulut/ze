@@ -97,7 +97,7 @@ void ZEDGrid::GenerateGrid()
 
 	MajorGridCount = Canvas.GetVertexCount() - MajorGridOffset;	
 
-	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_BT_VERTEX_BUFFER, ZEGR_TF_NONE, Canvas.GetBuffer());
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Canvas.GetBuffer());
 }
 
 ZEEntityResult ZEDGrid::LoadInternal()

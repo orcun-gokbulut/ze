@@ -123,8 +123,8 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		virtual bool							Update() const;
 
 		virtual bool							PreRender(ZERNCommand& Command) const;
-		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 
 		static ZEHolder<ZERNSimpleMaterial>		CreateInstance();
 };

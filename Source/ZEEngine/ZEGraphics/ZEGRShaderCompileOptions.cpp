@@ -39,62 +39,34 @@ ZEGRShaderDefinition::ZEGRShaderDefinition()
 {
 }
 
-void ZEGRShaderCompileOptions::GenerateHash()
-{
-	Hash += Type *  0x5328FD43;
-	Hash += Model * 0xAF32F3CD;
-	Hash += Definitions.GetCount() * 0xAF32F3CD;
-	Hash += IncludeDirectories.GetCount() * 0xAF32F3CD;
-	Hash += FileName.Hash();
-	Hash += EntryPoint.Hash();
-	Hash += SourceData.Hash();
-
-	for (ZESize I = 0; I < Definitions.GetCount(); I++)
-		Hash += Definitions[I].Name.Hash() + Definitions[I].Value.Hash();
-
-	for (ZESize I = 0; I < IncludeDirectories.GetCount(); I++)
-		Hash += IncludeDirectories[I].Hash();
-}
-
-bool ZEGRShaderCompileOptions::Equals(const ZEGRShaderCompileOptions& Other)
-{
-	if (Hash == 0 ||
-		Hash != Other.Hash ||
-		Type != Other.Type ||
-		Model != Other.Model ||
-		Definitions.GetCount() != Other.Definitions.GetCount() ||
-		IncludeDirectories.GetCount() != Other.IncludeDirectories.GetCount() ||
-		EntryPoint != Other.EntryPoint ||
-		FileName != Other.FileName ||
-		SourceData != Other.SourceData)
-	{
-		return false;
-	}
-
-	for (ZESize I = 0; I < Definitions.GetCount(); I++)
-	{
-		if (Definitions[I].Name != Other.Definitions[I].Name ||	Definitions[I].Value != Other.Definitions[I].Value)
-			return false;
-	}
-
-	for (ZESize I = 0; I < IncludeDirectories.GetCount(); I++)
-	{
-		if (IncludeDirectories[I] != Other.IncludeDirectories[I])
-			return false;
-	}
-}
-
 ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value)
 {
 	this->Name = Name;
 	this->Value = Value;
 }
 
+ZEUInt32 ZEGRShaderCompileOptions::Hash() const
+{
+	ZEUInt32 Hash = 0;
+
+	Hash += Type;
+	Hash += Model;
+	Hash += FileName.Hash();
+	Hash += EntryPoint.Hash();
+
+	for (ZESize I = 0; I < Definitions.GetCount(); I++)
+		Hash += Definitions[I].Name.Hash() + Definitions[I].Value.Hash();
+
+	for (ZESize I = 0; I < IncludeDirectories.GetCount(); I++)
+		Hash += IncludeDirectories[I].Hash();
+
+	return Hash;
+}
+
 ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()
 {
 	Type = ZEGR_ST_NONE;
-	Model = (ZEGRShaderModel)0;
+	Model = ZEGR_SM_5_0;
 	Debug = false;
 	OptimizationLevel = 3;
-	Hash = 0;
 }

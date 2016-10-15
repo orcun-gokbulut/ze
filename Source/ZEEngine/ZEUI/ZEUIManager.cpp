@@ -585,9 +585,12 @@ bool ZEUIManager::DeinitializeInternal()
 void ZEUIManager::Render(ZERNRenderer* Renderer)
 {
 	UIRenderer->Clean();
+	
+	Controls.LockRead();
 	for (size_t I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetVisiblity())
 			Controls[I]->Draw(UIRenderer);
+	Controls.UnlockRead();
 
 	UIRenderer->Setup(Renderer);
 }
@@ -596,9 +599,11 @@ void ZEUIManager::Tick(float ElapsedTime)
 {
 	ProcessEvents();
 
+	Controls.LockRead();
 	for (size_t I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
+	Controls.UnlockRead();
 }
 
 void ZEUIManager::Destroy()
@@ -610,7 +615,3 @@ ZEUIManager* ZEUIManager::CreateInstance()
 {
 	return new ZEUIManager();
 }
-
-
-
-

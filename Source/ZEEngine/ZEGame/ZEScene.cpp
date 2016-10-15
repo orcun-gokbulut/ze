@@ -255,6 +255,8 @@ void ZEScene::UpdateConstantBuffer()
 	if (!SceneDirtyFlags.GetFlags(ZE_SDF_CONSTANT_BUFFER))
 		return;
 
+	Constants.AmbientColor = AmbientColor * AmbientFactor;
+
 	ConstantBuffer->SetData(&Constants);
 
 	SceneDirtyFlags.UnraiseFlags(ZE_SDF_CONSTANT_BUFFER);
@@ -304,9 +306,11 @@ bool ZEScene::GetEnabled() const
 
 void ZEScene::SetAmbientFactor(float Factor)
 {
+	if (AmbientFactor == Factor)
+		return;
+
 	AmbientFactor = Factor;
 
-	Constants.AmbientColor = AmbientColor * AmbientFactor;
 	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
 }
 
@@ -317,9 +321,11 @@ float ZEScene::GetAmbientFactor() const
 
 void ZEScene::SetAmbientColor(ZEVector3 Color)
 {
+	if (AmbientColor == Color)
+		return;
+
 	AmbientColor = Color;
 
-	Constants.AmbientColor = AmbientColor * AmbientFactor;
 	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
 }
 
@@ -662,9 +668,12 @@ ZEScene::ZEScene()
 	PhysicalWorld = NULL;
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
-	AmbientFactor = 0.0f;
+	AmbientFactor = 0.2f;
 	SpatialDatabase = false;
-	
+	PreRendering = true;
+
+	Constants.AmbientColor = ZEVector3::Zero;
+
 	RenderListOctree.SetBoundingBox(ZEAABBox(-32000.0f * ZEVector3::One, 32000.0f * ZEVector3::One));
 	RenderListOctree.SetMaxDepth(8);
 }

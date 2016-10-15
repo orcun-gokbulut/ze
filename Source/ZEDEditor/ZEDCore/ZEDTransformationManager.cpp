@@ -643,7 +643,7 @@ void ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent* E
 void ZEDTransformationManager::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
 {
 	const ZERNPreRenderParameters& PreRenderParameters = Event->GetPreRenderParameters();
-	PreRenderParameters.Renderer->StartScene(NULL);
+	//PreRenderParameters.Renderer->StartScene(NULL);
 	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
 	{
 		if (TransformStates[I].Gizmo == NULL)
@@ -657,7 +657,7 @@ void ZEDTransformationManager::ViewportRenderEvent(const ZEDViewportRenderEvent*
 
 		TransformStates[I].Gizmo->PreRender(&PreRenderParameters);
 	}
-	PreRenderParameters.Renderer->EndScene();
+	//PreRenderParameters.Renderer->EndScene();
 }
 
 ZEDTransformationManager::ZEDTransformationManager()

@@ -701,7 +701,7 @@ bool ZEGRWindow::InitializeInternal()
 
 	WindowCount++;
 
-	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+	Output = ZEGROutput::CreateInstance(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	if (Output == NULL)
 		return false;
 
@@ -780,7 +780,7 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	Window->ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
 	Window->AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
 
-	Window->Output = ZEGROutput::Create(Window, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+	Window->Output = ZEGROutput::CreateInstance(Window, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	if (Window->Output == NULL)
 	{
 		delete Window;

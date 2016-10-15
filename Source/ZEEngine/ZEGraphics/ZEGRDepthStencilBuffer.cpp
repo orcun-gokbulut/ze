@@ -68,35 +68,20 @@ bool ZEGRDepthStencilBuffer::GetBound() const
 	return Bound;
 }
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType() const
-{
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetWidth() const
-{
-	return Width;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetHeight() const
-{
-	return Height;
-}
-
-ZEGRFormat ZEGRDepthStencilBuffer::GetFormat() const
-{
-	return Format;
-}
-
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
 {
 	Owner = NULL;
+	ReadOnly = false;
+	Bound = false;
+
 	Register();
 }
 
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	Owner = NULL;
+	ReadOnly = false;
+	Bound = false;
 
 	this->Width = Width;
 	this->Height = Height;
@@ -123,4 +108,24 @@ ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
 	Owner = NULL;
 
 	Unregister();
+}
+
+ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType() const
+{
+	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
+}
+
+ZEUInt ZEGRDepthStencilBuffer::GetWidth() const
+{
+	return Width;
+}
+
+ZEUInt ZEGRDepthStencilBuffer::GetHeight() const
+{
+	return Height;
+}
+
+ZEGRFormat ZEGRDepthStencilBuffer::GetFormat() const
+{
+	return Format;
 }

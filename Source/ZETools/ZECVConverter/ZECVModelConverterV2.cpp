@@ -696,13 +696,13 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 		{
 			GenerateIndices(Vertices, Indexes, IndexedVertices);
 			IndexedVertexCount = IndexedVertices.GetCount();
-			IndexedVertexBufferSize = Vertices.GetCount() * (IndexedVertexCount > 65536 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertexV2);
+			IndexedVertexBufferSize = Indexes.GetCount() * (IndexedVertexCount > 65535 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertexV2);
 		}
 		else
 		{
 			GenerateIndices(VerticesSkin, Indexes, IndexedVerticesSkin);
 			IndexedVertexCount = IndexedVerticesSkin.GetCount();
-			IndexedVertexBufferSize = VerticesSkin.GetCount() * (IndexedVertexCount > 65536 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertexSkinV2);
+			IndexedVertexBufferSize = Indexes.GetCount() * (IndexedVertexCount > 65535 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertexSkinV2);
 		}
 
 		float GainRatio = (float)IndexedVertexBufferSize / (float)VertexBufferSize;
@@ -753,7 +753,7 @@ bool ZECVModelConverterV2::ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWri
 	if (IsIndexed)
 	{
 		ZESize IndexBufferSize;
-		if (IndexedVertexCount > 65536)
+		if (IndexedVertexCount > 65535)
 		{
 			// 32 Bit Indices
 			IndexBufferSize = Indexes.GetCount() * sizeof(ZEUInt32);

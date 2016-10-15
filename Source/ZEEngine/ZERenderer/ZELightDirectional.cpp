@@ -383,9 +383,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		ShadowParameters.Type = ZERN_PRT_SHADOW;
 		
 		Parameters->Renderer->BeginNestedRenderer();
-		ShadowRenderer.StartScene(GetScene());
-			GetScene()->PreRender(&ShadowParameters);
-		ShadowRenderer.EndScene();
+		GetScene()->PreRender(&ShadowParameters);
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
 		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);

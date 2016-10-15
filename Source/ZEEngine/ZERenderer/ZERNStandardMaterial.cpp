@@ -67,15 +67,27 @@
 #define ZERN_FMDF_SHADERS				4
 #define ZERN_FMDF_STAGE_MASK			8
 
-void ZERNStandardMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+void ZERNStandardMaterial::UpdateGBufferForwardVertexShaderDefinitions(ZEGRShaderCompileOptions& Options) const
 {
-	Options.Definitions.Clear();
-
-	if (AlphaCullEnabled)
-		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
-
 	if (SkinningEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_SKIN_TRANSFORM"));
+
+	if (VertexColorEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_VERTEX_COLOR"));
+
+	if (ClippingPlanesEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
+
+	if (TransparencyEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_FORWARD"));
+	else
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
+}
+
+void ZERNStandardMaterial::UpdateGBufferForwardPixelShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+{
+	if (AlphaCullEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
 
 	if (VertexColorEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_VERTEX_COLOR"));
@@ -113,13 +125,28 @@ void ZERNStandardMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Opt
 	if (DetailNormalMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DETAIL_NORMAL_MAP"));
 
-	if (ClippingPlanesEnabled)
-		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
-
 	if (TransparencyEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_FORWARD"));
 	else
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
+}
+
+void ZERNStandardMaterial::UpdateShadowMapGenerationVertexShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+{
+	if (SkinningEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_SKIN_TRANSFORM"));
+
+	if (VertexColorEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_VERTEX_COLOR"));
+
+	if (ClippingPlanesEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
+}
+
+void ZERNStandardMaterial::UpdateShadowMapGenerationPixelShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+{
+	if (OpacityMapEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_MAP"));
 }
 
 bool ZERNStandardMaterial::UpdateShaders()
@@ -129,27 +156,49 @@ bool ZERNStandardMaterial::UpdateShaders()
 
 	ZEGRShaderCompileOptions Options;
 
-	UpdateShaderDefinitions(Options);
-
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
-
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFixedMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
+
+	UpdateGBufferForwardVertexShaderDefinitions(Options);
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
 	StageGBuffer_Forward_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageGBuffer_Forward_VertexShader == NULL, false, "Cannot set vertex shader.");
 
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNFixedMaterial_PixelShader";
-	StageGBuffer_Forward_PixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageGBuffer_Forward_PixelShader == NULL, false, "Cannot set pixel shader.");
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
+	StageGBuffer_Forward_Instancing_VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageGBuffer_Forward_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Definitions.Clear();
+	UpdateShadowMapGenerationVertexShaderDefinitions(Options);
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
 	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+	StageShadowmapGeneration_Instancing_VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageShadowmapGeneration_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Definitions.Clear();
+	UpdateGBufferForwardPixelShaderDefinitions(Options);
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFixedMaterial_PixelShader";
+	StageGBuffer_Forward_PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageGBuffer_Forward_PixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.Definitions.Clear();
+	UpdateShadowMapGenerationPixelShaderDefinitions(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
@@ -199,6 +248,12 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	StageGBuffer_Forward_RenderState = RenderState.Compile();
 	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer/forward render state.");
 
+	RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
+	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_Instancing_VertexShader);
+
+	StageGBuffer_Forward_Instancing_RenderState = RenderState.Compile();
+	zeCheckError(StageGBuffer_Forward_Instancing_RenderState == NULL, false, "Cannot set gbuffer/forward instancing render state.");
+
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
@@ -217,6 +272,12 @@ bool ZERNStandardMaterial::UpdateRenderState()
 
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
+
+	RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
+	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_Instancing_VertexShader);
+
+	StageShadowmapGeneration_Instancing_RenderState = RenderState.Compile();
+	zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -1732,7 +1793,7 @@ bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 	return true;
 }
 
-bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -1745,7 +1806,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	ZEUInt StageID = Stage->GetId();
 	if (StageID == ZERN_STAGE_GBUFFER || StageID == ZERN_STAGE_FORWARD_TRANSPARENT)
 	{
-		Context->SetRenderState(StageGBuffer_Forward_RenderState);
+		Context->SetRenderState(Instanced ? StageGBuffer_Forward_Instancing_RenderState : StageGBuffer_Forward_RenderState);
 
 		const ZEGRSampler* Samplers[] = {Sampler, Sampler, Sampler, Sampler};
 		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 4, Samplers);
@@ -1768,7 +1829,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	}
 	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION || StageID == ZERN_STAGE_RENDER_DEPTH)
 	{
-		Context->SetRenderState(StageShadowmapGeneration_RenderState);
+		Context->SetRenderState(Instanced ? StageShadowmapGeneration_Instancing_RenderState : StageShadowmapGeneration_RenderState);
 
 		if (AlphaCullEnabled)
 		{
@@ -1783,7 +1844,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	return true;
 }
 
-void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }

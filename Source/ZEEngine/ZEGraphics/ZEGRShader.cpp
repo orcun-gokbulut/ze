@@ -44,6 +44,8 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRShaderCompiler.h"
 
+ZEList2<ZEGRShader>	ZEGRShader::ShaderCache;
+
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	this->ShaderType = ShaderType;
@@ -57,15 +59,19 @@ void ZEGRShader::Deinitialize()
 	SetSize(0);
 }
 
-ZEGRShader::ZEGRShader()
+ZEGRShader::ZEGRShader() : ShaderCacheLink(this)
 {
 	ShaderType = ZEGR_ST_NONE;
+	Hash = 0;
+
 	Register();
 }
 
 ZEGRShader::~ZEGRShader()
 {
 	Unregister();
+
+	ShaderCache.Remove(&ShaderCacheLink);
 }
 
 ZEGRResourceType ZEGRShader::GetResourceType() const
@@ -92,6 +98,18 @@ ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const
 
 ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 {
+	ZEUInt32 Hash = Options.Hash();
+	ShaderCache.LockRead();
+	ze_for_each(Entry, ShaderCache)
+	{
+		if (Entry->Hash == Hash)
+		{
+			ShaderCache.UnlockRead();
+			return Entry.GetPointer();
+		}
+	}
+	ShaderCache.UnlockRead();
+
 	ZEFile File;
 
 	ZEFileInfo FileInfo(Options.FileName);
@@ -160,11 +178,20 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 		UpdatedOptions.Debug = true;
 		UpdatedOptions.OptimizationLevel = 0;
 	#endif
-		
+
+	zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Declaration()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
+
 	ZEArray<ZEBYTE> OutputShaderBinary;
 	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
 	if (!Compiler->Compile(OutputShaderBinary, UpdatedOptions, NULL, NULL))
 		return NULL;
 
-	return ZEGRShader::CreateInstance(Options.Type, OutputShaderBinary.GetConstCArray(), OutputShaderBinary.GetCount());
+	ZEHolder<ZEGRShader> Shader = ZEGRShader::CreateInstance(Options.Type, OutputShaderBinary.GetConstCArray(), OutputShaderBinary.GetCount());
+	if (Shader != NULL)
+	{
+		Shader->Hash = Hash;
+		ShaderCache.AddEnd(&Shader->ShaderCacheLink);
+	}
+
+	return Shader;
 }

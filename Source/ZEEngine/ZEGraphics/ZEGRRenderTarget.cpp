@@ -35,9 +35,7 @@
 
 #include "ZEGRRenderTarget.h"
 
-#include "ZEError.h"
 #include "ZEGRGraphicsModule.h"
-#include "ZEGRTexture.h"
 #include "ZEGRContext.h"
 
 void ZEGRRenderTarget::SetOwner(const ZEGRTexture* OwnerTexture)
@@ -64,6 +62,11 @@ ZEGRRenderTarget::ZEGRRenderTarget()
 {
 	Owner = NULL;
 	Bound = false;
+
+	Width = 0;
+	Height = 0;
+	Format = ZEGR_TF_NONE;
+
 	Register();
 }
 
@@ -75,6 +78,7 @@ ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Forma
 	this->Width = Width;
 	this->Height = Height;
 	this->Format = Format;
+
 	Register();
 }
 
@@ -113,12 +117,12 @@ ZEUInt ZEGRRenderTarget::GetHeight() const
 	return Height;
 }
 
-ZEVector2 ZEGRRenderTarget::GetPixelSize() const
-{
-	return ZEVector2(1.0f / Width, 1.0f / Height);
-}
-
 ZEGRFormat ZEGRRenderTarget::GetFormat() const
 {
 	return Format;
+}
+
+ZEVector2 ZEGRRenderTarget::GetPixelSize() const
+{
+	return ZEVector2(1.0f / Width, 1.0f / Height);
 }

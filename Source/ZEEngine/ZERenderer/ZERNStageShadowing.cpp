@@ -238,9 +238,7 @@ bool ZERNStageShadowing::Setup(ZEGRContext* Context)
 	//	PreRenderParameters.View = &View;
 	//	PreRenderParameters.Type = ZERN_PRT_SHADOW;
 	//
-	//	ShadowRenderer.StartScene(RenderParameters->Scene->GetConstantBuffer());
 	//	RenderParameters->Scene->PreRender(&Parameters);
-	//	ShadowRenderer.EndScene();
 	//
 	//	const ZEGRDepthStencilBuffer* DepthBuffer = DirectionalShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
 	//	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);

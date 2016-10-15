@@ -54,11 +54,17 @@ class ZEGRTexture;
 class ZEGRSampler;
 class ZEGRRenderTarget;
 
+struct ZERNInstanceData
+{
+	ZEMatrix4x4	WorldTransform;
+	ZEMatrix4x4	WorldTransformInverseTranspose;
+};
+
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStage;
-	friend class ZEGRTestModule;
+	friend class ZEModelDraw;
 	private:
 		ZERNView									View;
 		ZEList2<ZERNStage>							Stages;
@@ -67,6 +73,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEArray<ZEScene*>							Scenes;
 		ZEList2<ZERNCommand>						CommandList;
 		ZEList2<ZERNCommand>						CommandListInstanced;
+
+		static ZEHolder<ZEGRBuffer>					InstanceVertexBuffer;
 
 		ZEGRContext*								Context;
 		ZEHolder<const ZEGRTexture>					OutputTexture;

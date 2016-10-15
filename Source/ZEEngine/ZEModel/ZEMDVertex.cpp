@@ -56,6 +56,32 @@ const ZEGRVertexLayout& ZEMDVertex::GetVertexLayout()
 	return VertexLayout;
 }
 
+const ZEGRVertexLayout& ZEMDVertexInstance::GetVertexLayout()
+{
+	static ZEGRVertexLayout VertexLayout;
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		static ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION,	0, ZEGR_VET_FLOAT_3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_INT16_2, 0, 16, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TANGENT,	0, ZEGR_VET_INT16_2, 0, 20, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT_2, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	1, ZEGR_VET_FLOAT_4, 1, 0, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	2, ZEGR_VET_FLOAT_4, 1, 16, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	3, ZEGR_VET_FLOAT_4, 1, 32, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	4, ZEGR_VET_FLOAT_4, 1, 48, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	5, ZEGR_VET_FLOAT_4, 1, 64, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	6, ZEGR_VET_FLOAT_4, 1, 80, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	7, ZEGR_VET_FLOAT_4, 1, 96, ZEGR_VU_PER_INSTANCE, 1},
+			{ZEGR_VES_TEXCOORD,	8, ZEGR_VET_FLOAT_4, 1, 112, ZEGR_VU_PER_INSTANCE, 1}
+		};
+
+		VertexLayout.SetElements(ElementArray, 12);
+	}
+
+	return VertexLayout;
+}
 
 const ZEGRVertexLayout& ZEMDVertexSkin::GetVertexLayout()
 {

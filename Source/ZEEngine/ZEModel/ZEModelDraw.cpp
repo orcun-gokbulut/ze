@@ -45,6 +45,7 @@
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 void ZEMDInstanceTag::Update()
 {
@@ -182,38 +183,62 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	if (GetLOD()->GetIndexType() != ZEMD_VIT_NONE)
 		Context->SetIndexBuffer(GetLOD()->GetIndexBuffer());
 
-	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage))
+	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage, (Command->Instances.GetCount() > 0)))
 		return;
 
-	if (Command->Instances.GetCount() != 0)
+	if (Command->Instances.GetCount() > 0)
 	{
+		ZERNRenderer* Renderer = Parameters->Renderer;
+		static ZEUInt Index = 0;
+		ZERNInstanceData* InstanceBuffer;
+		if ((Index + Command->Instances.GetCount() + 1) >= Renderer->InstanceVertexBuffer->GetElementCount())
+		{
+			Index = 0;
+			Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceBuffer));
+		}
+		else
+		{
+			Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_NO_OVERWRITE, reinterpret_cast<void**>(&InstanceBuffer));
+		}
+
+		ZEUInt InstanceOffset = Index;
 		ze_for_each(Instance, Command->Instances)
 		{
-			const ZEMDInstanceTag* ModelInstance = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag);
-
-			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ModelInstance->Draw->GetMesh()->ConstantBuffer);
-		
-			if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
-				Context->Draw(GetCount(), GetOffset());
-			else
-				Context->DrawIndexed(GetCount(), GetOffset(), 0);
+			const ZEModelMesh* InstanceMesh = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag)->Draw->GetMesh();
+			InstanceBuffer[Index].WorldTransform = InstanceMesh->GetWorldTransform();
+			InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceMesh->GetInvWorldTransform().Transpose();
+			Index++;
 		}
-	}
+		const ZEModelMesh* InstanceMesh = static_cast<const ZEMDInstanceTag*>(Command->InstanceTag)->Draw->GetMesh();
+		InstanceBuffer[Index].WorldTransform = InstanceMesh->GetWorldTransform();
+		InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceMesh->GetInvWorldTransform().Transpose();
+		Index++;
+		Renderer->InstanceVertexBuffer->Unmap();
 
-	if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
-	{
-		ZEGRBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetMesh()->GetModel()->ConstantBufferBoneTransforms};
-		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
+		Context->SetVertexBuffer(1, Renderer->InstanceVertexBuffer);
+
+		if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
+			Context->DrawInstanced(GetCount(), GetOffset(), (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
+		else
+			Context->DrawIndexedInstanced(GetCount(), GetOffset(), 0, (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
 	}
 	else
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetMesh()->ConstantBuffer);
-	}
+		if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
+		{
+			ZEGRBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetMesh()->GetModel()->ConstantBufferBoneTransforms};
+			Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
+		}
+		else
+		{
+			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetMesh()->ConstantBuffer);
+		}
 
-	if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
-		Context->Draw(GetCount(), GetOffset());
-	else
-		Context->DrawIndexed(GetCount(), GetOffset(), 0);
+		if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
+			Context->Draw(GetCount(), GetOffset());
+		else
+			Context->DrawIndexed(GetCount(), GetOffset(), 0);
+	}
 	
 	GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
 }

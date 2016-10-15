@@ -391,16 +391,19 @@ ZEGRWindow::ZEGRWindow()
 {
 	Id = NextWindowId++;
 	Handle = NULL;
-	QuitWhenClosed = true;
-	Title = "Zinek Engine";
 	
 	Width = 800;
 	Height = 600;
 	Left = 100;
 	Top = 100;
 
+	Enabled = true;
+	Visible = true;
+
+	Title = "Zinek Engine";
 	TitleBar = true;
 	IconVisible = true;
+	CloseButton = true;
 	MinimizeButton = true;
 	MaximizeButton = true;
 	Resizable = true;
@@ -412,14 +415,15 @@ ZEGRWindow::ZEGRWindow()
 	CursorVisible = false;
 	CursorLocked = false;
 	ManageInputAcquisition = true;
-
-	Enabled = true;
-	Focused = false;
-	Minimized = false;
-	Maximized = false;
+	CursorVisibleState = true;
+	CursorLockedState = false;
 
 	FullScreen = false;
 	VSynchEnabled = false;
+
+	Focused = false;
+	Minimized = false;
+	Maximized = false;
 }
 
 ZEGRWindow::~ZEGRWindow()
