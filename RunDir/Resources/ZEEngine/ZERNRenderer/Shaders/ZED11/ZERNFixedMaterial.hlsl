@@ -46,7 +46,7 @@
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
 
-cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNFixedMaterial_Constants								: register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
 	float3			ZERNFixedMaterial_AmbientColor;
 	float			ZERNFixedMaterial_Opacity;
@@ -83,11 +83,10 @@ cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 	float			ZERNFixedMaterial_DetailNormalMapAttenuationFactor;
 };
 
-cbuffer ZERNFixedMaterial_Constant_Draw_Transform	: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNFixedMaterial_Constant_Draw_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4		ZERNFixedMaterial_WorldTransform;
 	float4x4		ZERNFixedMaterial_WorldTransformInverseTranspose;
-	float4x4		ZERNFixedMaterial_PreSkinTransform;
 	float4			ZERNFixedMaterial_ClippingPlane0;
 	float4			ZERNFixedMaterial_ClippingPlane1;
 	float4			ZERNFixedMaterial_ClippingPlane2;
@@ -135,6 +134,11 @@ struct ZERNFixedMaterial_VSInput
 
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4 BoneWeights	: BLENDWEIGHTS;
+	#endif
+	
+	#ifdef ZERN_FM_INSTANCING
+		float4x4 WorldTransform : TEXCOORD1;
+		float4x4 WorldTransformInverseTranspose : TEXCOORD5;
 	#endif
 };
 
@@ -220,10 +224,17 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 		Binormal = mul(SkinTransform, float4(Binormal, 0.0f)).xyz;
 	#endif
 
-	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
-	float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
-	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Tangent, 0.0f)).xyz;
-	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Binormal, 0.0f)).xyz;
+	#ifdef ZERN_FM_INSTANCING
+		float4 PositionWorld = mul(Input.WorldTransform, float4(Input.Position, 1.0f));
+		float3 NormalWorld = mul(Input.WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
+		float3 TangentWorld = mul(Input.WorldTransform, float4(Tangent, 0.0f)).xyz;
+		float3 BinormalWorld = mul(Input.WorldTransform, float4(Binormal, 0.0f)).xyz;
+	#else
+		float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
+		float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
+		float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Tangent, 0.0f)).xyz;
+		float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Binormal, 0.0f)).xyz;
+	#endif
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(float4(NormalWorld, 0.0f));
@@ -405,7 +416,11 @@ ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapG
 		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
 	#endif
 	
-	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
+	#ifdef ZERN_FM_INSTANCING
+		float4 PositionWorld = mul(Input.WorldTransform, float4(Input.Position, 1.0f));
+	#else
+		float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
+	#endif
 	
 	ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput Output;
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);

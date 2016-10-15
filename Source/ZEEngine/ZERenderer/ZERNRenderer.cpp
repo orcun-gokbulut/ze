@@ -55,6 +55,8 @@
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRSampler.h"
 
+ZEHolder<ZEGRBuffer>	ZERNRenderer::InstanceVertexBuffer;
+
 ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
 	if (A->SceneIndex < B->SceneIndex)
@@ -246,7 +248,10 @@ void ZERNRenderer::RenderStages()
 			continue;
 
 		if (!Stage->Setup(Context))
+		{
+			Stage->CleanUp(Context);
 			continue;
+		}
 
 		Parameters.Stage = Stage.GetPointer();
 		ZEInt LastSceneIndex = -1;
@@ -284,6 +289,8 @@ bool ZERNRenderer::InitializeInternal()
 
 	ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	if (InstanceVertexBuffer == NULL)
+		InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 2048, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 
 	CreatePredefinedSamplers();
 
@@ -297,6 +304,7 @@ bool ZERNRenderer::DeinitializeInternal()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
+	InstanceVertexBuffer.Release();
 
 	Context = NULL;
 	OutputTexture = NULL;

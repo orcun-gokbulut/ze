@@ -68,5 +68,5 @@ class ZEGROutput : public ZEGRResource
 
 		virtual void						Present() = 0;
 
-		static ZEGROutput*					Create(ZEGRWindow* Window, ZEGRFormat Format);
+		static ZEHolder<ZEGROutput>			CreateInstance(ZEGRWindow* Window, ZEGRFormat Format);
 };

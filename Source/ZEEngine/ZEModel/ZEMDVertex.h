@@ -38,6 +38,7 @@
 #include "ZETypes.h"
 #include "ZEPacking.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 
 #include "ZEGraphics/ZEGRVertexElementType.h"
 
@@ -64,6 +65,21 @@ struct ZEMDVertex
 	ZEInt16_2						Normal;
 	ZEInt16_2						Tangent;
 	ZEVector2						Texcoords;
+
+	static const ZEGRVertexLayout&	GetVertexLayout();
+});
+
+ZEPackStruct(
+struct ZEMDVertexInstance
+{
+	ZEVector3						Position;
+	float							Reserved0;
+	ZEInt16_2						Normal;
+	ZEInt16_2						Tangent;
+	ZEVector2						Texcoords;
+
+	ZEMatrix4x4						WorldTransform;
+	ZEMatrix4x4						WorldTransformInverseTranspose;
 
 	static const ZEGRVertexLayout&	GetVertexLayout();
 });

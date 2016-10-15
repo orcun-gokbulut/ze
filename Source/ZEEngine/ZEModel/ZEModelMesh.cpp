@@ -65,7 +65,6 @@ struct ZEModelMeshConstants
 {
 	ZEMatrix4x4	WorldTransform;
 	ZEMatrix4x4	WorldTransformInverseTranspose;
-	ZEMatrix4x4	PreSkinTransform;
 	ZEVector4	ClippingPlane0;
 	ZEVector4	ClippingPlane1;
 	ZEVector4	ClippingPlane2;
@@ -145,7 +144,6 @@ void ZEModelMesh::UpdateConstantBuffer()
 
 	Constants.WorldTransform = GetWorldTransform();
 	Constants.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-	Constants.PreSkinTransform = GetModelTransform();
 
 	if (ClippingPlanes.GetCount() > 0)
 		Constants.ClippingPlane0 = Constants.WorldTransformInverseTranspose * ClippingPlanes[0].ToABCD();

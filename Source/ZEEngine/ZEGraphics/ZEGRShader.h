@@ -38,25 +38,32 @@
 #include "ZEGRResource.h"
 
 #include "ZEGRShaderCompileOptions.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEList2.h"
 
 class ZEGRShader : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRShader)
 	private:
-		ZEGRShaderType					ShaderType;
+		ZEGRShaderType						ShaderType;
+
+		static ZEList2<ZEGRShader>			ShaderCache;
+		ZELink<ZEGRShader>					ShaderCacheLink;
+
+		ZEUInt32							Hash;
 
 	protected:
-		virtual bool					Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
-		virtual void					Deinitialize();
+		virtual bool						Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
+		virtual void						Deinitialize();
 
-										ZEGRShader();
-		virtual							~ZEGRShader();
+											ZEGRShader();
+		virtual								~ZEGRShader();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEGRShaderType			GetShaderType() const;
+		virtual ZEGRResourceType			GetResourceType() const;
+		virtual ZEGRShaderType				GetShaderType() const;
 
-		static ZEHolder<ZEGRShader>		CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
-		static ZEHolder<ZEGRShader>		Compile(const ZEGRShaderCompileOptions& Options);
+		static ZEHolder<ZEGRShader>			CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
+		static ZEHolder<ZEGRShader>			Compile(const ZEGRShaderCompileOptions& Options);
 };

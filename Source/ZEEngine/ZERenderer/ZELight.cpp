@@ -70,7 +70,7 @@ ZEEntityResult ZELight::UnloadInternal()
 {
 	ShadowRenderer.Deinitialize();
 	
-	ZE_ENTITY_UNLOAD_CHAIN();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
 }
 

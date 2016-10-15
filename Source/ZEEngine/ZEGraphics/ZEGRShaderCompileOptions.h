@@ -66,10 +66,8 @@ class ZEGRShaderCompileOptions : public ZEObject
 		ZEString						SourceData;
 		ZEArray<ZEGRShaderDefinition>	Definitions;
 		ZEArray<ZEString>				IncludeDirectories;
-		ZEUInt32						Hash;
 
-		void							GenerateHash();
-		bool							Equals(const ZEGRShaderCompileOptions& Other);
+		ZEUInt32						Hash() const;
 
 										ZEGRShaderCompileOptions();
 };

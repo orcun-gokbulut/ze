@@ -71,7 +71,8 @@ ZERNCommand::ZERNCommand()
 {
 	Entity = NULL;
 	Priority = 0;
-	Order = 0;
+	Order = 0.0f;
+	SceneIndex = 0;
 	StageMask = 0;
 	ExtraParameters = NULL;
 	InstanceTag = NULL;

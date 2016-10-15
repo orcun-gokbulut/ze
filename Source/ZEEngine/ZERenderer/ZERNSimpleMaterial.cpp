@@ -322,7 +322,7 @@ const ZERNMap& ZERNSimpleMaterial::GetTexture() const
 	return TextureMap;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -347,7 +347,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 	return true;
 }
 
-void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }

@@ -82,9 +82,15 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEHolder<ZEGRShader>						StageGBuffer_Forward_PixelShader;
 		ZEHolder<ZEGRRenderStateData>				StageGBuffer_Forward_RenderState;
 		
+		ZEHolder<ZEGRShader>						StageGBuffer_Forward_Instancing_VertexShader;
+		ZEHolder<ZEGRRenderStateData>				StageGBuffer_Forward_Instancing_RenderState;
+
 		ZEHolder<ZEGRShader>						StageShadowmapGeneration_VertexShader;
 		ZEHolder<ZEGRShader>						StageShadowmapGeneration_PixelShader;
 		ZEHolder<ZEGRRenderStateData>				StageShadowmapGeneration_RenderState;
+
+		ZEHolder<ZEGRShader>						StageShadowmapGeneration_Instancing_VertexShader;
+		ZEHolder<ZEGRRenderStateData>				StageShadowmapGeneration_Instancing_RenderState;
 
 		ZEHolder<ZEGRBuffer>						ConstantBuffer;
 		ZEHolder<ZEGRSampler>						Sampler;
@@ -189,7 +195,10 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEString									DetailNormalMapFile;
 		bool										ClippingPlanesEnabled;
 		
-		void										UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		void										UpdateGBufferForwardVertexShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		void										UpdateGBufferForwardPixelShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		void										UpdateShadowMapGenerationVertexShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		void										UpdateShadowMapGenerationPixelShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
 		bool										UpdateShaders();
 		bool										UpdateConstantBuffer();
 		bool										UpdateRenderState();
@@ -390,8 +399,8 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetClippingPlanesEnabled() const;
 
 		virtual bool								PreRender(ZERNCommand& Command) const;
-		virtual bool								SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
-		virtual void								CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual bool								SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual void								CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 
 		virtual bool								Update();
 

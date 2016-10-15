@@ -86,7 +86,6 @@ ZEGRResource::ZEGRResource()
 	Stage.BoundAsUnorderedAccess = false;
 	Stage.Slot = -1;
 	BoundStages.Fill(Stage);
-
 }
 
 ZEGRResource::~ZEGRResource()

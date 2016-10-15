@@ -262,9 +262,7 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	ZEGRContext* Context = Parameters->Context;
 	ShadowRenderer.SetContext(Context);
 	ShadowRenderer.SetView(View);
-	ShadowRenderer.StartScene(GetScene());
-		GetScene()->PreRender(&PreRenderParameters);
-	ShadowRenderer.EndScene();
+	GetScene()->PreRender(&PreRenderParameters);
 
 	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
 	this->ShadowMapIndex = const_cast<ZERNStageShadowing*>(StageShadowing)->ProjectiveShadowMapCount++;

@@ -178,7 +178,7 @@ bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 
 void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	Parameters->Renderer->StartScene(NULL);
+	Parameters->Renderer->StartScene(GetScene());
 
 	GetScene()->PreRender(Parameters);
 	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();

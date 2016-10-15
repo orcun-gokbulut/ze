@@ -306,5 +306,6 @@ ZEInt ZERNStageForwardPostHDR::GetId() const
 
 const ZEString& ZERNStageForwardPostHDR::GetName() const
 {
-	return "StageForwardPostHDR";
+	static const ZEString Name = "Stage ForwardPostHDR";
+	return Name;
 }

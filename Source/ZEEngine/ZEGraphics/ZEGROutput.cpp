@@ -53,19 +53,17 @@ ZEGRResourceType ZEGROutput::GetResourceType() const
 	return ZEGR_RT_OUTPUT;
 }
 
-ZEGROutput* ZEGROutput::Create(ZEGRWindow* Window, ZEGRFormat Format)
+ZEHolder<ZEGROutput> ZEGROutput::CreateInstance(ZEGRWindow* Window, ZEGRFormat Format)
 {
 	zeCheckError(Window == NULL, NULL, "Window cannot be NULL.");
+	zeDebugCheck(Format == ZEGR_TF_NONE, "Format cannot be none");
 
-	ZEGROutput* Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
+	ZEHolder<ZEGROutput> Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
 	if (Output == NULL)
 		return NULL;
 
 	if (!Output->Initialize(Window->GetHandle(), Window->GetWidth(), Window->GetHeight(), Format))
-	{
-		delete Output;
 		return NULL;
-	}
 
 	return Output;
 }

@@ -120,6 +120,8 @@ bool ZED11ShaderCompilerIncludeInterface::ReadInclude(const ZEString& pFileName,
 
 HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT * pBytes)
 {
+	zeDebugCheck(CompileOptions == NULL, "Compile options cannot be NULL");
+
 	if (ReadInclude(ZEFormat::Format("{0}/{1}", ZEFileInfo(CompileOptions->FileName).GetParentDirectory(), pFileName), ppData, pBytes))
 	{
 		return S_OK;
@@ -128,7 +130,7 @@ HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Open(D3D_INCLUDE_TYPE Inc
 	{
 		for (ZESize I = 0; I < CompileOptions->IncludeDirectories.GetCount(); I++)
 		{
-			if (!ReadInclude(ZEFormat::Format("{0}/{1}", ZEFileInfo(CompileOptions->FileName).GetParentDirectory(), pFileName), ppData, pBytes))
+			if (!ReadInclude(ZEFormat::Format("{0}/{1}", CompileOptions->IncludeDirectories[I], pFileName), ppData, pBytes))
 				continue;
 
 			return S_OK;
@@ -136,6 +138,7 @@ HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Open(D3D_INCLUDE_TYPE Inc
 	}
 
 	*ppData = NULL;
+
 	return S_OK;
 }
 
@@ -143,6 +146,7 @@ HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Close(LPCVOID pData)
 {
 	if (pData != NULL)
 		delete[] pData;
+
 	return S_OK;
 }
 
