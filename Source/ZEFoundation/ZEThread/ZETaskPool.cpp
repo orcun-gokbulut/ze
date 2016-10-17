@@ -110,6 +110,21 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 				Thread->Suspend();
 				continue;
 			}
+
+			ZESize QueuedTasks = Tasks.GetCount();
+			if (QueuedTasks != 0)
+			{
+				while(QueuedTasks != 0)
+				{
+					ZEThread* Thread = RequestThread();
+					if (Thread == NULL)
+						break;
+
+					Thread->Run();
+
+					QueuedTasks--;
+				}
+			}
 		}
 		
 		static_cast<ZETaskThread*>(Thread)->SetTask(Task);
