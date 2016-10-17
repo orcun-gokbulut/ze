@@ -35,11 +35,11 @@
 
 #include "ZERNSimpleMaterial.h"
 
-#include "ZEGRCanvas.h"
 #include "ZERNCommand.h"
 #include "ZERNRenderer.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNStageForward.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRBuffer.h"
