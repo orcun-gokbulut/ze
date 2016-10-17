@@ -66,8 +66,8 @@ Texture2D<float4>	ZERNSimpleMaterial_Texture				: register(t0);
 struct ZERNSimpleMaterial_VSInput 
 {
 	float3			Position								: POSITION0;
-	float2			Texcoord								: TEXCOORD0;
 	float3			Normal									: NORMAL0;
+	float2			Texcoord								: TEXCOORD0;
 	float4			Color									: COLOR0;
 };
 

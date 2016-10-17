@@ -304,7 +304,7 @@ bool ZERNRenderer::DeinitializeInternal()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
-	InstanceVertexBuffer.Release();
+	//InstanceVertexBuffer.Release();
 
 	Context = NULL;
 	OutputTexture = NULL;
