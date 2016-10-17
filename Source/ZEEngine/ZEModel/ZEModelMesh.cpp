@@ -801,7 +801,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	ze_for_each(LOD, LODs)
 	{
-		float LODDistanceSquare = LOD->GetStartDistance() * LOD->GetEndDistance();
+		float LODDistanceSquare = LOD->GetStartDistance() * LOD->GetStartDistance();
 
 		if (LODDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
 		{
