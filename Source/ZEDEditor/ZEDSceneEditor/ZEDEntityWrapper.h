@@ -62,7 +62,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		bool								AlterRaycast(ZERayCastCollision& Collision);
 
 	protected:
-		ZECanvas							Canvas;
+		ZEGRCanvas							Canvas;
 
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
 		virtual bool						UpdateGraphics();

@@ -37,7 +37,7 @@
 
 #include "ZEGame/ZEEntity.h"
 
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEPointer/ZEHolder.h"
 
@@ -84,8 +84,8 @@ class ZEDGizmo : public ZEEntity
 		ZEQuaternion					InitialRotation;
 		ZEVector3						InitialScale;
 
-		ZECanvas						GizmoLines;
-		ZECanvas						GizmoTriangles;
+		ZEGRCanvas						GizmoLines;
+		ZEGRCanvas						GizmoTriangles;
 		
 		ZEHolder<ZEGRBuffer>			VertexBuffer;
 		ZEHolder<ZEGRBuffer>			ConstantBuffer;

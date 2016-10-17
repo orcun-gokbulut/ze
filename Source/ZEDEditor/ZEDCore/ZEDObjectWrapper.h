@@ -45,7 +45,7 @@
 #include "ZEMath/ZEAABBox.h"
 
 #include "ZEGame/ZERayCast.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEMeta/ZEEnumerator.h"
 

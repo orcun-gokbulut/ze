@@ -44,7 +44,7 @@
 #include "ZEMath/ZEFrustum.h"
 
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERenderer/ZERNRenderer.h"

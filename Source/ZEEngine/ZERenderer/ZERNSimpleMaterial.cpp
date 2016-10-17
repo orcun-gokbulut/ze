@@ -35,7 +35,7 @@
 
 #include "ZERNSimpleMaterial.h"
 
-#include "ZECanvas.h"
+#include "ZEGRCanvas.h"
 #include "ZERNCommand.h"
 #include "ZERNRenderer.h"
 #include "ZERNShaderSlots.h"

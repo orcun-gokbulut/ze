@@ -41,7 +41,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 
 class ZEGRShader;
 class ZEGRBuffer;
@@ -54,8 +54,8 @@ class ZERNStageDebug : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
-		ZECanvas						LineCanvas;
-		ZECanvas						TriangleCanvas;
+		ZEGRCanvas						LineCanvas;
+		ZEGRCanvas						TriangleCanvas;
 
 		ZEHolder<ZEGRBuffer>			LineVertexBuffer;
 		ZEHolder<ZEGRBuffer>			TriangleVertexBuffer;

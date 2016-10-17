@@ -38,7 +38,7 @@
 #include "ZEGame/ZEEntity.h"
 
 #include "ZEPointer/ZEHolder.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
 class ZEGRTexture;

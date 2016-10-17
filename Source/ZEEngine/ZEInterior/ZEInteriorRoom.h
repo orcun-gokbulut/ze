@@ -40,7 +40,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
 ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");

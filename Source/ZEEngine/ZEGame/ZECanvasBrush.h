@@ -38,7 +38,7 @@
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
 class ZERNMaterial;
@@ -55,7 +55,7 @@ class ZECanvasBrush : public ZEEntity
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 		ZEHolder<ZEGRBuffer>			VertexBuffer;
 		ZEHolder<ZERNMaterial>			Material;
-		ZECanvas						Canvas;
+		ZEGRCanvas						Canvas;
 
 		virtual ZEEntityResult			UnloadInternal();
 
@@ -63,7 +63,7 @@ class ZECanvasBrush : public ZEEntity
 		virtual							~ZECanvasBrush();
 
 	public:
-		ZECanvas*						GetCanvas();
+		ZEGRCanvas*						GetCanvas();
 
 		void							SetMaterial(ZERNMaterial* Material);
 		ZERNMaterial*					GetMaterial() const;

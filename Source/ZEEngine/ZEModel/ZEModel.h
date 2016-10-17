@@ -52,7 +52,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEPointer/ZEPointer.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;

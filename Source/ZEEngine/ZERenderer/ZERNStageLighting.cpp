@@ -42,7 +42,7 @@
 #include "ZERNStageID.h"
 #include "ZERNRenderer.h"
 #include "ZERNStage.h"
-#include "ZECanvas.h"
+#include "ZEGRCanvas.h"
 #include "ZELightPoint.h"
 #include "ZELightDirectional.h"
 #include "ZELightProjective.h"
@@ -90,7 +90,7 @@ void ZERNStageLighting::CreateLightGeometries()
 	End			4650				
 	*/
 
-	ZECanvas Canvas;
+	ZEGRCanvas Canvas;
 
 	// Directional
 	Canvas.AddQuad(
