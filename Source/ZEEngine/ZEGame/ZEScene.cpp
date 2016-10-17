@@ -668,7 +668,7 @@ ZEScene::ZEScene()
 	PhysicalWorld = NULL;
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
-	AmbientFactor = 0.2f;
+	AmbientFactor = 0.1f;
 	SpatialDatabase = false;
 	PreRendering = true;
 

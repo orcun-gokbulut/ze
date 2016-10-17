@@ -163,12 +163,15 @@ bool ZERNStandardMaterial::UpdateShaders()
 	StageGBuffer_Forward_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageGBuffer_Forward_VertexShader == NULL, false, "Cannot set vertex shader.");
 
-	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+	if (!SkinningEnabled)
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
-	StageGBuffer_Forward_Instancing_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageGBuffer_Forward_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
+		StageGBuffer_Forward_Instancing_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageGBuffer_Forward_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
 
 	Options.Definitions.Clear();
 	UpdateShadowMapGenerationVertexShaderDefinitions(Options);
@@ -178,12 +181,15 @@ bool ZERNStandardMaterial::UpdateShaders()
 	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
 
-	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+	if (!SkinningEnabled)
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
-	StageShadowmapGeneration_Instancing_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageShadowmapGeneration_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageShadowmapGeneration_Instancing_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageShadowmapGeneration_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
 
 	Options.Definitions.Clear();
 	UpdateGBufferForwardPixelShaderDefinitions(Options);
@@ -245,11 +251,14 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	StageGBuffer_Forward_RenderState = RenderState.Compile();
 	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer/forward render state.");
 
-	RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_Instancing_VertexShader);
+	if (!SkinningEnabled)
+	{
+		RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_Instancing_VertexShader);
 
-	StageGBuffer_Forward_Instancing_RenderState = RenderState.Compile();
-	zeCheckError(StageGBuffer_Forward_Instancing_RenderState == NULL, false, "Cannot set gbuffer/forward instancing render state.");
+		StageGBuffer_Forward_Instancing_RenderState = RenderState.Compile();
+		zeCheckError(StageGBuffer_Forward_Instancing_RenderState == NULL, false, "Cannot set gbuffer/forward instancing render state.");
+	}
 
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
@@ -270,11 +279,14 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
 
-	RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_Instancing_VertexShader);
+	if (!SkinningEnabled)
+	{
+		RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_Instancing_VertexShader);
 
-	StageShadowmapGeneration_Instancing_RenderState = RenderState.Compile();
-	zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
+		StageShadowmapGeneration_Instancing_RenderState = RenderState.Compile();
+		zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
+	}
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -1792,6 +1804,8 @@ bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 
 bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
+	zeDebugCheck(Instanced && SkinningEnabled, "Cannot setup skinned material for instanced draw");
+
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 

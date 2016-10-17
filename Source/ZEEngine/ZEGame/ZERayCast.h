@@ -74,6 +74,7 @@ enum ZERayCastMatch
 	ZE_RCM_FURTHEST
 };
 
+enum ZEMDVertexIndexType;
 class ZERayCastCollision;
 
 typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
@@ -205,6 +206,8 @@ class ZERayCastHelper
 
 		bool								RayCastBoundingBox(const ZEAABBox& WorldBoundingBox) const;
 		bool								RayCastBoundingBox(const ZEAABBox& WorldBoundingBox, const ZEAABBox& LocalBoundingBox) const;
+
+		bool								RayCastMeshIndexed(const void* VertexBuffer, ZESize VertexStride, const void* IndexBuffer, ZESize IndexCount, ZEMDVertexIndexType IndexType);
 
 		bool								RayCastMesh(const void* VertexBuffer, ZESize VertexCount, ZESize VertexStride) const;
 		bool								RayCastMesh(const void* PolygonBuffer, ZESize PolgonCount, ZESize PolygonStride, 

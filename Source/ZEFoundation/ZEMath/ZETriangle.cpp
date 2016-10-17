@@ -131,7 +131,7 @@ void ZETriangle::GetTangent(const ZETriangle& Triangle, ZEVector3& Tangent)
 
 void ZETriangle::GetBinormal(const ZETriangle& Triangle, ZEVector3& Binormal)
 {
-	ZEVector3::Sub(Binormal, Triangle.V1, Triangle.V0);
+	ZEVector3::Sub(Binormal, Triangle.V2, Triangle.V0);
 	ZEVector3::Normalize(Binormal, Binormal);
 }
 
