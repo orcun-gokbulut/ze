@@ -50,7 +50,7 @@
 #include "ZERNStageID.h"
 #include "ZERNShaderSlots.h"
 #include "ZEModel/ZEMDResource.h"
-#include "ZECanvas.h"
+#include "ZEGRCanvas.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEInterior/ZEInteriorResource.h"
 #include "ZERNStageShadowmapGeneration.h"

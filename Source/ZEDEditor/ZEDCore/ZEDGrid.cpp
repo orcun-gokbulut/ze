@@ -49,7 +49,7 @@ void ZEDGrid::GenerateGrid()
 	if (GetState() == ZE_ES_NONE || GetState() == ZE_ES_DEINITIALIZING)
 		return;
 
-	ZECanvas Canvas;
+	ZEGRCanvas Canvas;
 
 	// Axis
 	Canvas.SetColor(ZEVector4(AxisColor, 1.0f));

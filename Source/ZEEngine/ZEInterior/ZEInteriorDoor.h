@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZERectangle3D.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZECanvas.h"
+#include "ZEGraphics/ZEGRCanvas.h"
 
 ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
 ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");

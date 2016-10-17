@@ -51,7 +51,7 @@ ZERNMaterial* ZECanvasBrush::GetMaterial() const
 	return Material;
 }
 
-ZECanvas* ZECanvasBrush::GetCanvas()
+ZEGRCanvas* ZECanvasBrush::GetCanvas()
 {
 	return &Canvas;
 }

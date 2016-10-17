@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECanvas.h
+ Zinek Engine - ZEGRCanvas.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -43,6 +43,7 @@
 #include "ZEMath/ZEQuaternion.h"
 
 class ZEGRVertexLayout;
+class ZEFile;
 
 class ZECanvasVertex
 {
@@ -58,7 +59,7 @@ class ZECanvasVertex
 		static ZEGRVertexLayout*		GetVertexLayout();
 };
 
-class ZECanvas
+class ZEGRCanvas
 {
 	private:
 		ZESmartArray<ZECanvasVertex>	Vertices;
@@ -71,25 +72,32 @@ class ZECanvas
 		ZEVector3						Scale;
 
 	public:
+		ZESize							GetVertexCount() const;
+
+		ZESize							GetBufferSize() const;
+		void*							GetBuffer();
+		const void*						GetBuffer() const;
+
+		void							SetTransformation(const ZEMatrix4x4& Matrix);
+		const ZEMatrix4x4&				GetTransformation() const;
+
+		void							SetTranslation(const ZEVector3& Translation);
+		const ZEVector3&				GetTranslation() const;
+
+		void							SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&				GetRotation() const;
+
+		void							SetScale(const ZEVector3& Scale);
+		const ZEVector3&				GetScale() const;
+
+		void							SetColor(const ZEVector4& Color);
+		const ZEVector4&				GetColor() const;
+
+
+		// Transformations
 		void							PushTransformation();
 		void							PopTransformation();
 
-		void							SetTransformation(const ZEMatrix4x4& Matrix);
-		const ZEMatrix4x4&				GetTransformation();
-
-		void							SetTranslation(const ZEVector3& Translation);
-		const ZEVector3&				GetTranslation();
-
-		void							SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion&				GetRotation();
-
-		void							SetScale(const ZEVector3& Scale);
-		const ZEVector3&				GetScale();
-
-		void							SetColor(const ZEVector4& Color);
-		const ZEVector4&				GetColor();
-
-		// Transformations
 		void							ApplyTransformationBefore(const ZEMatrix4x4& Matrix);
 		void							ApplyTransformationAfter(const ZEMatrix4x4& Matrix);
 
@@ -97,10 +105,23 @@ class ZECanvas
 		void							ApplyRotation(const ZEQuaternion& Rotation);
 		void							ApplyScale(const ZEVector3& Scale);
 
+		void							ResetTransforms();
+
+
+		// Vertices
+		void							SetVertex(ZESize Index, const ZECanvasVertex& Vertex);
+		const ZECanvasVertex&			GetVertex(ZESize Index) const;
+
+		void							AddVertex(const ZECanvasVertex& Vertex);
+		void							AddVertices(const ZECanvasVertex* Vertices, ZESize Count);
+		ZECanvasVertex*					AddVertices(ZESize Count);
+
+
 		// 2D Primitives
 		void							AddPoint(const ZEVector3& Point);
 		void							AddLine(const ZEVector3& Point0, const ZEVector3& Point1);
 		void							AddCircle(float Radius, ZEUInt Segments);
+
 
 		// 3D Wireframe primitives
 		void							AddWireframePlane(float Width, float Length, ZEUInt VSegment, ZEUInt HSegment);
@@ -113,6 +134,7 @@ class ZECanvas
 		void							AddWireframeCone(float Radius, ZEUInt Segments, float Height);
 		void							AddWireframeConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount);
 
+
 		// 3D Primitives
 		void							AddBox(float Width, float Height, float Length);
 		void							AddSphere(float Radius, ZEUInt HSegment, ZEUInt VSegment);
@@ -124,23 +146,18 @@ class ZECanvas
 		void							AddCone(float Radius, ZEUInt Segments, float Height);
 		void							AddConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount);
 
-		// Custom Vertices
-		void							AddVertex(const ZECanvasVertex& Vertex);
-		void							AddVertices(const ZECanvasVertex* Vertices, ZESize Count);
-		ZECanvasVertex*					AddVertices(ZESize Count);
 
-		void							CalculateBoundingBox(ZEAABBox& BoundingBox);
-
-		bool							IsEmpty();
+		// Utility
+		void							CalculateBoundingBox(ZEAABBox& BoundingBox) const;
 		void							Clean();
-		void							ResetTransforms();
 
+
+		// File
+		bool							LoadFromFile(ZEFile* File);
 		bool							LoadFromFile(const ZEString& FileName);
-		void							SaveToFile(const ZEString& FileName);
 
-		ZESize							GetVertexCount();
-		ZESize							GetBufferSize();
-		void*							GetBuffer();
-		
-										ZECanvas();
+		bool							SaveToFile(ZEFile* File) const;
+		bool							SaveToFile(const ZEString& FileName) const;
+
+										ZEGRCanvas();
 };

@@ -109,6 +109,9 @@ ze_add_source(ZEGRTracer.h					Sources Headers)
 ze_add_source(ZEGRTracerEvent.cpp			Sources)
 ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 
+ze_add_source(ZEGRCanvas.cpp 				Sources)
+ze_add_source(ZEGRCanvas.h 					Sources Headers)
+
 ze_add_library(TARGET ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}

@@ -81,7 +81,7 @@ ZEEntityResult ZEATSkyBox::LoadInternal()
 			return ZE_ER_FAILED;
 	}
 
-	ZECanvas SkyBox;
+	ZEGRCanvas SkyBox;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 
 	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, SkyBox.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, SkyBox.GetBuffer());
