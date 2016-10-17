@@ -40,6 +40,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZETriangle.h"
+#include "ZEModel/ZEMDVertex.h"
 
 
 // ZERayCastParameters
@@ -454,6 +455,9 @@ bool ZERayCastHelper::RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& 
 {
 	const ZERayCastParameters& Parameters = *Report->GetParameters();
 	ZETriangle Triangle(Vertex0, Vertex1, Vertex2);
+	if (Triangle.GetArea() <= 0.00001f)
+		return false;
+
 	float RayT;
 	if (!ZETriangle::IntersectionTest(Triangle, LocalRay, RayT))
 		return false;
@@ -472,6 +476,46 @@ bool ZERayCastHelper::RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& 
 	return true;
 }
 
+bool ZERayCastHelper::RayCastMeshIndexed(const void* VertexBuffer, ZESize VertexStride, const void* IndexBuffer, ZESize IndexCount, ZEMDVertexIndexType IndexType)
+{
+	const ZERayCastParameters& Parameters = *Report->GetParameters();
+	if (!Parameters.Components.GetFlags(ZE_RCRE_POLYGONS))
+		return false;
+
+	Update();
+
+	bool Result = false;
+	const ZEUInt16* Indices16 = NULL;
+	const ZEUInt32* Indices32 = NULL;
+	if (IndexType == ZEMD_VIT_16BIT)
+		Indices16 = static_cast<const ZEUInt16*>(IndexBuffer);
+	else
+		Indices32 = static_cast<const ZEUInt32*>(IndexBuffer);
+	const ZEBYTE* Vertices = static_cast<const ZEBYTE*>(VertexBuffer);
+	for (ZESize I = 0; I < IndexCount; I += 3)
+	{
+		ZEVector3 Vertex0, Vertex1, Vertex2;
+		if (IndexType == ZEMD_VIT_16BIT)
+		{
+			Vertex0 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices16[I] * VertexStride);
+			Vertex1 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices16[I + 1] * VertexStride);
+			Vertex2 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices16[I + 2] * VertexStride);
+		}
+		else
+		{
+			Vertex0 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices32[I] * VertexStride);
+			Vertex1 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices32[I + 1] * VertexStride);
+			Vertex2 = *reinterpret_cast<const ZEVector3*>(Vertices + Indices32[I + 2] * VertexStride);
+		}
+
+		Result |= RayCastPolygon(Vertex0, Vertex1, Vertex2);
+
+		if (Report->CheckDone())
+			break;
+	}
+
+	return Result;
+}
 
 bool ZERayCastHelper::RayCastMesh(const void* VertexBuffer, ZESize VertexCount, ZESize VertexStride) const
 {

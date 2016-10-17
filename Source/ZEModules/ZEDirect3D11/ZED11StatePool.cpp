@@ -608,11 +608,16 @@ ID3D11InputLayout* ZED11StatePool::CreateVertexLayout(const ZEGRVertexLayout& Ve
 
 ZED11StateBase* ZED11StatePool::FindPoolEntry(ZEList2<ZED11StateBase>& Pool, const ZEGRState& State) const
 {
+	Pool.LockRead();
 	ze_for_each(Entry, Pool)
 	{
 		if (Entry->GetStateBase().GetHash() == State.GetHash() && State.Equals(Entry->GetStateBase()))
+		{
+			Pool.UnlockRead();
 			return &(*Entry);
+		}
 	}
+	Pool.UnlockRead();
 
 	return NULL;
 }
@@ -636,12 +641,7 @@ ZEHolder<const ZED11BlendState> ZED11StatePool::GetBlendState(const ZEGRBlendSta
 		Entry->State = BlendState;
 		Entry->Interface = CreateBlendState(BlendState);
 
-		static ZELock CriticalSection;
-		CriticalSection.Lock();
-
 		BlendStatePool.AddEnd(Entry->Link);
-
-		CriticalSection.Unlock();
 	}
 
 	return Entry;
@@ -657,16 +657,12 @@ ZEHolder<const ZED11RasterizerState> ZED11StatePool::GetRasterizerState(const ZE
 		Entry->State = RasterizerState;
 		Entry->Interface = CreateRasterizerState(RasterizerState);
 
-		static ZELock CriticalSection;
-		CriticalSection.Lock();
-
 		RasterizerStatePool.AddEnd(Entry->Link);
-
-		CriticalSection.Unlock();
 	}
 	
 	return Entry;
 }
+
 ZEHolder<const ZED11DepthStencilState> ZED11StatePool::GetDepthStencilState(const ZEGRDepthStencilState& DepthStencilState) const
 {
 	ZED11DepthStencilState* Entry = static_cast<ZED11DepthStencilState*>(FindPoolEntry(DepthStencilStatePool, DepthStencilState));
@@ -677,12 +673,7 @@ ZEHolder<const ZED11DepthStencilState> ZED11StatePool::GetDepthStencilState(cons
 		Entry->State = DepthStencilState;
 		Entry->Interface = CreateDepthStencilState(DepthStencilState);
 
-		static ZELock CriticalSection;
-		CriticalSection.Lock();
-
 		DepthStencilStatePool.AddEnd(Entry->Link);
-
-		CriticalSection.Unlock();
 	}
 
 	return Entry;
@@ -694,7 +685,7 @@ ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVert
 	zeCheckCriticalError(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, NULL, "Wrong shader type.");
 
 	ZED11VertexLayout* Entry = NULL;
-	if(VertexLayout.GetElementCount() > 0)
+	if (VertexLayout.GetElementCount() > 0)
 	{
 		Entry = static_cast<ZED11VertexLayout*>(FindPoolEntry(VertexLayoutPool, VertexLayout));
 		if (Entry == NULL)
@@ -704,12 +695,7 @@ ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVert
 			Entry->State = VertexLayout;
 			Entry->Interface =  CreateVertexLayout(VertexLayout, VertexShader);
 
-			static ZELock CriticalSection;
-			CriticalSection.Lock();
-
 			VertexLayoutPool.AddEnd(Entry->Link);
-
-			CriticalSection.Unlock();
 		}
 	}
 

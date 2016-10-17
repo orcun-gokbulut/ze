@@ -853,8 +853,34 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	if (!Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox()))
 		return;
 
-	if (Resource != NULL)
+	if (Resource == NULL)
+		return;
+	
+	const ZEMDResourceLOD* ResourceLOD = Resource->GetLODs()[0];
+	if (ResourceLOD == NULL)
+		return;
+
+	if (ResourceLOD->GetIndexType() == ZEMD_VIT_NONE)
+	{
 		Helper.RayCastMesh(Resource->GetGeometry().GetConstCArray(), Resource->GetGeometry().GetCount(), sizeof(ZEVector3));
+	}
+	else
+	{
+		const void* IndexBuffer = NULL;
+		ZESize IndexCount = 0;
+		if (ResourceLOD->GetIndexType() == ZEMD_VIT_16BIT)
+		{
+			IndexBuffer = ResourceLOD->GetIndices().GetConstCArray();
+			IndexCount = ResourceLOD->GetIndices().GetCount();
+		}
+		else
+		{
+			IndexBuffer = ResourceLOD->GetIndices32().GetConstCArray();
+			IndexCount = ResourceLOD->GetIndices32().GetCount();
+		}
+
+		Helper.RayCastMeshIndexed(Resource->GetGeometry().GetConstCArray(), sizeof(ZEVector3), IndexBuffer, IndexCount, ResourceLOD->GetIndexType());
+	}
 }
 
 ZEModelMesh* ZEModelMesh::CreateInstance()
