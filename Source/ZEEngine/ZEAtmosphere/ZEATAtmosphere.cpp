@@ -464,31 +464,9 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 	TextureOptions.Type = ZEGR_TT_3D;
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture::LoadResource("#R:/ZEEngine/ZEATAtmosphere/MultipleScatteringLUT.dds", TextureOptions);
 
-	Sun = ZEATSun::CreateInstance();
-	AddComponent(Sun);
-
-	Moon = ZEATMoon::CreateInstance();
 	Moon->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/MoonPhases.dds", 53, 1);
-	AddComponent(Moon);
-
-	Fog = ZEATFog::CreateInstance();
-	Fog->SetDensity(0.0f);
-	Fog->SetStartDistance(0.0f);
-	Fog->SetColor(ZEVector3(0.5f));
-	AddComponent(Fog);
-
-	Cloud = ZEATCloud::CreateInstance();
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEATAtmosphere/Clouds.dds");
-	AddComponent(Cloud);
-
-	Stars = ZEATSkyBox::CreateInstance();
-	Stars->SetName("StarMap");
-	Stars->SetVisible(true);
-	Stars->SetEnabled(true);
 	Stars->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/StarMap.dds");
-	Stars->SetColor(ZEVector3::One);
-	Stars->SetBrightness(0.1f);
-	AddComponent(Stars);
 
 	if (!Update())
 		return ZE_ER_FAILED_CLEANUP;
@@ -546,11 +524,28 @@ ZEATAtmosphere::ZEATAtmosphere()
 	TerrestrialMoonColor = ZEVector3::Zero;
 	TerrestrialMoonAmbientColor = ZEVector3::Zero;
 
-	Sun = NULL;
-	Moon = NULL;
-	Fog = NULL;
-	Cloud = NULL;
-	Stars = NULL;
+	Sun = ZEATSun::CreateInstance();
+	AddComponent(Sun);
+
+	Moon = ZEATMoon::CreateInstance();
+	AddComponent(Moon);
+
+	Fog = ZEATFog::CreateInstance();
+	Fog->SetDensity(0.0f);
+	Fog->SetStartDistance(0.0f);
+	Fog->SetColor(ZEVector3(0.5f));
+	AddComponent(Fog);
+
+	Cloud = ZEATCloud::CreateInstance();
+	AddComponent(Cloud);
+
+	Stars = ZEATSkyBox::CreateInstance();
+	Stars->SetName("StarMap");
+	Stars->SetVisible(true);
+	Stars->SetEnabled(true);
+	Stars->SetColor(ZEVector3::One);
+	Stars->SetBrightness(0.1f);
+	AddComponent(Stars);
 
 	OrderCount = 4;
 	UseMultipleScattering = true;

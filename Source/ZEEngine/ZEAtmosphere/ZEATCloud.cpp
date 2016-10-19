@@ -270,7 +270,7 @@ void ZEATCloud::SetCloudTexture(const ZEString& FileName)
 {
 	ZEGRTextureOptions TextureOptions;
 	TextureOptions.Type = ZEGR_TT_2D;
-	TextureOptions.CompressionFormat = ZEGR_TF_BC3_UNORM_SRGB;
+	TextureOptions.CompressionFormat = ZEGR_TF_NONE;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
