@@ -75,6 +75,8 @@ class ZEModelDraw : public ZEObject
 		mutable ZERNCommand							RenderCommand;
 		ZEMDInstanceTag								InstanceTag;
 
+		void										SetLOD(ZEModelMeshLOD* LOD);
+
 	public:
 		ZEModel*									GetModel();
 		const ZEModel*								GetModel() const;

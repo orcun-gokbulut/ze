@@ -41,12 +41,12 @@ class ZERNInstanceTag : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZESize							Hash;
+		ZESize			Hash;
 
-		virtual bool					Check(const ZERNInstanceTag* Other) const = NULL;
+		virtual bool	Check(const ZERNInstanceTag* Other) const = 0;
 
-										ZERNInstanceTag();
-		virtual							~ZERNInstanceTag();
+						ZERNInstanceTag();
+		virtual			~ZERNInstanceTag();
 		
-		static ZESize					GenerateHash(const void* Data, ZESize Hash);
+		static ZESize	GenerateHash(const void* Data, ZESize Hash);
 };

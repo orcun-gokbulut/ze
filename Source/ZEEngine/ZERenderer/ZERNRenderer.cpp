@@ -290,7 +290,7 @@ bool ZERNRenderer::InitializeInternal()
 	ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	if (InstanceVertexBuffer == NULL)
-		InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 4096, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
+		InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 8192, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 
 	CreatePredefinedSamplers();
 

@@ -385,6 +385,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 	#elif defined ZERN_FM_FORWARD
 		float3 ResultColor = 0.0f;
 		
+		[unroll(2)]
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		

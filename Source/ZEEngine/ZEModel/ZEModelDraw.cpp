@@ -80,6 +80,12 @@ bool ZEMDInstanceTag::Check(const ZERNInstanceTag* Other) const
 		Draw->Count == OtherMD->Draw->Count);
 }
 
+void ZEModelDraw::SetLOD(ZEModelMeshLOD* LOD)
+{
+	this->LOD = LOD;
+	InstanceTag.Update();
+}
+
 ZEModel* ZEModelDraw::GetModel()
 {
 	if (GetLOD() == NULL)
@@ -178,7 +184,7 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	Context->SetVertexBuffer(0, GetLOD()->VertexBuffer);
+	Context->SetVertexBuffer(0, GetLOD()->GetVertexBuffer());
 
 	if (GetLOD()->GetIndexType() != ZEMD_VIT_NONE)
 		Context->SetIndexBuffer(GetLOD()->GetIndexBuffer());

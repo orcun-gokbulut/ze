@@ -81,6 +81,7 @@ float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID, u
 	float3 ResultColor = 0.0f;
 	
 	#if defined ZERN_RENDER_DIRECTIONAL_LIGHT
+		[unroll(2)]
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		

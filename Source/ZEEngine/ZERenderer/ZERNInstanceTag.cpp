@@ -50,7 +50,7 @@ ZESize ZERNInstanceTag::GenerateHash(const void* Data, ZESize Size)
 
 ZERNInstanceTag::ZERNInstanceTag()
 {
-
+	Hash = 0;
 }
 
 ZERNInstanceTag::~ZERNInstanceTag()
