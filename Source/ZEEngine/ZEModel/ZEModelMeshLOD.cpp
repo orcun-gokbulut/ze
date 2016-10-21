@@ -67,7 +67,7 @@ bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 		Draws[I].SetMaterial(ResourceDraw->GetMaterial());
 		Draws[I].SetOffset(ResourceDraw->GetOffset());
 		Draws[I].SetCount(ResourceDraw->GetCount());
-		Draws[I].LOD = this;
+		Draws[I].SetLOD(this);
 		Draws[I].Resource = ResourceDraw;
 	}
 
