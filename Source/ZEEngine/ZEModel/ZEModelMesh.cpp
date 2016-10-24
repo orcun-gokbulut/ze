@@ -866,6 +866,9 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	}
 	else
 	{
+		const void* VertexBuffer = NULL;
+		ZESize VertexCount = 0;
+		ZESize VertexStride = 0;
 		const void* IndexBuffer = NULL;
 		ZESize IndexCount = 0;
 		if (ResourceLOD->GetIndexType() == ZEMD_VIT_16BIT)
@@ -879,7 +882,17 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 			IndexCount = ResourceLOD->GetIndices32().GetCount();
 		}
 
-		Helper.RayCastMeshIndexed(Resource->GetGeometry().GetConstCArray(), sizeof(ZEVector3), IndexBuffer, IndexCount, ResourceLOD->GetIndexType());
+		if (ResourceLOD->GetVertexType() == ZEMD_VT_NORMAL)
+		{
+			VertexBuffer = ResourceLOD->GetVertices().GetConstCArray();
+			VertexStride = sizeof(ZEMDVertex);
+		}
+		else
+		{
+			VertexBuffer = ResourceLOD->GetVerticesSkin().GetConstCArray();
+			VertexStride = sizeof(ZEMDVertexSkin);
+		}
+		Helper.RayCastMeshIndexed(VertexBuffer, VertexStride, IndexBuffer, IndexCount, ResourceLOD->GetIndexType());
 	}
 }
 
