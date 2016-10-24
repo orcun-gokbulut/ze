@@ -283,7 +283,7 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 void ZEEntity::ClearComponents()
 {
 	Components.LockWrite();
-	while(ChildEntities.GetCount() != 0)
+	while(Components.GetCount() != 0)
 	{
 		ZEEntity* Component = Components.GetFirstItem();
 		Component->Destroy();
