@@ -80,10 +80,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZELock									SceneLock;
 		bool									SpatialDatabase;
 
-		ZELock									TickListLock;
 		ZEList2<ZEEntity>						TickList;
-
-		ZELock									RenderListLock;
 		ZEList2<ZEEntity>						RenderList;
 		ZEOctree<ZEEntity*>						RenderListOctree;
 

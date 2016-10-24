@@ -56,6 +56,11 @@ bool ZEThread::ControlPoint()
 	{
 		return false;
 	}
+	else if (Status == ZE_TS_DESTROYED)
+	{
+		Destroy();
+		return false;
+	}
 	else
 	{
 		return false;

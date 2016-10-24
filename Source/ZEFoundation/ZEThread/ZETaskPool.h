@@ -48,20 +48,20 @@ class ZETaskPool
 	private:
 		ZEInt							Id;
 		ZEString						Name;
-		ZEList2<ZETaskThread>			ActiveThreads;
 		ZEList2<ZETaskThread>			SuspendedThreads;
-		ZEList2<ZETaskThread>			DeletedThreads;
+		ZEList2<ZETaskThread>			FiringThreads;
+		ZEList2<ZETaskThread>			ActiveThreads;
 		ZEList2<ZETask>					Tasks;
 		ZESize							ThreadCount;
 		ZELock							SchedulerLock;
-			
-		ZETaskThread*					RequestThread();
-		void							ReleaseThread(ZETaskThread*);
-		void							PurgeThreads();
 
-		// MISSING (CURRENT ISSUE): Thread Life Cycle Management 
+		// Thread Management
+		ZETaskThread*					RequestThread();
+		void							ReleaseThread(ZETaskThread* Thread);
+
+		// Task Management
 		void							Schedule(ZEThread* Thread, void* ExtraParameter);
-		void							Reschedule(ZETask* Task);
+		void							QueueTask(ZETask* Task);
 		void							RunTask(ZETask* Task);
 		void							TaskDestroyed(ZETask* Task);
 

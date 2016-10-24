@@ -146,6 +146,7 @@ class ZEArray
 		void							UnlockRead() const;
 
 		void							LockWrite();
+		void							LockWriteNested();
 		void							UnlockWrite();
 
 										ZEArray();
@@ -891,6 +892,12 @@ template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArray<ZEItemType, ZEAllocatorType>::LockWrite()
 {
 	Lock.LockWrite();
+}
+
+template<typename ZEItemType, typename ZEAllocatorType/*= ZEAllocatorBase<ZEItemType> */>
+void ZEArray<ZEItemType, ZEAllocatorType>::LockWriteNested()
+{
+	Lock.LockWriteNested();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>

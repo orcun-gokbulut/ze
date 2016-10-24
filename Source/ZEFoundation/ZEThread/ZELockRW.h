@@ -41,6 +41,7 @@ class ZELockRW
 {
 	ZE_COPY_NO_ACTION(ZELockRW)
 	private:
+		ZELock					CountersLock;
 		ZELock					ReaderLock;
 		ZELock					AccessLock;
 		volatile ZEInt32		ReaderCount;
