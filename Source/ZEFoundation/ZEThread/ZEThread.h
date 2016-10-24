@@ -39,6 +39,7 @@
 #include "ZEPlatform.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
+#include "ZESignal.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -49,7 +50,8 @@ enum ZEThreadStatus
     ZE_TS_NOT_RUNNING	= 0,
     ZE_TS_RUNNING		= 1,
     ZE_TS_SUSPENDED		= 2,
-    ZE_TS_EXITING		= 3
+    ZE_TS_EXITING		= 3,
+	ZE_TS_DESTROYED		= 4
 };
 
 class ZEThread;
@@ -74,6 +76,7 @@ class ZEThread
 		ZEThreadStatus				Status;
         ZEThreadFunction			Function;
         void*						Parameter;
+		ZESignal					SuspendSignal;
 
 	public:
 		ZEInt						GetId();
@@ -97,6 +100,8 @@ class ZEThread
 
 									ZEThread();
 		virtual 					~ZEThread();
+
+		void						Destroy();
 
 		static ZEThread*			GetCurrentThread();
 		static ZEUInt32				GetCurrentThreadId();

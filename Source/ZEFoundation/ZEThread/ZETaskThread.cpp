@@ -60,4 +60,5 @@ ZETaskThread::ZETaskThread() : PoolLink(this)
 {
 	Task = NULL;
 	InstanceIndex = 0;
+	TaskDestroyed = false;
 }

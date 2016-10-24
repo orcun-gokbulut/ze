@@ -103,8 +103,8 @@ void ZEThread::Run()
 {
 	if (Handle != NULL)
 	{
-		ResumeThread(Handle);
 		Status = ZE_TS_RUNNING;
+		SuspendSignal.Signal();
 		return;
 	}
 	else
@@ -123,7 +123,12 @@ void ZEThread::Suspend()
 		return;
 
 	Status = ZE_TS_SUSPENDED;
-	SuspendThread(Handle);
+
+	if (CurrentThread == this)
+	{
+		SuspendSignal.Wait();
+		SuspendSignal.Reset();
+	}
 }
 
 void ZEThread::Terminate()
@@ -174,6 +179,25 @@ void ZEThread::Wait()
 		zeCriticalError("Can not wait thread.");
 }
 
+void ZEThread::Destroy()
+{
+	if (Handle == NULL)
+		return;
+
+	if (CurrentThread == this || Status == ZE_TS_SUSPENDED)
+	{
+		Status = ZE_TS_DESTROYED;
+		ThreadId = 0;
+		delete this;
+		ExitThread(EXIT_SUCCESS);
+		CloseHandleSafe(Handle);
+	}
+	else if (Status == ZE_TS_RUNNING)
+	{
+		Status = ZE_TS_DESTROYED;
+	}
+
+}
 ZEThread::ZEThread()
 {
 	Handle = NULL;

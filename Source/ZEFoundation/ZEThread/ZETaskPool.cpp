@@ -47,18 +47,19 @@ ZETaskThread* ZETaskPool::RequestThread()
 	ZELink<ZETaskThread>* ThreadLink = SuspendedThreads.GetFirst();
 	if (ThreadLink == NULL)
 	{
-		 if (ThreadCount > SuspendedThreads.GetCount() + ActiveThreads.GetCount())
+		ZESize AliveThreadCount = SuspendedThreads.GetCount() + FiringThreads.GetCount() + ActiveThreads.GetCount();
+		 if (AliveThreadCount < ThreadCount)
 		 {
 			Thread = new ZETaskThread();
 			Thread->SetFunction(ZEThreadFunction::Create<ZETaskPool, &ZETaskPool::Schedule>(this));
-			ActiveThreads.AddEnd(&Thread->PoolLink);
+			FiringThreads.AddEnd(&Thread->PoolLink);
 		 }
 	}
 	else
 	{
 		Thread = ThreadLink->GetItem();
 		SuspendedThreads.Remove(ThreadLink);
-		ActiveThreads.AddEnd(ThreadLink);
+		FiringThreads.AddEnd(&Thread->PoolLink);
 	}
 	
 	return Thread;
@@ -66,10 +67,12 @@ ZETaskThread* ZETaskPool::RequestThread()
 
 void ZETaskPool::ReleaseThread(ZETaskThread* Thread)
 {
-	if (ThreadCount > SuspendedThreads.GetCount() + ActiveThreads.GetCount())
+	ZESize AliveThreadCount = SuspendedThreads.GetCount() + FiringThreads.GetCount() + ActiveThreads.GetCount();
+	if (AliveThreadCount > ThreadCount)
 	{
 		ActiveThreads.Remove(&Thread->PoolLink);
-		DeletedThreads.AddEnd(&Thread->PoolLink);
+		SchedulerLock.Unlock();
+		Thread->Destroy();
 	}
 	else
 	{
@@ -78,19 +81,15 @@ void ZETaskPool::ReleaseThread(ZETaskThread* Thread)
 	}
 }
 
-void ZETaskPool::PurgeThreads()
-{
-	ZELink<ZETaskThread>* Thread;
-	while(Thread = DeletedThreads.GetFirst())
-	{
-		DeletedThreads.Remove(Thread);
-		delete Thread->GetItem();
-	}
-}
-
 void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 {
 	ZETaskThread* TaskThread = static_cast<ZETaskThread*>(Thread);
+	SchedulerLock.Lock();
+	{
+		FiringThreads.Remove(&TaskThread->PoolLink);
+		ActiveThreads.AddEnd(&TaskThread->PoolLink);
+	}
+	SchedulerLock.Unlock();
 
 	while(Thread->ControlPoint())
 	{
@@ -107,7 +106,14 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 			{
 				ReleaseThread(TaskThread);
 				SchedulerLock.Unlock();
-				Thread->Suspend();
+
+				TaskThread->Suspend();
+
+				SchedulerLock.Lock();
+				FiringThreads.Remove(&TaskThread->PoolLink);
+				ActiveThreads.AddEnd(&TaskThread->PoolLink);
+				SchedulerLock.Unlock();
+
 				continue;
 			}
 
@@ -116,7 +122,7 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 			{
 				while(QueuedTasks != 0)
 				{
-					ZEThread* Thread = RequestThread();
+					ZETaskThread* Thread = RequestThread();
 					if (Thread == NULL)
 						break;
 
@@ -125,10 +131,10 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 					QueuedTasks--;
 				}
 			}
-		}
 		
-		static_cast<ZETaskThread*>(Thread)->SetTask(Task);
-		Task->Status = ZE_TS2_RUNNING;
+			static_cast<ZETaskThread*>(Thread)->SetTask(Task);
+			Task->Status = ZE_TS2_RUNNING;
+		}
 		SchedulerLock.Unlock();
 
 		ZETaskResult Result = ZE_TR_DONE;
@@ -147,7 +153,7 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 			else if (Result == ZE_TR_COOPERATING)
 			{
 				Task->Status = ZE_TS2_WAITING;
-				Reschedule(Task);
+				QueueTask(Task);
 			}
 			else
 			{
@@ -158,7 +164,7 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 	}
 }
 
-void ZETaskPool::Reschedule(ZETask* Task)
+void ZETaskPool::QueueTask(ZETask* Task)
 {
 	Task->Status = ZE_TS2_WAITING;
 
@@ -177,17 +183,19 @@ void ZETaskPool::Reschedule(ZETask* Task)
 
 void ZETaskPool::RunTask(ZETask* Task)
 {
+	ZETaskThread* Thread = NULL;
 	SchedulerLock.Lock();
-	if (Task->Status == ZE_TS2_RUNNING || Task->Status == ZE_TS2_WAITING)
 	{
-		SchedulerLock.Unlock();
-		return;
+		if (Task->Status == ZE_TS2_RUNNING || Task->Status == ZE_TS2_WAITING)
+		{
+			SchedulerLock.Unlock();
+			return;
+		}
+
+		QueueTask(Task);
+
+		Thread = RequestThread();
 	}
-
-	PurgeThreads();
-	Reschedule(Task);
-
-	ZETaskThread* Thread = RequestThread();
 	SchedulerLock.Unlock();
 
 	if (Thread != NULL)
@@ -197,18 +205,19 @@ void ZETaskPool::RunTask(ZETask* Task)
 void ZETaskPool::TaskDestroyed(ZETask* Task)
 {
 	SchedulerLock.Lock();
-	if (Task->GetStatus() == ZE_TS2_WAITING)
-		Tasks.Remove(&Task->Link);
-	
-	if (Task->GetStatus() == ZE_TS2_RUNNING)
 	{
-		ze_for_each(Thread, ActiveThreads)
+		if (Task->GetStatus() == ZE_TS2_WAITING)
+			Tasks.Remove(&Task->Link);
+	
+		if (Task->GetStatus() == ZE_TS2_RUNNING)
 		{
-			if (Thread->Task == Task)
-				Thread->TaskDestroyed = true;
+			ze_for_each(Thread, ActiveThreads)
+			{
+				if (Thread->Task == Task)
+					Thread->TaskDestroyed = true;
+			}
 		}
 	}
-
 	SchedulerLock.Unlock();
 }
 

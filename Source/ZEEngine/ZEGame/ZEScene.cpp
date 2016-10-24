@@ -176,25 +176,33 @@ void ZEScene::AddToTickList(ZEEntity* Entity)
 {
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
 	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
-
-	ZE_LOCK_SECTION(TickListLock)
+	 
+	TickList.LockWrite();
+	
+	if (Entity->TickListLink.GetInUse())
 	{
-		if (Entity->TickListLink.GetInUse())
-			return;
-
-		TickList.AddEnd(&Entity->TickListLink);
+		TickList.UnlockWrite();
+		return;
 	}
+
+	TickList.AddEnd(&Entity->TickListLink);
+
+	TickList.UnlockWrite();
 }
 
 void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 {
-	ZE_LOCK_SECTION(TickListLock)
-	{
-		if (!Entity->TickListLink.GetInUse())
-			return;
+	TickList.LockWrite();
 
-		TickList.Remove(&Entity->TickListLink);
+	if (!Entity->TickListLink.GetInUse())
+	{
+		TickList.UnlockWrite();
+		return;
 	}
+
+	TickList.Remove(&Entity->TickListLink);
+
+	TickList.UnlockWrite();
 }
 
 void ZEScene::AddToRenderList(ZEEntity* Entity)
@@ -202,34 +210,38 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
 	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
 
-	ZE_LOCK_SECTION(RenderListLock)
-	{
-		if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
-			return;
+	RenderList.LockWrite();
 
-		if (SpatialDatabase && 
-			Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
-			Entity->GetStatic())
-		{
-			Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
-		}
-		else
-		{
-			RenderList.AddEnd(&Entity->RenderListLink);
-		}
+	if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
+	{
+		RenderList.UnlockWrite();
+		return;
 	}
+
+	if (SpatialDatabase && 
+		Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
+		Entity->GetStatic())
+	{
+		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+	}
+	else
+	{
+		RenderList.AddEnd(&Entity->RenderListLink);
+	}
+
+	RenderList.UnlockWrite();
 }
 
 void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 {
-	ZE_LOCK_SECTION(RenderListLock)
-	{
-		if (Entity->RenderListLink.GetInUse())
-			RenderList.Remove(&Entity->RenderListLink);
+	RenderList.LockWrite();
 	
-		if (Entity->RenderListOctree != NULL)
-			Entity->RenderListOctree->RemoveItem(Entity);
-	}
+	if (Entity->RenderListLink.GetInUse())
+		RenderList.Remove(&Entity->RenderListLink);
+	else if (Entity->RenderListOctree != NULL)
+		Entity->RenderListOctree->RemoveItem(Entity);
+	
+	RenderList.UnlockWrite();
 }
 
 void ZEScene::UpdateOctree(ZEEntity* Entity)
@@ -238,16 +250,17 @@ void ZEScene::UpdateOctree(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetStatic(), "Non-static entity updating octree.");
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Not loaded entity updating octree.");
 
-	ZE_LOCK_SECTION(RenderListLock)
-	{
-		if (!SpatialDatabase)
-			return;
+	if (!SpatialDatabase)
+		return;
 
-		if (Entity->RenderListOctree != NULL)
-			Entity->RenderListOctree->RemoveItem(Entity);
+	RenderList.LockWrite();
+	
+	if (Entity->RenderListOctree != NULL)
+		Entity->RenderListOctree->RemoveItem(Entity);
 
-		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
-	}
+	Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+	
+	RenderList.UnlockWrite();
 }
 
 void ZEScene::UpdateConstantBuffer()
@@ -438,11 +451,12 @@ void ZEScene::Tick(float ElapsedTime)
 	if (!Enabled)
 		return;
 
-	ZE_LOCK_SECTION(TickListLock)
-	{
-		ze_for_each(Entity, TickList)
-			TickEntity(Entity.GetPointer(), ElapsedTime);
-	}
+	TickList.LockRead();
+
+	ze_for_each(Entity, TickList)
+		TickEntity(Entity.GetPointer(), ElapsedTime);
+
+	TickList.UnlockRead();
 }
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
@@ -469,7 +483,7 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	float TotalCullRatio = 0.0f;
 
-	RenderListLock.LockNested();
+	RenderList.LockRead();
 
 	TotalRenderableEntity = RenderListOctree.GetTotalItemCount() + RenderList.GetCount();
 
@@ -504,7 +518,7 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 	CulledEntity = TotalRenderableEntity - RenderedEntity;
 	CullRatio = (float)CulledEntity / (float)TotalRenderableEntity;
 	
-	RenderListLock.Unlock();
+	RenderList.UnlockRead();
 
 	Parameters->Renderer->EndScene();
 }

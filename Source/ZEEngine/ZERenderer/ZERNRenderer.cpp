@@ -518,7 +518,7 @@ void ZERNRenderer::BindStages()
 void ZERNRenderer::StartScene(ZEScene* Scene)
 {
 	Scenes.Enqueue(Scene);
-	Scene->RenderListLock.LockNested();
+	Scene->RenderList.LockRead();
 }
 
 void ZERNRenderer::EndScene()
@@ -594,7 +594,7 @@ void ZERNRenderer::Render()
 	CleanCommands();
 
 	for (ZESize I = 0; I < Scenes.GetCount(); I++)
-		Scenes[I]->RenderListLock.Unlock();
+		Scenes[I]->RenderList.UnlockRead();
 
 	Scenes.Clear();
 }
