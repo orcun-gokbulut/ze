@@ -64,8 +64,6 @@ ze_add_source(ZELightDirectional.h					Sources Headers ZEMC)
 ze_add_source(ZELightOmniProjective.cpp 			Sources)
 ze_add_source(ZELightOmniProjective.h 				Sources Headers ZEMC)
 
-ze_add_source(ZERNMap.cpp 							Sources)
-ze_add_source(ZERNMap.h 							Sources Headers ZEMC)
 ze_add_source(ZERNShaderSlots.cpp 					Sources)
 ze_add_source(ZERNShaderSlots.h 					Sources Headers)
 ze_add_source(ZERNMaterial.cpp 						Sources)
