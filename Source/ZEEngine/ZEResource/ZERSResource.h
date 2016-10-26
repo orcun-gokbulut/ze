@@ -52,6 +52,13 @@
 class ZERSResourceManager;
 class ZERSResourceGroup;
 
+class ZERSResourceIdentifier
+{
+	public:
+		virtual bool							Equals(const ZERSResourceIdentifier* Identifier) const = 0;
+		virtual ZEString						ToString() const;
+};
+
 class ZERSResource : public ZEObject, public ZEReferenceCounted
 {
 	ZE_OBJECT
@@ -71,6 +78,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		ZEGUID									GUID;
 		ZEString								FileName;
 		ZEUInt32								FileNameHash;
+		const ZERSResourceIdentifier*			Identifier;
 
 		ZEArray<ZERSResource*>					ChildResources;
 		ZEArray<const ZERSResource*>			ExternalResources;
@@ -87,9 +95,10 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 
 		bool									LoadInternalDone;
 		bool									UnloadInternalDone;
-		bool									Destroying;
+		bool									ReloadFlag;
 
 		mutable ZELock							ResourceLock;
+		ZELock									StateLock;
 
 		virtual void							Reference() const;
 		virtual void							Release() const;
@@ -98,8 +107,14 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		ZETaskResult							UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters);
 		void									UpdateMemoryConsumption();
 
+		bool									UpdateStateSerial();
+		void									UpdateState();
+
 	protected:
 		void									SetGUID(const ZEGUID& GUID);
+		void									SetFileName(const ZEString& FileName);
+		void									SetIdentifier(const ZERSResourceIdentifier* Identifier);
+
 		void									SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size);
 
 		void									SetLocalLoadProgress(ZEUInt Percentage);
@@ -132,6 +147,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		const ZEGUID&							GetGUID() const;
 		const ZEString&							GetFileName() const;
 		ZEUInt32								GetFileNameHash() const;
+		const ZERSResourceIdentifier*			GetIdentifier() const;
 
 		ZERSResourceState						GetState() const;
 		ZEUInt									GetLoadProgress() const;
@@ -139,6 +155,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool) const;
 		ZESize									GetTotalMemoryUsage() const;
 
+		bool									IsDestroyed() const;
 		bool									IsStaged() const;
 		bool									IsLoaded() const;
 		bool									IsLoadedOrLoading() const;
@@ -151,8 +168,13 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		void									StagingRealized();
 		void									StagingFailed();
 
-		void									Load(const ZEString& FileName);
+		void									Load();
 		void									Unload();
+		void									Reload();
+
+		bool									LoadSerial();
+		bool									UnloadSerial();
+		bool									ReloadSerial();
 
 		void									WaitStaging() const;
 		void									WaitLoading() const;

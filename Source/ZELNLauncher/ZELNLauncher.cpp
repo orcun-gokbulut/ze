@@ -309,7 +309,7 @@ void ZELNLauncher::Launch()
 			return;
 		}
 
-		Information.Parameters.Combine(Module->GetLaunchParameters());
+		Information.Parameters.AddMultiple(Module->GetLaunchParameters());
 	}
 	
 	char ParameterString[32767];

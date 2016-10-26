@@ -42,7 +42,7 @@ class ZEGRContext;
 class ZERNStage;
 class ZERNCommand;
 
-class ZERNMaterial : public ZERSResource, public ZEInitializable
+class ZERNMaterial : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNMaterial)

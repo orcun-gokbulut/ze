@@ -39,6 +39,11 @@
 #include "ZEFile\ZEPathInfo.h"
 
 
+ZEString ZERSResourceIdentifier::ToString() const
+{
+	return ZEString::Empty;
+}
+
 void ZERSResource::Reference() const
 {
 	zeDebugCheck(Manager == NULL, "Resource is not registered.");
@@ -121,10 +126,24 @@ void ZERSResource::UpdateMemoryConsumption()
 	ResourceLock.Unlock();
 }
 
+bool ZERSResource::UpdateStateSerial()
+{
+	StateLock.Lock();
+
+	ZETaskResult Result = ZE_TR_COOPERATING;
+	while (Result == ZE_TR_COOPERATING)
+		Result = UpdateStateFunction(NULL, 0);
+
+	StateLock.Unlock();
+
+	return (Result == ZE_TR_DONE);
+}
+
 ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters)
 {
 	if (State == ZERS_RS_NONE)
 	{
+		ReloadFlag = false;
 		if (TargetState == ZERS_RS_NONE)
 		{
 			return ZE_TR_DONE;
@@ -135,6 +154,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 		}
 		else if (TargetState == ZERS_RS_LOADED)
 		{
+			StagingRealized();
 			return ZE_TR_COOPERATING;
 		}
 		else if (TargetState == ZERS_RS_DESTROYED)
@@ -144,6 +164,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 	}
 	else if (State == ZERS_RS_STAGED)
 	{
+		ReloadFlag = false;
 		if (TargetState == ZERS_RS_STAGED)
 		{
 			return ZE_TR_DONE;
@@ -160,26 +181,31 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 	}
 	else if (State == ZERS_RS_LOADED)
 	{
-		 if (TargetState == ZERS_RS_LOADED)
+		if (TargetState == ZERS_RS_LOADED)
+		{
+			return ZE_TR_DONE;
+		}
+		else if (ReloadFlag == true && TargetState == ZERS_RS_STAGED)
+		{
+			UnloadInternalDone = false;
+			State = ZERS_RS_UNLOADING;
+		}
+		else if (TargetState == ZERS_RS_DESTROYED)
 		 {
-			 return ZE_TR_DONE;
-		 }
-		 else if (TargetState == ZERS_RS_STAGED)
-		 {
-			 UnloadInternalDone = false;
 			 State = ZERS_RS_UNLOADING;
-		 }
-		 else if (TargetState == ZERS_RS_DESTROYED)
-		 {
-			 State = ZERS_RS_UNLOADING;
-		 }
+		}
 	}
 	else if (State < 0)
 	{
 		if (TargetState == ZERS_RS_DESTROYED)
+		{
 			TargetState = ZERS_RS_DESTROYING;
+		}
 		else
+		{
+			StateLock.Unlock();
 			return ZE_TR_DONE;
+		}
 	}
 
 	if (State == ZERS_RS_LOADING)
@@ -405,6 +431,7 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	Manager = NULL;
 	Group = NULL;
 	GUID = ZEGUID::Zero;
+	Identifier = NULL;
 	State = ZERS_RS_NONE;
 	Parent = NULL;
 	Shared = false;
@@ -416,7 +443,7 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	LocalLoadProgress = 0;
 	LoadInternalDone = false;
 	UnloadInternalDone = false;
-	Destroying = false;
+	ReloadFlag = false;
 	UpdateStateTask.SetPool(ZE_TPI_IO);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
 }
@@ -466,6 +493,16 @@ void ZERSResource::SetGUID(const ZEGUID& GUID)
 	this->GUID = GUID;
 }
 
+void ZERSResource::SetFileName(const ZEString& FileName)
+{
+	this->FileName = FileName;
+}
+
+void ZERSResource::SetIdentifier(const ZERSResourceIdentifier* Identifier)
+{
+	this->Identifier = Identifier;
+}
+
 const ZEGUID& ZERSResource::GetGUID() const
 {
 	return GUID;
@@ -479,6 +516,11 @@ const ZEString& ZERSResource::GetFileName() const
 ZEUInt32 ZERSResource::GetFileNameHash() const
 {
 	return FileNameHash;
+}
+
+const ZERSResourceIdentifier* ZERSResource::GetIdentifier() const
+{
+	return Identifier;
 }
 
 ZERSResourceState ZERSResource::GetState() const
@@ -529,6 +571,11 @@ ZEUInt ZERSResource::GetLoadProgress() const
 	ResourceLock.Unlock();
 
 	return TotalProgress / TotalItems;
+}
+
+bool ZERSResource::IsDestroyed() const
+{
+	return TargetState == ZERS_RS_DESTROYED || TargetState == ZERS_RS_DESTROYING;
 }
 
 bool ZERSResource::IsStaged() const
@@ -588,17 +635,12 @@ void ZERSResource::StagingFailed()
 		State = ZERS_RS_ERROR_STAGING;
 }
 
-void ZERSResource::Load(const ZEString& FileName)
+void ZERSResource::Load()
 {
+	zeCheckError(IsDestroyed(), ZE_VOID, "Cannot load destroyed resource.");
 	zeDebugCheck(Manager == NULL, "Resource is not registered.");
 
-	if (TargetState == ZERS_RS_DESTROYED)
-		return;
-
 	if (IsLoadedOrLoading())
-		return;
-
-	if (Destroying)
 		return;
 
 	ResourceLock.Lock();
@@ -613,16 +655,77 @@ void ZERSResource::Load(const ZEString& FileName)
 
 void ZERSResource::Unload()
 {
+	if (IsDestroyed())
+		return;
+
 	zeDebugCheck(Manager == NULL, "Resource is not registered.");
 
 	if (State < ZERS_RS_STAGED)
 		return;
 
-	if (Destroying)
-		return;
+	zeLog("Unloading resource. Resource Class: \"%s\", File Name: \"%s\".", GetClass()->GetName(), this->FileName.ToCString());
+	TargetState = ZERS_RS_STAGED;
+	UpdateStateTask.Run();
+}
+
+void ZERSResource::Reload()
+{
+	zeCheckError(IsDestroyed(), ZE_VOID, "Cannot reload destroyed resource.");
+	zeCheckError(IsShared(), ZE_VOID, "Cannot reload shared resource.");
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
+	ReloadFlag = true;
+
+	if (TargetState <= ZERS_RS_LOADED)
+		TargetState = ZERS_RS_LOADED;
+
+	UpdateStateTask.Run();
+}
+
+bool ZERSResource::LoadSerial()
+{
+	zeCheckError(IsDestroyed(), false, "Cannot serial load destroyed resource.");
+	zeCheckError(IsShared(), false, "Cannot serial load shared resource.");
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
+	if (IsLoaded())
+		return true;
+
+	ResourceLock.Lock();
+	this->FileName = ZEPathInfo(FileName).Normalize();
+	FileNameHash = this->FileName.Lower().Hash();
+	TargetState = ZERS_RS_LOADED;
+	ResourceLock.Unlock();
+
+	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+	return UpdateStateSerial();
+}
+
+bool ZERSResource::UnloadSerial()
+{
+	zeCheckError(IsDestroyed(), false, "Cannot serial unload destroyed resource.");
+	zeCheckError(IsShared(), false, "Cannot serial unload shared resource. Serial load/unload/reload operations are not allowed on shared resources.");
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
+	if (State < ZERS_RS_STAGED)
+		return true;
 
 	zeLog("Unloading resource. Resource Class: \"%s\", File Name: \"%s\".", GetClass()->GetName(), this->FileName.ToCString());
 	TargetState = ZERS_RS_STAGED;
+	return UpdateStateSerial();
+}
+
+bool ZERSResource::ReloadSerial()
+{
+	zeCheckError(IsDestroyed(), false, "Cannot serial reload destroyed resource.");
+	zeCheckError(IsShared(), false, "Cannot serial reload shared resource. Serial load/unload/reload operations are not allowed on shared resources.");
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
+	ReloadFlag = true;
+
+	if (TargetState <= ZERS_RS_LOADED)
+		TargetState = ZERS_RS_LOADED;
+
 	UpdateStateTask.Run();
 }
 

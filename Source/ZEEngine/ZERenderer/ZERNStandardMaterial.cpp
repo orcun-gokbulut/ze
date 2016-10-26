@@ -369,7 +369,20 @@ ZETaskResult ZERNStandardMaterial::LoadInternal()
 
 	DirtyFlags.RaiseAll();
 
-	if (!Update())
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	if (ConstantBuffer == NULL)
+		return ZE_TR_FAILED;
+
+	if (!UpdateStageMask())
+		return ZE_TR_FAILED;
+
+	if (!UpdateShaders())
+		return ZE_TR_FAILED;
+
+	if (!UpdateRenderState())
+		return ZE_TR_FAILED;
+
+	if (!UpdateConstantBuffer())
 		return ZE_TR_FAILED;
 
 	return ZE_TR_DONE;
@@ -686,7 +699,8 @@ void ZERNStandardMaterial::SetSubSurfaceScatteringMap(const ZEGRTexture* Texture
 	UnregisterExternalResource(Texture);
 	SubSurfaceScatteringMap = Texture;
 	RegisterExternalResource(Texture);
-	SubSurfaceScatteringMapFile = "";
+	
+	SubSurfaceScatteringMapFileName = (SubSurfaceScatteringMap != NULL ? SubSurfaceScatteringMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetSubSurfaceScatteringMap() const
@@ -696,13 +710,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetSubSurfaceScatteringMap() const
 
 void ZERNStandardMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
 {
-	if (SubSurfaceScatteringMapFile == FileName)
+	if (ZEPathInfo::Compare(SubSurfaceScatteringMapFileName, FileName))
 		return;
 
-	SubSurfaceScatteringMapFile = FileName;
+	SubSurfaceScatteringMapFileName = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (SubSurfaceScatteringMapFileName.IsEmpty())
+		SubSurfaceScatteringMap.Release();
+
+	if (IsLoadedOrLoading() && !SubSurfaceScatteringMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -718,7 +734,7 @@ void ZERNStandardMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileNa
 
 const ZEString& ZERNStandardMaterial::GetSubSurfaceScatteringMapFile() const
 {
-	return SubSurfaceScatteringMapFile;
+	return SubSurfaceScatteringMapFileName;
 }
 
 void ZERNStandardMaterial::SetBaseMapEnabled(bool Enabled)
@@ -736,12 +752,13 @@ bool ZERNStandardMaterial::GetBaseMapEnabled() const
 	return BaseMapEnabled;
 }
 
-void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture* Map)
+void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture* Texture)
 {
 	UnregisterExternalResource(BaseMap);
-	BaseMap = Map;
+	BaseMap = Texture;
 	RegisterExternalResource(BaseMap);
-	BaseMapFile = "";
+	
+	BaseMapFileName = (BaseMap != NULL ? BaseMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetBaseMap() const
@@ -751,12 +768,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetBaseMap() const
 
 void ZERNStandardMaterial::SetBaseMapFile(const ZEString& FileName)
 {
-	if (BaseMapFile == FileName)
+	if (ZEPathInfo::Compare(BaseMapFileName, FileName))
 		return;
 
-	BaseMapFile = FileName;
+	BaseMapFileName = FileName;
 
-	if (IsLoadedOrLoading())
+	if (BaseMapFileName.IsEmpty())
+		BaseMap.Release();
+
+	if (IsLoadedOrLoading() && !BaseMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -773,7 +793,7 @@ void ZERNStandardMaterial::SetBaseMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetBaseMapFile() const
 {
-	return BaseMapFile;
+	return BaseMapFileName;
 }
 
 void ZERNStandardMaterial::SetAmbientEnabled(bool Enabled)
@@ -961,7 +981,8 @@ void ZERNStandardMaterial::SetSpecularMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(SpecularMap);
 	SpecularMap = Texture;
 	RegisterExternalResource(SpecularMap);
-	SpecularMapFile = "";
+	
+	SpecularMapFileName = (SpecularMap != NULL ? SpecularMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetSpecularMap() const
@@ -971,13 +992,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetSpecularMap() const
 
 void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 {
-	if (SpecularMapFile == FileName)
+	if (ZEPathInfo::Compare(SpecularMapFileName, FileName))
 		return;
 
-	SpecularMapFile = FileName;
+	SpecularMapFileName = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (SpecularMapFileName.IsEmpty())
+		SpecularMap.Release();
+
+	if (IsLoadedOrLoading() && !SpecularMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -994,7 +1017,7 @@ void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetSpecularMapFile() const
 {
-	return SpecularMapFile;
+	return SpecularMapFileName;
 }
 
 void ZERNStandardMaterial::SetSpecularGlossMapEnabled(bool Enabled)
@@ -1017,7 +1040,8 @@ void ZERNStandardMaterial::SetSpecularGlossMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(SpecularGlossMap);
 	SpecularGlossMap = Texture;
 	RegisterExternalResource(SpecularGlossMap);
-	SpecularGlossMapFile = "";
+
+	SpecularGlossMapFile = (SpecularGlossMap != NULL ? SpecularGlossMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetSpecularGlossMap() const
@@ -1027,13 +1051,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetSpecularGlossMap() const
 
 void ZERNStandardMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 {
-	if (SpecularGlossMapFile == FileName)
+	if (ZEPathInfo::Compare(SpecularGlossMapFile, FileName))
 		return;
 
 	SpecularGlossMapFile = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (SpecularGlossMapFile.IsEmpty())
+		SpecularGlossMap.Release();
+
+	if (IsLoadedOrLoading() && !SpecularGlossMapFile.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1118,7 +1144,8 @@ void ZERNStandardMaterial::SetEmissiveMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(EmissiveMap);
 	EmissiveMap = Texture;
 	RegisterExternalResource(EmissiveMap);
-	EmissiveMapFile = "";
+
+	EmissiveMapFileName = (EmissiveMap != NULL ? EmissiveMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetEmissiveMap() const
@@ -1128,13 +1155,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetEmissiveMap() const
 
 void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 {
-	if (EmissiveMapFile == FileName)
+	if (ZEPathInfo::Compare(EmissiveMapFileName, FileName))
 		return;
 
-	EmissiveMapFile = FileName;
+	EmissiveMapFileName = FileName;
 	
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (EmissiveMapFileName.IsEmpty())
+		EmissiveMap.Release();
+
+	if (IsLoadedOrLoading() && !EmissiveMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1151,7 +1180,7 @@ void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetEmissiveMapFile() const
 {
-	return EmissiveMapFile;
+	return EmissiveMapFileName;
 }
 
 void ZERNStandardMaterial::SetNormalMapEnabled(bool Enabled)
@@ -1171,8 +1200,11 @@ bool ZERNStandardMaterial::GetNormalMapEnabled() const
 
 void ZERNStandardMaterial::SetNormalMap(const ZEGRTexture* Texture)
 {
+	UnregisterExternalResource(NormalMap);
 	NormalMap = Texture;
-	NormalMapFile = "";
+	RegisterExternalResource(NormalMap);
+	
+	NormalMapFileName = (NormalMap != NULL ? NormalMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetNormalMap() const
@@ -1182,13 +1214,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetNormalMap() const
 
 void ZERNStandardMaterial::SetNormalMapFile(const ZEString& FileName)
 {
-	if (NormalMapFile == FileName)
+	if (ZEPathInfo::Compare(NormalMapFileName, FileName))
 		return;
 	
-	NormalMapFile = FileName;
+	NormalMapFileName = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (NormalMapFileName.IsEmpty())
+		NormalMap.Release();
+
+	if (IsLoadedOrLoading() && !NormalMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1205,7 +1239,7 @@ void ZERNStandardMaterial::SetNormalMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetNormalMapFile() const
 {
-	return NormalMapFile;
+	return NormalMapFileName;
 }
 
 void ZERNStandardMaterial::SetHeightMapEnabled(bool Enabled)
@@ -1273,7 +1307,8 @@ void ZERNStandardMaterial::SetHeightMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(HeightMap);
 	HeightMap = Texture;
 	RegisterExternalResource(HeightMap);
-	HeightMapFile = "";
+
+	HeightMapFileName = (HeightMap != NULL ? HeightMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetHeightMap() const
@@ -1283,13 +1318,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetHeightMap() const
 
 void ZERNStandardMaterial::SetHeightMapFile(const ZEString& FileName)
 {
-	if (HeightMapFile == FileName)
+	if (ZEPathInfo::Compare(HeightMapFileName, FileName))
 		return;
 
-	HeightMapFile = FileName;
+	HeightMapFileName = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (HeightMapFileName.IsEmpty())
+		HeightMap.Release();
+
+	if (IsLoadedOrLoading() && !HeightMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1306,7 +1343,7 @@ void ZERNStandardMaterial::SetHeightMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetHeightMapFile() const
 {
-	return HeightMapFile;
+	return HeightMapFileName;
 }
 
 void ZERNStandardMaterial::SetOpacity(float Value)
@@ -1340,8 +1377,11 @@ bool ZERNStandardMaterial::GetOpacityMapEnabled() const
 
 void ZERNStandardMaterial::SetOpacityMap(const ZEGRTexture* Texture)
 {
+	UnregisterExternalResource(OpacityMap);
 	OpacityMap = Texture;
-	OpacityMapFile = "";
+	RegisterExternalResource(OpacityMap);
+
+	OpacityMapFileName = (OpacityMap != NULL ? OpacityMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetOpacityMap() const
@@ -1351,13 +1391,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetOpacityMap() const
 
 void ZERNStandardMaterial::SetOpacityMapFile(const ZEString& FileName)
 {
-	if (OpacityMapFile == FileName)
+	if (ZEPathInfo::Compare(OpacityMapFileName, FileName))
 		return;
 
-	OpacityMapFile = FileName;
+	OpacityMapFileName = FileName;
 
-	ZERSResourceState State = GetState();
-	if (IsLoadedOrLoading())
+	if (OpacityMapFileName.IsEmpty())
+		OpacityMap.Release();
+
+	if (IsLoadedOrLoading() && !OpacityMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1374,7 +1416,7 @@ void ZERNStandardMaterial::SetOpacityMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetOpacityMapFile() const
 {
-	return OpacityMapFile;
+	return OpacityMapFileName;
 }
 
 void ZERNStandardMaterial::SetEnvironmentMapEnabled(bool Enabled)
@@ -1394,8 +1436,11 @@ bool ZERNStandardMaterial::GetEnvironmentMapEnabled() const
 
 void ZERNStandardMaterial::SetEnvironmentMap(const ZEGRTexture* Texture)
 {
+	UnregisterExternalResource(EnvironmentMap);
 	EnvironmentMap = Texture;
-	EnvironmentMapFile = "";
+	RegisterExternalResource(EnvironmentMap);
+
+	EnvironmentMapFileName = (EnvironmentMap != NULL ? EnvironmentMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetEnvironmentMap() const
@@ -1405,12 +1450,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetEnvironmentMap() const
 
 void ZERNStandardMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 {
-	if (EnvironmentMapFile == FileName)
+	if (ZEPathInfo::Compare(EnvironmentMapFileName, FileName))
 		return;
 
-	EnvironmentMapFile = FileName;
+	EnvironmentMapFileName = FileName;
 
-	if (IsLoadedOrLoading())
+	if (EnvironmentMapFileName.IsEmpty())
+		EnvironmentMap.Release();
+
+	if (IsLoadedOrLoading() && !EnvironmentMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1427,7 +1475,7 @@ void ZERNStandardMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetEnvironmentMapFile() const
 {
-	return EnvironmentMapFile;
+	return EnvironmentMapFileName;
 }
 
 void ZERNStandardMaterial::SetReflectionEnabled(bool Enabled)
@@ -1631,7 +1679,8 @@ void ZERNStandardMaterial::SetDetailBaseMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(DetailBaseMap);
 	DetailBaseMap = Texture;
 	RegisterExternalResource(DetailBaseMap);
-	DetailBaseMapFile = "";
+
+	DetailBaseMapFileName = (DetailBaseMap != NULL ? DetailBaseMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetDetailBaseMap() const
@@ -1641,12 +1690,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetDetailBaseMap() const
 
 void ZERNStandardMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 {
-	if (DetailBaseMapFile == FileName)
+	if (ZEPathInfo::Compare(DetailBaseMapFileName, FileName))
 		return;
 
-	DetailBaseMapFile = FileName;
+	DetailBaseMapFileName = FileName;
 
-	if (IsLoadedOrLoading())
+	if (DetailBaseMapFileName.IsEmpty())
+		DetailBaseMap.Release();
+
+	if (IsLoadedOrLoading() && !DetailBaseMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1663,7 +1715,7 @@ void ZERNStandardMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetDetailBaseMapFile() const
 {
-	return DetailBaseMapFile;
+	return DetailBaseMapFileName;
 }
 
 void ZERNStandardMaterial::SetDetailNormalMapEnabled(bool Enabled)
@@ -1746,7 +1798,8 @@ void ZERNStandardMaterial::SetDetailNormalMap(const ZEGRTexture* Texture)
 	UnregisterExternalResource(DetailNormalMap);
 	DetailNormalMap = Texture;
 	RegisterExternalResource(DetailNormalMap);
-	DetailNormalMapFile = "";
+
+	DetailNormalMapFileName = (DetailNormalMap != NULL ? DetailNormalMap->GetFileName() : "");
 }
 
 const ZEGRTexture* ZERNStandardMaterial::GetDetailNormalMap() const
@@ -1756,12 +1809,15 @@ const ZEGRTexture* ZERNStandardMaterial::GetDetailNormalMap() const
 
 void ZERNStandardMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 {
-	if (DetailNormalMapFile == FileName)
+	if (ZEPathInfo::Compare(DetailNormalMapFileName, FileName))
 		return;
 
-	DetailNormalMapFile = FileName;
+	DetailNormalMapFileName = FileName;
 
-	if (IsLoadedOrLoading())
+	if (DetailNormalMapFileName.IsEmpty())
+		DetailNormalMap.Release();
+
+	if (IsLoadedOrLoading() && !DetailNormalMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
@@ -1778,7 +1834,7 @@ void ZERNStandardMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 
 const ZEString& ZERNStandardMaterial::GetDetailNormalMapFile() const
 {
-	return DetailNormalMapFile;
+	return DetailNormalMapFileName;
 }
 
 void ZERNStandardMaterial::SetClippingPlanesEnabled(bool Enabled)

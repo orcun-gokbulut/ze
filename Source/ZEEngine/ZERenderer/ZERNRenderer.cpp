@@ -532,8 +532,6 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 		return;
 
 	Command->SceneIndex = (ZEInt)Scenes.GetCount() - 1;
-	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
-
 	if (Command->InstanceTag != NULL)
 	{
 		bool Found = false;

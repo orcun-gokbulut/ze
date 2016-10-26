@@ -41,7 +41,8 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
-#include "ZERenderer/ZERNMap.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
 class ZEGRShader;
@@ -65,10 +66,10 @@ class ZERNParticleMaterial : public ZERNMaterial
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
 
-		ZERNMap									DiffuseMap;
-		ZERNMap									EmissiveMap;
-		ZERNMap									NormalMap;
-		ZERNMap									OpacityMap;
+		ZEHolder<const ZEGRTexture>				DiffuseMap;
+		ZEHolder<const ZEGRTexture>				EmissiveMap;
+		ZEHolder<const ZEGRTexture>				NormalMap;
+		ZEHolder<const ZEGRTexture>				OpacityMap;
 
 		bool									ShadowCaster;
 		bool									AlphaCullEnabled;
@@ -77,15 +78,19 @@ class ZERNParticleMaterial : public ZERNMaterial
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
 		bool									DiffuseMapEnabled;
+		ZEString								DiffuseMapFileName;
 		bool									DiffuseEnabled;
 		float									DiffuseFactor;
 		ZEVector3								DiffuseColor;
 		bool									EmissiveMapEnabled;
+		ZEString								EmissiveMapFileName;
 		bool									EmissiveEnabled;
 		float									EmissiveFactor;
 		ZEVector3								EmissiveColor;
 		bool									NormalMapEnabled;
+		ZEString								NormalMapFileName;
 		bool									OpacityMapEnabled;
+		ZEString								OpacityMapFileName;
 
 		mutable struct
 		{
@@ -110,52 +115,49 @@ class ZERNParticleMaterial : public ZERNMaterial
 		bool									UpdateRenderState() const;
 		bool									UpdateConstantBuffer() const;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZETaskResult					LoadInternal();
+		virtual ZETaskResult					UnloadInternal();
 
 												ZERNParticleMaterial();
 
 	public:
 		virtual ZEUInt							GetStageMask() const;
 
-		void									SetFileName(const ZEString& Filename);
-		const ZEString&							GetFileName() const;
-
 		void									SetSampler(ZEHolder<ZEGRSampler> Sampler);
 		ZEHolder<ZEGRSampler>					GetSampler() const;
 
-		void									SetDiffuseMap(const ZERNMap& Map);
-		const ZERNMap&							GetDiffuseMap() const;
+		void									SetDiffuseMap(const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetDiffuseMap() const;
 
-		void									SetDiffuseMapFile(const ZEString& Filename);
-		const ZEString&							GetDiffuseMapFile() const;
+		void									SetDiffuseMapFileName(const ZEString& Filename);
+		const ZEString&							GetDiffuseMapFileName() const;
 
-		void									SetEmissiveMap(const ZERNMap& Map);
-		const ZERNMap&							GetEmissiveMap() const;
+		void									SetEmissiveMap(const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetEmissiveMap() const;
 
-		void									SetEmissiveMapFile(const ZEString& Filename);
-		const ZEString&							GetEmissiveMapFile() const;
+		void									SetEmissiveMapFileName(const ZEString& Filename);
+		const ZEString&							GetEmissiveMapFileName() const;
 
-		void									SetNormalMap(const ZERNMap& Map);
-		const ZERNMap&							GetNormalMap() const;
+		void									SetNormalMap(const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetNormalMap() const;
 
-		void									SetNormalMapFile(const ZEString& Filename);
-		const ZEString&							GetNormalMapFile() const;
+		void									SetNormalMapFileName(const ZEString& Filename);
+		const ZEString&							GetNormalMapFileName() const;
 
-		void									SetOpacityMap(const ZERNMap& Map);
-		const ZERNMap&							GetOpacityMap() const;
+		void									SetOpacityMap(const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetOpacityMap() const;
 
-		void									SetOpacityMapFile(const ZEString& Filename);
-		const ZEString&							GetOpacityMapFile() const;
+		void									SetOpacityMapFileName(const ZEString& Filename);
+		const ZEString&							GetOpacityMapFileName() const;
 
 		void									SetSoftParticle(bool SoftParticle);
 		bool									GetSoftParticle() const;
 
 		void									SetDistanceMax(float DistanceMax);
-		bool									GetDistanceMax() const;
+		float									GetDistanceMax() const;
 
-		void									SetContrastPower(bool ContrastPower);
-		bool									GetContrastPower() const;
+		void									SetContrastPower(float ContrastPower);
+		float									GetContrastPower() const;
 
 		void									SetShadowCaster(bool ShadowCaster);
 		bool									GetShadowCaster() const;

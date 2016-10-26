@@ -44,6 +44,19 @@
 #include "ZEGraphics\ZEGRTexture.h"
 
 struct ZEFreeType;
+class ZEUIFontTrueType;
+
+class ZEUIFontTrueTypeIdentifier : public ZERSResourceIdentifier
+{
+	friend class ZEUIFontTrueType;
+	private:
+		ZEUIFontTrueType*					Font;
+
+											ZEUIFontTrueTypeIdentifier(ZEUIFontTrueType* Font);
+	public:
+		virtual bool						Equals(const ZERSResourceIdentifier* Identifier) const;
+		virtual ZEString					ToString() const;
+};
 
 class ZEUIFontTrueType : public ZEUIFont
 {
@@ -51,6 +64,8 @@ class ZEUIFontTrueType : public ZEUIFont
 	ZE_DISALLOW_COPY(ZEUIFontTrueType)
 	friend class ZERSTemplates;
 	private:
+		ZEUIFontTrueTypeIdentifier					Identifier;
+
 		ZEFreeType*									FreeType;
 
 		ZEUInt32									HorizontalOutputDPI;

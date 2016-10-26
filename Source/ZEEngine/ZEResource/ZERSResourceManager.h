@@ -45,6 +45,7 @@
 
 class ZERSResource;
 class ZERSResourceGroup;
+class ZERSResourceIdentifier;
 
 class ZERSResourceManager : public ZEObject
 {
@@ -69,7 +70,7 @@ class ZERSResourceManager : public ZEObject
 		ZERSResourceGroup*						GetResourceGroupInternal(ZEClass* ResourceClass);
 
 		ZERSHolder<const ZERSResource>			GetResourceInternal(ZEClass* ResourceClass, const ZEGUID& GUID);
-		ZERSHolder<const ZERSResource>			GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName);
+		ZERSHolder<const ZERSResource>			GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName, const ZERSResourceIdentifier* Identifier = NULL);
 	
 		void									RegisterResourceInternal(ZERSResource* Resource);
 		void									UnregisterResourceInternal(ZERSResource* Resource);
@@ -96,7 +97,7 @@ class ZERSResourceManager : public ZEObject
 		ZESize									GetMemoryUsageTotal();
 
 		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEGUID& GUID);
-		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEString& FileName);
+		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEString& FileName, const ZERSResourceIdentifier* Identifier = NULL);
 
 		void									RegisterResource(ZERSResource* Resource);
 

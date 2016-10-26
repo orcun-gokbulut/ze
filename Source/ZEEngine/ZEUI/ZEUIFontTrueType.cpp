@@ -44,6 +44,7 @@
 #include <freetype\ftglyph.h>
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEResource\ZERSTemplates.h"
+#include "ZEDS\ZEFormat.h"
 
 struct ZEFreeType
 {
@@ -61,6 +62,22 @@ struct ZEFontPixel
 	ZEUInt8	B;
 	ZEUInt8	A;
 };
+
+ZEUIFontTrueTypeIdentifier::ZEUIFontTrueTypeIdentifier(ZEUIFontTrueType* Font)
+{
+	this->Font = Font;
+}
+
+bool ZEUIFontTrueTypeIdentifier::Equals(const ZERSResourceIdentifier* Identifier) const
+{
+	const ZEUIFontTrueTypeIdentifier* Other = static_cast<const ZEUIFontTrueTypeIdentifier*>(Identifier);
+	return (Font->GetFontSize() == Other->Font->GetFontSize());
+}
+
+ZEString ZEUIFontTrueTypeIdentifier::ToString() const
+{
+	return ZEFormat::Format("{0}pt", Font->GetFontSize());
+}
 
 ZETaskResult ZEUIFontTrueType::LoadInternal()
 {
@@ -268,8 +285,10 @@ ZEHolder<const ZEUIFontTrueType> ZEUIFontTrueType::LoadResourceShared(const ZESt
 	return ZERSTemplates::LoadResourceShared<ZEUIFontTrueType>(FileName, Instanciator, &FontSize);
 }
 
-ZEUIFontTrueType::ZEUIFontTrueType()
+ZEUIFontTrueType::ZEUIFontTrueType() : Identifier(this)
 {
+	SetIdentifier(&Identifier);
+
 	FreeType = new ZEFreeType();
 	FreeType->Face = NULL;
 	FreeType->Library = NULL;
