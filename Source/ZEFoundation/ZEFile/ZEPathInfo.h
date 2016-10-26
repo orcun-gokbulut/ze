@@ -93,6 +93,7 @@ class ZEPathInfo
 									ZEPathInfo();
 									ZEPathInfo(const char* Path);
 
+		static bool					Compare(const ZEString& PathA, const ZEString& PathB);
 		static bool					Normalize(ZEPathTokenizer& Tokenizer);
 		static ZEString				CombineRelativePath(const char* ParentFilePath, const char* Path);
 };

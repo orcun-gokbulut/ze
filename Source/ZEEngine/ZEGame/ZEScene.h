@@ -84,7 +84,6 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEList2<ZEEntity>						RenderList;
 		ZEOctree<ZEEntity*>						RenderListOctree;
 
-		bool									PreRendering;
 		struct
 		{
 			ZEVector3							AmbientColor;

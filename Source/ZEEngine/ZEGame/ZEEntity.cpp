@@ -1136,7 +1136,7 @@ bool ZEEntity::IsFailed() const
 
 bool ZEEntity::IsDestroyed() const
 {
-	return TargetState == ZE_ES_DESTROYED;
+	return TargetState == ZE_ES_DESTROYED || TargetState == ZE_ES_DESTROYING;
 }
 
 ZEUInt ZEEntity::GetLoadingPercentage()
@@ -1149,9 +1149,6 @@ ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 {
 	ZEEntityLoadingScore TotalScore;
 	TotalScore.Count = 1;
-
-	EntityLock.Lock();
-
 	TotalScore.Score = GetLocalLoadingPercentage();
 
 	Components.LockRead();
@@ -1174,8 +1171,6 @@ ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 	}
 	ChildEntities.UnlockRead();
 
-	EntityLock.Unlock();
-	
 	return TotalScore;
 }
 
@@ -1226,10 +1221,10 @@ bool ZEEntity::GetStatic()
 
 void ZEEntity::Initialize()
 {
-	if (TargetState >= ZE_ES_INITIALIZED)
-		return;
-	
 	if (IsDestroyed())
+		return;
+
+	if (TargetState >= ZE_ES_INITIALIZED)
 		return;
 
 	TargetState = ZE_ES_INITIALIZED;
@@ -1239,12 +1234,12 @@ void ZEEntity::Initialize()
 
 void ZEEntity::Deinitialize()
 {
-	if (TargetState <= ZE_ES_LOADED)
-		return;
-
 	if (IsDestroyed())
 		return;
 
+	if (TargetState <= ZE_ES_LOADED)
+		return;
+	
 	UpdateState();
 }
 
@@ -1263,10 +1258,10 @@ void ZEEntity::Reinitialize()
 
 void ZEEntity::Load()
 {
-	if (TargetState >= ZE_ES_LOADED)
+	if (IsDestroyed())
 		return;
 
-	if (IsDestroyed())
+	if (TargetState >= ZE_ES_LOADED)
 		return;
 
 	TargetState = ZE_ES_LOADED;
@@ -1276,10 +1271,10 @@ void ZEEntity::Load()
 
 void ZEEntity::Unload()
 {
-	if (TargetState <= ZE_ES_NONE)
+	if (IsDestroyed())
 		return;
 
-	if (IsDestroyed())
+	if (TargetState <= ZE_ES_NONE)
 		return;
 
 	TargetState = ZE_ES_NONE;

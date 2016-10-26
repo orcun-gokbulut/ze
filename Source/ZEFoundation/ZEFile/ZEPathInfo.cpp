@@ -352,7 +352,7 @@ bool ZEPathInfo::Equals(const ZEPathInfo& OtherPath) const
 		return false;
 	}
 	
-	return (RealPath.Path == OtherRealPath.Path);
+	return (RealPath.Path.EqualsIncase(OtherRealPath.Path));
 }
 
 bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements, bool Recursive, void* Parameters)
@@ -401,6 +401,14 @@ ZEPathInfo::ZEPathInfo()
 ZEPathInfo::ZEPathInfo(const char* Path)
 {
 	SetPath(Path);
+}
+
+bool ZEPathInfo::Compare(const ZEString& PathA, const ZEString& PathB)
+{
+	ZEString PathANormalized = ZEPathInfo(PathA).Normalize();
+	ZEString PathBNormalized = ZEPathInfo(PathB).Normalize();
+
+	return PathANormalized.EqualsIncase(PathBNormalized);
 }
 
 ZEString ZEPathInfo::CombineRelativePath(const char* ParentFilePath, const char* Path)

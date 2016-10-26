@@ -41,9 +41,10 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEVector.h"
-#include "ZERNMap.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRRasterizerState.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRSampler.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -62,13 +63,14 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool									Transparent;
 		ZERNStageMask							StageMask;
 		ZEGRPrimitiveType						PrimitiveType;
-
+		ZEString								TextureFileName;
+		ZEHolder<const ZEGRTexture>				Texture;
+		ZEHolder<const ZEGRSampler>				Sampler;
+		
 		mutable ZEHolder<ZEGRShader>			VertexShader;
 		mutable ZEHolder<ZEGRShader>			PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
 		mutable ZEHolder<ZEGRBuffer>			ConstantBuffer;
-
-		ZERNMap									TextureMap;
 
 		struct
 		{
@@ -83,8 +85,8 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool									UpdateRenderState() const;
 		bool									UpdateConstantBuffer() const;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZETaskResult					LoadInternal();
+		virtual ZETaskResult					UnloadInternal();
 
 												ZERNSimpleMaterial();
 		virtual									~ZERNSimpleMaterial();
@@ -114,9 +116,15 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void									SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&						GetMaterialColor() const;
 
-		void									SetTexture(const ZERNMap& Map);
-		const ZERNMap&							GetTexture() const;
-	
+		void									SetTextureFileName(const ZEString& FileName);
+		const ZEString&							GetTextureFileName() const;
+
+		void									SetTexture(const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetTexture() const;
+		
+		void									SetSampler(const ZEGRSampler* Sampler);
+		const ZEGRSampler*						GetSampler() const;
+
 		void									SetVertexColorEnabled(bool Enable);
 		bool									GetVertexColorEnabled() const;
 

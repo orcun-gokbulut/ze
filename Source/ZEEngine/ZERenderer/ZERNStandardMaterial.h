@@ -153,7 +153,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										TransparencyEnabled;
 		ZERNTransparencyMode						TransparencyMode;
 		bool										BaseMapEnabled;
-		ZEString									BaseMapFile;
+		ZEString									BaseMapFileName;
 		bool										AmbientEnabled;
 		float										AmbientFactor;
 		ZEVector3									AmbientColor;
@@ -162,23 +162,23 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEVector3									DiffuseColor;
 		bool										SpecularEnabled;
 		bool										SpecularMapEnabled;
-		ZEString									SpecularMapFile;
+		ZEString									SpecularMapFileName;
 		bool										SpecularGlossMapEnabled;
 		ZEString									SpecularGlossMapFile;
 		float										SpecularFactor;
 		ZEVector3									SpecularColor;
 		bool										NormalMapEnabled;
-		ZEString									NormalMapFile;
+		ZEString									NormalMapFileName;
 		bool										HeightMapEnabled;
-		ZEString									HeightMapFile;
+		ZEString									HeightMapFileName;
 		ZERNHeightMapTechnique						HeightMapTechnique;
 		bool										EmissiveEnabled;
 		float										EmissiveFactor;
 		ZEVector3									EmissiveColor; 
 		bool										EmissiveMapEnabled;
-		ZEString									EmissiveMapFile;
+		ZEString									EmissiveMapFileName;
 		bool										SubSurfaceScatteringMapEnabled;
-		ZEString									SubSurfaceScatteringMapFile;
+		ZEString									SubSurfaceScatteringMapFileName;
 		bool										ReflectionEnabled;
 		float										ReflectionFactor;
 		ZEVector3									ReflectionColor;
@@ -186,13 +186,13 @@ class ZERNStandardMaterial : public ZERNMaterial
 		float										RefractionFactor;
 		ZEVector3									RefractionColor;
 		bool										OpacityMapEnabled;
-		ZEString									OpacityMapFile;
+		ZEString									OpacityMapFileName;
 		bool										EnvironmentMapEnabled;
-		ZEString									EnvironmentMapFile;
+		ZEString									EnvironmentMapFileName;
 		bool										DetailBaseMapEnabled;
-		ZEString									DetailBaseMapFile;
+		ZEString									DetailBaseMapFileName;
 		bool										DetailNormalMapEnabled;
-		ZEString									DetailNormalMapFile;
+		ZEString									DetailNormalMapFileName;
 		bool										ClippingPlanesEnabled;
 		
 		void										UpdateGBufferForwardVertexShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
@@ -250,14 +250,14 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetSubSurfaceScatteringMapEnabled() const;
 		void										SetSubSurfaceScatteringMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetSubSurfaceScatteringMap() const;
-		void										SetSubSurfaceScatteringMapFile(const ZEString& Filename);
+		void										SetSubSurfaceScatteringMapFile(const ZEString& FileName);
 		const ZEString&								GetSubSurfaceScatteringMapFile() const;
 
 		void										SetBaseMapEnabled(bool Enabled);
 		bool										GetBaseMapEnabled() const;
 		void										SetBaseMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetBaseMap() const;
-		void										SetBaseMapFile(const ZEString& Filename);
+		void										SetBaseMapFile(const ZEString& FileName);
 		const ZEString&								GetBaseMapFile() const;
 
 		void										SetAmbientEnabled(bool Enabled);
@@ -288,13 +288,13 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetSpecularMapEnabled() const;
 		void										SetSpecularMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetSpecularMap() const;
-		void										SetSpecularMapFile(const ZEString& Filename);
+		void										SetSpecularMapFile(const ZEString& FileName);
 		const ZEString&								GetSpecularMapFile() const;
 		void										SetSpecularGlossMapEnabled(bool Enabled);
 		bool										GetSpecularGlossMapEnabled() const;
 		void										SetSpecularGlossMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetSpecularGlossMap() const;
-		void										SetSpecularGlossMapFile(const ZEString& Filename);
+		void										SetSpecularGlossMapFile(const ZEString& FileName);
 		const ZEString&								GetSpecularGlossMapFile() const;
 
 		void										SetEmissiveEnabled(bool Enabled);
@@ -307,14 +307,14 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetEmissiveMapEnabled() const;
 		void										SetEmissiveMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetEmissiveMap() const;
-		void										SetEmissiveMapFile(const ZEString& Filename);
+		void										SetEmissiveMapFile(const ZEString& FileName);
 		const ZEString&								GetEmissiveMapFile() const;
 
 		void										SetNormalMapEnabled(bool Enabled);
 		bool										GetNormalMapEnabled() const;
 		void										SetNormalMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetNormalMap() const;
-		void										SetNormalMapFile(const ZEString& Filename);
+		void										SetNormalMapFile(const ZEString& FileName);
 		const ZEString&								GetNormalMapFile() const;
 
 		void										SetHeightMapEnabled(bool Enabled);
@@ -327,7 +327,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 		float										GetHeightMapScale() const;
 		void										SetHeightMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetHeightMap() const;
-		void										SetHeightMapFile(const ZEString& Filename);
+		void										SetHeightMapFile(const ZEString& FileName);
 		const ZEString&								GetHeightMapFile() const;
 
 		void										SetOpacity(float Value);
@@ -336,14 +336,14 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetOpacityMapEnabled() const;
 		void										SetOpacityMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetOpacityMap() const;
-		void										SetOpacityMapFile(const ZEString& Filename);
+		void										SetOpacityMapFile(const ZEString& FileName);
 		const ZEString&								GetOpacityMapFile() const;
 
 		void										SetEnvironmentMapEnabled(bool Enabled);
 		bool										GetEnvironmentMapEnabled() const;
 		void										SetEnvironmentMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetEnvironmentMap() const;
-		void										SetEnvironmentMapFile(const ZEString& Filename);
+		void										SetEnvironmentMapFile(const ZEString& FileName);
 		const ZEString&								GetEnvironmentMapFile() const;
 
 		void										SetReflectionEnabled(bool Enabled);
@@ -377,7 +377,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 		float										GetDetailBaseMapAttenuationFactor() const;
 		void										SetDetailBaseMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetDetailBaseMap() const;
-		void										SetDetailBaseMapFile(const ZEString& Filename);
+		void										SetDetailBaseMapFile(const ZEString& FileName);
 		const ZEString&								GetDetailBaseMapFile() const;
 
 		void										SetDetailNormalMapEnabled(bool Enabled);
@@ -392,7 +392,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 		float										GetDetailNormalMapAttenuationFactor() const;
 		void										SetDetailNormalMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*							GetDetailNormalMap() const;
-		void										SetDetailNormalMapFile(const ZEString& Filename);
+		void										SetDetailNormalMapFile(const ZEString& FileName);
 		const ZEString&								GetDetailNormalMapFile() const;
 
 		void										SetClippingPlanesEnabled(bool Enabled);

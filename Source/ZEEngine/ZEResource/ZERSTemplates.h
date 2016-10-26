@@ -42,7 +42,7 @@
 #include "ZERSResourceManager.h"
 
 class ZERSResource;
-class ZERSResourceLoadable;
+class ZERSResourceIdentifier;
 
 class ZERSTemplates
 {
@@ -154,8 +154,9 @@ ZERSHolder<ZERSResourceObject> ZERSTemplates::LoadResource(const ZEString& FileN
 	if (Resource == NULL)
 		return NULL;
 
+	Resource->SetFileName(FileName);
 	Resource->StagingRealized();
-	Resource->Load(FileName);
+	Resource->Load();
 
 	return Resource;
 }
@@ -175,7 +176,8 @@ ZERSHolder<const ZERSResourceObject> ZERSTemplates::LoadResourceShared(const ZES
 	if (StagingResource != NULL)
 	{
 		StagingResource->StagingRealized();
-		StagingResource->Load(FileName);
+		StagingResource->SetFileName(FileName);
+		StagingResource->Load();
 	}
 
 	return static_cast<const ZERSResourceObject*>(SharedResource.GetPointer());

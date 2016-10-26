@@ -207,11 +207,11 @@ void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 
 void ZEScene::AddToRenderList(ZEEntity* Entity)
 {
-	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
-	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
-
 	RenderList.LockWrite();
 
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
+	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
+	
 	if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
 	{
 		RenderList.UnlockWrite();
@@ -237,9 +237,15 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 	RenderList.LockWrite();
 	
 	if (Entity->RenderListLink.GetInUse())
+	{
 		RenderList.Remove(&Entity->RenderListLink);
+		Entity->RenderListOctree = NULL;
+	}
 	else if (Entity->RenderListOctree != NULL)
+	{
 		Entity->RenderListOctree->RemoveItem(Entity);
+		Entity->RenderListOctree = NULL;
+	}
 	
 	RenderList.UnlockWrite();
 }
@@ -684,7 +690,6 @@ ZEScene::ZEScene()
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.1f;
 	SpatialDatabase = false;
-	PreRendering = true;
 
 	Constants.AmbientColor = ZEVector3::Zero;
 

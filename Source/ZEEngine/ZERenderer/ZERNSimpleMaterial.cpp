@@ -47,6 +47,7 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
+#include "ZEFile/ZEPathInfo.h"
 
 #define ZERN_SMDF_RENDER_STATE		1
 #define ZERN_SMDF_CONSTANT_BUFFER	2
@@ -127,26 +128,32 @@ bool ZERNSimpleMaterial::UpdateConstantBuffer() const
 	return true;
 }
 
-bool ZERNSimpleMaterial::InitializeInternal()
+ZETaskResult ZERNSimpleMaterial::LoadInternal()
 {
-	if (!ZERNMaterial::InitializeInternal())
-		return false;
-
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	if (ConstantBuffer == NULL)
+		return ZE_TR_FAILED;
+
+	if (!TextureFileName.IsEmpty())
+	{
+		ZEGRTextureOptions Options;
+		Options.Type = ZEGR_TT_2D;
+		Texture = ZEGRTexture::LoadResourceShared(TextureFileName, Options);
+	}
 
 	if (!UpdateShaders())
-		return false;
+		return ZE_TR_FAILED;
 
 	if (!UpdateRenderState())
-		return false;
+		return ZE_TR_FAILED;
 
 	if (!UpdateConstantBuffer())
-		return false;
+		return ZE_TR_FAILED;
 
-	return true;
+	return ZE_TR_DONE;
 }
 
-bool ZERNSimpleMaterial::DeinitializeInternal()
+ZETaskResult ZERNSimpleMaterial::UnloadInternal()
 {
 	DirtyFlags.RaiseAll();
 	StageMask = 0;
@@ -155,8 +162,9 @@ bool ZERNSimpleMaterial::DeinitializeInternal()
 	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();
+	Texture.Release();
 
-	return ZERNMaterial::DeinitializeInternal();
+	return ZE_TR_DONE;
 }
 
 ZERNSimpleMaterial::ZERNSimpleMaterial()
@@ -170,7 +178,7 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	Transparent = false;
 	PrimitiveType = ZEGR_PT_LINE_LIST;
 	StageMask = ZERN_STAGE_FORWARD;
-
+	Sampler = ZEGRSampler::GetDefaultSampler();
 	Constants.MaterialColor = ZEVector4::One;
 	Constants.TextureEnabled = false;
 	Constants.VertexColorEnabled = true;
@@ -305,21 +313,54 @@ const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 	return Constants.MaterialColor;
 }
 
-void ZERNSimpleMaterial::SetTexture(const ZERNMap& Map)
+void ZERNSimpleMaterial::SetTextureFileName(const ZEString& FileName)
 {
-	TextureMap = Map;
-	
-	bool TextureEnabled = (Map.GetTexture() != NULL);
-	if ((bool)Constants.TextureEnabled == TextureEnabled)
+	if (ZEPathInfo::Compare(TextureFileName, FileName))
 		return;
-	
-	Constants.TextureEnabled = TextureEnabled;
-	DirtyFlags.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
+
+	TextureFileName = FileName;
+
+	if (TextureFileName.IsEmpty())
+		Texture.Release();
+
+	if (IsLoadedOrLoading() && !TextureFileName.IsEmpty())
+	{
+		ZEGRTextureOptions Options;
+		Options.Type = ZEGR_TT_2D;
+
+		UnregisterExternalResource(Texture);
+		Texture = ZEGRTexture::LoadResourceShared(FileName, Options);
+		RegisterExternalResource(Texture);
+	}
 }
 
-const ZERNMap& ZERNSimpleMaterial::GetTexture() const
+const ZEString& ZERNSimpleMaterial::GetTextureFileName() const
 {
-	return TextureMap;
+	return TextureFileName;
+}
+
+void ZERNSimpleMaterial::SetTexture(const ZEGRTexture* Texture)
+{
+	UnregisterExternalResource(Texture);
+	this->Texture = Texture;
+	RegisterExternalResource(Texture);
+
+	TextureFileName = Texture->GetFileName();
+}
+
+const ZEGRTexture* ZERNSimpleMaterial::GetTexture() const
+{
+	return Texture;
+}
+
+void ZERNSimpleMaterial::SetSampler(const ZEGRSampler* Sampler)
+{
+	this->Sampler = Sampler;
+}
+
+const ZEGRSampler* ZERNSimpleMaterial::GetSampler() const
+{
+	return Sampler;
 }
 
 bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
@@ -337,11 +378,8 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 
 	if (Constants.TextureEnabled)
 	{
-		const ZEGRSampler* Sampler = TextureMap.GetSampler();
-		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, &Sampler);
-
-		const ZEGRTexture* Texture = TextureMap.GetTexture();
-		Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, &Texture);
+		Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler.GetPointer());
+		Context->SetTexture(ZEGR_ST_PIXEL, 0, Texture.GetPointer());
 	}
 
 	return true;

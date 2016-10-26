@@ -67,10 +67,13 @@ bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
+	if (!IsLoaded())
+		return false;
+
 	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
 
-	if (!IsInitialized() || (Stage->GetId() != ZERN_STAGE_FORWARD_POST_HDR && !IsLoaded()))
+	if (Stage->GetId() != ZERN_STAGE_FORWARD_POST_HDR && !IsLoaded())
 		return false;
 
 	return true;
@@ -83,11 +86,8 @@ void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage,
 
 bool ZERNMaterial::Update() const
 {
- 	if (!IsInitialized())
- 	{
- 		if (!const_cast<ZERNMaterial*>(this)->Initialize())
- 			return false;
- 	}
+	if (!IsLoaded())
+		return false;
 
 	return true;
 }

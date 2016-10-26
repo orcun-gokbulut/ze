@@ -40,13 +40,13 @@
 
 #include "ZEError.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEDS/ZEFastDelegate.h"
+#include "ZERegEx/ZERegEx.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZERegEx/ZERegEx.h"
-#include "ZECore/ZECommandSection.h"
-#include "ZECore/ZECommand.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEDS/ZEFastDelegate.h"
+#include "ZECore/ZECommand.h"
+#include "ZECore/ZECommandSection.h"
 #include "ZECore/ZECommandManager.h"
 
 
@@ -105,7 +105,7 @@ ZERSResourceGroup* ZERSResourceManager::GetResourceGroupInternal(ZEClass* Resour
 	return NULL;
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName, const ZERSResourceIdentifier* Identifer)
 {
 	ZERSResourceGroup* Group = GetResourceGroupInternal(ResourceClass);
 	if (Group == NULL)
@@ -125,6 +125,12 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 		if (Resource->GetFileNameHash() == Hash && 
 			Resource->GetFileName().EqualsIncase(FileNameNormalized))
 		{
+			if (Identifer != NULL)
+			{
+				if (Resource->GetIdentifier() == NULL && !Identifer->Equals(Resource->GetIdentifier()))
+					continue;
+			}
+		
 			return Resource.GetPointer();
 		}
 	}
@@ -354,12 +360,12 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* Resourc
 	return Resource;
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* ResourceClass, const ZEString& FileName)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* ResourceClass, const ZEString& FileName, const ZERSResourceIdentifier* Identifier)
 {
 	zeCheckError(ResourceClass == NULL, NULL, "Cannot get resource. Resource Class is NULL.");
 
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(ResourceClass, FileName);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(ResourceClass, FileName, Identifier);
 	ManagerLock.Unlock();
 
 	return Resource;
