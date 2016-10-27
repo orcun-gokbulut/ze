@@ -107,7 +107,7 @@ bool ZEDEntityWrapper::InitializeInternal()
 	Material->SetVertexColorEnabled(true);
 	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 	Material->SetDepthTestDisabled(false);
-	Material->Update();
+	Material->Load();
 
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 

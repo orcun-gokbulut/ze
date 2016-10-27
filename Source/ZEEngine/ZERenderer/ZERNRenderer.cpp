@@ -515,15 +515,17 @@ void ZERNRenderer::BindStages()
 	}
 }
 
-void ZERNRenderer::StartScene(ZEScene* Scene)
+void ZERNRenderer::BeginScene(ZEScene* Scene)
 {
 	Scenes.Enqueue(Scene);
+	CurrentSceneIndex++;
 	Scene->RenderList.LockRead();
 }
 
 void ZERNRenderer::EndScene()
 {
-
+	CurrentSceneIndex--;
+	zeDebugCheck(CurrentSceneIndex < -1, "EndScene called befor BeginScene.");
 }
 
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
@@ -531,7 +533,7 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (!IsInitialized())
 		return;
 
-	Command->SceneIndex = (ZEInt)Scenes.GetCount() - 1;
+	Command->SceneIndex = CurrentSceneIndex;
 	if (Command->InstanceTag != NULL)
 	{
 		bool Found = false;
@@ -601,6 +603,7 @@ ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
 
+	CurrentSceneIndex = -1;
 	DirtyPipeline = false;
 	Resized = false;
 }

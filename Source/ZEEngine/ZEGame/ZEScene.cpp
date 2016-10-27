@@ -467,7 +467,7 @@ void ZEScene::Tick(float ElapsedTime)
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	Parameters->Renderer->StartScene(this);
+	Parameters->Renderer->BeginScene(this);
 
 	// Statistics
 	ZESize TotalRenderableEntity = 0;

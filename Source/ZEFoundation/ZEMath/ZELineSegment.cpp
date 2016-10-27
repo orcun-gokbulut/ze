@@ -51,15 +51,12 @@
 void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
 {
 	ZEVector3::Sub(LineSegment.v, End, Start);
-	LineSegment.Length = LineSegment.v.Length();
-	LineSegment.v = LineSegment.v.Normalize();
 	LineSegment.p = Start;
 }
 
 void ZELineSegment::CreateParametric(ZELineSegment& LineSegment, const ZEVector3& v, const ZEVector3& p)
 {
-	LineSegment.Length = v.Length();
-	LineSegment.v = v.Normalize();
+	LineSegment.v = v;
 	LineSegment.p = p;
 }
 
@@ -127,7 +124,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
             tN = e;
             tD = c;
         }
-        else if (sN > sD * LineSegment.Length) 
+        else if (sN > sD) 
 		{
             sN = sD;
             tN = e + b;
@@ -294,11 +291,12 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZER
 void ZELineSegment::GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegment, float TLineSegment)
 {
 	if (TLineSegment < 0.0f)
+	{
 		Point = LineSegment.p;
-	else if (TLineSegment > LineSegment.Length)
+	}
+	else if (TLineSegment * TLineSegment> LineSegment.v.LengthSquare())
 	{
 		ZEVector3::Add(Point, LineSegment.p, LineSegment.v);
-		ZEVector3::Scale(Point, Point, LineSegment.Length);
 	}
 	else
 	{
@@ -314,18 +312,34 @@ void ZELineSegment::GetStartPoint(ZEVector3& StartPoint, const ZELineSegment& Li
 
 void ZELineSegment::GetEndPoint(ZEVector3& EndPoint, const ZELineSegment& LineSegment)
 {
-	EndPoint = LineSegment.p + LineSegment.v * LineSegment.Length;
+	ZEVector3::Add(EndPoint, LineSegment.p, LineSegment.v);
+}
+
+ZEVector3 ZELineSegment::GetDirection() const
+{
+	return v.Normalize();
+}
+
+float ZELineSegment::GetLength() const
+{
+	return v.Length();
+}
+
+float ZELineSegment::GetLengthSquare() const
+{
+	return v.LengthSquare();
 }
 
 ZEVector3 ZELineSegment::GetPointOn(float TLineSegment) const
 {
 	ZEVector3 Temp;
 	if (TLineSegment < 0.0f)
+	{
 		Temp = p;
-	else if (TLineSegment > Length)
+	}
+	else if (TLineSegment * TLineSegment > v.LengthSquare())
 	{
 		ZEVector3::Add(Temp, p, v);
-		ZEVector3::Scale(Temp, Temp, Length);
 	}
 	else
 	{
@@ -343,7 +357,7 @@ const ZEVector3& ZELineSegment::GetStartPoint() const
 
 ZEVector3 ZELineSegment::GetEndPoint() const
 {
-	return p + v * Length;
+	return p + v;
 }
 
 ZELineSegment::ZELineSegment(const ZEVector3& Start, const ZEVector3& End)

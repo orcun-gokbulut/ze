@@ -78,6 +78,7 @@ class ZEDGizmo : public ZEEntity
 		ZEDGizmoAxis					HoveredAxis;
 		ZEDGizmoAxis					SelectedAxis;
 		float							AxisLength;
+		float							PickTreshold;
 
 		ZEVector3						PickOffset;
 		ZEVector3						InitialPosition;
@@ -133,6 +134,9 @@ class ZEDGizmo : public ZEEntity
 	
 		void							SetAxisLength(float Size);
 		float							GetAxisLength();
+
+		void							SetPickThreshold(float PixelCount);
+		float							GetPickThreashold() const;
 	
 		ZEDGizmoAxis					PickAxis(const ZERNView& View, const ZERay& Ray, float& TRay);
 	

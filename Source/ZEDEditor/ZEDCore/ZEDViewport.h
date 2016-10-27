@@ -50,6 +50,7 @@
 #include <QTimer>
 
 
+class ZEDGrid;
 class ZEDViewportManager;
 
 class ZEDViewport : public QWidget, public ZEDComponent
@@ -73,6 +74,8 @@ class ZEDViewport : public QWidget, public ZEDComponent
 
 		ZEVector2							MouseDelta;
 		ZEVector2							LastMousePosition;
+
+		ZEDGrid*							Grid;
 
 		ZEUInt								Modifiers;
 		ZEArray<ZEDViewportKeyboardEvent>	KeyboardEvents;

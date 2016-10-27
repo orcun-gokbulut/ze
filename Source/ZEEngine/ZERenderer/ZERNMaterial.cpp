@@ -73,9 +73,6 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, b
 	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
 
-	if (Stage->GetId() != ZERN_STAGE_FORWARD_POST_HDR && !IsLoaded())
-		return false;
-
 	return true;
 }
 

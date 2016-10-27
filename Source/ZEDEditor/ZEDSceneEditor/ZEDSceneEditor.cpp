@@ -97,9 +97,6 @@ bool ZEDSceneEditor::InitializeInternal()
 	StateScreen->SetManager(GetUIManager());
 	Scene->AddEntity(StateScreen);
 
-	ZEDGrid* Grid = ZEDGrid::CreateInstance();
-	Scene->AddEntity(Grid);
-
  	ZEModel* Trial = ZEModel::CreateInstance();
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Track-100.new.ZEMODEL");
 	Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");

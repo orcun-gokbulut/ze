@@ -117,10 +117,10 @@ ZEEntityResult ZEDGrid::LoadInternal()
 	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	Material->SetVertexColorEnabled(true);
 	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
-	Material->Update();
+	Material->Load();
 
 	RenderCommand.Entity = this;
-	RenderCommand.Priority = 0;
+	RenderCommand.Priority = -5;
 	RenderCommand.Order = 0;
 	RenderCommand.ExtraParameters = NULL;
 
