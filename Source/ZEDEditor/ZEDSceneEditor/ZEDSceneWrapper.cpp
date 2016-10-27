@@ -178,12 +178,9 @@ bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 
 void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	Parameters->Renderer->StartScene(GetScene());
-
 	GetScene()->PreRender(Parameters);
+
 	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 		PreRenderEntity(static_cast<ZEDEntityWrapper*>(Wrappers[I]), Parameters);
-
-	Parameters->Renderer->EndScene();
 }

@@ -82,7 +82,7 @@ ZEVector2 ZERNScreenUtilities::WorldToScreen(const ZERNView& View, const ZEVecto
 ZEVector2 ZERNScreenUtilities::ViewToScreen(const ZERNView& View, const ZEVector3& ViewCoords)
 {
 	ZEVector4 Output4;
-	ZEMatrix4x4::Transform(Output4, View.ViewProjectionTransform, ZEVector4(ViewCoords, 1.0f));
+	ZEMatrix4x4::Transform(Output4, View.ProjectionTransform, ZEVector4(ViewCoords, 1.0f));
 	
 	ZEVector2 ClipCoords;
 	ClipCoords.x = Output4.x / Output4.w;

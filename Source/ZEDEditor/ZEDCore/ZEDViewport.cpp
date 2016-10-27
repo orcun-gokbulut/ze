@@ -62,6 +62,7 @@
 #include "ZERenderer\ZERNStageRenderDepth.h"
 #include "ZERenderer\ZERNStageResolving.h"
 #include "ZERenderer\ZERNRenderParameters.h"
+#include "ZEDGrid.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -228,6 +229,9 @@ bool ZEDViewport::InitializeInternal()
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);
 
+	Grid = ZEDGrid::CreateInstance();
+	Grid->Initialize();
+
 	if (!Renderer.Initialize())
 		return false;
 
@@ -241,6 +245,7 @@ bool ZEDViewport::DeinitializeInternal()
 	Renderer.Deinitialize();
 	Window->Destroy();
 	Window = NULL;
+	Grid->Destroy();
 
 	return ZEDComponent::DeinitializeInternal();
 }
@@ -525,6 +530,8 @@ bool ZEDViewport::PreRender()
 	ZERNPreRenderParameters Parameters;
 	Parameters.Renderer = &Renderer;
 	Parameters.View = &View;
+
+	Grid->PreRender(&Parameters);
 
 	ZEDViewportRenderEvent Event;
 	Event.Viewport = this;

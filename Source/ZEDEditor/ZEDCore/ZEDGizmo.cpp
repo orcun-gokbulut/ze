@@ -51,6 +51,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNScreenUtilities.h"
 
 #define ZED_GDF_GIZMO				0x01
 #define ZED_GDF_VERTEX_BUFFER		0x02
@@ -739,11 +740,9 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
 {
 	const ZEVector3& Position = GetWorldPosition();
-
 	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
-	float AxisTreshold = AxisLength * 0.1f;
-
+	
 	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
 	ZEVector3 Right, Up, Front;
 	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetWorldRotation());
@@ -793,25 +792,41 @@ ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, floa
 	}
 
 	// Check Line Segments
-	ZELineSegment XAxis(Position, Position +  1.5f * Right * AxisLength);
-	if ((ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	ZELineSegment XAxis(Position, Position + Right * AxisLength);
+	ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay);
+	ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, XAxis.GetPointOn(TLineSegment));
+	ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	float MinDistanceSquare = ZE_FLOAT_MAX;
+	if (DistanceSquare < PickTreshold)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_X_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
-
-	ZELineSegment YAxis(Position, Position +  1.5f * Up * AxisLength);
-	if ((ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay)) < AxisTreshold && (NewTRay < TRay))
+	
+	ZELineSegment YAxis(Position, Position + Up * AxisLength);
+	ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay);
+	PointA = ZERNScreenUtilities::WorldToScreen(View, YAxis.GetPointOn(TLineSegment));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	if (DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_Y_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
 
-	ZELineSegment ZAxis(Position, Position +  1.5f * Front * AxisLength);
-	if ((ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	ZELineSegment ZAxis(Position, Position + Front * AxisLength);
+	ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay);
+	PointA = ZERNScreenUtilities::WorldToScreen(View, ZAxis.GetPointOn(TLineSegment));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	if (DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_Z_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
 	
 	return PickedAxis;
@@ -822,7 +837,7 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 	const ZEVector3& Position = GetWorldPosition();
 
 	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
-	float AxisTreshold = AxisLength * 0.1f;
+	float AxisTreshold = this->PickTreshold * this->PickTreshold;
 
 	ZEVector3 Right, Up, Front;
 	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetWorldRotation());
@@ -831,32 +846,44 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 
 	float NewTRay;
 	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
+	float DistanceSquareMin = ZE_FLOAT_MAX;
 
 	// X Axis
 	ZEPlane AxisXPlane(Right, Position);
 	if (ZEPlane::IntersectionTest(AxisXPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
-			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)
+		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
 		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_X_AXIS;
+			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+			if (DistanceSquare < AxisTreshold)
+			{
+				TRay = NewTRay;
+				PickedAxis = ZED_GA_X_AXIS;
+			}
 		}
 	}
+
+	
 	
 	ZEPlane AxisYPlane(Up, Position);
 	if (ZEPlane::IntersectionTest(AxisYPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-
-		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
-			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)
+		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
 		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_Y_AXIS;
+			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+			if (DistanceSquare < AxisTreshold && DistanceSquare < DistanceSquareMin)
+			{
+				TRay = NewTRay;
+				PickedAxis = ZED_GA_Y_AXIS;
+			}
 		}
 	}
 	
@@ -864,13 +891,17 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 	if (ZEPlane::IntersectionTest(AxisZPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-
-		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold) /* &&
-			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)*/
+		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
 		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_Z_AXIS;
+			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+			if (DistanceSquare < AxisTreshold && DistanceSquare < DistanceSquareMin)
+			{
+				TRay = NewTRay;
+				PickedAxis = ZED_GA_Z_AXIS;
+			}
 		}
 	}
 	
@@ -883,7 +914,7 @@ ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, flo
 
 	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
-	float AxisTreshold = AxisLength * 0.1f;
+	float AxisThreshold = this->PickTreshold * this->PickTreshold;
 
 	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
 	ZEVector3 Right, Up, Front;
@@ -929,25 +960,42 @@ ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, flo
 
 	// Check Line Segments
 	ZELineSegment XAxis(Position, Position + Right * AxisLength);
-	if ((ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay);
+	ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, XAxis.GetPointOn(TLineSegment));
+	ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	float MinDistanceSquare = ZE_FLOAT_MAX;
+	if (DistanceSquare < AxisThreshold)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_X_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
 
 	ZELineSegment YAxis(Position, Position + Up * AxisLength);
-	if ((ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay);
+	PointA = ZERNScreenUtilities::WorldToScreen(View, YAxis.GetPointOn(TLineSegment));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	if (DistanceSquare < AxisThreshold && DistanceSquare < MinDistanceSquare)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_Y_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
 
 	ZELineSegment ZAxis(Position, Position + Front * AxisLength);
-	if ((ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay);
+	PointA = ZERNScreenUtilities::WorldToScreen(View, ZAxis.GetPointOn(TLineSegment));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
+	if (DistanceSquare < AxisThreshold && DistanceSquare < MinDistanceSquare)
 	{
 		TRay = NewTRay;
 		PickedAxis = ZED_GA_Z_AXIS;
+		MinDistanceSquare = DistanceSquare;
 	}
+
 	
 	return PickedAxis;
 }
@@ -1017,6 +1065,16 @@ float ZEDGizmo::GetAxisLength()
 	return AxisLength;
 }
 
+void ZEDGizmo::SetPickThreshold(float Size)
+{
+	PickTreshold = Size;
+}
+
+float ZEDGizmo::GetPickThreashold() const
+{
+	return PickTreshold;
+}
+
 ZEEntityResult ZEDGizmo::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
@@ -1029,7 +1087,7 @@ ZEEntityResult ZEDGizmo::LoadInternal()
 	MaterialLines->SetTwoSided(true);
 	MaterialLines->SetDepthTestDisabled(true);
 	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
-	MaterialLines->Update();
+	MaterialLines->Load();
 	zeCheckError(MaterialLines == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create line material.");
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
@@ -1037,7 +1095,7 @@ ZEEntityResult ZEDGizmo::LoadInternal()
 	MaterialTriangles->SetTwoSided(true);
 	MaterialTriangles->SetDepthTestDisabled(true);
 	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
-	MaterialTriangles->Update();
+	MaterialTriangles->Load();
 	zeCheckError(MaterialTriangles == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create triangle material.");
 
 	return ZE_ER_DONE;
@@ -1235,11 +1293,13 @@ ZEDGizmo::ZEDGizmo()
 	SelectedAxis = ZED_GA_NONE;
 	Mode = ZED_GM_NONE;
 	AxisLength = 0.1f;
+	PickTreshold = 5;
 
 	PickOffset = ZEVector3::Zero;
 	InitialRotation = ZEQuaternion::Identity;
 	InitialScale = ZEVector3::One;
 
+	RenderCommand.Priority = 5;
 	RenderCommand.Entity = this;
 
 	SetEntityFlags(ZE_EF_RENDERABLE);

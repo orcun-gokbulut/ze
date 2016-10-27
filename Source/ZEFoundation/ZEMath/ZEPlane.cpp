@@ -91,7 +91,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
 		return false;
 
     t = N / D;
-    if (t < 0.0f || t >= LineSegment.Length)
+    if (t < 0.0f || t >= LineSegment.GetLength())
         return false;
 
 	return true;

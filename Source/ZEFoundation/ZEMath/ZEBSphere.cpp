@@ -232,10 +232,10 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSe
 	if(Max < 0.0f)
 		return false;
 
-	if (Min > LineSegment.Length)
+	if (Min > LineSegment.GetLength())
 		return false;
 
-	if(Max > LineSegment.Length)
+	if(Max > LineSegment.GetLength())
 		Max = Min;
 
 	MinT = Min;

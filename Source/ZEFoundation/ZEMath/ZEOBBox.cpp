@@ -264,29 +264,29 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 
 	ZEInt Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &LineSegment, TempTMin, TempTMax);
 
-	if(Result == 0)
+	if (Result == 0)
 		return false;
 	
 	if (Result == 2)
-		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.GetLength())
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &LineSegment, TempTMin, TempTMax);
 
-	if(Result == 0)
+	if (Result == 0)
 		return false;
 
 	if (Result == 2)
-		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.GetLength())
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Front, BoundingBox.HalfSize.z, &LineSegment, TempTMin, TempTMax);
 
-	if(Result == 0)
+	if (Result == 0)
 		return false;
 
 	if (Result == 2)
-		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.GetLength())
 			return false;
 
 	if (TempTMin > 0.0f)
@@ -299,10 +299,10 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		TMin = TMax = TempTMax;
 	}
 
-	if(TMax > LineSegment.Length) // Fazlalıkları çıkart
+	if (TMax > LineSegment.GetLength())
 		TMax = TMin;
 
-	if(TMin > LineSegment.Length)
+	if (TMin > LineSegment.GetLength())
 	{
 		TMin = TMax;
 		return false;
