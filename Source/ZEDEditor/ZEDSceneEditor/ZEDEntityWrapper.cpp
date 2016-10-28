@@ -48,12 +48,13 @@
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectManager.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEUI/ZEUIFontTrueType.h"
 
 void ZEDEntityWrapper::UpdateNamingPlate()
 {
 	ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
 
-	if (GetEntity() == NULL || stricmp(GetEntity()->Class()->GetAttributeValue("ZEDEditor.ObjectWrapper.NamePlate", 0, "true"), "true") != 0)
+	if (GetEntity() == NULL || !GetNamePlateVisible())
 	{
 		if (NamePlate != NULL)
 		{	
@@ -81,8 +82,9 @@ void ZEDEntityWrapper::UpdateNamingPlate()
 			NamePlateName = ZEUILabel::CreateInstance();
 			NamePlateName->SetSize(ZEVector2(200.0f, 40.0f));
 			NamePlateName->SetPosition(ZEVector2(36.0f, 2.0f));
+			NamePlateName->SetFontResource(ZEUIFontTrueType::LoadResourceShared("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Bold.ttf", 14).GetPointer());
 			NamePlate->AddChildControl(NamePlateName);
-
+			
 			NamePlateClass = ZEUILabel::CreateInstance();
 			NamePlateClass->SetSize(ZEVector2(200.0f, 40.0f));
 			NamePlateClass->SetPosition(ZEVector2(36.0f, 16.0f));
@@ -104,7 +106,7 @@ void ZEDEntityWrapper::UpdateNamingPlate()
 			NamePlateName->SetFontColor(ZEVector4(0.75f, 0.75f, 0.75f, 1.0f));
 		}
 		
-		NamePlateIcon->SetTextureFileName(GetObjectClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon"));
+		NamePlateIcon->SetTextureFileName(GetIconFileName());
 		NamePlateName->SetText(ZEFormat::Format("{0} ({1})", GetName(), GetId()));
 		NamePlateClass->SetText(ZEFormat::Format("Class: {0}", GetObjectClass()->GetName()));
 	}

@@ -163,4 +163,5 @@ class ZESoundSource : public ZEEntity
 		ZEHolder<const ZESoundResource>		GetSoundResource() const;
 
 		static ZESoundSource*				CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZESound.png");

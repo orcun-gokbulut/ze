@@ -662,7 +662,6 @@ ZECore::ZECore()
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
-	ZEGRGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();
 	
@@ -679,7 +678,6 @@ ZECore::ZECore()
 
 ZECore::~ZECore()
 {
-	ZEGRGraphicsModule::BaseDeinitialize();
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 

@@ -297,7 +297,6 @@ bool ZEDObjectWrapper::GetFocused() const
 	return Focused;
 }
 
-
 void ZEDObjectWrapper::SetVisible(bool Value)
 {
 	
@@ -307,6 +306,17 @@ bool ZEDObjectWrapper::GetVisible() const
 {
 	return true;
 }
+
+bool ZEDObjectWrapper::GetNamePlateVisible()
+{
+	return stricmp(GetObjectClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.NamePlate", 0, "true"), "true") == 0;
+}
+
+ZEString ZEDObjectWrapper::GetIconFileName()
+{
+	return GetObjectClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon");
+}
+
 
 QWidget* ZEDObjectWrapper::GetCustomWidget() const
 {

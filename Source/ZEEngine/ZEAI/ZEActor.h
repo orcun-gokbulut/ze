@@ -34,9 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_ACTOR_H__
-#define __ZE_ACTOR_H__
-
 
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEFlags.h"
@@ -111,5 +108,4 @@ class ZEActor : public ZEEntity
 
 		virtual void				Tick(float ElapsedTime);
 };
-
-#endif
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEActor.png");

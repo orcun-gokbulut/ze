@@ -35,11 +35,11 @@
 
 #include "ZEDClassTree.h"
 
+#include "ZEFile\ZEPathInfo.h"
 #include "ZEMeta\ZEProvider.h"
-
-#include <QHeaderView>
 #include "ZEGame\ZEEntity.h"
 
+#include <QHeaderView>
 
 bool ZEDClassTree::Filter(ZEClass* Class)
 {
@@ -64,6 +64,7 @@ void ZEDClassTree::UpdateAlphabeticList()
 			continue;
 
 		QTreeWidgetItem* Item = new QTreeWidgetItem();
+		Item->setIcon(0, QIcon(Classes[I]->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon")));
 		Item->setText(0, Classes[I]->GetName());
 		Item->setExpanded(true);
 		Item->setData(0, Qt::UserRole, QVariant((unsigned long long)Classes[I]));
@@ -87,6 +88,8 @@ void ZEDClassTree::UpdateInheritanceTree(ZEClass* CurrentBaseClass, QTreeWidgetI
 			continue;
 
 		QTreeWidgetItem* Item = new QTreeWidgetItem();
+		QString IconFile = ZEPathInfo(Classes[I]->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon")).GetRealPath().Path;
+		Item->setIcon(0, QIcon(IconFile));
 		Item->setText(0, Classes[I]->GetName());
 		Item->setExpanded(true);
 		Item->setData(0, Qt::UserRole, QVariant((unsigned long long)Classes[I]));
