@@ -144,14 +144,14 @@ ZEEntityResult ZEDGrid::UnloadInternal()
 
 ZEDGrid::ZEDGrid()
 {
-	GridSize = ZEVector2(100.0f, 100.0f);
+	GridSize = ZEVector2(1000.0f, 1000.0f);
 
 	MinorGridEnabled = true;
-	MinorGridUnitSize = ZEVector2(1.0f, 1.0f);
+	MinorGridUnitSize = ZEVector2(5.0f, 5.0f);
 	MinorGridColor = ZEVector3(0.3f, 0.3f, 0.3f);
 
 	MajorGridEnabled = true;
-	MajorGridUnitSize = ZEVector2(5.0f, 5.0f);
+	MajorGridUnitSize = ZEVector2(25.0f, 25.0f);
 	MajorGridColor = ZEVector3(0.5f, 0.5f, 0.5f);
 
 	AxisEnabled = true;

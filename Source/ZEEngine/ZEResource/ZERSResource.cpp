@@ -731,12 +731,12 @@ bool ZERSResource::ReloadSerial()
 
 void ZERSResource::WaitStaging() const
 {
-	while(State < ZERS_RS_STAGED && State > 0);
+	while(State < ZERS_RS_STAGED && State > ZERS_RS_DESTROYING);
 }
 
 void ZERSResource::WaitLoading() const
 {
-	while(State < ZERS_RS_LOADED && State > 0);
+	while(State < ZERS_RS_LOADED && State > ZERS_RS_DESTROYING);
 }
 
 void ZERSResource::WaitUnloading() const

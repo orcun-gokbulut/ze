@@ -559,8 +559,16 @@ void ZEDViewport::Present()
 	Output->Present();
 }
 
+QPaintEngine* ZEDViewport::paintEngine() const
+{
+	return NULL;
+}
+
 ZEDViewport::ZEDViewport(QWidget* Parent) : QWidget(Parent)
 {
+	setAttribute(Qt::WA_PaintOnScreen, true);
+	setAttribute(Qt::WA_NativeWindow, true);
+
 	DirtyFlags.RaiseAll();
 	ViewportManager = NULL;
 	Window = NULL;

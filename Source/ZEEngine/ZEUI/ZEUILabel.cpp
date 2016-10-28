@@ -39,8 +39,11 @@
 
 void ZEUILabel::UpdateCharacters()
 {
-	if (FontResource == NULL || !FontResource->IsLoaded())
+	if (FontResource == NULL)
 		return;
+
+	if (!FontResource->IsLoaded())
+		FontResource->WaitLoading();
 
 	ZEInt64 KerningDistance = 0;
 	ZEUIFontCharacter Character;

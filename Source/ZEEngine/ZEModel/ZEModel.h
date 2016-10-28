@@ -157,4 +157,5 @@ class ZEModel : public ZEEntity
 
 		static ZEModel*							CreateInstance();
 }
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEModel.png")
 ZE_META_ATTRIBUTE_PROPERTY("ModelFile", "ZEDEditor.PropertyEditor.Semantic", "Asset", "ZEModelAsset");

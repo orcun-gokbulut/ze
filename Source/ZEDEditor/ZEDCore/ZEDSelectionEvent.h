@@ -48,32 +48,48 @@ enum ZEDSelectionEventType
 	ZED_SET_SELECTED,
 	ZED_SET_DESELECTED,
 	ZED_SET_FOCUS_CHANGED,
+	ZED_SET_OBJECTS_FREEZED,
+	ZED_SET_OBJECTS_UNFREEZED,
 	ZED_SET_MANAGER_STATE_CHANGED
 };
 
 class ZEDSelectionEvent : public ZEDEvent
 {
 	ZE_OBJECT
-	friend class ZEDSelectionManager;
 	private:
-		ZEDSelectionEventType				Type;
-		ZEDSelectionManager*				Manager;
-		ZEArray<ZEDObjectWrapper*>*			Selection;
-		ZEArray<ZEDObjectWrapper*>*			OldSelection;
-		ZEArray<ZEDObjectWrapper*>*			SelectedObjects;
-		ZEArray<ZEDObjectWrapper*>*			UnselectedObjects;
-		ZEDObjectWrapper*					FocusedObject;
-		ZEDObjectWrapper*					OldFocusedObject;
+		ZEDSelectionEventType					Type;
+		ZEDSelectionManager*					Manager;
+		
+		// Selection Event
+		mutable ZEFlags							DirtyFlags;
+		const ZEArray<ZEDObjectWrapper*>*		NewList;
+		const ZEArray<ZEDObjectWrapper*>*		OldList;
+		mutable ZEArray<ZEDObjectWrapper*>		AddedList;
+		mutable ZEArray<ZEDObjectWrapper*>		RemovedList;
 
-											ZEDSelectionEvent();
+		// Focus Operation
+		ZEDObjectWrapper*						FocusedObject;
+		ZEDObjectWrapper*						OldFocusedObject;
 
 	public:
-		ZEDSelectionEventType				GetType() const;
-		ZEDSelectionManager*				GetManager() const;
-		const ZEArray<ZEDObjectWrapper*>&	GetSelection() const;
-		const ZEArray<ZEDObjectWrapper*>&	GetOldSelection() const;
-		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects() const;
-		const ZEArray<ZEDObjectWrapper*>&	GetUnselectedObjects() const;
-		ZEDObjectWrapper*					GetFocusedObject();
-		ZEDObjectWrapper*					GetOldFocusedObject();
+		void									SetManager(ZEDSelectionManager* Manager);
+		ZEDSelectionManager*					GetManager() const;
+
+		void									SetType(ZEDSelectionEventType Type);
+		ZEDSelectionEventType					GetType() const;
+
+		void									SetList(const ZEArray<ZEDObjectWrapper*>* List);
+		void									SetOldList(const ZEArray<ZEDObjectWrapper*>* List);
+		void									SetFocusedObject(ZEDObjectWrapper* FocusedObject);
+		void									SetOldFocusedObject(ZEDObjectWrapper* FocusedObject);
+
+		const ZEArray<ZEDObjectWrapper*>&		GetList() const;
+		const ZEArray<ZEDObjectWrapper*>&		GetOldList() const;
+		const ZEArray<ZEDObjectWrapper*>&		GetAddedlist() const;
+		const ZEArray<ZEDObjectWrapper*>&		GetRemovedlist() const;
+
+		ZEDObjectWrapper*						GetFocusedObject();
+		ZEDObjectWrapper*						GetOldFocusedObject();
+
+												ZEDSelectionEvent();
 };

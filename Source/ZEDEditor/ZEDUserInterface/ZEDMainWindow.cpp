@@ -66,13 +66,15 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	if (Event->type() == QEvent::Close)
 	{
 		int Result = QMessageBox::question(static_cast<QWidget*>(Object), "ZEDEditor", "Are you sure that you want to quit ?", QMessageBox::Yes, QMessageBox::No);
-		if (Result)
+		if (Result == QMessageBox::Yes)
 		{
+			Event->accept();
 			GetEditor()->Exit();
 			return false;
 		}
 		else
 		{
+			Event->ignore();
 			return true;
 		}
 	}
