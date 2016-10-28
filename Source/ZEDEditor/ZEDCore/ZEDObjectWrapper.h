@@ -64,11 +64,11 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		ZEDObjectWrapper*							Parent;
 		ZEDObjectManager*							Manager;
 
-		ZEString									Icon;
 		bool										Selectable;
 		bool										Selected;
 		bool										Focused;
-		bool										Locked;
+		bool										Frozen;
+		bool										NamePlateVisible;
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
@@ -77,9 +77,6 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		void										RaiseEvent(ZEDObjectEvent* Event);
 
 	protected:
-		void										DrawBoundingBox();
-		void										DrawNamePlate();
-
 		void										SyncronizeChildWrappers(ZEObject*const* TargetList, ZESize TargetListSize);
 		void										ClearChildWrappers();
 
@@ -108,20 +105,20 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual ZEAABBox							GetLocalBoundingBox();
 		virtual ZEMatrix4x4							GetWorldTransform();
 
-		virtual void								SetPosition(const ZEVector3& NewPosition);
+		virtual void								SetPosition(const ZEVector3& Position);
 		virtual ZEVector3							GetPosition() const;
 
-		virtual void								SetRotation(const ZEQuaternion& NewRotation);
+		virtual void								SetRotation(const ZEQuaternion& Rotation);
 		virtual ZEQuaternion						GetRotation() const;
 
-		virtual void								SetScale(const ZEVector3& NewScale);
+		virtual void								SetScale(const ZEVector3& Scale);
 		virtual ZEVector3							GetScale() const;
 
-		virtual void								SetVisible(bool Value);
+		virtual void								SetVisible(bool Visible);
 		virtual bool								GetVisible() const;
 
-		virtual void								SetLocked(bool Value);
-		bool										GetLocked() const;
+		virtual void								SetFrozen(bool Locked);
+		bool										GetFrozen() const;
 
 		virtual void								SetSelectable(bool Value);
 		bool										GetSelectable() const;
@@ -131,9 +128,6 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		virtual void								SetFocused(bool Focused);
 		bool										GetFocused() const;
-
-		virtual void								SetIcon(const ZEString& Icon);
-		const ZEString&								GetIcon() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);

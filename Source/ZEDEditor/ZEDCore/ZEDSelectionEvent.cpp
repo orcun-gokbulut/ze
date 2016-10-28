@@ -35,15 +35,17 @@
 
 #include "ZEDSelectionEvent.h"
 
-ZEDSelectionEvent::ZEDSelectionEvent()
+#define ZED_SEF_ADDED_LIST_DIRTY		0x01
+#define ZED_SEF_REMOVED_LIST_DIRTY		0x02
+
+void ZEDSelectionEvent::SetManager(ZEDSelectionManager* Manager)
 {
-	Type = ZED_SET_NONE;
-	Selection = NULL;
-	OldSelection = NULL;
-	SelectedObjects = NULL;
-	UnselectedObjects = NULL;
-	FocusedObject = NULL;
-	OldFocusedObject = NULL;
+	this->Manager = Manager;
+}
+
+void ZEDSelectionEvent::SetType(ZEDSelectionEventType Type)
+{
+	this->Type = Type;
 }
 
 ZEDSelectionEventType ZEDSelectionEvent::GetType() const
@@ -51,24 +53,77 @@ ZEDSelectionEventType ZEDSelectionEvent::GetType() const
 	return Type;
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelection() const
+void ZEDSelectionEvent::SetList(const ZEArray<ZEDObjectWrapper*>* List)
 {
-	return *Selection;
+	DirtyFlags.RaiseAll();
+	NewList = List;
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetOldSelection() const
+
+void ZEDSelectionEvent::SetOldList(const ZEArray<ZEDObjectWrapper*>* List)
 {
-	return *OldSelection;
+	DirtyFlags.RaiseAll();
+	OldList = List;
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelectedObjects() const
+void ZEDSelectionEvent::SetFocusedObject(ZEDObjectWrapper* FocusedObject)
 {
-	return *SelectedObjects;
+	FocusedObject = FocusedObject;
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() const
+void ZEDSelectionEvent::SetOldFocusedObject(ZEDObjectWrapper* UnfocusedObject)
 {
-	return *UnselectedObjects;
+	OldFocusedObject = UnfocusedObject;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetList() const
+{
+	return *NewList;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetOldList() const
+{
+	return *OldList;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetAddedlist() const
+{
+	if (NewList != NULL && OldList != NULL &&
+		DirtyFlags.GetFlags(ZED_SEF_ADDED_LIST_DIRTY))
+	{
+		AddedList.Clear();
+		for (ZESize I = 0; I < NewList->GetCount(); I++)
+		{
+			if (OldList->Exists((*NewList)[I]))
+				continue;
+
+			AddedList.Add((*NewList)[I]);
+		}
+	}
+
+	DirtyFlags.UnraiseFlags(ZED_SEF_ADDED_LIST_DIRTY);
+
+	return AddedList;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetRemovedlist() const
+{
+	if (NewList != NULL && OldList != NULL &&
+		DirtyFlags.GetFlags(ZED_SEF_REMOVED_LIST_DIRTY))
+	{
+		RemovedList.Clear();
+		for (ZESize I = 0; I < OldList->GetCount(); I++)
+		{
+			if (NewList->Exists((*OldList)[I]))
+				continue;
+
+			RemovedList.Add((*OldList)[I]);
+		}
+	}
+
+	DirtyFlags.UnraiseFlags(ZED_SEF_REMOVED_LIST_DIRTY);
+
+	return RemovedList;
 }
 
 ZEDObjectWrapper* ZEDSelectionEvent::GetFocusedObject()
@@ -79,4 +134,14 @@ ZEDObjectWrapper* ZEDSelectionEvent::GetFocusedObject()
 ZEDObjectWrapper* ZEDSelectionEvent::GetOldFocusedObject()
 {
 	return OldFocusedObject;
+}
+
+ZEDSelectionEvent::ZEDSelectionEvent()
+{
+	Type = ZED_SET_NONE;
+	DirtyFlags.RaiseAll();
+	NewList = NULL;
+	OldList = NULL;
+	FocusedObject = NULL;
+	OldFocusedObject = NULL;
 }

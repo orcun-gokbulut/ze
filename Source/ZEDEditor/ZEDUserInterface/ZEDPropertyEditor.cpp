@@ -244,11 +244,13 @@ void ZEDPropertyEditor::SelectionEvent(const ZEDSelectionEvent* Event)
 	if (Event->GetType() != ZED_SET_SELECTED && Event->GetType() != ZED_SET_DESELECTED)
 		return;
 
-	for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
-		Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
+	const ZEArray<ZEDObjectWrapper*>& UnselectedList = Event->GetRemovedlist();
+	for (ZESize I = 0; I < UnselectedList.GetCount(); I++)
+		Wrappers.RemoveValue(UnselectedList[I]);
 
-	for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
-		Wrappers.Add(Event->GetSelectedObjects()[I]);
+	const ZEArray<ZEDObjectWrapper*>& SelectedList = Event->GetAddedlist();
+	for (ZESize I = 0; I < SelectedList.GetCount(); I++)
+		Wrappers.Add(SelectedList[I]);
 
 	Dirty = true;
 }

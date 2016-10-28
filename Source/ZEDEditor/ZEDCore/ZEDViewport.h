@@ -56,6 +56,7 @@ class ZEDViewportManager;
 class ZEDViewport : public QWidget, public ZEDComponent
 {
 	Q_OBJECT
+	Q_DISABLE_COPY(ZEDViewport)
 	friend ZEDViewportManager;
 	private:
 		ZEFlags								DirtyFlags;
@@ -119,6 +120,8 @@ class ZEDViewport : public QWidget, public ZEDComponent
 		bool								PreRender();
 		void								Render();
 		void								Present();
+		
+		virtual QPaintEngine*				paintEngine() const;
 
 											ZEDViewport(QWidget* Parent = NULL);
 };

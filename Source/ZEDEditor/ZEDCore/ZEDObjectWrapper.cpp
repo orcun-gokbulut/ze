@@ -142,8 +142,9 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 	Manager = NULL;
 	Selectable = true;
 	Selected = false;
-	Locked = false;
+	Frozen = false;
 	Focused = false;
+	NamePlateVisible = true;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
@@ -213,16 +214,6 @@ ZEString ZEDObjectWrapper::GetName() const
 	return ZEString::Empty;
 }
 
-void ZEDObjectWrapper::SetIcon(const ZEString& Icon)
-{
-
-}
-
-const ZEString& ZEDObjectWrapper::GetIcon() const
-{
-	return ZEString::Empty;
-}
-
 ZEAABBox ZEDObjectWrapper::GetLocalBoundingBox()
 {
 	return ZEAABBox::Zero;
@@ -236,7 +227,6 @@ ZEMatrix4x4 ZEDObjectWrapper::GetWorldTransform()
 void ZEDObjectWrapper::SetPosition(const ZEVector3& NewPosition)
 {
 	ZEDObjectEvent Event;
-	
 }
 
 ZEVector3 ZEDObjectWrapper::GetPosition() const
@@ -264,15 +254,14 @@ ZEVector3 ZEDObjectWrapper::GetScale() const
 	return ZEVector3::One;
 }
 
-
-void ZEDObjectWrapper::SetLocked(bool Value)
+void ZEDObjectWrapper::SetFrozen(bool Value)
 {
-	Locked = Value;
+	Frozen = Value;
 }
 
-bool ZEDObjectWrapper::GetLocked() const
+bool ZEDObjectWrapper::GetFrozen() const
 {
-	return Locked;
+	return Frozen;
 }
 
 void ZEDObjectWrapper::SetSelectable(bool Value)

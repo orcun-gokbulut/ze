@@ -513,5 +513,8 @@ ZEUIControl::ZEUIControl()
 
 ZEUIControl::~ZEUIControl()
 {
+	for (ZESize I = 0; I < ChildControls.GetCount(); I++)
+		ChildControls[I]->Destroy();
 
+	ChildControls.Clear();
 }

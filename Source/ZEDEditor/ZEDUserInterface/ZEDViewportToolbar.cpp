@@ -101,11 +101,11 @@ void ZEDViewportToolbar::UpdateUI()
 	switch (SelectionManager->GetSelectionMode())
 	{
 		default:
-		case ZE_SM_FULLY_INSIDE:
+		case ZE_SM_FULLY_COVERS:
 			cmbMode->setCurrentText("Fully Inside");
 			break;
 
-		case ZE_SM_PARTIALY_INSIDE:
+		case ZE_SM_INTERSECTS:
 			cmbMode->setCurrentText("Partially Inside");
 			break;
 	}
@@ -131,11 +131,11 @@ void ZEDViewportToolbar::cmbShape_currentIndexChanged(const QString & text)
 void ZEDViewportToolbar::cmbMode_currentIndexChanged(const QString & text)
 {
 	if (text == "Fully Inside")
-		SelectionManager->SetSelectionMode(ZE_SM_FULLY_INSIDE);
+		SelectionManager->SetSelectionMode(ZE_SM_FULLY_COVERS);
 	else if (text == "Partially Inside")
-		SelectionManager->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
+		SelectionManager->SetSelectionMode(ZE_SM_INTERSECTS);
 	else
-		SelectionManager->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
+		SelectionManager->SetSelectionMode(ZE_SM_INTERSECTS);
 }
 
 void ZEDViewportToolbar::btnFreeze_clicked()

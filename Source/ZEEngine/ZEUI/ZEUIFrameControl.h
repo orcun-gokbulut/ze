@@ -44,9 +44,8 @@ class ZEUIFrameControl : public ZEUIControl
 {
 	ZE_OBJECT
 	public:
+		ZEString					TextureFileName;
 		ZEUIRectangle				Frame;
-		ZEString					TexturePath;
-		ZETexture2DResource*		TextureResource;
 
 	public:
 		virtual void				SetPosition(const ZEVector2& Position);
@@ -57,8 +56,8 @@ class ZEUIFrameControl : public ZEUIControl
 		virtual void				SetTexture(const ZEGRTexture* Texture);
 		const ZEGRTexture*			GetTexture();
 
-		virtual void				SetTexturePath(const ZEString& Path);
-		const ZEString&				GetTexturePath();
+		virtual void				SetTextureFileName(const ZEString& Path);
+		const ZEString&				GetTextureFileName();
 
 		virtual void				Draw(ZEUIRenderer* Renderer);
 

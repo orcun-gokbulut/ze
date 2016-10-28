@@ -93,9 +93,9 @@ bool ZEDSceneEditor::InitializeInternal()
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
 	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
-	ZEStateScreen* StateScreen = ZEStateScreen::CreateInstance();
+	/*ZEStateScreen* StateScreen = ZEStateScreen::CreateInstance();
 	StateScreen->SetManager(GetUIManager());
-	Scene->AddEntity(StateScreen);
+	Scene->AddEntity(StateScreen);*/
 
  	ZEModel* Trial = ZEModel::CreateInstance();
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Track-100.new.ZEMODEL");

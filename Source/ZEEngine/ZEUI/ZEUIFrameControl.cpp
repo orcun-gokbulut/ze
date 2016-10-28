@@ -39,6 +39,7 @@
 #include "ZEUIHorizontalSliderControl.h"
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZEFile/ZEPathInfo.h"
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
@@ -75,17 +76,8 @@ void ZEUIFrameControl::SetHeight(float Height)
 
 void ZEUIFrameControl::SetTexture(const ZEGRTexture* Texture)
 {
-	if (Frame.Texture == Texture)
-		return;
-
-	if (TextureResource != NULL)
-	{
-		Frame.Texture.Release();
-		TextureResource->Release();
-		TextureResource = NULL;	
-	}
-
 	Frame.Texture = Texture;
+	TextureFileName = (Frame.Texture == NULL ? "" : Texture->GetFileName());
 }
 
 const ZEGRTexture* ZEUIFrameControl::GetTexture()
@@ -93,31 +85,28 @@ const ZEGRTexture* ZEUIFrameControl::GetTexture()
 	return Frame.Texture;
 }
 
-void ZEUIFrameControl::SetTexturePath(const ZEString& Path)
+void ZEUIFrameControl::SetTextureFileName(const ZEString& FileName)
 {
-	if (TexturePath == Path)
-		return;
-
-	if (TextureResource != NULL)
+	if (FileName.IsEmpty())
 	{
+		TextureFileName = "";
 		Frame.Texture.Release();
-		TextureResource->Release();
-		TextureResource = NULL;
+		return;
 	}
 
-	if (Path.IsEmpty())
+	if (ZEPathInfo::Compare(TextureFileName, FileName))
 		return;
 
-	TextureResource = ZETexture2DResource::LoadSharedResource(Path);
-	if (TextureResource == NULL)
-		return;
+	TextureFileName = FileName;
 
-	Frame.Texture = TextureResource->GetTexture2D();
+	ZEGRTextureOptions Options;
+	Options.Type = ZEGR_TT_2D;
+	Frame.Texture = ZEGRTexture::LoadResourceShared(FileName, Options);
 }
 
-const ZEString& ZEUIFrameControl::GetTexturePath()
+const ZEString& ZEUIFrameControl::GetTextureFileName()
 {
-	return TexturePath;
+	return TextureFileName;
 }
 
 void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
@@ -128,8 +117,6 @@ void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 
 ZEUIFrameControl::ZEUIFrameControl()
 {
-	TextureResource = NULL;
-
 	Frame.Color = ZEUIManager::GetDefaultBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;

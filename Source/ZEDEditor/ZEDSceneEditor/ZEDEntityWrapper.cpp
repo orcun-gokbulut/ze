@@ -47,6 +47,68 @@
 #include "ZEUI/ZEUILabel.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectManager.h"
+#include "ZEDS/ZEFormat.h"
+
+void ZEDEntityWrapper::UpdateNamingPlate()
+{
+	ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
+
+	if (GetEntity() == NULL || stricmp(GetEntity()->Class()->GetAttributeValue("ZEDEditor.ObjectWrapper.NamePlate", 0, "true"), "true") != 0)
+	{
+		if (NamePlate != NULL)
+		{	
+			UIManager->RemoveControl(NamePlate);
+			NamePlate->Destroy();
+			NamePlate = NULL;
+			NamePlateIcon = NULL;
+			NamePlateName = NULL;
+			NamePlateClass = NULL;
+		}
+		return;
+	}
+	else
+	{
+		if (NamePlate == NULL)
+		{
+			NamePlate = new ZEUIControl();
+			NamePlate->SetSize(ZEVector2(200, 40));
+
+			NamePlateIcon = new ZEUIFrameControl();
+			NamePlateIcon->SetSize(ZEVector2(32.0f, 32.0f));
+			NamePlateIcon->SetPosition(ZEVector2::Zero);
+			NamePlate->AddChildControl(NamePlateIcon);
+
+			NamePlateName = ZEUILabel::CreateInstance();
+			NamePlateName->SetSize(ZEVector2(200.0f, 40.0f));
+			NamePlateName->SetPosition(ZEVector2(36.0f, 2.0f));
+			NamePlate->AddChildControl(NamePlateName);
+
+			NamePlateClass = ZEUILabel::CreateInstance();
+			NamePlateClass->SetSize(ZEVector2(200.0f, 40.0f));
+			NamePlateClass->SetPosition(ZEVector2(36.0f, 16.0f));
+			NamePlateClass->SetFontColor(ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
+			NamePlate->AddChildControl(NamePlateClass);
+
+			UIManager->AddControl(NamePlate);
+		}
+
+		if (GetSelected())
+		{
+			if (GetFocused())
+				NamePlateName->SetFontColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+			else
+				NamePlateName->SetFontColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+		}
+		else
+		{
+			NamePlateName->SetFontColor(ZEVector4(0.75f, 0.75f, 0.75f, 1.0f));
+		}
+		
+		NamePlateIcon->SetTextureFileName(GetObjectClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon"));
+		NamePlateName->SetText(ZEFormat::Format("{0} ({1})", GetName(), GetId()));
+		NamePlateClass->SetText(ZEFormat::Format("Class: {0}", GetObjectClass()->GetName()));
+	}
+}
 
 bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
 {
@@ -111,30 +173,20 @@ bool ZEDEntityWrapper::InitializeInternal()
 
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
-	NamePlate = new ZEUIControl();
-
-	NamePlateLabel = ZEUILabel::CreateInstance();
-	NamePlateIcon = new ZEUIFrameControl();
-	NamePlateIcon->SetSize(ZEVector2(32.0f, 32.0f));
-	NamePlateIcon->SetPosition(ZEVector2::Zero);
-
-	NamePlateIcon->SetTexturePath(GetIcon());
-	NamePlateIcon = new ZEUIFrameControl();
-	NamePlateIcon->SetSize(ZEVector2(100.0f, 40.0f));
-	NamePlateIcon->SetPosition(ZEVector2(36.0f, 0.0f));
-
-	NamePlate->AddChildControl(NamePlateIcon);
-	NamePlate->AddChildControl(NamePlateLabel);
-
-	/*ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
-	UIManager->AddControl(NamePlate);*/
+	UpdateNamingPlate();
 
 	return true;
 }
 
 bool ZEDEntityWrapper::DeinitializeInternal()
 {
-	delete NamePlate;
+	if (NamePlate != NULL)
+	{
+		ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
+		UIManager->RemoveControl(NamePlate);
+		NamePlate->Destroy();
+		NamePlate = NULL;
+	}
 
 	Material.Release();
 	ConstantBuffer.Release();
@@ -146,6 +198,10 @@ bool ZEDEntityWrapper::DeinitializeInternal()
 ZEDEntityWrapper::ZEDEntityWrapper()
 {
 	Dirty = true;
+	NamePlate = NULL;
+	NamePlateIcon = NULL;
+	NamePlateName = NULL;
+	NamePlateClass = NULL;
 }
 
 void ZEDEntityWrapper::SetId(ZEInt Id)
@@ -161,7 +217,7 @@ ZEInt ZEDEntityWrapper::GetId() const
 void ZEDEntityWrapper::SetName(const ZEString& Name)
 {
 	GetEntity()->SetName(Name);
-	NamePlateLabel->SetText(Name);
+	UpdateNamingPlate();
 }
 
 ZEString ZEDEntityWrapper::GetName() const
@@ -176,14 +232,9 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 
 	ZEDObjectWrapper::SetObject(Object);
 	GetEntity()->SetWrapper(this);
-	
-	if (IsInitialized())
-	{
-		NamePlateLabel->SetText(static_cast<ZEEntity*>(Object)->GetName());
-		NamePlateIcon->SetTexturePath("#R:/Resources/ZEEngine/ZEGUI/Textures/SemiChecked.png");
 
-		Update();
-	}
+	UpdateNamingPlate();
+	Update();
 }
 
 ZEEntity* ZEDEntityWrapper::GetEntity() const
@@ -322,6 +373,9 @@ void ZEDEntityWrapper::SetSelected(bool Selected)
 		return;
 
 	ZEDObjectWrapper::SetSelected(Selected);
+
+	UpdateNamingPlate();
+
 	Dirty = true;
 }
 
@@ -331,6 +385,9 @@ void ZEDEntityWrapper::SetFocused(bool Focused)
 		return;
 
 	ZEDObjectWrapper::SetFocused(Focused);
+
+	UpdateNamingPlate();
+
 	Dirty = true;
 }
 
@@ -352,10 +409,21 @@ void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
 	Parameters->Renderer->AddCommand(&Command);
 
-
-	ZEVector2 ScreenPosition = ZERNScreenUtilities::WorldToScreen(*Parameters->View, GetPosition());
-	NamePlate->SetPosition(ScreenPosition);
-	NamePlate->SetZOrder(ZEMath::Abs(Parameters->View->Position.z - GetPosition().z));
+	if (NamePlate != NULL)
+	{
+		if (GetVisible() && !GetFrozen() &&
+			ZEVector3::DotProduct(Parameters->View->Direction, GetPosition() - Parameters->View->Position) > 0.0f)
+		{
+			ZEVector2 ScreenPosition = ZERNScreenUtilities::WorldToScreen(*Parameters->View, GetPosition());
+			NamePlate->SetPosition(ZEVector2((ZEInt)ScreenPosition.x, (ZEInt)ScreenPosition.y));
+			NamePlate->SetZOrder(ZEMath::Abs(Parameters->View->Position.z - GetPosition().z));
+			NamePlate->SetVisiblity(true);
+		}
+		else
+		{
+			NamePlate->SetVisiblity(false);
+		}
+	}
 }
 
 void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)

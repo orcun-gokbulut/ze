@@ -46,22 +46,26 @@ class ZEDSelectionToolbar : public QObject, public ZEDToolbar
 {
 	Q_OBJECT
 	private:
-		QComboBox*							cmbShape;
-		QAction*							actFreeze;
+		QComboBox*							cmbSelectionShape;
+		QAction*							actSelectionMode;
+		QAction*							actLockSelection;
+		QAction*							actFreezeSelection;
 		QAction*							actUnfreezeAll;
-		QComboBox*							cmbMode;
 		QAction*							actSelectionList;
 
 		void								SetupUI();
 		void								UpdateUI();
+
+		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
 
 											ZEDSelectionToolbar();
 		virtual								~ZEDSelectionToolbar();
 
 	private slots:
 		void								actSelectionList_triggered();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
+		void								cmbSelectionShape_currentIndexChanged(const QString & text);
+		void								actSelectionMode_triggered();
+		void								actLockSelection_triggered();
 		void								actFreeze_triggered();
 		void								actUnfreezeAll_triggered();
 

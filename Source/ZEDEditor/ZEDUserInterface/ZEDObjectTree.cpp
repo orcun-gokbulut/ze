@@ -92,7 +92,7 @@ void ZEDObjectTree::SelectionEvent(const ZEDSelectionEvent* Event)
 
 	if (Event->GetType() == ZED_SET_SELECTED)
 	{
-		const ZEArray<ZEDObjectWrapper*>& SelectedObjects = Event->GetSelectedObjects();
+		const ZEArray<ZEDObjectWrapper*>& SelectedObjects = Event->GetAddedlist();
 		for (ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
 			QTreeWidgetItem* Item = GetTreeItem(SelectedObjects[I]);
@@ -105,7 +105,7 @@ void ZEDObjectTree::SelectionEvent(const ZEDSelectionEvent* Event)
 	}
 	else if (Event->GetType() == ZED_SET_DESELECTED)
 	{
-		const ZEArray<ZEDObjectWrapper*>& DeselectedObjects = Event->GetUnselectedObjects();
+		const ZEArray<ZEDObjectWrapper*>& DeselectedObjects = Event->GetRemovedlist();
 		for (ZESize I = 0; I < DeselectedObjects.GetCount(); I++)
 		{
 			QTreeWidgetItem* Item = GetTreeItem(DeselectedObjects[I]);
@@ -114,7 +114,11 @@ void ZEDObjectTree::SelectionEvent(const ZEDSelectionEvent* Event)
 
 			Item->setSelected(false);
 		}
-	}	
+	}
+	else if (Event->GetType() == ZED_SET_OBJECTS_FREEZED || Event->GetType() == ZED_SET_OBJECTS_UNFREEZED)
+	{
+		Update();
+	}
 }
 
 bool ZEDObjectTree::InitializeInternal()
@@ -321,6 +325,12 @@ void ZEDObjectTree::UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrap
 	TreeItem->setData(0, Qt::UserRole, QVariant((ZEUInt64)Wrapper));
 	TreeItem->setText(0, Wrapper->GetName().ToCString());
 	TreeItem->setText(1, Wrapper->GetObject()->GetClass()->GetName());
+	if (!Wrapper->GetSelectable() || Wrapper->GetFrozen())
+		TreeItem->setFlags(TreeItem->flags() & ~Qt::ItemIsSelectable);
+	else
+		TreeItem->setFlags(TreeItem->flags() | Qt::ItemIsSelectable);
+
+	TreeItem->setSelected(Wrapper->GetSelected());
 }
 
 void ZEDObjectTree::SetRootWrapper(ZEDObjectWrapper* Wrapper)

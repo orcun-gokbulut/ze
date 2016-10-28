@@ -53,8 +53,8 @@ enum ZEDSelectionShape
 enum ZEDSelectionMode
 {
 	ZE_SM_NONE,
-	ZE_SM_FULLY_INSIDE,
-	ZE_SM_PARTIALY_INSIDE
+	ZE_SM_FULLY_COVERS,
+	ZE_SM_INTERSECTS,
 };
 
 class ZEObject;
@@ -69,13 +69,16 @@ class ZEDSelectionManager : public ZEDComponent
 	friend class ZEDEditorCore;
 	private:
 		ZEArray<ZEDObjectWrapper*>			Selection;
+		ZEArray<ZEDObjectWrapper*>			FrozenObjects;
 		ZEDObjectWrapper*					FocusedObject;
 		ZEDSelectionMode					SelectionMode;
 		ZEDSelectionShape					SelectionShape;
 		ZEClass*							Filter;
 		ZEVector2							SelectionStartPosition;
+		bool								LockSelection;
 
 		bool								FilterSelection(ZEObject* Object, void* Class);
+		void								UnfrezeeAllInternal(ZEDObjectWrapper* Object);
 
 		virtual void						EditorEvent(const ZEDEditorEvent* Event);
 		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
@@ -94,6 +97,8 @@ class ZEDSelectionManager : public ZEDComponent
 		void								SetSelectionFilter(ZEClass* Class);
 		ZEClass*							GetSelectionFilter();
 		
+		void								SetLockSelection(bool Lock);
+		bool								GetLockSelection();
 
 		void								SetSelection(const ZEArray<ZEDObjectWrapper*>& Selection);
 		const ZEArray<ZEDObjectWrapper*>&	GetSelection();
@@ -103,11 +108,17 @@ class ZEDSelectionManager : public ZEDComponent
 		void								SelectObject(ZEDObjectWrapper* Object);
 		void								SelectObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 		void								DeselectObject(ZEDObjectWrapper* Object);
-		void								DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Object);
+		void								DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 		void								ClearSelection();
 
 		void								FocusObject(ZEDObjectWrapper* Object);
 		void								ClearFocus();
+
+		const ZEArray<ZEDObjectWrapper*>	GetFrozonObjects();
+		void								FreezeObject(ZEDObjectWrapper* Object);
+		void								FreezeObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
+		void								UnfreezeObject(ZEDObjectWrapper* Object);
+		void								UnfreezeObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 
 		static ZEDSelectionManager*			CreateInstance();
 };
