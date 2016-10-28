@@ -43,39 +43,9 @@
 
 ZEUInt ZEGRGraphicsModule::SAMPLE_COUNT = 4;
 
-ZEOptionSection ZEGRGraphicsModule::GraphicsOptions;
-
 void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
 {
 	zeLog("%s", Message);
-}
-
-void ZEGRGraphicsModule::BaseInitialize()
-{
-	FreeImage_Initialise();
-	FreeImage_SetOutputMessage(FreeImageOutput);
-
-	GraphicsOptions.SetName("Graphics");
-	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("FullScreen", false, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("SampleCount", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_HIGH, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
-}
-
-void ZEGRGraphicsModule::BaseDeinitialize()
-{
-	FreeImage_DeInitialise();
-	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
 ZETextureOptions* ZEGRGraphicsModule::GetTextureOptions()

@@ -99,7 +99,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible() const;
-		
+
 		virtual bool						CheckChildrenClass(ZEClass* Class);
 
 		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);

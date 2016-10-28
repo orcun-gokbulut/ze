@@ -129,6 +129,9 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								SetFocused(bool Focused);
 		bool										GetFocused() const;
 
+		bool										GetNamePlateVisible();
+		ZEString									GetIconFileName();
+
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 		virtual bool								RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);

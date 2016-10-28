@@ -124,4 +124,5 @@ class ZECamera : public ZEEntity
 		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZECamera.png");;

@@ -35,13 +35,13 @@
 
 #include "ZEDObjectTree.h"
 
+#include "ZEFile/ZEPathInfo.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDSelectionEvent.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDCore/ZEDObjectEvent.h"
 
 #include <QHeaderView>
-
 
 void ZEDObjectTree::ObjectEvent(const ZEDObjectEvent* Event)
 {
@@ -259,7 +259,6 @@ void ZEDObjectTree::AddWrapper(ZEDObjectWrapper* Wrapper)
 	}
 
 	QTreeWidgetItem* Item = new QTreeWidgetItem();
-
 	UpdateItem(Item, Wrapper);
 
 	if (Mode == ZED_OTM_LIST || Wrapper == RootWrapper)
@@ -323,6 +322,8 @@ void ZEDObjectTree::UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrap
 		return;
 
 	TreeItem->setData(0, Qt::UserRole, QVariant((ZEUInt64)Wrapper));
+	QString IconFile = ZEPathInfo(Wrapper->GetObjectClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon")).GetRealPath().Path;
+	TreeItem->setIcon(0, QIcon(IconFile));
 	TreeItem->setText(0, Wrapper->GetName().ToCString());
 	TreeItem->setText(1, Wrapper->GetObject()->GetClass()->GetName());
 	if (!Wrapper->GetSelectable() || Wrapper->GetFrozen())

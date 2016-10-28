@@ -153,6 +153,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void									UnlockScene();
 
 		static ZEScene*							CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEScene.png");
 
 #endif

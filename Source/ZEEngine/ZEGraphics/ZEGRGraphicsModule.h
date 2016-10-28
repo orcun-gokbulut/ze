@@ -71,9 +71,6 @@ class ZEGRGraphicsModule : public ZEModule
 		// NOTE: These methods should be here ?
 		// -------------------------------------------
 		ZETextureQuality						TextureQuality;
-		static ZEOptionSection					GraphicsOptions;
-		static void								BaseInitialize();
-		static void								BaseDeinitialize();
 		virtual ZETextureOptions*				GetTextureOptions();
 		// -------------------------------------------
 
