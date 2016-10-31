@@ -79,6 +79,8 @@ class ZEInputEvent
 		static ZEInputEvent			CreateSwitchAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
 		static ZEInputEvent			CreateVectorAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
 		static ZEInputEvent			CreateQuaternionAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		static ZEInputEvent			CreateCursorAction(const ZEString& DeviceName, ZEInputState State, ZEInt ActionId);
+		static ZEInputEvent			CreateTextAction(const ZEString& DeviceName, ZEInt ActionId);
 
 		static ZEInputEvent			CreateCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback);
 		static ZEInputEvent			CreateCallback(const ZEString& InputString, ZEInputState State, const ZEInputCallback& Callback);
@@ -88,6 +90,8 @@ class ZEInputEvent
 		static ZEInputEvent			CreateSwitchCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
 		static ZEInputEvent			CreateVectorCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
 		static ZEInputEvent			CreateQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		static ZEInputEvent			CreateCursorCallback(const ZEString& DeviceName, ZEInputState State, const ZEInputCallback& Callback);
+		static ZEInputEvent			CreateTextCallback(const ZEString& DeviceName, const ZEInputCallback& Callback);
 };
 
 #endif

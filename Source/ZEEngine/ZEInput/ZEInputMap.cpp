@@ -160,7 +160,6 @@ void ZEInputMap::AddQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Inde
 	Events.Add(ZEInputEvent::CreateCallback(ZEInput::CreateQuaternion(DeviceName, Index), State, Callback));
 }
 
-
 ZEInputMap::ZEInputMap()
 {
 	ActionCount = 0;	

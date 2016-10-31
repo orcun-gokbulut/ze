@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypes.h"
 #include "ZEInputDefinitions.h"
+
+#include "ZETypes.h"
 #include <string.h>
 
 #define ZE_MAX_KEYIDNAME			0x100

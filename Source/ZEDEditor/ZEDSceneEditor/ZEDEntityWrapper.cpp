@@ -52,6 +52,13 @@
 
 void ZEDEntityWrapper::UpdateNamingPlate()
 {
+	if (GetManager() == NULL ||
+		GetManager()->GetEditor() == NULL || 
+		GetManager()->GetEditor()->GetUIManager() == NULL)
+	{
+		return;
+	}
+
 	ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
 
 	if (GetEntity() == NULL || !GetNamePlateVisible())
@@ -235,8 +242,8 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 	ZEDObjectWrapper::SetObject(Object);
 	GetEntity()->SetWrapper(this);
 
-	UpdateNamingPlate();
 	Update();
+	UpdateNamingPlate();
 }
 
 ZEEntity* ZEDEntityWrapper::GetEntity() const

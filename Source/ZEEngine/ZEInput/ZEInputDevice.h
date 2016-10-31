@@ -34,116 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_DEVICE_H__
-#define __ZE_INPUT_DEVICE_H__
 
 #include "ZEDestroyable.h"
 #include "ZEInitializable.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-
-enum ZEInputDeviceType
-{
-	ZE_IDT_NONE,
-	ZE_IDT_MOUSE,
-	ZE_IDT_KEYBOARD,
-	ZE_IDT_JOYSTICK,
-	ZE_IDT_GAMEPAD,
-	ZE_IDT_WHEEL,
-	ZE_IDT_SENSOR,
-	ZE_IDT_OTHER
-};
-
-class ZEInputDeviceDescription
-{
-	public:
-		ZEString								Name;
-		ZEUInt									NameHash;
-		ZEUInt									Index;
-		ZEInputDeviceType						Type;
-
-		ZEString								FullName;
-
-		ZEString								SinkName;
-		ZEUInt									SinkNameHash;
-		bool									Sink;
-
-		ZESize									ButtonCount;
-		ZESize									AxisCount;
-		ZESize									POVCount;
-		ZESize									SwitchCount;
-		ZESize									VectorCount;
-		ZESize									QuaternionCount;
-
-		void									Clear();
-
-												ZEInputDeviceDescription();
-};
-
-class ZEInputDeviceState
-{
-	public:
-		struct  
-		{
-			ZEArray<bool>						OldValues;
-			ZEArray<bool>						CurrentValues;
-
-		} Buttons;
-
-		struct  
-		{
-			ZEArray<float>						OldValues;
-			ZEArray<float>						CurrentValues;
-		} Axises;
-
-		struct  
-		{
-			ZEArray<ZEInt>						OldValues;
-			ZEArray<ZEInt>						CurrentValues;
-		} POVs;
-
-		struct  
-		{
-			ZEArray<ZEUInt>						OldValues;
-			ZEArray<ZEUInt>						CurrentValues;
-		} Switches;
-
-		struct  
-		{
-			ZEArray<ZEVector4>					OldValues;
-			ZEArray<ZEVector4>					CurrentValues;
-		} Vectors;
-
-		struct  
-		{
-			ZEArray<ZEQuaternion>				OldValues;
-			ZEArray<ZEQuaternion>				CurrentValues;
-		} Quaternions;
-
-		void									Initialize(const ZEInputDeviceDescription& Description);
-		void									Reset();
-		void									Advance();
-		void									AdvanceAndReset();
-		void									Clear();
-};
+#include "ZEInputDeviceState.h"
+#include "ZEInputDeviceDescription.h"
 
 class ZEInputDeviceIndexes
 {
 	private:
-		static ZESize							KeyboardIndex;
-		static ZESize							MouseIndex;
-		static ZESize							JoystickIndex;
-		static ZESize							GamepadIndex;
-		static ZESize							WheelIndex;
-		static ZESize							SensorIndex;
-		static ZESize							OtherIndex;
+		static ZEUInt							KeyboardIndex;
+		static ZEUInt							MouseIndex;
+		static ZEUInt							JoystickIndex;
+		static ZEUInt							GamepadIndex;
+		static ZEUInt							WheelIndex;
+		static ZEUInt							SensorIndex;
+		static ZEUInt							OtherIndex;
 
 	public:
-		static ZESize							GetNewDeviceIndex(ZEInputDeviceType Type);
+		static ZEUInt							GetNewDeviceIndex(ZEInputDeviceType Type);
 };
 
 class ZEInputDevice : public ZEInitializable, public ZEDestroyable
@@ -175,5 +85,3 @@ class ZEInputDevice : public ZEInitializable, public ZEDestroyable
 		virtual void							UnAcquire();
 
 };
-
-#endif

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_MODULE_H__
-#define __ZE_INPUT_MODULE_H__
 
 #define zeInput ZEInputModule::GetInstance()
 
@@ -75,4 +73,3 @@ class ZEInputModule : public ZEModule
 		static ZEInputModule*				GetInstance();
 		static ZEInputModule*				CreateInstance();
 };
-#endif

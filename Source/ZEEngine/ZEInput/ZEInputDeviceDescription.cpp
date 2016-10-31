@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputCursorDevice.h
+ Zinek Engine - ZEInputDeviceDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
-#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
+#include "ZEInputDevice.h"
 
-#include "ZETypes.h"
-#include "ZEInput/ZEInputDevice.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-class ZEWindowsInputMouseDevice : public ZEInputDevice
+void ZEInputDeviceDescription::Clear()
 {
-	friend class ZEWindowsInputModule;
-	friend class ZEWindowsInputSystemMessageHandler;	
-	private:
-		virtual bool				InitializeInternal();
+	Name = "";
+	NameHash = 0;
+	Index = 0;
+	Type = ZE_IDT_NONE;
 
-	public:
-		virtual void				UnAcquire();
+	FullName = "";
 
-		virtual void				Process(const RAWINPUT& Data);
-};
+	Sink = false;
+	SinkName = "";
+	SinkNameHash = 0;
 
-#endif
+	ButtonCount = 0;
+	AxisCount = 0;
+	POVCount = 0;
+	SwitchCount = 0;
+	VectorCount = 0;
+	QuaternionCount = 0;
+}
+
+ZEInputDeviceDescription::ZEInputDeviceDescription()
+{
+	Clear();
+}

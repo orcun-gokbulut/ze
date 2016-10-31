@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputDeviceExtension.h
+ Zinek Engine - ZEInputDeviceIndexes.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_INPUT_DEVICE_EXTENSION_H__
-#define __ZE_INPUT_DEVICE_EXTENSION_H__
+#include "ZEInputDeviceIndexes.h"
 
-#include "ZECore/ZEModule.h"
-#include "ZEInputDevice.h"
+ZEUInt ZEInputDeviceIndexes::KeyboardIndex = 0;
+ZEUInt ZEInputDeviceIndexes::MouseIndex = 0;
+ZEUInt ZEInputDeviceIndexes::JoystickIndex = 0;
+ZEUInt ZEInputDeviceIndexes::GamepadIndex = 0;
+ZEUInt ZEInputDeviceIndexes::WheelIndex = 0;
+ZEUInt ZEInputDeviceIndexes::SensorIndex = 0;
+ZEUInt ZEInputDeviceIndexes::OtherIndex = 0;
 
-class ZEInputDeviceModule : public ZEModule
+ZEUInt ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
 {
-	ZE_OBJECT
-	private:
-		ZEArray<ZEInputDevice*>				Devices;
+	ZEUInt Index;
+	switch(Type)
+	{
+		case ZE_IDT_KEYBOARD:
+			Index = KeyboardIndex;
+			KeyboardIndex++;
+			break;
 
-	protected:
-		bool								RegisterDevice(ZEInputDevice* Device);
-		void								UnregisterDevice(ZEInputDevice* Device);
-		void								DestroyDevices();
+		case ZE_IDT_MOUSE:
+			Index = MouseIndex;
+			MouseIndex++;
+			break;
 
-		virtual bool						DeinitializeInternal();
+		case ZE_IDT_JOYSTICK:
+			Index = JoystickIndex;
+			JoystickIndex++;
+			break;
 
-		virtual								~ZEInputDeviceModule();
+		case ZE_IDT_GAMEPAD:
+			Index = GamepadIndex;
+			GamepadIndex++;
+			break;
 
-	public:
-		const ZEArray<ZEInputDevice*>&		GetDevices();
+		case ZE_IDT_WHEEL:
+			Index = WheelIndex;
+			WheelIndex++;
+			break;
 
-		virtual void						Acquire();
-		virtual void						UnAcquire();
+		case ZE_IDT_SENSOR:
+			Index = SensorIndex;
+			SensorIndex++;
+			break;
 
-		virtual void						Process() = 0;
+		case ZE_IDT_OTHER:
+			Index = OtherIndex;
+			OtherIndex++;
+			break;
 
-};
+		default:
+			Index = 0;
+			break;
+	}
 
-#endif
+	return Index;
+}

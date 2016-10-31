@@ -38,7 +38,7 @@
 #include "ZEInputModule.h"
 #include "ZEInputDevice.h"
 #include "ZEDS/ZEString.h"
-#include "ZEInputDeviceExtension.h"
+#include "ZEInputDeviceModule.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -422,6 +422,23 @@ bool ZEInput::Check(ZEInputState State, ZEInputValue& Action) const
 			return true;
 		}
 	}
+	else if (this->Type == ZE_IT_CURSOR)
+	{
+		if (State == ZE_IS_VALUE || (State == ZE_IS_CHANGED && DeviceState.Cursor.CurrentValue != DeviceState.Cursor.OldValue))
+		{
+			Action.Cursor = DeviceState.Cursor.CurrentValue;
+			return true;
+		}
+	}
+	else if (this->Type == ZE_IT_TEXT)
+	{
+		if (DeviceState.Character != 0)
+		{
+			Action.Character = DeviceState.Character;
+			Action.CharacterModifiers = DeviceState.CharacterModifiers;
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -497,6 +514,28 @@ ZEInput ZEInput::CreateQuaternion(const ZEString& DeviceName, ZEUInt32 Index)
 	Temp.DeviceNameHash = ZEHashGenerator::Hash(DeviceName);
 	Temp.Index = Index;
 	Temp.Type = ZE_IT_QUATERNION;
+	Temp.ConnectToDevice();
+	return Temp;
+}
+
+ZEInput ZEInput::CreateCursor(const ZEString& DeviceName)
+{
+	ZEInput Temp;
+	Temp.DeviceName = DeviceName;
+	Temp.DeviceNameHash = ZEHashGenerator::Hash(DeviceName);
+	Temp.Index = 0;
+	Temp.Type = ZE_IT_CURSOR;
+	Temp.ConnectToDevice();
+	return Temp;
+}
+
+ZEInput ZEInput::CreateText(const ZEString& DeviceName)
+{
+	ZEInput Temp;
+	Temp.DeviceName = DeviceName;
+	Temp.DeviceNameHash = ZEHashGenerator::Hash(DeviceName);
+	Temp.Index = 0;
+	Temp.Type = ZE_IT_TEXT;
 	Temp.ConnectToDevice();
 	return Temp;
 }

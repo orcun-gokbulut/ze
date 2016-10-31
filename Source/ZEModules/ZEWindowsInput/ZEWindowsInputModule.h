@@ -37,16 +37,25 @@
 #ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
 #define __ZE_WINDOWS_INPUT_MODULE_H__
 
-#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInputDeviceModule.h"
 #include "ZECore/ZESystemMessageHandler.h"
 
-class ZEInputDevice;
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
 
 #define ZE_MAX_RAW_INPUT_COUNT 256
 
+class ZEInputDevice;
 class ZEWindowsInputModule;
 class ZEWindowsInputKeyboardDevice;
 class ZEWindowsInputMouseDevice;
+
+struct ZEWindowsInputMessage
+{
+	MSG				Message;
+	RAWINPUT		RawInput;
+};
 
 class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
 {
@@ -55,17 +64,18 @@ class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
 		virtual bool				Callback(MSG* Message);
 };
 
+
 class ZEWindowsInputModule : public ZEInputDeviceModule
 {
 	ZE_OBJECT
+	friend class ZEWindowsInputModule;
 	friend class ZEWindowsInputSystemMessageHandler;
 	private:
 		ZEWindowsInputSystemMessageHandler	MessageHandler;
-		RAWINPUT							RawInputs[ZE_MAX_RAW_INPUT_COUNT];
-		ZESize								RawInputCount;
+		ZEWindowsInputMessage				Messages[ZE_MAX_RAW_INPUT_COUNT];
+		ZESize								MessageCount;
 		ZEWindowsInputMouseDevice*			MouseDevice;
 		ZEWindowsInputKeyboardDevice*		KeyboardDevice;
-
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
