@@ -59,7 +59,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZEUIFrameControl*					NamePlateIcon;
 		ZEUILabel*							NamePlateName;
 		ZEUILabel*							NamePlateClass;
-
+		
 		bool								AlterRaycast(ZERayCastCollision& Collision);
 		void								UpdateNamingPlate();
 

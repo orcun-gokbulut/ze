@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputCursorDevice.h
+ Zinek Engine - ZEInputDeviceState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,26 +34,68 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
-#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
 #include "ZETypes.h"
-#include "ZEInput/ZEInputDevice.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "ZEInputDefinitions.h"
+#include "ZEInputDeviceDescription.h"
 
-class ZEWindowsInputMouseDevice : public ZEInputDevice
+class ZEInputDeviceState
 {
-	friend class ZEWindowsInputModule;
-	friend class ZEWindowsInputSystemMessageHandler;	
-	private:
-		virtual bool				InitializeInternal();
-
 	public:
-		virtual void				UnAcquire();
+		struct  
+		{
+			ZEArray<bool>						OldValues;
+			ZEArray<bool>						CurrentValues;
 
-		virtual void				Process(const RAWINPUT& Data);
+		} Buttons;
+
+		struct  
+		{
+			ZEArray<float>						OldValues;
+			ZEArray<float>						CurrentValues;
+		} Axises;
+
+		struct  
+		{
+			ZEArray<ZEInt>						OldValues;
+			ZEArray<ZEInt>						CurrentValues;
+		} POVs;
+
+		struct  
+		{
+			ZEArray<ZEUInt>						OldValues;
+			ZEArray<ZEUInt>						CurrentValues;
+		} Switches;
+
+		struct  
+		{
+			ZEArray<ZEVector4>					OldValues;
+			ZEArray<ZEVector4>					CurrentValues;
+		} Vectors;
+
+		struct  
+		{
+			ZEArray<ZEQuaternion>				OldValues;
+			ZEArray<ZEQuaternion>				CurrentValues;
+		} Quaternions;
+
+		struct 
+		{
+			ZEVector2							OldValue;
+			ZEVector2							CurrentValue;
+		} Cursor;
+
+		ZEUInt									Character;
+		ZEINCharacterModifiers					CharacterModifiers;
+		
+		void									Setup(const ZEInputDeviceDescription& Description);
+		void									Reset();
+		void									Advance();
+		void									AdvanceAndReset();
+		void									Clear();
 };
-
-#endif

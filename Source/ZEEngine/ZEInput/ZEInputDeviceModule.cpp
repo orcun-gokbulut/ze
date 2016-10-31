@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputCursorDevice.h
+ Zinek Engine - ZEInputDeviceModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
-#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
+#include "ZEInputDeviceModule.h"
 
-#include "ZETypes.h"
-#include "ZEInput/ZEInputDevice.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-class ZEWindowsInputMouseDevice : public ZEInputDevice
+bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 {
-	friend class ZEWindowsInputModule;
-	friend class ZEWindowsInputSystemMessageHandler;	
-	private:
-		virtual bool				InitializeInternal();
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+	{
+		if (Devices[I] == Device)
+		{
+			zeError("Input device already registered. Device Name : \"%s\".", Device->GetName());
+			return false;
+		}
 
-	public:
-		virtual void				UnAcquire();
+		if (Devices[I]->GetName() == Device->GetName())
+		{
+			zeError("A input device with the same name has been already registered. Device Name : \"%s\".", Device->GetName());
+			return false;
+		}
+	}
 
-		virtual void				Process(const RAWINPUT& Data);
-};
+	Devices.Add(Device);
 
-#endif
+	if (IsInitializedOrInitializing())
+	{
+		if (!Device->Initialize())
+		{
+			zeError("Can not initialize input device.");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
+{
+	if (IsInitializedOrInitializing())
+		Device->Deinitialize();
+
+	Devices.RemoveValue(Device);
+}
+
+void ZEInputDeviceModule::DestroyDevices()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Destroy();
+
+	Devices.Clear();
+}
+
+
+const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
+{
+	return Devices;
+}
+
+bool ZEInputDeviceModule::DeinitializeInternal()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Deinitialize();
+
+	return ZEModule::DeinitializeInternal();
+}
+
+void ZEInputDeviceModule::Acquire()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Acquire();
+}
+
+void ZEInputDeviceModule::UnAcquire()
+{
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->UnAcquire();
+}
+
+ZEInputDeviceModule::~ZEInputDeviceModule()
+{
+	DestroyDevices();
+}

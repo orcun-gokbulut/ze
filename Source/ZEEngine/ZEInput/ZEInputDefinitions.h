@@ -34,12 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INPUT_DEFINITONS_H__
-#define __ZE_INPUT_DEFINITONS_H__
 
-#define ZE_IDK_DEFAULT_KEYBOARD		0x00
-#define ZE_IDK_DEFAULT_MOUSE		0x00
-#define ZE_IDK_DEFAULT_JOYSTICK		0x00
+#include "ZEDS/ZEFlags.h"
+
+typedef ZEFlags ZEINCharacterModifiers;
+enum ZEINCharacterModifier
+{
+	ZEIN_CM_NONE					= 0x0000,
+	ZEIN_CM_CTRL					= 0x0010,
+	ZEIN_CM_CTRL_LEFT				= 0x0011,
+	ZEIN_CM_CTRL_RIGHT				= 0x0012,
+	ZEIN_CM_ALT						= 0x0020,
+	ZEIN_CM_ALT_LEFT				= 0x0021,
+	ZEIN_CM_ALT_RIGHT				= 0x0022,
+	ZEIN_CM_SHIFT					= 0x0040,
+	ZEIN_CM_SHIFT_LEFT				= 0x0041,
+	ZEIN_CM_SHIFT_RIGHT				= 0x0042,
+	ZEIN_CM_WINDOWS					= 0x0080,
+	ZEIN_CM_WINDOWS_LEFT			= 0x0081,
+	ZEIN_CM_WINDOWS_RIGHT			= 0x0082,
+};
 
 // Keyboard Button Definitions
 #define ZE_IKB_ESCAPE				0x01
@@ -283,5 +297,3 @@
 unsigned char	zeGetKeyboardButtonId(char* KeyShortName);
 const char*		zeGetKeyboardButtonName(unsigned char Key);
 const char*		zeGetKeyboardButtonShortName(unsigned char Key);
-
-#endif

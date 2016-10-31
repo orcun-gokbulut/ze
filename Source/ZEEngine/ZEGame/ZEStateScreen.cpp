@@ -87,7 +87,7 @@ ZEStateScreen::ZEStateScreen()
 	LastLoadingPercentage = -1;
 	LastOutputBufferCount = 0;
 
-	SetEntityFlags(ZE_EF_RENDERABLE_CUSTOM);
+	SetEntityFlags(ZE_EF_RENDERABLE_CUSTOM | ZE_EF_TICKABLE_CUSTOM);
 }
 
 ZEStateScreen::~ZEStateScreen()
@@ -111,9 +111,13 @@ ZEUIManager* ZEStateScreen::GetManager()
 	return Manager;
 }
 
+void ZEStateScreen::Tick(float ElapsedTime)
+{
+	LoadingPercentage = GetScene()->GetLoadingPercentage();
+}
+
 bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	ZEUInt LoadingPercentage = GetScene()->GetLoadingPercentage();
 	if (LoadingPercentage == 100)
 	{
 		LoadingLabel->SetVisiblity(false);
@@ -129,32 +133,6 @@ bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 			LastLoadingPercentage = LoadingPercentage;
 		}
 	}
-
-	/*// Resize
-	for (ZESize I = 0; ConsoleLines.GetCount(); I++)
-		ConsoleLines[I]->SetWidth(Parameters->View->Viewport.GetWidth() - 100);
-	
-	LoadingLabel->SetPosition(ZEVector2(Parameters->View->Viewport.GetWidth() - 100, 0.0f));
-
-	// Update Text
-	ZEArray<char*> OutputHistory = ZEConsole::GetInstance()->OutputHistory;
-
-	if (LastOutputBufferCount != Console->OutputHistory.GetCount())
-	{
-		ZESize Start =;
-		ZESize End = Console->OutputHistory.GetCount();
-		for (ZESize I = 0; ConsoleLines.GetCount(); I++)
-		{
-			ConsoleLines[I]->SetText(Console->Out)
-			if (I >= )
-		}
-
-
-	// Fade Out
-	for (ZESize I = 0; ConsoleLines.GetCount(); I++)
-	{
-
-	}*/
 
 	return false;
 }

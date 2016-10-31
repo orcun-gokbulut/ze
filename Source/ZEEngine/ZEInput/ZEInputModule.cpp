@@ -40,7 +40,7 @@
 
 #include "ZECore/ZECore.h"
 #include "ZEInputDevice.h"
-#include "ZEInputDeviceExtension.h"
+#include "ZEInputDeviceModule.h"
 
 ZEInputModule::ZEInputModule()
 {

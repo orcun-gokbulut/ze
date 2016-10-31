@@ -173,7 +173,7 @@ bool ZEDirectInputDevice::InitializeInternal()
 		return false;
 	}
 
-	State.Initialize(Description);
+	State.Setup(Description);
 	State.Reset();
 
 	Description.Index = ZEInputDeviceIndexes::GetNewDeviceIndex(Description.Type);

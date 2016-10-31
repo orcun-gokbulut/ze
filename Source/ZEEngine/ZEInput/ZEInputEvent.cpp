@@ -109,6 +109,16 @@ ZEInputEvent ZEInputEvent::CreateQuaternionAction(const ZEString& DeviceName, ZE
 	return ZEInputEvent::CreateAction(ZEInput::CreateQuaternion(DeviceName, Index), State, ActionId);
 }
 
+ZEInputEvent ZEInputEvent::CreateCursorAction(const ZEString& DeviceName, ZEInputState State, ZEInt ActionId)
+{
+	return ZEInputEvent::CreateAction(ZEInput::CreateCursor(DeviceName), State, ActionId);
+}
+
+ZEInputEvent ZEInputEvent::CreateTextAction(const ZEString& DeviceName, ZEInt ActionId)
+{
+	return ZEInputEvent::CreateAction(ZEInput::CreateText(DeviceName), ZE_IS_CHANGED, ActionId);
+}
+
 ZEInputEvent ZEInputEvent::CreateCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback)
 {
 	ZEInputEvent Event;
@@ -153,4 +163,14 @@ ZEInputEvent ZEInputEvent::CreateVectorCallback(const ZEString& DeviceName, ZEUI
 ZEInputEvent ZEInputEvent::CreateQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback)
 {
 	return ZEInputEvent::CreateCallback(ZEInput::CreateQuaternion(DeviceName, Index), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateCursorCallback(const ZEString& DeviceName, ZEInputState State, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateCursor(DeviceName), State, Callback);
+}
+
+ZEInputEvent ZEInputEvent::CreateTextCallback(const ZEString& DeviceName, const ZEInputCallback& Callback)
+{
+	return ZEInputEvent::CreateCallback(ZEInput::CreateText(DeviceName), ZE_IS_CHANGED, Callback);
 }

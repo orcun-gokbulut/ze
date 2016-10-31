@@ -37,7 +37,7 @@
 #ifndef	__ZE_DIRECT_INPUT_MODULE_H__
 #define __ZE_DIRECT_INPUT_MODULE_H__
 
-#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInputDeviceModule.h"
 #include "ZEDirectInputDevice.h"
 
 #include <dinput.h>

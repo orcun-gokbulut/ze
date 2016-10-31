@@ -74,7 +74,9 @@ enum ZEInputType
 	ZE_IT_POV,
 	ZE_IT_SWITCH,
 	ZE_IT_VECTOR,
-	ZE_IT_QUATERNION
+	ZE_IT_QUATERNION,
+	ZE_IT_CURSOR,
+	ZE_IT_TEXT
 };
 
 class ZEInputValue
@@ -90,6 +92,9 @@ class ZEInputValue
 
 		ZEVector4					Vector;
 		ZEQuaternion				Quaternion;
+		ZEVector2					Cursor;
+		ZEUInt						Character;
+		ZEINCharacterModifiers		CharacterModifiers;
 };
 
 class ZEInputDevice;
@@ -129,6 +134,8 @@ class ZEInput
 		static ZEInput			CreateSwitch(const ZEString& DeviceName, ZEUInt32 Index);
 		static ZEInput			CreateVector(const ZEString& DeviceName, ZEUInt32 Index);
 		static ZEInput			CreateQuaternion(const ZEString& DeviceName, ZEUInt32 Index);
+		static ZEInput			CreateCursor(const ZEString& DeviceName);
+		static ZEInput			CreateText(const ZEString& DeviceName);
 };
 
 #endif

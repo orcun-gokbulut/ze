@@ -33,28 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZEWindowsInputModule.h"
+
+#include "ZEError.h"
 #include "ZEWindowsInputMouseDevice.h"
 #include "ZEWindowsInputKeyboardDevice.h"
-#include "ZECore\ZESystemMessageManager.h"
+#include "ZECore/ZESystemMessageManager.h"
 
-#define WINDIWS_LEAN_AND_MEAN
-#include <windows.h>
 #include <string.h>
 #include <memory.h>
 #include <stdio.h>
 
 bool ZEWindowsInputSystemMessageHandler::Callback(MSG* Message)
 {
-	if (Module->RawInputCount >= ZE_MAX_RAW_INPUT_COUNT)
+	if (Module->MessageCount >= ZE_MAX_RAW_INPUT_COUNT)
 		return false;
 
-	UINT InputSize = sizeof(RAWINPUT);
-	if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Module->RawInputs[Module->RawInputCount], &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
-		return false;
+	Module->Messages[Module->MessageCount].Message = *Message;
+	if (Message->message == WM_INPUT)
+	{
+		UINT InputSize = sizeof(RAWINPUT);
+		if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Module->Messages[Module->MessageCount].RawInput, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
+			return false;
+	}
 
-	Module->RawInputCount++;
+	Module->MessageCount++;
 
 	return true;
 }
@@ -63,7 +66,7 @@ ZEWindowsInputModule::ZEWindowsInputModule()
 {
 	MouseDevice = NULL;
 	KeyboardDevice = NULL;
-	RawInputCount = 0;
+	MessageCount = 0;
 }
 
 ZEWindowsInputModule::~ZEWindowsInputModule()
@@ -126,23 +129,10 @@ bool ZEWindowsInputModule::DeinitializeInternal()
 
 void ZEWindowsInputModule::Process()
 {
-	KeyboardDevice->State.Advance();
-	MouseDevice->State.Advance();
-
-	for (ZESize I = 0; I < MouseDevice->State.Axises.CurrentValues.GetCount(); I++)
-		MouseDevice->State.Axises.CurrentValues[I] = 0.0f;
-
-	for (ZESize I = 0; I < RawInputCount; I++)
-	{
-		if (RawInputs[I].header.dwType== RIM_TYPEMOUSE && MouseDevice->IsAcquired())
-			MouseDevice->Process(RawInputs[I]);
-		else if (RawInputs[I].header.dwType== RIM_TYPEKEYBOARD && KeyboardDevice->IsAcquired())
-			KeyboardDevice->Process(RawInputs[I]);
-	}
-
-	RawInputCount = 0;
+	MouseDevice->Process(Messages, MessageCount);
+	KeyboardDevice->Process(Messages, MessageCount);
+	MessageCount = 0;
 }
-
 
 ZEWindowsInputModule* ZEWindowsInputModule::CreateInstance()
 {

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputDeviceExtension.cpp
+ Zinek Engine - ZEInputDeviceIndexes.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEInputDeviceExtension.h"
+#pragma once
 
-bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
+#include "ZETypes.h"
+#include "ZEInputDeviceDescription.h"
+
+class ZEInputDeviceIndexes
 {
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-	{
-		if (Devices[I] == Device)
-		{
-			zeError("Input device already registered. Device Name : \"%s\".", Device->GetName());
-			return false;
-		}
+	private:
+		static ZEUInt							KeyboardIndex;
+		static ZEUInt							MouseIndex;
+		static ZEUInt							JoystickIndex;
+		static ZEUInt							GamepadIndex;
+		static ZEUInt							WheelIndex;
+		static ZEUInt							SensorIndex;
+		static ZEUInt							OtherIndex;
 
-		if (Devices[I]->GetName() == Device->GetName())
-		{
-			zeError("A input device with the same name has been already registered. Device Name : \"%s\".", Device->GetName());
-			return false;
-		}
-	}
-
-	Devices.Add(Device);
-
-	if (IsInitializedOrInitializing())
-	{
-		if (!Device->Initialize())
-		{
-			zeError("Can not initialize input device.");
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
-{
-	if (IsInitializedOrInitializing())
-		Device->Deinitialize();
-
-	Devices.RemoveValue(Device);
-}
-
-void ZEInputDeviceModule::DestroyDevices()
-{
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->Destroy();
-
-	Devices.Clear();
-}
-
-
-const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
-{
-	return Devices;
-}
-
-bool ZEInputDeviceModule::DeinitializeInternal()
-{
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->Deinitialize();
-
-	return ZEModule::DeinitializeInternal();
-}
-
-void ZEInputDeviceModule::Acquire()
-{
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->Acquire();
-}
-
-void ZEInputDeviceModule::UnAcquire()
-{
-	for (ZESize I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->UnAcquire();
-}
-
-ZEInputDeviceModule::~ZEInputDeviceModule()
-{
-	DestroyDevices();
-}
+	public:
+		static ZEUInt							GetNewDeviceIndex(ZEInputDeviceType Type);
+};

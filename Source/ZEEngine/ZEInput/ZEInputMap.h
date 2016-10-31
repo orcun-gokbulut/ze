@@ -67,6 +67,8 @@ class ZEInputMap
 		void						AddSwitchAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
 		void						AddVectorAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
 		void						AddQuaternionAction(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, ZEInt ActionId);
+		void						AddCursorAction(const ZEString& DeviceName, ZEInputState State, ZEInt ActionId);
+		void						AddTextAction(const ZEString& DeviceName, ZEInt ActionId);
 
 		void						AddCallback(const ZEInput& Input, ZEInputState State, const ZEInputCallback& Callback);
 		void						AddCallback(const ZEString& InputString, ZEInputState State, const ZEInputCallback& Callback);
@@ -76,6 +78,8 @@ class ZEInputMap
 		void						AddSwitchCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
 		void						AddVectorCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
 		void						AddQuaternionCallback(const ZEString& DeviceName, ZEUInt32 Index, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddCursorCallback(const ZEString& DeviceName, ZEInputState State, const ZEInputCallback& Callback);
+		void						AddTextCallback(const ZEString& DeviceName, const ZEInputCallback& Callback);
 
 		void						Update();
 

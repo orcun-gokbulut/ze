@@ -35,20 +35,13 @@
 
 #include "ZEWindowsInputKeyboardDevice.h"
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEError.h"
-
-#include "ZECore/ZESystemMessageHandler.h"
-#include "ZECore/ZESystemMessageManager.h"
-
+#include "ZEDS/ZEFormat.h"
+#include "ZEDS/ZEHashGenerator.h"
 #include "ZEInput/ZEInputDefinitions.h"
+#include "ZEWindowsInputModule.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEDS/ZEFormat.h"
-#include "ZEDS/ZEHashGenerator.h"
-
 
 void ZEWindowsInputKeyboardDevice::UnAcquire()
 {
@@ -72,7 +65,7 @@ bool ZEWindowsInputKeyboardDevice::InitializeInternal()
 	Description.Name = ZEFormat::Format("Keyboard{0:d:02}", Description.Index);
 	Description.NameHash = ZEHashGenerator::Hash(Description.Name);
 
-	State.Initialize(Description);
+	State.Setup(Description);
 	State.Reset();
 
 	Acquire();
@@ -80,10 +73,46 @@ bool ZEWindowsInputKeyboardDevice::InitializeInternal()
 	return true;
 }
 
-void ZEWindowsInputKeyboardDevice::Process(const RAWINPUT& Data)
+void ZEWindowsInputKeyboardDevice::Process(const ZEWindowsInputMessage* Messages, ZESize MessageCount)
 {   
-	if ((Data.data.keyboard.Flags & 0x01) == RI_KEY_MAKE)
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = true;
-	else
-		State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = false;
+	if (!IsAcquired())
+		return;
+
+	State.Advance();
+	
+	for (ZESize I = 0; I < MessageCount; I++)
+	{
+		const ZEWindowsInputMessage& Message = Messages[I];
+		if (Message.Message.message == WM_INPUT && Message.RawInput.header.dwType== RIM_TYPEKEYBOARD)
+		{
+			const RAWINPUT& Data = Message.RawInput;
+
+			if ((Data.data.keyboard.Flags & 0x01) == RI_KEY_MAKE)
+				State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = true;
+			else
+				State.Buttons.CurrentValues[Data.data.keyboard.MakeCode] = false;
+		}
+		else if (Message.Message.message == WM_CHAR)
+		{
+			State.Character = Message.Message.wParam;
+
+			State.CharacterModifiers = ZEIN_CM_NONE;
+			if (State.Buttons.CurrentValues[ZE_IKB_LCONTROL])
+				State.CharacterModifiers |= ZEIN_CM_CTRL | ZEIN_CM_CTRL_LEFT;
+			if (State.Buttons.CurrentValues[ZE_IKB_RCONTROL])
+				State.CharacterModifiers |= ZEIN_CM_CTRL | ZEIN_CM_CTRL_RIGHT;
+			if (State.Buttons.CurrentValues[ZE_IKB_LALT])
+				State.CharacterModifiers |= ZEIN_CM_ALT | ZEIN_CM_ALT_LEFT;
+			if (State.Buttons.CurrentValues[ZE_IKB_RALT])
+				State.CharacterModifiers |= ZEIN_CM_ALT | ZEIN_CM_ALT_RIGHT;
+			if (State.Buttons.CurrentValues[ZE_IKB_LSHIFT])
+				State.CharacterModifiers |= ZEIN_CM_SHIFT | ZEIN_CM_SHIFT_LEFT;
+			if (State.Buttons.CurrentValues[ZE_IKB_RSHIFT])
+				State.CharacterModifiers |= ZEIN_CM_SHIFT | ZEIN_CM_SHIFT_RIGHT;
+			if (State.Buttons.CurrentValues[ZE_IKB_LWIN])
+				State.CharacterModifiers |= ZEIN_CM_WINDOWS | ZEIN_CM_WINDOWS_LEFT;
+			if (State.Buttons.CurrentValues[ZE_IKB_RWIN])
+				State.CharacterModifiers |= ZEIN_CM_WINDOWS | ZEIN_CM_WINDOWS_RIGHT;
+		}
+	}
 }

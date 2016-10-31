@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputCursorDevice.h
+ Zinek Engine - ZEInputDeviceDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,26 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
-#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
 #include "ZETypes.h"
-#include "ZEInput/ZEInputDevice.h"
+#include "ZEDS/ZEString.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-class ZEWindowsInputMouseDevice : public ZEInputDevice
+enum ZEInputDeviceType
 {
-	friend class ZEWindowsInputModule;
-	friend class ZEWindowsInputSystemMessageHandler;	
-	private:
-		virtual bool				InitializeInternal();
-
-	public:
-		virtual void				UnAcquire();
-
-		virtual void				Process(const RAWINPUT& Data);
+	ZE_IDT_NONE,
+	ZE_IDT_MOUSE,
+	ZE_IDT_KEYBOARD,
+	ZE_IDT_JOYSTICK,
+	ZE_IDT_GAMEPAD,
+	ZE_IDT_WHEEL,
+	ZE_IDT_SENSOR,
+	ZE_IDT_OTHER
 };
 
-#endif
+class ZEInputDeviceDescription
+{
+	public:
+		ZEString								Name;
+		ZEUInt									NameHash;
+		ZEUInt									Index;
+		ZEInputDeviceType						Type;
+
+		ZEString								FullName;
+
+		ZEString								SinkName;
+		ZEUInt									SinkNameHash;
+		bool									Sink;
+
+		ZESize									ButtonCount;
+		ZESize									AxisCount;
+		ZESize									POVCount;
+		ZESize									SwitchCount;
+		ZESize									VectorCount;
+		ZESize									QuaternionCount;
+
+		void									Clear();
+
+												ZEInputDeviceDescription();
+};

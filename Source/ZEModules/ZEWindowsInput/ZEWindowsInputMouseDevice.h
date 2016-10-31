@@ -34,26 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
-#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
-#include "ZETypes.h"
 #include "ZEInput/ZEInputDevice.h"
-#include "ZECore/ZESystemMessageHandler.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+struct ZEWindowsInputMessage;
 
 class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
-	friend class ZEWindowsInputModule;
-	protected:
+	private:
 		virtual bool				InitializeInternal();
 
 	public:
 		virtual void				UnAcquire();
 
-		virtual void				Process(const RAWINPUT& Data);
+		virtual void				Process(const ZEWindowsInputMessage* Messages, ZESize MessageCount);
 };
-
-#endif

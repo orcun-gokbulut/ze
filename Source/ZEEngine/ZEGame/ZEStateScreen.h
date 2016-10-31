@@ -56,6 +56,7 @@ class ZEStateScreen : public ZEEntity
 		ZEUIFrameControl*					LoadingIndicatorFrame;
 		ZEHolder<const ZEUIFontTrueType>	Font;
 
+		ZEUInt								LoadingPercentage;
 		ZEUInt								LastLoadingPercentage;
 		ZESize								LastOutputBufferCount;
 
@@ -69,6 +70,7 @@ class ZEStateScreen : public ZEEntity
 		void								SetManager(ZEUIManager* Manager);
 		ZEUIManager*						GetManager();
 
+		virtual void						Tick(float ElapsedTime);
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 
 		static ZEStateScreen*				CreateInstance();
