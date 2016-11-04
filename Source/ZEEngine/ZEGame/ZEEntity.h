@@ -242,6 +242,7 @@ class ZEEntity : public ZEObject
 		virtual const ZEAABBox&					GetWorldBoundingBox() const;
 
 		const ZEMatrix4x4&						GetTransform() const;
+		const ZEMatrix4x4&						GetInvTransform() const;
 		const ZEMatrix4x4&						GetWorldTransform() const;
 		const ZEMatrix4x4&						GetInvWorldTransform() const;
 

@@ -85,4 +85,9 @@ float4 ZEUIRenderer_PixelShader(ZEUIRenderer_PSInput Input) : SV_Target0
 	return Input.Color;
 }
 
+float4 ZEUIRenderer_PixelShaderNonTextured(ZEUIRenderer_PSInput Input) : SV_Target0
+{
+	return Input.Color;
+}
+
 #endif

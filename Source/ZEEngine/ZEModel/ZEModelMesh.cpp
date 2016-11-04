@@ -319,7 +319,7 @@ const ZEMatrix4x4& ZEModelMesh::GetInvTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_MDF_INV_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(InvTransform, GetTransform());
+		ZEMatrix4x4::CreateOrientation(InvTransform, -Position, Rotation.Conjugate(), ZEVector3::One / Scale);
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_INV_TRANSFORM);
 	}
 
@@ -331,13 +331,9 @@ const ZEMatrix4x4& ZEModelMesh::GetModelTransform() const
 	if (DirtyFlags.GetFlags(ZEMD_MDF_MODEL_TRANSFORM))
 	{
 		if (Parent == NULL)
-		{
 			ModelTransform = GetTransform();
-		}
 		else
-		{
 			ZEMatrix4x4::Multiply(ModelTransform, Parent->GetModelTransform(), GetTransform());
-		}
 
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_MODEL_TRANSFORM);
 	}
@@ -349,7 +345,11 @@ const ZEMatrix4x4& ZEModelMesh::GetInvModelTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_MDF_MODEL_INV_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(InvModelTransform, GetModelTransform());
+		if (Parent == NULL)
+			InvModelTransform = GetInvTransform();
+		else
+			ZEMatrix4x4::Multiply(InvModelTransform, GetInvTransform(), Parent->GetInvModelTransform());
+
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_MODEL_INV_TRANSFORM);
 	}
 
@@ -361,14 +361,10 @@ const ZEMatrix4x4& ZEModelMesh::GetWorldTransform() const
 	if (DirtyFlags.GetFlags(ZEMD_MDF_WORLD_TRANSFORM))
 	{
 		if (Model == NULL)
-		{
 			WorldTransform = GetModelTransform();
-		}
 		else
-		{
 			ZEMatrix4x4::Multiply(WorldTransform, Model->GetWorldTransform(), GetModelTransform());
-		}
-
+	
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_WORLD_TRANSFORM);
 	}
 
@@ -379,7 +375,11 @@ const ZEMatrix4x4& ZEModelMesh::GetInvWorldTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_MDF_WORLD_INV_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+		if (Model == NULL)
+			InvWorldTransform = GetInvModelTransform();
+		else
+			ZEMatrix4x4::Multiply(InvWorldTransform, GetInvModelTransform(), Model->GetInvWorldTransform());
+
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_WORLD_INV_TRANSFORM);
 	}
 

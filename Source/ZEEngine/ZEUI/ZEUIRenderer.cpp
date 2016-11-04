@@ -98,9 +98,6 @@ void ZEUIRenderer::UpdateBatches()
 		ZEUIRendererBatch* LastBatch = NULL;
 		ze_for_each(Rectangle, Rectangles)
 		{
-			if (Rectangle->Texture == NULL)
-				continue;
-
 			if (LastBatch == NULL || Rectangle->Texture != LastBatch->Texture)
 			{
 				// New Batch
@@ -161,12 +158,19 @@ bool ZEUIRenderer::InitializeInternal()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot compile render state.");
 
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZEUIRenderer_PixelShaderNonTextured";
+	RenderState.SetShader(ZEGR_ST_PIXEL, ZEGRShader::Compile(Options));
+	zeCheckError(RenderState.GetShader(ZEGR_ST_PIXEL) == NULL, false, "Cannot compile pixel shader.");
+
+	RenderStateDataNonTextured = RenderState.Compile(); 
+	zeCheckError(RenderStateData == NULL, false, "Cannot compile render state.");
+
 	// Sampler
 	ZEGRSamplerDescription SamplerDescription;
 	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
 	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
 	SamplerDescription.BorderColor = ZEVector4::Zero;
-
 	Sampler = ZEGRSampler::GetSampler(SamplerDescription);
 
 	return true;
@@ -231,12 +235,23 @@ void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZE
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 	Context->SetVertexBuffer(0, VertexBuffer);
 
+	bool LastTextured = false;
 	ze_for_each(Batch, Batches)
 	{
 		if (Batch->Texture != NULL)
+		{
+			if (!LastTextured)
+				Context->SetRenderState(RenderStateData);
+
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, Batch->Texture);
+			LastTextured = true;
+		}
 		else
+		{
+			Context->SetRenderState(RenderStateDataNonTextured);
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+			LastTextured = false;
+		}
 
 		Context->Draw(Batch->Count, Batch->Offset);
 	}
