@@ -907,7 +907,7 @@ const ZEMatrix4x4& ZEEntity::GetInvTransform() const
 {
 	if (EntityDirtyFlags.GetFlags(ZE_EDF_INV_LOCAL_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateOrientation(InvTransform, -GetPosition(), GetRotation().Conjugate(), ZEVector3::One / GetScale());
+		ZEMatrix4x4::CreateInvOrientation(InvTransform, Position, Rotation, ZEVector3::One);
 		EntityDirtyFlags.UnraiseFlags(ZE_EDF_INV_LOCAL_TRANSFORM);
 	}
 

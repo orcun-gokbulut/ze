@@ -319,7 +319,7 @@ const ZEMatrix4x4& ZEModelMesh::GetInvTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_MDF_INV_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateOrientation(InvTransform, -Position, Rotation.Conjugate(), ZEVector3::One / Scale);
+		ZEMatrix4x4::CreateInvOrientation(InvTransform, Position, Rotation, ZEVector3::One);
 		DirtyFlags.UnraiseFlags(ZEMD_MDF_INV_TRANSFORM);
 	}
 

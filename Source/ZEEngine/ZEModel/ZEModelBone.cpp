@@ -355,7 +355,7 @@ const ZEMatrix4x4& ZEModelBone::GetInvTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateOrientation(InvTransform, -Position, Rotation.Conjugate());
+		ZEMatrix4x4::CreateInvOrientation(InvTransform, Position, Rotation);
 		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_TRANSFORM);
 	}
 
@@ -382,7 +382,7 @@ const ZEMatrix4x4& ZEModelBone::GetInvModelTransform() const
 	if (DirtyFlags.GetFlags(ZEMD_BDF_MODEL_INV_TRANSFORM))
 	{
 		if (Parent == NULL)
-			ModelTransform = GetInvTransform();
+			InvModelTransform = GetInvTransform();
 		else
 			ZEMatrix4x4::Multiply(InvModelTransform, GetInvTransform(), Parent->GetInvModelTransform());
 
@@ -396,7 +396,7 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_WORLD_TRANSFORM))
 	{
-		if (Model != NULL)
+		if (Model == NULL)
 			WorldTransform = GetModelTransform();
 		else
 			ZEMatrix4x4::Multiply(WorldTransform, Model->GetWorldTransform(), GetModelTransform());
