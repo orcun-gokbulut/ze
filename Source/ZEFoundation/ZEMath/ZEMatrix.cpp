@@ -853,6 +853,43 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 		0.0f, 0.0f, 0.0f, 1.0f);
 }
 
+void ZEMatrix4x4::CreateInvOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale)
+{
+	ZEMatrix4x4 TranslationMatrix;
+	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -Position);
+
+	ZEMatrix4x4 RotationMatrix;
+	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation.Conjugate());
+
+	ZEMatrix4x4 ScaleMatrix;
+	ZEMatrix4x4::CreateScale(ScaleMatrix, ZEVector3::One / Scale);
+
+	ZEMatrix4x4 Temp;
+	ZEMatrix4x4::Multiply(Temp, RotationMatrix, TranslationMatrix);
+	ZEMatrix4x4::Multiply(Matrix, ScaleMatrix, Temp);
+}
+
+void ZEMatrix4x4::CreateInvOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
+{
+	ZEMatrix4x4 TranslationMatrix;
+	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -Position);
+
+	ZEMatrix4x4 RotationMatrix;
+	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation.Conjugate());
+
+	ZEMatrix4x4::Multiply(Matrix, RotationMatrix, TranslationMatrix);
+}
+
+void ZEMatrix4x4::CreateInvOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& Scale)
+{
+	ZEMatrix4x4 TranslationMatrix;
+	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -Position);
+
+	ZEMatrix4x4 ScaleMatrix;
+	ZEMatrix4x4::CreateScale(ScaleMatrix, ZEVector3::One / Scale);
+
+	ZEMatrix4x4::Multiply(Matrix, ScaleMatrix, TranslationMatrix);
+}
 
 void ZEMatrix4x4::CreateUVN(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& U, const ZEVector3& V, const ZEVector3& N)
 {
