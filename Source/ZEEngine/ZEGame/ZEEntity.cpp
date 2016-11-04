@@ -902,29 +902,42 @@ const ZEMatrix4x4& ZEEntity::GetTransform() const
 	return Transform;
 }
 
-const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
+
+const ZEMatrix4x4& ZEEntity::GetInvTransform() const
 {
-	if (Parent == NULL)
+	if (EntityDirtyFlags.GetFlags(ZE_EDF_INV_LOCAL_TRANSFORM))
 	{
-		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
-		return GetTransform();
+		ZEMatrix4x4::CreateOrientation(InvTransform, -GetPosition(), GetRotation().Conjugate(), ZEVector3::One / GetScale());
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_INV_LOCAL_TRANSFORM);
 	}
 
+	return InvTransform;
+}
+
+const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
+{
 	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(WorldTransform, Parent->GetWorldTransform(), GetTransform());
+		if (Parent == NULL)
+			WorldTransform = GetTransform();
+		else
+			ZEMatrix4x4::Multiply(WorldTransform, Parent->GetWorldTransform(), GetTransform());
+
 		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
 	}
 
 	return WorldTransform;
-
 }
 
 const ZEMatrix4x4& ZEEntity::GetInvWorldTransform() const
 {
 	if (EntityDirtyFlags.GetFlags(ZE_EDF_INV_WORLD_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+		if (Parent == NULL)
+			InvWorldTransform = GetInvTransform();
+		else
+			ZEMatrix4x4::Multiply(InvWorldTransform, GetInvTransform(), Parent->GetInvWorldTransform());
+
 		EntityDirtyFlags.UnraiseFlags(ZE_EDF_INV_WORLD_TRANSFORM);
 	}
 

@@ -62,6 +62,7 @@ class ZEClass;
 class ZEViewVolume;
 class ZEDEditor;
 class ZEDObjectWrapper;
+class ZEUIFrameControl;
 
 class ZEDSelectionManager : public ZEDComponent
 {
@@ -74,8 +75,11 @@ class ZEDSelectionManager : public ZEDComponent
 		ZEDSelectionMode					SelectionMode;
 		ZEDSelectionShape					SelectionShape;
 		ZEClass*							Filter;
-		ZEVector2							SelectionStartPosition;
 		bool								LockSelection;
+
+		bool								MultiSelection;
+		ZEUIFrameControl*					MultiSelectionBox;
+		ZEVector2							MultiSelectionStartPosition;
 
 		bool								FilterSelection(ZEObject* Object, void* Class);
 		void								UnfrezeeAllInternal(ZEDObjectWrapper* Object);
@@ -83,6 +87,9 @@ class ZEDSelectionManager : public ZEDComponent
 		virtual void						EditorEvent(const ZEDEditorEvent* Event);
 		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
 		virtual void						ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 											ZEDSelectionManager();
 		virtual								~ZEDSelectionManager();

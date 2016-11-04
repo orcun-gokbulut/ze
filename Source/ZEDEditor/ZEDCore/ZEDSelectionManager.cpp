@@ -46,6 +46,8 @@
 #include "ZEDSelectionEvent.h"
 #include "ZEDEditorEvent.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
+#include "ZEUI/ZEUIFrameControl.h"
+#include "ZEMath/ZEMath.h"
 
 /*void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 {
@@ -183,24 +185,7 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 		RightDown.y = ScreenPoint2.y;
 	}
 
-	ZERay RayLU, RayRU, RayLD, RayRD;
-	ActiveCamera->GetScreenRay(RayLU, LeftUp.x, LeftUp.y);
-	ActiveCamera->GetScreenRay(RayRU, RightDown.x, LeftUp.y);
-	ActiveCamera->GetScreenRay(RayLD, LeftUp.x, RightDown.y);
-	ActiveCamera->GetScreenRay(RayRD, RightDown.x, RightDown.y);
-	float FarZ = ActiveCamera->GetFarZ();
 
-	ZEPlane LeftClipPlane, TopClipPlane, RightClipPlane, BottomClipPlane, NearClipPlane, FarClipPlane;
-	ZEViewFrustum SelectionFrustum;
-
-	ZEPlane::Create(LeftClipPlane, RayLD.p, RayLU.p, RayLU.GetPointOn(1.0f));
-	ZEPlane::Create(TopClipPlane, RayLU.p, RayRU.p, RayRU.GetPointOn(1.0f));
-	ZEPlane::Create(BottomClipPlane, RayRD.p, RayLD.p, RayLD.GetPointOn(1.0f));
-	ZEPlane::Create(RightClipPlane, RayRU.p, RayRD.p, RayRD.GetPointOn(1.0f));
-	ZEPlane::Create(NearClipPlane, RayLU.p, RayLD.p, RayRD.p);
-	ZEPlane::Create(FarClipPlane, RayRD.GetPointOn(FarZ), RayLD.GetPointOn(FarZ), RayLU.GetPointOn(FarZ));
-
-	SelectionFrustum.Create(RightClipPlane, BottomClipPlane, LeftClipPlane, TopClipPlane, FarClipPlane, NearClipPlane);
 
 	DeselectObject(&SelectionFrustum);
 }*/
@@ -209,6 +194,7 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 ZEDSelectionManager::ZEDSelectionManager()
 {
 	LockSelection = false;
+	MultiSelection = false;
 	FocusedObject = NULL;
 	Filter = NULL;
 }
@@ -627,12 +613,10 @@ void ZEDSelectionManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* 
 
 void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 {
-	if (Event->GetButton() != ZED_VMB_LEFT)
-		return;
-
-	if (Event->GetType() == ZED_VIET_BUTTON_PRESSED)
+	if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
 	{
-		SelectionStartPosition = Event->GetPosition();
+		MultiSelection = true;
+		MultiSelectionStartPosition = Event->GetPosition();
 
 		// Single Selection	
 		ZERayCastParameters Parameters;
@@ -673,12 +657,125 @@ void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 
 		Event->Acquire();
 	}
-	else if (Event->GetType() == ZED_VIET_BUTTON_PRESSED)
+	else if (Event->GetType() == ZED_VIET_MOUSE_MOVED)
 	{
-		if (SelectionStartPosition - Event->GetPosition() == ZEVector2::Zero)
+		if (MultiSelection)
 		{
+			ZEVector2 Size;
+			Size.x = ZEMath::Abs(MultiSelectionStartPosition.x - Event->GetPosition().x);
+			Size.y = ZEMath::Abs(MultiSelectionStartPosition.y - Event->GetPosition().y);
+
+			if (Size.Min() != 0)
+			{
+				ZEVector2 Position;
+				Position.x = MultiSelectionStartPosition.x < Event->GetPosition().x ? MultiSelectionStartPosition.x : Event->GetPosition().x;
+				Position.y = MultiSelectionStartPosition.y < Event->GetPosition().y ? MultiSelectionStartPosition.y : Event->GetPosition().y;
+
+				MultiSelectionBox->SetPosition(Position);
+				MultiSelectionBox->SetSize(Size);
+				MultiSelectionBox->SetVisiblity(true);
+			}
+		}
+		else
+		{
+			MultiSelectionBox->SetVisiblity(false);
 		}
 	}
+	else if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_RELEASED)
+	{
+		if (MultiSelection)
+		{
+			ZEVector2 Size;
+			Size.x = ZEMath::Abs(MultiSelectionStartPosition.x - Event->GetPosition().x);
+			Size.y = ZEMath::Abs(MultiSelectionStartPosition.y - Event->GetPosition().y);
+
+			ZEArray<ZEDObjectWrapper*> List;
+			if (Size.Min() != 0)
+			{
+				ZEVector2 Position;
+				Position.x = MultiSelectionStartPosition.x < Event->GetPosition().x ? MultiSelectionStartPosition.x : Event->GetPosition().x;
+				Position.y = MultiSelectionStartPosition.y < Event->GetPosition().y ? MultiSelectionStartPosition.y : Event->GetPosition().y;
+
+				const ZERNView& View = Event->GetViewport()->GetView();
+				ZERay LeftBottomRay =  ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(0.0f, Size.y));
+				ZERay RightBottomRay = ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(Size.x, Size.y));
+				ZERay LeftTopRay =	ZERNScreenUtilities::ScreenToWorld(View, Position);
+				ZERay RightTopRay = ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(Size.x, 0.0f));
+
+				ZEFrustum Frustum;
+				ZEPlane::Create(Frustum.LeftPlane,	LeftBottomRay.p + LeftBottomRay.v,	 LeftBottomRay.p,	LeftTopRay.p + LeftTopRay.v);
+				ZEPlane::Create(Frustum.RightPlane, RightBottomRay.p + RightBottomRay.v, RightBottomRay.p,	RightTopRay.p + RightTopRay.v);
+				ZEPlane::Create(Frustum.DownPlane,	LeftBottomRay.p + LeftBottomRay.v,	 LeftBottomRay.p,	LeftTopRay.p + LeftTopRay.v);
+				ZEPlane::Create(Frustum.UpPlane,	LeftTopRay.p + LeftTopRay.v,		 LeftTopRay.p,		RightTopRay.p + RightTopRay.v);
+				
+				Frustum.NearPlane.p = View.Position + View.Direction * View.NearZ;
+				Frustum.NearPlane.n = View.Direction;
+				Frustum.FarPlane.p = View.Position + View.Direction * View.FarZ;
+				Frustum.FarPlane.n = -View.Direction;
+
+				ZEDObjectWrapper* RootWrapper = GetEditor()->GetObjectManager()->GetRootWrapper();
+				
+				const ZEArray<ZEDObjectWrapper*> ChildWrappers = RootWrapper->GetChildWrappers();
+				for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+				{
+					ZEDObjectWrapper* ChildWrapper = ChildWrappers[I];
+
+					ZEOBBox BoundingBox;
+					ZEAABBox::GenerateOBoundingBox(BoundingBox, ChildWrapper->GetLocalBoundingBox());
+					ZEOBBox WorldBoundingBox;
+					ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), BoundingBox);
+					
+					if (!ChildWrapper->GetSelectable())
+						continue;
+
+					if (ChildWrapper->GetFrozen())
+						continue;
+
+					if (!Frustum.IntersectionTest(Frustum, WorldBoundingBox))
+						continue;
+
+					List.Add(ChildWrapper);
+				}
+			}
+
+			if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0 || (Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
+				SelectObjects(List);
+			else if (Event->GetModifiers() & ZED_VKM_ALT)
+				DeselectObjects(List);
+			else
+				SetSelection(List);
+		}
+
+		MultiSelection = false;
+		MultiSelectionBox->SetVisiblity(false);
+	}
+	else if (Event->GetButton() == ZED_VMB_RIGHT && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
+	{
+		MultiSelection = false;
+		MultiSelectionBox->SetVisiblity(false);
+	}
+}
+
+bool ZEDSelectionManager::InitializeInternal()
+{
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
+	MultiSelectionBox = new ZEUIFrameControl();
+	MultiSelectionBox->SetBackgroundColor(ZEVector4(0.17f, 0.5f, 1.0f, 0.5f));
+	MultiSelectionBox->SetVisiblity(false);
+	MultiSelectionBox->SetZOrder(1000);
+	GetEditor()->GetUIManager()->AddControl(MultiSelectionBox);
+
+	return true;
+}
+
+bool ZEDSelectionManager::DeinitializeInternal()
+{
+	GetEditor()->GetUIManager()->RemoveControl(MultiSelectionBox);
+	MultiSelectionBox->Destroy();
+
+	return ZEInitializable::DeinitializeInternal();
 }
 
 ZEDSelectionManager* ZEDSelectionManager::CreateInstance()

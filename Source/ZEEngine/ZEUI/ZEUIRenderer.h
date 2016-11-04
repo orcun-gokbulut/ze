@@ -77,6 +77,7 @@ class ZEUIRenderer : public ZEInitializable
 		ZESmartArray<ZEUIRendererBatch>		Batches;
 		ZEHolder<ZEGRBuffer>				VertexBuffer;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRRenderStateData>		RenderStateDataNonTextured;
 		ZEHolder<ZEGRSampler>				Sampler;
 
 	protected:
