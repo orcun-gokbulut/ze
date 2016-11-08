@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
 
 #include "ZEGame/ZEEntity.h"
 #include "ZESoundSource.h"
@@ -74,5 +72,7 @@ class ZESoundSource3D : public ZESoundSource
 		ZEUInt						GetConeOutsideVolume() const;
 
 		static ZESoundSource3D*		CreateInstance();
-};
-#endif
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZESound.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);

@@ -95,4 +95,7 @@ class ZEATFog : public ZEEntity
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEATFog*					CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);

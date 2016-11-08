@@ -164,4 +164,7 @@ class ZESoundSource : public ZEEntity
 
 		static ZESoundSource*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZESound.png");
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZESound.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);

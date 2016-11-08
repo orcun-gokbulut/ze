@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_MODULE_H__
-#define __ZE_SOUND_MODULE_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -118,5 +116,3 @@ class ZESoundModule : public ZEModule
 
 		static ZESoundModule*					GetInstance();
 };
-
-#endif

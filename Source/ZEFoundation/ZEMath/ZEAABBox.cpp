@@ -52,6 +52,40 @@
 const ZEAABBox ZEAABBox::Zero = ZEAABBox(ZEVector3::Zero, ZEVector3::Zero);
 const ZEAABBox ZEAABBox::Maximum = ZEAABBox(ZEVector3(ZE_FLOAT_MIN, ZE_FLOAT_MIN, ZE_FLOAT_MIN), ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX));
 
+static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
+{
+	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
+	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
+
+	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
+	{
+		float t1 = (e + HalfSize) / f;
+		float t2 = (e - HalfSize) / f;
+		if (t1 > t2)
+		{
+			float Temp;
+			Temp = t1;
+			t1 = t2;
+			t2 = Temp;
+		}
+
+		if (t1 > TMin) 
+			TMin = t1;
+
+		if (t2 < TMax) 
+			TMax = t2;
+
+		if (TMin > TMax)
+			return 0;
+
+		return 1;
+	}
+	else if (-e - HalfSize > 0 || -e + HalfSize < 0) // Ray is parallel but test whether line lies between planes.
+		return 0;
+
+	return 2;
+}
+
 ZEVector3 ZEAABBox::GetCenter() const
 {
 	ZEVector3 Center;
@@ -97,9 +131,7 @@ ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlan
 	ZEVector3 HalfDiameter = (BoundingBox.Max - BoundingBox.Min) * 0.5f;
 
 	float Extent = HalfDiameter.x * ZEMath::Abs(Plane.n.x) + HalfDiameter.y * ZEMath::Abs(Plane.n.y) + HalfDiameter.z * ZEMath::Abs(Plane.n.z);
-
 	float Distance = ZEVector3::DotProduct(Center - Plane.p, Plane.n);
-
 	if (Distance - Extent > 0)
 		return ZE_HS_POSITIVE_SIDE;
 	else if (Distance + Extent < 0)
@@ -132,44 +164,6 @@ void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox
 	OrientedBoundingBox.Front.y = 0;
 	OrientedBoundingBox.Front.z = 1.0f;
 }
-
-static inline void CheckSwap(float& a, float& b) 
-{
-	float Temp;
-	Temp = a;
-	a = b;
-	b = Temp;
-}
-
-static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
-{
-	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
-	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
-
-	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
-	{
-		float t1 = (e + HalfSize) / f;
-		float t2 = (e - HalfSize) / f;
-		if (t1 > t2) 
-			CheckSwap(t1, t2);
-
-		if (t1 > TMin) 
-			TMin = t1;
-
-		if (t2 < TMax) 
-			TMax = t2;
-
-		if (TMin > TMax)
-			return 0;
-
-		return 1;
-	}
-	else if (-e - HalfSize > 0 || -e + HalfSize < 0) // Ray is parallel but test whether line lies between planes.
-		return 0;
-
-	return 2;
-}
-
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point)
 {

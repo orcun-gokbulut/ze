@@ -59,9 +59,8 @@ class ZEAABBox
 
 		static void						Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix);
 
-		static ZEHalfSpace				IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane);
-
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point);
+		static ZEHalfSpace				IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
@@ -71,7 +70,6 @@ class ZEAABBox
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
-		
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
 		static bool						IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);

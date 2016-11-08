@@ -50,6 +50,53 @@
 #define		Y_AXIS		(ZEUInt)0x02
 #define		Z_AXIS		(ZEUInt)0x04
 
+
+static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
+{
+	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
+	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
+
+	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
+	{
+		float t1 = (e + HalfSize) / f;
+		float t2 = (e - HalfSize) / f;
+		if (t1 > t2)
+		{
+			float Temp = t1;
+			t1 = t2;
+			t2 = Temp;
+		}
+
+		if (t1 > TMin) 
+			TMin = t1;
+
+		if (t2 < TMax) 
+			TMax = t2;
+
+		if (TMin > TMax)
+			return 0;
+
+		return 1;
+	}
+	else if (-e - HalfSize > 0 || -e + HalfSize < 0) // Ray is parallel but test whether line lies between planes.
+		return 0;
+
+	return 2;
+}
+
+static inline bool SeparatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
+{
+	float dA = A.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(A.Right, Axis)) +
+		A.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(A.Up, Axis)) +
+		A.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(A.Front, Axis));
+
+	float dB = B.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(B.Right, Axis)) +
+		B.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(B.Up, Axis)) +
+		B.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(B.Front, Axis));
+
+	return (ZEMath::Abs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB)); 
+}
+
 ZEVector3 ZEOBBox::GetVertex(ZEUInt Index) const
 {
 	ZEVector3 Max = Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
@@ -70,31 +117,25 @@ void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Posit
 void ZEOBBox::Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input)
 {
 	ZEMatrix4x4::Transform(Output.Center, Matrix, Input.Center);
-	ZEMatrix4x4::Transform3x3(Output.Right, Matrix, Input.Right);
-	ZEMatrix4x4::Transform3x3(Output.Up, Matrix, Input.Up);
-	ZEMatrix4x4::Transform3x3(Output.Front, Matrix, Input.Front);
+
+	ZEMatrix4x4::Transform3x3(Output.Right, Matrix, Input.Right * Input.HalfSize.x);
+	ZEMatrix4x4::Transform3x3(Output.Up, Matrix, Input.Up * Input.HalfSize.y);
+	ZEMatrix4x4::Transform3x3(Output.Front, Matrix, Input.Front * Input.HalfSize.z);
+
+	Output.HalfSize.x = Output.Right.Length();
+	Output.Right /= Output.HalfSize.x;
+
+	Output.HalfSize.y = Output.Up.Length();
+	Output.Up /= Output.HalfSize.y;
+
+	Output.HalfSize.z = Output.Front.Length();
+	Output.Front /= Output.HalfSize.z;
 }
 
 void ZEOBBox::ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input)
 {
 	Sphere.Position = Input.Center;
 	Sphere.Radius = Input.HalfSize.Max();
-}
-
-ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane)
-{
-	float Extent = 
-		BoundingBox.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
-		BoundingBox.HalfSize.y * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
-		BoundingBox.HalfSize.z * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
-	float Distance = ZEVector3::DotProduct(BoundingBox.Center - Plane.p, Plane.n);
-
-	if (Distance - Extent > 0)
-		return ZE_HS_POSITIVE_SIDE;
-	else if (Distance + Extent < 0)
-		return ZE_HS_NEGATIVE_SIDE;
-	else
-		return ZE_HS_INTERSECTS;
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3& Point)
@@ -125,41 +166,20 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3& Poin
 	return true;
 }
 
-static inline void CheckSwap(float& a, float& b) 
+ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane)
 {
-	float Temp;
-	Temp = a;
-	a = b;
-	b = Temp;
-}
+	float Extent = 
+		BoundingBox.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
+		BoundingBox.HalfSize.y * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
+		BoundingBox.HalfSize.z * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
+	float Distance = ZEVector3::DotProduct(BoundingBox.Center - Plane.p, Plane.n);
 
-static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
-{
-	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
-	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
-
-	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
-	{
-		float t1 = (e + HalfSize) / f;
-		float t2 = (e - HalfSize) / f;
-		if (t1 > t2) 
-			CheckSwap(t1, t2);
-
-		if (t1 > TMin) 
-			TMin = t1;
-
-		if (t2 < TMax) 
-			TMax = t2;
-
-		if (TMin > TMax)
-			return 0;
-
-		return 1;
-	}
-	else if (-e - HalfSize > 0 || -e + HalfSize < 0) // Ray is parallel but test whether line lies between planes.
-		return 0;
-
-	return 2;
+	if (Distance - Extent > 0)
+		return ZE_HS_POSITIVE_SIDE;
+	else if (Distance + Extent < 0)
+		return ZE_HS_NEGATIVE_SIDE;
+	else
+		return ZE_HS_INTERSECTS;
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line)
@@ -326,21 +346,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& Boun
 {
 	ZEOBBox TempBoundingBox;
 	ZEAABBox::GenerateOBoundingBox(TempBoundingBox, BoundingBox2);
-
 	return IntersectionTest(BoundingBox1, TempBoundingBox);
-}
-
-static inline bool SeparatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
-{
-	float dA = A.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(A.Right, Axis)) +
-		A.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(A.Up, Axis)) +
-		A.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(A.Front, Axis));
-
-	float dB = B.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(B.Right, Axis)) +
-		B.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(B.Up, Axis)) +
-		B.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(B.Front, Axis));
-
-	return (ZEMath::Abs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB)); 
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
@@ -364,49 +370,39 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
 		return false;
 
 	ZEVector3 CrossProductOutput;
-
-	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Right);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Right, B.Right);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Up);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Up, B.Right);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Front);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Front, B.Right);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Right);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Right, B.Up);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Up);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Up, B.Up);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Front);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Front, B.Up);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Right);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Right, B.Front);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Up);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Up, B.Front);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Front);
-
+	ZEVector3::CrossProduct(CrossProductOutput, A.Front, B.Front);
 	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 

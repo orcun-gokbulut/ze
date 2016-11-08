@@ -60,22 +60,17 @@ class ZEOBBox
 
 		static void						Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input);
 
-		static ZEHalfSpace				IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane);
-
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3& Point);
-
+		static ZEHalfSpace				IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, float& TMin);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
-
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax);
-
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
-
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox, const ZEBSphere& BoundingSphere);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& BoundingBox2);
 		static bool						IntersectionTest(const ZEOBBox& BoundingBox1, const ZEOBBox& BoundingBox2);

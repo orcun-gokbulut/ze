@@ -120,4 +120,5 @@ class ZELightDirectional : public ZELight
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZELightDirectional*			CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false);
