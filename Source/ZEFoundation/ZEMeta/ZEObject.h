@@ -68,11 +68,11 @@ class ZEObject
 		virtual	ZEClass*			GetClass() const;
 		static ZEClass*				Class();
 }
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEObject.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, true)
 ZE_META_ATTRIBUTE_MEMBER(*, ZEMC.Export, true)
 ZE_META_ATTRIBUTE_MEMBER(~*, ZEMC.Accessor, true)
 ZE_META_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEObject.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlate, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Visualization, None)
 ZE_META_ATTRIBUTE_MEMBER(@*, ZEDEditor.PropertyEditor.Display, true);

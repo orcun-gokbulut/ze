@@ -399,7 +399,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 				ZEVector3 Direction = ProjectiveLight->GetWorldRotation() * ZEVector3::UnitZ;
 				Direction.NormalizeSelf();
 				const ZEViewFrustum& ViewFrustum = static_cast<const ZEViewFrustum&>(ProjectiveLight->GetViewVolume());
-				DestLight.CullRange = ZEVector3::Length(ViewFrustum.GetVertex(ZE_FV_RIGHT_UP_FAR) - ViewFrustum.GetVertex(ZE_FV_LEFT_DOWN_NEAR)) * 0.5f;
+				DestLight.CullRange = ZEVector3::Length(ViewFrustum.GetVertex(ZE_FV_RIGHT_TOP_FAR) - ViewFrustum.GetVertex(ZE_FV_LEFT_BOTTOM_NEAR)) * 0.5f;
 				ZEMatrix4x4::Transform(DestLight.CullPositionView, View.ViewTransform, ProjectiveLight->GetWorldPosition() + DestLight.CullRange * Direction);
 
 				ProjectiveLights.AddByRef(DestLight);

@@ -47,30 +47,30 @@ class ZEQuaternion;
 
 enum ZEFrustumVertex
 {
-	ZE_FV_LEFT_DOWN_NEAR = 0,
-	ZE_FV_LEFT_DOWN_FAR,
-	ZE_FV_LEFT_UP_NEAR,
-	ZE_FV_LEFT_UP_FAR,
-	ZE_FV_RIGHT_DOWN_FAR,
-	ZE_FV_RIGHT_DOWN_NEAR,
-	ZE_FV_RIGHT_UP_NEAR,
-	ZE_FV_RIGHT_UP_FAR
+	ZE_FV_LEFT_BOTTOM_NEAR = 0,
+	ZE_FV_LEFT_BOTTOM_FAR,
+	ZE_FV_LEFT_TOP_NEAR,
+	ZE_FV_LEFT_TOP_FAR,
+	ZE_FV_RIGHT_BOTTOM_NEAR,
+	ZE_FV_RIGHT_BOTTOM_FAR,
+	ZE_FV_RIGHT_TOP_NEAR,
+	ZE_FV_RIGHT_TOP_FAR,
 };
 
 enum ZEFrustumEdge
 {
-	ZE_FE_LEFT_DOWN = 0,
-	ZE_FE_LEFT_UP,
+	ZE_FE_LEFT_BOTTOM = 0,
+	ZE_FE_LEFT_TOP,
 	ZE_FE_LEFT_NEAR,
 	ZE_FE_LEFT_FAR,
-	ZE_FE_RIGHT_DOWN,
-	ZE_FE_RIGHT_UP,
+	ZE_FE_RIGHT_BOTTOM,
+	ZE_FE_RIGHT_TOP,
 	ZE_FE_RIGHT_NEAR,
 	ZE_FE_RIGHT_FAR,
-	ZE_FE_DOWN_NEAR,
-	ZE_FE_DOWN_FAR,
-	ZE_FE_UP_NEAR,
-	ZE_FE_UP_FAR
+	ZE_FE_BOTTOM_NEAR,
+	ZE_FE_BOTTOM_FAR,
+	ZE_FE_TOP_NEAR,
+	ZE_FE_TOP_FAR,
 
 };
 
@@ -78,10 +78,18 @@ enum ZEFrustumPlane
 {
 	ZE_FP_LEFT = 0,
 	ZE_FP_RIGHT,
-	ZE_FP_DOWN,
-	ZE_FP_UP,
+	ZE_FP_BOTTOM,
+	ZE_FP_TOP,
 	ZE_FP_NEAR,
 	ZE_FP_FAR,
+};
+
+enum ZEIntersectionResult
+{
+	ZE_IR_NONE,
+	ZE_IR_INTERSECT,
+	ZE_IR_INSIDE,
+	ZE_IR_COVERS,
 };
 
 class ZEFrustum
@@ -89,8 +97,8 @@ class ZEFrustum
 	public:
 		ZEPlane								LeftPlane; 
 		ZEPlane								RightPlane;
-		ZEPlane								DownPlane;
-		ZEPlane								UpPlane;
+		ZEPlane								BottomPlane;
+		ZEPlane								TopPlane;
 		ZEPlane								NearPlane;
 		ZEPlane								FarPlane;
 
@@ -100,6 +108,7 @@ class ZEFrustum
 		ZEVector3							GetRight() const;
 		ZEVector3							GetUp() const;
 
+		ZEPlane&							GetPlane(ZEFrustumPlane Plane);
 		const ZEPlane&						GetPlane(ZEFrustumPlane Plane) const;
 		ZELineSegment						GetEdge(ZEFrustumEdge Edge) const;
 		ZEVector3							GetVertex(ZEFrustumVertex Vertex) const;
@@ -110,17 +119,19 @@ class ZEFrustum
 												const ZEPlane& DownClippingPlane, const ZEPlane& UpClippingPlane, 
 												const ZEPlane& NearClippingPlane, const ZEPlane& FarClippingPlane);
 
-		static void							Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ);
-		static void							Create(ZEFrustum& Frustum,
-												const ZEPlane& LeftPlane, const ZEPlane& RightPlane, 
-												const ZEPlane& DownPlane, const ZEPlane& UpPlane, 
-												const ZEPlane& NearPlane, const ZEPlane& FarPlane);
-
+		static bool							IntersectionTest(const ZEFrustum& Frustum, const ZEVector3& Point);
 		static bool							IntersectionTest(const ZEFrustum& Frustum, const ZEBSphere& BoundingSphere);
 		static bool							IntersectionTest(const ZEFrustum& Frustum, const ZEAABBox& BoundingBox);
 		static bool							IntersectionTest(const ZEFrustum& Frustum, const ZEOBBox& BoundingBox);
 		static bool							IntersectionTest(const ZEFrustum& Frustum, const ZERectangle3D& Rectangle);
+		static ZEIntersectionResult			IntersectionTestExact(const ZEFrustum& Frustum, const ZEAABBox& BoundingBox);
+		static ZEIntersectionResult			IntersectionTestExact(const ZEFrustum& Frustum, const ZEOBBox& BoundingBox);
 
+		static void							Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ);
+		static void							Create(ZEFrustum& Frustum,
+												const ZEPlane& LeftPlane, const ZEPlane& RightPlane, 
+												const ZEPlane& BottomPlane, const ZEPlane& TopPlane, 
+												const ZEPlane& NearPlane, const ZEPlane& FarPlane);
 };
 
 class ZEViewFrustum : public ZEFrustum, public ZEViewVolume

@@ -66,9 +66,12 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		bool										Selectable;
 		bool										Selected;
+		bool										Pickable;
 		bool										Focused;
 		bool										Frozen;
+
 		bool										NamePlateVisible;
+		ZEString									IconFileName;
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
@@ -82,6 +85,8 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		virtual bool								InitializeInternal();
 		virtual bool								DeinitializeInternal();
+
+		virtual void								UpdateNamePlate();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
@@ -102,8 +107,8 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								SetName(const ZEString& Name);
 		virtual ZEString							GetName() const;
 
-		virtual ZEAABBox							GetLocalBoundingBox();
-		virtual ZEMatrix4x4							GetWorldTransform();
+		virtual ZEAABBox							GetBoundingBox() const;
+		virtual ZEMatrix4x4							GetWorldTransform() const;
 
 		virtual void								SetPosition(const ZEVector3& Position);
 		virtual ZEVector3							GetPosition() const;
@@ -123,14 +128,20 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								SetSelectable(bool Value);
 		bool										GetSelectable() const;
 
+		void										SetPickable(bool Pickable);
+		bool										GetPickable() const;
+
 		virtual void								SetSelected(bool Selected);
 		bool										GetSelected() const;
-
+		
 		virtual void								SetFocused(bool Focused);
 		bool										GetFocused() const;
 
-		bool										GetNamePlateVisible();
-		ZEString									GetIconFileName();
+		void										SetNamePlateVisible(bool Visible);
+		bool										GetNamePlateVisible() const;
+
+		void										SetIconFileName(const ZEString& FileName);
+		const ZEString&								GetIconFileName() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);

@@ -113,7 +113,7 @@ ZEUIManager* ZEStateScreen::GetManager()
 
 void ZEStateScreen::Tick(float ElapsedTime)
 {
-	LoadingPercentage = GetScene()->GetLoadingPercentage();
+//	LoadingPercentage = GetScene()->GetLoadingPercentage();
 }
 
 bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)

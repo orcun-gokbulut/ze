@@ -56,10 +56,10 @@ void ZEDViewportController::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent
 
 	float ModStepSize = StepSize;
 	if ((Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
-		ModStepSize *= 5.0f;
+		ModStepSize *= 8.0f;
 
 	if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0)
-		ModStepSize *= 0.2f;
+		ModStepSize *= 0.25f;
 
 
 	if (Event->GetKey() == ZED_VKK_W)
@@ -147,7 +147,7 @@ void ZEDViewportController::ViewportMouseEvent(const ZEDViewportMouseEvent* Even
 ZEDViewportController::ZEDViewportController()
 {
 	MouseSensivity = 1.0f;
-	StepSize = 10.0f;
+	StepSize = 20.0f;
 	LockCamera = false;
 	Active = false;
 	Rx = Ry = Rz = 0.0f;

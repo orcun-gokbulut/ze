@@ -101,4 +101,7 @@ class ZEATSun : public ZEEntity
 
 		static ZEATSun*					CreateInstance();
 }
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false)
 ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color");

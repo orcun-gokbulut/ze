@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_LISTENER_H__
-#define __ZE_LISTENER_H__
 
 #include "ZEGame/ZEEntity.h"
 
@@ -65,6 +63,7 @@ class ZEListener: public ZEEntity
 		virtual void			SetRollOffFactor(float NewRollOffFactor);
 
 		static ZEListener*		CreateInstance();
-};
-
-#endif
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZESound.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);

@@ -98,8 +98,8 @@ bool ZEDSceneEditor::InitializeInternal()
 	Scene->AddEntity(StateScreen);*/
 
  	ZEModel* Trial = ZEModel::CreateInstance();
-	//Trial->SetModelFile("#R:/ZETrainSimulator/Procedurals/Railway/Tracks/Track-100.new.ZEMODEL");
-	Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
+	Trial->SetModelFile("#R:/ZETrainSimulator/Actors/Vehicles/DE24000/DE24000.ZEMODEL");
+	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
 	//Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.new.ZEMODEL");
 	Scene->AddEntity(Trial);
 

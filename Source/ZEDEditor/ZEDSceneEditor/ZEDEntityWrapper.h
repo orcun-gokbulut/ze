@@ -49,7 +49,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 {
 	ZE_OBJECT
 	private:
-		bool								Dirty;
+		bool								GraphicsDirty;
 		ZEHolder<ZEGRBuffer>				VertexBuffer;
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>		Material;
@@ -59,14 +59,17 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZEUIFrameControl*					NamePlateIcon;
 		ZEUILabel*							NamePlateName;
 		ZEUILabel*							NamePlateClass;
-		
+
+		bool								DrawBoundingBox;
+
 		bool								AlterRaycast(ZERayCastCollision& Collision);
-		void								UpdateNamingPlate();
 
 	protected:
 		ZEGRCanvas							Canvas;
 
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
+
+		virtual void						UpdateNamingPlate();
 		virtual bool						UpdateGraphics();
 
 		virtual bool						InitializeInternal();
@@ -84,7 +87,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						SetName(const ZEString& Name);
 		virtual ZEString					GetName() const;
 
-		virtual ZEAABBox					GetLocalBoundingBox() const;
+		virtual ZEAABBox					GetBoundingBox() const;
 		virtual ZEMatrix4x4					GetWorldTransform() const;
 
 		virtual void						SetPosition(const ZEVector3& NewPosition);
@@ -100,6 +103,9 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible() const;
 
+		void								SetDrawBoundingBox(bool Enabled);
+		bool								GetDrawBoundingBox();
+		
 		virtual bool						CheckChildrenClass(ZEClass* Class);
 
 		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
