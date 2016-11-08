@@ -82,7 +82,7 @@ void ZELightProjective::LoadProjectionTexture()
 
 ZEEntityResult ZELightProjective::LoadInternal()
 {
-	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	LoadProjectionTexture();
 

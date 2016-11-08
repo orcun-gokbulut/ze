@@ -455,7 +455,7 @@ bool ZERayCastHelper::RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& 
 {
 	const ZERayCastParameters& Parameters = *Report->GetParameters();
 	ZETriangle Triangle(Vertex0, Vertex1, Vertex2);
-	if (Triangle.GetArea() <= 0.00001f)
+	if (Triangle.GetArea() <= 0.01f)
 		return false;
 
 	float RayT;
