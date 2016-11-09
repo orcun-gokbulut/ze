@@ -34,7 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEObject.h"
+
 #include "ZEClass.h"
+#include "ZEEvent.h"
+#include "ZEDS\ZEArray.h"
+
+void ZEObject::AddEventConnection(ZEEventBase* Event) const
+{
+	zeDebugCheck(Event == NULL, "Cannot add event connection. Event is NULL.");
+
+	if (EventConnections == NULL)
+		EventConnections = new ZEArray<ZEEventBase*>();
+
+	static_cast<ZEArray<ZEEventBase*>*>(EventConnections)->Add(Event);
+}
+
+void ZEObject::RemoveEventConnection(ZEEventBase* Event) const
+{
+	zeDebugCheck(Event == NULL, "Cannot remove event connection. Event is NULL.");
+	zeDebugCheck(EventConnections == NULL, "Cannot remove event connection. There are no event connections available.");
+	zeDebugCheck(EventConnections == NULL, "Cannot remove event connection. Eveint connection does not belong to this object.");
+	
+	static_cast<ZEArray<ZEEventBase*>*>(EventConnections)->RemoveValue(Event);
+}
 
 ZEClass* ZEObject::GetClass() const
 {
@@ -45,4 +67,25 @@ ZEClass* ZEObject::Class()
 {
 	static ZEClass Class;
 	return &Class;
+}
+
+ZEObject::ZEObject()
+{
+	EventConnections = NULL;
+}
+
+ZEObject::~ZEObject()
+{
+	if (EventConnections != NULL)
+	{
+		ZEArray<ZEEventBase*>& EventConnections = *static_cast<ZEArray<ZEEventBase*>*>(this->EventConnections);
+
+		EventConnections.LockWrite();
+		{
+			for (ZESize I = 0; I < EventConnections.GetCount(); I++)
+				EventConnections[I]->DisconnectObject(this);
+
+		}
+		EventConnections.UnlockWrite();
+	}
 }

@@ -33,11 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_EVENT_H__
-#define __ZE_EVENT_H__
+#pragma once
 
 #include "ZEMethodSignatureGenerator.h"
-#include "ZEEventHandler.h"
+#include "ZEEventDelegate.h"
+#include "ZEObject.h"
+
+class ZEEventBase
+{
+	friend class ZEObject;
+	private:
+		bool								Suppressed;
+	
+		virtual void						DisconnectObject(ZEObject* Object) = 0;
+
+	public:
+		virtual const ZEMethodSignature&	GetSignature() const = 0;
+
+		void								SetSuppressed(bool Suppressed);
+		bool								GetSuppressed() const;
+
+											ZEEventBase();
+};
 
 template <typename TSignature> 
 class ZEEvent;
@@ -47,5 +64,3 @@ class ZEEvent;
 #include "ZEMacro/ZEMacroIncludeRepeater.h"
 #undef ZE_MACRO_INCLUDE_FILE_NAME
 #undef ZE_MACRO_INCLUDE_COUNT
-
-#endif

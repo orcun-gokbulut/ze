@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_METHOD_SIGNATURE_H__
-#define __ZE_METHOD_SIGNATURE_H__
 
 #include "ZEPropertySignature.h"
 #include "ZEDS/ZEArray.h"
@@ -46,7 +44,10 @@ class ZEMethodSignature
 		ZEPropertySignature				ReturnType;
 		ZEArray<ZEPropertySignature>	Parameters;
 
+		bool							operator==(const ZEMethodSignature& Other);
+		bool							operator!=(const ZEMethodSignature& Other);
+
+		ZEString						ToString() const;
+
 		static bool						Compare(const ZEMethodSignature& A, const ZEMethodSignature& B);
 };
-
-#endif

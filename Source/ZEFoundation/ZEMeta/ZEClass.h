@@ -70,8 +70,8 @@
 			virtual bool					AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value); \
 			virtual bool					RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index); \
 			virtual bool					GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count); \
-			virtual bool					AddEventHandler(ZEObject* Object, ZESize EventId, ZEEventHandlerBase* Handler); \
-			virtual bool					RemoveEventHandler(ZEObject* Object, ZESize EventId, ZEEventHandlerBase* Handler); \
+			virtual bool					AddEventDelegate(ZEObject* Object, ZESize EventId, ZEEventDelegateBase* Delegate); \
+			virtual bool					RemoveEventDelegate(ZEObject* Object, ZESize EventId, ZEEventDelegateBase* Delegate); \
 			virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount); \
 			virtual ZESize					GetSizeOfObject(); \
 			virtual ZEObject*				CreateInstance(); \
@@ -86,7 +86,7 @@
 	};
 
 class ZEObject;
-class ZEEventHandlerBase;
+class ZEEventDelegateBase;
 class ZEVariant;
 class ZEReference;
 class ZEScriptObject;
@@ -170,11 +170,11 @@ class ZEClass : public ZEMTDeclaration
 		virtual bool					GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count);
 		bool							GetPropertyItemCount(ZEObject* Object, const ZEString& PropertyName, ZESize& Count);
 
-		virtual bool					AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler);
-		bool							AddEventHandler(ZEObject* Target, const ZEString& EventName, ZEEventHandlerBase* Handler);
+		virtual bool					AddEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate);
+		bool							AddEventDelegate(ZEObject* Target, const ZEString& EventName, ZEEventDelegateBase* Delegate);
 
-		virtual bool					RemoveEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler);
-		bool							RemoveEventHandler(ZEObject* Target, const ZEString& EventName, ZEEventHandlerBase* Handler);
+		virtual bool					RemoveEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate);
+		bool							RemoveEventDelegate(ZEObject* Target, const ZEString& EventName, ZEEventDelegateBase* Delegate);
 
 		virtual bool					CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount);
 		bool							CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue);
