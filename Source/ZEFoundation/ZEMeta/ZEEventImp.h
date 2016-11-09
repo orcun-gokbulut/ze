@@ -46,110 +46,234 @@
 #define ZE_ARGUMENT_DEFINITIONS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_DEFINITION_MACRO, 0)
 #define ZE_ARGUMENT_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) Arg##Index
 #define ZE_ARGUMENTS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_MACRO, 0)
+#define ZE_TEMPLATE_KEYWORD template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
+#define ZE_TEMPLATE_SPECIALIZATION TReturn (ZE_TEMPLATE_ARGUMENTS)
 
-template<ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
-class ZEEvent<void (ZE_TEMPLATE_ARGUMENTS)>
+ZE_TEMPLATE_KEYWORD
+class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEEventBase
 {
 	private:
 		ZEMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
-		ZEArray<ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)> > Handlers;
+		ZEArray<ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION> > Delegates;
+
+		void								Assign(const ZEEvent& Event);
+
+		virtual void						DisconnectObject(ZEObject* Object);
 
 	public:
-		void Call(ZE_ARGUMENT_DEFINITIONS)
-		{
-			for (ZESize I = 0; I < Handlers.GetCount(); I++)
-				Handlers[I].Call(ZE_ARGUMENTS);
-		}
+		virtual const ZEMethodSignature&	GetSignature() const;
 
-		void operator()(ZE_ARGUMENT_DEFINITIONS)
-		{
-			Call(ZE_ARGUMENTS);
-		}
+		bool								AddDelegate(const ZEEventDelegateBase* Delegate);
+		void								AddDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
 
-		bool AddEventHandler(ZEEventHandlerBase* Handler)
-		{
-			if (!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Handler->GetSignature()))
-				return false;
+		bool								RemoveDelegate(const ZEEventDelegateBase* Delegate);
+		void								RemoveDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
 
-			Handlers.Add(*(ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)>*)Handler);
+		void								Clear();
 
-			return true;
-		}
+		void								Call(ZE_ARGUMENT_DEFINITIONS) const;
 
-		bool RemoveEventHandler(ZEEventHandlerBase* Handler)
-		{
-			if (!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Handler->GetSignature()))
-				return false;
+		ZEEvent&							operator=(const ZEEvent& Event);
+		ZEEvent&							operator+=(const ZEEventDelegateBase* Delegate);
+		ZEEvent&							operator+=(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
+		ZEEvent&							operator-=(const ZEEventDelegateBase* Delegate);
+		ZEEvent&							operator-=(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
 
-			Handlers.Add(*(ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)>*)Handler);
+		void								operator()(ZE_ARGUMENT_DEFINITIONS) const;
 
-			return true;
-		}
-
-		void AddEventHandler(ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)>& Handler)
-		{
-			Handlers.Add(Handler);
-		}
-
-		void RemoveEventHandler(ZEEventHandler<void (ZE_TEMPLATE_ARGUMENTS)>& Handler)
-		{
-			Handlers.RemoveValue(Handler);
-		}
+											ZEEvent();
+											ZEEvent(const ZEEvent& Event);
+											~ZEEvent();
 };
 
-template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
-class ZEEvent<TReturn (ZE_TEMPLATE_ARGUMENTS)>
+ZE_TEMPLATE_KEYWORD
+const ZEMethodSignature& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() const
 {
-	private:
-		ZEMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
-		ZEArray<ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)> > Handlers;
+	return SignatureGenerator.GetSignature();
+}
 
-	public:
-		TReturn Call(ZE_ARGUMENT_DEFINITIONS)
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Assign(const ZEEvent& Event)
+{
+	Delegates.LockWrite();
+	for (ZESize I = 0; I < Delegates.GetCount(); I++)
+		Delegates[I].GetObject()->RemoveEventConnection(this);
+
+	Delegates.Clear();
+	Delegates.AddMultiple(Event.Delegates);
+	for (ZESize I = 0; I < Delegates.GetCount(); I++)
+		Delegates[I].GetObject()->AddEventConnection(this);
+
+	Delegates.UnlockWrite();
+}
+
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::DisconnectObject(ZEObject* Object)
+{
+	Delegates.LockWrite();
+	{
+		for (ZESize I = 0; I < Delegates.GetCount(); I++)
 		{
-			TReturn ReturnValue;
-			for (ZESize I = 0; I < Handlers.GetCount(); I++)
-				ReturnValue = Handlers[I].Call(ZE_ARGUMENTS);
+			if (Delegates[I].GetObject() == Object)
+			{
+				Delegates.Remove(I);
+				I--;
+			}
+		}
+	}
+	Delegates.UnlockWrite();
+}
 
-			return ReturnValue;
+ZE_TEMPLATE_KEYWORD
+bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegateBase* Delegate)
+{
+	zeCheckError(Delegate == NULL, false, "Cannot add delegate. Delegate is NULL.");
+	zeCheckError(!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
+		"Cannot add delegate. ZEEventDelegate signature does not match with the event. "
+		"Event Signature: \"%s\", "
+		"Delegate Object Name: \"%s\", "
+		"Delegate Signature: \"%s\".",
+		GetSignature().ToString().ToCString(),
+		Delegate->GetObject()->GetClass()->GetName(),
+		Delegate->GetSignature().ToString().ToCString());
+
+
+	Delegates.LockWrite();
+	{
+		Delegates.Add(*static_cast<const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>*>(Delegate));
+		Delegate->GetObject()->AddEventConnection(this);
+	}
+	Delegates.UnlockWrite();
+
+	return true;
+}
+
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate)
+{
+	Delegates.LockWrite();
+	{
+		Delegates.Add(Delegate);
+		Delegate.GetObject()->AddEventConnection(this);
+	}
+	Delegates.UnlockWrite();
+}
+
+ZE_TEMPLATE_KEYWORD
+bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::RemoveDelegate(const ZEEventDelegateBase* Delegate)
+{
+	zeCheckError(Delegate == NULL, false, "Cannot add delegate. Delegate is NULL.");
+	zeCheckError(!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
+		"Cannot add delegate. ZEEventDelegate signature does not match with the event. Delegate Object Name: \"%s\".", Delegate->GetObject()->GetClass()->GetName());
+
+	Delegates.LockWrite();
+	{
+		Delegates.Add(*static_cast<const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>*>(Delegate));
+		Delegate->GetObject()->AddEventConnection(this);
+	}
+	Delegates.UnlockWrite();
+
+	return true;
+}
+
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::RemoveDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate)
+{
+	Delegates.LockWrite();
+	{
+		ZESSize Index = Delegates.FindIndex(Delegate);
+		if (Index == -1)
+		{
+			Delegates.UnlockWrite();
+			return;
 		}
 
-		TReturn operator()(ZE_ARGUMENT_DEFINITIONS)
-		{
-			return Call(ZE_ARGUMENTS);
-		}
+		Delegate.GetObject()->RemoveEventConnection(this);
+		Delegates.Remove(Index);
+	}
+	Delegates.UnlockWrite();
+}
 
-		bool AddEventHandler(ZEEventHandlerBase* Handler)
-		{
-			if (!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Handler->GetSignature()))
-				return false;
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Call(ZE_ARGUMENT_DEFINITIONS) const
+{
+	if (GetSuppressed())
+		return;
 
-			Handlers.Add(*(ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)>*)Handler);
+	Delegates.LockRead();
+	{
+		for (ZESize I = 0; I < Delegates.GetCount(); I++)
+			Delegates[I].Call(ZE_ARGUMENTS);
+	}
+	Delegates.UnlockRead();
+}
 
-			return true;
-		}
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator=(const ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& Other)
+{
+	Assign(Other);
+	return *this;
+}
 
-		bool RemoveEventHandler(ZEEventHandlerBase* Handler)
-		{
-			if (!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Handler->GetSignature()))
-				return false;
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator+=(const ZEEventDelegateBase* Delegate)
+{
+	AddDelegate(Delegate);
+	return *this;
+}
 
-			Handlers.Add(*(ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)>*)Handler);
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator+=(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate)
+{
+	AddDelegate(Delegate);
+	return *this;
+}
 
-			return true;
-		}
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator-=(const ZEEventDelegateBase* Delegate)
+{
+	RemoveDelegate(Delegate);
+	return *this;
+}
 
-		void AddEventHandler(ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)>& Handler)
-		{
-			Handlers.Add(Handler);
-		}
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator-=(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate)
+{
+	RemoveDelegate(Delegate);
+	return *this;
+}
 
-		void RemoveEventHandler(ZEEventHandler<TReturn (ZE_TEMPLATE_ARGUMENTS)>& Handler)
-		{
-			Handlers.RemoveValue(Handler);
-		}
-};
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator()(ZE_ARGUMENT_DEFINITIONS) const
+{
+	Call(ZE_ARGUMENTS);
+}
 
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::ZEEvent()
+{
+
+}
+
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::ZEEvent(const ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& Event)
+{
+	Assign(Event);
+}
+
+ZE_TEMPLATE_KEYWORD
+ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::~ZEEvent()
+{
+	Delegates.LockWrite();
+	
+	for (ZESize I = 0; I < Delegates.GetCount(); I++)
+		Delegates[I].GetObject()->RemoveEventConnection(this);
+
+	Delegates.UnlockWrite();
+}
+
+#undef ZE_TEMPLATE_SPECIALIZATION
+#undef ZE_TEMPLATE_KEYWORD
 #undef ZE_ARGUMENT_SEPERATOR
 #undef ZE_TEMPLATE_ARGUMENT_DEFINITION_MACRO
 #undef ZE_TEMPLATE_ARGUMENT_DEFINITIONS

@@ -33,8 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#pragma once
 
 #define ZEDelegateFunction(DelegateClass, Function) DelegateClass::Create<Function>()
 #define ZEDelegateMethod(DelegateClass, Class, Function, Object) DelegateClass::Create<Class, &Class::Function>(Object)
@@ -48,5 +47,3 @@ class ZEDelegate;
 #include "ZEMacro/ZEMacroIncludeRepeater.h"
 #undef ZE_MACRO_INCLUDE_FILE_NAME
 #undef ZE_MACRO_INCLUDE_COUNT
-
-#endif

@@ -62,11 +62,23 @@
 		return ClassName::Class(); \
 	}
 
+class ZEEventBase;
+
 class ZEObject
 {
+	template<typename TSignature> friend class ZEEvent;
+	private:
+		mutable void*				EventConnections;
+	
+		void						AddEventConnection(ZEEventBase* Event) const;
+		void						RemoveEventConnection(ZEEventBase* Event) const;
+
 	public:
 		virtual	ZEClass*			GetClass() const;
 		static ZEClass*				Class();
+
+									ZEObject();
+									~ZEObject();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEObject.png")
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)

@@ -35,6 +35,33 @@
 
 #include "ZEMethodSignature.h"
 
+bool ZEMethodSignature::operator==(const ZEMethodSignature& Other)
+{
+	return Compare(*this, Other);
+}
+
+bool ZEMethodSignature::operator!=(const ZEMethodSignature& Other)
+{
+	return !Compare(*this, Other);
+}
+
+ZEString ZEMethodSignature::ToString() const
+{
+	ZEString String = ReturnType.ToString();
+	
+	String += " (";
+	for (ZESize I = 0; I < Parameters.GetCount(); I++)
+	{
+		String += Parameters[I].ToString();
+		
+		if (I + 1 != Parameters.GetCount())
+			String += ",";
+	}
+	String += ")";
+
+	return String;
+}
+
 bool ZEMethodSignature::Compare(const ZEMethodSignature& A, const ZEMethodSignature& B)
 {
 	if (A.Parameters.GetCount() != B.Parameters.GetCount())

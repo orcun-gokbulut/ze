@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROPERTY_SIGNATURE_H__
-#define __ZE_PROPERTY_SIGNATURE_H__
 
 #include "ZEDS/ZEValue.h"
 
@@ -53,14 +51,16 @@ class ZEClass;
 class ZEPropertySignature
 {
 	public:
-		ZEValueType			Type;
-		ZEClass*				BaseClass;
-		ZECanonicalType			CanonicalType;
+		ZEValueType					Type;
+		ZEClass*					BaseClass;
+		ZECanonicalType				CanonicalType;
 
-		static bool				Compare(const ZEPropertySignature& A, const ZEPropertySignature& B);
-		ZEString				GetName();
+		bool						operator==(const ZEPropertySignature& Other);
+		bool						operator!=(const ZEPropertySignature& Other);
 
-								ZEPropertySignature();
+		ZEString					ToString() const;
+
+									ZEPropertySignature();
+
+		static bool					Compare(const ZEPropertySignature& A, const ZEPropertySignature& B);
 };
-
-#endif

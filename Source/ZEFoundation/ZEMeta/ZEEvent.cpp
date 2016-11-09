@@ -35,5 +35,17 @@
 
 #include "ZEEvent.h"
 
-#include "ZECommon.h"
-ZE_SUPPRESS_LNK4221
+void ZEEventBase::SetSuppressed(bool Suppressed)
+{
+	this->Suppressed = Suppressed;
+}
+
+bool ZEEventBase::GetSuppressed() const
+{
+	return Suppressed;
+}
+
+ZEEventBase::ZEEventBase()
+{
+	Suppressed = false;
+}

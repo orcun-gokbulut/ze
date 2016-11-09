@@ -121,8 +121,8 @@ class ZEMCGenerator
 		void					GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass);
 		void					GenerateClassGetMethodCount(ZEMCClass* CurrentClass);
 		void					GenerateClassGetMethodId(ZEMCClass* CurrentClass);
-		void					GenerateClassAddEventHandler(ZEMCClass* CurrentClass);
-		void					GenerateClassRemoveEventHandler(ZEMCClass* CurrentClass);
+		void					GenerateClassAddEventDelegate(ZEMCClass* CurrentClass);
+		void					GenerateClassRemoveEventDelegate(ZEMCClass* CurrentClass);
 		void					GenerateClassCallMethod(ZEMCClass* CurrentClass);
 		void					GenerateClassWrapperMethods(ZEMCClass* CurrentClass);
 

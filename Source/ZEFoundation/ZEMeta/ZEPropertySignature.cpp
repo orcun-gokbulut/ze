@@ -34,22 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPropertySignature.h"
+#include "ZEClass.h"
 
-bool ZEPropertySignature::Compare(const ZEPropertySignature& A, const ZEPropertySignature& B)
+
+bool ZEPropertySignature::operator==(const ZEPropertySignature& Other)
 {
-	if (A.CanonicalType != B.CanonicalType)
-		return false;
-
-	if (A.Type != B.Type)
-		return false;
-
-	if (A.BaseClass != B.BaseClass)
-		return false;
-
-	return true;
+	return Compare(*this, Other);
 }
 
-ZEString ZEPropertySignature::GetName()
+bool ZEPropertySignature::operator!=(const ZEPropertySignature& Other)
+{
+	return !Compare(*this, Other);
+}
+
+ZEString ZEPropertySignature::ToString() const
 {
 	ZEString TypeString;
 	switch(Type)
@@ -72,35 +70,35 @@ ZEString ZEPropertySignature::GetName()
 			break;
 
 		case ZE_VRT_INTEGER_8:
-			TypeString = "int8";
+			TypeString = "ZEInt8";
 			break;
 
 		case ZE_VRT_INTEGER_16:
-			TypeString = "int16";
+			TypeString = "ZEInt16";
 			break;
 
 		case ZE_VRT_INTEGER_32:
-			TypeString = "int32";
+			TypeString = "ZEInt32";
 			break;
 
 		case ZE_VRT_INTEGER_64:
-			TypeString = "int64";
+			TypeString = "ZEInt64";
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_8:
-			TypeString = "uint8";
+			TypeString = "ZEUInt8";
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_16:
-			TypeString = "uint16";
+			TypeString = "ZEUInt16";
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_32:
-			TypeString = "uint32";
+			TypeString = "ZEUInt32";
 			break;
 
 		case ZE_VRT_UNSIGNED_INTEGER_64:
-			TypeString = "uint64";
+			TypeString = "ZEUInt64";
 			break;
 
 		case ZE_VRT_BOOLEAN:
@@ -108,34 +106,43 @@ ZEString ZEPropertySignature::GetName()
 			break;
 
 		case ZE_VRT_STRING:
-			TypeString = "string";
+			TypeString = "ZEString";
 			break;
 
 		case ZE_VRT_QUATERNION:
-			TypeString = "quaternion";
+			TypeString = "ZEQuaternion";
 			break;
 
 		case ZE_VRT_VECTOR2:
-			TypeString = "vector2";
+			TypeString = "ZEVector2";
 			break;
 
 		case ZE_VRT_VECTOR3:
-			TypeString = "vector3";
+			TypeString = "ZEVector3";
 			break;
 
 		case ZE_VRT_VECTOR4:
-			TypeString = "vector4";
+			TypeString = "ZEVector4";
 			break;
 
 		case ZE_VRT_MATRIX3X3:
-			TypeString = "matrix3x3";
+			TypeString = "ZEMatrix3x3";
 			break;
 
 		case ZE_VRT_MATRIX4X4:
-			TypeString = "matrix4x4";
+			TypeString = "ZEMatrix4x4";
+			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			TypeString = "ZEMatrix3x3D";
+			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			TypeString = "ZEMatrix4x4D";
 			break;
 
 		case ZE_VRT_CLASS:
+			TypeString = BaseClass->GetName();
 			break;
 	}
 
@@ -149,6 +156,8 @@ ZEString ZEPropertySignature::GetName()
 		return TypeString + "&";
 	else if (CanonicalType == ZE_CT_CONST_REFERENCE)
 		return "const " + TypeString + "&";
+	else
+		return TypeString;
 }
 
 ZEPropertySignature::ZEPropertySignature()
@@ -156,4 +165,18 @@ ZEPropertySignature::ZEPropertySignature()
 	Type = ZE_VRT_UNDEFINED;
 	BaseClass = NULL;
 	CanonicalType = ZE_CT_VALUE;
+}
+
+bool ZEPropertySignature::Compare(const ZEPropertySignature& A, const ZEPropertySignature& B)
+{
+	if (A.CanonicalType != B.CanonicalType)
+		return false;
+
+	if (A.Type != B.Type)
+		return false;
+
+	if (A.BaseClass != B.BaseClass)
+		return false;
+
+	return true;
 }

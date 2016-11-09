@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_METHOD_SIGNATURE_GENERATOR_H__
-#define __ZE_METHOD_SIGNATURE_GENERATOR_H__
 
 #include "ZEMethodSignature.h"
 #include "ZEPropertySignatureGenerator.h"
@@ -48,5 +46,3 @@ class ZEMethodSignatureGenerator;
 #include "ZEMacro/ZEMacroIncludeRepeater.h"
 #undef ZE_MACRO_INCLUDE_FILE_NAME
 #undef ZE_MACRO_INCLUDE_COUNT
-
-#endif

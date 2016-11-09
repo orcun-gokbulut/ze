@@ -120,8 +120,8 @@ void ZEMCGenerator::GenerateClassMethods(ZEMCClass* CurrentClass)
 	GenerateClassGetMethods(CurrentClass);
 	GenerateClassGetMethodCount(CurrentClass);
 	GenerateClassGetMethodId(CurrentClass);
-	GenerateClassAddEventHandler(CurrentClass);
-	GenerateClassRemoveEventHandler(CurrentClass);
+	GenerateClassAddEventDelegate(CurrentClass);
+	GenerateClassRemoveEventDelegate(CurrentClass);
 	GenerateClassCallMethod(CurrentClass);
 }
 
@@ -384,10 +384,10 @@ void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 
 }
 
-void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassAddEventDelegate(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"bool %sClass::AddEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
+		"bool %sClass::AddEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate)\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -397,7 +397,7 @@ void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)
 		GenerateClassMethodIdRangeCheck(CurrentClass);
 		
 		WriteToFile(
-			"\tswitch(EventId)\n"
+			"\tswitch(MethodId)\n"
 			"\t{\n", CurrentClass->Name.ToCString());
 
 		for(ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
@@ -407,14 +407,14 @@ void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)
 			{
 				WriteToFile(
 					"\t\tcase %d:\n"
-					"\t\t\treturn ");
+					"\t\t\treturn ", I);
 
 				if (!CurrentMethod->IsStatic)
 					WriteToFile("CastedObject->");
 				else
 					WriteToFile("%s::", CurrentClass->Name.ToCString());
 
-				WriteToFile("%s.AddEventHandler(Handler);\n", I, CurrentMethod->Name.ToCString());
+				WriteToFile("%s.AddDelegate(Delegate);\n", CurrentMethod->Name.ToCString());
 			}
 		}
 
@@ -425,10 +425,10 @@ void ZEMCGenerator::GenerateClassAddEventHandler(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateClassRemoveEventHandler(ZEMCClass* CurrentClass)
+void ZEMCGenerator::GenerateClassRemoveEventDelegate(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"bool %sClass::RemoveEventHandler(ZEObject* Object, ZESize MethodId, ZEEventHandlerBase* Handler)\n"
+		"bool %sClass::RemoveEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate)\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -438,7 +438,7 @@ void ZEMCGenerator::GenerateClassRemoveEventHandler(ZEMCClass* CurrentClass)
 		GenerateClassMethodIdRangeCheck(CurrentClass);
 
 		WriteToFile(
-			"\tswitch(EventId)\n"
+			"\tswitch(MethodId)\n"
 			"\t{\n", CurrentClass->Name.ToCString());
 
 		for(ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
@@ -448,14 +448,14 @@ void ZEMCGenerator::GenerateClassRemoveEventHandler(ZEMCClass* CurrentClass)
 			{
 				WriteToFile(
 					"\t\tcase %d:\n"
-					"\t\t\treturn ");
+					"\t\t\treturn ", I);
 
 				if (!CurrentMethod->IsStatic)
 					WriteToFile("CastedObject->");
 				else
 					WriteToFile("%s::", CurrentClass->Name.ToCString());
 
-				WriteToFile("%s.RemoveEventHandler(Handler);\n", I, CurrentMethod->Name.ToCString());
+				WriteToFile("%s.RemoveDelegate(Delegate);\n", CurrentMethod->Name.ToCString());
 			}
 		}
 

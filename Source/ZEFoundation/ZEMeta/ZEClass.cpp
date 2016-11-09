@@ -299,32 +299,32 @@ bool ZEClass::GetPropertyItemCount(ZEObject* Object, const ZEString& PropertyNam
 	return GetPropertyItemCount(Object, PropertyId, Count);
 }
 
-bool ZEClass::AddEventHandler(ZEObject* Target, ZESize EventId, ZEEventHandlerBase* Handler)
+bool ZEClass::AddEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate)
 {
 	return false;
 }
 
-bool ZEClass::AddEventHandler(ZEObject* Object, const ZEString& EventName, ZEEventHandlerBase* Handler)
+bool ZEClass::AddEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate)
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
 		return false;
 
-	return AddEventHandler(Object, MethodId, Handler);
+	return AddEventDelegate(Object, MethodId, Delegate);
 }
 
-bool ZEClass::RemoveEventHandler(ZEObject* Object, ZESize EventId, ZEEventHandlerBase* Handler)
+bool ZEClass::RemoveEventDelegate(ZEObject* Object, ZESize EventId, ZEEventDelegateBase* Delegate)
 {
 	return false;
 }
 
-bool ZEClass::RemoveEventHandler(ZEObject* Object, const ZEString& EventName, ZEEventHandlerBase* Handler)
+bool ZEClass::RemoveEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate)
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
 		return false;
 
-	return RemoveEventHandler(Object, MethodId, Handler);
+	return RemoveEventDelegate(Object, MethodId, Delegate);
 }
 
 bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
