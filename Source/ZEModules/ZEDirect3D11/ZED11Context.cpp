@@ -58,17 +58,20 @@
 #define ZEGR_CDF_BLEND_STATE			1
 #define ZEGR_CDF_DEPTHSTENCIL_STATE		2
 
-void ZED11Context::Initialize(ID3D11DeviceContext* Context)
+void ZED11Context::Initialize(ID3D11DeviceContext1* Context)
 {
 	this->Context = Context;
 
-#ifdef ZE_DEBUG_ENABLE
-	HRESULT HR = this->Context->QueryInterface(__uuidof(UserDefinedAnnotation), reinterpret_cast<void**>(&UserDefinedAnnotation));
+#ifdef ZE_EDITION_DEVELOPMENT
+	HRESULT HR = this->Context->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), reinterpret_cast<void**>(&UserDefinedAnnotation));
 	if (FAILED(HR))
 	{
 		zeError("Context initialize failed. QueryInterface error: 0x%X", HR);
 		return;
 	}
+
+	if (UserDefinedAnnotation->GetStatus())
+		ProfilingEnabled = true;
 #endif
 
 	GraphicsState = static_cast<ZED11RenderStateData*>(GetModule()->CreateRenderStateData());
@@ -111,7 +114,7 @@ void ZED11Context::UpdateGraphicsState()
 	}
 }
 
-ID3D11DeviceContext* ZED11Context::GetContext() const
+ID3D11DeviceContext1* ZED11Context::GetContext() const
 {
 	return Context;
 }
@@ -310,9 +313,9 @@ void ZED11Context::SetIndexBuffer(const ZEGRBuffer* Buffer, ZEUInt Offset)
 	UnlockContext();
 }
 
-void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers)
+void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant, const ZEUInt* NumConstants)
 {
-	if (!CheckConstantBuffers(Shader, Index, Count, Buffers))
+	if (!CheckConstantBuffers(Shader, Index, Count, Buffers, FirstConstant, NumConstants))
 		return;
 
 	ID3D11Buffer* NativeBuffers[ZEGR_MAX_CONSTANT_BUFFER_SLOT] = {};
@@ -331,36 +334,36 @@ void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUIn
 	switch (Shader)
 	{
 		case ZEGR_ST_VERTEX:
-			Context->VSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->VSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_PIXEL:
-			Context->PSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->PSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_GEOMETRY:
-			Context->GSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->GSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_DOMAIN:
-			Context->DSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->DSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_HULL:
-			Context->HSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->HSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_COMPUTE:
-			Context->CSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->CSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		case ZEGR_ST_ALL:
-			Context->VSSetConstantBuffers(Index, Count, NativeBuffers);
-			Context->PSSetConstantBuffers(Index, Count, NativeBuffers);
-			Context->GSSetConstantBuffers(Index, Count, NativeBuffers);
-			Context->DSSetConstantBuffers(Index, Count, NativeBuffers);
-			Context->HSSetConstantBuffers(Index, Count, NativeBuffers);
-			Context->CSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->VSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
+			Context->PSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
+			Context->GSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
+			Context->DSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
+			Context->HSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
+			Context->CSSetConstantBuffers1(Index, Count, NativeBuffers, FirstConstant, NumConstants);
 			break;
 
 		default:
@@ -893,22 +896,24 @@ void ZED11Context::ClearState()
 
 void ZED11Context::BeginEvent(const ZEString& Name)
 {
-	if (UserDefinedAnnotation != NULL)
+	//if (ProfilingEnabled)
 	{
 		LockContext();
 		//UserDefinedAnnotation->BeginEvent(Name.ToWCString());
 		D3DPERF_BeginEvent(D3DCOLOR_XRGB(ZERandom::GetUInt8(), ZERandom::GetUInt8(), ZERandom::GetUInt8()), Name.ToWCString());
+		//Context->BeginEventInt(Name.ToWCString(), 0);
 		UnlockContext();
 	}
 }
 
 void ZED11Context::EndEvent()
 {
-	if (UserDefinedAnnotation != NULL)
+	//if (ProfilingEnabled)
 	{
 		LockContext();
 		//UserDefinedAnnotation->EndEvent();
 		D3DPERF_EndEvent();
+		//Context->EndEvent();
 		UnlockContext();
 	}
 }

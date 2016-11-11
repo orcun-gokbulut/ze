@@ -47,7 +47,7 @@ class ZED11Module : public ZEGRGraphicsModule
 {
 	ZE_OBJECT
 	protected:
-		ID3D11Device*							Device;
+		ID3D11Device1*							Device;
 		ZEGRAdapter*							CurrentAdapter;
 		ZEArray<ZEGRAdapter*>					Adapters;
 		ZED11Context							Context;

@@ -60,7 +60,7 @@ cbuffer ZERNFixedMaterial_Constants								: register(ZERN_SHADER_CONSTANT_MATER
 	uint			ZERNFixedMaterial_HeightMapTechnique;
 	float			ZERNFixedMaterial_HeightMapScale;
 	float			ZERNFixedMaterial_HeightMapOffset;
-	float			ZERNFixedMaterial_Reserved0;
+	bool			ZERNFixedMaterial_DitheredOpacityEnabled;
 
 	float3			ZERNFixedMaterial_EmissiveColor;
 	float			ZERNFixedMaterial_AlphaCullLimit;
@@ -90,7 +90,15 @@ cbuffer ZERNFixedMaterial_Constant_Draw_Transform				: register(ZERN_SHADER_CONS
 	float4			ZERNFixedMaterial_ClippingPlane0;
 	float4			ZERNFixedMaterial_ClippingPlane1;
 	float4			ZERNFixedMaterial_ClippingPlane2;
-	float4			ZERNFixedMaterial_ClippingPlane3;
+	float4			ZERNFixedMaterial_ClippingPlane3;	
+};
+
+cbuffer ZERNFixedMaterial_Constant_Draw_Material				: register(ZERN_SHADER_CONSTANT_DRAW_MATERIAL)
+{
+	float4			ZERNFixedMaterial_Draw_Color;
+	
+	float3			ZERNFixedMaterial_Draw_Reserved;
+	bool			ZERNFixedMaterial_Draw_LODTransition;
 };
 
 // SHADER RESOURCES (TEXTURES)
@@ -107,12 +115,25 @@ TextureCube<float3>	ZERNFixedMaterial_EnvironmentMap			: register(t7);
 Texture2D<float3>	ZERNFixedMaterial_DetailBaseMap			 	: register(t8);
 Texture2D<float3>	ZERNFixedMaterial_DetailNormalMap			: register(t9);
 Texture2D<float>	ZERNFixedMaterial_SpecularGlossMap			: register(t10);
+Texture2D<float>	ZERNFixedMaterial_DitherMap					: register(t25);
 
 SamplerState		ZERNFixedMaterial_TextureSampler			: register(s0);
 SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
 SamplerState		ZERNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
+static const float ThresholdMatrix[8][8] =
+			{
+				{ 0, 32, 8, 40, 2, 34, 10, 42}, 
+				{48, 16, 56, 24, 50, 18, 58, 26}, 
+				{12, 44, 4, 36, 14, 46, 6, 38}, 
+				{60, 28, 52, 20, 62, 30, 54, 22}, 
+				{ 3, 35, 11, 43, 1, 33, 9, 41}, 
+				{51, 19, 59, 27, 49, 17, 57, 25},
+				{15, 47, 7, 39, 13, 45, 5, 37},
+				{63, 31, 55, 23, 61, 29, 53, 21} 
+			};
+			
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -137,8 +158,11 @@ struct ZERNFixedMaterial_VSInput
 	#endif
 	
 	#ifdef ZERN_FM_INSTANCING
-		float4x4 WorldTransform : TEXCOORD1;
-		float4x4 WorldTransformInverseTranspose : TEXCOORD5;
+		float4x4	WorldTransform					: TEXCOORD1;
+		float4x4	WorldTransformInverseTranspose	: TEXCOORD5;
+		
+		float4		DrawColor						: TEXCOORD9;
+		uint4		DrawLODTransition				: TEXCOORD10;
 	#endif
 };
 
@@ -150,13 +174,20 @@ struct ZERNFixedMaterial_VSOutput
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
 	float ViewDistance		: TEXCOORD4;
+	float3 CurrPosition		: TEXCOORD5;
+	float3 PrevPosition		: TEXCOORD6;
 	
 	#ifdef ZERN_FM_FORWARD
-		float3 PositionView	: TEXCOORD5;
+		float3 PositionView	: TEXCOORD7;
 	#endif
 	
 	#ifdef ZERN_FM_VERTEX_COLOR
-		float4 Color		: TEXCOORD6;
+		float4 Color		: TEXCOORD8;
+	#endif
+	
+	#ifdef ZERN_FM_INSTANCING
+		nointerpolation float4	DrawColor			: TEXCOORD9;
+		nointerpolation uint4	DrawLODTransition	: TEXCOORD10;
 	#endif
 	
 	#ifdef ZERN_FM_CLIPPING_PLANES
@@ -172,13 +203,20 @@ struct ZERNFixedMaterial_PSInput
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
 	float ViewDistance		: TEXCOORD4;
+	float3 CurrPosition		: TEXCOORD5;
+	float3 PrevPosition		: TEXCOORD6;
 	
 	#ifdef ZERN_FM_FORWARD
-		float3 PositionView	: TEXCOORD5;
+		float3 PositionView	: TEXCOORD7;
 	#endif
 	
 	#ifdef ZERN_FM_VERTEX_COLOR
-		float4 Color		: TEXCOORD6;
+		float4 Color		: TEXCOORD8;
+	#endif
+	
+	#ifdef ZERN_FM_INSTANCING
+		nointerpolation float4	DrawColor			: TEXCOORD9;
+		nointerpolation uint4	DrawLODTransition	: TEXCOORD10;
 	#endif
 };
 
@@ -229,6 +267,9 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 		float3 NormalWorld = mul(Input.WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
 		float3 TangentWorld = mul(Input.WorldTransform, float4(Tangent, 0.0f)).xyz;
 		float3 BinormalWorld = mul(Input.WorldTransform, float4(Binormal, 0.0f)).xyz;
+		
+		Output.DrawColor = Input.DrawColor;
+		Output.DrawLODTransition = Input.DrawLODTransition;
 	#else
 		float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 		float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
@@ -242,7 +283,12 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 	Output.Binormal = ZERNTransformations_WorldToView(float4(BinormalWorld, 0.0f));
 	Output.Texcoord = Input.Texcoord;
 	Output.ViewDistance = length(PositionWorld.xyz - ZERNView_Position);
-
+	Output.CurrPosition = Output.Position.xyw;
+	Output.PrevPosition = ZERNTransformations_WorldToPrevProjection(PositionWorld).xyw;
+	
+	Output.CurrPosition.xy *= float2(0.5f, -0.5f);
+	Output.PrevPosition.xy *= float2(0.5f, -0.5f);
+	
 	#ifdef ZERN_FM_FORWARD
 		Output.PositionView = ZERNTransformations_WorldToView(PositionWorld);
 	#endif
@@ -262,15 +308,39 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 }
 
 ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
-{	
-	float Alpha = ZERNFixedMaterial_Opacity;
-	#ifdef ZERN_FM_OPACITY_MAP
-		Alpha = ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
-		Alpha = ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
+{
+	#ifdef ZERN_FM_INSTANCING
+		float Alpha = Input.DrawColor.a * ZERNFixedMaterial_Opacity;
+	#else
+		float Alpha = ZERNFixedMaterial_Draw_Color.a * ZERNFixedMaterial_Opacity;
 	#endif
 	
-	#ifdef ZERN_FM_ALPHA_CULL
+	#ifdef ZERN_FM_OPACITY_MAP
+		Alpha *= ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
+	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
+		Alpha *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
+	#endif
+	
+	#ifdef ZERN_FM_DEFERRED
+		if (ZERNFixedMaterial_DitheredOpacityEnabled || 
+		#ifdef ZERN_FM_INSTANCING
+			(Input.DrawLODTransition.w > 0))
+		#else
+			ZERNFixedMaterial_Draw_LODTransition)
+		#endif
+		{
+			clip(Alpha - ((ThresholdMatrix[floor(Input.Position.x) % 8][floor(Input.Position.y) % 8] + 1.0f) / 65.0f));
+			//if (ZERNFixedMaterial_DitherMap[float2(floor(Alpha * 255.0f + 0.5f), floor(Input.Position.y) % 32)] == 0.0f)
+			//	discard;
+		}
+		else
+		{
+			#if defined ZERN_FM_ALPHA_CULL
+				if (Alpha <= ZERNFixedMaterial_AlphaCullLimit)
+					discard;
+			#endif
+		}
+	#elif defined ZERN_FM_FORWARD
 		if (Alpha <= ZERNFixedMaterial_AlphaCullLimit)
 			discard;
 	#endif
@@ -296,7 +366,12 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 		Normal = normalize(lerp(Normal, DetailNormal, DetailNormalAttenuation));
 	#endif
 
-	float3 BaseColor = float3(1.0f, 1.0f, 1.0f);
+	#ifdef ZERN_FM_INSTANCING
+		float3 BaseColor = Input.DrawColor.rgb;
+	#else
+		float3 BaseColor = ZERNFixedMaterial_Draw_Color.rgb;
+	#endif
+	
 	#ifdef ZERN_FM_BASE_MAP
 		BaseColor *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
 	#endif
@@ -372,13 +447,16 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 	ZERNShading_Surface Surface = GetSurfaceDataFromResources(Input);
 	
 	#ifdef ZERN_FM_DEFERRED
+		Input.CurrPosition.xy /= Input.CurrPosition.z;
+		Input.PrevPosition.xy /= Input.PrevPosition.z;
+		
 		ZERNGBuffer GBuffer = (ZERNGBuffer)0;
 		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient + Surface.Emissive);
 		ZERNGBuffer_SetViewNormal(GBuffer, Surface.NormalView);
 		ZERNGBuffer_SetSpecularColor(GBuffer, Surface.Specular);
 		ZERNGBuffer_SetDiffuseColor(GBuffer, Surface.Diffuse);
 		ZERNGBuffer_SetSubsurfaceScattering(GBuffer, Surface.SubsurfaceScattering);
-		ZERNGBuffer_SetEmissiveColor(GBuffer, Surface.Emissive);
+		ZERNGBuffer_SetVelocity(GBuffer, Input.CurrPosition.xy - Input.PrevPosition.xy);
 		ZERNGBuffer_SetSpecularPower(GBuffer, Surface.SpecularPower);
 		
 		Output.GBuffer = GBuffer;
@@ -389,17 +467,17 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		
-		uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
-		uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
-		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
-		
-		uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
-		for (uint J = 0; J < TilePointLightCount; J++)
-			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
-		
-		uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
-		for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
-			ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
+		//uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
+		//uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
+		//uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		//
+		//uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
+		//for (uint J = 0; J < TilePointLightCount; J++)
+		//	ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
+		//
+		//uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
+		//for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
+		//	ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
 		
 		Output.Color = float4(ResultColor + Surface.Ambient + Surface.Emissive, Surface.Opacity);
 	#endif

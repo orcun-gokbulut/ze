@@ -85,7 +85,7 @@ void ZERNStageGBuffer::CreateOutput(const ZEString& Name)
 			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT0);
 		}
 	}
-	else if (Name == "GBufferEmissive")
+	else if (Name == "GBuffer1")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT1))
 		{
@@ -93,7 +93,7 @@ void ZERNStageGBuffer::CreateOutput(const ZEString& Name)
 			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT1);
 		}
 	}
-	else if (Name == "GBufferDiffuse")
+	else if (Name == "GBuffer2")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT2))
 		{
@@ -101,7 +101,7 @@ void ZERNStageGBuffer::CreateOutput(const ZEString& Name)
 			DirtyFlags.UnraiseFlags(ZERN_SGDF_OUTPUT2);
 		}
 	}
-	else if (Name == "GBufferNormal")
+	else if (Name == "GBuffer3")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SGDF_OUTPUT3))
 		{
@@ -168,9 +168,9 @@ ZERNStageGBuffer::ZERNStageGBuffer()
 	DirtyFlags.RaiseAll();
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer0), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBufferEmissive", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBufferDiffuse", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBufferNormal", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBuffer1", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBuffer2", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBuffer3", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthStencilBuffer), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN);
 }
 

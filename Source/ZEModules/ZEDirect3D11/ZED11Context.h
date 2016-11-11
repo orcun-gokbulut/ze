@@ -45,17 +45,14 @@
 
 class ZED11RenderStateData;
 class ZED11ComputeRenderStateData;
-struct ID3D11Buffer;
-struct ID3D11SamplerState;
-struct ID3D11ShaderResourceView;
-struct ID3DUserDefinedAnnotation;
 
 class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	protected:
-		ID3D11DeviceContext*							Context;
+		ID3D11DeviceContext1*							Context;
 		ID3DUserDefinedAnnotation*						UserDefinedAnnotation;
+		bool											ProfilingEnabled;
 
 		ZEFlags											DirtyFlags;
 		ZEVector4										BlendFactors;
@@ -65,12 +62,12 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		ZEHolder<ZED11RenderStateData>					GraphicsState;
 		ZEHolder<ZED11ComputeRenderStateData>			ComputeState;
 
-		void											Initialize(ID3D11DeviceContext* Device);
+		void											Initialize(ID3D11DeviceContext1* Context);
 		void											Deinitialize();
 
 		void											UpdateGraphicsState();
 
-		ID3D11DeviceContext*							GetContext() const;
+		ID3D11DeviceContext1*							GetContext() const;
 
 														ZED11Context();
 		virtual											~ZED11Context();
@@ -81,7 +78,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 
 		virtual void									SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* Offsets);
 		virtual void									SetIndexBuffer(const ZEGRBuffer* Buffer, ZEUInt Offset = 0);
-		virtual void									SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
+		virtual void									SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant = NULL, const ZEUInt* NumConstants = NULL);
 
 		virtual void									SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
 		virtual void									SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures);

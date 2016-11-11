@@ -837,6 +837,100 @@ void ZEMatrix4x4d::CreateOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Pos
 		0.0, 0.0, 0.0, 1.0);
 }
 
+void ZEMatrix4x4d::CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation, const ZEVector3d& Scale)
+{
+	double xx = -Rotation.x * -Rotation.x;
+	double xy = -Rotation.x * -Rotation.y;
+	double xz = -Rotation.x * -Rotation.z;
+	double xw = -Rotation.x *  Rotation.w;
+	double yy = -Rotation.y * -Rotation.y;
+	double yz = -Rotation.y * -Rotation.z;
+	double yw = -Rotation.y *  Rotation.w;
+	double zz = -Rotation.z * -Rotation.z;
+	double zw = -Rotation.z *  Rotation.w;
+	double ww =  Rotation.w *  Rotation.w;
+
+	double InvScaleX = (1.0 / Scale.x);
+	Matrix.M11 = (1.0 - 2.0 * yy - 2.0 * zz) * InvScaleX;
+	Matrix.M12 = (		 2.0 * xy - 2.0 * zw) * InvScaleX;
+	Matrix.M13 = (		 2.0 * xz + 2.0 * yw) * InvScaleX;
+	Matrix.M14 = (Matrix.M11 * -Position.x + Matrix.M12 * -Position.y + Matrix.M13 * -Position.z) * InvScaleX;
+
+	double InvScaleY = (1.0 / Scale.y);
+	Matrix.M21 = (		 2.0 * xy + 2.0 * zw) * InvScaleY;
+	Matrix.M22 = (1.0 - 2.0 * xx - 2.0 * zz) * InvScaleY;
+	Matrix.M23 = (		 2.0 * yz - 2.0 * xw) * InvScaleY;
+	Matrix.M24 = (Matrix.M21 * -Position.x + Matrix.M22 * -Position.y + Matrix.M23 * -Position.z) * InvScaleY;				 
+
+	double InvScaleZ = (1.0 / Scale.z);
+	Matrix.M31 = (		 2.0 * xz - 2.0 * yw) * InvScaleZ;
+	Matrix.M32 = (		 2.0 * yz + 2.0 * xw) * InvScaleZ;
+	Matrix.M33 = (1.0 - 2.0 * xx - 2.0 * yy) * InvScaleZ;
+	Matrix.M34 = (Matrix.M31 * -Position.x + Matrix.M32 * -Position.y + Matrix.M33 * -Position.z) * InvScaleZ;
+
+	Matrix.M41 = 0.0;
+	Matrix.M42 = 0.0;
+	Matrix.M43 = 0.0;
+	Matrix.M44 = 1.0;
+}
+
+void ZEMatrix4x4d::CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation)
+{
+	double xx = -Rotation.x * -Rotation.x;
+	double xy = -Rotation.x * -Rotation.y;
+	double xz = -Rotation.x * -Rotation.z;
+	double xw = -Rotation.x *  Rotation.w;
+	double yy = -Rotation.y * -Rotation.y;
+	double yz = -Rotation.y * -Rotation.z;
+	double yw = -Rotation.y *  Rotation.w;
+	double zz = -Rotation.z * -Rotation.z;
+	double zw = -Rotation.z *  Rotation.w;
+	double ww =  Rotation.w *  Rotation.w;
+
+	Matrix.M11 = 1.0 - 2.0 * yy - 2.0 * zz;
+	Matrix.M12 = 		2.0 * xy - 2.0 * zw;
+	Matrix.M13 = 		2.0 * xz + 2.0 * yw;
+	Matrix.M14 = Matrix.M11 * -Position.x + Matrix.M12 * -Position.y + Matrix.M13 * -Position.z;
+
+	Matrix.M21 = 		2.0 * xy + 2.0 * zw;
+	Matrix.M22 = 1.0 - 2.0 * xx - 2.0 * zz;
+	Matrix.M23 = 		2.0 * yz - 2.0 * xw;
+	Matrix.M24 = Matrix.M21 * -Position.x + Matrix.M22 * -Position.y + Matrix.M23 * -Position.z;				 
+
+	Matrix.M31 = 		2.0 * xz - 2.0 * yw;
+	Matrix.M32 = 		2.0 * yz + 2.0 * xw;
+	Matrix.M33 = 1.0 - 2.0 * xx - 2.0 * yy;
+	Matrix.M34 = Matrix.M31 * -Position.x + Matrix.M32 * -Position.y + Matrix.M33 * -Position.z;
+
+	Matrix.M41 = 0.0;
+	Matrix.M42 = 0.0;
+	Matrix.M43 = 0.0;
+	Matrix.M44 = 1.0;
+}
+
+void ZEMatrix4x4d::CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEVector3d& Scale)
+{
+	Matrix.M11 = 1.0 / Scale.x;
+	Matrix.M12 = 0.0;
+	Matrix.M13 = 0.0;
+	Matrix.M14 = -Position.x * Matrix.M11;
+
+	Matrix.M21 =  0.0;
+	Matrix.M22 = 1.0 / Scale.y;
+	Matrix.M23 = 0.0;
+	Matrix.M24 = -Position.y * Matrix.M22;				 
+
+	Matrix.M31 = 0.0;
+	Matrix.M32 = 0.0;
+	Matrix.M33 = 1.0 / Scale.z;
+	Matrix.M34 =  -Position.z * Matrix.M33;
+
+	Matrix.M41 = 0.0;
+	Matrix.M42 = 0.0;
+	Matrix.M43 = 0.0;
+	Matrix.M44 = 1.0;
+}
+
 void ZEMatrix4x4d::CreateTranslation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position)
 {
 	Create(Matrix,

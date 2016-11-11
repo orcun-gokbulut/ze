@@ -47,6 +47,8 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZECamera.h"
@@ -457,16 +459,20 @@ void ZEScene::Tick(float ElapsedTime)
 	if (!Enabled)
 		return;
 
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("SceneTick");
 	TickList.LockRead();
 
 	ze_for_each(Entity, TickList)
 		TickEntity(Entity.GetPointer(), ElapsedTime);
 
 	TickList.UnlockRead();
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->EndEvent();
 }
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("ScenePreRender");
+
 	Parameters->Renderer->BeginScene(this);
 
 	// Statistics
@@ -527,6 +533,8 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 	RenderList.UnlockRead();
 
 	Parameters->Renderer->EndScene();
+
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->EndEvent();
 }
 
 void ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

@@ -107,7 +107,7 @@ bool ZEGRContext::CheckIndexBuffer(const ZEGRBuffer* Buffer)
 	return Dirty;
 }
 
-bool ZEGRContext::CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers)
+bool ZEGRContext::CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant, const ZEUInt* NumConstants)
 {
 	zeDebugCheck(Index >= ZEGR_MAX_CONSTANT_BUFFER_SLOT, "Constant buffer index exceeds the max slot count.");
 	zeDebugCheck(Count > (ZEGR_MAX_CONSTANT_BUFFER_SLOT - Index), "Constant buffer count is too much.");
@@ -140,10 +140,26 @@ bool ZEGRContext::CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUI
 				if (SrcResource == NULL && DestResource == NULL)
 					continue;
 
-				if (SrcResource != NULL && DestResource != SrcResource)
+				if (SrcResource != NULL)
 				{
-					Dirty = true;
-					DestResource = SrcResource;
+					if (SrcResource != DestResource)
+					{
+						Dirty = true;
+						DestResource = SrcResource;
+						const_cast<ZEGRResource*>(DestResource)->BoundStages[J].Offset = (FirstConstant != NULL) ? FirstConstant[I] : 0;
+						const_cast<ZEGRResource*>(DestResource)->BoundStages[J].Count = (NumConstants != NULL) ? NumConstants[I] : 0;
+					}
+					else
+					{
+						if ((FirstConstant != NULL && NumConstants != NULL) && 
+							(DestResource->BoundStages[J].Offset != FirstConstant[I] || 
+							DestResource->BoundStages[J].Count != NumConstants[I]))
+						{
+							Dirty = true;
+							const_cast<ZEGRResource*>(DestResource)->BoundStages[J].Offset = FirstConstant[I];
+							const_cast<ZEGRResource*>(DestResource)->BoundStages[J].Count = NumConstants[I];
+						}
+					}
 				}
 			}
 		}
@@ -561,9 +577,9 @@ void ZEGRContext::SetVertexBuffer(ZEUInt Index, const ZEGRBuffer* Buffer, const 
 	SetVertexBuffers(Index, 1, &Buffer, &Offset);
 }
 
-void ZEGRContext::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer)
+void ZEGRContext::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer, const ZEUInt* FirstConstant, const ZEUInt* NumConstants)
 {
-	SetConstantBuffers(Shader, Index, 1, &Buffer);
+	SetConstantBuffers(Shader, Index, 1, &Buffer, FirstConstant, NumConstants);
 }
 
 void ZEGRContext::GetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRBuffer** Buffers)

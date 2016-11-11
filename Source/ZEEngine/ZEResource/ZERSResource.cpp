@@ -336,7 +336,7 @@ void ZERSResource::SetLocalLoadProgress(ZESize Index, ZESize Count, ZEUInt Start
 	SetLocalLoadProgress(StartPercentage + (Index + 1) * (EndPercentage - StartPercentage) / Count);
 }
 
-ZEUInt ZERSResource::GetLocalLoadProgress()
+ZEUInt ZERSResource::GetLocalLoadProgress() const
 {
 	return LocalLoadProgress;
 }

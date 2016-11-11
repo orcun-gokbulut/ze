@@ -81,6 +81,9 @@ struct ZEMDVertexInstance
 	ZEMatrix4x4						WorldTransform;
 	ZEMatrix4x4						WorldTransformInverseTranspose;
 
+	ZEVector4						DrawColor;
+	ZEUInt32_4						DrawLODTransition;
+
 	static const ZEGRVertexLayout&	GetVertexLayout();
 });
 

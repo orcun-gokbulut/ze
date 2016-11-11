@@ -42,6 +42,8 @@
 #include "ZEUICursorControl.h"
 #include "ZEUIButtonControl.h"
 #include "ZEInput/ZEInputDefinitions.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRContext.h"
 
 ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
 ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
@@ -584,6 +586,8 @@ bool ZEUIManager::DeinitializeInternal()
 
 void ZEUIManager::Render(ZERNRenderer* Renderer)
 {
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("UIRender");
+
 	UIRenderer->Clean();
 	
 	Controls.LockRead();
@@ -593,6 +597,8 @@ void ZEUIManager::Render(ZERNRenderer* Renderer)
 	Controls.UnlockRead();
 
 	UIRenderer->Setup(Renderer);
+
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->EndEvent();
 }
 
 void ZEUIManager::Tick(float ElapsedTime)

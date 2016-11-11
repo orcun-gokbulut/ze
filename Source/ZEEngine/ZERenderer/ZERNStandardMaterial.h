@@ -83,6 +83,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEHolder<ZEGRRenderStateData>				StageGBuffer_Forward_RenderState;
 		
 		ZEHolder<ZEGRShader>						StageGBuffer_Forward_Instancing_VertexShader;
+		ZEHolder<ZEGRShader>						StageGBuffer_Forward_Instancing_PixelShader;
 		ZEHolder<ZEGRRenderStateData>				StageGBuffer_Forward_Instancing_RenderState;
 
 		ZEHolder<ZEGRShader>						StageShadowmapGeneration_VertexShader;
@@ -94,6 +95,8 @@ class ZERNStandardMaterial : public ZERNMaterial
 
 		ZEHolder<ZEGRBuffer>						ConstantBuffer;
 		ZEHolder<ZEGRSampler>						Sampler;
+		
+		ZEHolder<const ZEGRTexture>					DitherMap;
 
 		ZEHolder<const ZEGRTexture>					BaseMap;
 		ZEHolder<const ZEGRTexture>					SpecularMap;
@@ -121,7 +124,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 			ZEUInt32								HeightMapTechnique;
 			float									HeightMapScale;
 			float									HeightMapOffset;
-			float									Reserved0;
+			ZEBool32								DitheredOpacityEnabled;
 			
 			ZEVector3								EmissiveColor;
 			float									AlphaCullLimit;
@@ -238,6 +241,9 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool										GetTransparencyEnabled() const;
 		void										SetTransparencyMode(ZERNTransparencyMode Mode);
 		ZERNTransparencyMode						GetTransparencyMode() const;
+
+		void										SetDitheredOpacityEnabled(bool Enabled);
+		bool										GetDitheredOpacityEnabled() const;
 
 		void										SetAlphaCullEnabled(bool Enabled);
 		bool										GetAlphaCullEnabled() const;

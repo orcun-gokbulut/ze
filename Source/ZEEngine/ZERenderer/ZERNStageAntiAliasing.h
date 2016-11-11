@@ -56,6 +56,7 @@ class ZERNStageAntiAliasing  : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
+		bool								TemporalEnabled;
 
 		ZEHolder<ZEGRShader>				EdgeDetectionVertexShader;
 		ZEHolder<ZEGRShader>				EdgeDetectionPixelShader;
@@ -63,10 +64,15 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRShader>				BlendingWeightCalculationPixelShader;
 		ZEHolder<ZEGRShader>				NeighborhoodBlendingVertexShader;
 		ZEHolder<ZEGRShader>				NeighborhoodBlendingPixelShader;
+		ZEHolder<ZEGRShader>				ScreenCoverPositionTexcoordVertexShader;
+		ZEHolder<ZEGRShader>				GenerateVelocityBufferPixelShader;
+		ZEHolder<ZEGRShader>				ReprojectPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>		EdgeDetectionPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		BlendingWeightCalculationPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		NeighborhoodBlendingPassRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		GenerateVelocityBufferRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		ReprojectRenderStateData;
 
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
@@ -74,6 +80,9 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRTexture>				BlendTexture;
 		ZEHolder<ZEGRTexture>				AreaTexture;
 		ZEHolder<ZEGRTexture>				SearchTexture;
+		
+		ZEHolder<ZEGRTexture>				ColorTextures[2];
+		ZEHolder<ZEGRTexture>				VelocityBuffer;
 
 		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 		ZEHolder<ZEGRSampler>				SamplerPointClamp;
@@ -83,11 +92,12 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		struct SMAAConstants
 		{
 			ZEVector2						OutputSize;
-			ZEVector2						Reserved0;
+			ZEVector2						InvOutputSize;
+
+			ZEVector4						SubsampleIndices;
 		} Constants;
 
 		ZEHolder<const ZEGRTexture>			InputTexture;
-		ZEHolder<const ZEGRTexture>			GBufferNormal;
 		ZEHolder<const ZEGRTexture>			DepthTexture;
 		ZEHolder<const ZEGRTexture>			OutputTexture;
 
@@ -104,6 +114,8 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		void								DoEdgeDetection(ZEGRContext* Context);
 		void								DoBlendingWeightCalculation(ZEGRContext* Context);
 		void								DoNeighborhoodBlending(ZEGRContext* Context);
+		void								GenerateVelocityBuffer(ZEGRContext* Context);
+		void								DoReprojection(ZEGRContext* Context);
 
 		virtual bool						InitializeInternal();						
 		virtual bool						DeinitializeInternal();
@@ -113,6 +125,9 @@ class ZERNStageAntiAliasing  : public ZERNStage
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
+
+		void								SetTemporalEnabled(bool Enabled);
+		bool								GetTemporalEnabled() const;
 
 		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 

@@ -222,6 +222,11 @@ float4 ZERNTransformations_WorldToProjection(float4 VectorWorld)
 	return mul(ZERNView_ViewProjectionTransform, VectorWorld);
 }
 
+float4 ZERNTransformations_WorldToPrevProjection(float4 VectorWorld)
+{
+	return mul(ZERNView_PrevViewProjectionTransform, VectorWorld);
+}
+
 float3 ZERNTransformations_WorldToHomogeneous(float4 VectorWorld)
 {
 	float4 VectorProjection = ZERNTransformations_WorldToProjection(VectorWorld);

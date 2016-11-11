@@ -128,8 +128,8 @@ class ZEEntity : public ZEObject
 		ZEScene*								Scene;
 		ZEDObjectWrapper*						Wrapper;
 
-		ZEEntityState							State;
-		ZEEntityState							TargetState;
+		volatile ZEEntityState					State;
+		volatile ZEEntityState					TargetState;
 		bool									ReloadFlag;
 		bool									ReinitializeFlag;
 		bool									SerialOperation;

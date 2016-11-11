@@ -60,7 +60,7 @@
 struct ZERNGBuffer
 {
 	float4								Buffer0					: SV_Target0; // xyz:AccumulationBuffer
-	float4								Buffer1					: SV_Target1; // xyz:Emissive, w:SpecularPower
+	float4								Buffer1					: SV_Target1; // xy:Velocity(optional) z:Unused, w:SpecularPower
 	float4								Buffer2					: SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering 
 	float4								Buffer3					: SV_Target3; // xyz:Normal, w:SpecularColor
 };
@@ -112,20 +112,20 @@ float3 ZERNGBuffer_GetAccumulationColor(float2 ScreenPos, float SampleIndex = 0)
 	#endif
 }
 
-// EMISSIVE COLOR
+// VELOCITY
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetEmissiveColor(inout ZERNGBuffer GBuffer, float3 EmissiveColor)
+void ZERNGBuffer_SetVelocity(inout ZERNGBuffer GBuffer, float2 Velocity)
 {
-	GBuffer.Buffer1.xyz = EmissiveColor;
+	GBuffer.Buffer1.xy = Velocity;
 }
 
-float3 ZERNGBuffer_GetEmissiveColor(float2 ScreenPos, float SampleIndex = 0)
+float2 ZERNGBuffer_GetVelocity(float2 ScreenPos, float SampleIndex = 0)
 {
 	#ifdef MSAA_ENABLED
-		return ZERNGBuffer_Buffer1.Load(ScreenPos, SampleIndex).xyz;
+		return ZERNGBuffer_Buffer1.Load(ScreenPos, SampleIndex).xy;
 	#else
-		return ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xyz;
+		return ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xy;
 	#endif
 }
 
