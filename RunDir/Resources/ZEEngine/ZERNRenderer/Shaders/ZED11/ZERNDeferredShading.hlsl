@@ -143,11 +143,6 @@ float3 ZERNDeferredShading_PixelShader_PerSample_LightingStage(ZERNDeferredShadi
 	return ResultColor;
 }
 
-float3 ZERNDeferredShading_Accumulate_Emissive_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
-{
-	return ZERNGBuffer_GetEmissiveColor(PositionViewport.xy);
-}
-
 void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport : SV_Position)
 {
 	ZERNShading_Surface Surfaces[SAMPLE_COUNT];

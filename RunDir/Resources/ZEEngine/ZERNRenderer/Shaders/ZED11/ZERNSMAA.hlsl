@@ -39,26 +39,32 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScreenCover.hlsl"
 #include "ZERNShaderSlots.hlsl"
+#include "ZERNTransformations.hlsl"
 
-cbuffer ZERNSMAA_Constant_Buffer	: register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNSMAA_Constant_Buffer	: register(ZERN_SHADER_CONSTANT_STAGE)
 {
 	float2	ZERNSMAA_OutputSize;
-	float2	ZERNSMAA_Reserved;
+	float2	ZERNSMAA_InvOutputSize;
+	
+	float4	ZERNSMAA_SubsampleIndices;
 };
 
-#define		SMAA_RT_METRICS float4((float2)1.0 / ZERNSMAA_OutputSize.xy, ZERNSMAA_OutputSize.xy)
+#define		SMAA_RT_METRICS float4(ZERNSMAA_InvOutputSize, ZERNSMAA_OutputSize)
 #define		SMAA_HLSL_4
-#define		SMAA_PREDICATION 1
 #define		SMAA_PRESET_ULTRA
+#define		SMAA_REPROJECTION 1
 
 #include "SMAA.hlsl"
 
-Texture2D	ZERNSMAA_InputTexture		: register(t5);
-Texture2D	ZERNSMAA_PredicationTexture	: register(t6);
-Texture2D	ZERNSMAA_AreaTexture		: register(t7);
-Texture2D	ZERNSMAA_SearchTexture		: register(t8);
-Texture2D	ZERNSMAA_EdgeTexture		: register(t9);
-Texture2D	ZERNSMAA_BlendTexture		: register(t10);
+Texture2D			ZERNSMAA_InputTexture		: register(t5);
+Texture2D			ZERNSMAA_AreaTexture		: register(t6);
+Texture2D			ZERNSMAA_SearchTexture		: register(t7);
+Texture2D			ZERNSMAA_EdgeTexture		: register(t8);
+Texture2D			ZERNSMAA_BlendTexture		: register(t9);
+Texture2D			ZERNSMAA_CurrColorTexture	: register(t10);
+Texture2D			ZERNSMAA_PrevColorTexture	: register(t11);
+Texture2D			ZERNSMAA_VelocityTexture	: register(t12);
+Texture2D<float>	ZERNSMAA_DepthTexture		: register(t13);
 
 void ZERNSMAA_EdgeDetection_VertexShader(
 	in uint VertexIndex : SV_VertexId, 
@@ -103,11 +109,11 @@ float2 ZERNSMAA_EdgeDetection_PixelShader(
     float4 Offset[3] : TEXCOORD1) : SV_TARGET 
 {
 	#if (ZERNSMAA_EDGE_DETECTION == 1)
-			return SMAAColorEdgeDetectionPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_PredicationTexture);
+			return SMAAColorEdgeDetectionPS(Texcoord, Offset, ZERNSMAA_InputTexture);
 	#elif (ZERNSMAA_EDGE_DETECTION == 2)
 		return SMAADepthEdgeDetectionPS(Texcoord, Offset, ZERNGBuffer_DepthBuffer);
-	#else // if (ZERNSMAA_EDGE_DETECTION == 0)
-		return SMAALumaEdgeDetectionPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_PredicationTexture);
+	#else
+		return SMAALumaEdgeDetectionPS(Texcoord, Offset, ZERNSMAA_InputTexture);
 	#endif
 }
 
@@ -117,7 +123,7 @@ float4 ZERNSMAA_BlendingWeightCalculation_PixelShader(
 	float2 Pixcoord : TEXCOORD1,
 	float4 Offset[3] : TEXCOORD2) : SV_TARGET
 {
-    return SMAABlendingWeightCalculationPS(Texcoord, Pixcoord, Offset, ZERNSMAA_EdgeTexture, ZERNSMAA_AreaTexture, ZERNSMAA_SearchTexture, float4(0.0f, 0.0f, 0.0f, 0.0f));
+    return SMAABlendingWeightCalculationPS(Texcoord, Pixcoord, Offset, ZERNSMAA_EdgeTexture, ZERNSMAA_AreaTexture, ZERNSMAA_SearchTexture, ZERNSMAA_SubsampleIndices);
 }
 
 float4 ZERNSMAA_NeighborhoodBlending_PixelShader(
@@ -125,7 +131,26 @@ float4 ZERNSMAA_NeighborhoodBlending_PixelShader(
 	float2 Texcoord : TEXCOORD0,
 	float4 Offset : TEXCOORD1) : SV_TARGET
 {
-	return SMAANeighborhoodBlendingPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_BlendTexture);
+	return SMAANeighborhoodBlendingPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_BlendTexture, ZERNSMAA_VelocityTexture);
+}
+
+float2 ZERNSMAA_GenerateVelocityBuffer_PixelShader(float4 PositionViewport : SV_POSITION) : SV_TARGET0
+{
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNSMAA_OutputSize, ZERNSMAA_DepthTexture[floor(PositionViewport.xy)]);
+	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
+	
+	float4 PrevPositionHomogeneous = ZERNTransformations_WorldToPrevProjection(float4(PositionWorld, 1.0f));
+	PrevPositionHomogeneous.xy /= PrevPositionHomogeneous.w;
+	float2 CurrPositionHomogeneous = ZERNTransformations_ViewportToHomogeneous(PositionViewport.xy, ZERNSMAA_OutputSize);
+	
+	float2 Velocity = (CurrPositionHomogeneous - PrevPositionHomogeneous.xy) * float2(0.5f, -0.5f);
+	
+	return (length(Velocity) > length(ZERNSMAA_InvOutputSize)) ? ZERNSMAA_InvOutputSize : Velocity;
+}
+
+float4 ZERNSMAA_Reprojection_PixelShader(float4 Position : SV_POSITION) : SV_TARGET0
+{
+	return SMAAResolvePS(Position.xy * ZERNSMAA_InvOutputSize, ZERNSMAA_CurrColorTexture, ZERNSMAA_PrevColorTexture, ZERNSMAA_VelocityTexture);
 }
 
 #endif

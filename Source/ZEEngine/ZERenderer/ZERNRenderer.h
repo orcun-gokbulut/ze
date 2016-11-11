@@ -43,6 +43,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERNView.h"
 #include "ZERNStageID.h"
+#include "ZEModel/ZEMDVertex.h"
 
 ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
 ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
@@ -58,6 +59,9 @@ struct ZERNInstanceData
 {
 	ZEMatrix4x4	WorldTransform;
 	ZEMatrix4x4	WorldTransformInverseTranspose;
+
+	ZEVector4	DrawColor;
+	ZEUInt32_4	DrawLODTransition;
 };
 
 class ZERNRenderer : public ZEObject, public ZEInitializable
@@ -79,6 +83,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 
 		ZEGRContext*								Context;
 		ZEHolder<const ZEGRTexture>					OutputTexture;
+
+		ZEMatrix4x4									PrevViewProjectionTransform;
 
 		bool										DirtyPipeline;
 		bool										Resized;

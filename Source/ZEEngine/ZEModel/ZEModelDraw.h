@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 
+#include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNInstanceTag.h"
@@ -46,6 +47,7 @@ class ZEModelMesh;
 class ZEModelMeshLOD;
 class ZEModelDraw;
 class ZEMDResourceDraw;
+class ZEGRBuffer;
 
 ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
 
@@ -74,6 +76,18 @@ class ZEModelDraw : public ZEObject
 		ZEHolder<const ZERNMaterial>				Material;
 		mutable ZERNCommand							RenderCommand;
 		ZEMDInstanceTag								InstanceTag;
+		bool										DirtyConstants;
+
+		ZEHolder<ZEGRBuffer>						ConstantBuffer;
+
+		struct
+		{
+			ZEVector3								Color;
+			float									Opacity;
+
+			ZEVector3								Reserved;
+			ZEBool32								LODTransition;
+		} Constants;
 
 		void										SetLOD(ZEModelMeshLOD* LOD);
 
@@ -92,6 +106,15 @@ class ZEModelDraw : public ZEObject
 
 		void										SetCount(ZEUInt32 Count);
 		ZEUInt32									GetCount() const;
+
+		void										SetColor(const ZEVector3& Color);
+		const ZEVector3&							GetColor() const;
+
+		void										SetOpacity(float Opacity);
+		float										GetOpacity() const;
+
+		void										SetLODTransition(bool LODTransition);
+		bool										GetLODTransition() const;
 
 		void										SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>				GetMaterial() const;

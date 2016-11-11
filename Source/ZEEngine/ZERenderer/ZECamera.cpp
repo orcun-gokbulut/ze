@@ -514,7 +514,6 @@ ZECamera::ZECamera()
 
 	SetVerticalFOV(ZE_PI_4);
 
-	ProjectionTransformChanged();
 }
 
 ZECamera* ZECamera::CreateInstance()

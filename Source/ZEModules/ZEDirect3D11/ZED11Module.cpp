@@ -57,7 +57,7 @@
 
 #pragma warning(disable:4267)
 
-static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device* Device)
+static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device1* Device)
 {
 	IDXGIDevice* DXGIDevice;
 	HRESULT Result = Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&DXGIDevice);
@@ -153,15 +153,23 @@ bool ZED11Module::InitializeInternal()
 		DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 	#endif
 
-	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, DeviceFlags, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &Device, NULL, NULL);
+	ID3D11Device* TempDevice = NULL;
+	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, DeviceFlags, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &TempDevice, NULL, NULL);
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);
 		return false;
 	}
 
-	ID3D11DeviceContext* NativeContext;
-	Device->GetImmediateContext(&NativeContext);
+	Result = TempDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&Device));
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot query ID3D11Device1. Error: %d", Result);
+		return false;
+	}
+
+	ID3D11DeviceContext1* NativeContext;
+	Device->GetImmediateContext1(&NativeContext);
 
 	ZED11ComponentBase::Module = this;
 	ZED11ComponentBase::Device = Device;
@@ -241,7 +249,7 @@ ZEGROutput* ZED11Module::CreateOutput()
 ZEGRContext* ZED11Module::CreateContext()
 {
 	ZED11Context* Context = new ZED11Context();
-	if (FAILED(Device->CreateDeferredContext(0, &Context->Context)))
+	if (FAILED(Device->CreateDeferredContext1(0, &Context->Context)))
 	{
 		zeError("Cannot create deffered device context.");
 		return NULL;

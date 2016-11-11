@@ -134,8 +134,7 @@ ZEUInt32 ZEUIFontTrueType::GetFontSize() const
 
 ZEUIFontCharacter ZEUIFontTrueType::GetCharacter(char Character) const
 {
-	if (!IsLoaded())
-		WaitLoading();
+	while (!IsLoaded());
 
 	ZEInt64 KerningDistance;
 	return GetCharacter(Character, Character, KerningDistance);

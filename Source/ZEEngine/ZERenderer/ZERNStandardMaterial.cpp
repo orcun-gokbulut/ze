@@ -200,6 +200,16 @@ bool ZERNStandardMaterial::UpdateShaders()
 	StageGBuffer_Forward_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageGBuffer_Forward_PixelShader == NULL, false, "Cannot set pixel shader.");
 
+	if (!SkinningEnabled)
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+
+		Options.Type = ZEGR_ST_PIXEL;
+		Options.EntryPoint = "ZERNFixedMaterial_PixelShader";
+		StageGBuffer_Forward_Instancing_PixelShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageGBuffer_Forward_Instancing_PixelShader == NULL, false, "Cannot set pixel shader.");
+	}
+
 	Options.Definitions.Clear();
 	UpdateShadowMapGenerationPixelShaderDefinitions(Options);
 
@@ -232,14 +242,6 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
-	if (AlphaCullEnabled && !TransparencyEnabled)
-	{
-		ZEGRBlendState BlendStateAlphaToCoverage;
-		BlendStateAlphaToCoverage.SetAlphaToCoverageEnable(true);
-
-		RenderState.SetBlendState(BlendStateAlphaToCoverage);
-	}
-
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : RasterizerState.GetFillMode());
@@ -255,7 +257,7 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	{
 		RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
 		RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_Instancing_VertexShader);
-
+		RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_Forward_Instancing_PixelShader);
 		StageGBuffer_Forward_Instancing_RenderState = RenderState.Compile();
 		zeCheckError(StageGBuffer_Forward_Instancing_RenderState == NULL, false, "Cannot set gbuffer/forward instancing render state.");
 	}
@@ -368,6 +370,10 @@ ZETaskResult ZERNStandardMaterial::LoadInternal()
 	}
 
 	DirtyFlags.RaiseAll();
+	
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.Type = ZEGR_TT_2D;
+	DitherMap = ZEGRTexture::LoadResourceShared("#R:/ZEEngine/ZEPostEffects/Textures/grad2-7-1.png", TextureOptions);
 
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	if (ConstantBuffer == NULL)
@@ -470,7 +476,7 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 	Constants.HeightMapTechnique = ZERN_HMT_NONE;
 	Constants.HeightMapScale = 1.0f;
 	Constants.HeightMapOffset = 0.0f;
-	Constants.Reserved0 = 0.0f;
+	Constants.DitheredOpacityEnabled = ZEGR_FALSE;
 	Constants.EmissiveColor = ZEVector3::One;
 	Constants.AlphaCullLimit = 1.0f;
 	Constants.ReflectionColor = ZEVector3::One;
@@ -632,6 +638,21 @@ void ZERNStandardMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
 ZERNTransparencyMode ZERNStandardMaterial::GetTransparencyMode() const
 {
 	return TransparencyMode;
+}
+
+void ZERNStandardMaterial::SetDitheredOpacityEnabled(bool Enabled)
+{
+	if (Constants.DitheredOpacityEnabled == Enabled)
+		return;
+
+	Constants.DitheredOpacityEnabled = Enabled;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
+}
+
+bool ZERNStandardMaterial::GetDitheredOpacityEnabled() const
+{
+	return Constants.DitheredOpacityEnabled;
 }
 
 void ZERNStandardMaterial::SetAlphaCullEnabled(bool Enabled)
@@ -1893,6 +1914,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 			SpecularGlossMap
 		};
 		Context->SetTextures(ZEGR_ST_PIXEL, 0, 11, Textures);
+		Context->SetTexture(ZEGR_ST_PIXEL, 25, DitherMap);
 	}
 	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION || StageID == ZERN_STAGE_RENDER_DEPTH)
 	{

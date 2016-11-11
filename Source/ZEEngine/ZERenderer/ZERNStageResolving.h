@@ -68,15 +68,15 @@ class ZERNStageResolving : public ZERNStage
 		ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		ZEHolder<ZEGRTexture>			ResolvedInputTexture;
-		ZEHolder<ZEGRTexture>			ResolvedGBufferEmissive;
-		ZEHolder<ZEGRTexture>			ResolvedGBufferDiffuse;
-		ZEHolder<ZEGRTexture>			ResolvedGBufferNormal;
+		ZEHolder<ZEGRTexture>			ResolvedGBuffer1;
+		ZEHolder<ZEGRTexture>			ResolvedGBuffer2;
+		ZEHolder<ZEGRTexture>			ResolvedGBuffer3;
 		ZEHolder<ZEGRTexture>			ResolvedDepthTexture;
 
 		ZEHolder<const ZEGRTexture>		InputTexture;
-		ZEHolder<const ZEGRTexture>		GBufferEmissive;
-		ZEHolder<const ZEGRTexture>		GBufferDiffuse;
-		ZEHolder<const ZEGRTexture>		GBufferNormal;
+		ZEHolder<const ZEGRTexture>		GBuffer1;
+		ZEHolder<const ZEGRTexture>		GBuffer2;
+		ZEHolder<const ZEGRTexture>		GBuffer3;
 		ZEHolder<const ZEGRTexture>		DepthTexture;
 
 		ZEString						CustomInputname;

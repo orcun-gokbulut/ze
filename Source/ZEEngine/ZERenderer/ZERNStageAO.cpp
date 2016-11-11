@@ -680,7 +680,7 @@ ZERNStageAO::ZERNStageAO()
 	memset(&DeinterleavedConstants, 0, sizeof(DeinterleavedConstants));
 
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
-	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&NormalTexture), "GBufferNormal", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&NormalTexture), "GBuffer3", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }

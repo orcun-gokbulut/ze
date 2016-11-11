@@ -75,7 +75,7 @@ const ZEMatrix4x4d& ZEGeographicEntity::GetInvGeographicTransform() const
 {
 	if (GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM))
 	{
-		ZEMatrix4x4d::Inverse(InvGeographicTransform, GetGeographicTransform());
+		ZEMatrix4x4d::CreateInvOrientation(InvGeographicTransform, GeographicPosition, GeographicRotation, GeographicScale);
 		GeographicEntityDirtyFlags.UnraiseFlags(ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM);
 	}
 

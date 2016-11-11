@@ -67,7 +67,7 @@ class ZEGRContext : public ZEObject
 
 		bool							CheckVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
 		bool							CheckIndexBuffer(const ZEGRBuffer* Buffer);
-		bool							CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
+		bool							CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant, const ZEUInt* NumConstants);
 		bool							CheckSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers);
 		bool							CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRResource*const* Resources);
 		bool							CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRResource*const* Resources);
@@ -87,8 +87,8 @@ class ZEGRContext : public ZEObject
 		void							SetVertexBuffer(ZEUInt Index, const ZEGRBuffer* Buffer, const ZEUInt Offset = 0);
 		virtual void					SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* Offsets = NULL) = 0;
 		
-		void							SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer);
-		virtual void					SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers) = 0;
+		void							SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer, const ZEUInt* FirstConstant = NULL, const ZEUInt* NumConstants = NULL);
+		virtual void					SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant = NULL, const ZEUInt* NumConstants = NULL) = 0;
 		virtual void					GetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRBuffer** Buffers);
 
 		void							SetBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer);

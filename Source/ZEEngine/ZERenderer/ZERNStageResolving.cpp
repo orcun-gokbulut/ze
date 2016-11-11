@@ -76,15 +76,15 @@ bool ZERNStageResolving::DeinitializeInternal()
 	ConstantBuffer.Release();
 
 	ResolvedInputTexture.Release();
-	ResolvedGBufferEmissive.Release();
-	ResolvedGBufferDiffuse.Release();
-	ResolvedGBufferNormal.Release();
+	ResolvedGBuffer1.Release();
+	ResolvedGBuffer2.Release();
+	ResolvedGBuffer3.Release();
 	ResolvedDepthTexture.Release();
 
 	InputTexture = NULL;
-	GBufferEmissive = NULL;
-	GBufferDiffuse = NULL;
-	GBufferNormal = NULL;
+	GBuffer1 = NULL;
+	GBuffer2 = NULL;
+	GBuffer3 = NULL;
 	DepthTexture = NULL;
 
 	return ZERNStage::DeinitializeInternal();
@@ -174,35 +174,36 @@ void ZERNStageResolving::CreateOutput(const ZEString& Name)
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT0);
 		}
 	}
-	else if (Name == "GBufferEmissive")
+	else if (Name == "GBuffer1")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT1))
 		{
-			if (ResolveAllGbuffers)
-				ResolvedGBufferEmissive = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferEmissive->GetWidth(), GBufferEmissive->GetHeight(), 1, GBufferEmissive->GetFormat());
-			else
-				ResolvedGBufferEmissive = NULL;
+				ResolvedGBuffer1 = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBuffer1->GetWidth(), GBuffer1->GetHeight(), 1, GBuffer1->GetFormat());
 
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT1);
 		}
 	}
-	else if (Name == "GBufferDiffuse")
+	else if (Name == "GBuffer2")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT2))
 		{
 			if (ResolveAllGbuffers)
-				ResolvedGBufferDiffuse = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferDiffuse->GetWidth(), GBufferDiffuse->GetHeight(), 1, GBufferDiffuse->GetFormat());
+				ResolvedGBuffer2 = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBuffer2->GetWidth(), GBuffer2->GetHeight(), 1, GBuffer2->GetFormat());
 			else
-				ResolvedGBufferDiffuse = NULL;
+				ResolvedGBuffer2 = NULL;
 
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT2);
 		}
 	}
-	else if (Name == "GBufferNormal")
+	else if (Name == "GBuffer3")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT3))
 		{
-			ResolvedGBufferNormal = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBufferNormal->GetWidth(), GBufferNormal->GetHeight(), 1, GBufferNormal->GetFormat());
+			if (ResolveAllGbuffers)
+				ResolvedGBuffer3 = ZEGRTexture::CreateResource(ZEGR_TT_2D, GBuffer3->GetWidth(), GBuffer3->GetHeight(), 1, GBuffer3->GetFormat());
+			else
+				ResolvedGBuffer3 = NULL;
+
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT3);
 		}
 	}
@@ -307,24 +308,24 @@ bool ZERNStageResolving::Setup(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
-	if (ResolvedDepthTexture == NULL || ResolvedGBufferNormal == NULL)
+	if (ResolvedDepthTexture == NULL || ResolvedGBuffer1 == NULL)
 		return false;
 
 	Context->ClearDepthStencilBuffer(ResolvedDepthTexture->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
 
 	if (ResolveAllGbuffers)
 	{
-		if (ResolvedGBufferEmissive == NULL || ResolvedGBufferDiffuse == NULL)
+		if (ResolvedGBuffer2 == NULL || ResolvedGBuffer3 == NULL)
 			return false;
 
 		Context->SetRenderState(ResolveAllGBuffersRenderStateData);
-		const ZEGRRenderTarget* RenderTargets[] = {ResolvedGBufferEmissive->GetRenderTarget(), ResolvedGBufferDiffuse->GetRenderTarget(), ResolvedGBufferNormal->GetRenderTarget()};
+		const ZEGRRenderTarget* RenderTargets[] = {ResolvedGBuffer1->GetRenderTarget(), ResolvedGBuffer2->GetRenderTarget(), ResolvedGBuffer3->GetRenderTarget()};
 		Context->SetRenderTargets(3, RenderTargets, ResolvedDepthTexture->GetDepthStencilBuffer());
 	}
 	else
 	{
 		Context->SetRenderState(ResolveGBuffersRenderStateData);
-		const ZEGRRenderTarget* RenderTarget = ResolvedGBufferNormal->GetRenderTarget();
+		const ZEGRRenderTarget* RenderTarget = ResolvedGBuffer1->GetRenderTarget();
 		Context->SetRenderTargets(1, &RenderTarget, ResolvedDepthTexture->GetDepthStencilBuffer());
 	}
 	
@@ -347,13 +348,13 @@ ZERNStageResolving::ZERNStageResolving()
 
 	Constants.FilterType = ZERN_FILTER_BOX;
 
-	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBufferEmissive), "GBufferEmissive", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
-	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBufferDiffuse), "GBufferDiffuse", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
-	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBufferNormal), "GBufferNormal", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBuffer1", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBuffer2", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBuffer3", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBufferEmissive), "GBufferEmissive", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBufferDiffuse), "GBufferDiffuse", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBufferNormal), "GBufferNormal", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBuffer1), "GBuffer1", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBuffer2), "GBuffer2", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBuffer3), "GBuffer3", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedDepthTexture), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }

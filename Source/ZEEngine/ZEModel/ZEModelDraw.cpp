@@ -150,6 +150,51 @@ ZEUInt32 ZEModelDraw::GetCount() const
 	return Count;
 }
 
+void ZEModelDraw::SetColor(const ZEVector3& Color)
+{
+	if (Constants.Color == Color)
+		return;
+
+	Constants.Color = Color;
+
+	DirtyConstants = true;
+}
+
+const ZEVector3& ZEModelDraw::GetColor() const
+{
+	return Constants.Color;
+}
+
+void ZEModelDraw::SetOpacity(float Opacity)
+{
+	if (Constants.Opacity == Opacity)
+		return;
+
+	Constants.Opacity = Opacity;
+
+	DirtyConstants = true;
+}
+
+float ZEModelDraw::GetOpacity() const
+{
+	return Constants.Opacity;
+}
+
+void ZEModelDraw::SetLODTransition(bool LODTransition)
+{
+	if (Constants.LODTransition == (ZEBool32)LODTransition)
+		return;
+
+	Constants.LODTransition = (ZEBool32)LODTransition;
+
+	DirtyConstants = true;
+}
+
+bool ZEModelDraw::GetLODTransition() const
+{
+	return (bool)Constants.LODTransition;
+}
+
 void ZEModelDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
 	if (this->Material == Material)
@@ -210,14 +255,18 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 		ZEUInt InstanceOffset = Index;
 		ze_for_each(Instance, Command->Instances)
 		{
-			const ZEModelMesh* InstanceMesh = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag)->Draw->GetMesh();
-			InstanceBuffer[Index].WorldTransform = InstanceMesh->GetWorldTransform();
-			InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceMesh->GetInvWorldTransform().Transpose();
+			const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag)->Draw;
+			InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
+			InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
+			InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
+			InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
 			Index++;
 		}
-		const ZEModelMesh* InstanceMesh = static_cast<const ZEMDInstanceTag*>(Command->InstanceTag)->Draw->GetMesh();
-		InstanceBuffer[Index].WorldTransform = InstanceMesh->GetWorldTransform();
-		InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceMesh->GetInvWorldTransform().Transpose();
+		const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Command->InstanceTag)->Draw;
+		InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
+		InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
+		InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
+		InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
 		Index++;
 		Renderer->InstanceVertexBuffer->Unmap();
 
@@ -232,13 +281,21 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	{
 		if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
 		{
-			ZEGRBuffer* ConstantBuffers[] = {GetLOD()->GetMesh()->ConstantBuffer, GetMesh()->GetModel()->ConstantBufferBoneTransforms};
+			ZEGRBuffer* ConstantBuffers[] = {GetMesh()->ConstantBuffer, GetModel()->ConstantBufferBoneTransforms};
 			Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
 		}
 		else
 		{
 			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetMesh()->ConstantBuffer);
 		}
+
+		if (DirtyConstants)
+		{
+			ConstantBuffer->SetData(&Constants);
+			DirtyConstants = false;
+		}
+
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW_MATERIAL, ConstantBuffer);
 
 		if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
 			Context->Draw(GetCount(), GetOffset());
@@ -258,4 +315,11 @@ ZEModelDraw::ZEModelDraw()
 	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEModelDraw, Render, this);
 	InstanceTag.Draw = this;
 	RenderCommand.InstanceTag = &InstanceTag;
+	DirtyConstants = true;
+
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+
+	Constants.Color = ZEVector3::One;
+	Constants.Opacity = 1.0f;
+	Constants.LODTransition = ZEGR_FALSE;
 }

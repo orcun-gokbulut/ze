@@ -54,6 +54,7 @@
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRSampler.h"
+#include "ZERNStageAntiAliasing.h"
 
 ZEHolder<ZEGRBuffer>	ZERNRenderer::InstanceVertexBuffer;
 
@@ -131,10 +132,31 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 	Buffer->ViewTransform = View.ViewTransform;
 	Buffer->ProjectionTransform = View.ProjectionTransform;
-	Buffer->ViewProjectionTransform = View.ViewProjectionTransform;
 	Buffer->InvViewTransform = View.InvViewTransform;
 	Buffer->InvProjectionTransform = View.InvProjectionTransform;
 	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
+	Buffer->ViewProjectionTransform = View.ViewProjectionTransform;
+	Buffer->PrevViewProjectionTransform = PrevViewProjectionTransform;
+
+	PrevViewProjectionTransform = View.ViewProjectionTransform;
+
+	ZERNStageAntiAliasing* StageAA = static_cast<ZERNStageAntiAliasing*>(GetStage(ZERN_STAGE_ANTI_ALIASING));
+	if (OutputTexture != NULL && StageAA != NULL && StageAA->GetEnabled() && StageAA->GetTemporalEnabled())
+	{
+		ZEVector2 Jitters[] = 
+		{
+			ZEVector2(0.25f, -0.25f),
+			ZEVector2(-0.25f, 0.25f)
+		};
+
+		ZEMatrix4x4 TranslationMatrix;
+		ZEMatrix4x4::CreateTranslation(TranslationMatrix, 
+			2.0f * Jitters[ZECore::GetInstance()->GetFrameId() % 2].x / (float)OutputTexture->GetWidth(), 
+			2.0f * Jitters[ZECore::GetInstance()->GetFrameId() % 2].y / (float)OutputTexture->GetHeight(), 
+			0.0f);
+		Buffer->ViewProjectionTransform = TranslationMatrix * Buffer->ViewProjectionTransform;
+		Buffer->PrevViewProjectionTransform = TranslationMatrix * Buffer->PrevViewProjectionTransform;
+	}
 
 	Buffer->Width = View.Viewport.GetWidth();
 	Buffer->Height = View.Viewport.GetHeight();
@@ -589,9 +611,15 @@ void ZERNRenderer::Render()
 	if (!IsInitialized())
 		return;
 
+	Context->BeginEvent("PopulateStageCommands");
 	PopulateStageCommands();
+	Context->EndEvent();
+	Context->BeginEvent("RenderStages");
 	RenderStages();
+	Context->EndEvent();
+	Context->BeginEvent("CleanCommands");
 	CleanCommands();
+	Context->EndEvent();
 
 	for (ZESize I = 0; I < Scenes.GetCount(); I++)
 		Scenes[I]->RenderList.UnlockRead();
@@ -606,6 +634,8 @@ ZERNRenderer::ZERNRenderer()
 	CurrentSceneIndex = -1;
 	DirtyPipeline = false;
 	Resized = false;
+
+	memset(&RendererConstants, 0, sizeof(RendererConstants));
 }
 
 ZERNRenderer::~ZERNRenderer()

@@ -87,8 +87,8 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		mutable bool							Shared;
 		ZESize									MemoryUsageSelf[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
-		ZERSResourceState						State;
-		ZERSResourceState						TargetState;
+		volatile ZERSResourceState				State;
+		volatile ZERSResourceState				TargetState;
 		ZETask									UpdateStateTask;
 
 		ZEUInt									LocalLoadProgress;
@@ -119,7 +119,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 
 		void									SetLocalLoadProgress(ZEUInt Percentage);
 		void									SetLocalLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage);
-		ZEUInt									GetLocalLoadProgress();
+		ZEUInt									GetLocalLoadProgress() const;
 
 		void									AddChildResource(ZERSResource* Resource);
 		void									RemoveChildResource(ZERSResource* Resource);

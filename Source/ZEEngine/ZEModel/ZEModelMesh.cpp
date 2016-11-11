@@ -50,6 +50,7 @@
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNStandardMaterial.h"
 
 #define ZEMD_MDF_TRANSFORM					0x0001
 #define ZEMD_MDF_INV_TRANSFORM				0x0002
@@ -778,7 +779,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	UpdateConstantBuffer();
 
 	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;
-	float CurrentBoundingBoxEdgeDistanceSquare;
+	float CurrentBoundingBoxEdgeDistanceSquare = 0.0f;
 
 	for (ZEUInt I = 0; I < 8; I++)
 	{
@@ -788,54 +789,78 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			ClosestBoundingBoxEdgeDistanceSquare = CurrentBoundingBoxEdgeDistanceSquare;
 	}
 	
-	float DrawOrder = 0.0f;
+	float DrawOrder = ClosestBoundingBoxEdgeDistanceSquare;
 
-	float EntityDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldPosition());	
-	if (!CustomDrawOrderEnabled)
-		DrawOrder = ClosestBoundingBoxEdgeDistanceSquare;
-	else
-		DrawOrder = ClosestBoundingBoxEdgeDistanceSquare * (CustomDrawOrder + 1);
- 	
-	float CurrentDistanceSquare = 0.0f;
-	ZEModelMeshLOD* CurrentLOD = NULL;
+	float CurrentStartDistanceSquare = 0.0f;
+	float CurrentEndDistanceSquare = 0.0f;
+	ZEModelMeshLOD* CurrentLODs[2] = {};
 
 	ze_for_each(LOD, LODs)
 	{
-		float LODDistanceSquare = LOD->GetStartDistance() * LOD->GetStartDistance();
+		float LODStartDistanceSquare = LOD->GetStartDistance() * LOD->GetStartDistance();
+		float LODEndDistanceSquare = LOD->GetEndDistance() * LOD->GetEndDistance();
 
-		if (LODDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
+		if (LODStartDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare && 
+			ClosestBoundingBoxEdgeDistanceSquare < LODEndDistanceSquare)
 		{
-			if (CurrentDistanceSquare <= LODDistanceSquare)
+			if (LODStartDistanceSquare < CurrentEndDistanceSquare)
 			{
-				CurrentDistanceSquare = LODDistanceSquare;
-				CurrentLOD = LOD.GetPointer();
+				CurrentLODs[1] = LOD.GetPointer();
+			}
+			else
+			{
+				CurrentStartDistanceSquare = LODStartDistanceSquare;
+				CurrentEndDistanceSquare = LODEndDistanceSquare;
+				CurrentLODs[0] = LOD.GetPointer();
 			}
 		}
 	}
 
-	if (CurrentLOD == NULL)
+	if (CurrentLODs[0] == NULL)
 		return false;
 
-	if (ClosestBoundingBoxEdgeDistanceSquare > (CurrentLOD->GetEndDistance() * CurrentLOD->GetEndDistance()))
+	if (ClosestBoundingBoxEdgeDistanceSquare > CurrentEndDistanceSquare)
 		return false;
 
-	if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
+	if (CurrentLODs[0]->GetVertexType() == ZEMD_VT_SKINNED)
 		GetModel()->UpdateConstantBufferBoneTransforms();
 
-	ze_for_each(Draw, CurrentLOD->GetDraws())
+	if (CurrentLODs[1] != NULL)
 	{
-		Draw->RenderCommand.Entity = GetModel();
-		Draw->RenderCommand.Priority = 0;
-		Draw->RenderCommand.Order = DrawOrder;
-		Draw->RenderCommand.InstanceTag = (CurrentLOD->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
+		float DistanceToCamera = ZEMath::Sqrt(ClosestBoundingBoxEdgeDistanceSquare); 
+		float Opacity = (CurrentLODs[0]->GetEndDistance() - DistanceToCamera) / (CurrentLODs[0]->GetEndDistance() - CurrentLODs[1]->GetStartDistance());
+		Opacity = ZEMath::Clamp(Opacity, 0.0f, 1.0f);
+		const_cast<ZEModelDraw&>(CurrentLODs[0]->GetDraws()[0]).SetOpacity(ZEMath::Power(Opacity, 0.5f));
+		const_cast<ZEModelDraw&>(CurrentLODs[0]->GetDraws()[0]).SetLODTransition(true);
+		const_cast<ZEModelDraw&>(CurrentLODs[1]->GetDraws()[0]).SetOpacity(ZEMath::Power(1.0f - Opacity, 2.0f));
+		const_cast<ZEModelDraw&>(CurrentLODs[1]->GetDraws()[0]).SetLODTransition(true);
+	}
+	else
+	{
+		const_cast<ZEModelDraw&>(CurrentLODs[0]->GetDraws()[0]).SetOpacity(1.0f);
+		const_cast<ZEModelDraw&>(CurrentLODs[0]->GetDraws()[0]).SetLODTransition(false);
+	}
 
-		if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->IsLoaded())
+	for (ZEUInt I = 0; I < 2; I++)
+	{
+		if (CurrentLODs[I] == NULL)
 			continue;
 
-		if (!Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-			continue;
+		ze_for_each(Draw, CurrentLODs[I]->GetDraws())
+		{
+			Draw->RenderCommand.Entity = GetModel();
+			Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
+			Draw->RenderCommand.Order = DrawOrder;
+			Draw->RenderCommand.InstanceTag = (CurrentLODs[I]->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
 
-		Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->IsLoaded())
+				continue;
+
+			if (!Draw->GetMaterial()->PreRender(Draw->RenderCommand))
+				continue;
+
+			Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+		}
 	}
 
 	return true;

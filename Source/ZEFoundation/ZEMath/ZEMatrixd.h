@@ -186,6 +186,9 @@ class ZEMatrix4x4d
 		static void						CreateOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation, const ZEVector3d& Scale);
 		static void						CreateOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation);
 		static void						CreateOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEVector3d& Scale);
+		static void						CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation, const ZEVector3d& Scale);
+		static void						CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation);
+		static void						CreateInvOrientation(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEVector3d& Scale);
 		static void						CreateIdentity(ZEMatrix4x4d& Matrix);
 		static void						CreateZero(ZEMatrix4x4d& Matrix);
 		static void						CreateViewTransform(ZEMatrix4x4d& Matrix, const ZEVector3d& Position, const ZEQuaternion& Rotation);

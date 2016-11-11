@@ -80,6 +80,7 @@ struct ZERNViewConstantBuffer
 	ZEMatrix4x4						InvViewTransform;
 	ZEMatrix4x4						InvProjectionTransform;			
 	ZEMatrix4x4						InvViewProjectionTransform;
+	ZEMatrix4x4						PrevViewProjectionTransform;
 
 	ZEVector3						Position;
 	float							Width;

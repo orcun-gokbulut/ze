@@ -44,15 +44,15 @@
 
 struct ZERNResolving_Output
 {
-	float3	NormalRenderTarget						: SV_Target0;
+	float3	GBuffer1								: SV_Target0;
 	float	Depth									: SV_Depth;
 };
 
 struct ZERNResolving_GBuffers_Output
 {
-	float3	EmissiveRenderTarget					: SV_Target0;
-	float3	DiffuseRenderTarget						: SV_Target1;
-	float3	NormalRenderTarget						: SV_Target2;
+	float3	GBuffer1								: SV_Target0;
+	float3	GBuffer2								: SV_Target1;
+	float3	GBuffer3								: SV_Target2;
 	float	Depth									: SV_Depth;
 };
 
@@ -97,7 +97,7 @@ ZERNResolving_Output ZERNResolving_ResolveGBuffers_PixelShader_Main(float4 Posit
 {
 	ZERNResolving_Output Output = (ZERNResolving_Output)0;
 	#ifdef MSAA_ENABLED
-		Output.NormalRenderTarget = ZERNResolving_Resolve_NoFilter(ZERNGBuffer_Buffer3, PositionViewport.xy).xyz;
+		Output.GBuffer1 = ZERNResolving_Resolve_BoxFilter(ZERNGBuffer_Buffer1, PositionViewport.xy).xyz;
 		Output.Depth = ZERNResolving_Resolve_NoFilter(ZERNGBuffer_DepthBuffer, PositionViewport.xy).x;
 	#endif
 	return Output;
@@ -107,9 +107,9 @@ ZERNResolving_GBuffers_Output ZERNResolving_ResolveAllGBuffers_PixelShader_Main(
 {
 	ZERNResolving_GBuffers_Output Output = (ZERNResolving_GBuffers_Output)0;
 	#ifdef MSAA_ENABLED
-		Output.EmissiveRenderTarget = ZERNResolving_Resolve_BoxFilter(ZERNGBuffer_Buffer1, PositionViewport.xy).xyz;
-		Output.DiffuseRenderTarget = ZERNResolving_Resolve_BoxFilter(ZERNGBuffer_Buffer2, PositionViewport.xy).xyz;
-		Output.NormalRenderTarget = ZERNResolving_Resolve_NoFilter(ZERNGBuffer_Buffer3, PositionViewport.xy).xyz;
+		Output.GBuffer1 = ZERNResolving_Resolve_BoxFilter(ZERNGBuffer_Buffer1, PositionViewport.xy).xyz;
+		Output.GBuffer2 = ZERNResolving_Resolve_BoxFilter(ZERNGBuffer_Buffer2, PositionViewport.xy).xyz;
+		Output.GBuffer3 = ZERNResolving_Resolve_NoFilter(ZERNGBuffer_Buffer3, PositionViewport.xy).xyz;
 		Output.Depth = ZERNResolving_Resolve_NoFilter(ZERNGBuffer_DepthBuffer, PositionViewport.xy).x;
 	#endif
 	return Output;

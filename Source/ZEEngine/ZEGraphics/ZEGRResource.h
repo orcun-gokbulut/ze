@@ -105,6 +105,8 @@ class ZEGRResource : public ZERSResource
 		{
 			bool						BoundAsShaderResource;
 			bool						BoundAsUnorderedAccess;
+			ZEUInt						Offset;
+			ZEUInt						Count;
 			ZEInt						Slot;
 		};
 		
