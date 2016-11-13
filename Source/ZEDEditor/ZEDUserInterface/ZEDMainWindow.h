@@ -41,11 +41,14 @@
 #include "ZEDMenu.h"
 #include "ZEDWindow.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEDCommand.h"
+#include "ZEDMenuManager.h"
 
 class ZEDMenu;
 class ZEDWindow;
 class ZEDToolbar;
 class ZEDViewport;
+class ZEDMenuManager;
 class Ui_ZEDMainWindow;
 
 enum ZEDWindowDefault
@@ -88,6 +91,14 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		ZEArray<ZEDToolbar*>				Toolbars;
 		ZEArray<ZEDWindow*>					Windows;
+
+		ZEDMenuManager*						MenuManager;
+
+		ZEDCommand							QuitCommand;
+		void								QuitCommand_OnAction(const ZEDCommand* Command);
+
+		ZEDCommand							B;
+		void								B_OnAction(const ZEDCommand* Command);
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
 

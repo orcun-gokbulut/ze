@@ -78,6 +78,7 @@ enum ZEDViewportKeyModifier
 
 enum ZEDViewportKeyboardKey
 {
+	ZED_VKK_NONE					= 0x00000000,
 	ZED_VKK_ESCAPE					= 0x01000000,	 
 	ZED_VKK_TAB						= 0x01000001,	 
 	ZED_VKK_BACKTAB					= 0x01000002,	 

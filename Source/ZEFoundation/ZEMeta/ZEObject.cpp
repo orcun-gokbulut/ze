@@ -39,23 +39,96 @@
 #include "ZEEvent.h"
 #include "ZEDS\ZEArray.h"
 
-void ZEObject::AddEventConnection(ZEEventBase* Event) const
+struct ZEEventConnection 
 {
-	zeDebugCheck(Event == NULL, "Cannot add event connection. Event is NULL.");
+	ZEEventBase*					Event;
+	ZESize							Count;
+};
 
-	if (EventConnections == NULL)
-		EventConnections = new ZEArray<ZEEventBase*>();
+void ZEObject::CloneEventConnections(ZEObject* Other)
+{
+	if (EventConnections != NULL)
+	{
+		ZEArray<ZEEventConnection>& EventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
 
-	static_cast<ZEArray<ZEEventBase*>*>(EventConnections)->Add(Event);
+		EventConnectionsCasted.LockWrite();
+		for (ZESize I = 0; I < EventConnectionsCasted.GetCount(); I++)
+			EventConnectionsCasted[I].Event->DisconnectObject(this);
+		EventConnectionsCasted.Clear();
+		EventConnectionsCasted.UnlockWrite();
+	}
+
+	if (Other->EventConnections != NULL)
+	{
+		ZEArray<ZEEventConnection>& OtherEventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(Other->EventConnections);
+		OtherEventConnectionsCasted.LockRead();
+		if (OtherEventConnectionsCasted.GetCount() != 0)
+		{
+			if (EventConnections == NULL)
+				EventConnections = new ZEArray<ZEEventConnection>();
+
+			ZEArray<ZEEventConnection>& EventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
+			EventConnectionsCasted.LockWrite();
+			{
+				EventConnectionsCasted = OtherEventConnectionsCasted;
+				for (ZESize I = 0; I < OtherEventConnectionsCasted.GetCount(); I++)
+					EventConnectionsCasted[I].Event->CloneConnections(Other, this);
+			}
+			EventConnectionsCasted.UnlockWrite();
+		}
+		OtherEventConnectionsCasted.UnlockRead();
+	}
 }
 
-void ZEObject::RemoveEventConnection(ZEEventBase* Event) const
+void ZEObject::AddEventConnection(ZEEventBase* Event)
+{
+	zeDebugCheck(Event == NULL, "Cannot add event connection. Event is NULL.");
+	
+	if (EventConnections == NULL)
+		EventConnections = new ZEArray<ZEEventConnection>();
+
+	ZEArray<ZEEventConnection>& EventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
+	EventConnectionsCasted.LockWrite();
+	{
+		for (ZESize I = 0; I < EventConnectionsCasted.GetCount(); I++)
+		{
+			if (EventConnectionsCasted[I].Event != Event)
+				continue;
+
+			EventConnectionsCasted[I].Count++;
+
+			EventConnectionsCasted.UnlockWrite();
+			return;
+		}
+
+		ZEEventConnection* Connection = EventConnectionsCasted.Add();
+		Connection->Event = Event;
+		Connection->Count = 1;
+	}
+	EventConnectionsCasted.UnlockWrite();
+}
+
+void ZEObject::RemoveEventConnection(ZEEventBase* Event)
 {
 	zeDebugCheck(Event == NULL, "Cannot remove event connection. Event is NULL.");
-	zeDebugCheck(EventConnections == NULL, "Cannot remove event connection. There are no event connections available.");
-	zeDebugCheck(EventConnections == NULL, "Cannot remove event connection. Eveint connection does not belong to this object.");
-	
-	static_cast<ZEArray<ZEEventBase*>*>(EventConnections)->RemoveValue(Event);
+		
+	ZEArray<ZEEventConnection>& EventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
+	EventConnectionsCasted.LockWrite();
+	{
+		for (ZESize I = 0; I < EventConnectionsCasted.GetCount(); I++)
+		{
+			if (EventConnectionsCasted[I].Event != Event)
+				continue;
+			
+			EventConnectionsCasted[I].Count--;
+
+			if (EventConnectionsCasted[I].Count == 0)
+				EventConnectionsCasted.Remove(I);
+			
+			break;
+		}
+	}
+	EventConnectionsCasted.UnlockWrite();
 }
 
 ZEClass* ZEObject::GetClass() const
@@ -69,23 +142,37 @@ ZEClass* ZEObject::Class()
 	return &Class;
 }
 
+ZEObject& ZEObject::operator=(const ZEObject& Object)
+{
+	CloneEventConnections(const_cast<ZEObject*>(&Object));
+	return *this;
+}
+
 ZEObject::ZEObject()
 {
 	EventConnections = NULL;
+}
+
+ZEObject::ZEObject(const ZEObject& Object)
+{
+	EventConnections = NULL;
+	CloneEventConnections(const_cast<ZEObject*>(&Object));
 }
 
 ZEObject::~ZEObject()
 {
 	if (EventConnections != NULL)
 	{
-		ZEArray<ZEEventBase*>& EventConnections = *static_cast<ZEArray<ZEEventBase*>*>(this->EventConnections);
-
-		EventConnections.LockWrite();
+		ZEArray<ZEEventConnection>& EventConnectionsCasted = *static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
+		EventConnectionsCasted.LockWrite();
 		{
-			for (ZESize I = 0; I < EventConnections.GetCount(); I++)
-				EventConnections[I]->DisconnectObject(this);
+			for (ZESize I = 0; I < EventConnectionsCasted.GetCount(); I++)
+				EventConnectionsCasted[I].Event->DisconnectObject(this);
 
+			EventConnectionsCasted.Clear();
 		}
-		EventConnections.UnlockWrite();
+		EventConnectionsCasted.UnlockWrite();
+
+		delete static_cast<ZEArray<ZEEventConnection>*>(EventConnections);
 	}
 }

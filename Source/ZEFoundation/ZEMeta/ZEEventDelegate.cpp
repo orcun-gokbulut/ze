@@ -39,3 +39,8 @@ const ZEObject* ZEEventDelegateBase::GetObject() const
 {
 	return Object;
 }
+
+ZEObject* ZEEventDelegateBase::GetObject()
+{
+	return Object;
+}

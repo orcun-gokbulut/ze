@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEvent.h
+ Zinek Engine - ZEDUIUtils.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDUIUtils.h"
 
-#include "ZEMethodSignatureGenerator.h"
-#include "ZEEventDelegate.h"
+#include "ZEFile/ZEPathInfo.h"
 
-#include "ZEObject.h"
-
-#define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
-
-class ZEEventBase
+QIcon ZEDUIUtils::GetIcon(const ZEString& VirtualPath)
 {
-	friend class ZEObject;
-	private:
-		bool								Suppressed;
+	ZERealPath RealPath = ZEPathInfo(VirtualPath).GetRealPath();
+	
+	if ((RealPath.Access & ZE_PA_READ) == 0)
+		return QIcon();
 
-		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
+	return QIcon(RealPath.Path.ToCString());
+}
 
-	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
-
-		void								SetSuppressed(bool Suppressed);
-		bool								GetSuppressed() const;
-
-		virtual void						DisconnectObject(ZEObject* Object) = 0;
-
-											ZEEventBase();
-};
-
-template <typename TSignature> 
-class ZEEvent;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEEventImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT

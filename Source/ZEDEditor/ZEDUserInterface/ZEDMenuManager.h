@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEvent.h
+ Zinek Engine - ZEDMenuManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,36 @@
 
 #pragma once
 
-#include "ZEMethodSignatureGenerator.h"
-#include "ZEEventDelegate.h"
+#include "ZEMeta/ZEObject.h"
 
-#include "ZEObject.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
-#define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
+class ZEDMenu2;
 
-class ZEEventBase
+class ZEDMenuManager : public ZEObject
 {
-	friend class ZEObject;
+	ZE_OBJECT
 	private:
-		bool								Suppressed;
+		ZEArray<ZEDMenu2*>				Menus;
 
-		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
+
+										ZEDMenuManager();
+		virtual							~ZEDMenuManager();
 
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
+		const ZEArray<ZEDMenu2*>&		GetMenus();
+		ZEDMenu2*						GetMenu(const ZEString& Name);
+		
+		bool							AddMenu(ZEDMenu2* Menu);
+		bool							RemoveMenu(ZEDMenu2* Menu);
 
-		void								SetSuppressed(bool Suppressed);
-		bool								GetSuppressed() const;
+		bool							Load(const ZEString& ConfigurationFile);
+		bool							Save(const ZEString& ConfigurationFile);
 
-		virtual void						DisconnectObject(ZEObject* Object) = 0;
+		void							Update();
 
-											ZEEventBase();
+		virtual void					Destroy();
+
+		static ZEDMenuManager*			CreateInstance();
 };
-
-template <typename TSignature> 
-class ZEEvent;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEEventImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT

@@ -175,7 +175,8 @@ void ZEDObjectWrapper::SetObject(ZEObject* Object)
 	ClearChildWrappers();
 	this->Object = Object;
 
-	Update();
+	if (IsInitialized())
+		Update();
 }
 
 ZEObject* ZEDObjectWrapper::GetObject() const
@@ -476,7 +477,7 @@ void ZEDObjectWrapper::UnlockWrapper()
 
 void ZEDObjectWrapper::Update()
 {
-
+	UpdateNamePlate();
 }
 
 ZEDObjectWrapper* ZEDObjectWrapper::Clone()

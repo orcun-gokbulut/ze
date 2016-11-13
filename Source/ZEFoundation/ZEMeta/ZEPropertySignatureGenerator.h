@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROPERTY_SIGNATURE_GENERATOR_H__
-#define __ZE_PROPERTY_SIGNATURE_GENERATOR_H__
 
 #include "ZETypes.h"
+#include "ZEClass.h"
 #include "ZEPropertySignature.h"
+
+#include <type_traits>
+#include "ZEProvider.h"
 
 template <typename T>
 class ZEPropertySignatureGenerator;
@@ -49,8 +51,7 @@ class ZEPropertySignatureGenerator<const T>
 	public:
 		static ZEPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-			Type.BaseClass = NULL;
+			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_VALUE;
 			return Type;
 		}
@@ -62,8 +63,7 @@ class ZEPropertySignatureGenerator<T *>
 	public:
 		static ZEPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-			Type.BaseClass = NULL;
+			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_POINTER;
 			return Type;
 		}
@@ -75,8 +75,7 @@ class ZEPropertySignatureGenerator<const T *>
 	public:
 		static ZEPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-			Type.BaseClass = NULL;
+			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_POINTER;
 			return Type;
 		}
@@ -88,8 +87,7 @@ class ZEPropertySignatureGenerator<T &>
 	public:
 		static ZEPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-			Type.BaseClass = NULL;
+			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_REFERENCE;
 			return Type;
 		}
@@ -101,8 +99,7 @@ class ZEPropertySignatureGenerator<const T &>
 	public:
 		static ZEPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-			Type.BaseClass = NULL;
+			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_REFERENCE;
 			return Type;
 		}
@@ -243,17 +240,20 @@ class ZEPropertySignatureGenerator<ZEString>
 		static ZEPropertySignature GetType();
 };
 
+
 template <typename T>
 class ZEPropertySignatureGenerator
 {
-	template<typename T>
-	static ZEPropertySignature GetType()
-	{
-		ZEPropertySignature Type = ZEPropertySignature<T>::GetType();
-		Type.BaseClass = T::Class();
-		Type.CanonicalType = ZE_CT_VALUE;
-		return Type;
-	}
-};
+	public:
+		static ZEPropertySignature GetType()
+		{
+			ZEPropertySignature Type;
+			
+			Type.BaseClass = ZEProvider::GetInstance()->GetClass(typeid(T).name());
+			if (Type.BaseClass == NULL)
+				Type.Type = ZE_VRT_UNDEFINED;
 
-#endif
+			Type.CanonicalType = ZE_CT_VALUE;
+			return Type;
+		}
+};

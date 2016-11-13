@@ -49,7 +49,6 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 {
 	ZE_OBJECT
 	private:
-		bool								GraphicsDirty;
 		ZEHolder<ZEGRBuffer>				VertexBuffer;
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>		Material;
@@ -71,6 +70,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 
 		virtual void						UpdateNamingPlate();
 		virtual bool						UpdateGraphics();
+		virtual void						UpdateConstantBuffer();
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
