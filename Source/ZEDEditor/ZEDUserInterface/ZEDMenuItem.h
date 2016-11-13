@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEvent.h
+ Zinek Engine - ZEDMenuItem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,68 @@
 
 #pragma once
 
-#include "ZEMethodSignatureGenerator.h"
-#include "ZEEventDelegate.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDS/ZEValue.h"
 
-#include "ZEObject.h"
+#include <QObject>
+#include <QAction>
 
-#define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
+class ZEDCommand;
+class ZEDMenuItem;
+class QMenu;
 
-class ZEEventBase
+enum ZEDMenuItemType
 {
-	friend class ZEObject;
-	private:
-		bool								Suppressed;
-
-		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
-
-	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
-
-		void								SetSuppressed(bool Suppressed);
-		bool								GetSuppressed() const;
-
-		virtual void						DisconnectObject(ZEObject* Object) = 0;
-
-											ZEEventBase();
+	ZED_MIT_NONE,
+	ZED_MIT_COMMAND,
+	ZED_MIT_MENU_POINTER,
+	ZED_MIT_SEPERATOR
 };
 
-template <typename TSignature> 
-class ZEEvent;
+class ZEDMenuAction : public QAction
+{
+	Q_OBJECT
+	friend class ZEDMenu2;
+	private:
+		ZEDMenuItem*					Item;
+		void							Action_triggered(bool Triggered);
 
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEEventImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+										ZEDMenuAction(ZEDMenuItem* Item);
+};
+
+class ZEDMenuItem : public ZEObject
+{
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEDMenuItem)
+	friend class ZEDMenuAction;
+	friend class ZEDMenu2;
+	private:
+		ZEDMenuAction*					Action;
+		ZEDMenu2*						Menu;
+		ZEDMenuItemType					Type;
+
+		ZEString						TargetName;
+		ZEDCommand*						TargetCommand;
+		ZEDMenu2*						TargetMenu;
+
+		void							Action_Triggered();
+		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
+		void							TargetMenu_OnUpdate(const ZEDMenu2* Menu);
+
+	public:
+		ZEDMenu2*						GetMenu();
+
+		void							SetType(ZEDMenuItemType Type);
+		ZEDMenuItemType					GetType() const;
+
+		void							SetTargetName(const ZEString& Name);
+		const ZEString&					GetTargetName() const;
+
+		void							Update();
+
+		virtual bool					Load(ZEMLReaderNode* ItemNode);
+		virtual bool					Save(ZEMLWriterNode* ItemsNode);
+
+										ZEDMenuItem();
+										~ZEDMenuItem();
+};

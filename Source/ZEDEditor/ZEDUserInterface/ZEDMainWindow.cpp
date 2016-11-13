@@ -51,12 +51,28 @@
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
+#include "ZEDCommandManager.h"
+#include "ZEDMenu2.h"
+#include "ZEDMenuItem.h"
+#include "ZEMeta/ZEEventDelegate.h"
 
 class ZEDMenuWrapper : public QMenu
 {
 	public:
 		ZEString Section;
 };
+
+void ZEDMainWindow::QuitCommand_OnAction(const ZEDCommand* Command)
+{
+	int Result = QMessageBox::question(MainWindow, "ZEDEditor", "Are you sure that you want to quit ?", QMessageBox::Yes, QMessageBox::No);
+	if (Result == QMessageBox::Yes)
+		GetEditor()->Exit();
+}
+
+void ZEDMainWindow::B_OnAction(const ZEDCommand* Command)
+{
+	QuitCommand.SetEnabled(Command->GetValue().GetBoolean());
+}
 
 bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 {
@@ -102,9 +118,63 @@ void ZEDMainWindow::ToolbarMenuCallback(ZEDMenu* Menu)
 
 ZEDMainWindow::ZEDMainWindow()
 {
+	QuitCommand.SetName("Quit");
+	QuitCommand.SetCategory("Main Window");
+	QuitCommand.SetText("Quit");
+	QuitCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/Close.png");
+	QuitCommand.SetTooltip("Exit from the editor");
+	QuitCommand.SetEnabled(false);
+	QuitCommand.OnAction += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDMainWindow, &ZEDMainWindow::QuitCommand_OnAction>(this);
+
+	ZEDCommandManager::GetInstance()->RegisterCommand(&QuitCommand);
+
+	B.SetName("CommandB");
+	B.SetCategory("Test1");
+	B.SetText("B");
+	B.SetTooltip("Tool tip o a");
+	B.SetType(ZED_CT_CHECK);
+	B.OnAction += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDMainWindow, &ZEDMainWindow::B_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&B);
+
+	MenuManager = ZEDMenuManager::CreateInstance();
+
+	ZEDMenu2* MainMenu = ZEDMenu2::CreateInstance();
+	MainMenu->SetName("MainMenu");
+	MainMenu->SetText("Menu1");
+	MenuManager->AddMenu(MainMenu);
+
+	ZEDMenu2* SubMenu2 = ZEDMenu2::CreateInstance();
+	SubMenu2->SetName("MainMenu2");
+	SubMenu2->SetText("Menu12");
+	MenuManager->AddMenu(SubMenu2);
+
+	ZEDMenuItem* Item = new ZEDMenuItem();
+	Item->SetType(ZED_MIT_COMMAND);
+	Item->SetTargetName("CommandB");
+	SubMenu2->AddItem(Item);
+
+	ZEDMenuItem* Item1 = new ZEDMenuItem();
+	Item1->SetType(ZED_MIT_COMMAND);
+	Item1->SetTargetName("Quit");
+	MainMenu->AddItem(Item1);
+
+	ZEDMenuItem* Item2 = new ZEDMenuItem();;
+	Item2->SetType(ZED_MIT_SEPERATOR);
+	MainMenu->AddItem(Item2);
+
+	ZEDMenuItem* Item3 = new ZEDMenuItem();;
+	Item3->SetType(ZED_MIT_MENU_POINTER);
+	Item3->SetTargetName("MainMenu2");
+	MainMenu->AddItem(Item3);
+
+
+	MenuManager->Update();
+
 	MainWindow = new QMainWindow();
 	Form = new Ui_ZEDMainWindow();
 	Form->setupUi(MainWindow);
+
+	MainWindow->menuBar()->addMenu(MenuManager->GetMenu("MainMenu")->GetNativeMenu());
 
 	MainWindow->installEventFilter(this);
 
@@ -116,7 +186,7 @@ ZEDMainWindow::ZEDMainWindow()
 
 ZEDMainWindow::~ZEDMainWindow()
 {
-
+	MenuManager->Destroy();
 }
 
 QMainWindow* ZEDMainWindow::GetMainWindow()
@@ -131,6 +201,7 @@ ZEDMenu* ZEDMainWindow::GetRootMenu()
 
 void ZEDMainWindow::AddMenu(const ZEString& Path, ZEDMenu* Menu)
 {
+	return;
 	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
 	RootMenu.AddMenu(Path, Menu);
 }

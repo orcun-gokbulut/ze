@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEvent.h
+ Zinek Engine - ZEDMenu2.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,65 @@
 
 #pragma once
 
-#include "ZEMethodSignatureGenerator.h"
-#include "ZEEventDelegate.h"
+#include "ZEMeta/ZEObject.h"
 
-#include "ZEObject.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEEvent.h"
 
-#define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
+class ZEDMenuItem;
+class ZEDMenuManager;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+class QMenu;
 
-class ZEEventBase
+class ZEDMenu2 : public ZEObject
 {
-	friend class ZEObject;
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEDMenu2)
+	friend class ZEDMenuManager;
 	private:
-		bool								Suppressed;
+		ZEDMenuManager*					Manager;
+		QMenu*							Menu;
+		ZEArray<ZEDMenuItem*>			Items;
+		ZEString						Name;
+		ZEString						Text;
+		ZEString						Icon;
+		bool							SystemMenu;
 
-		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
+										ZEDMenu2();
+										~ZEDMenu2();
 
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
+		ZEDMenuManager*					GetManager();
 
-		void								SetSuppressed(bool Suppressed);
-		bool								GetSuppressed() const;
+		void							SetName(const ZEString&	Name);
+		const ZEString&					GetName() const;
 
-		virtual void						DisconnectObject(ZEObject* Object) = 0;
+		void							SetText(const ZEString&	Name);
+		const ZEString&					GetText() const;
 
-											ZEEventBase();
+		void							SetIcon(const ZEString& Icon);
+		const ZEString&					GetIcon() const;
+
+		void							SetSystemMenu(bool SystemMenu);
+		bool							GetSystemMenu() const;
+
+		QMenu*							GetNativeMenu();
+
+		const ZEArray<ZEDMenuItem*>&	GetItems() const;
+		void							AddItem(ZEDMenuItem* Item);
+		void							InsertItem(ZESize Index, ZEDMenuItem* Item);
+		void							RemoveItem(ZEDMenuItem* Item);
+		void							ClearItems();
+
+		bool							Load(ZEMLReaderNode* Reader);
+		bool							Save(ZEMLWriterNode* WriterNode);
+
+		ZE_EVENT(						OnUpdated,(ZEDMenu2* Menu));
+
+		void							Update();
+
+		virtual void					Destroy();
+
+		static ZEDMenu2*				CreateInstance();
 };
-
-template <typename TSignature> 
-class ZEEvent;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEEventImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT

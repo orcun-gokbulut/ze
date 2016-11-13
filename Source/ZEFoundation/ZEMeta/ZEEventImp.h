@@ -56,9 +56,8 @@ class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEEventBase
 		ZEMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
 		ZEArray<ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION> > Delegates;
 
-		void								Assign(const ZEEvent& Event);
-
-		virtual void						DisconnectObject(ZEObject* Object);
+		void								Clone(const ZEEvent& Event);
+		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject);
 
 	public:
 		virtual const ZEMethodSignature&	GetSignature() const;
@@ -68,6 +67,8 @@ class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEEventBase
 
 		bool								RemoveDelegate(const ZEEventDelegateBase* Delegate);
 		void								RemoveDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
+
+		virtual void						DisconnectObject(ZEObject* Object);
 
 		void								Clear();
 
@@ -93,17 +94,39 @@ const ZEMethodSignature& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() con
 }
 
 ZE_TEMPLATE_KEYWORD
-void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Assign(const ZEEvent& Event)
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Clone(const ZEEvent& Other)
 {
 	Delegates.LockWrite();
-	for (ZESize I = 0; I < Delegates.GetCount(); I++)
-		Delegates[I].GetObject()->RemoveEventConnection(this);
+	{
+		Other.Delegates.LockRead();
+		{
+			Delegates = Other.Delegates;
+		}
+		Other.Delegates.UnlockRead();
 
-	Delegates.Clear();
-	Delegates.AddMultiple(Event.Delegates);
-	for (ZESize I = 0; I < Delegates.GetCount(); I++)
-		Delegates[I].GetObject()->AddEventConnection(this);
+		for (ZESize I = 0; I < Delegates.GetCount(); I++)
+			Delegates[I].GetObject()->AddEventConnection(this);
+	}
+	Delegates.UnlockWrite();
+}
 
+ZE_TEMPLATE_KEYWORD
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::CloneConnections(ZEObject* SourceObject, ZEObject* NewObject)
+{
+	Delegates.LockWrite();
+	{
+		ZESize DelegateCount = Delegates.GetCount();
+
+		for (ZESize I = 0; I < DelegateCount; I++)
+		{
+			if (Delegates[I].GetObject() != SourceObject)
+				continue;
+
+			ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION> DelegateClone = Delegates[I];
+			DelegateClone.Object = NewObject;
+			Delegates.Add(DelegateClone);
+		}
+	}
 	Delegates.UnlockWrite();
 }
 
@@ -141,7 +164,7 @@ bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegateBase*
 	Delegates.LockWrite();
 	{
 		Delegates.Add(*static_cast<const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>*>(Delegate));
-		Delegate->GetObject()->AddEventConnection(this);
+		const_cast<ZEObject*>(Delegate->GetObject())->AddEventConnection(this);
 	}
 	Delegates.UnlockWrite();
 
@@ -154,7 +177,7 @@ void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegate<ZE_T
 	Delegates.LockWrite();
 	{
 		Delegates.Add(Delegate);
-		Delegate.GetObject()->AddEventConnection(this);
+		const_cast<ZEObject*>(Delegate.GetObject())->AddEventConnection(this);
 	}
 	Delegates.UnlockWrite();
 }
@@ -169,7 +192,7 @@ bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::RemoveDelegate(const ZEEventDelegateBa
 	Delegates.LockWrite();
 	{
 		Delegates.Add(*static_cast<const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>*>(Delegate));
-		Delegate->GetObject()->AddEventConnection(this);
+		const_cast<ZEObject*>(Delegate->GetObject())->AddEventConnection(this);
 	}
 	Delegates.UnlockWrite();
 
@@ -211,7 +234,7 @@ void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Call(ZE_ARGUMENT_DEFINITIONS) const
 ZE_TEMPLATE_KEYWORD
 ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::operator=(const ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& Other)
 {
-	Assign(Other);
+	Clone(Other);
 	return *this;
 }
 
@@ -258,7 +281,7 @@ ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::ZEEvent()
 ZE_TEMPLATE_KEYWORD
 ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::ZEEvent(const ZEEvent<ZE_TEMPLATE_SPECIALIZATION>& Event)
 {
-	Assign(Event);
+	Clone(Event);
 }
 
 ZE_TEMPLATE_KEYWORD
@@ -267,7 +290,7 @@ ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::~ZEEvent()
 	Delegates.LockWrite();
 	
 	for (ZESize I = 0; I < Delegates.GetCount(); I++)
-		Delegates[I].GetObject()->RemoveEventConnection(this);
+		const_cast<ZEObject*>(Delegates[I].GetObject())->RemoveEventConnection(this);
 
 	Delegates.UnlockWrite();
 }

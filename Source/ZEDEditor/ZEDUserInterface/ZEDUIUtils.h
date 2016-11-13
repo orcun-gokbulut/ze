@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEEvent.h
+ Zinek Engine - ZEDUIUtils.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#pragma  once
 
-#include "ZEMethodSignatureGenerator.h"
-#include "ZEEventDelegate.h"
 
-#include "ZEObject.h"
+#include "ZEDS/ZEString.h"
+#include <QIcon>
 
-#define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
-
-class ZEEventBase
+class ZEDUIUtils
 {
-	friend class ZEObject;
-	private:
-		bool								Suppressed;
-
-		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
-
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
-
-		void								SetSuppressed(bool Suppressed);
-		bool								GetSuppressed() const;
-
-		virtual void						DisconnectObject(ZEObject* Object) = 0;
-
-											ZEEventBase();
+		static QIcon		GetIcon(const ZEString& VirtualPath);
 };
-
-template <typename TSignature> 
-class ZEEvent;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEEventImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT

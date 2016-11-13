@@ -44,11 +44,15 @@
 
 class ZEEventDelegateBase
 {
+	template<typename TSignature> friend class ZEEvent;
 	protected:
 		ZEObject*							Object;
+
 	public:
 		virtual const ZEMethodSignature&	GetSignature() const = 0;
+		ZEObject*							GetObject();
 		const ZEObject*						GetObject() const;
+		
 };
 
 template<typename TSignature>

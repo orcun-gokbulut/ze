@@ -35,17 +35,30 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ZEDCommand.cpp							Sources)
+ze_add_source(ZEDCommand.h								Sources ZEMC QtMocs)
+ze_add_source(ZEDCommandManager.cpp						Sources)
+ze_add_source(ZEDCommandManager.h						Sources ZEMC QtMocs)
+
 ze_add_source(ZEDUserInterfaceComponent.cpp				Sources)
 ze_add_source(ZEDUserInterfaceComponent.h				Sources ZEMC QtMocs)
 ze_add_source(ZEDWindow.cpp								Sources)
 ze_add_source(ZEDWindow.h								Sources ZEMC QtMocs)
 ze_add_source(ZEDMenu.cpp								Sources)
 ze_add_source(ZEDMenu.h									Sources QtMocs)
+ze_add_source(ZEDMenu2.cpp								Sources)
+ze_add_source(ZEDMenu2.h								Sources ZEMC QtMocs)
+ze_add_source(ZEDMenuItem.cpp							Sources)
+ze_add_source(ZEDMenuItem.h								Sources ZEMC QtMocs)
+ze_add_source(ZEDMenuManager.cpp						Sources)
+ze_add_source(ZEDMenuManager.h							Sources ZEMC)
 ze_add_source(ZEDToolbar.cpp							Sources)
 ze_add_source(ZEDToolbar.h								Sources ZEMC)
 ze_add_source(ZEDMainWindow.cpp							Sources)
 ze_add_source(ZEDMainWindow.h							Sources QtMocs)
 ze_add_source(ZEDMainWindow.ui							Sources QtUI)
+ze_add_source(ZEDUIUtils.cpp							Sources)
+ze_add_source(ZEDUIUtils.h								Sources)
 
 # Common Controls
 ze_add_source(ZEDTransformationToolbar.cpp				Sources)

@@ -68,16 +68,20 @@ class ZEObject
 {
 	template<typename TSignature> friend class ZEEvent;
 	private:
-		mutable void*				EventConnections;
+		void*						EventConnections;
 	
-		void						AddEventConnection(ZEEventBase* Event) const;
-		void						RemoveEventConnection(ZEEventBase* Event) const;
+		void						CloneEventConnections(ZEObject* Other);
+		void						AddEventConnection(ZEEventBase* Event);
+		void						RemoveEventConnection(ZEEventBase* Event);
 
 	public:
 		virtual	ZEClass*			GetClass() const;
 		static ZEClass*				Class();
 
+		ZEObject&					operator=(const ZEObject& Object);
+
 									ZEObject();
+									ZEObject(const ZEObject& Object);
 									~ZEObject();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEObject.png")
