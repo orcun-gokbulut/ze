@@ -84,16 +84,16 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 				  (1.0f - CascadeDistanceFactor) * (View.NearZ + (View.ShadowDistance - View.NearZ) * CascadeNumberDividedByCount);
 
 		float NearTop = Cascade.Borders.z * VerticalTopFovTangent;
-		float NearBottom = -Cascade.Borders.z * VerticalBottomFovTangent;
+		float NearBottom = Cascade.Borders.z * VerticalBottomFovTangent;
 
 		float NearRight = Cascade.Borders.z * HorizontalRightTangent;
-		float NearLeft = -Cascade.Borders.z * HorizontalLeftTangent;
+		float NearLeft = Cascade.Borders.z * HorizontalLeftTangent;
 
 		float FarTop = Cascade.Borders.w * VerticalTopFovTangent;
-		float FarBottom = -Cascade.Borders.w * VerticalBottomFovTangent;
+		float FarBottom = Cascade.Borders.w * VerticalBottomFovTangent;
 
 		float FarRight = Cascade.Borders.w * HorizontalRightTangent;
-		float FarLeft = -Cascade.Borders.w * HorizontalLeftTangent;
+		float FarLeft = Cascade.Borders.w * HorizontalLeftTangent;
 
 		CascadeFrustumVerticesView[0] = ZEVector3(NearLeft, NearBottom, Cascade.Borders.z);
 		CascadeFrustumVerticesView[1] = ZEVector3(NearLeft, NearTop, Cascade.Borders.z);

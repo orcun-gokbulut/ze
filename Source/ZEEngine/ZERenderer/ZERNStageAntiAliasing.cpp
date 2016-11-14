@@ -434,10 +434,9 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	Context->SetViewports(1, &Viewport);
 	
 	if (TemporalEnabled)
-	{
 		GenerateVelocityBuffer(Context);
-		Context->SetTexture(ZEGR_ST_PIXEL, 12, VelocityBuffer);
-	}
+
+	Context->SetTexture(ZEGR_ST_PIXEL, 12, VelocityBuffer);
 	
 	ClearTextures(Context);
 	DoEdgeDetection(Context);

@@ -132,7 +132,7 @@ void* ZEGRWindow::GetHandle() const
 	return Handle;
 }
 
-void ZEGRWindow::SetLeft(ZEUInt Left)
+void ZEGRWindow::SetLeft(ZEInt Left)
 {
 	SetPosition(Left, Top);
 }
@@ -142,7 +142,7 @@ ZEInt ZEGRWindow::GetLeft() const
 	return Left;
 }
 
-void ZEGRWindow::SetTop(ZEUInt Top)
+void ZEGRWindow::SetTop(ZEInt Top)
 {
 	SetPosition(Left, Top);
 }
