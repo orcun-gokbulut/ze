@@ -130,10 +130,10 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		
 		void							SetPosition(ZEInt Left, ZEInt Top);
 
-		void							SetLeft(ZEUInt Left);
+		void							SetLeft(ZEInt Left);
 		ZEInt							GetLeft() const;
 
-		void							SetTop(ZEUInt Top);
+		void							SetTop(ZEInt Top);
 		ZEInt							GetTop() const;
 
 		void							SetSize(ZEInt Width, ZEInt Height);
