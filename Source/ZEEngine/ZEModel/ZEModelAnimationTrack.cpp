@@ -502,7 +502,7 @@ ZEModelAnimationTrack::ZEModelAnimationTrack() : ModelLink(this)
 	StartFrame = 0;
 	EndFrame = 0;
 
-	Speed = 30.0f;
+	Speed = 1.0f;
 	BlendFactor	= 0.5f;
 	Looping = false;
 	BlendMode = ZE_MABM_INTERPOLATE;
@@ -552,9 +552,9 @@ float ZEModelAnimationTrack::GetSpeed()
 float ZEModelAnimationTrack::GetFrameRate()
 {
 	if (ResourceAnimation != NULL)
-		return Speed / ResourceAnimation->GetFramesPerSecond();
+		return ResourceAnimation->GetFramesPerSecond() * Speed;
 	else
-		return Speed / 30.0f;
+		return 30.0f * Speed;
 }
 
 void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
