@@ -35,7 +35,7 @@
 
 #include "ZEDMenuManager.h"
 
-#include "ZEDMenu2.h"
+#include "ZEDMenu.h"
 #include "ZEML/ZEMLReader.h"
 
 ZEDMenuManager::ZEDMenuManager()
@@ -50,12 +50,12 @@ ZEDMenuManager::~ZEDMenuManager()
 	Menus.Clear();
 }
 
-const ZEArray<ZEDMenu2*>& ZEDMenuManager::GetMenus()
+const ZEArray<ZEDMenu*>& ZEDMenuManager::GetMenus()
 {
 	return Menus;
 }
 
-ZEDMenu2* ZEDMenuManager::GetMenu(const ZEString& Name)
+ZEDMenu* ZEDMenuManager::GetMenu(const ZEString& Name)
 {
 	for (ZESize I = 0; I < Menus.GetCount(); I++)
 	{
@@ -66,7 +66,7 @@ ZEDMenu2* ZEDMenuManager::GetMenu(const ZEString& Name)
 	return NULL;
 }
 
-bool ZEDMenuManager::AddMenu(ZEDMenu2* Menu)
+bool ZEDMenuManager::AddMenu(ZEDMenu* Menu)
 {
 	zeCheckError(Menu == NULL, false, "Cannot add menu. Menu is NULL.");
 	zeCheckError(Menus.Exists(Menu), false, "Cannot add menu. Menu has been already added. Menu Name: \"%s\".", Menu->GetName().ToCString());
@@ -82,11 +82,11 @@ bool ZEDMenuManager::AddMenu(ZEDMenu2* Menu)
 
 	Menu->Manager = this;
 	Menus.Add(Menu);
-
+	
 	return true;
 }
 
-bool ZEDMenuManager::RemoveMenu(ZEDMenu2* Menu)
+bool ZEDMenuManager::RemoveMenu(ZEDMenu* Menu)
 {
 	zeCheckError(Menu == NULL, false, "Cannot remove menu. Menu is NULL.");
 	zeCheckError(!Menus.Exists(Menu), false, "Cannot remove menu. Menu is not added. Menu Name: \"%s\".", Menu->GetName().ToCString());
@@ -120,11 +120,18 @@ bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 		for (ZESize I = 0; I < MenuNodeCount; I++)
 		{
 			ZEMLReaderNode& MenuNode = MenusNode.GetNode("Menu", I);
-			ZEDMenu2* NewMenu = ZEDMenu2::CreateInstance();
-			NewMenu->Load(&MenuNode);
+			ZEDMenu* NewMenu = ZEDMenu::CreateInstance();
+			if (!NewMenu->Load(&MenuNode))
+			{
+				delete NewMenu;
+				continue;
+			}
+
 			AddMenu(NewMenu);
 		}
 	}
+
+	Update();
 
 	return true;
 }

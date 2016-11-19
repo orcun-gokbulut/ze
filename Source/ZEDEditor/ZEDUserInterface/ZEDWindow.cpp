@@ -34,13 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDWindow.h"
-#include "ZEDMenu.h"
 
 #include <QDockWidget>
 
 void ZEDWindow::visibilityChanged(bool Visibilty)
 {
-	Menu->SetChecked(Visibilty);
+
 }
 
 void ZEDWindow::SetName(const ZEString& Name)
@@ -56,7 +55,6 @@ void ZEDWindow::SetWidget(QWidget* Widget)
 
 ZEDWindow::ZEDWindow()
 {
-	Menu = new ZEDMenu();
 	DockWidget = new QDockWidget();
 }
 

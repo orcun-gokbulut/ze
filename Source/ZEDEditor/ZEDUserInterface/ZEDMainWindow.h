@@ -36,13 +36,14 @@
 #pragma once
 
 #include "ZEDCore/ZEDComponent.h"
-#include <QMainWindow>
+
 #include "ZEDS/ZEArray.h"
-#include "ZEDMenu.h"
-#include "ZEDWindow.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEDCommand.h"
 #include "ZEDMenuManager.h"
+#include "ZEDWindow.h"
+
+#include <QMainWindow>
 
 class ZEDMenu;
 class ZEDWindow;
@@ -87,35 +88,23 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		Ui_ZEDMainWindow*					Form;
 		QMainWindow*						MainWindow;
 		ZEDViewport*						Viewport;
-		ZEDMenu								RootMenu;
 
 		ZEArray<ZEDToolbar*>				Toolbars;
 		ZEArray<ZEDWindow*>					Windows;
 
 		ZEDMenuManager*						MenuManager;
 
-		ZEDCommand							QuitCommand;
-		void								QuitCommand_OnAction(const ZEDCommand* Command);
-
-		ZEDCommand							B;
-		void								B_OnAction(const ZEDCommand* Command);
-
 		bool								eventFilter(QObject* Object, QEvent* Event);
 
 		void								WindowMenuCallback(ZEDMenu* Menu);
 		void								ToolbarMenuCallback(ZEDMenu* Menu);
 
-		void								AddMenu(QMenu* Parent, const ZEString& RemainingPath, QAction* Action);
-		bool								RemoveMenu(QMenu* Parent, QAction* Action);
-
 											ZEDMainWindow();
 											~ZEDMainWindow();
+
 	public:
 		QMainWindow*						GetMainWindow();
-
-		ZEDMenu*							GetRootMenu();
-		void								AddMenu(const ZEString& Path, ZEDMenu* Menu);
-		void								RemoveMenu(ZEDMenu* Menu);
+		ZEDMenuManager*						GetMenuManager();
 
 		const ZEArray<ZEDWindow*>&			GetWindows();
 		void								AddWindow(ZEDWindow* Widget, ZEDWindowDefaults = ZED_WD_VISIBLE);

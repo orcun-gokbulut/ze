@@ -37,6 +37,7 @@
 
 #include "ZEDUserInterfaceComponent.h"
 #include "ZECommon.h"
+
 #include <QObject>
 
 class ZEDMainWindow;
@@ -50,7 +51,6 @@ class ZEDWindow : public QObject, public ZEDUserInterfaceComponent
 	friend class ZEDMainWindow;
 	private:
 		QDockWidget*				DockWidget;
-		ZEDMenu*					Menu;
 
 	private slots:
 		void						visibilityChanged(bool Visibilty);

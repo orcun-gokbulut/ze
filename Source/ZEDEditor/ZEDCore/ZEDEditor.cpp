@@ -54,6 +54,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include "ZEDUserInterface/ZEDCommandManager.h"
 
 
 void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
@@ -67,12 +68,62 @@ void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
 	}
 }
 
-void ZEDEditor::NewMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::RegisterCommands()
+{
+	NewCommand.SetName("ZEDEditor::New");
+	NewCommand.SetText("New");
+	NewCommand.SetCategory("File");
+	NewCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
+	NewCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::NewCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&NewCommand);
+
+	OpenCommand.SetName("ZEDEditor::Open");
+	OpenCommand.SetText("Open");
+	OpenCommand.SetCategory("File");
+	OpenCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_O));
+	OpenCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::OpenCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&OpenCommand);
+
+	RecentFilesCommand.SetName("ZEDEditor::RecentFilesCommand");
+	RecentFilesCommand.SetText("Recent Files");
+	RecentFilesCommand.SetCategory("File");
+	RecentFilesCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
+	RecentFilesCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::RecentFilesCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&RecentFilesCommand);
+
+	SaveCommand.SetName("ZEDEditor::SaveCommand");
+	SaveCommand.SetText("Save");
+	SaveCommand.SetCategory("File");
+	SaveCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_S));
+	SaveCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveCommand);
+
+	SaveAsCommand.SetName("ZEDEditor::SaveAsCommand");
+	SaveAsCommand.SetText("SaveAs");
+	SaveAsCommand.SetCategory("File");
+	SaveAsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL | ZED_VKM_SHIFT, ZED_VKK_S));
+	SaveAsCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveAsCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveAsCommand);
+
+	CloseCommand.SetName("ZEDEditor::CloseCommand");
+	CloseCommand.SetText("SaveAs");
+	CloseCommand.SetCategory("File");
+	CloseCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&CloseCommand);
+
+	ExitCommand.SetName("ZEDEditor::Exit");
+	ExitCommand.SetText("Exit");
+	ExitCommand.SetCategory("Application");
+	ExitCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&ExitCommand);
+}
+
+void ZEDEditor::NewCommand_OnAction(const ZEDCommand* Command)
 {
 	New();
 }
 
-void ZEDEditor::OpenMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::OpenCommand_OnAction(const ZEDCommand* Command)
 {
 	QString Result = QFileDialog::getOpenFileName(GetMainWindow()->GetMainWindow(), "Open", QString(), GetExtensions().ToCString());
 	if (Result.isEmpty())
@@ -82,7 +133,7 @@ void ZEDEditor::OpenMenu_activated(ZEDMenu* Menu)
 		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot load file.", "Error", QMessageBox::Ok);
 }
 
-void ZEDEditor::SaveMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::SaveCommand_OnAction(const ZEDCommand* Command)
 {
 	if (FileState == ZED_ES_NONE)
 		return;
@@ -91,7 +142,7 @@ void ZEDEditor::SaveMenu_activated(ZEDMenu* Menu)
 		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
 }
 
-void ZEDEditor::SaveAsMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 {
 	if (FileState == ZED_ES_NONE)
 		return;
@@ -104,7 +155,7 @@ void ZEDEditor::SaveAsMenu_activated(ZEDMenu* Menu)
 		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
 }
 
-void ZEDEditor::CloseMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::CloseCommand_OnAction(const ZEDCommand* Command)
 {
 	if (FileState == ZED_ES_NONE)
 		return;
@@ -119,7 +170,7 @@ void ZEDEditor::CloseMenu_activated(ZEDMenu* Menu)
 	Close();
 }
 
-void ZEDEditor::ExitMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::ExitCommand_OnAction(const ZEDCommand* Command)
 {
 	int Result;
 	if (FileState == ZED_ES_MODIFIED)
@@ -133,86 +184,16 @@ void ZEDEditor::ExitMenu_activated(ZEDMenu* Menu)
 	Exit();
 }
 
-void ZEDEditor::RecentFilesMenu_activated(ZEDMenu* Menu)
+void ZEDEditor::RecentFilesCommand_OnAction(const ZEDCommand* Command)
 {
-	Load(Menu->GetName());
+	Load(Command->GetValue().GetString());
 }
 
-void ZEDEditor::UpdateMenu()
+void ZEDEditor::UpdateCommands()
 {
-	SaveMenu->SetEnabled(FileState != ZED_ES_NONE);
-	SaveAsMenu->SetEnabled(FileState != ZED_ES_NONE);
-	CloseMenu->SetEnabled(FileState != ZED_ES_NONE);
-}
-
-void ZEDEditor::InitializeMenu()
-{
-	NewMenu = new ZEDMenu();
-	NewMenu->SetName("New");
-	NewMenu->SetSection("Open");
-	NewMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, NewMenu_activated, this));
-	GetMainWindow()->AddMenu("File", NewMenu);
-	
-	OpenMenu = new ZEDMenu();
-	OpenMenu->SetName("Open");
-	OpenMenu->SetSection("Open");
-	OpenMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, OpenMenu_activated, this));
-	GetMainWindow()->AddMenu("File", OpenMenu);
-	
-	RecentFilesMenu = new ZEDMenu();
-	RecentFilesMenu->SetName("Recent Files");
-	RecentFilesMenu->SetSection("Open");
-	GetMainWindow()->AddMenu("File", RecentFilesMenu);
-
-	SaveMenu = new ZEDMenu();
-	SaveMenu->SetName("Save");
-	SaveMenu->SetSection("Save");
-	SaveMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, SaveMenu_activated, this));
-	GetMainWindow()->AddMenu("File", SaveMenu);
-	
-	SaveAsMenu = new ZEDMenu();
-	SaveAsMenu->SetName("Save As");
-	SaveAsMenu->SetSection("Save");
-	SaveAsMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, SaveAsMenu_activated, this));
-	GetMainWindow()->AddMenu("File", SaveAsMenu);
-
-	CloseMenu = new ZEDMenu();
-	CloseMenu->SetName("Close");
-	CloseMenu->SetSection("Close");
-	CloseMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, CloseMenu_activated, this));
-	GetMainWindow()->AddMenu("File", CloseMenu);
-
-	ExitMenu = new ZEDMenu();
-	ExitMenu->SetName("Exit");
-	ExitMenu->SetSection("Exit");
-	ExitMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, ExitMenu_activated, this));
-	GetMainWindow()->AddMenu("File", ExitMenu);
-
-	UpdateMenu();
-}
-
-void ZEDEditor::DeinitializeMenu()
-{
-	delete NewMenu;
-	NewMenu = NULL;
-
-	delete OpenMenu;
-	OpenMenu = NULL;
-
-	delete SaveMenu;
-	SaveMenu = NULL;
-
-	delete SaveAsMenu;
-	SaveAsMenu = NULL;
-
-	delete CloseMenu;
-	CloseMenu = NULL;
-
-	delete ExitMenu;
-	ExitMenu = NULL;
-
-	delete RecentFilesMenu;
-	RecentFilesMenu = NULL;
+	SaveCommand.SetEnabled(FileState != ZED_ES_NONE);
+	SaveAsCommand.SetEnabled(FileState != ZED_ES_NONE);
+	CloseCommand.SetEnabled(FileState != ZED_ES_NONE);
 }
 
 void ZEDEditor::PopulateRecentFiles()
@@ -220,16 +201,11 @@ void ZEDEditor::PopulateRecentFiles()
 	QSettings Settings("Zinek", GetClass()->GetName());
 	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
 
-	while (RecentFilesMenu->GetChildMenus().GetCount() != 0)
-		delete RecentFilesMenu->GetChildMenus().GetFirstItem();
-
+	ZEArray<ZEString> Items;
 	for (int I = 0; I < RecentFiles.size(); I++)
-	{
-		ZEDMenu* Menu = new ZEDMenu();
-		Menu->SetName(RecentFiles[I].toUtf8().begin());
-		Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, RecentFilesMenu_activated, this));
-		GetMainWindow()->AddMenu("File/Open::Recent Files", Menu);
-	}
+		Items[I] = RecentFiles[I].toStdString();
+
+	RecentFilesCommand.SetListItems(Items);
 }
 
 void ZEDEditor::RegisterRecentFile(const ZEString& FileName)
@@ -245,8 +221,7 @@ void ZEDEditor::RegisterRecentFile(const ZEString& FileName)
 		RecentFiles.removeLast();
 
 	RecentFiles.insert(0, FileName.ToCString());
-
-	Settings.setValue("File/Open::RecentFiles", RecentFiles);
+	Settings.setValue("RecentFiles", RecentFiles);
 
 	PopulateRecentFiles();
 }
@@ -256,10 +231,9 @@ bool ZEDEditor::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	MainWindow = ZEDMainWindow::CreateInstance();
-	AddComponent(MainWindow);
+	RegisterCommands();
 
-	InitializeMenu();
+	MainWindow = ZEDMainWindow::CreateInstance();
 
 	ViewportManager = ZEDViewportManager::CreateInstance();
 	AddComponent(ViewportManager);
@@ -278,6 +252,8 @@ bool ZEDEditor::InitializeInternal()
 
 	OperationManager = ZEDOperationManager::CreateInstance();
 	AddComponent(OperationManager);
+
+	AddComponent(MainWindow);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 	{
@@ -299,8 +275,6 @@ bool ZEDEditor::DeinitializeInternal()
 		Components[I]->Deinitialize();
 
 	UIManager->Deinitialize();
-	
-	DeinitializeMenu();
 
 	return ZEInitializable::DeinitializeInternal();
 }
@@ -417,7 +391,7 @@ void ZEDEditor::New()
 	FileState = ZED_ES_UNMODIFIED;
 	FileName = "";
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -430,7 +404,7 @@ bool ZEDEditor::Save(const ZEString& FileName)
 	FileState = ZED_ES_UNMODIFIED;
 	this->FileName = FileName;
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -445,7 +419,7 @@ bool ZEDEditor::Load(const ZEString& FileName)
 	FileState = ZED_ES_UNMODIFIED;
 	this->FileName = FileName;
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -460,7 +434,7 @@ void ZEDEditor::Close()
 	FileState = ZED_ES_NONE;
 	FileName = NULL;
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -481,7 +455,7 @@ void ZEDEditor::MarkDocumentModified()
 
 	FileState = ZED_ES_MODIFIED;
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -496,7 +470,7 @@ void ZEDEditor::UnmarkDocumentModified()
 
 	FileState = ZED_ES_UNMODIFIED;
 
-	UpdateMenu();
+	UpdateCommands();
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
@@ -516,14 +490,6 @@ ZEDEditor::ZEDEditor()
 	ViewportManager = NULL;
 	MainWindow = NULL;
 	UIManager = NULL;
-
-	NewMenu = NULL;
-	OpenMenu = NULL;
-	SaveMenu = NULL;
-	SaveAsMenu = NULL;
-	CloseMenu = NULL;
-	ExitMenu = NULL;
-	RecentFilesMenu = NULL;
 }
 
 ZEDEditor::~ZEDEditor()

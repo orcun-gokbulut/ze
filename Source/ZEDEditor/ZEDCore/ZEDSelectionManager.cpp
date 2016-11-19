@@ -48,6 +48,7 @@
 #include "ZERenderer/ZERNScreenUtilities.h"
 #include "ZEUI/ZEUIFrameControl.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEDUserInterface/ZEDCommandManager.h"
 
 bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
 {
@@ -262,6 +263,8 @@ bool ZEDSelectionManager::InitializeInternal()
 	MultiSelectionBox->SetZOrder(1000);
 	GetEditor()->GetUIManager()->AddControl(MultiSelectionBox);
 
+	RegisterCommands();
+
 	return true;
 }
 
@@ -284,6 +287,112 @@ ZEDSelectionManager::ZEDSelectionManager()
 ZEDSelectionManager::~ZEDSelectionManager()
 {
 
+}
+
+void ZEDSelectionManager::RegisterCommands()
+{
+	SelectAllCommand.SetCategory("Selection");
+	SelectAllCommand.SetName("ZEDSelectionManager::SelectAllCommand");
+	SelectAllCommand.SetText("Select All");
+	SelectAllCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_A));
+	SelectAllCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionModeCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectAllCommand);
+	
+	ClearSelectionCommand.SetCategory("Selection");
+	ClearSelectionCommand.SetName("ZEDSelectionManager::ClearSelectionCommand");
+	ClearSelectionCommand.SetText("Clear Selection");
+	ClearSelectionCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_D));
+	ClearSelectionCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::ClearSelectionCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&ClearSelectionCommand);
+
+	LockSelectionCommand.SetCategory("Selection");
+	LockSelectionCommand.SetName("ZEDSelectionManager::LockSelectionCommand");
+	LockSelectionCommand.SetText("Lock Selection");
+	LockSelectionCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_L));
+	LockSelectionCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::LockSelectionCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&LockSelectionCommand);
+
+	FreezeObjectsCommand.SetCategory("Selection");
+	FreezeObjectsCommand.SetName("ZEDSelectionManager::FreezeObjectsCommand");
+	FreezeObjectsCommand.SetText("Freeze Objects");
+	FreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::FreezeObjectsCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&FreezeObjectsCommand);
+
+	UnfreezeObjectCommand.SetCategory("Selection");
+	UnfreezeObjectCommand.SetName("ZEDSelectionManager::UnfreezeObjectsCommand");
+	UnfreezeObjectCommand.SetText("Unfreeze Objects");
+	UnfreezeObjectCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectCommand);
+
+	SelectionModeCommand.SetCategory("Selection");
+	SelectionModeCommand.SetName("ZEDSelectionManager::SelectionModeCommand");
+	SelectionModeCommand.SetText("Intersects");
+	SelectionModeCommand.SetType(ZED_CT_CHECK);
+	SelectionModeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionModeCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionModeCommand);
+
+	SelectionShapeCommand.SetCategory("Selection");
+	SelectionShapeCommand.SetName("ZEDSelectionManager::SelectionShapeCommand");
+	SelectionShapeCommand.SetText("Shape");
+	SelectionShapeCommand.SetType(ZED_CT_LIST);
+	ZEArray<ZEString> Items;
+	Items.Add("Rectangle");
+	Items.Add("Circle");
+	Items.Add("Brush");
+	SelectionShapeCommand.SetListItems(Items);
+	SelectionShapeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionShapeCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionShapeCommand);
+}
+
+void ZEDSelectionManager::SelectAllCommand_OnAction(const ZEDCommand* Command)
+{
+
+}
+
+void ZEDSelectionManager::ClearSelectionCommand_OnAction(const ZEDCommand* Command)
+{
+	ClearSelection();
+}
+
+void ZEDSelectionManager::LockSelectionCommand_OnAction(const ZEDCommand* Command)
+{
+	SetLockSelection(Command->GetValue().GetBoolean());
+}
+
+void ZEDSelectionManager::FreezeObjectsCommand_OnAction(const ZEDCommand* Command)
+{
+	FreezeObjects(GetSelection());
+}
+
+void ZEDSelectionManager::UnfreezeObjectsCommand_OnAction(const ZEDCommand* Command)
+{
+	UnfreezeObjects(GetFrozonObjects());
+}
+
+void ZEDSelectionManager::SelectionModeCommand_OnAction(const ZEDCommand* Command)
+{
+	if (Command->GetValue().GetBoolean())
+	{
+		SetSelectionMode(ZE_SM_FULLY_COVERS);
+		SelectionModeCommand.SetText("Covers");
+	}
+	else
+	{
+		SetSelectionMode(ZE_SM_INTERSECTS);
+		SelectionModeCommand.SetText("Intersects");
+	}
+}
+
+void ZEDSelectionManager::SelectionShapeCommand_OnAction(const ZEDCommand* Command)
+{
+	const ZEString& Value = Command->GetValue().GetString();
+	
+	if (Value == "Circle")
+		SetSelectionShape(ZED_SS_CIRCLE);
+	else if (Value == "Brush")
+		SetSelectionShape(ZED_SS_BRUSH);
+	else
+		SetSelectionShape(ZED_SS_RECTANGLE);
 }
 
 void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)

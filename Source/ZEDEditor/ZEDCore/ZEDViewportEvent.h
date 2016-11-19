@@ -75,6 +75,7 @@ enum ZEDViewportKeyModifier
 	ZED_VKM_SHIFT					= 0x00040000,
 	ZED_VKM_WINDOWS					= 0x00080000,
 };
+typedef ZEFlags ZEDViewportKeyModifiers;
 
 enum ZEDViewportKeyboardKey
 {

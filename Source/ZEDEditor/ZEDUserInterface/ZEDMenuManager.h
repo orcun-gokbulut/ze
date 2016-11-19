@@ -40,24 +40,24 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
-class ZEDMenu2;
+class ZEDMenu;
 
 class ZEDMenuManager : public ZEObject
 {
 	ZE_OBJECT
 	private:
-		ZEArray<ZEDMenu2*>				Menus;
+		ZEArray<ZEDMenu*>				Menus;
 
 
 										ZEDMenuManager();
 		virtual							~ZEDMenuManager();
 
 	public:
-		const ZEArray<ZEDMenu2*>&		GetMenus();
-		ZEDMenu2*						GetMenu(const ZEString& Name);
+		const ZEArray<ZEDMenu*>&		GetMenus();
+		ZEDMenu*						GetMenu(const ZEString& Name);
 		
-		bool							AddMenu(ZEDMenu2* Menu);
-		bool							RemoveMenu(ZEDMenu2* Menu);
+		bool							AddMenu(ZEDMenu* Menu);
+		bool							RemoveMenu(ZEDMenu* Menu);
 
 		bool							Load(const ZEString& ConfigurationFile);
 		bool							Save(const ZEString& ConfigurationFile);

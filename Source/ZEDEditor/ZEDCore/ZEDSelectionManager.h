@@ -41,6 +41,7 @@
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEDViewportEvent.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
 enum ZEDSelectionShape
 {
@@ -93,6 +94,25 @@ class ZEDSelectionManager : public ZEDComponent
 
 											ZEDSelectionManager();
 		virtual								~ZEDSelectionManager();
+
+	private: /* COMMANDS */
+		ZEDCommand							SelectAllCommand;
+		ZEDCommand							ClearSelectionCommand;
+		ZEDCommand							LockSelectionCommand;
+		ZEDCommand							FreezeObjectsCommand;
+		ZEDCommand							UnfreezeObjectCommand;
+		ZEDCommand							SelectionModeCommand;
+		ZEDCommand							SelectionShapeCommand;
+
+		void								RegisterCommands();
+
+		void								SelectAllCommand_OnAction(const ZEDCommand* Command);
+		void								ClearSelectionCommand_OnAction(const ZEDCommand* Command);
+		void								LockSelectionCommand_OnAction(const ZEDCommand* Command);
+		void								FreezeObjectsCommand_OnAction(const ZEDCommand* Command);
+		void								UnfreezeObjectsCommand_OnAction(const ZEDCommand* Command);
+		void								SelectionModeCommand_OnAction(const ZEDCommand* Command);
+		void								SelectionShapeCommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		void								SetSelectionMode(ZEDSelectionMode Mode);

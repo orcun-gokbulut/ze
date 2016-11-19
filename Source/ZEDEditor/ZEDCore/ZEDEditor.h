@@ -40,6 +40,7 @@
 #include "ZEDestroyable.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
 class ZEDComponent;
 class ZEDEvent;
@@ -80,26 +81,6 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDMainWindow*						MainWindow;
 		ZEUIManager*						UIManager;
 
-		ZEDMenu*							NewMenu;
-		ZEDMenu*							OpenMenu;
-		ZEDMenu*							SaveMenu;
-		ZEDMenu*							SaveAsMenu;
-		ZEDMenu*							CloseMenu;
-		ZEDMenu*							ExitMenu;
-		ZEDMenu*							RecentFilesMenu;
-
-		void								NewMenu_activated(ZEDMenu* Menu);
-		void								OpenMenu_activated(ZEDMenu* Menu);
-		void								SaveMenu_activated(ZEDMenu* Menu);
-		void								SaveAsMenu_activated(ZEDMenu* Menu);
-		void								CloseMenu_activated(ZEDMenu* Menu);
-		void								ExitMenu_activated(ZEDMenu* Menu);
-		void								RecentFilesMenu_activated(ZEDMenu* Menu);
-
-		void								UpdateMenu();
-		void								InitializeMenu();
-		void								DeinitializeMenu();
-
 		void								PopulateRecentFiles();
 		void								RegisterRecentFile(const ZEString& FileName);
 
@@ -109,6 +90,26 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 											ZEDEditor();
 											~ZEDEditor();
+
+	private: /* COMMANDS */
+		ZEDCommand							NewCommand;
+		ZEDCommand							OpenCommand;
+		ZEDCommand							SaveCommand;
+		ZEDCommand							SaveAsCommand;
+		ZEDCommand							CloseCommand;
+		ZEDCommand							RecentFilesCommand;
+		ZEDCommand							ExitCommand;
+
+		void								RegisterCommands();
+		void								UpdateCommands();
+
+		void								NewCommand_OnAction(const ZEDCommand* Command);
+		void								OpenCommand_OnAction(const ZEDCommand* Command);
+		void								RecentFilesCommand_OnAction(const ZEDCommand* Command);
+		void								SaveCommand_OnAction(const ZEDCommand* Command);
+		void								SaveAsCommand_OnAction(const ZEDCommand* Command);
+		void								CloseCommand_OnAction(const ZEDCommand* Command);
+		void								ExitCommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		ZEDEditorCore*						GetCore();
