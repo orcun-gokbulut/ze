@@ -35,29 +35,81 @@
 
 #pragma once
 
-#include "ZEDUserInterfaceComponent.h"
-#include "ZECommon.h"
+#include "ZEMeta/ZEObject.h"
 
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEEvent.h"
+
+class ZEDToolbarItem;
+class ZEDToolbarManager;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 class QToolBar;
 
-class ZEDToolbar : public ZEDUserInterfaceComponent
+ZE_ENUM(ZEDToolbarDockLocation)
+{
+	ZED_TDL_LEFT,
+	ZED_TDL_RIGHT,
+	ZED_TDL_TOP,
+	ZED_TDL_BOTTOM
+};
+
+class ZEDToolbar : public ZEObject
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEDToolbar)
+	friend class ZEDToolbarManager;
 	private:
-		QToolBar*					Toolbar;
+		ZEDToolbarManager*				Manager;
+		QToolBar*						Toolbar;
+		ZEArray<ZEDToolbarItem*>		Items;
+		ZEString						Name;
+		ZEString						Text;
+		ZEString						Icon;
+		ZEDToolbarDockLocation			DockLocation;
+		ZEUInt							DockColumn;
+		ZEUInt							DockRow;
 
-	protected:
-		virtual void				SetName(const ZEString& Name);
-
-									ZEDToolbar();
-		virtual						~ZEDToolbar();
+										ZEDToolbar();
+										~ZEDToolbar();
 
 	public:
-		QToolBar*					GetToolbar();
+		ZEDToolbarManager*				GetManager();
 
-		void						SetEnabled(bool Enabled);
-		bool						GetEnabled();
+		void							SetName(const ZEString&	Name);
+		const ZEString&					GetName() const;
 
-		void						SetVisible(bool Visible);
-		bool						GetVisible();
+		void							SetText(const ZEString&	Name);
+		const ZEString&					GetText() const;
+
+		void							SetIcon(const ZEString& Icon);
+		const ZEString&					GetIcon() const;
+
+		void							SetDockLocation(ZEDToolbarDockLocation Position);
+		ZEDToolbarDockLocation			GetDockLocation() const;
+
+		void							SetDockColumn(ZEUInt Column);
+		ZEUInt							GetDockColumn() const;
+
+		void							SetDockRow(ZEUInt Row);
+		ZEUInt							GetDockRow() const;
+
+		QToolBar*						GetNativeToolbar();
+
+		const ZEArray<ZEDToolbarItem*>&	GetItems() const;
+		void							AddItem(ZEDToolbarItem* Item);
+		void							InsertItem(ZESize Index, ZEDToolbarItem* Item);
+		void							RemoveItem(ZEDToolbarItem* Item);
+		void							ClearItems();
+
+		bool							Load(ZEMLReaderNode* Reader);
+		bool							Save(ZEMLWriterNode* WriterNode);
+
+		ZE_EVENT(						OnUpdated,(ZEDToolbar* Menu));
+
+		void							Update();
+
+		virtual void					Destroy();
+
+		static ZEDToolbar*				CreateInstance();
 };

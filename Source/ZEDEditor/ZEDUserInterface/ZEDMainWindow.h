@@ -50,6 +50,7 @@ class ZEDWindow;
 class ZEDToolbar;
 class ZEDViewport;
 class ZEDMenuManager;
+class ZEDToolbarManager;
 class Ui_ZEDMainWindow;
 
 enum ZEDWindowDefault
@@ -93,11 +94,13 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		ZEArray<ZEDWindow*>					Windows;
 
 		ZEDMenuManager*						MenuManager;
+		ZEDToolbarManager*					ToolbarManager;
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
 
-		void								WindowMenuCallback(ZEDMenu* Menu);
 		void								ToolbarMenuCallback(ZEDMenu* Menu);
+
+		virtual bool						InitializeInternal();
 
 											ZEDMainWindow();
 											~ZEDMainWindow();
@@ -105,6 +108,7 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 	public:
 		QMainWindow*						GetMainWindow();
 		ZEDMenuManager*						GetMenuManager();
+		ZEDToolbarManager*					GetToolbarManager();
 
 		const ZEArray<ZEDWindow*>&			GetWindows();
 		void								AddWindow(ZEDWindow* Widget, ZEDWindowDefaults = ZED_WD_VISIBLE);

@@ -51,7 +51,6 @@ ZEDMenu::ZEDMenu()
 {
 	Manager = NULL;
 	Menu = new QMenu();
-	SystemMenu = false;
 }
 
 ZEDMenu::~ZEDMenu()
@@ -114,16 +113,6 @@ const ZEString& ZEDMenu::GetIcon() const
 	return Icon;
 }
 
-void ZEDMenu::SetSystemMenu(bool SystemMenu)
-{
-	this->SystemMenu = SystemMenu;
-}
-
-bool ZEDMenu::GetSystemMenu() const
-{
-	return SystemMenu;
-}
-
 const ZEArray<ZEDMenuItem*>& ZEDMenu::GetItems() const
 {
 	return Items;
@@ -137,7 +126,7 @@ QMenu* ZEDMenu::GetNativeMenu()
 void ZEDMenu::AddItem(ZEDMenuItem* Item)
 {
 	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is NULL");
-	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is already added.");
+	zeDebugCheck(Item->Menu != NULL, "Cannot insert menu item. Item is already added.");
 
 	Items.Add(Item);
 
@@ -149,7 +138,7 @@ void ZEDMenu::AddItem(ZEDMenuItem* Item)
 void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
 {
 	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is NULL");
-	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is already added.");
+	zeDebugCheck(Item->Menu != NULL, "Cannot insert menu item. Item is already added.");
 
 	if (Items.GetCount() >= Index)
 		Items.Add(Item);
@@ -211,9 +200,6 @@ bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
 bool ZEDMenu::Save(ZEMLWriterNode* MenusNode)
 {
 	zeCheckError(MenusNode == NULL, false, "Cannot save Menu Item. ItemNode is NULL.");
-
-	if (GetSystemMenu())
-		return true;
 	
 	ZEMLWriterNode MenuNode;
 	MenuNode.OpenNode("Menu", MenuNode);

@@ -24,7 +24,43 @@
 			<Node Name="Items">
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">1</Property>
-					<Property Type="String" Name="TargetName">ZEDMainWindow::QuitCommand</Property>
+					<Property Type="String" Name="TargetName">ZEDEditior::NewCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>				
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::OpenCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::RecentFilesCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>				
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::SaveCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::SaveAsCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::CloseCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::ExitCommand</Property>
 				</Node>
 			</Node>
 		</Node>
@@ -46,7 +82,7 @@
 				</Node>
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">1</Property>
-					<Property Type="String" Name="TargetName">ZEDSelectionManager::SelectNoneCommand</Property>
+					<Property Type="String" Name="TargetName">ZEDSelectionManager::ClearSelectionCommand</Property>
 				</Node>
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">3</Property>				
@@ -58,6 +94,13 @@
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">1</Property>
 					<Property Type="String" Name="TargetName">ZEDSelectionManager::UnfreezeObjectsCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>				
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDSelectionManager::SelectionShapeCommand</Property>
 				</Node>
 			</Node>
 		</Node>

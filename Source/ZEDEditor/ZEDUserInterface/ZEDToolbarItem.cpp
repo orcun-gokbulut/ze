@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuItem.cpp
+ Zinek Engine - ZEDToolbarItem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDMenuItem.h"
+#include "ZEDToolbarItem.h"
 
+#include "ZEDToolbar.h"
+#include "ZEDToolbarManager.h"
 #include "ZEDMenu.h"
-#include "ZEDMenuManager.h"
 #include "ZEDCommand.h"
-#include "ZEDUIUtils.h"
 #include "ZEDCommandManager.h"
+#include "ZEDUIUtils.h"
 
-#include "ZEMeta\ZEEventDelegate.h"
-#include "ZEML\ZEMLReader.h"
-#include "ZEML\ZEMLWriter.h"
+#include "ZEMeta/ZEEventDelegate.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
 
 #include <QAction>
-#include "QMenu"
+#include <QMenu>
 
-void ZEDMenuAction::Action_triggered(bool Triggered)
+void ZEDToolbarAction::Action_triggered(bool Triggered)
 {
 	Item->Action_Triggered();
 }
 
-void ZEDMenuAction::SubAction_triggered(bool Triggered)
+void ZEDToolbarAction::SubAction_triggered(bool Triggered)
 {
 	Item->SubAction_Triggered(static_cast<QAction*>(sender()));
 }
 
-ZEDMenuAction::ZEDMenuAction(ZEDMenuItem* Item) : QAction(NULL)
+ZEDToolbarAction::ZEDToolbarAction(ZEDToolbarItem* Item) : QAction(NULL)
 {
 	this->Item = Item;
-	connect(this, &QAction::triggered, this, &ZEDMenuAction::Action_triggered);
+	connect(this, &QAction::triggered, this, &ZEDToolbarAction::Action_triggered);
 }
 
-void ZEDMenuItem::Action_Triggered()
+void ZEDToolbarItem::Action_Triggered()
 {
 	QSignalBlocker Blocker(Action);
 
-	if (GetType() == ZED_MIT_COMMAND && TargetCommand != NULL)
+	if (GetType() == ZED_TIT_COMMAND && TargetCommand != NULL)
 	{
 		if (TargetCommand->GetType() == ZED_CT_COMMAND)
 		{
@@ -82,7 +83,7 @@ void ZEDMenuItem::Action_Triggered()
 	}
 }
 
-void ZEDMenuItem::SubAction_Triggered(QAction* Action)
+void ZEDToolbarItem::SubAction_Triggered(QAction* Action)
 {
 	TargetCommand->SetValue(ZEString(Action->text().toStdString()));
 
@@ -100,23 +101,23 @@ void ZEDMenuItem::SubAction_Triggered(QAction* Action)
 	TargetCommand->OnAction(TargetCommand);
 }
 
-void ZEDMenuItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
+void ZEDToolbarItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 {
 	Update();
 }
 
-void ZEDMenuItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
+void ZEDToolbarItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
 {
 	TargetName = Menu->GetName();
 	Update();
 }
 
-ZEDMenu* ZEDMenuItem::GetMenu()
+ZEDToolbar* ZEDToolbarItem::GetToolbar()
 {
-	return Menu;
+	return Toolbar;
 }
 
-void ZEDMenuItem::SetType(ZEDMenuItemType Type)
+void ZEDToolbarItem::SetType(ZEDToolbarItemType Type)
 {
 	if (this->Type == Type)
 		return;
@@ -126,12 +127,12 @@ void ZEDMenuItem::SetType(ZEDMenuItemType Type)
 	Update();
 }
 
-ZEDMenuItemType ZEDMenuItem::GetType() const
+ZEDToolbarItemType ZEDToolbarItem::GetType() const
 {
 	return Type;
 }
 
-void ZEDMenuItem::SetTargetName(const ZEString& Name)
+void ZEDToolbarItem::SetTargetName(const ZEString& Name)
 {
 	if (TargetName == Name)
 		return;
@@ -141,17 +142,17 @@ void ZEDMenuItem::SetTargetName(const ZEString& Name)
 	Update();
 }
 
-const ZEString& ZEDMenuItem::GetTargetName() const
+const ZEString& ZEDToolbarItem::GetTargetName() const
 {
 	return TargetName;
 }
 
-void ZEDMenuItem::Update()
+void ZEDToolbarItem::Update()
 {
 	if (Action == NULL)
 		return;
 
-	if (Type != ZED_MIT_COMMAND && TargetCommand != NULL)
+	if (Type != ZED_TIT_COMMAND && TargetCommand != NULL)
 	{
 		TargetCommand->OnUpdated.DisconnectObject(this);
 		TargetCommand = NULL;
@@ -160,7 +161,7 @@ void ZEDMenuItem::Update()
 	switch (Type)
 	{
 		default:
-		case ZED_MIT_NONE:
+		case ZED_TIT_NONE:
 		{
 			Action->setMenu(NULL);
 			Action->setSeparator(true);
@@ -168,12 +169,12 @@ void ZEDMenuItem::Update()
 			break;
 		}
 
-		case ZED_MIT_COMMAND:
+		case ZED_TIT_COMMAND:
 		{
 			Action->setSeparator(false);
 			Action->setMenu(NULL);
 
-			if (GetMenu()->GetManager() == NULL)
+			if (GetToolbar()->GetManager() == NULL)
 				break;
 
 			ZEDCommand* NewCommand = ZEDCommandManager::GetInstance()->GetCommand(GetTargetName());
@@ -183,7 +184,7 @@ void ZEDMenuItem::Update()
 					TargetCommand->OnUpdated.DisconnectObject(this);
 
 				TargetCommand = NewCommand;
-				TargetCommand->OnUpdated += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDMenuItem, &ZEDMenuItem::TargetCommand_OnUpdate>(this);
+				TargetCommand->OnUpdated += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDToolbarItem, &ZEDToolbarItem::TargetCommand_OnUpdate>(this);
 			}
 
 			if (TargetCommand != NULL)
@@ -218,7 +219,7 @@ void ZEDMenuItem::Update()
 					for (ZESize I = 0; I < Items.GetCount(); I++)
 					{
 						QAction* SubAction = SubMenu->addAction(Items[I].ToCString());
-						QObject::connect(SubAction, &QAction::triggered, Action, &ZEDMenuAction::SubAction_triggered);
+						QObject::connect(SubAction, &QAction::triggered, Action, &ZEDToolbarAction::SubAction_triggered);
 						
 						if (TargetCommand->GetType() == ZED_CT_LIST)
 						{
@@ -243,43 +244,7 @@ void ZEDMenuItem::Update()
 			break;
 		}
 
-		case ZED_MIT_MENU_POINTER:
-		{
-			Action->setSeparator(false);
-			
-			if (GetMenu()->GetManager() == NULL)
-				break;
-
-			ZEDMenu* NewMenu = GetMenu()->GetManager()->GetMenu(TargetName);
-			if (TargetMenu != NewMenu)
-			{
-				if (TargetMenu != NULL)
-					TargetMenu->OnUpdated.DisconnectObject(this);
-
-				TargetMenu = NewMenu;
-			}
-
-			if (TargetMenu != NULL)
-			{
-				Action->setMenu(TargetMenu->GetNativeMenu());
-				Action->setText(TargetMenu->GetText().ToCString());
-				Action->setIcon(ZEDUIUtils::GetIcon(TargetMenu->GetIcon()));
-				Action->setEnabled(true);
-				Action->setVisible(true);
-			}
-			else
-			{
-				Action->setMenu(NULL);
-				Action->setText(NULL);
-				Action->setIcon(QIcon());
-				Action->setEnabled(false);
-				Action->setVisible(false);
-			}
-
-			break;
-		}
-
-		case ZED_MIT_SEPERATOR:
+		case ZED_TIT_SEPERATOR:
 		{
 			Action->setMenu(NULL);
 			Action->setSeparator(true);
@@ -290,13 +255,13 @@ void ZEDMenuItem::Update()
 	}
 }
 
-bool ZEDMenuItem::Load(ZEMLReaderNode* ItemNode)
+bool ZEDToolbarItem::Load(ZEMLReaderNode* ItemNode)
 {
 	zeCheckError(ItemNode == NULL, false, "Cannot load Menu Item. ItemNode is NULL.");
 	zeCheckError(ItemNode->IsValid() == NULL, false, "Cannot load Menu Item. ItemNode is not valid.");
 
-	Type = (ZEDMenuItemType)ItemNode->ReadUInt8("Type");
-	if (Type != ZED_MIT_SEPERATOR)
+	Type = (ZEDToolbarItemType)ItemNode->ReadUInt8("Type");
+	if (Type != ZED_TIT_SEPERATOR)
 		TargetName = ItemNode->ReadString("TargetName");
 	else
 		TargetName = "";
@@ -304,28 +269,28 @@ bool ZEDMenuItem::Load(ZEMLReaderNode* ItemNode)
 	return true;
 }
 
-bool ZEDMenuItem::Save(ZEMLWriterNode* ItemNode)
+bool ZEDToolbarItem::Save(ZEMLWriterNode* ItemNode)
 {
 	zeCheckError(ItemNode == NULL, false, "Cannot save Menu Item. ItemsNode is NULL.");
 	
 	ItemNode->WriteUInt8("Type", Type);
-	if (Type == ZED_MIT_SEPERATOR)
+	if (Type == ZED_TIT_SEPERATOR)
 		ItemNode->WriteString("TargetName", TargetName);
 
 	return true;
 }
 
-ZEDMenuItem::ZEDMenuItem()
+ZEDToolbarItem::ZEDToolbarItem()
 {
 	Action = NULL;
-	Menu = NULL;
+	Toolbar = NULL;
 	SubMenu = NULL;
-	Type = ZED_MIT_NONE;
+	Type = ZED_TIT_NONE;
 	TargetCommand = NULL;
 	TargetMenu = NULL;
 }
 
-ZEDMenuItem::~ZEDMenuItem()
+ZEDToolbarItem::~ZEDToolbarItem()
 {
 	if (SubMenu != NULL)
 		delete SubMenu;

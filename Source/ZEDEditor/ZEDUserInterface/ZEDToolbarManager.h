@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportToolbar.h
+ Zinek Engine - ZEDToolbarManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,40 +35,36 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ZEMeta/ZEObject.h"
 
-#include <QToolBar>
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
-class ZEDSelectionManager;
-class QToolButton;
-class QComboBox;
+class ZEDToolbar;
 
-class ZEDViewportToolbar : public QToolBar, public ZEDComponent
+class ZEDToolbarManager : public ZEObject
 {
-	Q_OBJECT
+	ZE_OBJECT
 	private:
-		ZEDSelectionManager*				SelectionManager;
+		ZEArray<ZEDToolbar*>			Toolbars;
 
-		QComboBox*							cmbShape;
-		QToolButton*						btnFreeze;
-		QToolButton*						btnUnfreezeAll;
-		QComboBox*							cmbMode;
-		QToolButton*						btnSelectionList;
 
-		void								SetupUI();
-		void								UpdateUI();
-
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+										ZEDToolbarManager();
+		virtual							~ZEDToolbarManager();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+		const ZEArray<ZEDToolbar*>&	GetToolbars();
+		ZEDToolbar*					GetToolbar(const ZEString& Name);
+		
+		bool							AddToolbar(ZEDToolbar* Menu);
+		bool							RemoveToolbar(ZEDToolbar* Menu);
 
-											ZEDViewportToolbar(QWidget* Parent = NULL);
-											~ZEDViewportToolbar();
+		bool							Load(const ZEString& ConfigurationFile);
+		bool							Save(const ZEString& ConfigurationFile);
+
+		void							Update();
+
+		virtual void					Destroy();
+
+		static ZEDToolbarManager*		CreateInstance();
 };

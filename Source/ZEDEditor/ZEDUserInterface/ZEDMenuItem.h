@@ -57,8 +57,11 @@ class ZEDMenuAction : public QAction
 {
 	Q_OBJECT
 	friend class ZEDMenu;
+	friend class ZEDMenuItem;
 	private:
 		ZEDMenuItem*					Item;
+
+		void							SubAction_triggered(bool Triggered);
 		void							Action_triggered(bool Triggered);
 
 										ZEDMenuAction(ZEDMenuItem* Item);
@@ -74,12 +77,15 @@ class ZEDMenuItem : public ZEObject
 		ZEDMenuAction*					Action;
 		ZEDMenu*						Menu;
 		ZEDMenuItemType					Type;
+		QMenu*							SubMenu;
 
 		ZEString						TargetName;
 		ZEDCommand*						TargetCommand;
 		ZEDMenu*						TargetMenu;
 
 		void							Action_Triggered();
+		void							SubAction_Triggered(QAction* Action);
+
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
 		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
