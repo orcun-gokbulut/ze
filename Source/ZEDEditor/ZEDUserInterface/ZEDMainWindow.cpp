@@ -42,11 +42,10 @@
 #include "ZEMeta/ZEEventDelegate.h"
 #include "ZEFile/ZEPathTokenizer.h"
 
-#include "ZEDWindow.h"
-#include "ZEDToolbar.h"
 #include "ZEDMenu.h"
-#include "ZEDMenuItem.h"
-#include "ZEDUserInterfaceComponent.h"
+#include "ZEDToolbar.h"
+#include "ZEDWindow.h"
+#include "ZEDToolbarManager.h"
 #include "ZEDCommandManager.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDViewPort.h"
@@ -54,6 +53,7 @@
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
+
 
 class ZEDMenuWrapper : public QMenu
 {
@@ -85,9 +85,28 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
+bool ZEDMainWindow::InitializeInternal()
+{
+	if (!ZEDComponent::InitializeInternal())
+		return false;
+
+	MenuManager->Load("#R:/ZEDEditor/Menu.ZEDMenuManager");
+	ZEDMenu* MainMenu = MenuManager->GetMenu("MainMenu");
+	if (MainMenu == NULL)
+		return true;
+	MainWindow->menuBar()->addMenu(MainMenu->GetNativeMenu());
+
+	ToolbarManager->Load("#R:/ZEDEditor/Toolbar.ZEDToolbarManager");
+	for (ZESize I = 0; I < ToolbarManager->GetToolbars().GetCount(); I++)
+		MainWindow->addToolBar(ToolbarManager->GetToolbars()[I]->GetNativeToolbar());
+
+	return true;
+}
+
 ZEDMainWindow::ZEDMainWindow()
 {
 	MenuManager = ZEDMenuManager::CreateInstance();
+	ToolbarManager = ZEDToolbarManager::CreateInstance();
 
 	MainWindow = new QMainWindow();
 	Form = new Ui_ZEDMainWindow();
@@ -102,6 +121,7 @@ ZEDMainWindow::ZEDMainWindow()
 ZEDMainWindow::~ZEDMainWindow()
 {
 	MenuManager->Destroy();
+	ToolbarManager->Destroy();
 }
 
 QMainWindow* ZEDMainWindow::GetMainWindow()
@@ -114,54 +134,9 @@ ZEDMenuManager* ZEDMainWindow::GetMenuManager()
 	return MenuManager;
 }
 
-const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
+ZEDToolbarManager* ZEDMainWindow::GetToolbarManager()
 {
-	return Toolbars;
-}
-
-void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar, ZEDToolbarDefaults Default)
-{
-	zeCheckError(Toolbar == NULL, ZE_VOID, "Toolbar is NULL.");
-	zeCheckError(Toolbar->GetMainWindow() != NULL, ZE_VOID, "Toolbar already added to a Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
-
-	Toolbars.Add(Toolbar);
-	GetEditor()->AddComponent(Toolbar);
-
-	switch (Default & 0xF0)
-	{
-		case ZED_WD_DOCK_LEFT:
-			MainWindow->addToolBar(Qt::LeftToolBarArea, Toolbar->GetToolbar());
-			break;
-
-		case ZED_WD_DOCK_RIGHT:
-			MainWindow->addToolBar(Qt::RightToolBarArea, Toolbar->GetToolbar());
-			break;
-
-		case ZED_WD_DOCK_TOP:
-			MainWindow->addToolBar(Qt::TopToolBarArea, Toolbar->GetToolbar());
-			break;
-
-		case ZED_WD_DOCK_BOTTOM:
-			MainWindow->addToolBar(Qt::BottomToolBarArea, Toolbar->GetToolbar());
-			break;
-
-		default:
-			MainWindow->addToolBar(Qt::NoToolBarArea, Toolbar->GetToolbar());
-			break;
-	}
-	
-	Toolbar->SetVisible(Default & ZED_WD_VISIBLE);
-}
-
-void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
-{
-	zeCheckError(Toolbar == NULL, ZE_VOID, "Toolbar is NULL.");
-	zeCheckError(Toolbar->GetMainWindow() != this, ZE_VOID, "Toolbar does not belong to this Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
-
-	GetMainWindow()->removeToolBar(Toolbar->GetToolbar());
-
-	GetEditor()->RemoveComponent(Toolbar);
-	Toolbars.RemoveValue(Toolbar);
+	return ToolbarManager;
 }
 
 const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()

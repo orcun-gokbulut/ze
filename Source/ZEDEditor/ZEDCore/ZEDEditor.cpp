@@ -70,14 +70,14 @@ void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
 
 void ZEDEditor::RegisterCommands()
 {
-	NewCommand.SetName("ZEDEditor::New");
+	NewCommand.SetName("ZEDEditor::NewCommand");
 	NewCommand.SetText("New");
 	NewCommand.SetCategory("File");
 	NewCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
 	NewCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::NewCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&NewCommand);
 
-	OpenCommand.SetName("ZEDEditor::Open");
+	OpenCommand.SetName("ZEDEditor::OpenCommand");
 	OpenCommand.SetText("Open");
 	OpenCommand.SetCategory("File");
 	OpenCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_O));
@@ -106,12 +106,12 @@ void ZEDEditor::RegisterCommands()
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveAsCommand);
 
 	CloseCommand.SetName("ZEDEditor::CloseCommand");
-	CloseCommand.SetText("SaveAs");
+	CloseCommand.SetText("Close");
 	CloseCommand.SetCategory("File");
 	CloseCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloseCommand);
 
-	ExitCommand.SetName("ZEDEditor::Exit");
+	ExitCommand.SetName("ZEDEditor::ExitCommand");
 	ExitCommand.SetText("Exit");
 	ExitCommand.SetCategory("Application");
 	ExitCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);

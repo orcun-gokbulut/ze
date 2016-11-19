@@ -100,11 +100,12 @@ class ZEDSelectionManager : public ZEDComponent
 		ZEDCommand							ClearSelectionCommand;
 		ZEDCommand							LockSelectionCommand;
 		ZEDCommand							FreezeObjectsCommand;
-		ZEDCommand							UnfreezeObjectCommand;
+		ZEDCommand							UnfreezeObjectsCommand;
 		ZEDCommand							SelectionModeCommand;
 		ZEDCommand							SelectionShapeCommand;
 
 		void								RegisterCommands();
+		void								UpdateCommands();
 
 		void								SelectAllCommand_OnAction(const ZEDCommand* Command);
 		void								ClearSelectionCommand_OnAction(const ZEDCommand* Command);

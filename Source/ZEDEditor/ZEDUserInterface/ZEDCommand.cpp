@@ -71,6 +71,39 @@ void ZEDCommand::SetType(ZEDCommandType Type)
 
 	this->Type = Type;
 
+
+	switch (Type)
+	{
+		default:
+		case ZED_CT_COMMAND:
+			break;
+
+		case ZED_CT_TOGGLE:
+			if (Value.GetType() != ZE_VRT_BOOLEAN)
+				Value.SetValue(false);
+			break;
+
+		case ZED_CT_LIST:
+			if (Value.GetType() != ZE_VRT_STRING)
+				Value.SetString("");
+			break;
+
+		case ZED_CT_INPUT_TEXT:
+			if (Value.GetType() != ZE_VRT_STRING)
+				Value.SetString("");
+			break;
+
+		case ZED_CT_INPUT_NUMBER:
+			if (!Value.IsInteger())
+				Value.SetInt32(0);
+			break;
+
+		case ZED_CT_INPUT_FLOAT:
+			if (!Value.IsFloatingPoint())
+				Value.SetFloat(0.0f);
+			break;
+	}
+
 	OnUpdated(this);
 }
 
@@ -152,7 +185,7 @@ bool ZEDCommand::GetVisible() const
 void ZEDCommand::SetValue(const ZEValue& Value)
 {
 	this->Value = Value;
-	OnAction(this);
+	OnUpdated(this);
 }
 
 const ZEValue& ZEDCommand::GetValue() const
@@ -203,7 +236,7 @@ const ZEDCommandShortcut& ZEDCommand::GetShortcut() const
 ZEDCommand::ZEDCommand()
 {
 	Manager = NULL;
-	Type = ZED_CT_BUTTON;
+	Type = ZED_CT_COMMAND;
 	Enabled = true;
 	Visible = true;
 }

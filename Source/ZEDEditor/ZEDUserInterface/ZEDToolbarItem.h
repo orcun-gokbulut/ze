@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationToolbar.h
+ Zinek Engine - ZEDToolbarItem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,55 +35,74 @@
 
 #pragma once
 
-#include "ZEDToolbar.h"
+#include "ZEMeta/ZEObject.h"
+
 #include <QObject>
+#include <QAction>
 
-class ZEDTransformationManager;
-class Ui_ZEDTransformationToolbar;
+class ZEDCommand;
+class ZEDToolbarItem;
+class ZEDToolbar;
+class ZEDMenu;
+class QMenu;
 
-class QAction;
-class QActionGroup;
-class QPushButton;
-class QComboBox;
-class QDoubleSpinBox;
+enum ZEDToolbarItemType
+{
+	ZED_TIT_NONE,
+	ZED_TIT_COMMAND,
+	ZED_TIT_SEPERATOR
+};
 
-class ZEDTransformationToolbar : public QObject, public ZEDToolbar
+class ZEDToolbarAction : public QAction
 {
 	Q_OBJECT
+	friend class ZEDToolbar;
+	friend class ZEDToolbarItem;
 	private:
-		QAction*							actSelect;
-		QAction*							actMove;
-		QAction*							actRotate;
-		QAction*							actScale;
-		QActionGroup*						ActionGroup;
+		ZEDToolbarItem*				Item;
 
-		QComboBox*							cmbSpace;
-		QComboBox*							cmbPivot;
-		QDoubleSpinBox*						txtX;
-		QDoubleSpinBox*						txtY;
-		QDoubleSpinBox*						txtZ;
+		void							SubAction_triggered(bool Triggered);
+		void							Action_triggered(bool Triggered);
 
-		void								SetupUI();
-		void								UpdateUI();
+										ZEDToolbarAction(ZEDToolbarItem* Item);
+};
 
-		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
+class ZEDToolbarItem : public ZEObject
+{
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEDToolbarItem)
+	friend class ZEDToolbarAction;
+	friend class ZEDToolbar;
+	private:
+		ZEDToolbarAction*				Action;
+		ZEDToolbar*					Toolbar;
+		ZEDToolbarItemType				Type;
+		QMenu*							SubMenu;
 
-											ZEDTransformationToolbar();
-		virtual								~ZEDTransformationToolbar();
+		ZEString						TargetName;
+		ZEDCommand*						TargetCommand;
+		ZEDMenu*						TargetMenu;
 
-	private slots:
-		void								actSelect_triggered();
-		void								actMove_triggered();
-		void								actRotate_triggered();
-		void								actScale_triggered();
-		void								cmbSpace_currentIndexChanged(const QString & text);
-		void								cmbPivot_currentIndexChanged(const QString & text);
-		void								txtX_valueChanged(double d);
-		void								txtY_valueChanged(double d);
-		void								txtZ_valueChanged(double d);
+		void							Action_Triggered();
+		void							SubAction_Triggered(QAction* Action);
+
+		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
+		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
 	public:
-		ZEDTransformationManager*			GetTransformationManager();
+		ZEDToolbar*					GetToolbar();
 
-		static ZEDTransformationToolbar*	CreateInstance();
+		void							SetType(ZEDToolbarItemType Type);
+		ZEDToolbarItemType				GetType() const;
+
+		void							SetTargetName(const ZEString& Name);
+		const ZEString&					GetTargetName() const;
+
+		void							Update();
+
+		virtual bool					Load(ZEMLReaderNode* ItemNode);
+		virtual bool					Save(ZEMLWriterNode* ItemsNode);
+
+										ZEDToolbarItem();
+										~ZEDToolbarItem();
 };

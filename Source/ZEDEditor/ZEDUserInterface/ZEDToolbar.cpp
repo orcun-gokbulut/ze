@@ -35,48 +35,256 @@
 
 #include "ZEDToolbar.h"
 
-#include <QToolbar>
+#include "ZEDToolbarItem.h"
+#include "ZEDCommand.h"
+#include "ZEDUIUtils.h"
 
-void ZEDToolbar::SetName(const ZEString& Name)
-{
-	Toolbar->setWindowTitle(Name.ToCString());
-	ZEDUserInterfaceComponent::SetName(Name);
-}
+#include "ZEError.h"
+#include "ZEFile/ZEPathInfo.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
+
+#include <QAction>
+#include <QToolBar>
 
 ZEDToolbar::ZEDToolbar()
 {
+	Manager = NULL;
 	Toolbar = new QToolBar();
+	DockLocation = ZED_TDL_TOP;
+	DockColumn = 0;
+	DockRow = 0;
 }
 
 ZEDToolbar::~ZEDToolbar()
 {
+	ClearItems();
 	delete Toolbar;
 }
 
-QToolBar* ZEDToolbar::GetToolbar()
+ZEDToolbarManager* ZEDToolbar::GetManager()
+{
+	return Manager;
+}
+
+void ZEDToolbar::SetName(const ZEString&	Name)
+{
+	if (this->Name == Name)
+		return;
+
+	this->Name = Name;
+
+	OnUpdated(this);
+}
+
+const ZEString& ZEDToolbar::GetName() const
+{
+	return Name;
+}
+
+void ZEDToolbar::SetText(const ZEString& Text)
+{
+	if (this->Text == Text)
+		return;
+
+	this->Text = Text;
+	
+	Toolbar->setWindowTitle(Text.ToCString());
+
+	OnUpdated(this);
+}
+
+const ZEString& ZEDToolbar::GetText() const
+{
+	return Text;
+}
+
+void ZEDToolbar::SetIcon(const ZEString& Icon)
+{
+	if (ZEPathInfo::Compare(this->Icon, Icon))
+		return;
+
+	this->Icon = Icon;
+
+	Toolbar->setWindowIcon(ZEDUIUtils::GetIcon(GetIcon()));
+
+	OnUpdated(this);
+}
+
+const ZEString& ZEDToolbar::GetIcon() const
+{
+	return Icon;
+}
+
+void ZEDToolbar::SetDockLocation(ZEDToolbarDockLocation Location)
+{
+	if (DockLocation == Location)
+		return;
+
+	DockLocation = Location;
+}
+
+ZEDToolbarDockLocation ZEDToolbar::GetDockLocation() const
+{
+	return DockLocation;
+}
+
+void ZEDToolbar::SetDockColumn(ZEUInt Column)
+{
+	if (DockColumn == Column)
+		return;
+
+	DockColumn = Column;
+}
+
+ZEUInt ZEDToolbar::GetDockColumn() const
+{
+	return DockColumn;
+}
+
+void ZEDToolbar::SetDockRow(ZEUInt Row)
+{
+	if (DockRow == Row)
+		return;
+
+	DockRow = Row;
+}
+
+ZEUInt ZEDToolbar::GetDockRow() const
+{
+	return DockRow;
+}
+
+const ZEArray<ZEDToolbarItem*>& ZEDToolbar::GetItems() const
+{
+	return Items;
+}
+
+QToolBar* ZEDToolbar::GetNativeToolbar()
 {
 	return Toolbar;
 }
 
-void ZEDToolbar::SetEnabled(bool Enabled)
+void ZEDToolbar::AddItem(ZEDToolbarItem* Item)
 {
-	GetToolbar()->setEnabled(Enabled);
+	zeDebugCheck(Item == NULL, "Cannot insert toolbar item. Item is NULL");
+	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
+
+	Items.Add(Item);
+
+	Item->Toolbar = this;
+	Item->Action = new ZEDToolbarAction(Item);
+	Toolbar->addAction(Item->Action);
 }
 
-bool ZEDToolbar::GetEnabled()
+void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
 {
-	return GetToolbar()->isEnabled();
+	zeDebugCheck(Item == NULL, "Cannot insert toolbar item. Item is NULL");
+	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
+
+	if (Items.GetCount() >= Index)
+		Items.Add(Item);
+	else
+		Items.Insert(Index, Item);
+
+	Item->Toolbar = this;
+	Item->Action = new ZEDToolbarAction(Item);
+	Toolbar->addAction(Item->Action);
 }
 
-void ZEDToolbar::SetVisible(bool Visible)
+void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
 {
-	GetToolbar()->setVisible(Visible);
+	zeDebugCheck(Item == NULL, "Cannot delete toolbar item. Item is NULL");
+	zeDebugCheck(Item->Toolbar != this, "Cannot delete toolbar item. Item is belong to this toolbar.");
+
+	delete Item->Action;
+	Items.RemoveValue(Item);
+}
+
+void ZEDToolbar::ClearItems()
+{
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		delete Items[I];
+
+	Items.Clear();
+}
+
+bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
+{
+	zeCheckError(ToolbarNode == NULL, false, "Cannot load Toolbar. ToolbarNode is NULL.");
+	zeCheckError(!ToolbarNode->IsValid(), false, "Cannot load Toolbar. ToolbarNode is not valid.");
+
+	SetName(ToolbarNode->ReadString("Name"));
+	SetIcon(ToolbarNode->ReadString("Icon"));
+	SetText(ToolbarNode->ReadString("Text"));
+	SetDockLocation((ZEDToolbarDockLocation)ToolbarNode->ReadUInt8("DockLocation"));
+	SetDockColumn(ToolbarNode->ReadUInt8("DockColumn"));
+	SetDockRow(ToolbarNode->ReadUInt8("DockRow"));
+
+	ClearItems();
+	ZEMLReaderNode ItemsNode = ToolbarNode->GetNode("Items");
+	if (ItemsNode.IsValid())
+	{
+		ZESize ItemCount = ItemsNode.GetNodeCount("Item");
+		for (ZESize I = 0; I < ItemCount; I++)
+		{
+			ZEDToolbarItem* Item = new ZEDToolbarItem();
+			ZEMLReaderNode ItemNode = ItemsNode.GetNode("Item", I);
+			if (!Item->Load(&ItemNode))
+			{
+				delete Item;
+				return false;
+			}
+			AddItem(Item);
+		}
+	}
+
+	return true;
+}
+
+bool ZEDToolbar::Save(ZEMLWriterNode* ToolbarsNode)
+{
+	zeCheckError(ToolbarsNode == NULL, false, "Cannot save Toolbar Item. ItemNode is NULL.");
+
+	ZEMLWriterNode ToolbarNode;
+	ToolbarNode.OpenNode("Toolbar", ToolbarNode);
+
+	ToolbarNode.WriteString("Name", GetName());
+	ToolbarNode.WriteString("Icon", GetIcon());
+	ToolbarNode.WriteUInt8("DockLocation", DockLocation);
+	ToolbarNode.WriteUInt8("DockColumn", DockColumn);
+	ToolbarNode.WriteUInt8("DockRow", DockRow);
 	
-	if (Menu == NULL)
-		return;
+	ZEMLWriterNode ItemsNode;
+	ToolbarNode.OpenNode("Items", ItemsNode);
+	
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+	{
+		if (!Items[I]->Save(&ItemsNode))
+			return false;
+	}
+
+	ItemsNode.CloseNode();
+	ToolbarNode.CloseNode();
+
+	return true;
 }
 
-bool ZEDToolbar::GetVisible()
+void ZEDToolbar::Update()
 {
-	return GetToolbar()->isVisible();
+	if (GetManager() == NULL)
+		return;
+
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		Items[I]->Update();
+}
+
+void ZEDToolbar::Destroy()
+{
+	delete this;
+}
+
+ZEDToolbar* ZEDToolbar::CreateInstance()
+{
+	return new ZEDToolbar;
 }

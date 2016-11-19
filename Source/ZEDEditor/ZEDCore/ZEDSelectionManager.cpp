@@ -308,6 +308,7 @@ void ZEDSelectionManager::RegisterCommands()
 	LockSelectionCommand.SetCategory("Selection");
 	LockSelectionCommand.SetName("ZEDSelectionManager::LockSelectionCommand");
 	LockSelectionCommand.SetText("Lock Selection");
+	LockSelectionCommand.SetType(ZED_CT_TOGGLE);
 	LockSelectionCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_L));
 	LockSelectionCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::LockSelectionCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&LockSelectionCommand);
@@ -318,16 +319,16 @@ void ZEDSelectionManager::RegisterCommands()
 	FreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::FreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&FreezeObjectsCommand);
 
-	UnfreezeObjectCommand.SetCategory("Selection");
-	UnfreezeObjectCommand.SetName("ZEDSelectionManager::UnfreezeObjectsCommand");
-	UnfreezeObjectCommand.SetText("Unfreeze Objects");
-	UnfreezeObjectCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
-	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectCommand);
+	UnfreezeObjectsCommand.SetCategory("Selection");
+	UnfreezeObjectsCommand.SetName("ZEDSelectionManager::UnfreezeObjectsCommand");
+	UnfreezeObjectsCommand.SetText("Unfreeze Objects");
+	UnfreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectsCommand);
 
 	SelectionModeCommand.SetCategory("Selection");
 	SelectionModeCommand.SetName("ZEDSelectionManager::SelectionModeCommand");
 	SelectionModeCommand.SetText("Intersects");
-	SelectionModeCommand.SetType(ZED_CT_CHECK);
+	SelectionModeCommand.SetType(ZED_CT_TOGGLE);
 	SelectionModeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionModeCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionModeCommand);
 
@@ -340,8 +341,17 @@ void ZEDSelectionManager::RegisterCommands()
 	Items.Add("Circle");
 	Items.Add("Brush");
 	SelectionShapeCommand.SetListItems(Items);
+	SelectionShapeCommand.SetValue("Rectangle");
 	SelectionShapeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionShapeCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionShapeCommand);
+}
+
+void ZEDSelectionManager::UpdateCommands()
+{
+	ClearSelectionCommand.SetEnabled(GetSelection().GetCount() != 0);
+	LockSelectionCommand.SetValue(GetLockSelection());
+	FreezeObjectsCommand.SetEnabled(GetSelection().GetCount() != 0);
+	UnfreezeObjectsCommand.SetEnabled(GetFrozonObjects().GetCount() != 0);
 }
 
 void ZEDSelectionManager::SelectAllCommand_OnAction(const ZEDCommand* Command)
@@ -399,6 +409,8 @@ void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
 {
 	SelectionMode = Mode;
 
+	UpdateCommands();
+
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
 	Event.SetType(ZED_SET_MANAGER_STATE_CHANGED);
@@ -413,6 +425,8 @@ ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
 void ZEDSelectionManager::SetSelectionShape(ZEDSelectionShape Shape)
 {
 	SelectionShape = Shape;
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -441,6 +455,8 @@ void ZEDSelectionManager::SetLockSelection(bool Lock)
 		return;
 
 	LockSelection = Lock;
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -521,6 +537,8 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 	Object->SetSelected(true);
 	Selection.Add(Object);
 
+	UpdateCommands();
+
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
 	Event.SetType(ZED_SET_SELECTED);
@@ -553,7 +571,9 @@ void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Object
 		Objects[I]->SetSelected(true);
 		Selection.Add(Objects[I]);
 	}
-	
+
+	UpdateCommands();
+
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
 	Event.SetType(ZED_SET_SELECTED);
@@ -577,6 +597,8 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 
 	Object->SetSelected(false);
 	Selection.RemoveValue(Object);
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -605,6 +627,8 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 		Selection.RemoveValue(Objects[I]);
 		I--;
 	}
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -635,6 +659,8 @@ void ZEDSelectionManager::FocusObject(ZEDObjectWrapper* Object)
 	Object->SetFocused(true);
 	FocusedObject = Object;
 
+	UpdateCommands();
+
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
 	Event.SetType(ZED_SET_FOCUS_CHANGED);
@@ -655,6 +681,8 @@ void ZEDSelectionManager::ClearFocus()
 
 	FocusedObject->SetFocused(false);
 	FocusedObject = NULL;
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -683,6 +711,8 @@ void ZEDSelectionManager::ClearSelection()
 
 	Selection.Clear();
 
+	UpdateCommands();
+
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
 	Event.SetType(ZED_SET_DESELECTED);
@@ -700,6 +730,8 @@ void ZEDSelectionManager::FreezeObject(ZEDObjectWrapper* Object)
 
 	Object->SetFrozen(false);
 	FrozenObjects.Add(Object);
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -731,6 +763,8 @@ void ZEDSelectionManager::FreezeObjects(const ZEArray<ZEDObjectWrapper*>& Object
 	Event.SetOldList(&OldFrozenObjects);
 	RaiseEvent(&Event);
 
+	UpdateCommands();
+
 	DeselectObjects(Objects);
 }
 
@@ -743,6 +777,8 @@ void ZEDSelectionManager::UnfreezeObject(ZEDObjectWrapper* Object)
 	
 	Object->SetFrozen(false);
 	FrozenObjects.RemoveValue(Object);
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);
@@ -764,6 +800,8 @@ void ZEDSelectionManager::UnfreezeObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 		FrozenObjects.RemoveValue(Objects[I]);
 		Objects[I]->SetFrozen(false);
 	}
+
+	UpdateCommands();
 
 	ZEDSelectionEvent Event;
 	Event.SetManager(this);

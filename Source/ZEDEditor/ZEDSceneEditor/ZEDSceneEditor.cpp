@@ -42,8 +42,6 @@
 #include "ZEDCore/ZEDViewportManager.h"
 #include "ZEDCore/ZEDViewportController.h"
 #include "ZEDUserInterface/ZEDMainWindow.h"
-#include "ZEDUserInterface/ZEDTransformationToolbar.h"
-#include "ZEDUserInterface/ZEDSelectionToolbar.h"
 #include "ZEDUserInterface/ZEDObjectBrowser.h"
 #include "ZEDUserInterface/ZEDAssetBrowser.h"
 #include "ZEDUserInterface/ZEDPropertyWindow.h"
@@ -61,12 +59,6 @@ bool ZEDSceneEditor::InitializeInternal()
 {
 	if (!ZEDEditor::InitializeInternal())
 		return false;
-
-	TransformationToolbar = ZEDTransformationToolbar::CreateInstance();
-	GetMainWindow()->AddToolbar(TransformationToolbar);
-	
-	SelectionToolbar = ZEDSelectionToolbar::CreateInstance();
-	GetMainWindow()->AddToolbar(SelectionToolbar);
 
 	ZEDViewportController* Controller = ZEDViewportController::CreateInstance();
 	AddComponent(Controller);
@@ -93,10 +85,6 @@ bool ZEDSceneEditor::InitializeInternal()
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
 	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
-	/*ZEStateScreen* StateScreen = ZEStateScreen::CreateInstance();
-	StateScreen->SetManager(GetUIManager());
-	Scene->AddEntity(StateScreen);*/
-
  	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetModelFile("#R:/ZETrainSimulator/Actors/Vehicles/DE24000/DE24000.ZEMODEL");
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
@@ -108,30 +96,6 @@ bool ZEDSceneEditor::InitializeInternal()
 	Light1->SetColor(ZEVector3::One);
 	Light1->SetUseSunLight(true);
 	Scene->AddEntity(Light1);
-
-	/*ZESector* Sector = ZESector::CreateInstance();
-	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector001/Sector001.ZESector");
-	Scene->AddEntity(Sector);
-
-	Sector = ZESector::CreateInstance();
-	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector002/Sector002.ZESector");
-	Sector->SetWorldPosition(2.0f * ZEVector3::UnitX * 1000.0f);
-	Scene->AddEntity(Sector);
-
-	Sector = ZESector::CreateInstance();
-	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZESector");
-	Sector->SetWorldPosition(3.0f * ZEVector3::UnitX * 1000.0f);
-	Scene->AddEntity(Sector);
-
-	Sector = ZESector::CreateInstance();
-	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector004/Sector004.ZESector");
-	Sector->SetWorldPosition(4.0f * ZEVector3::UnitX * 1000.0f);
-	Scene->AddEntity(Sector);
-
-	Sector = ZESector::CreateInstance();
-	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector005/Sector005.ZESector");
-	Sector->SetWorldPosition(5.0f * ZEVector3::UnitX * 1000.0f);
-	Scene->AddEntity(Sector);*/
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);

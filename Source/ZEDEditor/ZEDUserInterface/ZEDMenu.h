@@ -58,7 +58,6 @@ class ZEDMenu : public ZEObject
 		ZEString						Name;
 		ZEString						Text;
 		ZEString						Icon;
-		bool							SystemMenu;
 
 										ZEDMenu();
 										~ZEDMenu();
@@ -75,9 +74,6 @@ class ZEDMenu : public ZEObject
 		void							SetIcon(const ZEString& Icon);
 		const ZEString&					GetIcon() const;
 
-		void							SetSystemMenu(bool SystemMenu);
-		bool							GetSystemMenu() const;
-
 		QMenu*							GetNativeMenu();
 
 		const ZEArray<ZEDMenuItem*>&	GetItems() const;
@@ -86,8 +82,8 @@ class ZEDMenu : public ZEObject
 		void							RemoveItem(ZEDMenuItem* Item);
 		void							ClearItems();
 
-		bool							Load(ZEMLReaderNode* Reader);
-		bool							Save(ZEMLWriterNode* WriterNode);
+		bool							Load(ZEMLReaderNode* MenuNode);
+		bool							Save(ZEMLWriterNode* MenusNode);
 
 		ZE_EVENT(						OnUpdated,(ZEDMenu* Menu));
 
@@ -95,5 +91,5 @@ class ZEDMenu : public ZEObject
 
 		virtual void					Destroy();
 
-		static ZEDMenu*				CreateInstance();
+		static ZEDMenu*					CreateInstance();
 };

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.cpp
+ Zinek Engine - ZEDToolbarManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,73 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDMenuManager.h"
+#include "ZEDToolbarManager.h"
 
-#include "ZEDMenu.h"
+#include "ZEDToolbar.h"
+
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
 
-ZEDMenuManager::ZEDMenuManager()
+ZEDToolbarManager::ZEDToolbarManager()
 {
 
 }
 
-ZEDMenuManager::~ZEDMenuManager()
+ZEDToolbarManager::~ZEDToolbarManager()
 {
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
-		Menus[I]->Destroy();
-	Menus.Clear();
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
+		Toolbars[I]->Destroy();
+	Toolbars.Clear();
 }
 
-const ZEArray<ZEDMenu*>& ZEDMenuManager::GetMenus()
+const ZEArray<ZEDToolbar*>& ZEDToolbarManager::GetToolbars()
 {
-	return Menus;
+	return Toolbars;
 }
 
-ZEDMenu* ZEDMenuManager::GetMenu(const ZEString& Name)
+ZEDToolbar* ZEDToolbarManager::GetToolbar(const ZEString& Name)
 {
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 	{
-		if (Menus[I]->GetName() == Name)
-			return Menus[I];
+		if (Toolbars[I]->GetName() == Name)
+			return Toolbars[I];
 	}
 
 	return NULL;
 }
 
-bool ZEDMenuManager::AddMenu(ZEDMenu* Menu)
+bool ZEDToolbarManager::AddToolbar(ZEDToolbar* Toolbar)
 {
-	zeCheckError(Menu == NULL, false, "Cannot add menu. Menu is NULL.");
-	zeCheckError(Menus.Exists(Menu), false, "Cannot add menu. Menu has been already added. Menu Name: \"%s\".", Menu->GetName().ToCString());
+	zeCheckError(Toolbar == NULL, false, "Cannot add toolbar. Toolbar is NULL.");
+	zeCheckError(Toolbars.Exists(Toolbar), false, "Cannot add toolbar. Toolbar has been already added. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 	{
-		if (Menus[I]->GetName() == Menu->GetName())
+		if (Toolbars[I]->GetName() == Toolbar->GetName())
 		{
-			zeError("Cannot add menu. Another menu with the same name has been already added. Menu Name: \"%s\".", Menu->GetName().ToCString());
+			zeError("Cannot add toolbar. Another toolbar with the same name has been already added. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 			return false;
 		}
 	}
 
-	Menu->Manager = this;
-	Menus.Add(Menu);
+	Toolbar->Manager = this;
+	Toolbars.Add(Toolbar);
 	
 	return true;
 }
 
-bool ZEDMenuManager::RemoveMenu(ZEDMenu* Menu)
+bool ZEDToolbarManager::RemoveToolbar(ZEDToolbar* Toolbar)
 {
-	zeCheckError(Menu == NULL, false, "Cannot remove menu. Menu is NULL.");
-	zeCheckError(!Menus.Exists(Menu), false, "Cannot remove menu. Menu is not added. Menu Name: \"%s\".", Menu->GetName().ToCString());
+	zeCheckError(Toolbar == NULL, false, "Cannot remove toolbar. Toolbar is NULL.");
+	zeCheckError(!Toolbars.Exists(Toolbar), false, "Cannot remove toolbar. Toolbar is not added. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
-	Menu->Manager = NULL;
-	Menus.Add(Menu);
+	Toolbar->Manager = NULL;
+	Toolbars.Add(Toolbar);
 
 	return true;
 }
 
-bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
+bool ZEDToolbarManager::Load(const ZEString& ConfigurationFile)
 {
 	ZEMLReader Reader;
 	if (!Reader.Open(ConfigurationFile))
@@ -108,27 +109,27 @@ bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 	}
 
 	ZEMLReaderNode RootNode = Reader.GetRootNode();
-	if (!RootNode.IsValid() || RootNode.GetName() != "ZEDMenuManager")
+	if (!RootNode.IsValid() || RootNode.GetName() != "ZEDToolbarManager")
 	{
 		zeError("Cannor load configuration. Unknown structure. File Name: \"%s\".", ConfigurationFile.ToCString());
 		return false;
 	}
 
-	ZEMLReaderNode MenusNode = RootNode.GetNode("Menus");
-	if (MenusNode.IsValid())
+	ZEMLReaderNode ToolbarsNode = RootNode.GetNode("Toolbars");
+	if (ToolbarsNode.IsValid())
 	{
-		ZESize MenuNodeCount = MenusNode.GetNodeCount("Menu");
-		for (ZESize I = 0; I < MenuNodeCount; I++)
+		ZESize ToolbarNodeCount = ToolbarsNode.GetNodeCount("Toolbar");
+		for (ZESize I = 0; I < ToolbarNodeCount; I++)
 		{
-			ZEMLReaderNode& MenuNode = MenusNode.GetNode("Menu", I);
-			ZEDMenu* NewMenu = ZEDMenu::CreateInstance();
-			if (!NewMenu->Load(&MenuNode))
+			ZEMLReaderNode& ToolbarNode = ToolbarsNode.GetNode("Toolbar", I);
+			ZEDToolbar* NewToolbar = ZEDToolbar::CreateInstance();
+			if (!NewToolbar->Load(&ToolbarNode))
 			{
-				NewMenu->Destroy();
+				NewToolbar->Destroy();
 				continue;
 			}
 
-			AddMenu(NewMenu);
+			AddToolbar(NewToolbar);
 		}
 	}
 
@@ -137,7 +138,7 @@ bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 	return true;
 }
 
-bool ZEDMenuManager::Save(const ZEString& ConfigurationFile)
+bool ZEDToolbarManager::Save(const ZEString& ConfigurationFile)
 {
 	ZEMLWriter Writer;
 	if (!Writer.Open(ConfigurationFile))
@@ -147,35 +148,35 @@ bool ZEDMenuManager::Save(const ZEString& ConfigurationFile)
 	}
 
 	ZEMLWriterNode RootNode;
-	if (!Writer.OpenRootNode("ZEDMenuManager", RootNode))
+	if (!Writer.OpenRootNode("ZEDToolbarManager", RootNode))
 		return false;
 
-	ZEMLWriterNode MenusNode;
-	RootNode.OpenNode("Menus", MenusNode);
+	ZEMLWriterNode ToolbarsNode;
+	RootNode.OpenNode("Toolbars", ToolbarsNode);
 
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
-		Menus[I]->Save(&MenusNode);
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
+		Toolbars[I]->Save(&ToolbarsNode);
 
 
-	MenusNode.CloseNode();
+	ToolbarsNode.CloseNode();
 	RootNode.CloseNode();
 	Writer.Close();
 
-	return true;
+	return false;
 }
 
-void ZEDMenuManager::Update()
+void ZEDToolbarManager::Update()
 {
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
-		Menus[I]->Update();
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
+		Toolbars[I]->Update();
 }
 
-void ZEDMenuManager::Destroy()
+void ZEDToolbarManager::Destroy()
 {
 	delete this;
 }
 
-ZEDMenuManager* ZEDMenuManager::CreateInstance()
+ZEDToolbarManager* ZEDToolbarManager::CreateInstance()
 {
-	return new ZEDMenuManager;
+	return new ZEDToolbarManager;
 }
