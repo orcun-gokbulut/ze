@@ -41,30 +41,35 @@
 #include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMeta/ZEEvent.h"
+#include "ZEMeta/ZEEventDelegate.h"
 #include "ZEDCore/ZEDViewportEvent.h"
+
 
 ZE_ENUM(ZEDCommandType)
 {
 	ZED_CT_BUTTON,
 	ZED_CT_CHECK,
-	ZED_CT_RADIO,
-	ZED_CT_COMBO_BOX,
+	ZED_CT_LIST,
 	ZED_CT_INPUT_TEXT,
 	ZED_CT_INPUT_NUMBER,
 	ZED_CT_INPUT_FLOAT
 };
+
+class ZEDCommand;
+class ZEDCommandManager;
+
+typedef ZEEventDelegate<void (const ZEDCommand* Command)> ZEDCommandDelegate;
 
 class ZEDCommandShortcut : public ZEObject
 {
 	ZE_OBJECT
 	public:
 		ZEDViewportKeyboardKey				Key;
-		ZEDViewportKeyModifier				Modifier;
+		ZEDViewportKeyModifiers				Modifier;
 
+											ZEDCommandShortcut(ZEDViewportKeyModifiers Modifier, ZEDViewportKeyboardKey Key);
 											ZEDCommandShortcut();
 };
-
-class ZEDCommandManager;
 
 class ZEDCommand : public ZEObject
 {
@@ -109,8 +114,8 @@ class ZEDCommand : public ZEObject
 		void								SetValue(const ZEValue& Value);
 		const ZEValue&						GetValue() const;
 
-		void								SetComboBoxItems(const ZEArray<ZEString>& Items);
-		const ZEArray<ZEString>&			GetComboBoxItems() const;
+		void								SetListItems(const ZEArray<ZEString>& Items);
+		const ZEArray<ZEString>&			GetListItems() const;
 
 		void								SetTooltip(const ZEString& Tooltip);
 		const ZEString&						GetTooltip() const;

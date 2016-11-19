@@ -43,6 +43,12 @@ ZEDCommandShortcut::ZEDCommandShortcut()
 	Modifier = ZED_VKM_NONE;
 }
 
+ZEDCommandShortcut::ZEDCommandShortcut(ZEDViewportKeyModifiers Modifier, ZEDViewportKeyboardKey Key)
+{
+	this->Modifier = Modifier;
+	this->Key = Key;
+}
+
 void ZEDCommand::SetName(const ZEString& Name)
 {
 	if (this->Name == Name)
@@ -154,12 +160,12 @@ const ZEValue& ZEDCommand::GetValue() const
 	return Value;
 }
 
-void ZEDCommand::SetComboBoxItems(const ZEArray<ZEString>& Items)
+void ZEDCommand::SetListItems(const ZEArray<ZEString>& Items)
 {
 	ComboBoxItems = Items;
 }
 
-const ZEArray<ZEString>& ZEDCommand::GetComboBoxItems() const
+const ZEArray<ZEString>& ZEDCommand::GetListItems() const
 {
 	return ComboBoxItems;
 }

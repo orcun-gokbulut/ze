@@ -35,18 +35,17 @@
 
 #include "ZEDMenuItem.h"
 
-#include "ZEDMenu2.h"
+#include "ZEDMenu.h"
 #include "ZEDMenuManager.h"
 #include "ZEDCommand.h"
 #include "ZEDUIUtils.h"
+#include "ZEDCommandManager.h"
 
 #include "ZEMeta\ZEEventDelegate.h"
 #include "ZEML\ZEMLReader.h"
 #include "ZEML\ZEMLWriter.h"
 
 #include <QAction>
-#include "ZEDCommandManager.h"
-
 
 void ZEDMenuAction::Action_triggered(bool Triggered)
 {
@@ -67,7 +66,7 @@ void ZEDMenuItem::Action_Triggered()
 	{
 		if (TargetCommand->GetType() == ZED_CT_BUTTON)
 			TargetCommand->OnAction(TargetCommand);
-		else if (TargetCommand->GetType() == ZED_CT_CHECK || TargetCommand->GetType() == ZED_CT_RADIO)
+		else if (TargetCommand->GetType() == ZED_CT_CHECK)
 			TargetCommand->SetValue(Action->isChecked());
 	}
 }
@@ -77,13 +76,13 @@ void ZEDMenuItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 	Update();
 }
 
-void ZEDMenuItem::TargetMenu_OnUpdate(const ZEDMenu2* Menu)
+void ZEDMenuItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
 {
 	TargetName = Menu->GetName();
 	Update();
 }
 
-ZEDMenu2* ZEDMenuItem::GetMenu()
+ZEDMenu* ZEDMenuItem::GetMenu()
 {
 	return Menu;
 }
@@ -145,6 +144,9 @@ void ZEDMenuItem::Update()
 			Action->setSeparator(false);
 			Action->setMenu(NULL);
 
+			if (GetMenu()->GetManager() == NULL)
+				break;
+
 			ZEDCommand* NewCommand = ZEDCommandManager::GetInstance()->GetCommand(GetTargetName());
 			if (NewCommand != TargetCommand)
 			{
@@ -164,7 +166,7 @@ void ZEDMenuItem::Update()
 				Action->setVisible(TargetCommand->GetVisible());
 				Action->setEnabled(TargetCommand->GetEnabled());
 					
-				if (TargetCommand->GetType() == ZED_CT_CHECK || TargetCommand->GetType() == ZED_CT_RADIO)
+				if (TargetCommand->GetType() == ZED_CT_CHECK)
 				{
 					Action->setCheckable(true);
 					Action->setChecked(TargetCommand->GetValue().GetBoolean());
@@ -195,7 +197,7 @@ void ZEDMenuItem::Update()
 			if (GetMenu()->GetManager() == NULL)
 				break;
 
-			ZEDMenu2* NewMenu = GetMenu()->GetManager()->GetMenu(TargetName);
+			ZEDMenu* NewMenu = GetMenu()->GetManager()->GetMenu(TargetName);
 			if (TargetMenu != NewMenu)
 			{
 				if (TargetMenu != NULL)
@@ -239,7 +241,6 @@ bool ZEDMenuItem::Load(ZEMLReaderNode* ItemNode)
 {
 	zeCheckError(ItemNode == NULL, false, "Cannot load Menu Item. ItemNode is NULL.");
 	zeCheckError(ItemNode->IsValid() == NULL, false, "Cannot load Menu Item. ItemNode is not valid.");
-	zeCheckError((ZEDMenuItemType)ItemNode->ReadInt8("Type") == NULL, false, "Cannot load Menu Item. ItemNode is type miss match.");
 
 	Type = (ZEDMenuItemType)ItemNode->ReadUInt8("Type");
 	if (Type != ZED_MIT_SEPERATOR)

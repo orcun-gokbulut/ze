@@ -56,7 +56,7 @@ enum ZEDMenuItemType
 class ZEDMenuAction : public QAction
 {
 	Q_OBJECT
-	friend class ZEDMenu2;
+	friend class ZEDMenu;
 	private:
 		ZEDMenuItem*					Item;
 		void							Action_triggered(bool Triggered);
@@ -69,22 +69,22 @@ class ZEDMenuItem : public ZEObject
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDMenuItem)
 	friend class ZEDMenuAction;
-	friend class ZEDMenu2;
+	friend class ZEDMenu;
 	private:
 		ZEDMenuAction*					Action;
-		ZEDMenu2*						Menu;
+		ZEDMenu*						Menu;
 		ZEDMenuItemType					Type;
 
 		ZEString						TargetName;
 		ZEDCommand*						TargetCommand;
-		ZEDMenu2*						TargetMenu;
+		ZEDMenu*						TargetMenu;
 
 		void							Action_Triggered();
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
-		void							TargetMenu_OnUpdate(const ZEDMenu2* Menu);
+		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
 	public:
-		ZEDMenu2*						GetMenu();
+		ZEDMenu*						GetMenu();
 
 		void							SetType(ZEDMenuItemType Type);
 		ZEDMenuItemType					GetType() const;

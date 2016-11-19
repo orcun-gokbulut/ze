@@ -38,41 +38,28 @@
 
 #include "ZEError.h"
 #include "ZEDS/ZEFormat.h"
-#include "ZEFile/ZEPathTokenizer.h"
 #include "ZERegEx/ZERegEx.h"
+#include "ZEMeta/ZEEventDelegate.h"
+#include "ZEFile/ZEPathTokenizer.h"
 
 #include "ZEDWindow.h"
 #include "ZEDToolbar.h"
 #include "ZEDMenu.h"
+#include "ZEDMenuItem.h"
+#include "ZEDUserInterfaceComponent.h"
+#include "ZEDCommandManager.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDViewPort.h"
-#include "ZEDUserInterfaceComponent.h"
 
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
-#include "ZEDCommandManager.h"
-#include "ZEDMenu2.h"
-#include "ZEDMenuItem.h"
-#include "ZEMeta/ZEEventDelegate.h"
 
 class ZEDMenuWrapper : public QMenu
 {
 	public:
 		ZEString Section;
 };
-
-void ZEDMainWindow::QuitCommand_OnAction(const ZEDCommand* Command)
-{
-	int Result = QMessageBox::question(MainWindow, "ZEDEditor", "Are you sure that you want to quit ?", QMessageBox::Yes, QMessageBox::No);
-	if (Result == QMessageBox::Yes)
-		GetEditor()->Exit();
-}
-
-void ZEDMainWindow::B_OnAction(const ZEDCommand* Command)
-{
-	QuitCommand.SetEnabled(Command->GetValue().GetBoolean());
-}
 
 bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 {
@@ -98,90 +85,18 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
-void ZEDMainWindow::WindowMenuCallback(ZEDMenu* Menu)
-{
-	ZEDWindow* Window = static_cast<ZEDWindow*>(Menu->GetUserData());
-	if (Window == NULL)
-		return;
-
-	Window->SetVisible(Menu->GetChecked());
-}
-
-void ZEDMainWindow::ToolbarMenuCallback(ZEDMenu* Menu)
-{
-	ZEDToolbar* Toolbar = static_cast<ZEDToolbar*>(Menu->GetUserData());
-	if (Toolbar == NULL)
-		return;
-
-	Toolbar->SetVisible(Menu->GetChecked());
-}
-
 ZEDMainWindow::ZEDMainWindow()
 {
-	QuitCommand.SetName("Quit");
-	QuitCommand.SetCategory("Main Window");
-	QuitCommand.SetText("Quit");
-	QuitCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/Close.png");
-	QuitCommand.SetTooltip("Exit from the editor");
-	QuitCommand.SetEnabled(false);
-	QuitCommand.OnAction += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDMainWindow, &ZEDMainWindow::QuitCommand_OnAction>(this);
-
-	ZEDCommandManager::GetInstance()->RegisterCommand(&QuitCommand);
-
-	B.SetName("CommandB");
-	B.SetCategory("Test1");
-	B.SetText("B");
-	B.SetTooltip("Tool tip o a");
-	B.SetType(ZED_CT_CHECK);
-	B.OnAction += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDMainWindow, &ZEDMainWindow::B_OnAction>(this);
-	ZEDCommandManager::GetInstance()->RegisterCommand(&B);
-
 	MenuManager = ZEDMenuManager::CreateInstance();
-
-	ZEDMenu2* MainMenu = ZEDMenu2::CreateInstance();
-	MainMenu->SetName("MainMenu");
-	MainMenu->SetText("Menu1");
-	MenuManager->AddMenu(MainMenu);
-
-	ZEDMenu2* SubMenu2 = ZEDMenu2::CreateInstance();
-	SubMenu2->SetName("MainMenu2");
-	SubMenu2->SetText("Menu12");
-	MenuManager->AddMenu(SubMenu2);
-
-	ZEDMenuItem* Item = new ZEDMenuItem();
-	Item->SetType(ZED_MIT_COMMAND);
-	Item->SetTargetName("CommandB");
-	SubMenu2->AddItem(Item);
-
-	ZEDMenuItem* Item1 = new ZEDMenuItem();
-	Item1->SetType(ZED_MIT_COMMAND);
-	Item1->SetTargetName("Quit");
-	MainMenu->AddItem(Item1);
-
-	ZEDMenuItem* Item2 = new ZEDMenuItem();;
-	Item2->SetType(ZED_MIT_SEPERATOR);
-	MainMenu->AddItem(Item2);
-
-	ZEDMenuItem* Item3 = new ZEDMenuItem();;
-	Item3->SetType(ZED_MIT_MENU_POINTER);
-	Item3->SetTargetName("MainMenu2");
-	MainMenu->AddItem(Item3);
-
-
-	MenuManager->Update();
 
 	MainWindow = new QMainWindow();
 	Form = new Ui_ZEDMainWindow();
 	Form->setupUi(MainWindow);
 
-	MainWindow->menuBar()->addMenu(MenuManager->GetMenu("MainMenu")->GetNativeMenu());
-
 	MainWindow->installEventFilter(this);
 
 	MainWindow->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 	MainWindow->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-
-	RootMenu.MenuBar = MainWindow->menuBar();
 }
 
 ZEDMainWindow::~ZEDMainWindow()
@@ -194,24 +109,10 @@ QMainWindow* ZEDMainWindow::GetMainWindow()
 	return MainWindow;
 }
 
-ZEDMenu* ZEDMainWindow::GetRootMenu()
+ZEDMenuManager* ZEDMainWindow::GetMenuManager()
 {
-	return &RootMenu;
+	return MenuManager;
 }
-
-void ZEDMainWindow::AddMenu(const ZEString& Path, ZEDMenu* Menu)
-{
-	return;
-	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
-	RootMenu.AddMenu(Path, Menu);
-}
-
-void ZEDMainWindow::RemoveMenu(ZEDMenu* Menu)
-{
-	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
-	RootMenu.RemoveMenu(Menu);
-}
-
 
 const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
 {
@@ -250,15 +151,6 @@ void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar, ZEDToolbarDefaults Default)
 	}
 	
 	Toolbar->SetVisible(Default & ZED_WD_VISIBLE);
-
-	Toolbar->Menu = new ZEDMenu();
-	Toolbar->Menu->SetName(Toolbar->GetName());
-	Toolbar->Menu->SetSection(Toolbar->GetCategory());
-	Toolbar->Menu->SetCheckable(true);
-	Toolbar->Menu->SetChecked(Default & ZED_WD_VISIBLE);
-	Toolbar->Menu->SetUserData(Toolbar);
-	Toolbar->Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDMainWindow, ToolbarMenuCallback, this));
-	AddMenu("User Interface/Toolbars", Toolbar->Menu);
 }
 
 void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
@@ -267,12 +159,9 @@ void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
 	zeCheckError(Toolbar->GetMainWindow() != this, ZE_VOID, "Toolbar does not belong to this Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
 	GetMainWindow()->removeToolBar(Toolbar->GetToolbar());
-	RemoveMenu(Toolbar->Menu);
 
 	GetEditor()->RemoveComponent(Toolbar);
 	Toolbars.RemoveValue(Toolbar);
-
-	RemoveMenu(Toolbar->Menu);
 }
 
 const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()
@@ -328,20 +217,6 @@ void ZEDMainWindow::AddWindow(ZEDWindow* Window, ZEDWindowDefaults Default)
 	}
 
 	Window->SetVisible(Default & ZED_WD_VISIBLE);
-
-	Window->Menu = new ZEDMenu();
-	Window->Menu->SetName(Window->GetName());
-	Window->Menu->SetSection(Window->GetCategory());
-	Window->Menu->SetCheckable(true);
-	Window->Menu->SetChecked(Default & ZED_WD_VISIBLE);
-	Window->Menu->SetUserData(Window);
-	Window->Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDMainWindow, WindowMenuCallback, this));
-
-	if (Window->GetCategory().IsEmpty())
-		AddMenu("User Interface/Windows", Window->Menu);
-	else
-		AddMenu(ZEFormat::Format("User Interface/Windows/{0}", Window->GetCategory()), Window->Menu);
-
 }
 
 void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)
@@ -351,8 +226,6 @@ void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)
 
 	Window->Deinitialize();
 	Windows.RemoveValue(Window);
-
-	RemoveMenu(Window->Menu);
 }
 
 void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)

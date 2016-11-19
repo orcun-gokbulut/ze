@@ -35,8 +35,6 @@
 
 #include "ZEDToolbar.h"
 
-#include "ZEDMenu.h"
-
 #include <QToolbar>
 
 void ZEDToolbar::SetName(const ZEString& Name)
@@ -76,8 +74,6 @@ void ZEDToolbar::SetVisible(bool Visible)
 	
 	if (Menu == NULL)
 		return;
-
-	Menu->SetChecked(Visible);
 }
 
 bool ZEDToolbar::GetVisible()

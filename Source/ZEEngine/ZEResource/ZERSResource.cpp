@@ -203,7 +203,6 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 		}
 		else
 		{
-			StateLock.Unlock();
 			return ZE_TR_DONE;
 		}
 	}
