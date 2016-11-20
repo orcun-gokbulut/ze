@@ -49,10 +49,12 @@
 #include "ZEDCommandManager.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDViewPort.h"
+#include "ZEDCustomizeUIWindow.h"
 
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
+
 
 
 class ZEDMenuWrapper : public QMenu
@@ -90,6 +92,8 @@ bool ZEDMainWindow::InitializeInternal()
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 
+	RegisterCommands();
+
 	MenuManager->Load("#R:/ZEDEditor/Menu.ZEDMenuManager");
 	ZEDMenu* MainMenu = MenuManager->GetMenu("MainMenu");
 	if (MainMenu == NULL)
@@ -122,6 +126,20 @@ ZEDMainWindow::~ZEDMainWindow()
 {
 	MenuManager->Destroy();
 	ToolbarManager->Destroy();
+}
+
+void ZEDMainWindow::RegisterCommands()
+{
+	CustomizeUICommand.SetCategory("User Interface");
+	CustomizeUICommand.SetName("ZEDEditor::CustomizeUICommand");
+	CustomizeUICommand.SetText("Customize UI");
+	CustomizeUICommand.OnAction += ZEDCommandDelegate::Create<ZEDMainWindow, &ZEDMainWindow::CustomizeUICommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&CustomizeUICommand);
+}
+
+void ZEDMainWindow::CustomizeUICommand_OnAction(const ZEDCommand* Command)
+{
+	Configure();
 }
 
 QMainWindow* ZEDMainWindow::GetMainWindow()
@@ -212,6 +230,12 @@ void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)
 ZEDViewport* ZEDMainWindow::GetViewport()
 {
 	return Viewport;
+}
+
+void ZEDMainWindow::Configure()
+{
+	ZEDCustomizeUIWindow* Customize = new ZEDCustomizeUIWindow(this);
+	Customize->show();
 }
 
 ZEDMainWindow* ZEDMainWindow::CreateInstance()
