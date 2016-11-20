@@ -24,7 +24,7 @@
 			<Node Name="Items">
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">1</Property>
-					<Property Type="String" Name="TargetName">ZEDEditior::NewCommand</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::NewCommand</Property>
 				</Node>
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">3</Property>				
@@ -54,6 +54,13 @@
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">1</Property>
 					<Property Type="String" Name="TargetName">ZEDEditor::CloseCommand</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">3</Property>
+				</Node>
+				<Node Name="Item">
+					<Property Type="UInt8" Name="Type">1</Property>
+					<Property Type="String" Name="TargetName">ZEDEditor::CustomizeUICommand</Property>
 				</Node>
 				<Node Name="Item">
 					<Property Type="UInt8" Name="Type">3</Property>

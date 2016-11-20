@@ -104,6 +104,12 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 											ZEDMainWindow();
 											~ZEDMainWindow();
+	private:
+		ZEDCommand							CustomizeUICommand;
+
+		void								RegisterCommands();
+
+		void								CustomizeUICommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		QMainWindow*						GetMainWindow();
@@ -120,6 +126,8 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		void								SetViewport(ZEDViewport* Viewport);
 		ZEDViewport*						GetViewport();
+
+		void								Configure();
 
 		static ZEDMainWindow*				CreateInstance();
 };
