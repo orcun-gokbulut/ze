@@ -38,6 +38,7 @@
 #include "ZEDToolbarItem.h"
 #include "ZEDCommand.h"
 #include "ZEDUIUtils.h"
+#include "ZEDToolbarManager.h"
 
 #include "ZEError.h"
 #include "ZEFile/ZEPathInfo.h"
@@ -54,10 +55,14 @@ ZEDToolbar::ZEDToolbar()
 	DockLocation = ZED_TDL_TOP;
 	DockColumn = 0;
 	DockRow = 0;
+	Visible = true;
 }
 
 ZEDToolbar::~ZEDToolbar()
 {
+	if (GetManager() != NULL)
+		GetManager()->RemoveToolbar(this);
+
 	ClearItems();
 	delete Toolbar;
 }
@@ -116,6 +121,21 @@ const ZEString& ZEDToolbar::GetIcon() const
 	return Icon;
 }
 
+void ZEDToolbar::SetVisible(bool Visible)
+{
+	if (this->Visible == Visible)
+		return;
+
+	this->Visible = Visible;
+
+	Toolbar->setVisible(Visible);
+}
+
+bool ZEDToolbar::GetVisible() const
+{
+	return Visible;
+}
+
 void ZEDToolbar::SetDockLocation(ZEDToolbarDockLocation Location)
 {
 	if (DockLocation == Location)
@@ -170,10 +190,11 @@ void ZEDToolbar::AddItem(ZEDToolbarItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot insert toolbar item. Item is NULL");
 	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
 
-	Items.Add(Item);
-
 	Item->Toolbar = this;
 	Item->Action = new ZEDToolbarAction(Item);
+	Item->Update();
+
+	Items.Add(Item);
 	Toolbar->addAction(Item->Action);
 }
 
@@ -182,14 +203,20 @@ void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot insert toolbar item. Item is NULL");
 	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
 
-	if (Items.GetCount() >= Index)
-		Items.Add(Item);
-	else
-		Items.Insert(Index, Item);
-
 	Item->Toolbar = this;
 	Item->Action = new ZEDToolbarAction(Item);
-	Toolbar->addAction(Item->Action);
+	Item->Update();
+
+	if (Index >= Items.GetCount())
+	{
+		Items.Add(Item);
+		Toolbar->addAction(Item->Action);
+	}
+	else
+	{
+		Items.Insert(Index, Item);
+		Toolbar->insertAction(Toolbar->actions()[Index], Item->Action);
+	}
 }
 
 void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
@@ -197,6 +224,7 @@ void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot delete toolbar item. Item is NULL");
 	zeDebugCheck(Item->Toolbar != this, "Cannot delete toolbar item. Item is belong to this toolbar.");
 
+	Item->Toolbar = NULL;
 	delete Item->Action;
 	Items.RemoveValue(Item);
 }

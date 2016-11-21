@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>438</height>
+    <width>609</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,6 +25,9 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
        <string>Element</string>
@@ -34,8 +37,11 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetMaximumSize</enum>
+           </property>
            <item>
-            <widget class="QRadioButton" name="radMenus">
+            <widget class="QRadioButton" name="radElementTypeMenu">
              <property name="text">
               <string>Menu</string>
              </property>
@@ -45,7 +51,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QRadioButton" name="radToolbars">
+            <widget class="QRadioButton" name="radElementTypeToolbar">
              <property name="text">
               <string>Toolbar</string>
              </property>
@@ -64,49 +70,62 @@
              </property>
             </spacer>
            </item>
-           <item>
-            <widget class="QPushButton" name="btnNew">
-             <property name="text">
-              <string>New</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="btnDelete">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
           </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMaximumSize</enum>
+         </property>
+         <item>
+          <widget class="QComboBox" name="cmbElements">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnElementNew">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>New</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnElementDelete">
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Delete</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
-          <widget class="QLabel" name="lblType">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Element</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="cmbName"/>
-         </item>
-         <item row="1" column="0">
           <widget class="QLabel" name="label_3">
            <property name="minimumSize">
             <size>
@@ -119,31 +138,47 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLineEdit" name="txtName"/>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txtElementName"/>
          </item>
-         <item row="3" column="0">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Text</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="txtElementText"/>
+         </item>
+         <item row="2" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Visible</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="chkVisible">
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="chkElementVisible">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Items</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="3" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <spacer name="horizontalSpacer_3">
@@ -159,7 +194,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="btnAddItem">
+            <widget class="QPushButton" name="btnElementItemAdd">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -184,7 +219,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btnRemoveItem">
+            <widget class="QPushButton" name="btnElementItemRemove">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -203,7 +238,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btnMoveUpItem">
+            <widget class="QPushButton" name="btnElementItemUp">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -217,12 +252,12 @@
               </size>
              </property>
              <property name="text">
-              <string>&lt;</string>
+              <string>▲</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="btnMoveDownItem">
+            <widget class="QPushButton" name="btnElementItemDown">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -236,35 +271,19 @@
               </size>
              </property>
              <property name="text">
-              <string>&gt;</string>
+              <string>▼</string>
              </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QListWidget" name="lstItems">
+         <item row="4" column="0" colspan="2">
+          <widget class="QListWidget" name="lstElementItems">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="txtTitle"/>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Title</string>
            </property>
           </widget>
          </item>
@@ -274,13 +293,47 @@
      </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="title">
-       <string>Commands</string>
+       <string>Items</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QRadioButton" name="radItemTypeCommand">
+           <property name="text">
+            <string>Command</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radItemTypeMenu">
+           <property name="text">
+            <string>Menu</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lblItemCategory">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -293,12 +346,12 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="cmbCategory"/>
+          <widget class="QComboBox" name="cmbItemCategory"/>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QListWidget" name="lstCommands"/>
+        <widget class="QListWidget" name="lstItems"/>
        </item>
       </layout>
      </widget>
@@ -330,9 +383,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnClose">
+      <widget class="QPushButton" name="btnSave">
        <property name="text">
-        <string>Close</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>
@@ -341,23 +394,20 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>radMenus</tabstop>
-  <tabstop>radToolbars</tabstop>
-  <tabstop>btnNew</tabstop>
-  <tabstop>btnDelete</tabstop>
-  <tabstop>cmbName</tabstop>
-  <tabstop>txtName</tabstop>
-  <tabstop>txtTitle</tabstop>
-  <tabstop>chkVisible</tabstop>
-  <tabstop>btnAddItem</tabstop>
-  <tabstop>btnRemoveItem</tabstop>
-  <tabstop>btnMoveUpItem</tabstop>
-  <tabstop>btnMoveDownItem</tabstop>
+  <tabstop>radElementTypeMenu</tabstop>
+  <tabstop>radElementTypeToolbar</tabstop>
+  <tabstop>txtElementName</tabstop>
+  <tabstop>txtElementText</tabstop>
+  <tabstop>chkElementVisible</tabstop>
+  <tabstop>btnElementItemAdd</tabstop>
+  <tabstop>btnElementItemRemove</tabstop>
+  <tabstop>btnElementItemUp</tabstop>
+  <tabstop>btnElementItemDown</tabstop>
+  <tabstop>lstElementItems</tabstop>
+  <tabstop>cmbItemCategory</tabstop>
   <tabstop>lstItems</tabstop>
-  <tabstop>cmbCategory</tabstop>
-  <tabstop>lstCommands</tabstop>
   <tabstop>btnDefault</tabstop>
-  <tabstop>btnClose</tabstop>
+  <tabstop>btnSave</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -111,6 +111,26 @@ void ZEDMenuItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
 	Update();
 }
 
+
+ZEDMenuItem::ZEDMenuItem()
+{
+	Action = NULL;
+	Menu = NULL;
+	SubMenu = NULL;
+	Type = ZED_MIT_NONE;
+	TargetCommand = NULL;
+	TargetMenu = NULL;
+}
+
+ZEDMenuItem::~ZEDMenuItem()
+{
+	if (GetMenu() != NULL)
+		GetMenu()->RemoveItem(this);
+
+	if (SubMenu != NULL)
+		delete SubMenu;
+}
+
 ZEDMenu* ZEDMenuItem::GetMenu()
 {
 	return Menu;
@@ -315,18 +335,12 @@ bool ZEDMenuItem::Save(ZEMLWriterNode* ItemNode)
 	return true;
 }
 
-ZEDMenuItem::ZEDMenuItem()
+void ZEDMenuItem::Destroy()
 {
-	Action = NULL;
-	Menu = NULL;
-	SubMenu = NULL;
-	Type = ZED_MIT_NONE;
-	TargetCommand = NULL;
-	TargetMenu = NULL;
+	delete this;
 }
 
-ZEDMenuItem::~ZEDMenuItem()
+ZEDMenuItem* ZEDMenuItem::CreateInstance()
 {
-	if (SubMenu != NULL)
-		delete SubMenu;
+	return new ZEDMenuItem();
 }
