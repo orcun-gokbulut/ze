@@ -356,6 +356,7 @@ const ZERNView& ZERNRenderer::GetView()
 void ZERNRenderer::SetOutputTexture(const ZEGRTexture* OutputTexture)
 {
 	if (this->OutputTexture == NULL || 
+		this->OutputTexture != OutputTexture ||
 		this->OutputTexture->GetWidth() != OutputTexture->GetWidth() || 
 		this->OutputTexture->GetHeight() != OutputTexture->GetHeight())
 		Resized = true;

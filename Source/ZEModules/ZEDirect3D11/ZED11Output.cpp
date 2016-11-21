@@ -39,34 +39,122 @@
 
 #include "ZEGraphics\ZEGRDefinitions.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
+#include "ZEGraphics\ZEGRWindow.h"
 
 #include "ZED11Texture.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11Adapter.h"
 
-#include <d3d11.h>
 #include <dxgi1_2.h>
 
-void ZED11Output::SwitchToFullscreen()
+bool ZED11Output::Initialize(const ZEGRWindow* Window, ZEGRFormat Format)
 {
-	IDXGIOutput1* Output = NULL;
-	if(RestrictedToMonitor)
-		Output = static_cast<ZED11Monitor*>(Monitor)->GetOutput();
+	if (!ZEGROutput::Initialize(Window, Format))
+		return false;
 
-	SwapChain->SetFullscreenState(TRUE, Output);
+	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc = {};
+	SwapChainDesc.Width = Window->GetWidth();
+	SwapChainDesc.Height = Window->GetHeight();
+	SwapChainDesc.Format = ZED11ComponentBase::ConvertFormat(Format);
+	SwapChainDesc.Stereo = FALSE;
+	SwapChainDesc.BufferCount = 1;
+	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	SwapChainDesc.Flags = 0;
+	SwapChainDesc.SampleDesc.Count = 1;
+	SwapChainDesc.SampleDesc.Quality = 0;
+	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+	IDXGIDevice1* DXGIDevice;
+	HRESULT Result = GetDevice()->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot query IDXGIDevice1. Error: %d", Result);
+		DXGIDevice->Release();
+		return false;
+	}
+
+	IDXGIAdapter1* DXGIAdapter;
+	Result = DXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void**)&DXGIAdapter);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIAdapter1. Error: %d", Result);
+		DXGIAdapter->Release();
+		return false;
+	}
+
+	IDXGIFactory2* DXGIFactory;
+	Result = DXGIAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIFactory2. Error: %d", Result);
+		DXGIFactory->Release();
+		return false;
+	}
+
+	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)Window->GetHandle(), &SwapChainDesc, NULL, NULL, &SwapChain);
+	if (FAILED(Result))
+	{
+		zeCriticalError("Cannot create swap chain. Error: %d", Result);
+		DXGIDevice->Release();
+		DXGIAdapter->Release();
+		DXGIFactory->Release();
+		return false;
+	}
+
+	DXGIFactory->MakeWindowAssociation((HWND)Window->GetHandle(), DXGI_MWA_NO_WINDOW_CHANGES);
+
+	DXGIDevice->Release();
+	DXGIAdapter->Release();
+	DXGIFactory->Release();
+
+	Resize(SwapChainDesc.Width, SwapChainDesc.Height);
+
+	return true;
 }
 
-void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+void ZED11Output::Deinitialize()
 {
+	SwapChain->SetFullscreenState(FALSE, NULL);
+	ZEGR_RELEASE(SwapChain);
+}
+
+ZED11Output::ZED11Output()
+{
+	SwapChain = NULL;
+}
+
+ZED11Output::~ZED11Output()
+{
+	Deinitialize();
+}
+
+void ZED11Output::SetFullScreen(bool FullScreen)
+{
+	SwapChain->SetFullscreenState((BOOL)FullScreen, NULL);
+}
+
+void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
+{
+	if (SwapChain == NULL)
+		return;
+
+	if (Width == 0 || Height == 0)
+		return;
+
 	if (Texture != NULL)
 	{
+		if (Texture->GetWidth() == Width && Texture->GetHeight() == Height)
+			return;
+
 		ZED11Texture* D11Texture = static_cast<ZED11Texture*>(Texture.GetPointer());
 		const_cast<ZED11RenderTarget*>(static_cast<const ZED11RenderTarget*>(D11Texture->GetRenderTarget()))->ForcedRelease();
 		ZEGR_RELEASE(D11Texture->Resource);
 	}
 
-	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(Format), 0);
-	if(FAILED(Result))
+	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(GetFormat()), 0);
+	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot resize swapchain buffers. Error: 0x%X.", Result);
 		return;
@@ -74,7 +162,7 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 
 	ID3D11Texture2D* BackBuffer;
 	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer));
-	if(FAILED(Result))
+	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot get swapchain buffers. Error: 0x%X.", Result);
 		return;
@@ -90,205 +178,11 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 	D11Texture->LevelCount = 1;
 	D11Texture->SetResourceBindFlags(ZEGR_RBF_RENDER_TARGET);
 	D11Texture->SetResourceUsage(ZEGR_RU_STATIC);
-	D11Texture->SetFormat(Format);
+	D11Texture->SetFormat(GetFormat());
 	D11Texture->Resource = BackBuffer;
 
-	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(GetFormat());
 	SetSize(Width * Height * FormatDefinition->BlockSize);
-}
-
-bool ZED11Output::Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
-{
-	zeDebugCheck(Handle == NULL, "Handle parameter cannot be null.");
-	zeDebugCheck(Width == 0 || Height == 0, "Width and Height cannot be null.");
-
-	this->Handle = Handle;
-
-	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
-	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC1));
-	SwapChainDesc.Width = Width;
-	SwapChainDesc.Height = Height;
-	SwapChainDesc.Format = ZED11ComponentBase::ConvertFormat(Format);
-	SwapChainDesc.Stereo = FALSE;
-	SwapChainDesc.BufferCount = 1;
-	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	SwapChainDesc.SampleDesc.Count = 1;
-	SwapChainDesc.SampleDesc.Quality = 0;
-	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
-	memset(&FullScreenDesc, 0, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
-	FullScreenDesc.Windowed = TRUE;
-	FullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	FullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	FullScreenDesc.RefreshRate.Numerator = 0;
-	FullScreenDesc.RefreshRate.Denominator = 0;
-
-	IDXGIDevice1* DXGIDevice;
-	HRESULT Result = GetDevice()->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
-	if(FAILED(Result))
-	{
-		zeCriticalError("Cannot query IDXGIDevice1. Error: %d", Result);
-		DXGIDevice->Release();
-		return false;
-	}
-
-	IDXGIAdapter1* DXGIAdapter;
-	Result = DXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void**)&DXGIAdapter);
-	if(FAILED(Result))
-	{
-		zeCriticalError("Cannot get IDXGIAdapter1. Error: %d", Result);
-		DXGIAdapter->Release();
-		return false;
-	}
-
-	IDXGIFactory2* DXGIFactory;
-	Result = DXGIAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
-	if(FAILED(Result))
-	{
-		zeCriticalError("Cannot get IDXGIFactory2. Error: %d", Result);
-		DXGIFactory->Release();
-		return false;
-	}
-
-	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)Handle, &SwapChainDesc, &FullScreenDesc, NULL, &SwapChain);
-	if (FAILED(Result))
-	{
-		zeCriticalError("Cannot create swap chain. Error: %d", Result);
-		DXGIDevice->Release();
-		DXGIAdapter->Release();
-		DXGIFactory->Release();
-		return false;
-	}
-
-	DXGIDevice->Release();
-	DXGIAdapter->Release();
-	DXGIFactory->Release();
-
-	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Format);
-
-	return true;
-}
-
-void ZED11Output::Deinitialize()
-{
-	Handle = NULL;
-	Monitor = NULL;
-
-	SwapChain->SetFullscreenState(FALSE, NULL);
-	ZEGR_RELEASE(SwapChain);
-}
-
-ZED11Output::ZED11Output()
-{
-	Texture = NULL;
-	Handle = NULL;
-	Monitor = NULL;
-	SwapChain = NULL;
-
-	Fullscreen = false;
-	RestrictedToMonitor = false;
-}
-
-ZED11Output::~ZED11Output()
-{
-	Deinitialize();
-}
-
-void* ZED11Output::GetHandle() const
-{
-	return Handle;
-}
-
-ZEGRTexture* ZED11Output::GetTexture() const
-{
-	return Texture;
-}
-
-void ZED11Output::SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor)
-{
-	if (this->Monitor == Monitor && RestrictedToMonitor == RestrictToMonitor)
-		return;
-	
-	this->Monitor = Monitor;
-	
-	if (Fullscreen)
-		SwitchToFullscreen();
-}
-
-ZEGRMonitor* ZED11Output::GetMonitor() const
-{
-	if (RestrictedToMonitor)
-		return Monitor;
-
-	IDXGIOutput* CurrentOutputMonitor;
-	SwapChain->GetContainingOutput(&CurrentOutputMonitor);
-
-	DXGI_OUTPUT_DESC CurrentOutputDescription;
-	CurrentOutputMonitor->GetDesc(&CurrentOutputDescription);
-
-	if (Monitor == NULL)
-	{
-		ZEGRAdapter* CurrentAdapter = ZEGRGraphicsModule::GetInstance()->GetCurrentAdapter();
-
-		const ZEArray<ZEGRMonitor*>& Monitors = CurrentAdapter->GetMonitors();
-		for (ZEUInt I = 0; I < Monitors.GetCount(); I++)
-		{
-			if (Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
-				Monitor = Monitors[I];
-		}
-	}
-	else
-	{
-		if (Monitor->GetHandle() != CurrentOutputDescription.Monitor)
-		{
-			const ZEArray<ZEGRMonitor*>& Monitors = Monitor->GetAdapter()->GetMonitors();
-			for (ZEUInt I = 0; I < Monitors.GetCount(); I++)
-			{
-				if (Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
-					Monitor = Monitors[I];
-			}
-		}
-	}
-
-	CurrentOutputMonitor->Release();
-
-	return Monitor;
-}
-
-void ZED11Output::SetFullscreen(bool Enabled)
-{
-	if (Fullscreen == Enabled)
-		return;
-
-	Fullscreen = Enabled;
-
-	if (Enabled)
-		SwitchToFullscreen();
-	else
-		SwapChain->SetFullscreenState(FALSE, NULL);
-}
-
-bool ZED11Output::GetFullscreen() const
-{
-	return Fullscreen;
-}
-
-void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
-{
-	if (SwapChain == NULL)
-		return;
-
-	if (Width == 0 || Height == 0)
-		return;
-
-	if (Texture->GetWidth() == Width && Texture->GetHeight() == Height)
-		return;
-
-	UpdateRenderTarget(Width, Height, Texture->GetFormat());
 }
 
 void ZED11Output::Present()

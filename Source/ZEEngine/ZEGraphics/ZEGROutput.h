@@ -37,7 +37,8 @@
 
 #include "ZEGRResource.h"
 
-class ZEGRMonitor;
+#include "ZEPointer/ZEHolder.h"
+
 class ZEGRWindow;
 class ZEGRTexture;
 
@@ -46,8 +47,12 @@ class ZEGROutput : public ZEGRResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGROutput)
 	protected:
-		virtual bool						Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format) = 0;
-		virtual void						Deinitialize() = 0;
+		const ZEGRWindow*					Window;
+
+		ZEHolder<ZEGRTexture>				Texture;
+
+		virtual bool						Initialize(const ZEGRWindow* Window, ZEGRFormat Format);
+		virtual void						Deinitialize();
 
 											ZEGROutput();
 		virtual								~ZEGROutput();
@@ -55,18 +60,13 @@ class ZEGROutput : public ZEGRResource
 	public:
 		virtual ZEGRResourceType			GetResourceType() const;
 
-		virtual void*						GetHandle() const = 0;
-		virtual ZEGRTexture*				GetTexture() const = 0;
+		virtual const ZEGRWindow*			GetWindow() const;
+		virtual ZEGRTexture*				GetTexture() const;
 
-		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor) = 0;
-		virtual ZEGRMonitor*				GetMonitor() const = 0;
-
-		virtual void						SetFullscreen(bool Enabled) = 0;
-		virtual bool						GetFullscreen() const = 0;
+		virtual void						SetFullScreen(bool FullScreen) = 0;
 
 		virtual void						Resize(ZEUInt Width, ZEUInt Height) = 0;
-
 		virtual void						Present() = 0;
 
-		static ZEHolder<ZEGROutput>			CreateInstance(ZEGRWindow* Window, ZEGRFormat Format);
+		static ZEHolder<ZEGROutput>			CreateInstance(const ZEGRWindow* Window, ZEGRFormat Format);
 };

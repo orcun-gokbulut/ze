@@ -51,7 +51,6 @@ enum ZEGRWindowType : ZEUInt8
 	ZEGR_WT_POPUP		= 1
 };
 
-class ZEGRMonitor;
 class ZEGROutput;
 
 class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
@@ -64,7 +63,6 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		static ZEGRWindow*				LastCursorLock;
 
 		ZEHolder<ZEGROutput>			Output;
-
 		void*							Handle;
 
 		ZEUInt							Width;
@@ -136,12 +134,12 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void							SetTop(ZEInt Top);
 		ZEInt							GetTop() const;
 
-		void							SetSize(ZEInt Width, ZEInt Height);
+		void							SetSize(ZEUInt Width, ZEUInt Height);
 
 		void							SetWidth(ZEUInt Width);
 		ZEUInt							GetWidth() const;
 		
-		void							SetHeight(ZEUInt Width);
+		void							SetHeight(ZEUInt Height);
 		ZEUInt							GetHeight() const;
 
 		void							SetFullScreen(bool FullScreen);
@@ -201,7 +199,6 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void							SetManageInputAcquisition(bool Enabled);
 		bool							GetManageInputAcquisition() const;
 
-		ZEGRMonitor*					GetContainingMonitor() const;
 		ZEGROutput*						GetOutput() const;
 		
 		bool							GetFocused() const;
@@ -215,8 +212,6 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void							Restore();
 
 		void							WrapperResized(ZEUInt Width, ZEUInt Height);
-
-		void							Show();
 
 		static ZEUInt					GetWindowCount();
 		virtual ZESSize					HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);

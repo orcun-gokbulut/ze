@@ -37,9 +37,27 @@
 
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRWindow.h"
+#include "ZEGRTexture.h"
+
+bool ZEGROutput::Initialize(const ZEGRWindow* Window, ZEGRFormat Format)
+{
+	this->Window = Window;
+	SetFormat(Format);
+
+	return true;
+}
+
+void ZEGROutput::Deinitialize()
+{
+	Window = NULL;
+	
+	Texture.Release();
+}
 
 ZEGROutput::ZEGROutput()
 {
+	Window = NULL;
+
 	Register();
 }
 
@@ -53,16 +71,27 @@ ZEGRResourceType ZEGROutput::GetResourceType() const
 	return ZEGR_RT_OUTPUT;
 }
 
-ZEHolder<ZEGROutput> ZEGROutput::CreateInstance(ZEGRWindow* Window, ZEGRFormat Format)
+const ZEGRWindow* ZEGROutput::GetWindow() const
+{
+	return Window;
+}
+
+ZEGRTexture* ZEGROutput::GetTexture() const
+{
+	return Texture;
+}
+
+ZEHolder<ZEGROutput> ZEGROutput::CreateInstance(const ZEGRWindow* Window, ZEGRFormat Format)
 {
 	zeCheckError(Window == NULL, NULL, "Window cannot be NULL.");
+	zeDebugCheck(Window->GetWidth() == 0 || Window->GetHeight() == 0, "Width or height of window cannot be null.");
 	zeDebugCheck(Format == ZEGR_TF_NONE, "Format cannot be none");
 
 	ZEHolder<ZEGROutput> Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
 	if (Output == NULL)
 		return NULL;
 
-	if (!Output->Initialize(Window->GetHandle(), Window->GetWidth(), Window->GetHeight(), Format))
+	if (!Output->Initialize(Window, Format))
 		return NULL;
 
 	return Output;

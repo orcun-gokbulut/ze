@@ -68,7 +68,7 @@ void ZEGRWindow::OnFocusGain()
 void ZEGRWindow::OnFocusLoose()
 {
 	zeLog("Window lost focus.");
-	
+
 	if (ManageInputAcquisition)
 	{
 		ZEInputModule* InputModule = ZECore::GetInstance()->GetInputModule();
@@ -347,11 +347,6 @@ bool ZEGRWindow::GetVSynchEnabled() const
 	return VSynchEnabled;
 }
 
-ZEGRMonitor* ZEGRWindow::GetContainingMonitor() const
-{
-	return Output->GetMonitor();
-}
-
 ZEGROutput* ZEGRWindow::GetOutput() const
 {
 	return Output;
@@ -391,7 +386,7 @@ ZEGRWindow::ZEGRWindow()
 {
 	Id = NextWindowId++;
 	Handle = NULL;
-	
+
 	Width = 800;
 	Height = 600;
 	Left = 100;
@@ -412,7 +407,7 @@ ZEGRWindow::ZEGRWindow()
 	AlwaysOnTop = false;
 	QuitWhenClosed = true;
 	ValidateQuit = true;
-	CursorVisible = false;
+	CursorVisible = true;
 	CursorLocked = false;
 	ManageInputAcquisition = true;
 	CursorVisibleState = true;

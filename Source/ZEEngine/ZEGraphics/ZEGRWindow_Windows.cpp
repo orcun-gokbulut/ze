@@ -152,26 +152,18 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 	return true;
 }
 
-static void GetWin32Style(ZEGRWindow*  Window, DWORD& Win32StyleExt, DWORD& Win32Style)
+static void GetWin32Style(ZEGRWindow* Window, DWORD& Win32StyleExt, DWORD& Win32Style)
 {
-	Win32Style = NULL;
-	Win32StyleExt = NULL;
+	Win32Style = 0;
+	Win32StyleExt = 0;
 
-	if (Window->GetFullScreen())
-	{
-		Win32Style = WS_POPUP;
-	}
-	else
-	{
-		Win32Style |= Window->GetTitleBar() ? WS_OVERLAPPED | WS_CAPTION : WS_POPUP;
-		Win32Style |= Window->GetTitleBar() && Window->GetIconVisible() ? WS_SYSMENU : 0;
-		Win32Style |= Window->GetTitleBar() && Window->GetMinimizeButton() ? WS_MINIMIZEBOX : 0;
-		Win32Style |= Window->GetTitleBar() && Window->GetMaximizeButton() ?  WS_MAXIMIZEBOX : 0;
-		Win32Style |= Window->GetResizable() ? WS_SIZEBOX : 0;
-		Win32Style |= Window->GetBordered() ? WS_BORDER : 0;
-		Win32StyleExt |= Window->GetShowInTaskbar() ? WS_EX_APPWINDOW : 0;
-		Win32StyleExt |= Window->GetAlwaysOnTop() ? WS_EX_TOPMOST : 0;
-	}
+	Win32Style |= Window->GetTitleBar() ? WS_OVERLAPPED | WS_CAPTION : 0;
+	Win32Style |= Window->GetTitleBar() && Window->GetIconVisible() && Window->GetCloseButton() ? WS_SYSMENU : 0;
+	Win32Style |= Window->GetTitleBar() && Window->GetMinimizeButton() ? WS_MINIMIZEBOX : 0;
+	Win32Style |= Window->GetTitleBar() && Window->GetMaximizeButton() ?  WS_MAXIMIZEBOX : 0;
+	Win32Style |= Window->GetResizable() ? WS_SIZEBOX : 0;
+	Win32Style |= Window->GetBordered() ? WS_BORDER : 0;
+	Win32StyleExt |= Window->GetShowInTaskbar() ? WS_EX_APPWINDOW : 0;
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -266,10 +258,7 @@ void ZEGRWindow::SetTitle(const ZEString& Title)
 
 	BOOL Result = ::SetWindowText((HWND)Handle, Title);
 	if (Result == 0)
-	{
 		HandleWin32Error(GetLastError());
-		return;
-	}
 }
 
 void ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
@@ -312,7 +301,7 @@ void ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
 		HandleWin32Error(GetLastError());
 }
 
-void ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
+void ZEGRWindow::SetSize(ZEUInt Width, ZEUInt Height)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -357,6 +346,16 @@ void ZEGRWindow::SetFullScreen(bool FullScreen)
 		return;
 
 	this->FullScreen = FullScreen;
+
+	if (!IsInitialized())
+		return;
+
+	Output->SetFullScreen(FullScreen);
+
+	if (FullScreen)
+		OnFullScreen();
+	else
+		OnWindowed();
 }
 
 void ZEGRWindow::SetVSynchEnabled(bool VSynchEnable)
@@ -397,21 +396,16 @@ void ZEGRWindow::Focus()
 void ZEGRWindow::Maximize()
 {
 	Maximized = true;
-	Minimized = false;
-	FullScreen = false;
 
 	if (!IsInitialized())
 		return;
 
 	::ShowWindow((HWND)Handle, SW_SHOWMAXIMIZED);
-	::UpdateWindow((HWND)Handle);
 }
 
 void ZEGRWindow::Minimize()
 {
 	Minimized = true;
-	Maximized = false;
-	FullScreen = false;
 
 	if (!IsInitialized())
 		return;
@@ -425,7 +419,6 @@ void ZEGRWindow::Restore()
 {
 	Minimized = false;
 	Maximized = false;
-	FullScreen = false;
 
 	if (!IsInitialized())
 		return;
@@ -460,17 +453,17 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		// Window notification
 		case WM_SIZE:
 		{
-			ZEInt TempWidth =  (short)LOWORD(lParam);
-			ZEInt TempHeight = (short)HIWORD(lParam);
+			ZEInt NewWidth =  (short)LOWORD(lParam);
+			ZEInt NewHeight = (short)HIWORD(lParam);
 
-			if (TempWidth == 0 || TempHeight == 0)
-				break;
+			if ((NewWidth != 0 && NewHeight != 0) && (Width != NewWidth || Height != NewHeight) && wParam != SIZE_MINIMIZED)
+			{
+				Width = NewWidth;
+				Height = NewHeight;
 
-			Width =  TempWidth;
-			Height = TempHeight;
-
-			if (IsInitialized())
-				Output->Resize(Width, Height);
+				if (Output != NULL)
+					Output->Resize(Width, Height);
+			}
 
 			OnSize();
 
@@ -480,18 +473,21 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 					Minimized = false;
 					Maximized = true;
 					OnMaximize();
+
 					break;
 
 				case SIZE_MINIMIZED:
 					Minimized = true;
 					Maximized = false;
 					OnMinimize();
+
 					break;
 
 				case SIZE_RESTORED:
 					Minimized = false;
 					Maximized = false;
 					OnRestore();
+
 					break;
 			};
 
@@ -570,22 +566,48 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		}
 
 		// keyboard notification
+		case WM_SETFOCUS:
+		{
+			Focused = true;
+			OnFocusGain();
+
+			break;
+		}
+		
+		case WM_KILLFOCUS:
+		{
+			Focused = false;
+			OnFocusLoose();
+
+			break;
+		}
+
 		case WM_ACTIVATE:
 		{
 			ZEInt HighOrder = HIWORD(wParam);
 			ZEInt LowOrder = LOWORD(wParam);
-			switch(LowOrder)
+			
+			switch (LowOrder)
 			{
 				case WA_ACTIVE:
 				case WA_CLICKACTIVE:
-					Focused = true;
-					OnFocusGain();
+					if (Output != NULL && FullScreen && Minimized)
+					{
+						Restore();
+						Output->SetFullScreen(true);
+					}
+
 					break;
 
 				case WA_INACTIVE:
-					Focused = false;
 					ManageCursorLock(this, false);
-					OnFocusLoose();
+
+					if (Output != NULL && FullScreen && !Minimized)
+					{
+						Output->SetFullScreen(false);
+						Minimize();
+					}
+
 					break;
 			};
 
@@ -601,16 +623,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 				switch (wParam)
 				{
 					case VK_RETURN:
-						if (FullScreen)
-						{
-							SetFullScreen(false);
-							OnWindowed();
-						}
-						else
-						{
-							SetFullScreen(true);
-							OnFullScreen();
-						}
+						SetFullScreen(!GetFullScreen());
 						break;
 
 					case VK_F4:
@@ -652,42 +665,22 @@ bool ZEGRWindow::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	DWORD Win32Style = 0;
-	DWORD Win32StyleExt = 0;
-	GetWin32Style(this, Win32StyleExt, Win32Style);
-	
-	Win32Style |= !Enabled ? WS_DISABLED : 0;
-	Win32Style |= Maximized ? WS_MAXIMIZE : 0;
-	Win32Style |= Minimized ? WS_MINIMIZE : 0;
-
 	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
 	
 	if (!RegisterWindowClass(Instance))
 	{
-		zeError("Cannot register class.");
+		zeError("Cannot register window class.");
 		return false;
 	}
-	
-	ZEInt WindowPosX, WindowPosY, WindowWidth, WindowHeight;
-	ConvertClientToWindowSize(	Win32Style,
-								Win32StyleExt,
-								Left,
-								Top,
-								Width,
-								Height,
-								WindowPosX,
-								WindowPosY,
-								WindowWidth,
-								WindowHeight);
 
-	Handle = CreateWindowEx(Win32StyleExt,
+	Handle = CreateWindowEx(0,
 							ZE_WIN32_APP_WINDOW_CLASS_NAME,
 							Title,
-							Win32Style,
-							WindowPosX,
-							WindowPosY,
-							WindowWidth,
-							WindowHeight,
+							0,
+							CW_USEDEFAULT,
+							CW_USEDEFAULT,
+							CW_USEDEFAULT,
+							CW_USEDEFAULT,
 							NULL,
 							NULL,
 							Instance,
@@ -701,13 +694,40 @@ bool ZEGRWindow::InitializeInternal()
 
 	WindowCount++;
 
+	DWORD Win32Style = 0;
+	DWORD Win32StyleExt = 0;
+	GetWin32Style(this, Win32StyleExt, Win32Style);
+
+	ZEInt WindowPosX, WindowPosY, WindowWidth, WindowHeight;
+	ConvertClientToWindowSize(
+		Win32Style,
+		Win32StyleExt,
+		Left,
+		Top,
+		Width,
+		Height,
+		WindowPosX,
+		WindowPosY,
+		WindowWidth,
+		WindowHeight);
+
+	::SetWindowLongPtr((HWND)Handle, GWL_STYLE, Win32Style);
+	::SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, Win32StyleExt);
+
+	int ShowState = Maximized ? SW_SHOWMAXIMIZED : (Minimized ? SW_SHOWMINIMIZED : SW_SHOW);
+	::SetWindowPos((HWND)Handle, AlwaysOnTop ? HWND_TOPMOST : HWND_TOP, WindowPosX, WindowPosY, WindowWidth, WindowHeight, SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+	::EnableWindow((HWND)Handle, Enabled);
+	::ShowWindow((HWND)Handle, ShowState);
+
 	Output = ZEGROutput::CreateInstance(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	if (Output == NULL)
 		return false;
 
+	Output->SetFullScreen(FullScreen);
+
 	return true;
 }
-
 
 bool ZEGRWindow::DeinitializeInternal()
 {
@@ -788,13 +808,4 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	}
 
 	return Window;
-}
-
-void ZEGRWindow::Show()
-{
-	if (!IsInitialized())
-		return;
-
-	if (GetVisible())
-		::ShowWindow((HWND)Handle, SW_SHOW);
 }
