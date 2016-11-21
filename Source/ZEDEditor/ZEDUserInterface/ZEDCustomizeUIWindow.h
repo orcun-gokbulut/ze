@@ -38,6 +38,8 @@
 #include <QDialog>
 
 class Ui_ZEDCustomizeUIWindow;
+class ZEDMenu;
+class ZEDToolbar;
 class ZEDMainWindow;
 
 class ZEDCustomizeUIWindow : public QDialog
@@ -47,23 +49,35 @@ class ZEDCustomizeUIWindow : public QDialog
 		Ui_ZEDCustomizeUIWindow*			Form;
 		ZEDMainWindow*						MainWindow;
 
+		void								UpdateElements();
+		void								UpdateElement();
+		void								UpdateElementItems();
 		void								UpdateItems();
-		void								UpdateCommands();
-		void								UpdateNames();
-		void								UpdateCategories();
+		void								UpdateItemCategories();
+		void								UpdateUI();
+
+		bool								IsElementTypeMenu();
+		ZEDMenu*							GetMenu();
+		ZEDToolbar*							GetToolbar();
 
 	private slots:
-		void								radSelection_toggled(bool);
-		void								btnNew_clicked();
-		void								btnDelete_clicked();
-		void								cmbName_currentIndexChanged(int);
-		void								txtName_textChanged(const QString&);
-		void								txtTitle_textChanged(const QString&);
-		void								btnAddItem_clicked();
-		void								btnRemoveItem_clicked();
-		void								btnMoveUpItem_clicked();
-		void								btnMoveDownItem_clicked();
-		void								cmbCategory_currentIndexChanged(int);
+		void								radElementType_toggled(bool);
+		void								btnElementNew_clicked();
+		void								btnElementDelete_clicked();
+		void								cmbElements_currentIndexChanged(int);
+		void								txtElementName_textChanged(const QString&);
+		void								txtElementText_textChanged(const QString&);
+		void								chkElementVisible_toggled(bool);
+		void								btnElementItemAdd_clicked();
+		void								btnElementItemRemove_clicked();
+		void								btnElementItemUp_clicked();
+		void								btnElementItemDown_clicked();
+		void								lstElementItems_itemSelectionChanged();
+		void								radItemType_currentIndexChanged(int);
+		void								cmbItemCategory_currentIndexChanged(int);
+		void								lstItems_itemSelectionChanged();
+		void								btnDefault_clicked();
+		void								btnSave_clicked();
 
 	public:
 											ZEDCustomizeUIWindow(ZEDMainWindow* Window);

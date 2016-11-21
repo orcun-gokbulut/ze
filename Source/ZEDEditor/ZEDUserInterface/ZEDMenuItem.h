@@ -89,6 +89,9 @@ class ZEDMenuItem : public ZEObject
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
 		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
+										ZEDMenuItem();
+										~ZEDMenuItem();
+
 	public:
 		ZEDMenu*						GetMenu();
 
@@ -100,9 +103,11 @@ class ZEDMenuItem : public ZEObject
 
 		void							Update();
 
-		virtual bool					Load(ZEMLReaderNode* ItemNode);
-		virtual bool					Save(ZEMLWriterNode* ItemsNode);
+		bool							Load(ZEMLReaderNode* ItemNode);
+		bool							Save(ZEMLWriterNode* ItemsNode);
 
-										ZEDMenuItem();
-										~ZEDMenuItem();
+		virtual void					Destroy();
+
+		static ZEDMenuItem*				CreateInstance();
+
 };

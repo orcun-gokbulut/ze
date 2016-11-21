@@ -44,28 +44,151 @@
 #include "ZEDToolbar.h"
 #include "ZEDToolbarItem.h"
 #include "ZEDToolbarManager.h"
+#include "ZEDUIUtils.h"
+
+
+void ZEDCustomizeUIWindow::UpdateElements()
+{
+	QSignalBlocker cmbNameBlocker(Form->cmbElements);
+
+	if (Form->radElementTypeMenu->isChecked())
+	{
+		Form->cmbElements->clear();
+		const ZEArray<ZEDMenu*>& Menus = MainWindow->GetMenuManager()->GetMenus();
+		for (ZESize I = 0; I < Menus.GetCount(); I++)
+			Form->cmbElements->addItem(Menus[I]->GetName().ToCString());
+	}
+	else
+	{
+		Form->cmbElements->clear();
+		const ZEArray<ZEDToolbar*>& Toolbars = MainWindow->GetToolbarManager()->GetToolbars();
+		for (ZESize I = 0; I < Toolbars.GetCount(); I++)
+			Form->cmbElements->addItem(Toolbars[I]->GetName().ToCString());
+	}
+
+	UpdateElement();
+}
+
+void ZEDCustomizeUIWindow::UpdateElement()
+{
+	QSignalBlocker txtElementNameBlocker(Form->txtElementName);
+	QSignalBlocker txtElementTextBlocker(Form->txtElementText);
+	QSignalBlocker chkElementVisibleBlocker(Form->chkElementVisible);
+
+	if (IsElementTypeMenu())
+	{
+		if (GetMenu() == NULL)
+			return;
+
+		Form->txtElementName->setText(GetMenu()->GetName().ToCString());
+		Form->txtElementText->setText(GetMenu()->GetText().ToCString());
+	}
+	else
+	{
+		if (GetToolbar() == NULL)
+			return;
+
+		Form->txtElementName->setText(GetToolbar()->GetName().ToCString());
+		Form->txtElementText->setText(GetMenu()->GetText().ToCString());
+		Form->chkElementVisible->setChecked(GetToolbar()->GetVisible());
+	}
+}
 
 void ZEDCustomizeUIWindow::UpdateItems()
 {
-	QSignalBlocker lstItemsBlocker(Form->lstItems);
+	QSignalBlocker lstCommandsBlocker(Form->lstItems);
 
-	Form->lstItems->clear();
-	if (Form->radMenus->isChecked())
+	if (Form->radItemTypeCommand->isChecked())
+	{
+		ZEArray<ZEDCommand*> Commands;
+		if (Form->cmbItemCategory->currentText() == "<All>")
+			Commands = ZEDCommandManager::GetInstance()->GetCommands();
+		else
+			Commands = ZEDCommandManager::GetInstance()->GetCommands(Form->cmbItemCategory->currentText().toStdString());
+
+		Form->lstItems->clear();
+		Form->lstItems->addItem("<Seperator>");
+		for (ZESize I = 0; I < Commands.GetCount(); I++)
+		{
+			QListWidgetItem* ListItem = new QListWidgetItem();
+			ListItem->setText(Commands[I]->GetText().ToCString());
+			ListItem->setIcon(QIcon(ZEDUIUtils::GetIcon(Commands[I]->GetIcon())));
+			ListItem->setData(Qt::UserRole, QVariant((ZESize)Commands[I]));
+			Form->lstItems->addItem(ListItem);
+		}
+	}
+	else
+	{
+		ZEArray<ZEDMenu*> Menus = MainWindow->GetMenuManager()->GetMenus();
+		Form->lstItems->clear();
+		Form->lstItems->addItem("<Seperator>");
+		for (ZESize I = 0; I < Menus.GetCount(); I++)
+		{
+			QListWidgetItem* ListItem = new QListWidgetItem();
+			ListItem->setText(Menus[I]->GetText().ToCString());
+			ListItem->setIcon(QIcon(ZEDUIUtils::GetIcon(Menus[I]->GetIcon())));
+			ListItem->setData(Qt::UserRole, QVariant((ZESize)Menus[I]));
+			Form->lstItems->addItem(ListItem);
+		}
+	}
+
+	UpdateUI();
+}
+
+void ZEDCustomizeUIWindow::UpdateElementItems()
+{
+	QSignalBlocker lstItemsBlocker(Form->lstElementItems);
+
+	ZEDCommandManager* Manager = ZEDCommandManager::GetInstance();
+
+	Form->lstElementItems->clear();
+	if (Form->radElementTypeMenu->isChecked())
 	{
 		const ZEArray<ZEDMenu*>& Menus = MainWindow->GetMenuManager()->GetMenus();
 		for (ZESize I = 0; I < Menus.GetCount(); I++)
 		{
 			ZEDMenu* Menu = Menus[I];
-			if (Menu->GetName() != Form->cmbName->currentText())
+			if (Menu->GetName() != Form->cmbElements->currentText())
 				continue;
 
 			const ZEArray<ZEDMenuItem*>& Items = Menu->GetItems();
 			for (ZESize I = 0; I < Items.GetCount(); I++)
 			{
+				QListWidgetItem* ListItem = new QListWidgetItem();
+				ListItem->setData(Qt::UserRole, QVariant((ZESize)Items[I]));
+
 				if (Items[I]->GetType() == ZED_MIT_SEPERATOR)
-					Form->lstItems->addItem("<Seperator>");
-				else
-					Form->lstItems->addItem(Items[I]->GetTargetName().ToCString());
+				{
+					ListItem->setText("----------------");
+				}
+				else if (Items[I]->GetType() == ZED_TIT_COMMAND)
+				{
+					ZEDCommand* Command = Manager->GetCommand(Items[I]->GetTargetName());
+					if (Command != NULL)
+					{
+						ListItem->setIcon(QIcon(ZEDUIUtils::GetIcon(Command->GetIcon())));
+						ListItem->setText(Command->GetText().ToCString());
+					}
+					else
+					{
+						ListItem->setText("<Error: Command Not Found>");
+					}
+				}
+				else if (Items[I]->GetType() == ZED_MIT_MENU_POINTER)
+				{
+					ZEDMenu* Menu = MainWindow->GetMenuManager()->GetMenu(Items[I]->GetTargetName());
+					if (Menu != NULL)
+					{
+						ListItem->setIcon(QIcon(ZEDUIUtils::GetIcon(Menu->GetIcon())));
+						ListItem->setText(Menu->GetText().ToCString());
+					}
+					else
+					{
+						ListItem->setText("<Error: Menu Not Found>");
+					}
+				}
+
+				Form->lstElementItems->addItem(ListItem);
 			}
 
 			break;
@@ -77,143 +200,313 @@ void ZEDCustomizeUIWindow::UpdateItems()
 		for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 		{
 			ZEDToolbar* Toolbar = Toolbars[I];
-			if (Toolbar->GetName() != Form->cmbName->currentText())
+			if (Toolbar->GetName() != Form->cmbElements->currentText())
 				continue;
 
 			const ZEArray<ZEDToolbarItem*>& Items = Toolbar->GetItems();
 			for (ZESize I = 0; I < Items.GetCount(); I++)
 			{
+				QListWidgetItem* ListItem = new QListWidgetItem();
+				ListItem->setData(Qt::UserRole, QVariant((ZESize)Items[I]));
+
 				if (Items[I]->GetType() == ZED_MIT_SEPERATOR)
-					Form->lstItems->addItem("<Seperator>");
-				else
-					Form->lstItems->addItem(Items[I]->GetTargetName().ToCString());
+				{
+					ListItem->setText("----------------");
+				}
+				else if (Items[I]->GetType() == ZED_TIT_COMMAND)
+				{
+					ZEDCommand* Command = Manager->GetCommand(Items[I]->GetTargetName());
+					if (Command == NULL)
+					{
+						ListItem->setIcon(QIcon(ZEDUIUtils::GetIcon(Command->GetIcon())));
+						ListItem->setText(Command->GetText().ToCString());
+					}
+					else
+					{
+						ListItem->setText("<Error: Command Not Found>");
+					}
+
+				}
+		
+				Form->lstElementItems->addItem(ListItem);
 			}
 
 			break;
 		}
 	}
+
+	UpdateUI();
 }
 
-void ZEDCustomizeUIWindow::UpdateCommands()
+void ZEDCustomizeUIWindow::UpdateItemCategories()
 {
-	QSignalBlocker lstCommandsBlocker(Form->lstCommands);
+	if (Form->radItemTypeMenu->isChecked())
+		return;
 
-	ZEArray<ZEDCommand*> Commands;
-	if (Form->cmbCategory->currentText() == "<All>")
-		Commands = ZEDCommandManager::GetInstance()->GetCommands();
-	else
-		Commands = ZEDCommandManager::GetInstance()->GetCommands(Form->cmbCategory->currentText().toStdString());
-
-	Form->lstCommands->clear();
-	Form->lstCommands->addItem("<Seperator>");
-	for (ZESize I = 0; I < Commands.GetCount(); I++)
-		Form->lstCommands->addItem(Commands[I]->GetName().ToCString());
-}
-
-void ZEDCustomizeUIWindow::UpdateNames()
-{
-	QSignalBlocker cmbNameBlocker(Form->cmbName);
-
-	if (Form->radMenus->isChecked())
-	{
-		Form->cmbName->clear();
-		const ZEArray<ZEDMenu*>& Menus = MainWindow->GetMenuManager()->GetMenus();
-		for (ZESize I = 0; I < Menus.GetCount(); I++)
-			Form->cmbName->addItem(Menus[I]->GetName().ToCString());
-	}
-	else
-	{
-		Form->cmbName->clear();
-		const ZEArray<ZEDToolbar*>& Toolbars = MainWindow->GetToolbarManager()->GetToolbars();
-		for (ZESize I = 0; I < Toolbars.GetCount(); I++)
-			Form->cmbName->addItem(Toolbars[I]->GetName().ToCString());
-	}
-}
-
-void ZEDCustomizeUIWindow::UpdateCategories()
-{
-	QSignalBlocker cmbCategoryBlocker(Form->cmbCategory);
+	QSignalBlocker cmbCategoryBlocker(Form->cmbItemCategory);
 
 	ZEArray<ZEString> Categories = ZEDCommandManager::GetInstance()->GetCatagories();
-	Form->cmbCategory->clear();
-	Form->cmbCategory->addItem("<All>");
+	Form->cmbItemCategory->clear();
+	Form->cmbItemCategory->addItem("<All>");
 	for (ZESize I = 0; I < Categories.GetCount(); I++)
-		Form->cmbCategory->addItem(Categories[I].ToCString());
-
+		Form->cmbItemCategory->addItem(Categories[I].ToCString());
 }
 
-void ZEDCustomizeUIWindow::radSelection_toggled(bool)
+void ZEDCustomizeUIWindow::UpdateUI()
 {
-	UpdateNames();
+	bool ElementSelected = Form->cmbElements->currentIndex() != -1;
+	Form->txtElementName->setEnabled(ElementSelected);
+	Form->txtElementText->setEnabled(ElementSelected);
+	Form->chkElementVisible->setEnabled(ElementSelected && !IsElementTypeMenu());
+	Form->lstElementItems->setEnabled(ElementSelected);
+	Form->btnElementItemAdd->setEnabled(ElementSelected && Form->lstItems->selectedItems().count() != 0);
+	Form->btnElementItemRemove->setEnabled(ElementSelected && Form->lstElementItems->selectedItems().count() != 0);
+
+	int Index = Form->lstElementItems->currentIndex().row();
+	int Count = Form->lstElementItems->count();
+
+	Form->btnElementItemUp->setEnabled(ElementSelected && Count > 1 && Index > 0);
+	Form->btnElementItemDown->setEnabled(ElementSelected && Count > 1 && Index != -1 && Index + 1 != Count);
+
+	Form->cmbItemCategory->setEnabled(Form->radItemTypeCommand->isChecked());
+	Form->radItemTypeMenu->setEnabled(Form->radElementTypeMenu->isChecked());
+}
+
+bool ZEDCustomizeUIWindow::IsElementTypeMenu()
+{
+	return Form->radElementTypeMenu->isChecked();
+}
+
+ZEDMenu* ZEDCustomizeUIWindow::GetMenu()
+{
+	return MainWindow->GetMenuManager()->GetMenus()[Form->cmbElements->currentIndex()];
+}
+
+ZEDToolbar* ZEDCustomizeUIWindow::GetToolbar()
+{
+	return MainWindow->GetToolbarManager()->GetToolbars()[Form->cmbElements->currentIndex()];
+}
+
+void ZEDCustomizeUIWindow::radElementType_toggled(bool)
+{
+	if (Form->radElementTypeToolbar->isChecked())
+		Form->radItemTypeCommand->setChecked(true);
+
+	UpdateElements();
+	UpdateElementItems();
 	UpdateItems();
 }
 
-void ZEDCustomizeUIWindow::btnNew_clicked()
+void ZEDCustomizeUIWindow::btnElementNew_clicked()
 {
-
+	UpdateUI();
 }
 
-void ZEDCustomizeUIWindow::btnDelete_clicked()
+void ZEDCustomizeUIWindow::btnElementDelete_clicked()
 {
+	if (IsElementTypeMenu())
+	{
+		ZEDMenu* Menu = reinterpret_cast<ZEDMenu*>(Form->cmbElements->currentData(Qt::UserRole).toULongLong());
+		Menu->Destroy();
 
+	}
+	UpdateElements();
+	UpdateElementItems();
 }
 
-void ZEDCustomizeUIWindow::cmbCategory_currentIndexChanged(int)
+void ZEDCustomizeUIWindow::cmbElements_currentIndexChanged(int)
 {
-	UpdateCommands();
+	UpdateElement();
+	UpdateElementItems();
 }
 
-void ZEDCustomizeUIWindow::cmbName_currentIndexChanged(int)
+void ZEDCustomizeUIWindow::txtElementName_textChanged(const QString&)
+{
+	if (IsElementTypeMenu())
+		GetMenu()->SetName(Form->txtElementName->text().toStdString());
+	else
+		GetToolbar()->SetName(Form->txtElementName->text().toStdString());
+
+	UpdateElements();
+	UpdateUI();
+}
+
+void ZEDCustomizeUIWindow::txtElementText_textChanged(const QString&)
+{
+	if (IsElementTypeMenu())
+		GetMenu()->SetText(Form->txtElementText->text().toStdString());
+	else
+		GetToolbar()->SetText(Form->txtElementText->text().toStdString());
+
+	UpdateUI();
+}
+
+void ZEDCustomizeUIWindow::chkElementVisible_toggled(bool)
+{
+	GetToolbar()->SetVisible(Form->chkElementVisible->isChecked());
+}
+
+void ZEDCustomizeUIWindow::btnElementItemAdd_clicked()
+{
+	int ItemIndex = Form->lstItems->currentIndex().row() - 1;
+	if (IsElementTypeMenu())
+	{
+		if (Form->radItemTypeMenu->isChecked())
+		{
+			ZEDMenu* TargetMenu = reinterpret_cast<ZEDMenu*>(Form->lstItems->selectedItems()[0]->data(Qt::UserRole).toULongLong());
+			ZEDMenuItem* Item = ZEDMenuItem::CreateInstance();
+			if (TargetMenu == NULL)
+			{
+				Item->SetType(ZED_MIT_SEPERATOR);
+			}
+			else
+			{
+				Item->SetType(ZED_MIT_MENU_POINTER);
+				Item->SetTargetName(TargetMenu->GetName());
+			}
+			GetMenu()->AddItem(Item);
+		}
+		else
+		{
+			ZEDCommand* TargetCommand = reinterpret_cast<ZEDCommand*>(Form->lstItems->selectedItems()[0]->data(Qt::UserRole).toULongLong());
+			ZEDMenuItem* Item = ZEDMenuItem::CreateInstance();
+			if (TargetCommand == NULL)
+			{
+				Item->SetType(ZED_MIT_SEPERATOR);
+			}
+			else
+			{
+				Item->SetType(ZED_MIT_COMMAND);
+				Item->SetTargetName(TargetCommand->GetName());
+			}
+			GetMenu()->AddItem(Item);
+		}
+	}
+	else
+	{
+		ZEDCommand* TargetCommand = reinterpret_cast<ZEDCommand*>(Form->lstItems->selectedItems()[0]->data(Qt::UserRole).toULongLong());
+		ZEDToolbarItem* Item = ZEDToolbarItem::CreateInstance();
+		if (TargetCommand == NULL)
+		{
+			Item->SetType(ZED_TIT_SEPERATOR);
+		}
+		else
+		{
+			Item->SetType(ZED_TIT_COMMAND);
+			Item->SetTargetName(TargetCommand->GetName());
+		}
+		GetToolbar()->AddItem(Item);
+	}
+
+	UpdateElementItems();
+}
+
+void ZEDCustomizeUIWindow::btnElementItemRemove_clicked()
+{
+	if (IsElementTypeMenu())
+	{
+		ZEDMenuItem* MenuItem = reinterpret_cast<ZEDMenuItem*>(Form->lstElementItems->selectedItems()[0]->data(Qt::UserRole).toULongLong());
+		MenuItem->Destroy();
+
+	}
+	else
+	{
+		ZEDToolbarItem* ToolbarItem = reinterpret_cast<ZEDToolbarItem*>(Form->lstElementItems->selectedItems()[0]->data(Qt::UserRole).toULongLong());
+		ToolbarItem->Destroy();
+	}
+	
+	UpdateElementItems();
+}
+
+void ZEDCustomizeUIWindow::btnElementItemUp_clicked()
+{
+	QListWidgetItem* ListItem = Form->lstElementItems->selectedItems()[0];
+	int ListItemIndex = Form->lstElementItems->row(ListItem);
+
+	if (IsElementTypeMenu())
+	{
+		ZEDMenuItem* MenuItem = reinterpret_cast<ZEDMenuItem*>(ListItem->data(Qt::UserRole).toULongLong());
+		ZEDMenu* Menu = MenuItem->GetMenu();
+		ZESize Index = Menu->GetItems().FindIndex(MenuItem);
+		Menu->RemoveItem(MenuItem);
+		Index--;
+		Menu->InsertItem(Index, MenuItem);
+	}
+	else
+	{
+		ZEDToolbarItem* ToolbarItem = reinterpret_cast<ZEDToolbarItem*>(ListItem->data(Qt::UserRole).toULongLong());
+		ZEDToolbar* Toolbar = ToolbarItem->GetToolbar();
+		ZESize Index = Toolbar->GetItems().FindIndex(ToolbarItem);
+		Toolbar->RemoveItem(ToolbarItem);
+		Index--;
+		Toolbar->InsertItem(Index, ToolbarItem);
+	}
+
+	UpdateElementItems();
+	Form->lstElementItems->setCurrentRow(ListItemIndex - 1);
+}
+
+void ZEDCustomizeUIWindow::btnElementItemDown_clicked()
+{
+	QListWidgetItem* ListItem = Form->lstElementItems->selectedItems()[0];
+	int ListItemIndex = Form->lstElementItems->row(ListItem);
+
+	if (IsElementTypeMenu())
+	{
+		ZEDMenuItem* MenuItem = reinterpret_cast<ZEDMenuItem*>(ListItem->data(Qt::UserRole).toULongLong());
+		ZEDMenu* Menu = MenuItem->GetMenu();
+		ZESize Index = Menu->GetItems().FindIndex(MenuItem);
+		Menu->RemoveItem(MenuItem);
+		Index++;
+		Menu->InsertItem(Index, MenuItem);
+	}
+	else
+	{
+		ZEDToolbarItem* ToolbarItem = reinterpret_cast<ZEDToolbarItem*>(ListItem->data(Qt::UserRole).toULongLong());
+		ZEDToolbar* Toolbar = ToolbarItem->GetToolbar();
+		ZESize Index = Toolbar->GetItems().FindIndex(ToolbarItem);
+		Toolbar->RemoveItem(ToolbarItem);
+		Index++;
+		Toolbar->InsertItem(Index, ToolbarItem);
+	}
+
+	UpdateElementItems();
+	Form->lstElementItems->setCurrentRow(ListItemIndex + 1);		
+}
+
+void ZEDCustomizeUIWindow::lstElementItems_itemSelectionChanged()
+{
+	UpdateUI();
+}
+
+void ZEDCustomizeUIWindow::radItemType_currentIndexChanged(int)
 {
 	UpdateItems();
 }
 
-void ZEDCustomizeUIWindow::txtName_textChanged(const QString&)
+void ZEDCustomizeUIWindow::cmbItemCategory_currentIndexChanged(int)
 {
-	if (Form->radMenus->isChecked())
-	{
-		ZEDMenu* Menu = MainWindow->GetMenuManager()->GetMenus()[Form->cmbName->currentIndex()];
-		Menu->SetName(Form->txtName->text().toStdString());
-	}
-	else
-	{
-		ZEDToolbar* Toolbar = MainWindow->GetToolbarManager()->GetToolbars()[Form->cmbName->currentIndex()];
-		Toolbar->SetName(Form->txtName->text().toStdString());
-	}
+	UpdateItems();
 }
 
-void ZEDCustomizeUIWindow::txtTitle_textChanged(const QString&)
+void ZEDCustomizeUIWindow::lstItems_itemSelectionChanged()
 {
-	if (Form->radMenus->isChecked())
-	{
-		ZEDMenu* Menu = MainWindow->GetMenuManager()->GetMenus()[Form->cmbName->currentIndex()];
-		Menu->SetName(Form->txtName->text().toStdString());
-	}
-	else
-	{
-		ZEDToolbar* Toolbar = MainWindow->GetToolbarManager()->GetToolbars()[Form->cmbName->currentIndex()];
-		Toolbar->SetName(Form->txtName->text().toStdString());
-	}
+	UpdateUI();
 }
 
-void ZEDCustomizeUIWindow::btnAddItem_clicked()
+void ZEDCustomizeUIWindow::btnDefault_clicked()
 {
-
+	MainWindow->GetMenuManager()->Load("#R:/ZEDEditor/MenusDefault.ZEConfig");
+	MainWindow->GetToolbarManager()->Load("#R:/ZEDEditor/ToolbarsDefault.ZEConfig");
+	UpdateElements();
+	UpdateElementItems();
 }
 
-void ZEDCustomizeUIWindow::btnRemoveItem_clicked()
+void ZEDCustomizeUIWindow::btnSave_clicked()
 {
-
-}
-
-void ZEDCustomizeUIWindow::btnMoveUpItem_clicked()
-{
-
-}
-
-void ZEDCustomizeUIWindow::btnMoveDownItem_clicked()
-{
-
+	MainWindow->GetMenuManager()->Save("#S:/ZEDEditor/Menus.ZEConfig");
+	MainWindow->GetToolbarManager()->Save("#S:/ZEDEditor/Toolbars.ZEConfig");
+	close();
 }
 
 ZEDCustomizeUIWindow::ZEDCustomizeUIWindow(ZEDMainWindow* MainWindow)
@@ -222,23 +515,34 @@ ZEDCustomizeUIWindow::ZEDCustomizeUIWindow(ZEDMainWindow* MainWindow)
 	Form = new Ui_ZEDCustomizeUIWindow();
 	Form->setupUi(this);
 
-	UpdateCategories();
-	UpdateCommands();
-	UpdateNames();
+	UpdateItemCategories();
 	UpdateItems();
+	UpdateElements();
+	UpdateElement();
+	UpdateElementItems();
+	UpdateUI();
 
-	connect(Form->radMenus, SIGNAL(toggled(bool)), this, SLOT(radSelection_toggled(bool)));
-	connect(Form->radToolbars, SIGNAL(toggled(bool)), this, SLOT(radSelection_toggled(bool)));
-	connect(Form->btnNew, SIGNAL(clicked()), this, SLOT(btnNew_clicked()));
-	connect(Form->btnDelete, SIGNAL(clicked()), this, SLOT(btnDelete_clicked()));
-	connect(Form->cmbName, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbName_currentIndexChanged(int)));
-	connect(Form->txtName, SIGNAL(textChanged(const QString&)), this, SLOT(txtName_textChanged(const QString&)));
-	connect(Form->txtTitle, SIGNAL(textChanged(const QString&)), this, SLOT(txtTitle_textChanged(const QString&)));
-	connect(Form->btnAddItem, SIGNAL(clicked()), this, SLOT(btnAddItem_clicked()));
-	connect(Form->btnRemoveItem, SIGNAL(clicked()), this, SLOT(btnRemoveItem_clicked()));
-	connect(Form->btnMoveUpItem, SIGNAL(clicked()), this, SLOT(btnMoveUpItem_clicked()));
-	connect(Form->btnMoveDownItem, SIGNAL(clicked()), this, SLOT(btnMoveDownItem_clicked()));
-	connect(Form->cmbCategory, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCategory_currentIndexChanged(int)));
+	connect(Form->radElementTypeMenu, SIGNAL(toggled(bool)), this, SLOT(radElementType_toggled(bool)));
+	connect(Form->radElementTypeToolbar, SIGNAL(toggled(bool)), this, SLOT(radElementType_toggled(bool)));
+	connect(Form->cmbElements, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbElements_currentIndexChanged(int)));
+	connect(Form->btnElementNew, SIGNAL(clicked()), this, SLOT(btnElementNew_clicked()));
+	connect(Form->btnElementDelete, SIGNAL(clicked()), this, SLOT(btnElementDelete_clicked()));
+	connect(Form->txtElementName, SIGNAL(textChanged(const QString&)), this, SLOT(txtElementName_textChanged(const QString&)));
+	connect(Form->txtElementText, SIGNAL(textChanged(const QString&)), this, SLOT(txtElementText_textChanged(const QString&)));
+	connect(Form->chkElementVisible, SIGNAL(toggled(bool)), this, SLOT(chkElementVisible_toggled(bool)));
+	connect(Form->btnElementItemAdd, SIGNAL(clicked()), this, SLOT(btnElementItemAdd_clicked()));
+	connect(Form->btnElementItemRemove, SIGNAL(clicked()), this, SLOT(btnElementItemRemove_clicked()));
+	connect(Form->btnElementItemUp, SIGNAL(clicked()), this, SLOT(btnElementItemUp_clicked()));
+	connect(Form->btnElementItemDown, SIGNAL(clicked()), this, SLOT(btnElementItemDown_clicked()));
+	connect(Form->lstElementItems, SIGNAL(itemSelectionChanged()), this, SLOT(lstElementItems_itemSelectionChanged()));
+
+	connect(Form->radItemTypeCommand, SIGNAL(toggled(bool)), this, SLOT(radElementType_toggled(bool)));
+	connect(Form->radItemTypeMenu, SIGNAL(toggled(bool)), this, SLOT(radElementType_toggled(bool)));
+	connect(Form->cmbItemCategory, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbItemCategory_currentIndexChanged(int)));
+	connect(Form->lstItems, SIGNAL(itemSelectionChanged()), this, SLOT(lstItems_itemSelectionChanged()));
+
+	connect(Form->btnDefault, SIGNAL(clicked()), this, SLOT(btnDefault_clicked()));
+	connect(Form->btnSave, SIGNAL(clicked()), this, SLOT(btnSave_clicked()));
 }
 
 ZEDCustomizeUIWindow::~ZEDCustomizeUIWindow()

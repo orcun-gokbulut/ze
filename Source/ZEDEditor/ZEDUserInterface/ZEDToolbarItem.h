@@ -75,7 +75,7 @@ class ZEDToolbarItem : public ZEObject
 	friend class ZEDToolbar;
 	private:
 		ZEDToolbarAction*				Action;
-		ZEDToolbar*					Toolbar;
+		ZEDToolbar*						Toolbar;
 		ZEDToolbarItemType				Type;
 		QMenu*							SubMenu;
 
@@ -89,8 +89,11 @@ class ZEDToolbarItem : public ZEObject
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
 		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
+										ZEDToolbarItem();
+										~ZEDToolbarItem();
+
 	public:
-		ZEDToolbar*					GetToolbar();
+		ZEDToolbar*						GetToolbar();
 
 		void							SetType(ZEDToolbarItemType Type);
 		ZEDToolbarItemType				GetType() const;
@@ -100,9 +103,11 @@ class ZEDToolbarItem : public ZEObject
 
 		void							Update();
 
-		virtual bool					Load(ZEMLReaderNode* ItemNode);
-		virtual bool					Save(ZEMLWriterNode* ItemsNode);
+		bool							Load(ZEMLReaderNode* ItemNode);
+		bool							Save(ZEMLWriterNode* ItemsNode);
 
-										ZEDToolbarItem();
-										~ZEDToolbarItem();
+		virtual void					Destroy();
+
+		static ZEDToolbarItem*			CreateInstance();
+
 };

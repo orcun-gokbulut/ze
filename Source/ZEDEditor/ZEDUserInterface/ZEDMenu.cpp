@@ -35,6 +35,7 @@
 
 #include "ZEDMenu.h"
 
+#include "ZEDMenuManager.h"
 #include "ZEDMenuItem.h"
 #include "ZEDCommand.h"
 #include "ZEDUIUtils.h"
@@ -55,6 +56,9 @@ ZEDMenu::ZEDMenu()
 
 ZEDMenu::~ZEDMenu()
 {
+	if (!GetManager() != NULL)
+		GetManager()->RemoveMenu(this);
+
 	ClearItems();
 	delete Menu;
 }
@@ -64,7 +68,7 @@ ZEDMenuManager* ZEDMenu::GetManager()
 	return Manager;
 }
 
-void ZEDMenu::SetName(const ZEString&	Name)
+void ZEDMenu::SetName(const ZEString& Name)
 {
 	if (this->Name == Name)
 		return;
@@ -128,10 +132,11 @@ void ZEDMenu::AddItem(ZEDMenuItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is NULL");
 	zeDebugCheck(Item->Menu != NULL, "Cannot insert menu item. Item is already added.");
 
-	Items.Add(Item);
-
 	Item->Menu = this;
 	Item->Action = new ZEDMenuAction(Item);
+	Item->Update();
+
+	Items.Add(Item);
 	Menu->addAction(Item->Action);
 }
 
@@ -140,14 +145,21 @@ void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot insert menu item. Item is NULL");
 	zeDebugCheck(Item->Menu != NULL, "Cannot insert menu item. Item is already added.");
 
-	if (Items.GetCount() >= Index)
-		Items.Add(Item);
-	else
-		Items.Insert(Index, Item);
 
 	Item->Menu = this;
 	Item->Action = new ZEDMenuAction(Item);
-	Menu->addAction(Item->Action);
+	Item->Update();
+
+	if (Index >= Items.GetCount())
+	{
+		Items.Add(Item);
+		Menu->addAction(Item->Action);
+	}
+	else
+	{
+		Items.Insert(Index, Item);
+		Menu->insertAction(Menu->actions()[Index], Item->Action);
+	}
 }
 
 void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
@@ -156,6 +168,7 @@ void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
 	zeDebugCheck(Item->Menu != this, "Cannot delete menu item. Item is belong to this menu.");
 
 	delete Item->Action;
+	Item->Menu = NULL;
 	Items.RemoveValue(Item);
 }
 

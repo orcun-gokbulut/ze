@@ -66,6 +66,7 @@ class ZEDToolbar : public ZEObject
 		ZEString						Name;
 		ZEString						Text;
 		ZEString						Icon;
+		bool							Visible;
 		ZEDToolbarDockLocation			DockLocation;
 		ZEUInt							DockColumn;
 		ZEUInt							DockRow;
@@ -85,6 +86,9 @@ class ZEDToolbar : public ZEObject
 		void							SetIcon(const ZEString& Icon);
 		const ZEString&					GetIcon() const;
 
+		void							SetVisible(bool Visible);
+		bool							GetVisible() const;
+
 		void							SetDockLocation(ZEDToolbarDockLocation Position);
 		ZEDToolbarDockLocation			GetDockLocation() const;
 
@@ -93,6 +97,7 @@ class ZEDToolbar : public ZEObject
 
 		void							SetDockRow(ZEUInt Row);
 		ZEUInt							GetDockRow() const;
+
 
 		QToolBar*						GetNativeToolbar();
 

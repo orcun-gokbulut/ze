@@ -112,6 +112,25 @@ void ZEDToolbarItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
 	Update();
 }
 
+ZEDToolbarItem::ZEDToolbarItem()
+{
+	Action = NULL;
+	Toolbar = NULL;
+	SubMenu = NULL;
+	Type = ZED_TIT_NONE;
+	TargetCommand = NULL;
+	TargetMenu = NULL;
+}
+
+ZEDToolbarItem::~ZEDToolbarItem()
+{
+	if (GetToolbar() != NULL)
+		GetToolbar()->RemoveItem(this);
+
+	if (SubMenu != NULL)
+		delete SubMenu;
+}
+
 ZEDToolbar* ZEDToolbarItem::GetToolbar()
 {
 	return Toolbar;
@@ -280,18 +299,12 @@ bool ZEDToolbarItem::Save(ZEMLWriterNode* ItemNode)
 	return true;
 }
 
-ZEDToolbarItem::ZEDToolbarItem()
+void ZEDToolbarItem::Destroy()
 {
-	Action = NULL;
-	Toolbar = NULL;
-	SubMenu = NULL;
-	Type = ZED_TIT_NONE;
-	TargetCommand = NULL;
-	TargetMenu = NULL;
+	delete this;
 }
 
-ZEDToolbarItem::~ZEDToolbarItem()
+ZEDToolbarItem* ZEDToolbarItem::CreateInstance()
 {
-	if (SubMenu != NULL)
-		delete SubMenu;
+	return new ZEDToolbarItem();
 }
