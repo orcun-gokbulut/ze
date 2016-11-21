@@ -39,7 +39,6 @@
 #include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZEPointer/ZEHolder.h"
 
 struct IDXGISwapChain1;
 
@@ -48,36 +47,17 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 	ZE_DISALLOW_COPY(ZED11Output)
 	friend class ZED11Module;
 	private:
-		void*								Handle;
-		mutable ZEGRMonitor*				Monitor;
-
-		ZEHolder<ZEGRTexture>				Texture;
-
 		IDXGISwapChain1*					SwapChain;
 
-		bool								Fullscreen;
-		bool								RestrictedToMonitor;
-
-		void								SwitchToFullscreen();
-		void								UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-
-		virtual bool						Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		virtual bool						Initialize(const ZEGRWindow* Window, ZEGRFormat Format);
 		virtual	void						Deinitialize();
 
 											ZED11Output();
 		virtual								~ZED11Output();
 
 	public:
-		virtual void*						GetHandle() const;
-		virtual ZEGRTexture*				GetTexture() const;
-
-		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor);
-		virtual ZEGRMonitor*				GetMonitor() const;
-
-		virtual void						SetFullscreen(bool Enabled);
-		virtual bool						GetFullscreen() const;
+		virtual void						SetFullScreen(bool FullScreen);
 
 		virtual void						Resize(ZEUInt Width, ZEUInt Height);
-
 		virtual void						Present();
 };
