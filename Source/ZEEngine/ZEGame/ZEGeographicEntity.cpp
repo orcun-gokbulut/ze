@@ -40,12 +40,6 @@
 #define ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM		0x0002
 #define ZE_GEDF_LOCAL_TRANSFORM					0x0004 
 
-
-bool ZEGeographicEntity::CheckParent(ZEEntity* Parent)
-{
-	return false;
-}
-
 void ZEGeographicEntity::GeographicTransformChanged()
 {
 	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM | ZE_GEDF_LOCAL_TRANSFORM);
