@@ -85,6 +85,7 @@ typedef ZEFlags ZEDToolbarDefaults;
 class ZEDMainWindow : public QObject, public ZEDComponent
 {
 	Q_OBJECT
+	friend class ZEDCustomizeUIWindow;
 	private:
 		Ui_ZEDMainWindow*					Form;
 		QMainWindow*						MainWindow;
@@ -98,7 +99,8 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
 
-		void								ToolbarMenuCallback(ZEDMenu* Menu);
+		void								PopulateMainMenu();
+		void								PopulateToolbars();
 
 		virtual bool						InitializeInternal();
 
@@ -109,6 +111,7 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		void								RegisterCommands();
 
+		void								MainMenu_OnUpdated(ZEDMenu* Menu);
 		void								CustomizeUICommand_OnAction(const ZEDCommand* Command);
 
 	public:
@@ -119,10 +122,6 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		const ZEArray<ZEDWindow*>&			GetWindows();
 		void								AddWindow(ZEDWindow* Widget, ZEDWindowDefaults = ZED_WD_VISIBLE);
 		void								RemoveWindow(ZEDWindow* Widget);
-
-		const ZEArray<ZEDToolbar*>&			GetToolbars();
-		void								AddToolbar(ZEDToolbar* Toolbar, ZEDToolbarDefaults Default = ZED_TD_VISIBLE | ZED_TD_PLACE_TOP);
-		void								RemoveToolbar(ZEDToolbar* Toolbar);
 
 		void								SetViewport(ZEDViewport* Viewport);
 		ZEDViewport*						GetViewport();

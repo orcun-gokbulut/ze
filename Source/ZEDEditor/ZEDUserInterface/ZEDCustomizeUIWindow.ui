@@ -278,13 +278,21 @@
           </layout>
          </item>
          <item row="4" column="0" colspan="2">
-          <widget class="QListWidget" name="lstElementItems">
+          <widget class="QTreeWidget" name="lstElementItems">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
            </property>
+           <property name="headerHidden">
+            <bool>true</bool>
+           </property>
+           <column>
+            <property name="text">
+             <string notr="true">1</string>
+            </property>
+           </column>
           </widget>
          </item>
         </layout>
@@ -351,7 +359,19 @@
         </layout>
        </item>
        <item>
-        <widget class="QListWidget" name="lstItems"/>
+        <widget class="QTreeWidget" name="lstItems">
+         <property name="itemsExpandable">
+          <bool>false</bool>
+         </property>
+         <attribute name="headerVisible">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
        </item>
       </layout>
      </widget>

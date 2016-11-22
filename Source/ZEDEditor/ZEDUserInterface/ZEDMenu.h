@@ -58,6 +58,7 @@ class ZEDMenu : public ZEObject
 		ZEString						Name;
 		ZEString						Text;
 		ZEString						Icon;
+		bool							Protected;
 
 										ZEDMenu();
 										~ZEDMenu();
@@ -73,6 +74,9 @@ class ZEDMenu : public ZEObject
 
 		void							SetIcon(const ZEString& Icon);
 		const ZEString&					GetIcon() const;
+
+		void							SetProtected(bool Protected);
+		bool							GetProtected() const;
 
 		QMenu*							GetNativeMenu();
 

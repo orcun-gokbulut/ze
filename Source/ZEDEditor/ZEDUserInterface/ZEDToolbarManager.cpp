@@ -94,13 +94,21 @@ bool ZEDToolbarManager::RemoveToolbar(ZEDToolbar* Toolbar)
 	zeCheckError(!Toolbars.Exists(Toolbar), false, "Cannot remove toolbar. Toolbar is not added. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
 	Toolbar->Manager = NULL;
-	Toolbars.Add(Toolbar);
+	Toolbars.RemoveValue(Toolbar);
 
 	return true;
 }
 
+void ZEDToolbarManager::ClearToolbars()
+{
+	while(Toolbars.GetCount() != 0)
+		Toolbars.GetFirstItem()->Destroy();
+}
+
 bool ZEDToolbarManager::Load(const ZEString& ConfigurationFile)
 {
+	ClearToolbars();
+
 	ZEMLReader Reader;
 	if (!Reader.Open(ConfigurationFile))
 	{
@@ -141,6 +149,7 @@ bool ZEDToolbarManager::Load(const ZEString& ConfigurationFile)
 bool ZEDToolbarManager::Save(const ZEString& ConfigurationFile)
 {
 	ZEMLWriter Writer;
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
 	if (!Writer.Open(ConfigurationFile))
 	{
 		zeError("Cannor load configuration. File Name: \"%s\".", ConfigurationFile.ToCString());

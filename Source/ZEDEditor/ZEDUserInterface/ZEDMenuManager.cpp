@@ -93,13 +93,21 @@ bool ZEDMenuManager::RemoveMenu(ZEDMenu* Menu)
 	zeCheckError(!Menus.Exists(Menu), false, "Cannot remove menu. Menu is not added. Menu Name: \"%s\".", Menu->GetName().ToCString());
 
 	Menu->Manager = NULL;
-	Menus.Add(Menu);
+	Menus.RemoveValue(Menu);
 
 	return true;
 }
 
+void ZEDMenuManager::ClearMenus()
+{
+	while(Menus.GetCount() != 0)
+		Menus.GetFirstItem()->Destroy();
+}
+
 bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 {
+	ClearMenus();
+
 	ZEMLReader Reader;
 	if (!Reader.Open(ConfigurationFile))
 	{
@@ -140,6 +148,7 @@ bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 bool ZEDMenuManager::Save(const ZEString& ConfigurationFile)
 {
 	ZEMLWriter Writer;
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
 	if (!Writer.Open(ConfigurationFile))
 	{
 		zeError("Cannor load configuration. File Name: \"%s\".", ConfigurationFile.ToCString());

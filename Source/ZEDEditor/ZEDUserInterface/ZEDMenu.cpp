@@ -52,11 +52,12 @@ ZEDMenu::ZEDMenu()
 {
 	Manager = NULL;
 	Menu = new QMenu();
+	Protected = false;
 }
 
 ZEDMenu::~ZEDMenu()
 {
-	if (!GetManager() != NULL)
+	if (GetManager() != NULL)
 		GetManager()->RemoveMenu(this);
 
 	ClearItems();
@@ -117,6 +118,16 @@ const ZEString& ZEDMenu::GetIcon() const
 	return Icon;
 }
 
+void ZEDMenu::SetProtected(bool Protected)
+{
+	this->Protected = Protected;
+}
+
+bool ZEDMenu::GetProtected() const
+{
+	return Protected;
+}
+
 const ZEArray<ZEDMenuItem*>& ZEDMenu::GetItems() const
 {
 	return Items;
@@ -138,6 +149,8 @@ void ZEDMenu::AddItem(ZEDMenuItem* Item)
 
 	Items.Add(Item);
 	Menu->addAction(Item->Action);
+
+	OnUpdated(this);
 }
 
 void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
@@ -160,6 +173,8 @@ void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
 		Items.Insert(Index, Item);
 		Menu->insertAction(Menu->actions()[Index], Item->Action);
 	}
+
+	OnUpdated(this);
 }
 
 void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
@@ -170,14 +185,16 @@ void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
 	delete Item->Action;
 	Item->Menu = NULL;
 	Items.RemoveValue(Item);
+
+	OnUpdated(this);
 }
 
 void ZEDMenu::ClearItems()
 {
-	for (ZESize I = 0; I < Items.GetCount(); I++)
-		delete Items[I];
-
-	Items.Clear();
+	while(Items.GetCount() != 0)
+		Items.GetFirstItem()->Destroy();
+	
+	OnUpdated(this);
 }
 
 bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
@@ -188,6 +205,7 @@ bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
 	SetName(MenuNode->ReadString("Name"));
 	SetIcon(MenuNode->ReadString("Icon"));
 	SetText(MenuNode->ReadString("Text"));
+	SetProtected(MenuNode->ReadBoolean("Protected", false));
 
 	ClearItems();
 	ZEMLReaderNode ItemsNode = MenuNode->GetNode("Items");
@@ -215,10 +233,12 @@ bool ZEDMenu::Save(ZEMLWriterNode* MenusNode)
 	zeCheckError(MenusNode == NULL, false, "Cannot save Menu Item. ItemNode is NULL.");
 	
 	ZEMLWriterNode MenuNode;
-	MenuNode.OpenNode("Menu", MenuNode);
+	MenusNode->OpenNode("Menu", MenuNode);
 
 	MenuNode.WriteString("Name", GetName());
 	MenuNode.WriteString("Icon", GetIcon());
+	MenuNode.WriteString("Text", GetText());
+	MenuNode.WriteBool("Protected", GetProtected());
 	
 	ZEMLWriterNode ItemsNode;
 	MenuNode.OpenNode("Items", ItemsNode);

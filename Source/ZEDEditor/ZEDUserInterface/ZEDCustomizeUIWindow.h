@@ -37,6 +37,8 @@
 
 #include <QDialog>
 
+#include "ZETypes.h"
+
 class Ui_ZEDCustomizeUIWindow;
 class ZEDMenu;
 class ZEDToolbar;
@@ -59,6 +61,7 @@ class ZEDCustomizeUIWindow : public QDialog
 		bool								IsElementTypeMenu();
 		ZEDMenu*							GetMenu();
 		ZEDToolbar*							GetToolbar();
+		ZEInt								GetElementItemSelectionIndex();
 
 	private slots:
 		void								radElementType_toggled(bool);
@@ -73,7 +76,7 @@ class ZEDCustomizeUIWindow : public QDialog
 		void								btnElementItemUp_clicked();
 		void								btnElementItemDown_clicked();
 		void								lstElementItems_itemSelectionChanged();
-		void								radItemType_currentIndexChanged(int);
+		void								radItemType_toggled(bool);
 		void								cmbItemCategory_currentIndexChanged(int);
 		void								lstItems_itemSelectionChanged();
 		void								btnDefault_clicked();

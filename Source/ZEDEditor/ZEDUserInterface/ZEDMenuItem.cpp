@@ -324,13 +324,18 @@ bool ZEDMenuItem::Load(ZEMLReaderNode* ItemNode)
 	return true;
 }
 
-bool ZEDMenuItem::Save(ZEMLWriterNode* ItemNode)
+bool ZEDMenuItem::Save(ZEMLWriterNode* ItemsNode)
 {
-	zeCheckError(ItemNode == NULL, false, "Cannot save Menu Item. ItemsNode is NULL.");
+	zeCheckError(ItemsNode == NULL, false, "Cannot save Menu Item. ItemsNode is NULL.");
 	
-	ItemNode->WriteUInt8("Type", Type);
-	if (Type == ZED_MIT_SEPERATOR)
-		ItemNode->WriteString("TargetName", TargetName);
+	ZEMLWriterNode ItemNode;
+	ItemsNode->OpenNode("Item", ItemNode);
+
+	ItemNode.WriteUInt8("Type", Type);
+	if (Type != ZED_MIT_SEPERATOR)
+		ItemNode.WriteString("TargetName", TargetName);
+
+	ItemNode.CloseNode();
 
 	return true;
 }
