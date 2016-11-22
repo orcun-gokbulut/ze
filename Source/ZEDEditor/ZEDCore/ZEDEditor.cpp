@@ -94,6 +94,7 @@ void ZEDEditor::RegisterCommands()
 	SaveCommand.SetName("ZEDEditor::SaveCommand");
 	SaveCommand.SetText("Save");
 	SaveCommand.SetCategory("File");
+	SaveCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/SemiChecked.png");
 	SaveCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_S));
 	SaveCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveCommand);
@@ -108,6 +109,7 @@ void ZEDEditor::RegisterCommands()
 	CloseCommand.SetName("ZEDEditor::CloseCommand");
 	CloseCommand.SetText("Close");
 	CloseCommand.SetCategory("File");
+	CloseCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/Close.png");
 	CloseCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloseCommand);
 

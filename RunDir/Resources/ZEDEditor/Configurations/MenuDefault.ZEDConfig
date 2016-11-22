@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?ZEML VersionMajor="1" VersionMinor="0"?>
+ <Node Name="ZEDMenuManager">
+  <Node Name="Menus">
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">MainMenu</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">Main Menu</Property>
+    <Property Name="Protected" Type="Bool">true</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">2</Property>
+      <Property Name="TargetName" Type="String">File Menu</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">2</Property>
+      <Property Name="TargetName" Type="String">Edit Menu</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">2</Property>
+      <Property Name="TargetName" Type="String">Settings Menu</Property>
+     </Node>
+    </Node>
+   </Node>
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">File Menu</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">File</Property>
+    <Property Name="Protected" Type="Bool">false</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::NewCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::OpenCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::RecentFilesCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::SaveCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::SaveAsCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::CloseCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::ExitCommand</Property>
+     </Node>
+    </Node>
+   </Node>
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">Edit Menu</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">Edit</Property>
+    <Property Name="Protected" Type="Bool">false</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::LockSelectionCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectAllCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::ClearSelectionCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::FreezeObjectsCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::UnfreezeObjectsCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectionShapeCommand</Property>
+     </Node>
+    </Node>
+   </Node>
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">Settings Menu</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">Settings</Property>
+    <Property Name="Protected" Type="Bool">false</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDEditor::CustomizeUICommand</Property>
+     </Node>
+    </Node>
+   </Node>
+  </Node>
+ </Node>

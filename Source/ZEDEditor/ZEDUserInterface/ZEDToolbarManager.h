@@ -58,6 +58,7 @@ class ZEDToolbarManager : public ZEObject
 		
 		bool							AddToolbar(ZEDToolbar* Menu);
 		bool							RemoveToolbar(ZEDToolbar* Menu);
+		void							ClearToolbars();
 
 		bool							Load(const ZEString& ConfigurationFile);
 		bool							Save(const ZEString& ConfigurationFile);

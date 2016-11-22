@@ -196,6 +196,8 @@ void ZEDToolbar::AddItem(ZEDToolbarItem* Item)
 
 	Items.Add(Item);
 	Toolbar->addAction(Item->Action);
+
+	OnUpdated(this);
 }
 
 void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
@@ -217,6 +219,8 @@ void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
 		Items.Insert(Index, Item);
 		Toolbar->insertAction(Toolbar->actions()[Index], Item->Action);
 	}
+
+	OnUpdated(this);
 }
 
 void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
@@ -227,14 +231,16 @@ void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
 	Item->Toolbar = NULL;
 	delete Item->Action;
 	Items.RemoveValue(Item);
+
+	OnUpdated(this);
 }
 
 void ZEDToolbar::ClearItems()
 {
-	for (ZESize I = 0; I < Items.GetCount(); I++)
-		delete Items[I];
-
-	Items.Clear();
+	while(Items.GetCount() != 0)
+		Items.GetFirstItem()->Destroy();
+	
+	OnUpdated(this);
 }
 
 bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
@@ -245,6 +251,7 @@ bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
 	SetName(ToolbarNode->ReadString("Name"));
 	SetIcon(ToolbarNode->ReadString("Icon"));
 	SetText(ToolbarNode->ReadString("Text"));
+	SetVisible(ToolbarNode->ReadBoolean("Visible", true));
 	SetDockLocation((ZEDToolbarDockLocation)ToolbarNode->ReadUInt8("DockLocation"));
 	SetDockColumn(ToolbarNode->ReadUInt8("DockColumn"));
 	SetDockRow(ToolbarNode->ReadUInt8("DockRow"));
@@ -275,10 +282,12 @@ bool ZEDToolbar::Save(ZEMLWriterNode* ToolbarsNode)
 	zeCheckError(ToolbarsNode == NULL, false, "Cannot save Toolbar Item. ItemNode is NULL.");
 
 	ZEMLWriterNode ToolbarNode;
-	ToolbarNode.OpenNode("Toolbar", ToolbarNode);
+	ToolbarsNode->OpenNode("Toolbar", ToolbarNode);
 
 	ToolbarNode.WriteString("Name", GetName());
 	ToolbarNode.WriteString("Icon", GetIcon());
+	ToolbarNode.WriteString("Text", GetText());
+	ToolbarNode.WriteBool("Visible", GetVisible());
 	ToolbarNode.WriteUInt8("DockLocation", DockLocation);
 	ToolbarNode.WriteUInt8("DockColumn", DockColumn);
 	ToolbarNode.WriteUInt8("DockRow", DockRow);

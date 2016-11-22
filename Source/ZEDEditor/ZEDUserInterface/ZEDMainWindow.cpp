@@ -41,6 +41,7 @@
 #include "ZERegEx/ZERegEx.h"
 #include "ZEMeta/ZEEventDelegate.h"
 #include "ZEFile/ZEPathTokenizer.h"
+#include "ZEFile/ZEPathInfo.h"
 
 #include "ZEDMenu.h"
 #include "ZEDToolbar.h"
@@ -54,9 +55,6 @@
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
-
-
-
 class ZEDMenuWrapper : public QMenu
 {
 	public:
@@ -87,6 +85,37 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
+void ZEDMainWindow::PopulateMainMenu()
+{
+	ZEDMenu* MainMenu = MenuManager->GetMenu("MainMenu");
+	if (MainMenu == NULL)
+		return;
+
+	MainMenu->OnUpdated += ZEEventDelegate<void (ZEDMenu* Menu)>::Create<ZEDMainWindow, &ZEDMainWindow::MainMenu_OnUpdated>(this);
+	MainMenu_OnUpdated(MainMenu);
+}
+
+void ZEDMainWindow::PopulateToolbars()
+{
+	for (ZESize I = 0; I < ToolbarManager->GetToolbars().GetCount(); I++)
+		MainWindow->addToolBar(ToolbarManager->GetToolbars()[I]->GetNativeToolbar());
+}
+
+void ZEDMainWindow::MainMenu_OnUpdated(ZEDMenu* Menu)
+{
+	QMenu* NativeMenu = Menu->GetNativeMenu();
+	QList<QAction*> Actions = NativeMenu->actions();
+
+	MainWindow->menuBar()->clear();
+	for (ZESize I = 0; I < Actions.count(); I++)
+	{
+		if (Actions[I]->isSeparator())
+			continue;
+
+		MainWindow->menuBar()->addAction(Actions[I]);
+	}
+}
+
 bool ZEDMainWindow::InitializeInternal()
 {
 	if (!ZEDComponent::InitializeInternal())
@@ -94,15 +123,30 @@ bool ZEDMainWindow::InitializeInternal()
 
 	RegisterCommands();
 
-	MenuManager->Load("#R:/ZEDEditor/Menu.ZEDMenuManager");
-	ZEDMenu* MainMenu = MenuManager->GetMenu("MainMenu");
-	if (MainMenu == NULL)
-		return true;
-	MainWindow->menuBar()->addMenu(MainMenu->GetNativeMenu());
+	if (ZEPathInfo("#S:/Configurations/ZEDEditor/Menu.ZEDConfig").IsExists())
+	{
+		if (!MenuManager->Load("#S:/Configurations/ZEDEditor/Menu.ZEDConfig"))
+			MenuManager->Load("#R:/ZEDEditor/Configurations/MenuDefault.ZEDConfig");
+	}
+	else
+	{
+		MenuManager->Load("#R:/ZEDEditor/Configurations/MenuDefault.ZEDConfig");
+	}
 
-	ToolbarManager->Load("#R:/ZEDEditor/Toolbar.ZEDToolbarManager");
-	for (ZESize I = 0; I < ToolbarManager->GetToolbars().GetCount(); I++)
-		MainWindow->addToolBar(ToolbarManager->GetToolbars()[I]->GetNativeToolbar());
+	PopulateMainMenu();
+
+
+	if (ZEPathInfo("#S:/Configurations/ZEDEditor/Toolbar.ZEDConfig").IsExists())
+	{
+		if (!ToolbarManager->Load("#S:/Configurations/ZEDEditor/Toolbar.ZEDConfig"))
+			ToolbarManager->Load("#R:/ZEDEditor/Configurations/ToolbarDefault.ZEDConfig");
+	}
+	else
+	{
+		ToolbarManager->Load("#R:/ZEDEditor/Configurations/ToolbarDefault.ZEDConfig");
+	}
+
+	PopulateToolbars();
 
 	return true;
 }

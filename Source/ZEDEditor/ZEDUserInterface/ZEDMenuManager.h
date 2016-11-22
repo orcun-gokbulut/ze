@@ -58,6 +58,7 @@ class ZEDMenuManager : public ZEObject
 		
 		bool							AddMenu(ZEDMenu* Menu);
 		bool							RemoveMenu(ZEDMenu* Menu);
+		void							ClearMenus();
 
 		bool							Load(const ZEString& ConfigurationFile);
 		bool							Save(const ZEString& ConfigurationFile);
