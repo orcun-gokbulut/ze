@@ -50,6 +50,7 @@ class ZEDMenu : public ZEObject
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDMenu)
+	friend class ZEDMenuItem;
 	friend class ZEDMenuManager;
 	private:
 		ZEDMenuManager*					Manager;
@@ -59,6 +60,10 @@ class ZEDMenu : public ZEObject
 		ZEString						Text;
 		ZEString						Icon;
 		bool							Protected;
+		bool							DeferredSetup;
+
+		void							Setup();
+		void							CleanUp();
 
 										ZEDMenu();
 										~ZEDMenu();
@@ -89,9 +94,7 @@ class ZEDMenu : public ZEObject
 		bool							Load(ZEMLReaderNode* MenuNode);
 		bool							Save(ZEMLWriterNode* MenusNode);
 
-		ZE_EVENT(						OnUpdated,(ZEDMenu* Menu));
-
-		void							Update();
+		ZE_EVENT(						OnUpdated,(const ZEDMenu* Menu));
 
 		virtual void					Destroy();
 

@@ -83,7 +83,8 @@ bool ZEDMenuManager::AddMenu(ZEDMenu* Menu)
 
 	Menu->Manager = this;
 	Menus.Add(Menu);
-	
+	Menu->Setup();
+
 	return true;
 }
 
@@ -92,8 +93,12 @@ bool ZEDMenuManager::RemoveMenu(ZEDMenu* Menu)
 	zeCheckError(Menu == NULL, false, "Cannot remove menu. Menu is NULL.");
 	zeCheckError(!Menus.Exists(Menu), false, "Cannot remove menu. Menu is not added. Menu Name: \"%s\".", Menu->GetName().ToCString());
 
+	Menu->CleanUp();
+
 	Menu->Manager = NULL;
 	Menus.RemoveValue(Menu);
+
+	Setup();
 
 	return true;
 }
@@ -102,6 +107,12 @@ void ZEDMenuManager::ClearMenus()
 {
 	while(Menus.GetCount() != 0)
 		Menus.GetFirstItem()->Destroy();
+}
+
+void ZEDMenuManager::Setup()
+{
+	for (ZESize I = 0; I < Menus.GetCount(); I++)
+		Menus[I]->Setup();
 }
 
 bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
@@ -135,12 +146,11 @@ bool ZEDMenuManager::Load(const ZEString& ConfigurationFile)
 				NewMenu->Destroy();
 				continue;
 			}
-
 			AddMenu(NewMenu);
 		}
 	}
-
-	Update();
+	
+	Setup();
 
 	return true;
 }
@@ -171,12 +181,6 @@ bool ZEDMenuManager::Save(const ZEString& ConfigurationFile)
 	Writer.Close();
 
 	return true;
-}
-
-void ZEDMenuManager::Update()
-{
-	for (ZESize I = 0; I < Menus.GetCount(); I++)
-		Menus[I]->Update();
 }
 
 void ZEDMenuManager::Destroy()

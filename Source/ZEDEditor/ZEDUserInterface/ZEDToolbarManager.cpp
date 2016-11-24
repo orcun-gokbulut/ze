@@ -84,6 +84,7 @@ bool ZEDToolbarManager::AddToolbar(ZEDToolbar* Toolbar)
 
 	Toolbar->Manager = this;
 	Toolbars.Add(Toolbar);
+	Toolbar->Setup();
 	
 	return true;
 }
@@ -93,6 +94,7 @@ bool ZEDToolbarManager::RemoveToolbar(ZEDToolbar* Toolbar)
 	zeCheckError(Toolbar == NULL, false, "Cannot remove toolbar. Toolbar is NULL.");
 	zeCheckError(!Toolbars.Exists(Toolbar), false, "Cannot remove toolbar. Toolbar is not added. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
+	Toolbar->CleanUp();
 	Toolbar->Manager = NULL;
 	Toolbars.RemoveValue(Toolbar);
 
@@ -177,7 +179,7 @@ bool ZEDToolbarManager::Save(const ZEString& ConfigurationFile)
 void ZEDToolbarManager::Update()
 {
 	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
-		Toolbars[I]->Update();
+		Toolbars[I]->Setup();
 }
 
 void ZEDToolbarManager::Destroy()

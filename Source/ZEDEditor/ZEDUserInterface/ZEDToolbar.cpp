@@ -48,6 +48,22 @@
 #include <QAction>
 #include <QToolBar>
 
+void ZEDToolbar::Setup()
+{
+	if (DeferredSetup)
+		return;
+
+	CleanUp();
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		Items[I]->Setup();
+}
+
+void ZEDToolbar::CleanUp()
+{
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		Items[I]->CleanUp();
+}
+
 ZEDToolbar::ZEDToolbar()
 {
 	Manager = NULL;
@@ -56,6 +72,7 @@ ZEDToolbar::ZEDToolbar()
 	DockColumn = 0;
 	DockRow = 0;
 	Visible = true;
+	DeferredSetup = false;
 }
 
 ZEDToolbar::~ZEDToolbar()
@@ -78,8 +95,6 @@ void ZEDToolbar::SetName(const ZEString&	Name)
 		return;
 
 	this->Name = Name;
-
-	OnUpdated(this);
 }
 
 const ZEString& ZEDToolbar::GetName() const
@@ -95,8 +110,6 @@ void ZEDToolbar::SetText(const ZEString& Text)
 	this->Text = Text;
 	
 	Toolbar->setWindowTitle(Text.ToCString());
-
-	OnUpdated(this);
 }
 
 const ZEString& ZEDToolbar::GetText() const
@@ -112,8 +125,6 @@ void ZEDToolbar::SetIcon(const ZEString& Icon)
 	this->Icon = Icon;
 
 	Toolbar->setWindowIcon(ZEDUIUtils::GetIcon(GetIcon()));
-
-	OnUpdated(this);
 }
 
 const ZEString& ZEDToolbar::GetIcon() const
@@ -191,13 +202,9 @@ void ZEDToolbar::AddItem(ZEDToolbarItem* Item)
 	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
 
 	Item->Toolbar = this;
-	Item->Action = new ZEDToolbarAction(Item);
-	Item->Update();
-
 	Items.Add(Item);
-	Toolbar->addAction(Item->Action);
 
-	OnUpdated(this);
+	Setup();
 }
 
 void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
@@ -206,21 +213,13 @@ void ZEDToolbar::InsertItem(ZESize Index, ZEDToolbarItem* Item)
 	zeDebugCheck(Item->Toolbar != NULL, "Cannot insert toolbar item. Item is already added.");
 
 	Item->Toolbar = this;
-	Item->Action = new ZEDToolbarAction(Item);
-	Item->Update();
 
 	if (Index >= Items.GetCount())
-	{
 		Items.Add(Item);
-		Toolbar->addAction(Item->Action);
-	}
 	else
-	{
 		Items.Insert(Index, Item);
-		Toolbar->insertAction(Toolbar->actions()[Index], Item->Action);
-	}
 
-	OnUpdated(this);
+	Setup();
 }
 
 void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
@@ -229,18 +228,17 @@ void ZEDToolbar::RemoveItem(ZEDToolbarItem* Item)
 	zeDebugCheck(Item->Toolbar != this, "Cannot delete toolbar item. Item is belong to this toolbar.");
 
 	Item->Toolbar = NULL;
-	delete Item->Action;
 	Items.RemoveValue(Item);
 
-	OnUpdated(this);
+	Setup();
 }
 
 void ZEDToolbar::ClearItems()
 {
 	while(Items.GetCount() != 0)
 		Items.GetFirstItem()->Destroy();
-	
-	OnUpdated(this);
+
+	Setup();
 }
 
 bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
@@ -256,6 +254,7 @@ bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
 	SetDockColumn(ToolbarNode->ReadUInt8("DockColumn"));
 	SetDockRow(ToolbarNode->ReadUInt8("DockRow"));
 
+	DeferredSetup = true;
 	ClearItems();
 	ZEMLReaderNode ItemsNode = ToolbarNode->GetNode("Items");
 	if (ItemsNode.IsValid())
@@ -268,11 +267,15 @@ bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
 			if (!Item->Load(&ItemNode))
 			{
 				delete Item;
-				return false;
+				continue;
 			}
+
 			AddItem(Item);
 		}
 	}
+	DeferredSetup = false;
+
+	Setup();
 
 	return true;
 }
@@ -305,15 +308,6 @@ bool ZEDToolbar::Save(ZEMLWriterNode* ToolbarsNode)
 	ToolbarNode.CloseNode();
 
 	return true;
-}
-
-void ZEDToolbar::Update()
-{
-	if (GetManager() == NULL)
-		return;
-
-	for (ZESize I = 0; I < Items.GetCount(); I++)
-		Items[I]->Update();
 }
 
 void ZEDToolbar::Destroy()

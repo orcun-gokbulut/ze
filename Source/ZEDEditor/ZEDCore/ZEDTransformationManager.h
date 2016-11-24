@@ -41,6 +41,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
 class ZEDEditor;
 class ZEDObjectWrapper;
@@ -58,14 +59,16 @@ enum ZEDTransformType
 	ZED_TT_NONE,
 	ZED_TT_TRANSLATE,
 	ZED_TT_ROTATE,
-	ZED_TT_SCALE
+	ZED_TT_SCALE,
+	ZED_TT_AXIS_ROTATE,
+	ZED_TT_SNAP,
 };
 
 enum ZEDTransformSpace
 {
 	ZED_TS_LOCAL,
-	ZED_TS_WORLD,
 	ZED_TS_PARENT,
+	ZED_TS_WORLD,
 	ZED_TS_VIEW
 };
 
@@ -73,7 +76,7 @@ enum ZEDTransformPivot
 {
 	ZED_TP_OBJECT,
 	ZED_TP_FOCUSED_OBJECT,
-	ZED_TP_CENTER,
+	ZED_TP_SELECTION_CENTER,
 	ZED_TP_WORLD
 };
 
@@ -114,7 +117,6 @@ class ZEDTransformationManager : public ZEDComponent
 
 		void									UpdateGizmo(ZEDGizmo* Gizmo, const ZEVector3& WorldPosition, const ZEQuaternion& WorldRotation);
 		void									UpdateGizmos();
-		void									UpdateToolbar();
 		void									UpdateTransformStates();
 
 		bool									InitializeInternal();
@@ -140,6 +142,36 @@ class ZEDTransformationManager : public ZEDComponent
 
 												ZEDTransformationManager();
 		virtual									~ZEDTransformationManager();
+	
+	private: /* COMMANDS */
+		ZEDCommand								SelectCommand;
+		ZEDCommand								MoveCommand;
+		ZEDCommand								RotateCommand;
+		ZEDCommand								AxisRotateCommand;
+		ZEDCommand								ScaleCommand;
+		ZEDCommand								SnapCommand;
+		ZEDCommand								TransformSpaceCommand;
+		ZEDCommand								TransformPivotCommand;
+		ZEDCommand								XCommand;
+		ZEDCommand								YCommand;
+		ZEDCommand								ZCommand;
+
+		void									RegisterCommands();
+		void									UpdateCommands();
+
+		void									SelectCommand_OnAction(const ZEDCommand* Command);
+		void									MoveCommand_OnAction(const ZEDCommand* Command);
+		void									RotateCommand_OnAction(const ZEDCommand* Command);
+		void									AxisRotateCommand_OnAction(const ZEDCommand* Command);
+		void									ScaleCommand_OnAction(const ZEDCommand* Command);
+		void									SnapCommand_OnAction(const ZEDCommand* Command);
+		void									TransformSpaceCommand_OnAction(const ZEDCommand* Command);
+		void									TransformPivotCommand_OnAction(const ZEDCommand* Command);
+		void									XCommand_OnAction(const ZEDCommand* Command);
+		void									YCommand_OnAction(const ZEDCommand* Command);
+		void									ZCommand_OnAction(const ZEDCommand* Command);
+
+
 
 	public:
 		void									SetTransformType(ZEDTransformType Type);

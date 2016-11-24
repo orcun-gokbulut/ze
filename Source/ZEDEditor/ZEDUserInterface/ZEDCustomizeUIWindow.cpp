@@ -186,7 +186,7 @@ void ZEDCustomizeUIWindow::UpdateElementItems()
 				Line->setFrameShadow(QFrame::Sunken);
 				Form->lstElementItems->setItemWidget(ListItem, 1, Line);
 			}
-			else if (Items[I]->GetType() == ZED_TIT_COMMAND)
+			else if (Items[I]->GetType() == ZED_MIT_COMMAND)
 			{
 				ZEDCommand* Command = Manager->GetCommand(Items[I]->GetTargetName());
 				if (Command != NULL)
@@ -222,6 +222,12 @@ void ZEDCustomizeUIWindow::UpdateElementItems()
 					Form->lstElementItems->addTopLevelItem(ListItem);
 				}
 			}
+			else
+			{
+				ListItem->setText(1, "<Error: Unknown Type>");
+				ListItem->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+				Form->lstElementItems->addTopLevelItem(ListItem);
+			}
 		}
 	}
 	else
@@ -235,7 +241,7 @@ void ZEDCustomizeUIWindow::UpdateElementItems()
 			ListItem->setSizeHint(0, QSize(ZED_ROW_SIZE, ZED_ROW_SIZE));
 			ListItem->setData(0, Qt::UserRole, QVariant((ZEUInt64)Items[I]));
 
-			if (Items[I]->GetType() == ZED_MIT_SEPERATOR)
+			if (Items[I]->GetType() == ZED_TIT_SEPERATOR)
 			{
 				Form->lstElementItems->addTopLevelItem(ListItem);
 				QFrame* Line = new QFrame();
@@ -259,6 +265,12 @@ void ZEDCustomizeUIWindow::UpdateElementItems()
 					ListItem->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
 					Form->lstElementItems->addTopLevelItem(ListItem);
 				}
+			}
+			else
+			{
+				ListItem->setText(1, "<Error: Unknown Type>");
+				ListItem->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+				Form->lstElementItems->addTopLevelItem(ListItem);
 			}
 		}
 	}

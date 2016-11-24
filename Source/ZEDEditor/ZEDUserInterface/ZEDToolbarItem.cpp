@@ -48,27 +48,109 @@
 
 #include <QAction>
 #include <QMenu>
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QToolBar>
 
-void ZEDToolbarAction::Action_triggered(bool Triggered)
+
+// ZEDToolbarItem
+//////////////////////////////////////////////////////////////////////////////////////
+
+void ZEDToolbarItem::SetupCommand()
 {
-	Item->Action_Triggered();
+	TargetCommand = ZEDCommandManager::GetInstance()->GetCommand(GetTargetName());
+	if (TargetCommand == NULL)
+		return;
+
+	TargetCommand->OnUpdated += ZEDCommandDelegate::Create<ZEDToolbarItem, &ZEDToolbarItem::TargetCommand_OnUpdate>(this);
+
+	if (TargetCommand->GetType() == ZED_CT_COMMAND || TargetCommand->GetType() == ZED_CT_TOGGLE)
+	{
+		Action = new QAction(this);
+		Action->setCheckable(TargetCommand->GetType() == ZED_CT_TOGGLE);
+		connect(Action, &QAction::triggered, this, &ZEDToolbarItem::Action_triggered);
+		Toolbar->GetNativeToolbar()->addAction(Action);
+	}
+	else if (TargetCommand->GetType() == ZED_CT_LIST)
+	{
+		ComboBox = new QComboBox();
+		ComboBox->setMaximumWidth(100);
+		connect(ComboBox, (void (QComboBox::*)(int))&QComboBox::currentIndexChanged, this, &ZEDToolbarItem::ComboBox_currentIndexChanged);
+		Action = GetToolbar()->Toolbar->insertWidget(Action, ComboBox);
+	}
+	else if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER || TargetCommand->GetType() == ZED_CT_INPUT_FLOAT || TargetCommand->GetType() == ZED_CT_INPUT_TEXT)
+	{
+		LineEdit = new QLineEdit();
+		LineEdit->setMaximumWidth(100);
+		connect(LineEdit, &QLineEdit::textChanged, this, &ZEDToolbarItem::LineEdit_textChanged);
+		Action = GetToolbar()->Toolbar->insertWidget(Action, LineEdit);
+	}
+
+	TargetCommand_OnUpdate(TargetCommand);
 }
 
-void ZEDToolbarAction::SubAction_triggered(bool Triggered)
+void ZEDToolbarItem::SetupSeperator()
 {
-	Item->SubAction_Triggered(static_cast<QAction*>(sender()));
+	if (Action == NULL)
+	{
+		Action = new QAction(this);
+		Action->setSeparator(true);
+		GetToolbar()->GetNativeToolbar()->addAction(Action);
+	}
 }
 
-ZEDToolbarAction::ZEDToolbarAction(ZEDToolbarItem* Item) : QAction(NULL)
+void ZEDToolbarItem::Setup()
 {
-	this->Item = Item;
-	connect(this, &QAction::triggered, this, &ZEDToolbarAction::Action_triggered);
+	if (Type != ZED_TIT_COMMAND && TargetCommand != NULL)
+	{
+		TargetCommand->OnUpdated.DisconnectObject(this);
+		TargetCommand = NULL;
+	}
+
+	if (GetToolbar() == NULL || GetToolbar()->GetManager() == NULL)
+		return;
+
+	switch (Type)
+	{
+		default:
+		case ZED_TIT_NONE:
+			break;
+
+		case ZED_TIT_COMMAND:
+			SetupCommand();
+			break;
+
+		case ZED_TIT_SEPERATOR:
+			SetupSeperator();
+			break;
+	}
 }
 
-void ZEDToolbarItem::Action_Triggered()
+void ZEDToolbarItem::CleanUp()
+{
+	if (TargetCommand != NULL)
+	{
+		TargetCommand->OnUpdated.DisconnectObject(this);
+		TargetCommand = NULL;
+	}
+
+	if (Action != NULL)
+	{
+		delete Action;
+		Action = NULL;
+	}
+
+	if (Label != NULL)
+	{
+		delete Label;
+		Label = NULL;
+	}
+}
+
+void ZEDToolbarItem::Action_triggered()
 {
 	QSignalBlocker Blocker(Action);
-
 	if (GetType() == ZED_TIT_COMMAND && TargetCommand != NULL)
 	{
 		if (TargetCommand->GetType() == ZED_CT_COMMAND)
@@ -77,58 +159,137 @@ void ZEDToolbarItem::Action_Triggered()
 		}
 		else if (TargetCommand->GetType() == ZED_CT_TOGGLE)
 		{
-			TargetCommand->SetValue(Action->isChecked());
+			TargetCommand->SetValueChecked(Action->isChecked());
+			TargetCommand->OnAction(TargetCommand);
+		}
+		else if (TargetCommand->GetType() == ZED_CT_LIST)
+		{
+			TargetCommand->SetValueIndex(ComboBox->currentIndex());
+			TargetCommand->OnAction(TargetCommand);
+		}
+		else if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER)
+		{
+			TargetCommand->SetValueNumber(LineEdit->text().toInt());
+			TargetCommand->OnAction(TargetCommand);
+		}
+		else if (TargetCommand->GetType() == ZED_CT_INPUT_FLOAT)
+		{
+			TargetCommand->SetValueFloat(LineEdit->text().toDouble());
+			TargetCommand->OnAction(TargetCommand);
+		}
+		else if (TargetCommand->GetType() == ZED_CT_INPUT_TEXT)
+		{
+			TargetCommand->SetValueText((ZEString)LineEdit->text().toStdString());
 			TargetCommand->OnAction(TargetCommand);
 		}
 	}
 }
 
-void ZEDToolbarItem::SubAction_Triggered(QAction* Action)
+void ZEDToolbarItem::ComboBox_currentIndexChanged(int Index)
 {
-	TargetCommand->SetValue(ZEString(Action->text().toStdString()));
+	TargetCommand->SetValueIndex(Index);
+	TargetCommand->OnAction(TargetCommand);
+}
 
-	if (TargetCommand->GetType() == ZED_CT_LIST)
+void ZEDToolbarItem::LineEdit_textChanged(const QString&)
+{
+	if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER)
 	{
-		const ZEArray<ZEString>& Items = TargetCommand->GetListItems();
-		for (ZESize I = 0; I < Items.GetCount(); I++)
+		bool Correct = false;
+		LineEdit->text().toInt(&Correct);
+		if (Correct)
 		{
-			QAction* SubAction = SubMenu->actions().at(I);
-			QSignalBlocker Blocker(SubAction);
-			SubAction->setChecked(TargetCommand->GetValue().GetString() == Items[I]);
+			LineEdit->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
+			Action_triggered();
+		}
+		else
+		{
+			LineEdit->setStyleSheet("* { background-color: rgba(255, 200, 210, 255); }");
 		}
 	}
-
-	TargetCommand->OnAction(TargetCommand);
+	else if (TargetCommand->GetType() == ZED_CT_INPUT_FLOAT)
+	{
+		bool Correct;
+		LineEdit->text().toDouble(&Correct);
+		if (Correct)
+		{
+			LineEdit->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
+			Action_triggered();
+		}
+		else
+		{
+			LineEdit->setStyleSheet("* { background-color: rgba(255, 200, 210, 255); }");
+		}
+	}
+	else
+	{
+		Action_triggered();
+	}
 }
 
 void ZEDToolbarItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 {
-	Update();
-}
+	if (TargetCommand == NULL || Action == NULL)
+		return;
 
-void ZEDToolbarItem::TargetMenu_OnUpdate(const ZEDMenu* Menu)
-{
-	TargetName = Menu->GetName();
-	Update();
+	if (TargetCommand->GetType() == ZED_CT_COMMAND || TargetCommand->GetType() == ZED_CT_TOGGLE)
+	{
+		Action->setText(TargetCommand->GetText().ToCString());
+		Action->setIcon(ZEDUIUtils::GetIcon(TargetCommand->GetIcon()));
+		Action->setToolTip(TargetCommand->GetTooltip().ToCString());
+		Action->setVisible(TargetCommand->GetVisible());
+		Action->setEnabled(TargetCommand->GetEnabled());
+		Action->setCheckable(TargetCommand->GetType() == ZED_CT_TOGGLE);
+
+		if (TargetCommand->GetType() == ZED_CT_TOGGLE)
+			Action->setChecked(TargetCommand->GetValueChecked());
+	}
+	else if (TargetCommand->GetType() == ZED_CT_LIST)
+	{
+		QSignalBlocker ComboBoxBlocker(ComboBox);
+
+		ComboBox->clear();
+		const ZEArray<ZEString>& Items = TargetCommand->GetListItems();
+		for (ZESize I = 0; I < Items.GetCount(); I++)
+			ComboBox->addItem(Items[I].ToCString());
+
+		ComboBox->setCurrentIndex(TargetCommand->GetValueIndex());
+
+		Action->setVisible(TargetCommand->GetVisible());
+		Action->setEnabled(TargetCommand->GetEnabled());
+	}
+	else if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER || TargetCommand->GetType() == ZED_CT_INPUT_FLOAT || TargetCommand->GetType() == ZED_CT_INPUT_TEXT)
+	{
+		Action->setVisible(TargetCommand->GetVisible());
+		Action->setEnabled(TargetCommand->GetEnabled());
+
+		QSignalBlocker LineEditBlocker(LineEdit);
+		if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER)
+			LineEdit->setText(QString::number(TargetCommand->GetValueNumber()));
+		else if (TargetCommand->GetType() == ZED_CT_INPUT_FLOAT)
+			LineEdit->setText(QString::number(TargetCommand->GetValueFloat()));
+		else
+			LineEdit->setText(TargetCommand->GetValueText().ToCString());
+	}
 }
 
 ZEDToolbarItem::ZEDToolbarItem()
 {
 	Action = NULL;
 	Toolbar = NULL;
-	SubMenu = NULL;
+	Label = NULL;
+	ComboBox = NULL;
+	LineEdit = NULL;
 	Type = ZED_TIT_NONE;
 	TargetCommand = NULL;
-	TargetMenu = NULL;
 }
 
 ZEDToolbarItem::~ZEDToolbarItem()
 {
+	CleanUp();
+
 	if (GetToolbar() != NULL)
 		GetToolbar()->RemoveItem(this);
-
-	if (SubMenu != NULL)
-		delete SubMenu;
 }
 
 ZEDToolbar* ZEDToolbarItem::GetToolbar()
@@ -143,7 +304,8 @@ void ZEDToolbarItem::SetType(ZEDToolbarItemType Type)
 
 	this->Type = Type;
 
-	Update();
+	if (GetToolbar() != NULL)
+		GetToolbar()->Setup();
 }
 
 ZEDToolbarItemType ZEDToolbarItem::GetType() const
@@ -158,120 +320,13 @@ void ZEDToolbarItem::SetTargetName(const ZEString& Name)
 
 	TargetName = Name;
 
-	Update();
+	if (GetToolbar() != NULL)
+		GetToolbar()->Setup();
 }
 
 const ZEString& ZEDToolbarItem::GetTargetName() const
 {
 	return TargetName;
-}
-
-void ZEDToolbarItem::Update()
-{
-	if (Action == NULL)
-		return;
-
-	if (Type != ZED_TIT_COMMAND && TargetCommand != NULL)
-	{
-		TargetCommand->OnUpdated.DisconnectObject(this);
-		TargetCommand = NULL;
-	}
-
-	switch (Type)
-	{
-		default:
-		case ZED_TIT_NONE:
-		{
-			Action->setMenu(NULL);
-			Action->setSeparator(true);
-			Action->setVisible(false);
-			break;
-		}
-
-		case ZED_TIT_COMMAND:
-		{
-			Action->setSeparator(false);
-			Action->setMenu(NULL);
-
-			if (GetToolbar()->GetManager() == NULL)
-				break;
-
-			ZEDCommand* NewCommand = ZEDCommandManager::GetInstance()->GetCommand(GetTargetName());
-			if (NewCommand != TargetCommand)
-			{
-				if (TargetCommand != NULL)
-					TargetCommand->OnUpdated.DisconnectObject(this);
-
-				TargetCommand = NewCommand;
-				TargetCommand->OnUpdated += ZEEventDelegate<void (const ZEDCommand*)>::Create<ZEDToolbarItem, &ZEDToolbarItem::TargetCommand_OnUpdate>(this);
-			}
-
-			if (TargetCommand != NULL)
-			{
-				Action->setText(TargetCommand->GetText().ToCString());
-				Action->setIcon(ZEDUIUtils::GetIcon(TargetCommand->GetIcon()));
-				Action->setToolTip(TargetCommand->GetTooltip().ToCString());
-				Action->setVisible(TargetCommand->GetVisible());
-				Action->setEnabled(TargetCommand->GetEnabled());
-
-				if (TargetCommand->GetType() == ZED_CT_COMMAND)
-				{
-					Action->setCheckable(false);
-					Action->setChecked(false);
-				}
-				else if (TargetCommand->GetType() == ZED_CT_TOGGLE)
-				{
-					Action->setCheckable(true);
-					Action->setChecked(TargetCommand->GetValue().GetBoolean());
-				}
-				else if (TargetCommand->GetType() == ZED_CT_LIST || TargetCommand->GetType() == ZED_CT_LIST_COMMAND)
-				{
-					Action->setCheckable(false);
-					Action->setChecked(false);
-
-					if (SubMenu == NULL)
-						SubMenu = new QMenu();
-					
-					SubMenu->clear();
-
-					const ZEArray<ZEString>& Items = TargetCommand->GetListItems();
-					for (ZESize I = 0; I < Items.GetCount(); I++)
-					{
-						QAction* SubAction = SubMenu->addAction(Items[I].ToCString());
-						QObject::connect(SubAction, &QAction::triggered, Action, &ZEDToolbarAction::SubAction_triggered);
-						
-						if (TargetCommand->GetType() == ZED_CT_LIST)
-						{
-							SubAction->setCheckable(true);
-							if (TargetCommand->GetValue().GetString() == Items[I])
-								SubAction->setChecked(true);
-						}
-					}
-
-					Action->setMenu(SubMenu);				
-				}
-			}
-			else
-			{
-				Action->setText(NULL);
-				Action->setIcon(QIcon());
-				Action->setToolTip("");
-				Action->setEnabled(false);
-				Action->setVisible(false);
-			}
-
-			break;
-		}
-
-		case ZED_TIT_SEPERATOR:
-		{
-			Action->setMenu(NULL);
-			Action->setSeparator(true);
-			Action->setVisible(true);
-			Action->setEnabled(true);
-			break;
-		}
-	}
 }
 
 bool ZEDToolbarItem::Load(ZEMLReaderNode* ItemNode)

@@ -48,11 +48,31 @@
 #include <QAction>
 #include <QMenu>
 
+
+void ZEDMenu::Setup()
+{
+	if (DeferredSetup)
+		return;
+
+	CleanUp();
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		Items[I]->Setup();
+
+	OnUpdated(this);
+}
+
+void ZEDMenu::CleanUp()
+{
+	for (ZESize I = 0; I < Items.GetCount(); I++)
+		Items[I]->CleanUp();
+}
+
 ZEDMenu::ZEDMenu()
 {
 	Manager = NULL;
 	Menu = new QMenu();
 	Protected = false;
+	DeferredSetup = false;
 }
 
 ZEDMenu::~ZEDMenu()
@@ -92,8 +112,6 @@ void ZEDMenu::SetText(const ZEString& Text)
 	this->Text = Text;
 	
 	Menu->setTitle(Text.ToCString());
-
-	OnUpdated(this);
 }
 
 const ZEString& ZEDMenu::GetText() const
@@ -109,8 +127,6 @@ void ZEDMenu::SetIcon(const ZEString& Icon)
 	this->Icon = Icon;
 
 	Menu->setIcon(ZEDUIUtils::GetIcon(GetIcon()));
-
-	OnUpdated(this);
 }
 
 const ZEString& ZEDMenu::GetIcon() const
@@ -144,13 +160,9 @@ void ZEDMenu::AddItem(ZEDMenuItem* Item)
 	zeDebugCheck(Item->Menu != NULL, "Cannot insert menu item. Item is already added.");
 
 	Item->Menu = this;
-	Item->Action = new ZEDMenuAction(Item);
-	Item->Update();
-
 	Items.Add(Item);
-	Menu->addAction(Item->Action);
 
-	OnUpdated(this);
+	Setup();
 }
 
 void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
@@ -160,21 +172,13 @@ void ZEDMenu::InsertItem(ZESize Index, ZEDMenuItem* Item)
 
 
 	Item->Menu = this;
-	Item->Action = new ZEDMenuAction(Item);
-	Item->Update();
 
 	if (Index >= Items.GetCount())
-	{
 		Items.Add(Item);
-		Menu->addAction(Item->Action);
-	}
 	else
-	{
 		Items.Insert(Index, Item);
-		Menu->insertAction(Menu->actions()[Index], Item->Action);
-	}
 
-	OnUpdated(this);
+	Setup();
 }
 
 void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
@@ -182,11 +186,9 @@ void ZEDMenu::RemoveItem(ZEDMenuItem* Item)
 	zeDebugCheck(Item == NULL, "Cannot delete menu item. Item is NULL");
 	zeDebugCheck(Item->Menu != this, "Cannot delete menu item. Item is belong to this menu.");
 
-	delete Item->Action;
+	Item->CleanUp();
 	Item->Menu = NULL;
 	Items.RemoveValue(Item);
-
-	OnUpdated(this);
 }
 
 void ZEDMenu::ClearItems()
@@ -194,7 +196,7 @@ void ZEDMenu::ClearItems()
 	while(Items.GetCount() != 0)
 		Items.GetFirstItem()->Destroy();
 	
-	OnUpdated(this);
+	CleanUp();
 }
 
 bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
@@ -207,6 +209,7 @@ bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
 	SetText(MenuNode->ReadString("Text"));
 	SetProtected(MenuNode->ReadBoolean("Protected", false));
 
+	DeferredSetup = true;
 	ClearItems();
 	ZEMLReaderNode ItemsNode = MenuNode->GetNode("Items");
 	if (ItemsNode.IsValid())
@@ -224,6 +227,9 @@ bool ZEDMenu::Load(ZEMLReaderNode* MenuNode)
 			AddItem(Item);
 		}
 	}
+	DeferredSetup = false;
+
+	Setup();
 
 	return true;
 }
@@ -253,15 +259,6 @@ bool ZEDMenu::Save(ZEMLWriterNode* MenusNode)
 	MenuNode.CloseNode();
 
 	return true;
-}
-
-void ZEDMenu::Update()
-{
-	if (GetManager() == NULL)
-		return;
-
-	for (ZESize I = 0; I < Items.GetCount(); I++)
-		Items[I]->Update();
 }
 
 void ZEDMenu::Destroy()

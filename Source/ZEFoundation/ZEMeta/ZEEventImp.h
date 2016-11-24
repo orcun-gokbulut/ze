@@ -139,6 +139,7 @@ void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::DisconnectObject(ZEObject* Object)
 		{
 			if (Delegates[I].GetObject() == Object)
 			{
+				Object->RemoveEventConnection(this);
 				Delegates.Remove(I);
 				I--;
 			}

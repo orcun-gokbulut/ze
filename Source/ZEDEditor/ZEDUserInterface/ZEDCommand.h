@@ -82,13 +82,22 @@ class ZEDCommand : public ZEObject
 		ZEDCommandType						Type;
 		ZEString							Text;
 		ZEString							Icon;
-		ZEValue								Value;
+		ZEString							Category;
+
 		bool								Enabled;
 		bool								Visible;
+
+		ZEArray<ZEString>					ListItems;
+		bool								ValueChecked;
+		ZEInt								ValueIndex;
+		ZEInt								ValueInteger;
+		double								ValueFloat;
+		ZEString							ValueText;
+		
 		ZEDCommandShortcut					Shortcut;
 		ZEString							Tooltip;
-		ZEArray<ZEString>					ComboBoxItems;
-		ZEString							Category;
+
+
 
 	public:
 		void								SetName(const ZEString& Name);
@@ -112,9 +121,21 @@ class ZEDCommand : public ZEObject
 		void								SetVisible(bool Visible);
 		bool								GetVisible() const;
 
-		void								SetValue(const ZEValue& Value);
-		const ZEValue&						GetValue() const;
+		void								SetValueChecked(bool Checked);
+		bool								GetValueChecked() const;
 
+		void								SetValueIndex(ZEInt SelectedIndex);
+		ZEInt								GetValueIndex() const;
+
+		void								SetValueNumber(ZEInt Value);
+		ZEInt								GetValueNumber() const;
+
+		void								SetValueFloat(double Value);
+		ZEInt								GetValueFloat() const;
+
+		void								SetValueText(const ZEString& Value);
+		const ZEString&						GetValueText() const;
+		
 		void								SetListItems(const ZEArray<ZEString>& Items);
 		const ZEArray<ZEString>&			GetListItems() const;
 

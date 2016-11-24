@@ -58,6 +58,7 @@ class ZEDToolbar : public ZEObject
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDToolbar)
+	friend class ZEDToolbarItem;
 	friend class ZEDToolbarManager;
 	private:
 		ZEDToolbarManager*				Manager;
@@ -70,6 +71,10 @@ class ZEDToolbar : public ZEObject
 		ZEDToolbarDockLocation			DockLocation;
 		ZEUInt							DockColumn;
 		ZEUInt							DockRow;
+		bool							DeferredSetup;
+
+		void							Setup();
+		void							CleanUp();
 
 										ZEDToolbar();
 										~ZEDToolbar();
@@ -98,7 +103,6 @@ class ZEDToolbar : public ZEObject
 		void							SetDockRow(ZEUInt Row);
 		ZEUInt							GetDockRow() const;
 
-
 		QToolBar*						GetNativeToolbar();
 
 		const ZEArray<ZEDToolbarItem*>&	GetItems() const;
@@ -109,10 +113,6 @@ class ZEDToolbar : public ZEObject
 
 		bool							Load(ZEMLReaderNode* Reader);
 		bool							Save(ZEMLWriterNode* WriterNode);
-
-		ZE_EVENT(						OnUpdated,(ZEDToolbar* Menu));
-
-		void							Update();
 
 		virtual void					Destroy();
 
