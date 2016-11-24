@@ -341,7 +341,7 @@ void ZEDSelectionManager::RegisterCommands()
 	Items.Add("Circle");
 	Items.Add("Brush");
 	SelectionShapeCommand.SetListItems(Items);
-	SelectionShapeCommand.SetValue("Rectangle");
+	SelectionShapeCommand.SetValueIndex(0);
 	SelectionShapeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionShapeCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionShapeCommand);
 }
@@ -349,7 +349,7 @@ void ZEDSelectionManager::RegisterCommands()
 void ZEDSelectionManager::UpdateCommands()
 {
 	ClearSelectionCommand.SetEnabled(GetSelection().GetCount() != 0);
-	LockSelectionCommand.SetValue(GetLockSelection());
+	LockSelectionCommand.SetValueChecked(GetLockSelection());
 	FreezeObjectsCommand.SetEnabled(GetSelection().GetCount() != 0);
 	UnfreezeObjectsCommand.SetEnabled(GetFrozonObjects().GetCount() != 0);
 }
@@ -366,7 +366,7 @@ void ZEDSelectionManager::ClearSelectionCommand_OnAction(const ZEDCommand* Comma
 
 void ZEDSelectionManager::LockSelectionCommand_OnAction(const ZEDCommand* Command)
 {
-	SetLockSelection(Command->GetValue().GetBoolean());
+	SetLockSelection(Command->GetValueChecked());
 }
 
 void ZEDSelectionManager::FreezeObjectsCommand_OnAction(const ZEDCommand* Command)
@@ -381,7 +381,7 @@ void ZEDSelectionManager::UnfreezeObjectsCommand_OnAction(const ZEDCommand* Comm
 
 void ZEDSelectionManager::SelectionModeCommand_OnAction(const ZEDCommand* Command)
 {
-	if (Command->GetValue().GetBoolean())
+	if (Command->GetValueChecked())
 	{
 		SetSelectionMode(ZE_SM_FULLY_COVERS);
 		SelectionModeCommand.SetText("Covers");
@@ -395,14 +395,7 @@ void ZEDSelectionManager::SelectionModeCommand_OnAction(const ZEDCommand* Comman
 
 void ZEDSelectionManager::SelectionShapeCommand_OnAction(const ZEDCommand* Command)
 {
-	const ZEString& Value = Command->GetValue().GetString();
-	
-	if (Value == "Circle")
-		SetSelectionShape(ZED_SS_CIRCLE);
-	else if (Value == "Brush")
-		SetSelectionShape(ZED_SS_BRUSH);
-	else
-		SetSelectionShape(ZED_SS_RECTANGLE);
+	SetSelectionShape((ZEDSelectionShape)Command->GetValueIndex());
 }
 
 void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)

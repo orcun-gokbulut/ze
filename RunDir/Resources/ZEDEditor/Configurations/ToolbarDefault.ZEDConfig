@@ -16,20 +16,18 @@
       <Property Name="TargetName" Type="String">ZEDSelectionManager::LockSelectionCommand</Property>
      </Node>
      <Node Name="Item">
-      <Property Name="Type" Type="UInt8">3</Property>
-      <Property Name="TargetName" Type="String"></Property>
+      <Property Name="Type" Type="UInt8">2</Property>
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectAllCommand1</Property>
+      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectAllCommand</Property>
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
       <Property Name="TargetName" Type="String">ZEDSelectionManager::ClearSelectionCommand</Property>
      </Node>
      <Node Name="Item">
-      <Property Name="Type" Type="UInt8">3</Property>
-      <Property Name="TargetName" Type="String"></Property>
+      <Property Name="Type" Type="UInt8">2</Property>
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
@@ -40,27 +38,11 @@
       <Property Name="TargetName" Type="String">ZEDSelectionManager::UnfreezeObjectsCommand</Property>
      </Node>
      <Node Name="Item">
-      <Property Name="Type" Type="UInt8">3</Property>
-      <Property Name="TargetName" Type="String"></Property>
+      <Property Name="Type" Type="UInt8">2</Property>
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
       <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectionShapeCommand</Property>
-     </Node>
-    </Node>
-   </Node>
-   <Node Name="Toolbar">
-    <Property Name="Name" Type="String">Ralisting Toolbar</Property>
-    <Property Name="Icon" Type="String"></Property>
-    <Property Name="Text" Type="String">Ralistlin</Property>
-    <Property Name="Visible" Type="Bool">true</Property>
-    <Property Name="DockLocation" Type="UInt8">2</Property>
-    <Property Name="DockColumn" Type="UInt8">0</Property>
-    <Property Name="DockRow" Type="UInt8">0</Property>
-    <Node Name="Items">
-     <Node Name="Item">
-      <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDEditor::NewCommand</Property>
      </Node>
     </Node>
    </Node>

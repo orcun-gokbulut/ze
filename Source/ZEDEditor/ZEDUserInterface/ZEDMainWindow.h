@@ -111,7 +111,7 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		void								RegisterCommands();
 
-		void								MainMenu_OnUpdated(ZEDMenu* Menu);
+		void								MainMenu_OnUpdated(const ZEDMenu* Menu);
 		void								CustomizeUICommand_OnAction(const ZEDCommand* Command);
 
 	public:

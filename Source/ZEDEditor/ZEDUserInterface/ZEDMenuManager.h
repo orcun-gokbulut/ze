@@ -63,7 +63,7 @@ class ZEDMenuManager : public ZEObject
 		bool							Load(const ZEString& ConfigurationFile);
 		bool							Save(const ZEString& ConfigurationFile);
 
-		void							Update();
+		void							Setup();
 
 		virtual void					Destroy();
 

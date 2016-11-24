@@ -71,39 +71,6 @@ void ZEDCommand::SetType(ZEDCommandType Type)
 
 	this->Type = Type;
 
-
-	switch (Type)
-	{
-		default:
-		case ZED_CT_COMMAND:
-			break;
-
-		case ZED_CT_TOGGLE:
-			if (Value.GetType() != ZE_VRT_BOOLEAN)
-				Value.SetValue(false);
-			break;
-
-		case ZED_CT_LIST:
-			if (Value.GetType() != ZE_VRT_STRING)
-				Value.SetString("");
-			break;
-
-		case ZED_CT_INPUT_TEXT:
-			if (Value.GetType() != ZE_VRT_STRING)
-				Value.SetString("");
-			break;
-
-		case ZED_CT_INPUT_NUMBER:
-			if (!Value.IsInteger())
-				Value.SetInt32(0);
-			break;
-
-		case ZED_CT_INPUT_FLOAT:
-			if (!Value.IsFloatingPoint())
-				Value.SetFloat(0.0f);
-			break;
-	}
-
 	OnUpdated(this);
 }
 
@@ -182,25 +149,92 @@ bool ZEDCommand::GetVisible() const
 	return Visible;
 }
 
-void ZEDCommand::SetValue(const ZEValue& Value)
+void ZEDCommand::SetValueChecked(bool Checked)
 {
-	this->Value = Value;
+	if (ValueChecked == Checked)
+		return;
+
+	ValueChecked = Checked;
+
 	OnUpdated(this);
 }
 
-const ZEValue& ZEDCommand::GetValue() const
+bool ZEDCommand::GetValueChecked() const
 {
-	return Value;
+	return ValueChecked;
+}
+
+void ZEDCommand::SetValueIndex(ZEInt SelectedIndex)
+{
+	if (this->ValueIndex == SelectedIndex)
+		return;
+
+	this->ValueIndex = SelectedIndex;
+
+	OnUpdated(this);
+}
+
+ZEInt ZEDCommand::GetValueIndex() const
+{
+	return ValueIndex;
 }
 
 void ZEDCommand::SetListItems(const ZEArray<ZEString>& Items)
 {
-	ComboBoxItems = Items;
+	ListItems = Items;
+
+	OnUpdated(this);
 }
+
+void ZEDCommand::SetValueNumber(ZEInt Value)
+{
+	if (ValueIndex == Value)
+		return;
+
+	ValueIndex = Value;
+
+	OnUpdated(this);
+}
+
+ZEInt ZEDCommand::GetValueNumber() const
+{
+	return ValueIndex;
+}
+
+void ZEDCommand::SetValueFloat(double Value)
+{
+	if (ValueFloat == Value)
+		return;
+
+	ValueFloat = Value;
+
+	OnUpdated(this);
+}
+
+ZEInt ZEDCommand::GetValueFloat() const
+{
+	return ValueFloat;
+}
+
+void ZEDCommand::SetValueText(const ZEString& Value)
+{
+	if (ValueText == Value)
+		return;
+
+	ValueText = Value;
+
+	OnUpdated(this);
+}
+
+const ZEString& ZEDCommand::GetValueText() const
+{
+	return ValueText;
+}
+
 
 const ZEArray<ZEString>& ZEDCommand::GetListItems() const
 {
-	return ComboBoxItems;
+	return ListItems;
 }
 
 void ZEDCommand::SetTooltip(const ZEString& Tooltip)
@@ -239,6 +273,11 @@ ZEDCommand::ZEDCommand()
 	Type = ZED_CT_COMMAND;
 	Enabled = true;
 	Visible = true;
+
+	ValueChecked = false;
+	ValueIndex = 0;
+	ValueInteger = 0;
+	ValueFloat = 0.0;
 }
 
 ZEDCommand::~ZEDCommand()

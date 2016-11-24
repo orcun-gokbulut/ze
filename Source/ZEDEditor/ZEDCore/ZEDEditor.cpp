@@ -188,7 +188,7 @@ void ZEDEditor::ExitCommand_OnAction(const ZEDCommand* Command)
 
 void ZEDEditor::RecentFilesCommand_OnAction(const ZEDCommand* Command)
 {
-	Load(Command->GetValue().GetString());
+	Load(Command->GetListItems()[Command->GetValueIndex()]);
 }
 
 void ZEDEditor::UpdateCommands()

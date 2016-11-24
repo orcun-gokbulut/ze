@@ -41,9 +41,9 @@
 #include <QAction>
 
 class ZEDCommand;
-class ZEDToolbarItem;
-class ZEDToolbar;
-class ZEDMenu;
+class QLabel;
+class QComboBox;
+class QLineEdit;
 class QMenu;
 
 enum ZEDToolbarItemType
@@ -53,41 +53,35 @@ enum ZEDToolbarItemType
 	ZED_TIT_SEPERATOR
 };
 
-class ZEDToolbarAction : public QAction
+
+class ZEDToolbarItem : public QObject, public ZEObject
 {
 	Q_OBJECT
-	friend class ZEDToolbar;
-	friend class ZEDToolbarItem;
-	private:
-		ZEDToolbarItem*				Item;
-
-		void							SubAction_triggered(bool Triggered);
-		void							Action_triggered(bool Triggered);
-
-										ZEDToolbarAction(ZEDToolbarItem* Item);
-};
-
-class ZEDToolbarItem : public ZEObject
-{
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDToolbarItem)
-	friend class ZEDToolbarAction;
 	friend class ZEDToolbar;
 	private:
-		ZEDToolbarAction*				Action;
 		ZEDToolbar*						Toolbar;
 		ZEDToolbarItemType				Type;
-		QMenu*							SubMenu;
+
+		QAction*						Action;
+		QLabel*							Label;
+		QComboBox*						ComboBox;
+		QLineEdit*						LineEdit;
 
 		ZEString						TargetName;
 		ZEDCommand*						TargetCommand;
-		ZEDMenu*						TargetMenu;
 
-		void							Action_Triggered();
-		void							SubAction_Triggered(QAction* Action);
-
+		void							SetupSeperator();
+		void							SetupCommand();
+		void							Setup();
+		void							CleanUp();
+		
+		void							Action_triggered();
+		void							SubAction_triggered();
+		void							ComboBox_currentIndexChanged(int);
+		void							LineEdit_textChanged(const QString&);
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
-		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
 
 										ZEDToolbarItem();
 										~ZEDToolbarItem();
@@ -100,8 +94,6 @@ class ZEDToolbarItem : public ZEObject
 
 		void							SetTargetName(const ZEString& Name);
 		const ZEString&					GetTargetName() const;
-
-		void							Update();
 
 		bool							Load(ZEMLReaderNode* ItemNode);
 		bool							Save(ZEMLWriterNode* ItemsNode);

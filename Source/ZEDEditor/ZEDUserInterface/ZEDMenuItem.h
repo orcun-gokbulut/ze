@@ -39,11 +39,10 @@
 #include "ZEDS/ZEValue.h"
 
 #include <QObject>
-#include <QAction>
 
 class ZEDCommand;
-class ZEDMenuItem;
 class QMenu;
+class QAction;
 
 enum ZEDMenuItemType
 {
@@ -53,28 +52,14 @@ enum ZEDMenuItemType
 	ZED_MIT_SEPERATOR
 };
 
-class ZEDMenuAction : public QAction
+class ZEDMenuItem : public QObject, public ZEObject
 {
 	Q_OBJECT
-	friend class ZEDMenu;
-	friend class ZEDMenuItem;
-	private:
-		ZEDMenuItem*					Item;
-
-		void							SubAction_triggered(bool Triggered);
-		void							Action_triggered(bool Triggered);
-
-										ZEDMenuAction(ZEDMenuItem* Item);
-};
-
-class ZEDMenuItem : public ZEObject
-{
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDMenuItem)
-	friend class ZEDMenuAction;
 	friend class ZEDMenu;
 	private:
-		ZEDMenuAction*					Action;
+		QAction*						Action;
 		ZEDMenu*						Menu;
 		ZEDMenuItemType					Type;
 		QMenu*							SubMenu;
@@ -83,8 +68,13 @@ class ZEDMenuItem : public ZEObject
 		ZEDCommand*						TargetCommand;
 		ZEDMenu*						TargetMenu;
 
-		void							Action_Triggered();
-		void							SubAction_Triggered(QAction* Action);
+		void							SetupCommand();
+		void							SetupMenu();
+		void							SetupSeperator();
+		void							Setup();
+		void							CleanUp();
+
+		void							Action_triggered(bool);
 
 		void							TargetCommand_OnUpdate(const ZEDCommand* Command);
 		void							TargetMenu_OnUpdate(const ZEDMenu* Menu);
@@ -100,8 +90,6 @@ class ZEDMenuItem : public ZEObject
 
 		void							SetTargetName(const ZEString& Name);
 		const ZEString&					GetTargetName() const;
-
-		void							Update();
 
 		bool							Load(ZEMLReaderNode* ItemNode);
 		bool							Save(ZEMLWriterNode* ItemsNode);

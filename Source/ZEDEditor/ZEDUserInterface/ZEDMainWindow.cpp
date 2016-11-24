@@ -55,11 +55,7 @@
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
-class ZEDMenuWrapper : public QMenu
-{
-	public:
-		ZEString Section;
-};
+
 
 bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 {
@@ -91,7 +87,7 @@ void ZEDMainWindow::PopulateMainMenu()
 	if (MainMenu == NULL)
 		return;
 
-	MainMenu->OnUpdated += ZEEventDelegate<void (ZEDMenu* Menu)>::Create<ZEDMainWindow, &ZEDMainWindow::MainMenu_OnUpdated>(this);
+	MainMenu->OnUpdated += ZEEventDelegate<void (const ZEDMenu* Menu)>::Create<ZEDMainWindow, &ZEDMainWindow::MainMenu_OnUpdated>(this);
 	MainMenu_OnUpdated(MainMenu);
 }
 
@@ -101,9 +97,9 @@ void ZEDMainWindow::PopulateToolbars()
 		MainWindow->addToolBar(ToolbarManager->GetToolbars()[I]->GetNativeToolbar());
 }
 
-void ZEDMainWindow::MainMenu_OnUpdated(ZEDMenu* Menu)
+void ZEDMainWindow::MainMenu_OnUpdated(const ZEDMenu* Menu)
 {
-	QMenu* NativeMenu = Menu->GetNativeMenu();
+	QMenu* NativeMenu = const_cast<ZEDMenu*>(Menu)->GetNativeMenu();
 	QList<QAction*> Actions = NativeMenu->actions();
 
 	MainWindow->menuBar()->clear();
