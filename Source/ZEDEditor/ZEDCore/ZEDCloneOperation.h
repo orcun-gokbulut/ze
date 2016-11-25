@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDDeleteOperation.h
+ Zinek Engine - ZEDCloneOperation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,30 +38,22 @@
 #include "ZEDOperation.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEDRelocateOperation.h"
 
 class ZEDObjectWrapper;
 
-class ZEDDeletedItem
-{
-	public:
-		ZEDObjectWrapper*						Wrapper;
-		ZEDObjectWrapper*						Parent;
-		ZEArray<ZEDRelocatedItem>				RelocatedItems;
-};
-
-class ZEDDeleteOperation : public ZEDOperation
+class ZEDCloneOperation : public ZEDOperation
 {
 	ZE_OBJECT
 	private:
-		ZEArray<ZEDDeletedItem>					Items;
+		ZEArray<ZEDObjectWrapper*>				Originals;
+		ZEArray<ZEDObjectWrapper*>				Clones;
 
 		virtual bool							Apply();
 		virtual bool							Revert();
 
-												ZEDDeleteOperation();
-		virtual									~ZEDDeleteOperation();
+												ZEDCloneOperation();
+		virtual									~ZEDCloneOperation();
 
 	public:
-		static ZEDDeleteOperation*				Create(const ZEArray<ZEDObjectWrapper*>& Wrappers);
+		static ZEDCloneOperation*				Create(const ZEArray<ZEDObjectWrapper*>& Wrappers);
 };

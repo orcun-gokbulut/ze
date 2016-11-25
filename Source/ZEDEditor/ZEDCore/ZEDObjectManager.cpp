@@ -45,6 +45,9 @@
 #include "ZEDDeleteOperation.h"
 #include "ZEDRelocateOperation.h"
 #include "ZEDEditorEvent.h"
+#include "ZEDSelectionManager.h"
+#include "ZEDUserInterface\ZEDCommandManager.h"
+#include "ZEDCloneOperation.h"
 
 void ZEDObjectManager::LoadWrapperClasses()
 {
@@ -61,8 +64,9 @@ bool ZEDObjectManager::InitializeInternal()
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 	
+	RegisterCommands();
 	LoadWrapperClasses();
-
+	
 	if (RootWrapper != NULL)
 	{
 		RootWrapper->Update();
@@ -86,6 +90,11 @@ void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)
 		GetRootWrapper()->ClearChildWrappers();
 }
 
+void ZEDObjectManager::SelectionEvent(const ZEDSelectionEvent* Event)
+{
+	UpdateCommands();
+}
+
 void ZEDObjectManager::RaiseEvent(const ZEDObjectEvent* Event)
 {
 	if (GetEditor() != NULL && IsInitialized())
@@ -101,6 +110,48 @@ ZEDObjectManager::~ZEDObjectManager()
 {
 	if (RootWrapper != NULL)
 		RootWrapper->Destroy();
+}
+
+void ZEDObjectManager::RegisterCommands()
+{
+	CloneCommand.SetName("ZEDObjects::CloneCommand");
+	CloneCommand.SetCategory("Objects");
+	CloneCommand.SetText("Clone");
+	CloneCommand.SetType(ZED_CT_TOGGLE);
+	CloneCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_C));
+	CloneCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::CloneCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&CloneCommand);
+
+	DeleteCommand.SetName("ZEDObjects::DeleteCommand");
+	DeleteCommand.SetCategory("Objects");
+	DeleteCommand.SetText("Delete");
+	DeleteCommand.SetType(ZED_CT_TOGGLE);
+	DeleteCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_DELETE));
+	DeleteCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::DeleteCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&DeleteCommand);
+
+	UpdateCommands();
+}
+
+void ZEDObjectManager::UpdateCommands()
+{
+	ZEDSelectionManager* SelectionManager = GetEditor()->GetSelectionManager();
+	if (SelectionManager == NULL)
+		return;
+
+	bool HasSelection = (SelectionManager->GetSelection().GetCount() != 0);
+	CloneCommand.SetEnabled(HasSelection);
+	DeleteCommand.SetEnabled(HasSelection);
+}
+
+void ZEDObjectManager::CloneCommand_OnAction(const ZEDCommand* Command)
+{
+	CloneObjects(GetEditor()->GetSelectionManager()->GetSelection());
+}
+
+void ZEDObjectManager::DeleteCommand_OnAction(const ZEDCommand* Command)
+{
+	this->DeleteObjects(GetEditor()->GetSelectionManager()->GetSelection());
 }
 
 const ZEArray<ZEDWrapperRegistration>& ZEDObjectManager::GetWrapperClasses()
@@ -263,14 +314,14 @@ void ZEDObjectManager::DeleteObject(ZEDObjectWrapper* Wrapper)
 	ZEArray<ZEDObjectWrapper*> Wrappers;
 	Wrappers.Add(Wrapper);
 
-	ZEDDeleteOperation* DeleteOpeeration = ZEDDeleteOperation::Create(Wrappers);
-	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
+	ZEDDeleteOperation* DeleteOperation = ZEDDeleteOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOperation);
 }
 
 void ZEDObjectManager::DeleteObjects(const ZEArray<ZEDObjectWrapper*> Wrappers)
 {
-	ZEDDeleteOperation* DeleteOpeeration = ZEDDeleteOperation::Create(Wrappers);
-	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
+	ZEDDeleteOperation* DeleteOperation = ZEDDeleteOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOperation);
 }
 
 void ZEDObjectManager::RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWrapper* Wrapper)
@@ -278,14 +329,29 @@ void ZEDObjectManager::RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWr
 	ZEArray<ZEDObjectWrapper*> Wrappers;
 	Wrappers.Add(Wrapper);
 
-	ZEDRelocateOperation* DeleteOpeeration = ZEDRelocateOperation::Create(Destination, Wrappers);
-	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
+	ZEDRelocateOperation* RelocateOperation = ZEDRelocateOperation::Create(Destination, Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(RelocateOperation);
 }
 
 void ZEDObjectManager::RelocateObjects(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers)
 {
-	ZEDRelocateOperation* DeleteOpeeration = ZEDRelocateOperation::Create(Destination, Wrappers);
-	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
+	ZEDRelocateOperation* RelocateOperation = ZEDRelocateOperation::Create(Destination, Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(RelocateOperation);
+}
+
+void ZEDObjectManager::CloneObject(ZEDObjectWrapper* Wrapper)
+{
+	ZEArray<ZEDObjectWrapper*> Wrappers;
+	Wrappers.Add(Wrapper);
+
+	ZEDCloneOperation* CloneOperation = ZEDCloneOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(CloneOperation);
+}
+
+void ZEDObjectManager::CloneObjects(const ZEArray<ZEDObjectWrapper*> Wrappers)
+{
+	ZEDCloneOperation* CloneOperation = ZEDCloneOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(CloneOperation);
 }
 
 void ZEDObjectManager::Tick(float ElapsedTime)
