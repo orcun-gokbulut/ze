@@ -73,6 +73,7 @@ void ZEDEditor::RegisterCommands()
 	NewCommand.SetName("ZEDEditor::NewCommand");
 	NewCommand.SetText("New");
 	NewCommand.SetCategory("File");
+	NewCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/New.png");
 	NewCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
 	NewCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::NewCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&NewCommand);
@@ -81,6 +82,7 @@ void ZEDEditor::RegisterCommands()
 	OpenCommand.SetText("Open");
 	OpenCommand.SetCategory("File");
 	OpenCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_O));
+	OpenCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Open.png");
 	OpenCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::OpenCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&OpenCommand);
 
@@ -96,6 +98,7 @@ void ZEDEditor::RegisterCommands()
 	SaveCommand.SetCategory("File");
 	SaveCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/SemiChecked.png");
 	SaveCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_S));
+	SaveCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Save.png");
 	SaveCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveCommand);
 
@@ -103,13 +106,14 @@ void ZEDEditor::RegisterCommands()
 	SaveAsCommand.SetText("SaveAs");
 	SaveAsCommand.SetCategory("File");
 	SaveAsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL | ZED_VKM_SHIFT, ZED_VKK_S));
+	SaveAsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Save.png");
 	SaveAsCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveAsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveAsCommand);
 
 	CloseCommand.SetName("ZEDEditor::CloseCommand");
 	CloseCommand.SetText("Close");
 	CloseCommand.SetCategory("File");
-	CloseCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/Close.png");
+	CloseCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Close.png");
 	CloseCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloseCommand);
 
@@ -117,6 +121,7 @@ void ZEDEditor::RegisterCommands()
 	ExitCommand.SetText("Exit");
 	ExitCommand.SetCategory("Application");
 	ExitCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);
+	ExitCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Exit.png");
 	ZEDCommandManager::GetInstance()->RegisterCommand(&ExitCommand);
 }
 

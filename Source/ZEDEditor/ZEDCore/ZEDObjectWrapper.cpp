@@ -484,11 +484,27 @@ void ZEDObjectWrapper::Update()
 
 ZEDObjectWrapper* ZEDObjectWrapper::Clone()
 {
-	ZEDObjectWrapper* CloneWrapper = static_cast<ZEDObjectWrapper*>(GetClass()->Clone(this));
+	ZEDObjectWrapper* CloneWrapper = static_cast<ZEDObjectWrapper*>(GetClass()->CreateInstance());
+	if (CloneWrapper == NULL)
+		return false;
 
-	ZEObject* CloneObject = NULL;
-	if (Object != NULL)
-		CloneObject	= Object->GetClass()->Clone(Object);
+	ZEObject* CloneObject = Object->GetClass()->CreateInstance();
+	if (CloneObject == NULL)
+		return NULL;
+
+	const ZEProperty* Properties = CloneObject->GetClass()->GetProperties();
+	ZESize PropertyCount = CloneObject->GetClass()->GetPropertyCount();
+	for (ZESize I = 0; I < PropertyCount; I++)
+	{
+		if (Properties[I].Access != ZE_PA_READ_WRITE)
+			continue;
+
+		ZEVariant Value;
+		if (!Object->GetClass()->GetProperty(Object, Properties[I].ID, Value))
+			continue;
+		
+		CloneObject->GetClass()->SetProperty(CloneObject, Properties[I].ID, Value);
+	}
 
 	CloneWrapper->SetObject(CloneObject);
 

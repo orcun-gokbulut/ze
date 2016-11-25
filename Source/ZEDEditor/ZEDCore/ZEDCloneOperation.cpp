@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDDeleteOperation.h
+ Zinek Engine - ZEDCloneOperation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDCloneOperation.h"
 
-#include "ZEDOperation.h"
+#include "ZEDEditor.h"
+#include "ZEDObjectWrapper.h"
+#include "ZEDObjectManager.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDRelocateOperation.h"
-
-class ZEDObjectWrapper;
-
-class ZEDDeletedItem
+bool ZEDCloneOperation::Apply()
 {
-	public:
-		ZEDObjectWrapper*						Wrapper;
-		ZEDObjectWrapper*						Parent;
-		ZEArray<ZEDRelocatedItem>				RelocatedItems;
-};
+	Clones.SetCount(Originals.GetCount());
+	for (ZESize I = 0; I < Originals.GetCount(); I++)
+		Clones[I] = Originals[I]->Clone();
 
-class ZEDDeleteOperation : public ZEDOperation
+	for (ZESize I = 0; I < Clones.GetCount(); I++)
+	{
+		ZESSize ParentIndex = -1;
+		ZEDObjectWrapper* Parent = Originals[I]->GetParent();
+		while(Parent != NULL && Parent->GetParent() != NULL)
+		{
+			ParentIndex = Originals.FindIndex(Parent);
+			if (ParentIndex != -1)
+			{
+				Clones[ParentIndex]->AddChildWrapper(Clones[I]);
+				break;
+			}
+		}
+
+		if (ParentIndex == -1)
+			GetEditor()->GetObjectManager()->GetRootWrapper()->AddChildWrapper(Clones[I]);
+	}
+
+	return true;
+}
+
+bool ZEDCloneOperation::Revert()
 {
-	ZE_OBJECT
-	private:
-		ZEArray<ZEDDeletedItem>					Items;
+	for (ZESize I = 0; I < Clones.GetCount(); I++)
+	{
+		ZESSize ParentIndex = -1;
+		ZEDObjectWrapper* Parent = Clones[I]->GetParent();
+		while(Parent != NULL && Parent->GetParent() != NULL)
+		{
+			ParentIndex = Clones.FindIndex(Parent);
+			if (ParentIndex != -1)
+			{
+				Clones[ParentIndex]->RemoveChildWrapper(Clones[I]);
+				break;
+			}
+		}
 
-		virtual bool							Apply();
-		virtual bool							Revert();
+		if (ParentIndex == -1)
+			GetEditor()->GetObjectManager()->GetRootWrapper()->RemoveChildWrapper(Clones[I]);
+	}
 
-												ZEDDeleteOperation();
-		virtual									~ZEDDeleteOperation();
+	for (ZESize I = 0; I < Clones.GetCount(); I++)
+		Clones[I]->GetClass()->Destroy(Clones[I]);
 
-	public:
-		static ZEDDeleteOperation*				Create(const ZEArray<ZEDObjectWrapper*>& Wrappers);
-};
+	Clones.Clear();
+	return true;
+}
+
+ZEDCloneOperation::ZEDCloneOperation()
+{
+
+}
+
+ZEDCloneOperation::~ZEDCloneOperation()
+{
+
+}
+
+ZEDCloneOperation* ZEDCloneOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers)
+{
+	ZEDCloneOperation* Operation = new ZEDCloneOperation();
+
+	Operation->Originals = Wrappers;
+	Operation->SetText("Clone Objects");
+
+	return Operation;
+}

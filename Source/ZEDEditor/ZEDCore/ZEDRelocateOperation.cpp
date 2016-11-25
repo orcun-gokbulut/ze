@@ -43,14 +43,25 @@ bool ZEDRelocateOperation::Apply()
 {
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Wrapper == NULL)
+		ZEDRelocatedItem& Item = Items[I];
+		ZEDObjectWrapper* Wrapper = Item.Wrapper;
+
+		if (Wrapper == NULL)
 			continue;
+		
+		ZEVector3 Position = Wrapper->GetPosition();
+		ZEQuaternion Rotation = Wrapper->GetRotation();
+		ZEVector3 Scale = Wrapper->GetScale();
 
-		if (Items[I].OldParent != NULL)
-			Items[I].OldParent->RemoveChildWrapper(Items[I].Wrapper);
+		if (Item.OldParent != NULL)
+			Item.OldParent->RemoveChildWrapper(Wrapper);
 
-		if (Items[I].NewParent != NULL)
-			Items[I].NewParent->AddChildWrapper(Items[I].Wrapper);
+		if (Item.NewParent != NULL)
+			Item.NewParent->AddChildWrapper(Wrapper);
+
+		Wrapper->SetPosition(Position);
+		Wrapper->SetRotation(Rotation);
+		Wrapper->SetScale(Scale);
 	}
 
 	return true;
@@ -60,14 +71,22 @@ bool ZEDRelocateOperation::Revert()
 {
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Wrapper == NULL)
-			continue;
+		ZEDRelocatedItem& Item = Items[I];
+		ZEDObjectWrapper* Wrapper = Item.Wrapper;
+		
+		ZEVector3 Position = Wrapper->GetPosition();
+		ZEQuaternion Rotation = Wrapper->GetRotation();
+		ZEVector3 Scale = Wrapper->GetScale();
 
-		if (Items[I].NewParent != NULL)
-			Items[I].NewParent->RemoveChildWrapper(Items[I].Wrapper);
+		if (Item.NewParent != NULL)
+			Item.NewParent->RemoveChildWrapper(Wrapper);
 
-		if (Items[I].OldParent != NULL)
-			Items[I].OldParent->AddChildWrapper(Items[I].Wrapper);
+		if (Item.OldParent != NULL)
+			Item.OldParent->AddChildWrapper(Wrapper);
+
+		Wrapper->SetPosition(Position);
+		Wrapper->SetRotation(Rotation);
+		Wrapper->SetScale(Scale);
 	}
 
 	return true;

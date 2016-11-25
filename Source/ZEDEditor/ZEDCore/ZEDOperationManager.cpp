@@ -173,24 +173,16 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 		return false;
 	}
 
-	if (CanRedo())
+	StackIndex++;
+
+	for (ZESize I = StackIndex; I < Stack.GetCount(); I++)
 	{
-		for (ZESSize I = StackIndex + 1; I < (ZESSize)Stack.GetCount(); I++)
-		{
-			Stack[I]->Destroy();
-			Stack.Remove(I);
-			I--;
-		}
-		
-		StackIndex++;
-		Stack.SetCount(StackIndex + 1);
-		Stack[StackIndex] = Operation;
-	}
-	else
-	{
-		Stack.Add(Operation);
-		StackIndex++;
-	}
+		Stack[I]->Destroy();
+		Stack.Remove(I);
+		I--;
+	}	
+	
+	Stack.Add(Operation);
 
 	UpdateCommands();
 

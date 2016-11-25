@@ -692,6 +692,7 @@ void ZEDTransformationManager::RegisterCommands()
 	SelectCommand.SetCategory("Transformations");
 	SelectCommand.SetText("Select");
 	SelectCommand.SetType(ZED_CT_TOGGLE);
+	SelectCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Select.png");
 	SelectCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Q));
 	SelectCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::SelectCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectCommand);
@@ -700,6 +701,7 @@ void ZEDTransformationManager::RegisterCommands()
 	MoveCommand.SetCategory("Transformations");
 	MoveCommand.SetText("Move");
 	MoveCommand.SetType(ZED_CT_TOGGLE);
+	MoveCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Move.png");
 	MoveCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_W));
 	MoveCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::MoveCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&MoveCommand);
@@ -708,6 +710,7 @@ void ZEDTransformationManager::RegisterCommands()
 	RotateCommand.SetCategory("Transformations");
 	RotateCommand.SetText("Rotate");
 	RotateCommand.SetType(ZED_CT_TOGGLE);
+	RotateCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Rotate.png");
 	RotateCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_E));
 	RotateCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::RotateCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&RotateCommand);
@@ -724,6 +727,7 @@ void ZEDTransformationManager::RegisterCommands()
 	ScaleCommand.SetCategory("Transformations");
 	ScaleCommand.SetText("Scale");
 	ScaleCommand.SetType(ZED_CT_TOGGLE);
+	ScaleCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Scale.png");
 	ScaleCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_R));
 	ScaleCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::ScaleCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&ScaleCommand);
@@ -733,12 +737,13 @@ void ZEDTransformationManager::RegisterCommands()
 	SnapCommand.SetText("Snap");
 	SnapCommand.SetType(ZED_CT_TOGGLE);
 	SnapCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_T));
-	TransformSpaceCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformPivotCommand_OnAction>(this);
+	SnapCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformPivotCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SnapCommand);
 
 	TransformSpaceCommand.SetName("ZEDTransformationManager::TransformSpaceCommand");
 	TransformSpaceCommand.SetCategory("Transformations");
 	TransformSpaceCommand.SetText("Space");
+	TransformSpaceCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Space.png");
 	TransformSpaceCommand.SetType(ZED_CT_LIST);
 	ZEArray<ZEString> TransformSpaceCommandItems;
 	TransformSpaceCommandItems.Add("Local");
@@ -753,6 +758,7 @@ void ZEDTransformationManager::RegisterCommands()
 	TransformPivotCommand.SetCategory("Transformations");
 	TransformPivotCommand.SetText("Pivot");
 	TransformPivotCommand.SetType(ZED_CT_LIST);
+	TransformPivotCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Pivot.png");
 	ZEArray<ZEString> TransformPivotCommandItems;
 	TransformPivotCommandItems.Add("Object");
 	TransformPivotCommandItems.Add("Focused Object");

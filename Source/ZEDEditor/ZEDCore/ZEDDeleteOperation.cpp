@@ -37,6 +37,7 @@
 
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectEvent.h"
+#include "ZEDObjectManager.h"
 
 #include "ZEDEditor.h"
 
@@ -44,10 +45,26 @@ bool ZEDDeleteOperation::Apply()
 {
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Parent == NULL)
-			continue;
+		ZEDDeletedItem& Item = Items[I];
+		ZEDObjectWrapper* Wrapper = Item.Wrapper;
+		ZEDObjectWrapper* Parent = Wrapper->GetParent();
 
-		Items[I].Parent->RemoveChildWrapper(Items[I].Wrapper);
+		Parent->RemoveChildWrapper(Wrapper);
+		
+		const const ZEArray<ZEDObjectWrapper*>& ChildWrappers =  Wrapper->GetChildWrappers();
+		while(ChildWrappers.GetCount() != 0)
+		{
+			ZEDObjectWrapper* ChildeWrapper = ChildWrappers.GetFirstItem();
+
+			ZEDRelocatedItem RelocatedItem;
+			RelocatedItem.NewParent = Parent;
+			RelocatedItem.OldParent = Wrapper;
+			RelocatedItem.Wrapper = ChildWrappers[I];
+			Item.RelocatedItems.Add(RelocatedItem);
+
+			Wrapper->RemoveChildWrapper(RelocatedItem.Wrapper);
+			RelocatedItem.NewParent->AddChildWrapper(RelocatedItem.Wrapper);
+		}
 	}
 
 	return true;
@@ -55,12 +72,25 @@ bool ZEDDeleteOperation::Apply()
 
 bool ZEDDeleteOperation::Revert()
 {
-	for (ZESize I = 0; I < Items.GetCount(); I++)
+	for (ZESSize I = Items.GetCount() - 1; I >= 0 ; I--)
 	{
-		if (Items[I].Parent == NULL)
-			continue;
+		ZEDDeletedItem& Item = Items[I];
+		ZEDObjectWrapper* Wrapper = Item.Wrapper;
+		
+		for (ZESSize I = Item.RelocatedItems.GetCount() - 1; I >= 0; I--)
+		{
+			ZEDRelocatedItem& RelocatedItem = Item.RelocatedItems[I];
 
-		Items[I].Parent->AddChildWrapper(Items[I].Wrapper);
+			if (RelocatedItem.NewParent == NULL)
+				GetEditor()->GetObjectManager()->GetRootWrapper()->RemoveChildWrapper(RelocatedItem.Wrapper);
+			else
+				RelocatedItem.NewParent->RemoveChildWrapper(RelocatedItem.Wrapper);
+
+			RelocatedItem.OldParent->AddChildWrapper(RelocatedItem.Wrapper);
+		}
+		Item.RelocatedItems.Clear();
+
+		Item.Parent->AddChildWrapper(Wrapper);
 	}
 
 	return true;
@@ -73,16 +103,14 @@ ZEDDeleteOperation::ZEDDeleteOperation()
 
 ZEDDeleteOperation::~ZEDDeleteOperation()
 {
-	if (GetStatus() == ZED_OS_DONE)
+	if (GetStatus() == ZED_OS_NOT_DONE)
 		return;
 
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Wrapper->GetObject() != NULL)
-			delete Items[I].Wrapper->GetObject();
-
-		if (Items[I].Wrapper != NULL)
-			Items[I].Wrapper->Destroy();
+		ZEObject* Object = Items[I].Wrapper->GetObject() ;
+		Items[I].Wrapper->Destroy();
+		Object->GetClass()->Destroy(Object);
 	}
 }
 

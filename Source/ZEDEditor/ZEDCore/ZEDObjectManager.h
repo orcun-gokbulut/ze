@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
 class ZEClass;
 class ZEDObjectWrapper;
@@ -62,11 +63,22 @@ class ZEDObjectManager : public ZEDComponent
 		bool									DeinitializeInternal();
 
 		virtual void							EditorEvent(const ZEDEditorEvent* Event);
+		virtual void							SelectionEvent(const ZEDSelectionEvent* Event);
 
 		void									RaiseEvent(const ZEDObjectEvent* Event);
 
 												ZEDObjectManager();
 												~ZEDObjectManager();
+
+	private: /* COMMANDS */
+		ZEDCommand								CloneCommand;
+		ZEDCommand								DeleteCommand;
+
+		void									RegisterCommands();
+		void									UpdateCommands();
+
+		void									CloneCommand_OnAction(const ZEDCommand* Command);
+		void									DeleteCommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		const ZEArray<ZEDWrapperRegistration>&	GetWrapperClasses();
@@ -86,6 +98,8 @@ class ZEDObjectManager : public ZEDComponent
 		void									DeleteObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
 		void									RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWrapper* Wrapper);
 		void									RelocateObjects(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers);
+		void									CloneObject(ZEDObjectWrapper* Wrapper);
+		void									CloneObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
 
 		void									Tick(float ElapsedTime);
 

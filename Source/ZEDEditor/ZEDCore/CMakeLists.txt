@@ -64,6 +64,8 @@ ze_add_source(ZEDDeleteOperation.cpp					Sources)
 ze_add_source(ZEDDeleteOperation.h						Sources ZEMC)
 ze_add_source(ZEDRelocateOperation.cpp					Sources)
 ze_add_source(ZEDRelocateOperation.h					Sources ZEMC)
+ze_add_source(ZEDCloneOperation.cpp						Sources)
+ze_add_source(ZEDCloneOperation.h						Sources ZEMC)
 ze_add_source(ZEDPropertyOperation.cpp					Sources)
 ze_add_source(ZEDPropertyOperation.h					Sources ZEMC)
 
