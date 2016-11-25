@@ -39,11 +39,23 @@
 #include "ZEDOperation.h"
 #include "ZEDEditorCore.h"
 #include "ZEDEditorEvent.h"
+#include "ZEDUserInterface\ZEDCommandManager.h"
+
 
 void ZEDOperationManager::EditorEvent(const ZEDEditorEvent* Event)
 {
 	if (Event->GetType() == ZED_EET_FILE_CLOSED)
 		Clear();
+}
+
+bool ZEDOperationManager::InitializeInternal()
+{
+	if (!ZEDComponent::InitializeInternal())
+		return false;
+
+	RegisterCommands();
+
+	return true;
 }
 
 ZEDOperationManager::ZEDOperationManager()
@@ -54,6 +66,41 @@ ZEDOperationManager::ZEDOperationManager()
 ZEDOperationManager::~ZEDOperationManager()
 {
 	Clear();
+}
+
+void ZEDOperationManager::RegisterCommands()
+{
+	UndoCommand.SetName("ZEDOperationManager::UndoCommand");
+	UndoCommand.SetCategory("Operations");
+	UndoCommand.SetText("Undo");
+	UndoCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Z));
+	UndoCommand.OnAction += ZEDCommandDelegate::Create<ZEDOperationManager, &ZEDOperationManager::UndoCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&UndoCommand);
+
+	RedoCommand.SetName("ZEDTransformationManager::RedoCommand");
+	RedoCommand.SetCategory("Operations");
+	RedoCommand.SetText("Redo");
+	RedoCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Y));
+	RedoCommand.OnAction += ZEDCommandDelegate::Create<ZEDOperationManager, &ZEDOperationManager::RedoCommand_OnAction>(this);
+	ZEDCommandManager::GetInstance()->RegisterCommand(&RedoCommand);
+
+	UpdateCommands();
+}
+
+void ZEDOperationManager::UpdateCommands()
+{
+	UndoCommand.SetEnabled(CanUndo());
+	RedoCommand.SetEnabled(CanRedo());
+}
+
+void ZEDOperationManager::UndoCommand_OnAction(const ZEDCommand* Command)
+{
+	Undo();
+}
+
+void ZEDOperationManager::RedoCommand_OnAction(const ZEDCommand* Command)
+{
+	Redo();
 }
 
 const ZEArray<ZEDOperation*>& ZEDOperationManager::GetStack()
@@ -89,6 +136,8 @@ bool ZEDOperationManager::Undo()
 
 	StackIndex--;
 
+	UpdateCommands();
+
 	return true;
 }
 
@@ -104,6 +153,8 @@ bool ZEDOperationManager::Redo()
 		zeError("Cannot redo operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
 		return false;
 	}
+
+	UpdateCommands();
 
 	return true;
 }
@@ -141,6 +192,8 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 		StackIndex++;
 	}
 
+	UpdateCommands();
+
 	return true;
 }
 
@@ -152,6 +205,8 @@ void ZEDOperationManager::Clear()
 	Stack.Clear();
 
 	StackIndex = -1;
+
+	UpdateCommands();
 }
 
 ZEDOperationManager* ZEDOperationManager::CreateInstance()

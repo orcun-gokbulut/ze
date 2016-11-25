@@ -834,9 +834,9 @@ ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, floa
 
 ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
 {
-	const ZEVector3& Position = GetWorldPosition();
+	const ZEVector3& GizmoPosition = GetWorldPosition();
 
-	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, GizmoPosition) * View.ProjectionTransform.M11;
 	float AxisTreshold = this->PickTreshold * this->PickTreshold;
 
 	ZEVector3 Right, Up, Front;
@@ -849,15 +849,16 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 	float DistanceSquareMin = ZE_FLOAT_MAX;
 
 	// X Axis
-	ZEPlane AxisXPlane(Right, Position);
+	ZEPlane AxisXPlane(Right, GizmoPosition);
 	if (ZEPlane::IntersectionTest(AxisXPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
+		ZEVector3 IntersectionDirection = IntersectionPoint - GizmoPosition;
+		IntersectionDirection.NormalizeSelf();
+		if (ZEVector3::DotProduct(IntersectionDirection, View.Direction) < 0.1f)
 		{
-			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
-			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
-			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, GizmoPosition + IntersectionDirection * AxisLength);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, IntersectionPoint);
 			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
 			if (DistanceSquare < AxisTreshold)
 			{
@@ -869,17 +870,18 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 
 	
 	
-	ZEPlane AxisYPlane(Up, Position);
+	ZEPlane AxisYPlane(Up, GizmoPosition);
 	if (ZEPlane::IntersectionTest(AxisYPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
+		ZEVector3 IntersectionDirection = IntersectionPoint - GizmoPosition;
+		IntersectionDirection.NormalizeSelf();
+		if (ZEVector3::DotProduct(IntersectionDirection, View.Direction) < 0.1f)
 		{
-			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
-			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
-			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, GizmoPosition + IntersectionDirection * AxisLength);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, IntersectionPoint);
 			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
-			if (DistanceSquare < AxisTreshold && DistanceSquare < DistanceSquareMin)
+			if (DistanceSquare < AxisTreshold)
 			{
 				TRay = NewTRay;
 				PickedAxis = ZED_GA_Y_AXIS;
@@ -887,17 +889,18 @@ ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, fl
 		}
 	}
 	
-	ZEPlane AxisZPlane(Front, Position);
+	ZEPlane AxisZPlane(Front, GizmoPosition);
 	if (ZEPlane::IntersectionTest(AxisZPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
 		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-		if (ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.1f)
+		ZEVector3 IntersectionDirection = IntersectionPoint - GizmoPosition;
+		IntersectionDirection.NormalizeSelf();
+		if (ZEVector3::DotProduct(IntersectionDirection, View.Direction) < 0.1f)
 		{
-			ZEVector3 RadiusVector = IntersectionPoint.Normalize() * AxisLength;
-			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, RadiusVector);
-			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+			ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, GizmoPosition + IntersectionDirection * AxisLength);
+			ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, IntersectionPoint);
 			float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
-			if (DistanceSquare < AxisTreshold && DistanceSquare < DistanceSquareMin)
+			if (DistanceSquare < AxisTreshold)
 			{
 				TRay = NewTRay;
 				PickedAxis = ZED_GA_Z_AXIS;

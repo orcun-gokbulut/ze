@@ -459,6 +459,8 @@ void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 
 void ZEDObjectWrapper::SendChangedEvent()
 {
+	Update();
+
 	ZEDObjectEvent Event;
 	Event.Wrapper = this;
 	Event.Type = ZED_OET_CHANGED;

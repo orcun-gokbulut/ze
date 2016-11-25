@@ -39,6 +39,7 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEDOperation.h"
+#include "ZEDUserInterface\ZEDCommand.h"
 
 class ZEDOperationManager : public ZEDComponent
 {
@@ -49,8 +50,20 @@ class ZEDOperationManager : public ZEDComponent
 
 		virtual void					EditorEvent(const ZEDEditorEvent* Event);
 
+		virtual bool					InitializeInternal();
+
 										ZEDOperationManager();
 										~ZEDOperationManager();
+
+	private: /* COMMANDS */
+		ZEDCommand						UndoCommand;
+		ZEDCommand						RedoCommand;
+
+		void							RegisterCommands();
+		void							UpdateCommands();
+
+		void							UndoCommand_OnAction(const ZEDCommand* Command);
+		void							RedoCommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		const ZEArray<ZEDOperation*>&	GetStack();

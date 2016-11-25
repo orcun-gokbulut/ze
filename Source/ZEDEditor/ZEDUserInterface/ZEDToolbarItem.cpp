@@ -267,7 +267,7 @@ void ZEDToolbarItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 		if (TargetCommand->GetType() == ZED_CT_INPUT_NUMBER)
 			LineEdit->setText(QString::number(TargetCommand->GetValueNumber()));
 		else if (TargetCommand->GetType() == ZED_CT_INPUT_FLOAT)
-			LineEdit->setText(QString::number(TargetCommand->GetValueFloat()));
+			LineEdit->setText(QString::number(TargetCommand->GetValueFloat(), 'f', 2));
 		else
 			LineEdit->setText(TargetCommand->GetValueText().ToCString());
 	}

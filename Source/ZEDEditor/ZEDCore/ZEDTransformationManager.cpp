@@ -226,6 +226,7 @@ void ZEDTransformationManager::UpdateTransformStates()
 	PivotPosition = GetPosition(Valid);
 
 	UpdateGizmos();
+	UpdateCommands();
 }
 
 bool ZEDTransformationManager::InitializeInternal()
@@ -513,6 +514,11 @@ ZEVector3 ZEDTransformationManager::GetScale(bool& Valid)
 	return ZEVector3::Zero;
 }
 
+void ZEDTransformationManager::ObjectEvent(const ZEDObjectEvent* Event)
+{
+	UpdateTransformStates();
+}
+
 void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent* Event)
 {
 	ResetTransform();
@@ -740,7 +746,7 @@ void ZEDTransformationManager::RegisterCommands()
 	TransformSpaceCommandItems.Add("World");
 	TransformSpaceCommandItems.Add("View");
 	TransformSpaceCommand.SetListItems(TransformSpaceCommandItems);
-	TransformSpaceCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformPivotCommand_OnAction>(this);
+	TransformSpaceCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformSpaceCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&TransformSpaceCommand);
 
 	TransformPivotCommand.SetName("ZEDTransformationManager::TransformPivotCommand");
@@ -753,7 +759,7 @@ void ZEDTransformationManager::RegisterCommands()
 	TransformPivotCommandItems.Add("Selection Center");
 	TransformPivotCommandItems.Add("World");
 	TransformPivotCommand.SetListItems(TransformPivotCommandItems);
-	TransformPivotCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformSpaceCommand_OnAction>(this);
+	TransformPivotCommand.OnAction += ZEDCommandDelegate::Create<ZEDTransformationManager, &ZEDTransformationManager::TransformPivotCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&TransformPivotCommand);
 
 	XCommand.SetName("ZEDTransformationManager::XCommand");
@@ -790,8 +796,6 @@ void ZEDTransformationManager::UpdateCommands()
 	SnapCommand.SetValueChecked(GetTransformType() == ZED_TT_SNAP);
 
 	TransformSpaceCommand.SetValueIndex(GetTransformSpace());
-
-	TransformPivotCommand.SetEnabled(GetTransformType() == ZED_TT_ROTATE || GetTransformType() == ZED_TT_SCALE);
 	TransformPivotCommand.SetValueIndex(GetTransformPivot());
 
 	bool AllowChangeCoords = 
