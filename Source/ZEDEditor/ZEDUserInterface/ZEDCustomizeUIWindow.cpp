@@ -403,6 +403,7 @@ void ZEDCustomizeUIWindow::btnElementDelete_clicked()
 
 	UpdateElements();
 	UpdateElementItems();
+	UpdateItems();
 }
 
 void ZEDCustomizeUIWindow::cmbElements_currentIndexChanged(int)

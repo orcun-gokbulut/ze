@@ -134,6 +134,7 @@ class ZEDTransformationManager : public ZEDComponent
 		ZEVector3								GetRotation(bool& Valid);
 		ZEVector3								GetScale(bool& Valid);
 
+		virtual void							ObjectEvent(const ZEDObjectEvent* Event);
 		virtual void							SelectionEvent(const ZEDSelectionEvent* Event);
 		virtual void							ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
 		virtual void							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
