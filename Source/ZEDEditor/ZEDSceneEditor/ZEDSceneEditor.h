@@ -67,11 +67,6 @@ class ZEDSceneEditor : public ZEDEditor
 		virtual								~ZEDSceneEditor();
 
 	public:
-		virtual void						New();
-		virtual bool						Save(const ZEString& FileName);
-		virtual bool						Load(const ZEString& FileName);
-		virtual void						Close();
-
 		static ZEDSceneEditor*				CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");

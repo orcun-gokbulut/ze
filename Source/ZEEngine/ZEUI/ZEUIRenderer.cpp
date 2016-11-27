@@ -192,7 +192,7 @@ ZEUIRenderer::ZEUIRenderer()
 
 ZEUIRenderer::~ZEUIRenderer()
 {
-
+	Deinitialize();
 }
 
 void ZEUIRenderer::AddRectangle(ZEUIRectangle* Rectangle)

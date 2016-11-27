@@ -110,5 +110,6 @@ void ZEInputDeviceModule::UnAcquire()
 
 ZEInputDeviceModule::~ZEInputDeviceModule()
 {
+	Deinitialize();
 	DestroyDevices();
 }

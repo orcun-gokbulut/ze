@@ -67,6 +67,12 @@ ZEDirectInputDevice::ZEDirectInputDevice()
 	DirectInputDevice = NULL;
 }
 
+
+ZEDirectInputDevice::~ZEDirectInputDevice()
+{
+	Deinitialize();
+}
+
 void ZEDirectInputDevice::Acquire()
 {
 	if (!IsInitialized())

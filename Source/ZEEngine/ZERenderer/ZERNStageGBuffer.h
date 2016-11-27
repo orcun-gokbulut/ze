@@ -72,6 +72,7 @@ class ZERNStageGBuffer : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageGBuffer();
+		virtual								~ZERNStageGBuffer();
 
 		static ZEGRRenderState				GetRenderState();
 };

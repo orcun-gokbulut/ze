@@ -71,7 +71,7 @@ ZEWindowsInputModule::ZEWindowsInputModule()
 
 ZEWindowsInputModule::~ZEWindowsInputModule()
 {
-
+	Deinitialize();
 }
 
 bool ZEWindowsInputModule::InitializeInternal()

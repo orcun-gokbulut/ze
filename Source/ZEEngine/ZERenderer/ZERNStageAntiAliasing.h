@@ -135,4 +135,5 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageAntiAliasing();
+		virtual								~ZERNStageAntiAliasing();
 };

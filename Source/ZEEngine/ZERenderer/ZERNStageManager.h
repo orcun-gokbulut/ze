@@ -51,8 +51,8 @@ class ZERNStageManager : public ZEObject, public ZEInitializable
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
-		ZERNStageManager();
-		~ZERNStageManager();
+										ZERNStageManager();
+		virtual							~ZERNStageManager();
 
 	public:
 		const ZEArray<ZERNStage*>&		GetStages();

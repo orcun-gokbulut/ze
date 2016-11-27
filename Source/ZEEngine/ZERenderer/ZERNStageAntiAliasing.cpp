@@ -470,3 +470,8 @@ ZERNStageAntiAliasing::ZERNStageAntiAliasing()
 	EdgeRenderTarget = NULL;
 	BlendRenderTarget = NULL;
 }
+
+ZERNStageAntiAliasing::~ZERNStageAntiAliasing()
+{
+	Deinitialize();
+}

@@ -80,6 +80,9 @@ class ZELNLauncher : public ZEInitializable
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
+										ZELNLauncher();
+		virtual							~ZELNLauncher();
+
 	public:
 		const ZEArray<ZELNModule*>		GetModules();
 		ZELNLauncherWindow*				GetWindow();
@@ -100,13 +103,10 @@ class ZELNLauncher : public ZEInitializable
 		const ZELNLaunchInformation&	GetInformation();
 		bool							GetAllowedToLaunch();
 
-
 		void							Launch();
 		void							Terminate();
 
 		void							Update();
-
-										ZELNLauncher();
 
 		static ZELNLauncher*			GetInstance();
 };

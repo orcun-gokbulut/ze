@@ -78,6 +78,7 @@ ZEALModule::ZEALModule()
 
 ZEALModule::~ZEALModule()
 {
+	Deinitialize();
 }
 
 ALCdevice* ZEALModule::GetDevice()

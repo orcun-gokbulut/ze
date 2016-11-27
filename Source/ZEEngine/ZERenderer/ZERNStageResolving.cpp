@@ -358,3 +358,8 @@ ZERNStageResolving::ZERNStageResolving()
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedGBuffer3), "GBuffer3", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ResolvedDepthTexture), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }
+
+ZERNStageResolving::~ZERNStageResolving()
+{
+	Deinitialize();
+}

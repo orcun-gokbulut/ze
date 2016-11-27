@@ -51,5 +51,5 @@ class ZEDPropertyWindow : public ZEDWindow
 		ZEDPropertyEditor*					GetPropertyEditor();
 
 											ZEDPropertyWindow();
-											~ZEDPropertyWindow();
+		virtual								~ZEDPropertyWindow();
 };

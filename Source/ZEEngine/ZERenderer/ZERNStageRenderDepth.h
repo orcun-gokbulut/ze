@@ -65,6 +65,7 @@ class ZERNStageRenderDepth : public ZERNStage
 		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStageRenderDepth();
+		virtual							~ZERNStageRenderDepth();
 
 		static ZEGRRenderState			GetRenderState();
 };

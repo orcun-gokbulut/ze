@@ -53,4 +53,6 @@ class ZELNContactModule  : public ZELNModule
 
 	public:
 		virtual QWidget*			GetWidget();
+
+		virtual						~ZELNContactModule();
 };

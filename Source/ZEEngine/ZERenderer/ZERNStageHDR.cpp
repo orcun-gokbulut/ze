@@ -566,3 +566,8 @@ ZERNStageHDR::ZERNStageHDR()
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputColorTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
+
+ZERNStageHDR::~ZERNStageHDR()
+{
+	DeinitializeInternal();
+}

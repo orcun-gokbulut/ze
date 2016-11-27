@@ -306,6 +306,8 @@ ZERNStageMultiplexer::ZERNStageMultiplexer()
 
 ZERNStageMultiplexer::~ZERNStageMultiplexer()
 {
+	Deinitialize();
+
 	while (Displays.GetFirst() != NULL)
 	{
 		ZERNStageDisplay* Input = Displays.GetFirst()->GetItem();

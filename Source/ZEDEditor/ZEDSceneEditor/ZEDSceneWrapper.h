@@ -61,10 +61,15 @@ class ZEDSceneWrapper : public ZEDObjectWrapper
 
 		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-		virtual void							Update();
 
 		virtual void							LockWrapper();
 		virtual void							UnlockWrapper();
+
+		virtual bool							Load(const ZEString& FileName);
+		virtual bool							Save(const ZEString& FileName);
+		virtual void							Clean();
+
+		virtual void							Update();
 
 		static ZEDSceneWrapper*					CreateInstance();
 }

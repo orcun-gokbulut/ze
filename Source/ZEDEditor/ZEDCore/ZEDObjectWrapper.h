@@ -162,6 +162,10 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								LockWrapper();
 		virtual void								UnlockWrapper();
 
+		virtual bool								Load(const ZEString& FileName);
+		virtual bool								Save(const ZEString& FileName);
+		virtual void								Clean();
+
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();

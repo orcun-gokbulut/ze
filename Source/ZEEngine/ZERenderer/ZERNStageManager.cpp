@@ -63,7 +63,7 @@ ZERNStageManager::ZERNStageManager()
 
 ZERNStageManager::~ZERNStageManager()
 {
-
+	Deinitialize();
 }
 
 const ZEArray<ZERNStage*>& ZERNStageManager::GetStages()

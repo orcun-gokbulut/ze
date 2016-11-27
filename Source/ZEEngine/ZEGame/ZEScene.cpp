@@ -707,6 +707,8 @@ ZEScene::ZEScene()
 
 ZEScene::~ZEScene()
 {
+	Deinitialize();
+
 	ClearEntities();
 
 	if (PhysicalWorld != NULL)

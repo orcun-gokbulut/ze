@@ -63,7 +63,7 @@ class ZEDirectInputDevice : public ZEInputDevice
 		virtual void							Process();
 
 												ZEDirectInputDevice();
-
+		virtual									~ZEDirectInputDevice();
 };
 
 #endif

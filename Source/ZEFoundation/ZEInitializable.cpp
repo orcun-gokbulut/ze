@@ -155,5 +155,6 @@ ZEInitializable::ZEInitializable()
 
 ZEInitializable::~ZEInitializable()
 {
-	Deinitialize();
+	DeinitializeInternal();
+	//zeDebugCheck(InitializationState != ZE_IS_UNINITIALIZED, "Object is not deinitialized. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");
 }

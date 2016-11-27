@@ -90,4 +90,5 @@ class ZERNStageShadowing : public ZERNStage
 		virtual bool					Setup(ZEGRContext* Context);
 										
 										ZERNStageShadowing();
+		virtual							~ZERNStageShadowing();
 };

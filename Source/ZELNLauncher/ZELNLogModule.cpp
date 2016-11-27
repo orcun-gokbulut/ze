@@ -58,10 +58,6 @@ bool ZELNLogModule::InitializeInternal()
 	if (!ZELNModule::InitializeInternal())
 		return false;
 
-	Widget = new QWidget();
-	Form = new Ui_ZELNLogWidget();
-	Form->setupUi(Widget);
-
 	Session.SetCallback(LogCallback);
 	Session.SetCallbackParameter(this);
 	Session.SetSink(true);
@@ -74,16 +70,25 @@ bool ZELNLogModule::DeinitializeInternal()
 {
 	Session.EndSession();
 
-	delete Widget;
-	Widget = NULL;
-
-	delete Form;
-	Form = NULL;
-
 	return ZELNModule::DeinitializeInternal();
 }
 
 QWidget* ZELNLogModule::GetWidget()
 {
 	return Widget;
+}
+
+ZELNLogModule::ZELNLogModule()
+{
+	Widget = new QWidget();
+	Form = new Ui_ZELNLogWidget();
+	Form->setupUi(Widget);
+}
+
+ZELNLogModule::~ZELNLogModule()
+{
+	Deinitialize();
+
+	delete Widget;
+	delete Form;
 }

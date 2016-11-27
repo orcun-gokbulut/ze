@@ -85,6 +85,8 @@ bool ZEDSceneEditor::InitializeInternal()
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
 	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
+	New();
+
  	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetModelFile("#R:/ZETrainSimulator/Actors/Vehicles/DE24000/DE24000.ZEMODEL");
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
@@ -126,37 +128,6 @@ ZEDSceneEditor::ZEDSceneEditor()
 ZEDSceneEditor::~ZEDSceneEditor()
 {
 
-}
-
-void ZEDSceneEditor::New()
-{
-	Close();
-
-	ZEDEditor::New();
-}
-
-bool ZEDSceneEditor::Save(const ZEString& FileName)
-{
-	if (!Scene->Serialize(FileName))
-		return false;
-
-	return ZEDEditor::Save(FileName);
-}
-
-bool ZEDSceneEditor::Load(const ZEString& FileName)
-{
-	Close();
-
-	if (!Scene->Unserialize(FileName))
-		return false;
-
-	return ZEDEditor::Load(FileName);
-}
-
-void ZEDSceneEditor::Close()
-{
-	Scene->ClearEntities();
-	ZEDEditor::Close();
 }
 
 ZEDSceneEditor* ZEDSceneEditor::CreateInstance()

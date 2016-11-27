@@ -89,7 +89,7 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		virtual bool						DeinitializeInternal();
 
 											ZEDEditor();
-											~ZEDEditor();
+		virtual								~ZEDEditor();
 
 	private: /* COMMANDS */
 		ZEDCommand							NewCommand;

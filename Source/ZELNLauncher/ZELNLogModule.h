@@ -58,4 +58,7 @@ class ZELNLogModule  : public ZELNModule
 
 	public:
 		virtual QWidget*			GetWidget();
+
+									ZELNLogModule();
+		virtual						~ZELNLogModule();
 };

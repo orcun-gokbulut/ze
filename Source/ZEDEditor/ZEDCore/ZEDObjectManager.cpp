@@ -86,8 +86,7 @@ bool ZEDObjectManager::DeinitializeInternal()
 
 void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)
 {
-	if (Event->GetType() == ZED_EET_FILE_CLOSED)
-		GetRootWrapper()->ClearChildWrappers();
+	UpdateCommands();
 }
 
 void ZEDObjectManager::SelectionEvent(const ZEDSelectionEvent* Event)
@@ -108,6 +107,8 @@ ZEDObjectManager::ZEDObjectManager()
 
 ZEDObjectManager::~ZEDObjectManager()
 {
+	Deinitialize();
+
 	if (RootWrapper != NULL)
 		RootWrapper->Destroy();
 }
@@ -117,7 +118,6 @@ void ZEDObjectManager::RegisterCommands()
 	CloneCommand.SetName("ZEDObjects::CloneCommand");
 	CloneCommand.SetCategory("Objects");
 	CloneCommand.SetText("Clone");
-	CloneCommand.SetType(ZED_CT_TOGGLE);
 	CloneCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_C));
 	CloneCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::CloneCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloneCommand);
@@ -125,7 +125,6 @@ void ZEDObjectManager::RegisterCommands()
 	DeleteCommand.SetName("ZEDObjects::DeleteCommand");
 	DeleteCommand.SetCategory("Objects");
 	DeleteCommand.SetText("Delete");
-	DeleteCommand.SetType(ZED_CT_TOGGLE);
 	DeleteCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_DELETE));
 	DeleteCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::DeleteCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&DeleteCommand);

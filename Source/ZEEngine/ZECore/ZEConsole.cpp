@@ -593,6 +593,8 @@ ZEConsole::ZEConsole()
 
 ZEConsole::~ZEConsole()
 {
+	Deinitialize();
+
 	for (ZESize I = 0; I < InputHistory.GetCount(); I++)
 		delete[] InputHistory[I];
 	InputHistory.Clear();

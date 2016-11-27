@@ -204,7 +204,7 @@ class ZEUIManager : public ZEObject, public ZEInitializable
 		bool								DeinitializeInternal();
 
 											ZEUIManager();
-											~ZEUIManager();
+		virtual								~ZEUIManager();
 
 	public:
 		void								SetActiveCursor(ZEUICursorControl* Cursor);

@@ -641,6 +641,8 @@ ZERNRenderer::ZERNRenderer()
 
 ZERNRenderer::~ZERNRenderer()
 {
+	Deinitialize();
+
 	CleanCommands();
 	CleanStages();
 }

@@ -284,6 +284,8 @@ ZEDObjectBrowser::ZEDObjectBrowser()
 
 ZEDObjectBrowser::~ZEDObjectBrowser()
 {
+	Deinitialize();
+
 	delete Form;
 	delete Widget;
 }

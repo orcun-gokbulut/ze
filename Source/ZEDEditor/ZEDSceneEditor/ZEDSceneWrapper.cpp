@@ -42,6 +42,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNView.h"
+#include "ZEFile/ZEPathManager.h"
 
 void ZEDSceneWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZERNPreRenderParameters* Parameters)
 {
@@ -138,6 +139,36 @@ void ZEDSceneWrapper::UnlockWrapper()
 {
 	if (GetScene() != NULL)
 		GetScene()->UnlockScene();
+}
+
+bool ZEDSceneWrapper::Load(const ZEString& FileName)
+{
+	if (GetScene() == NULL)
+		return false;
+
+	if (!GetScene()->Unserialize(FileName))
+		return false;
+
+	Update();
+
+	return true;
+}
+
+bool ZEDSceneWrapper::Save(const ZEString& FileName)
+{
+	if (GetScene() == NULL)
+		return false;
+
+	bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+	return GetScene()->Serialize(FileName);
+	ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
+}
+
+void ZEDSceneWrapper::Clean()
+{
+	GetScene()->ClearEntities();
+	Update();
 }
 
 ZEDSceneWrapper* ZEDSceneWrapper::CreateInstance()

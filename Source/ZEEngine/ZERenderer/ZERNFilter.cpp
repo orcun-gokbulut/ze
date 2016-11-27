@@ -326,6 +326,11 @@ ZERNFilter::ZERNFilter()
 	memset(&Constants, 0, sizeof(Constants));
 }
 
+ZERNFilter::~ZERNFilter()
+{
+	Deinitialize();
+}
+
 void ZERNFilter::GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal)
 {
 	if(Values.GetCount() != Size)

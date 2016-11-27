@@ -64,6 +64,7 @@ class ZEViewVolume;
 class ZEDEditor;
 class ZEDObjectWrapper;
 class ZEUIFrameControl;
+class ZEFrustum;
 
 class ZEDSelectionManager : public ZEDComponent
 {
@@ -84,6 +85,8 @@ class ZEDSelectionManager : public ZEDComponent
 
 		bool								FilterSelection(ZEObject* Object, void* Class);
 		void								UnfrezeeAllInternal(ZEDObjectWrapper* Object);
+
+		void								CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper);
 
 		virtual void						EditorEvent(const ZEDEditorEvent* Event);
 		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);

@@ -101,7 +101,7 @@ ZEDirectInputModule::ZEDirectInputModule()
 
 ZEDirectInputModule::~ZEDirectInputModule()
 {
-
+	Deinitialize();
 }
 
 void ZEDirectInputModule::Process()
