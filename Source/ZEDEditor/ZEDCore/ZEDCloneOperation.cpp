@@ -57,6 +57,8 @@ bool ZEDCloneOperation::Apply()
 				Clones[ParentIndex]->AddChildWrapper(Clones[I]);
 				break;
 			}
+
+			Parent = Parent->GetParent();
 		}
 
 		if (ParentIndex == -1)
@@ -80,6 +82,8 @@ bool ZEDCloneOperation::Revert()
 				Clones[ParentIndex]->RemoveChildWrapper(Clones[I]);
 				break;
 			}
+
+			Parent = Parent->GetParent();
 		}
 
 		if (ParentIndex == -1)

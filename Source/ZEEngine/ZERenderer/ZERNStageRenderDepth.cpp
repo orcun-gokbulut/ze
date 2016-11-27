@@ -119,6 +119,11 @@ ZERNStageRenderDepth::ZERNStageRenderDepth()
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OpaqueDepthTexture), "OpaqueDepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }
 
+ZERNStageRenderDepth::~ZERNStageRenderDepth()
+{
+	Deinitialize();
+}
+
 ZEGRRenderState ZERNStageRenderDepth::GetRenderState()
 {
 	static ZEGRRenderState RenderState;

@@ -83,7 +83,7 @@ class ZEConsole : public ZEInitializable
 		virtual bool			DeinitializeInternal();
 
 								ZEConsole();
-								~ZEConsole();
+		virtual					~ZEConsole();
 
 	public:
 		ZEArray<char*>			InputHistory;

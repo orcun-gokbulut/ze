@@ -70,5 +70,7 @@ ZEDPropertyWindow::ZEDPropertyWindow()
 
 ZEDPropertyWindow::~ZEDPropertyWindow()
 {
+	Deinitialize();
+
 	delete Widget;
 }

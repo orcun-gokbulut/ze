@@ -194,6 +194,8 @@ ZEDClassBrowser::ZEDClassBrowser()
 
 ZEDClassBrowser::~ZEDClassBrowser()
 {
+	Deinitialize();
+
 	delete Form;
 	delete Widget;
 }

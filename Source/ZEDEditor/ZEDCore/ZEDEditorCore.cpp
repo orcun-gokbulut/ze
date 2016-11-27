@@ -116,6 +116,7 @@ ZEDEditorCore::ZEDEditorCore()
 
 ZEDEditorCore::~ZEDEditorCore()
 {
+	Deinitialize();
 	delete Application;
 }
 

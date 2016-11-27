@@ -108,6 +108,7 @@ ZEDSModule::ZEDSModule()
 
 ZEDSModule::~ZEDSModule()
 {
+	Deinitialize();
 }
 
 LPDIRECTSOUND8 ZEDSModule::GetDevice()

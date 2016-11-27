@@ -47,6 +47,12 @@ ZEInputModule::ZEInputModule()
 	Acquired = false;
 }
 
+
+ZEInputModule::~ZEInputModule()
+{
+	Deinitialize();
+}
+
 void ZEInputModule::BaseInitialize()
 {
 }

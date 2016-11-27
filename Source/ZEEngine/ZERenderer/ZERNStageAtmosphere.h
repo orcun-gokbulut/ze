@@ -63,6 +63,7 @@ class ZERNStageAtmosphere : public ZERNStage
 		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStageAtmosphere();
+		virtual							~ZERNStageAtmosphere();
 
 		static ZEGRRenderState			GetRenderState();
 };

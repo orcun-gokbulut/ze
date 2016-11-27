@@ -423,7 +423,7 @@ ZEGRWindow::ZEGRWindow()
 
 ZEGRWindow::~ZEGRWindow()
 {
-
+	Deinitialize();
 }
 
 void ZEGRWindow::WrapperResized(ZEUInt Width, ZEUInt Height)

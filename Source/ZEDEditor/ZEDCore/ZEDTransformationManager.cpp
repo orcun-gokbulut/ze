@@ -683,7 +683,7 @@ ZEDTransformationManager::ZEDTransformationManager()
 
 ZEDTransformationManager::~ZEDTransformationManager()
 {
-
+	Deinitialize();
 }
 
 void ZEDTransformationManager::RegisterCommands()

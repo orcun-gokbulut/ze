@@ -214,6 +214,11 @@ ZEDEntityWrapper::ZEDEntityWrapper()
 	NamePlateClass = NULL;
 }
 
+ZEDEntityWrapper::~ZEDEntityWrapper()
+{
+	Deinitialize();
+}
+
 void ZEDEntityWrapper::SetId(ZEInt Id)
 {
 	ZEDObjectWrapper::SetId(Id);
@@ -493,6 +498,13 @@ void ZEDEntityWrapper::Update()
 	LockWrapper();
 	SyncronizeChildWrappers((ZEObject*const*)GetEntity()->GetChildEntities().GetConstCArray(), GetEntity()->GetChildEntities().GetCount());
 	UnlockWrapper();
+}
+
+void ZEDEntityWrapper::Clean()
+{
+	GetEntity()->Unload();
+	GetEntity()->ClearChildEntities();
+	Update();
 }
 
 void ZEDEntityWrapper::LockWrapper()

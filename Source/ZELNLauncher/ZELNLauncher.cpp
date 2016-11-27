@@ -319,8 +319,7 @@ void ZELNLauncher::Launch()
 		strncat(ParameterString, " ", 32767);
 		strncat(ParameterString, Information.Parameters[I], 32767);
 	}
-
-
+	
 	// Launch
 	PROCESS_INFORMATION ProcessInformation = {0};
 	STARTUPINFO StartUpInfo = {0};
@@ -360,6 +359,11 @@ ZELNLauncher::ZELNLauncher()
 	ApplicationName = "Zinek Engine";
 	ApplicationVersionMajor = ZEVersion::GetZinekVersion().Major;
 	ApplicationVersionMinor = ZEVersion::GetZinekVersion().Minor;
+}
+
+ZELNLauncher::~ZELNLauncher()
+{
+	Deinitialize();
 }
 
 ZELNLauncher* ZELNLauncher::GetInstance()

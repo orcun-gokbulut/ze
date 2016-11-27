@@ -185,4 +185,5 @@ class ZERNStageAO : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageAO();
+		virtual								~ZERNStageAO();
 };

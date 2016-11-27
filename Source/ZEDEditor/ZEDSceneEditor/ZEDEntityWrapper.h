@@ -76,6 +76,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual bool						DeinitializeInternal();
 
 											ZEDEntityWrapper();
+		virtual								~ZEDEntityWrapper();
 
 	public:
 		virtual void						SetObject(ZEObject* Object);
@@ -117,6 +118,8 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual void						Update();
+
+		virtual void						Clean();
 
 		virtual void						LockWrapper();
 		virtual void						UnlockWrapper();

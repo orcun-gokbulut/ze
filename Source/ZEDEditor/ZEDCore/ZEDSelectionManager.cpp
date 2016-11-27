@@ -64,6 +64,43 @@ void ZEDSelectionManager::UnfrezeeAllInternal(ZEDObjectWrapper* Object)
 		UnfrezeeAllInternal(ChildObjects[I]);
 }
 
+void ZEDSelectionManager::CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper)
+{
+	const ZEArray<ZEDObjectWrapper*> ChildWrappers = Wrapper->GetChildWrappers();
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		ZEDObjectWrapper* ChildWrapper = ChildWrappers[I];
+
+		CastVolume(List, Frustum, ChildWrapper);
+
+		if (!ChildWrapper->GetSelectable())
+			continue;
+
+		if (!ChildWrapper->GetPickable())
+			continue;
+
+		if (ChildWrapper->GetFrozen())
+			continue;
+
+		ZEOBBox BoundingBox;
+		ZEAABBox::GenerateOBoundingBox(BoundingBox, ChildWrapper->GetBoundingBox());
+		ZEOBBox WorldBoundingBox;
+		ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), BoundingBox);
+
+		if (GetSelectionMode() == ZE_SM_FULLY_COVERS)
+		{
+			if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) != ZE_IR_COVERS)
+				continue;
+		}
+		else
+		{
+			if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) == ZE_IR_NONE)
+				continue;
+		}
+
+		List.Add(ChildWrapper);
+	}
+}
 
 void ZEDSelectionManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
 {
@@ -193,39 +230,7 @@ void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 				Frustum.FarPlane.n = -View.Direction;
 
 				ZEDObjectWrapper* RootWrapper = GetEditor()->GetObjectManager()->GetRootWrapper();
-
-				const ZEArray<ZEDObjectWrapper*> ChildWrappers = RootWrapper->GetChildWrappers();
-				for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-				{
-					ZEDObjectWrapper* ChildWrapper = ChildWrappers[I];
-
-					if (!ChildWrapper->GetSelectable())
-						continue;
-
-					if (!ChildWrapper->GetPickable())
-						continue;
-
-					if (ChildWrapper->GetFrozen())
-						continue;
-
-					ZEOBBox BoundingBox;
-					ZEAABBox::GenerateOBoundingBox(BoundingBox, ChildWrapper->GetBoundingBox());
-					ZEOBBox WorldBoundingBox;
-					ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), BoundingBox);
-
-					if (GetSelectionMode() == ZE_SM_FULLY_COVERS)
-					{
-						if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) != ZE_IR_COVERS)
-							continue;
-					}
-					else
-					{
-						if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) == ZE_IR_NONE)
-							continue;
-					}
-
-					List.Add(ChildWrapper);
-				}
+				CastVolume(List, Frustum, RootWrapper);
 
 				if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0 || (Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
 					SelectObjects(List);
@@ -286,7 +291,7 @@ ZEDSelectionManager::ZEDSelectionManager()
 
 ZEDSelectionManager::~ZEDSelectionManager()
 {
-
+	Deinitialize();
 }
 
 void ZEDSelectionManager::RegisterCommands()

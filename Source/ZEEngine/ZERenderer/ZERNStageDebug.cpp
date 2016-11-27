@@ -472,3 +472,8 @@ ZERNStageDebug::ZERNStageDebug()
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_OUTPUT);
 }
+
+ZERNStageDebug::~ZERNStageDebug()
+{
+	Deinitialize();
+}

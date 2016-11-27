@@ -156,6 +156,8 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
+	Deinitialize();
+
 	ClearChildWrappers();
 
 	if (GetParent() != NULL)
@@ -473,6 +475,21 @@ void ZEDObjectWrapper::LockWrapper()
 }
 
 void ZEDObjectWrapper::UnlockWrapper()
+{
+
+}
+
+bool ZEDObjectWrapper::Load(const ZEString& FileName)
+{
+	return false;
+}
+
+bool ZEDObjectWrapper::Save(const ZEString& FileName)
+{
+	return false;
+}
+
+void ZEDObjectWrapper::Clean()
 {
 
 }

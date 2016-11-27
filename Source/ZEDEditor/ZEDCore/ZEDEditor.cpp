@@ -89,7 +89,6 @@ void ZEDEditor::RegisterCommands()
 	RecentFilesCommand.SetName("ZEDEditor::RecentFilesCommand");
 	RecentFilesCommand.SetText("Recent Files");
 	RecentFilesCommand.SetCategory("File");
-	RecentFilesCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
 	RecentFilesCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::RecentFilesCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&RecentFilesCommand);
 
@@ -123,6 +122,15 @@ void ZEDEditor::RegisterCommands()
 	ExitCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);
 	ExitCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Exit.png");
 	ZEDCommandManager::GetInstance()->RegisterCommand(&ExitCommand);
+
+	UpdateCommands();
+}
+
+void ZEDEditor::UpdateCommands()
+{
+	SaveCommand.SetEnabled(FileState != ZED_ES_NONE);
+	SaveAsCommand.SetEnabled(FileState != ZED_ES_NONE);
+	CloseCommand.SetEnabled(FileState != ZED_ES_NONE);
 }
 
 void ZEDEditor::NewCommand_OnAction(const ZEDCommand* Command)
@@ -145,8 +153,20 @@ void ZEDEditor::SaveCommand_OnAction(const ZEDCommand* Command)
 	if (FileState == ZED_ES_NONE)
 		return;
 
+	if (FileName.IsEmpty())
+	{
+		QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Open", QString(), GetExtensions().ToCString());
+		if (Result.isEmpty())
+			return;
+
+		FileName = Result.toStdString();
+	}
+
 	if (!Save(FileName))
+	{
 		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
+		return;
+	}
 }
 
 void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
@@ -154,7 +174,7 @@ void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 	if (FileState == ZED_ES_NONE)
 		return;
 
-	QString Result = QFileDialog::getOpenFileName(GetMainWindow()->GetMainWindow(), "Open", QString(), GetExtensions().ToCString());
+	QString Result = QFileDialog::getOpenFileName(GetMainWindow()->GetMainWindow(), "Open", GetFileName().ToCString(), GetExtensions().ToCString());
 	if (Result.isEmpty())
 		return;
 
@@ -196,19 +216,13 @@ void ZEDEditor::RecentFilesCommand_OnAction(const ZEDCommand* Command)
 	Load(Command->GetListItems()[Command->GetValueIndex()]);
 }
 
-void ZEDEditor::UpdateCommands()
-{
-	SaveCommand.SetEnabled(FileState != ZED_ES_NONE);
-	SaveAsCommand.SetEnabled(FileState != ZED_ES_NONE);
-	CloseCommand.SetEnabled(FileState != ZED_ES_NONE);
-}
-
 void ZEDEditor::PopulateRecentFiles()
 {
 	QSettings Settings("Zinek", GetClass()->GetName());
 	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
 
 	ZEArray<ZEString> Items;
+	Items.SetCount(RecentFiles.count());
 	for (int I = 0; I < RecentFiles.size(); I++)
 		Items[I] = RecentFiles[I].toStdString();
 
@@ -398,6 +412,8 @@ void ZEDEditor::New()
 	FileState = ZED_ES_UNMODIFIED;
 	FileName = "";
 
+	GetObjectManager()->GetRootWrapper()->Clean();
+
 	UpdateCommands();
 
 	ZEDEditorEvent Event;
@@ -408,24 +424,35 @@ void ZEDEditor::New()
 
 bool ZEDEditor::Save(const ZEString& FileName)
 {
+	bool Result = GetObjectManager()->GetRootWrapper()->Save(FileName);
+	if (!Result)
+		return false;
+
 	FileState = ZED_ES_UNMODIFIED;
 	this->FileName = FileName;
 
 	UpdateCommands();
+
+	RegisterRecentFile(FileName);
 
 	ZEDEditorEvent Event;
 	Event.FileName = FileName;
 	Event.Type = ZED_EET_FILE_SAVED;
 	DistributeEvent(&Event);
 
-	return true;
+	return Result;
 }
 
 bool ZEDEditor::Load(const ZEString& FileName)
 {
+	bool Result = GetObjectManager()->GetRootWrapper()->Load(FileName);
+	if (!Result)
+		return false;
+
 	FileState = ZED_ES_UNMODIFIED;
 	this->FileName = FileName;
 
+	RegisterRecentFile(FileName);
 	UpdateCommands();
 
 	ZEDEditorEvent Event;
@@ -433,14 +460,16 @@ bool ZEDEditor::Load(const ZEString& FileName)
 	Event.Type = ZED_EET_FILE_LOADED;
 	DistributeEvent(&Event);
 
-	return true;
+	return Result;
 }
 
 void ZEDEditor::Close()
 {
-	FileState = ZED_ES_NONE;
-	FileName = NULL;
+	GetObjectManager()->GetRootWrapper()->Clean();
 
+	FileState = ZED_ES_NONE;
+	FileName = "";
+	
 	UpdateCommands();
 
 	ZEDEditorEvent Event;
@@ -501,6 +530,8 @@ ZEDEditor::ZEDEditor()
 
 ZEDEditor::~ZEDEditor()
 {
+	Deinitialize();
+
 	while (Components.GetCount() != 0)
 		Components.GetFirstItem()->Destroy();
 }

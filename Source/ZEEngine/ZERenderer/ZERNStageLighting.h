@@ -213,4 +213,5 @@ class ZERNStageLighting : public ZERNStage
 		virtual void							CleanUp(ZEGRContext* Context);
 
 												ZERNStageLighting();
+		virtual									~ZERNStageLighting();
 };

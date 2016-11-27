@@ -118,4 +118,5 @@ class ZERNStageDebug : public ZERNStage
 		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStageDebug();
+		virtual							~ZERNStageDebug();
 };

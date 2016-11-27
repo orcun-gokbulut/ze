@@ -78,6 +78,8 @@ ZEUIManager::ZEUIManager()
 
 ZEUIManager::~ZEUIManager() 
 {
+	Deinitialize();
+
 	if (UIRenderer != NULL)
 		UIRenderer->Destroy();
 }

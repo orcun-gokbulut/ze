@@ -83,6 +83,7 @@ class ZERNStageForward : public ZERNStage
 		virtual void							CleanUp(ZEGRContext* Context);
 
 												ZERNStageForward();
+		virtual									~ZERNStageForward();
 
 		static ZEGRRenderState					GetRenderState();
 };

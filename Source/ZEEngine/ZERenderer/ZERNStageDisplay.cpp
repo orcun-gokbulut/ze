@@ -237,7 +237,7 @@ ZERNStageDisplay::ZERNStageDisplay() : Link(this)
 
 ZERNStageDisplay::~ZERNStageDisplay()
 {
-
+	Deinitialize();
 }
 
 void ZERNStageDisplay::SetInput(const ZEString& InputName)

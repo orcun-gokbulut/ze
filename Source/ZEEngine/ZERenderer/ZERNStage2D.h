@@ -66,6 +66,7 @@ class ZERNStage2D : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStage2D();
+		virtual								~ZERNStage2D();
 
 		static ZEGRRenderState				GetRenderState();
 };

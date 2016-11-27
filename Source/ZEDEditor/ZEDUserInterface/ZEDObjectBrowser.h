@@ -71,5 +71,5 @@ class ZEDObjectBrowser : public ZEDWindow
 		ZEDObjectTree*						GetObjectTree();
 
 											ZEDObjectBrowser();
-											~ZEDObjectBrowser();
+		virtual								~ZEDObjectBrowser();
 };

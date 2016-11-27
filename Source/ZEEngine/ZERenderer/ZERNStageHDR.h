@@ -179,4 +179,5 @@ class ZERNStageHDR : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageHDR();
+		virtual								~ZERNStageHDR();
 };

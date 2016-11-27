@@ -57,6 +57,7 @@ ZEPhysXModule::ZEPhysXModule()
 
 ZEPhysXModule::~ZEPhysXModule()
 {
+	Deinitialize();
 	delete OutputStream;
 }
 

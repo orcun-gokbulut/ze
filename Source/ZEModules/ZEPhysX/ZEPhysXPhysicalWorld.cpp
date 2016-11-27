@@ -112,6 +112,7 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 {
+	Deinitialize();
 	GetModule()->PhysicalWorlds.RemoveValue(this);
 }
 

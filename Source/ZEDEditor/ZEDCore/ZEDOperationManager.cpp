@@ -37,10 +37,10 @@
 
 #include "ZEError.h"
 #include "ZEDOperation.h"
+#include "ZEDEditor.h"
 #include "ZEDEditorCore.h"
 #include "ZEDEditorEvent.h"
 #include "ZEDUserInterface\ZEDCommandManager.h"
-
 
 void ZEDOperationManager::EditorEvent(const ZEDEditorEvent* Event)
 {
@@ -135,6 +135,9 @@ bool ZEDOperationManager::Undo()
 	}
 
 	StackIndex--;
+	OperationIndex--;
+	if (OperationIndex == 0)
+		GetEditor()->UnmarkDocumentModified();
 
 	UpdateCommands();
 
@@ -153,6 +156,9 @@ bool ZEDOperationManager::Redo()
 		zeError("Cannot redo operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
 		return false;
 	}
+
+	OperationIndex++;
+	GetEditor()->UnmarkDocumentModified();
 
 	UpdateCommands();
 
@@ -174,6 +180,8 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 	}
 
 	StackIndex++;
+	OperationIndex++;
+	GetEditor()->MarkDocumentModified();
 
 	for (ZESize I = StackIndex; I < Stack.GetCount(); I++)
 	{
@@ -197,6 +205,7 @@ void ZEDOperationManager::Clear()
 	Stack.Clear();
 
 	StackIndex = -1;
+	OperationIndex = 0;
 
 	UpdateCommands();
 }

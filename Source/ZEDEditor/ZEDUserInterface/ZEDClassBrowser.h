@@ -72,5 +72,5 @@ class ZEDClassBrowser : public ZEDWindow
 		ZEDClassTree*						GetClassTree();
 
 											ZEDClassBrowser();
-											~ZEDClassBrowser();
+		virtual								~ZEDClassBrowser();
 };

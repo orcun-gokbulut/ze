@@ -582,6 +582,11 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QWidget(Parent)
 	setFocusPolicy(Qt::StrongFocus);
 }
 
+ZEDViewport::~ZEDViewport()
+{
+	Deinitialize();
+}
+
 void ZEDViewport::paintEvent(QPaintEvent* PaintEvent)
 {
 

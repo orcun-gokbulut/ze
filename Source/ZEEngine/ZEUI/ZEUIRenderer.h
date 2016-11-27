@@ -87,7 +87,7 @@ class ZEUIRenderer : public ZEInitializable
 		virtual bool						DeinitializeInternal();
 
 											ZEUIRenderer();
-											~ZEUIRenderer();
+		virtual								~ZEUIRenderer();
 
 	public:
 		void								AddRectangle(ZEUIRectangle* Rectangle);

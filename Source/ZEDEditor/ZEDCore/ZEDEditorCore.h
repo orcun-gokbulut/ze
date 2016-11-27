@@ -60,7 +60,7 @@ class ZEDEditorCore : public ZEObject, public ZEInitializable, public ZEDestroya
 		bool								DeinitializeInternal();
 
 											ZEDEditorCore();
-											~ZEDEditorCore();
+		virtual								~ZEDEditorCore();
 
 	public:
 		ZECore*								GetEngineCore();

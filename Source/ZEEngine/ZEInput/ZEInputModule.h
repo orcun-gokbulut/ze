@@ -54,6 +54,7 @@ class ZEInputModule : public ZEModule
 		virtual bool						DeinitializeInternal();
 
 											ZEInputModule();
+		virtual								~ZEInputModule();
 
 	public:
 		static void							BaseInitialize();

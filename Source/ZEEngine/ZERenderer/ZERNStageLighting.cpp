@@ -719,3 +719,8 @@ ZERNStageLighting::ZERNStageLighting()
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV);
 }
+
+ZERNStageLighting::~ZERNStageLighting()
+{
+	DeinitializeInternal();
+}

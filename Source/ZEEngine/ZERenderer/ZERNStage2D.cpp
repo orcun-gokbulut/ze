@@ -115,6 +115,11 @@ ZERNStage2D::ZERNStage2D()
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
 
+ZERNStage2D::~ZERNStage2D()
+{
+	Deinitialize();
+}
+
 ZEGRRenderState ZERNStage2D::GetRenderState()
 {
 	static ZEGRRenderState RenderState;

@@ -68,7 +68,7 @@ class ZEDObjectManager : public ZEDComponent
 		void									RaiseEvent(const ZEDObjectEvent* Event);
 
 												ZEDObjectManager();
-												~ZEDObjectManager();
+		virtual									~ZEDObjectManager();
 
 	private: /* COMMANDS */
 		ZEDCommand								CloneCommand;

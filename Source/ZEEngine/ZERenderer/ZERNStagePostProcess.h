@@ -66,6 +66,7 @@ class ZERNStagePostProcess : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStagePostProcess();
+											~ZERNStagePostProcess();
 
 		static ZEGRRenderState				GetRenderState();
 };

@@ -67,6 +67,7 @@ class ZERNStageParticleRendering : public ZERNStage
 		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStageParticleRendering();
+		virtual 						~ZERNStageParticleRendering();
 
 		static ZEGRRenderState			GetRenderState();
 };

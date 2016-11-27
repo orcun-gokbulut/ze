@@ -39,30 +39,21 @@
 
 ZELN_MODULE_DECRIPTION(ZELNContactModule, "Contact");
 
-bool ZELNContactModule::InitializeInternal()
-{
-	if (!ZELNModule::InitializeInternal())
-		return false;
-
-	Widget = new QWidget();
-	Form = new Ui_ZELNContactWidget();
-	Form->setupUi(Widget);
-
-	return true;
-}
-
-bool ZELNContactModule::DeinitializeInternal()
-{
-	delete Widget;
-	Widget = NULL;
-
-	delete Form;
-	Form = NULL;
-
-	return ZELNModule::DeinitializeInternal();
-}
 
 QWidget* ZELNContactModule::GetWidget()
 {
 	return Widget;
+}
+
+ZELNContactModule::ZELNContactModule()
+{
+	Widget = new QWidget();
+	Form = new Ui_ZELNContactWidget();
+	Form->setupUi(Widget);
+}
+
+ZELNContactModule::~ZELNContactModule()
+{
+	delete Widget;
+	delete Form;
 }

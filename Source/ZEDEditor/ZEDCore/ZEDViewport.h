@@ -124,4 +124,5 @@ class ZEDViewport : public QWidget, public ZEDComponent
 		virtual QPaintEngine*				paintEngine() const;
 
 											ZEDViewport(QWidget* Parent = NULL);
+		virtual								~ZEDViewport();
 };

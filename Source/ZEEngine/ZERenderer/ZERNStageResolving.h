@@ -116,4 +116,5 @@ class ZERNStageResolving : public ZERNStage
 		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStageResolving();
+		virtual							~ZERNStageResolving();
 };

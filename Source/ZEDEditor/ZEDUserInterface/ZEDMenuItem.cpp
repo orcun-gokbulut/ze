@@ -217,6 +217,18 @@ void ZEDMenuItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 	Action->setVisible(TargetCommand->GetVisible());
 	Action->setEnabled(TargetCommand->GetEnabled());
 
+	int Squence = 0;
+	if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_CTRL))
+		Squence += Qt::CTRL;
+	else if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_ALT))
+		Squence += Qt::ALT;
+	else if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_SHIFT))
+		Squence += Qt::SHIFT;
+
+	Squence += Command->GetShortcut().Key;
+	
+	Action->setShortcut(QKeySequence(Squence));
+
 	if (TargetCommand->GetType() == ZED_CT_COMMAND || TargetCommand->GetType() == ZED_CT_TOGGLE)
 	{
 		Action->setCheckable(TargetCommand->GetType() == ZED_CT_TOGGLE);

@@ -97,6 +97,7 @@ class ZERNFilter : public ZEInitializable
 		void									ApplyEdgeDetection(ZEGRContext* Context, float StencilRef);
 
 												ZERNFilter();
+		virtual									~ZERNFilter();
 
 		static void								GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
 };
