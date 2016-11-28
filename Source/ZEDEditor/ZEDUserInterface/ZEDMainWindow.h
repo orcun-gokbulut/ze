@@ -88,7 +88,7 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 	friend class ZEDCustomizeUIWindow;
 	private:
 		Ui_ZEDMainWindow*					Form;
-		QMainWindow*						MainWindow;
+		QMainWindow*						MainWindowNative;
 		ZEDViewport*						Viewport;
 
 		ZEArray<ZEDToolbar*>				Toolbars;
@@ -99,8 +99,8 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
 
-		void								PopulateMainMenu();
-		void								PopulateToolbars();
+		void								UpdateMainMenu();
+		void								UpdateToolbars();
 
 		virtual bool						InitializeInternal();
 

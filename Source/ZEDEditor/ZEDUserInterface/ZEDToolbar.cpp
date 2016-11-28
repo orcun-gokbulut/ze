@@ -47,6 +47,37 @@
 
 #include <QAction>
 #include <QToolBar>
+#include "QMainWindow"
+
+void ZEDToolbar::Toolbar_topLevelChanged(bool Changed)
+{
+	QMainWindow* MainWindow = static_cast<QMainWindow*>(Toolbar->parent());
+	Qt::ToolBarArea Area = MainWindow->toolBarArea(Toolbar);
+	switch (Area)
+	{
+		case Qt::LeftToolBarArea:
+			Location = ZED_TDL_LEFT;
+			break;
+
+		case Qt::RightToolBarArea:
+			Location = ZED_TDL_RIGHT;
+			break;
+
+		case Qt::BottomToolBarArea:
+			Location = ZED_TDL_BOTTOM;
+			break;
+
+		default:
+		case Qt::TopToolBarArea:
+			Location = ZED_TDL_TOP;
+			break;
+	}
+
+	Order = Toolbar->pos().x();
+	Row = Toolbar->pos().y();
+
+	zeLog("%s, L: %s", GetName().ToCString(), ZEDToolbarLocation_Declaration()->ToText(Location, "Unknown").ToCString());
+}
 
 void ZEDToolbar::Setup()
 {
@@ -68,11 +99,13 @@ ZEDToolbar::ZEDToolbar()
 {
 	Manager = NULL;
 	Toolbar = new QToolBar();
-	DockLocation = ZED_TDL_TOP;
-	DockColumn = 0;
-	DockRow = 0;
+	Location = ZED_TDL_TOP;
+	Order = 0;
+	Row = 0;
 	Visible = true;
 	DeferredSetup = false;
+
+	connect(Toolbar, &QToolBar::topLevelChanged, this, &ZEDToolbar::Toolbar_topLevelChanged);
 }
 
 ZEDToolbar::~ZEDToolbar()
@@ -147,43 +180,49 @@ bool ZEDToolbar::GetVisible() const
 	return Visible;
 }
 
-void ZEDToolbar::SetDockLocation(ZEDToolbarDockLocation Location)
+void ZEDToolbar::SetLocation(ZEDToolbarLocation Location)
 {
-	if (DockLocation == Location)
+	if (this->Location == Location)
 		return;
 
-	DockLocation = Location;
+	this->Location = Location;
+
+	OnUpdated(this);
 }
 
-ZEDToolbarDockLocation ZEDToolbar::GetDockLocation() const
+ZEDToolbarLocation ZEDToolbar::GetLocation() const
 {
-	return DockLocation;
+	return Location;
 }
 
-void ZEDToolbar::SetDockColumn(ZEUInt Column)
+void ZEDToolbar::SetOrder(ZEUInt Order)
 {
-	if (DockColumn == Column)
+	if (this->Order == Order)
 		return;
 
-	DockColumn = Column;
+	this->Order = Order;
+
+	OnUpdated(this);
 }
 
-ZEUInt ZEDToolbar::GetDockColumn() const
+ZEUInt ZEDToolbar::GetOrder() const
 {
-	return DockColumn;
+	return Order;
 }
 
-void ZEDToolbar::SetDockRow(ZEUInt Row)
+void ZEDToolbar::SetRow(ZEUInt Row)
 {
-	if (DockRow == Row)
+	if (this->Row == Row)
 		return;
 
-	DockRow = Row;
+	this->Row = Row;
+
+	OnUpdated(this);
 }
 
-ZEUInt ZEDToolbar::GetDockRow() const
+ZEUInt ZEDToolbar::GetRow() const
 {
-	return DockRow;
+	return Row;
 }
 
 const ZEArray<ZEDToolbarItem*>& ZEDToolbar::GetItems() const
@@ -250,9 +289,9 @@ bool ZEDToolbar::Load(ZEMLReaderNode* ToolbarNode)
 	SetIcon(ToolbarNode->ReadString("Icon"));
 	SetText(ToolbarNode->ReadString("Text"));
 	SetVisible(ToolbarNode->ReadBoolean("Visible", true));
-	SetDockLocation((ZEDToolbarDockLocation)ToolbarNode->ReadUInt8("DockLocation"));
-	SetDockColumn(ToolbarNode->ReadUInt8("DockColumn"));
-	SetDockRow(ToolbarNode->ReadUInt8("DockRow"));
+	SetLocation((ZEDToolbarLocation)ToolbarNode->ReadUInt8("Location", ZED_TDL_TOP));
+	SetOrder(ToolbarNode->ReadUInt32("Order"));
+	SetRow(ToolbarNode->ReadUInt32("Row"));
 
 	DeferredSetup = true;
 	ClearItems();
@@ -291,9 +330,10 @@ bool ZEDToolbar::Save(ZEMLWriterNode* ToolbarsNode)
 	ToolbarNode.WriteString("Icon", GetIcon());
 	ToolbarNode.WriteString("Text", GetText());
 	ToolbarNode.WriteBool("Visible", GetVisible());
-	ToolbarNode.WriteUInt8("DockLocation", DockLocation);
-	ToolbarNode.WriteUInt8("DockColumn", DockColumn);
-	ToolbarNode.WriteUInt8("DockRow", DockRow);
+	
+	ToolbarNode.WriteUInt8("Location", Location);
+	ToolbarNode.WriteUInt32("Order", Order);
+	ToolbarNode.WriteUInt32("Row", Row);
 	
 	ZEMLWriterNode ItemsNode;
 	ToolbarNode.OpenNode("Items", ItemsNode);

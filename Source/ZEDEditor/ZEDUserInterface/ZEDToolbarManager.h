@@ -53,8 +53,8 @@ class ZEDToolbarManager : public ZEObject
 		virtual							~ZEDToolbarManager();
 
 	public:
-		const ZEArray<ZEDToolbar*>&	GetToolbars();
-		ZEDToolbar*					GetToolbar(const ZEString& Name);
+		const ZEArray<ZEDToolbar*>&		GetToolbars();
+		ZEDToolbar*						GetToolbar(const ZEString& Name);
 		
 		bool							AddToolbar(ZEDToolbar* Menu);
 		bool							RemoveToolbar(ZEDToolbar* Menu);

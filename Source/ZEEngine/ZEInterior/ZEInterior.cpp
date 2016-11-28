@@ -54,6 +54,9 @@
 
 void ZEInterior::LoadInteriorResource()
 {
+	if (InteriorResource == NULL)
+		return;
+
 	ZEAABBox TempBoundingBox(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
 
 	ZESize RoomCount = InteriorResource->GetRooms().GetCount();

@@ -89,6 +89,7 @@ void ZEDEditor::RegisterCommands()
 	RecentFilesCommand.SetName("ZEDEditor::RecentFilesCommand");
 	RecentFilesCommand.SetText("Recent Files");
 	RecentFilesCommand.SetCategory("File");
+	RecentFilesCommand.SetType(ZED_CT_LIST_COMMAND);
 	RecentFilesCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::RecentFilesCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&RecentFilesCommand);
 
@@ -131,6 +132,7 @@ void ZEDEditor::UpdateCommands()
 	SaveCommand.SetEnabled(FileState != ZED_ES_NONE);
 	SaveAsCommand.SetEnabled(FileState != ZED_ES_NONE);
 	CloseCommand.SetEnabled(FileState != ZED_ES_NONE);
+	RecentFilesCommand.SetEnabled(RecentFilesCommand.GetListItems().GetCount() != 0);
 }
 
 void ZEDEditor::NewCommand_OnAction(const ZEDCommand* Command)
@@ -227,6 +229,8 @@ void ZEDEditor::PopulateRecentFiles()
 		Items[I] = RecentFiles[I].toStdString();
 
 	RecentFilesCommand.SetListItems(Items);
+
+	UpdateCommands();
 }
 
 void ZEDEditor::RegisterRecentFile(const ZEString& FileName)
@@ -409,6 +413,8 @@ void ZEDEditor::PostProcess(float ElapsedTime)
 
 void ZEDEditor::New()
 {
+	Close();
+
 	FileState = ZED_ES_UNMODIFIED;
 	FileName = "";
 
@@ -445,6 +451,8 @@ bool ZEDEditor::Save(const ZEString& FileName)
 
 bool ZEDEditor::Load(const ZEString& FileName)
 {
+	Close();
+
 	bool Result = GetObjectManager()->GetRootWrapper()->Load(FileName);
 	if (!Result)
 		return false;
@@ -465,6 +473,9 @@ bool ZEDEditor::Load(const ZEString& FileName)
 
 void ZEDEditor::Close()
 {
+	if (FileState == ZED_ES_NONE)
+		return;
+
 	GetObjectManager()->GetRootWrapper()->Clean();
 
 	FileState = ZED_ES_NONE;

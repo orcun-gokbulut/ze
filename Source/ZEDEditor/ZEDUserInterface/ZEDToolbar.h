@@ -37,6 +37,8 @@
 
 #include "ZEMeta/ZEObject.h"
 
+#include "QObject.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEMeta/ZEEvent.h"
 
@@ -46,15 +48,15 @@ class ZEMLReaderNode;
 class ZEMLWriterNode;
 class QToolBar;
 
-ZE_ENUM(ZEDToolbarDockLocation)
+ZE_ENUM(ZEDToolbarLocation)
 {
 	ZED_TDL_LEFT,
 	ZED_TDL_RIGHT,
-	ZED_TDL_TOP,
-	ZED_TDL_BOTTOM
+	ZED_TDL_BOTTOM,
+	ZED_TDL_TOP
 };
 
-class ZEDToolbar : public ZEObject
+class ZEDToolbar : public ZEObject, public QObject
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEDToolbar)
@@ -68,10 +70,14 @@ class ZEDToolbar : public ZEObject
 		ZEString						Text;
 		ZEString						Icon;
 		bool							Visible;
-		ZEDToolbarDockLocation			DockLocation;
-		ZEUInt							DockColumn;
-		ZEUInt							DockRow;
+
+		ZEDToolbarLocation				Location;
+		ZEUInt							Order;
+		ZEUInt							Row;
+
 		bool							DeferredSetup;
+
+		void							Toolbar_topLevelChanged(bool);
 
 		void							Setup();
 		void							CleanUp();
@@ -94,14 +100,14 @@ class ZEDToolbar : public ZEObject
 		void							SetVisible(bool Visible);
 		bool							GetVisible() const;
 
-		void							SetDockLocation(ZEDToolbarDockLocation Position);
-		ZEDToolbarDockLocation			GetDockLocation() const;
+		void							SetLocation(ZEDToolbarLocation Location);
+		ZEDToolbarLocation				GetLocation() const;
 
-		void							SetDockColumn(ZEUInt Column);
-		ZEUInt							GetDockColumn() const;
+		void							SetOrder(ZEUInt Column);
+		ZEUInt 							GetOrder() const;
 
-		void							SetDockRow(ZEUInt Row);
-		ZEUInt							GetDockRow() const;
+		void							SetRow(ZEUInt Row);
+		ZEUInt 							GetRow() const;
 
 		QToolBar*						GetNativeToolbar();
 
@@ -110,6 +116,8 @@ class ZEDToolbar : public ZEObject
 		void							InsertItem(ZESize Index, ZEDToolbarItem* Item);
 		void							RemoveItem(ZEDToolbarItem* Item);
 		void							ClearItems();
+
+		ZE_EVENT(						OnUpdated,(const ZEDToolbar* Menu));
 
 		bool							Load(ZEMLReaderNode* Reader);
 		bool							Save(ZEMLWriterNode* WriterNode);

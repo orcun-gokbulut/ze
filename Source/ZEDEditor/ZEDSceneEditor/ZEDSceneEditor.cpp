@@ -54,6 +54,7 @@
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZEGame/ZEStateScreen.h"
+#include "ZEInterior/ZEInterior.h"
 
 bool ZEDSceneEditor::InitializeInternal()
 {
@@ -92,6 +93,10 @@ bool ZEDSceneEditor::InitializeInternal()
 	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
 	//Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.new.ZEMODEL");
 	Scene->AddEntity(Trial);
+
+	//ZEInterior* Sponza = ZEInterior::CreateInstance();
+	//Sponza->SetInteriorFile("#R:/GraphicsTest/Sponza/Sponza.ZEINTERIOR");
+	//Scene->AddEntity(Sponza);
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
 	Light1->SetIntensity(3.0f);

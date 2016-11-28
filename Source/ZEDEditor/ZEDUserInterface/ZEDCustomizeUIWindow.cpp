@@ -623,8 +623,8 @@ void ZEDCustomizeUIWindow::btnDefault_clicked()
 	UpdateElements();
 	UpdateElementItems();
 
-	MainWindow->PopulateMainMenu();
-	MainWindow->PopulateToolbars();
+	MainWindow->UpdateMainMenu();
+	MainWindow->UpdateToolbars();
 }
 
 void ZEDCustomizeUIWindow::btnSave_clicked()
