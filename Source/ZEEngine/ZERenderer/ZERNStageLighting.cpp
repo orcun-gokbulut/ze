@@ -722,5 +722,5 @@ ZERNStageLighting::ZERNStageLighting()
 
 ZERNStageLighting::~ZERNStageLighting()
 {
-	DeinitializeInternal();
+	Deinitialize();
 }

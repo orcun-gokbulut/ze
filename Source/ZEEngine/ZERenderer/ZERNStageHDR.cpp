@@ -569,5 +569,5 @@ ZERNStageHDR::ZERNStageHDR()
 
 ZERNStageHDR::~ZERNStageHDR()
 {
-	DeinitializeInternal();
+	Deinitialize();
 }
