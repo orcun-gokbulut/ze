@@ -56,6 +56,37 @@
 #include <QToolBar>
 #include <QMessageBox>
 
+ZEInt ToolbarSortOperator(ZEDToolbar*const& A, ZEDToolbar*const& B)
+{
+	if (A->GetLocation() < B->GetLocation())
+	{
+		return -1;
+	}
+	else if (A->GetLocation() > B->GetLocation())
+	{
+		return 1;
+	}
+	else
+	{
+		if (A->GetRow() < B->GetRow())
+		{
+			return -1;
+		}
+		else if (A->GetRow() > B->GetRow())
+		{
+			return 1;
+		}
+		else
+		{
+			if (A->GetOrder() < B->GetOrder())
+				return -1;
+			else if (A->GetOrder() > B->GetOrder())
+				return 1;
+			else
+				return 0;
+		}
+	}
+}
 
 bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 {
@@ -81,7 +112,7 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
-void ZEDMainWindow::PopulateMainMenu()
+void ZEDMainWindow::UpdateMainMenu()
 {
 	ZEDMenu* MainMenu = MenuManager->GetMenu("MainMenu");
 	if (MainMenu == NULL)
@@ -91,24 +122,51 @@ void ZEDMainWindow::PopulateMainMenu()
 	MainMenu_OnUpdated(MainMenu);
 }
 
-void ZEDMainWindow::PopulateToolbars()
+void ZEDMainWindow::UpdateToolbars()
 {
-	for (ZESize I = 0; I < ToolbarManager->GetToolbars().GetCount(); I++)
-		MainWindow->addToolBar(ToolbarManager->GetToolbars()[I]->GetNativeToolbar());
-}
+	QList<QToolBar *> CurrentToolbars = MainWindowNative->findChildren<QToolBar *>();
+	for (int I = 0; I < CurrentToolbars.count(); I++)
+		MainWindowNative->removeEventFilter(CurrentToolbars[I]);
 
-void ZEDMainWindow::MainMenu_OnUpdated(const ZEDMenu* Menu)
-{
-	QMenu* NativeMenu = const_cast<ZEDMenu*>(Menu)->GetNativeMenu();
-	QList<QAction*> Actions = NativeMenu->actions();
-
-	MainWindow->menuBar()->clear();
-	for (ZESize I = 0; I < Actions.count(); I++)
+	ZEArray<ZEDToolbar*> Toolbars = ToolbarManager->GetToolbars();
+	Toolbars.Sort2<ToolbarSortOperator>();
+	
+	ZEDToolbar* PrevToolbar = NULL;
+	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 	{
-		if (Actions[I]->isSeparator())
-			continue;
+		ZEDToolbar* CurrentToolbar = Toolbars[I];
 
-		MainWindow->menuBar()->addAction(Actions[I]);
+		Qt::ToolBarArea Area;
+		switch (CurrentToolbar->GetLocation())
+		{
+			case ZED_TDL_LEFT:
+				Area = Qt::LeftToolBarArea;
+				break;
+
+			case ZED_TDL_RIGHT:
+				Area = Qt::RightToolBarArea;
+				break;
+
+			case ZED_TDL_BOTTOM:
+				Area = Qt::BottomToolBarArea;
+				break;
+
+			default:
+			case ZED_TDL_TOP:
+				Area = Qt::TopToolBarArea;
+				break;
+		}
+
+		if (PrevToolbar != NULL && 
+			PrevToolbar->GetLocation() == CurrentToolbar->GetLocation() &&
+			PrevToolbar->GetRow() != CurrentToolbar->GetRow())
+		{
+			MainWindowNative->addToolBarBreak(Area);
+		}
+
+		MainWindowNative->addToolBar(Area, Toolbars[I]->GetNativeToolbar());
+		
+		PrevToolbar = CurrentToolbar;
 	}
 }
 
@@ -129,7 +187,7 @@ bool ZEDMainWindow::InitializeInternal()
 		MenuManager->Load("#R:/ZEDEditor/Configurations/MenuDefault.ZEDConfig");
 	}
 
-	PopulateMainMenu();
+	UpdateMainMenu();
 
 
 	if (ZEPathInfo("#S:/Configurations/ZEDEditor/Toolbar.ZEDConfig").IsExists())
@@ -142,7 +200,7 @@ bool ZEDMainWindow::InitializeInternal()
 		ToolbarManager->Load("#R:/ZEDEditor/Configurations/ToolbarDefault.ZEDConfig");
 	}
 
-	PopulateToolbars();
+	UpdateToolbars();
 
 	return true;
 }
@@ -152,14 +210,14 @@ ZEDMainWindow::ZEDMainWindow()
 	MenuManager = ZEDMenuManager::CreateInstance();
 	ToolbarManager = ZEDToolbarManager::CreateInstance();
 
-	MainWindow = new QMainWindow();
+	MainWindowNative = new QMainWindow();
 	Form = new Ui_ZEDMainWindow();
-	Form->setupUi(MainWindow);
+	Form->setupUi(MainWindowNative);
 
-	MainWindow->installEventFilter(this);
+	MainWindowNative->installEventFilter(this);
 
-	MainWindow->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-	MainWindow->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+	MainWindowNative->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+	MainWindowNative->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
 ZEDMainWindow::~ZEDMainWindow()
@@ -177,6 +235,22 @@ void ZEDMainWindow::RegisterCommands()
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CustomizeUICommand);
 }
 
+
+void ZEDMainWindow::MainMenu_OnUpdated(const ZEDMenu* Menu)
+{
+	QMenu* NativeMenu = const_cast<ZEDMenu*>(Menu)->GetNativeMenu();
+	QList<QAction*> Actions = NativeMenu->actions();
+
+	MainWindowNative->menuBar()->clear();
+	for (ZESize I = 0; I < Actions.count(); I++)
+	{
+		if (Actions[I]->isSeparator())
+			continue;
+
+		MainWindowNative->menuBar()->addAction(Actions[I]);
+	}
+}
+
 void ZEDMainWindow::CustomizeUICommand_OnAction(const ZEDCommand* Command)
 {
 	Configure();
@@ -184,7 +258,7 @@ void ZEDMainWindow::CustomizeUICommand_OnAction(const ZEDCommand* Command)
 
 QMainWindow* ZEDMainWindow::GetMainWindow()
 {
-	return MainWindow;
+	return MainWindowNative;
 }
 
 ZEDMenuManager* ZEDMainWindow::GetMenuManager()
@@ -213,39 +287,39 @@ void ZEDMainWindow::AddWindow(ZEDWindow* Window, ZEDWindowDefaults Default)
 	switch (Default & 0xF0)
 	{
 		case ZED_WD_DOCK_LEFT:
-			MainWindow->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_DOCK_RIGHT:
-			MainWindow->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_DOCK_TOP:
-			MainWindow->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_DOCK_BOTTOM:
-			MainWindow->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_STACK_LEFT:
-			MainWindow->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_STACK_RIGHT:
-			MainWindow->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_STACK_TOP:
-			MainWindow->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		case ZED_WD_STACK_BOTTOM:
-			MainWindow->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
 			break;
 
 		default:
-			MainWindow->addDockWidget(Qt::NoDockWidgetArea, Window->GetDockWidget());
+			MainWindowNative->addDockWidget(Qt::NoDockWidgetArea, Window->GetDockWidget());
 			break;
 	}
 
@@ -264,7 +338,7 @@ void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)
 void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)
 {
 	this->Viewport = Viewport;
-	MainWindow->setCentralWidget(Viewport);
+	MainWindowNative->setCentralWidget(Viewport);
 }
 
 ZEDViewport* ZEDMainWindow::GetViewport()
