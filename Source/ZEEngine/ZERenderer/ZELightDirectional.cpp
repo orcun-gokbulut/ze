@@ -367,6 +367,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	View.U = GetWorldRight();
 	View.V = GetWorldUp();
 	View.N = GetWorldFront();
+	View.Entity = this;
 
 	ShadowRenderer.SetContext(Parameters->Context);
 

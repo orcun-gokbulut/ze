@@ -772,9 +772,11 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Visible)
 		return false;
 
-	ZEAABBox BoundingBox = GetWorldBoundingBox();
-	if (Parameters->View->ViewVolume != NULL && !Parameters->View->ViewVolume->IntersectionTest(BoundingBox))
-		return false;
+	if (GetModel()->GetMeshes().GetCount() > 1 || GetModel()->GetBones().GetCount() > 0)
+	{
+		if (Parameters->View->ViewVolume != NULL && !Parameters->View->ViewVolume->IntersectionTest(GetWorldBoundingBox()))
+			return false;
+	}
 
 	UpdateConstantBuffer();
 
@@ -783,7 +785,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	for (ZEUInt I = 0; I < 8; I++)
 	{
-		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, BoundingBox.GetVertex(I));
+		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I));
 
 		if (CurrentBoundingBoxEdgeDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
 			ClosestBoundingBoxEdgeDistanceSquare = CurrentBoundingBoxEdgeDistanceSquare;
@@ -853,10 +855,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			Draw->RenderCommand.Order = DrawOrder;
 			Draw->RenderCommand.InstanceTag = (CurrentLODs[I]->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
 
-			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->IsLoaded())
-				continue;
-
-			if (!Draw->GetMaterial()->PreRender(Draw->RenderCommand))
+			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 				continue;
 
 			Parameters->Renderer->AddCommand(&Draw->RenderCommand);

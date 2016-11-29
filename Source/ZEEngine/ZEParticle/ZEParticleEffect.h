@@ -53,6 +53,9 @@ class ZEParticleEffect : public ZEEntity
 
 		virtual ZEEntityResult				InitializeInternal();
 		virtual ZEEntityResult				DeinitializeInternal();
+		
+		virtual void						LocalTransformChanged();
+		virtual void						ParentTransformChanged();
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();

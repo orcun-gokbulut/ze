@@ -209,6 +209,8 @@ class ZERNStageLighting : public ZERNStage
 		void									SetUseTiledDeferred(bool UseTiledDeferred);
 		bool									GetUseTiledDeferred() const;
 
+		virtual void							Resized(ZEUInt Width, ZEUInt Height);
+
 		virtual bool							Setup(ZEGRContext* Context);
 		virtual void							CleanUp(ZEGRContext* Context);
 

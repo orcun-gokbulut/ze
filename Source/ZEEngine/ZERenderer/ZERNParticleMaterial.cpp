@@ -35,30 +35,27 @@
 
 #include "ZERNParticleMaterial.h"
 
+#include "ZEFile/ZEPathInfo.h"
 #include "ZERNStageID.h"
+#include "ZERNStageParticleRendering.h"
+#include "ZERNShaderSlots.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZERNStageParticleRendering.h"
-#include "ZERNShaderSlots.h"
-#include "ZEFile/ZEPathInfo.h"
 
 #define ZERN_PMDF_CONSTANT_BUFFER		1
 #define ZERN_PMDF_RENDER_STATE			2
 #define ZERN_PMDF_SHADERS				4
 
-void ZERNParticleMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+void ZERNParticleMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options)
 {
 	Options.Definitions.Clear();
 
 	if (AlphaCullEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_PM_ALPHA_CULL"));
-
-	if (VertexColorEnabled)
-		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_PM_VERTEX_COLOR"));
 
 	if (DiffuseMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_PM_DIFFUSE_MAP"));
@@ -73,7 +70,7 @@ void ZERNParticleMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Opt
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_PM_OPACITY_MAP"));
 }
 
-bool ZERNParticleMaterial::UpdateShaders() const
+bool ZERNParticleMaterial::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZERN_PMDF_SHADERS))
 		return true;
@@ -81,6 +78,7 @@ bool ZERNParticleMaterial::UpdateShaders() const
 	ZEGRShaderCompileOptions Options;
 
 	UpdateShaderDefinitions(Options);
+
 	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNParticleMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
@@ -101,12 +99,17 @@ bool ZERNParticleMaterial::UpdateShaders() const
 	return true;
 }
 
-bool ZERNParticleMaterial::UpdateRenderState() const
+bool ZERNParticleMaterial::UpdateRenderState()
 {
 	if (!DirtyFlags.GetFlags(ZERN_PMDF_RENDER_STATE))
 		return true;
 
 	ZEGRRenderState RenderState = ZERNStageParticleRendering::GetRenderState();
+
+	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
+	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
+	RenderState.SetRasterizerState(RasterizerState);
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageParticleRendering_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageParticleRendering_PixelShader);
 
@@ -118,7 +121,7 @@ bool ZERNParticleMaterial::UpdateRenderState() const
 	return true;
 }
 
-bool ZERNParticleMaterial::UpdateConstantBuffer() const
+bool ZERNParticleMaterial::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZERN_PMDF_CONSTANT_BUFFER))
 		return true;
@@ -136,7 +139,16 @@ bool ZERNParticleMaterial::UpdateConstantBuffer() const
 
 ZETaskResult ZERNParticleMaterial::LoadInternal()
 {
+	SetDiffuseMapFileName(DiffuseMapFileName);
+	SetEmissiveMapFileName(EmissiveMapFileName);
+	SetNormalMapFileName(NormalMapFileName);
+	SetOpacityMapFileName(OpacityMapFileName);
+
+	DirtyFlags.RaiseAll();
+
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	if (ConstantBuffer == NULL)
+		return ZE_TR_FAILED;
 
 	if (!UpdateShaders())
 		return ZE_TR_FAILED;
@@ -159,6 +171,11 @@ ZETaskResult ZERNParticleMaterial::UnloadInternal()
 	StageParticleRendering_RenderState.Release();
 
 	ConstantBuffer.Release();
+	Sampler.Release();
+	DiffuseMap.Release();
+	EmissiveMap.Release();
+	NormalMap.Release();
+	OpacityMap.Release();
 
 	return ZE_TR_DONE;
 }
@@ -167,6 +184,7 @@ ZERNParticleMaterial::ZERNParticleMaterial()
 {
 	DirtyFlags.RaiseAll();
 
+	TwoSided = false;
 	ShadowCaster = false;
 	AlphaCullEnabled = false;
 	VertexColorEnabled = false;
@@ -196,19 +214,41 @@ ZERNParticleMaterial::ZERNParticleMaterial()
 	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
 	Sampler = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
+
+	Register();
+}
+
+ZERNParticleMaterial::~ZERNParticleMaterial()
+{
+	Unregister();
 }
 
 ZEUInt ZERNParticleMaterial::GetStageMask() const
 {
-	return ZERN_STAGE_PARTICLE_RENDERING;
+	return ZERN_STAGE_DEBUG | ZERN_STAGE_PARTICLE_RENDERING;
 }
 
-void ZERNParticleMaterial::SetSampler(ZEHolder<ZEGRSampler> Sampler)
+void ZERNParticleMaterial::SetTwoSided(bool TwoSided)
+{
+	if (this->TwoSided == TwoSided)
+		return;
+
+	this->TwoSided = TwoSided;
+
+	DirtyFlags.RaiseFlags(ZERN_PMDF_RENDER_STATE);
+}
+
+bool ZERNParticleMaterial::GetTwoSided() const
+{
+	return TwoSided;
+}
+
+void ZERNParticleMaterial::SetSampler(const ZEGRSampler* Sampler)
 {
 	this->Sampler = Sampler;
 }
 
-ZEHolder<ZEGRSampler> ZERNParticleMaterial::GetSampler() const
+const ZEGRSampler* ZERNParticleMaterial::GetSampler() const
 {
 	return Sampler;
 }
@@ -229,13 +269,13 @@ const ZEGRTexture* ZERNParticleMaterial::GetDiffuseMap() const
 
 void ZERNParticleMaterial::SetDiffuseMapFileName(const ZEString& FileName)
 {
-	if (ZEPathInfo::Compare(DiffuseMapFileName, FileName))
-		return;
+	if (!ZEPathInfo::Compare(DiffuseMapFileName, FileName))
+	{
+		DiffuseMapFileName = FileName;
 
-	DiffuseMapFileName = Filename;
-
-	if (DiffuseMapFileName.IsEmpty())
-		DiffuseMap.Release();
+		if (DiffuseMapFileName.IsEmpty())
+			DiffuseMap.Release();
+	}
 
 	if (IsLoadedOrLoading() && !DiffuseMapFileName.IsEmpty())
 	{
@@ -269,13 +309,13 @@ const ZEGRTexture* ZERNParticleMaterial::GetEmissiveMap() const
 
 void ZERNParticleMaterial::SetEmissiveMapFileName(const ZEString& FileName)
 {
-	if (ZEPathInfo::Compare(EmissiveMapFileName, FileName))
-		return;
+	if (!ZEPathInfo::Compare(EmissiveMapFileName, FileName))
+	{
+		EmissiveMapFileName = FileName;
 
-	EmissiveMapFileName = Filename;
-
-	if (EmissiveMapFileName.IsEmpty())
-		EmissiveMap.Release();
+		if (EmissiveMapFileName.IsEmpty())
+			EmissiveMap.Release();
+	}
 
 	if (IsLoadedOrLoading() && !EmissiveMapFileName.IsEmpty())
 	{
@@ -309,19 +349,18 @@ const ZEGRTexture* ZERNParticleMaterial::GetNormalMap() const
 
 void ZERNParticleMaterial::SetNormalMapFileName(const ZEString& FileName)
 {
-	if (ZEPathInfo::Compare(EmissiveMapFileName, FileName))
-		return;
+	if (!ZEPathInfo::Compare(EmissiveMapFileName, FileName))
+	{
+		EmissiveMapFileName = FileName;
 
-	EmissiveMapFileName = Filename;
-
-	if (EmissiveMapFileName.IsEmpty())
-		EmissiveMap.Release();
+		if (EmissiveMapFileName.IsEmpty())
+			EmissiveMap.Release();
+	}
 
 	if (IsLoadedOrLoading() && !EmissiveMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions Options;
 		Options.Type = ZEGR_TT_2D;
-		Options.CompressionFormat = ZEGR_TF_BC5_UNORM;
 
 		UnregisterExternalResource(EmissiveMap);
 		EmissiveMap = ZEGRTexture::LoadResourceShared(EmissiveMapFileName, Options);
@@ -350,19 +389,18 @@ const ZEGRTexture* ZERNParticleMaterial::GetOpacityMap() const
 
 void ZERNParticleMaterial::SetOpacityMapFileName(const ZEString& FileName)
 {
-	if (ZEPathInfo::Compare(OpacityMapFileName, FileName))
-		return;
+	if (!ZEPathInfo::Compare(OpacityMapFileName, FileName))
+	{
+		OpacityMapFileName = FileName;
 
-	OpacityMapFileName = Filename;
-
-	if (OpacityMapFileName.IsEmpty())
-		OpacityMap.Release();
+		if (OpacityMapFileName.IsEmpty())
+			OpacityMap.Release();
+	}
 
 	if (IsLoadedOrLoading() && !OpacityMapFileName.IsEmpty())
 	{
 		ZEGRTextureOptions Options;
 		Options.Type = ZEGR_TT_2D;
-		Options.CompressionFormat = ZEGR_TF_BC4_UNORM;
 
 		UnregisterExternalResource(OpacityMap);
 		OpacityMap = ZEGRTexture::LoadResourceShared(OpacityMapFileName, Options);
@@ -700,12 +738,12 @@ float ZERNParticleMaterial::GetAlphaCullLimit() const
 	return Constants.AlphaCullLimit;
 }
 
-bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if (!Update())
+	if (!const_cast<ZERNParticleMaterial*>(this)->Update())
 		return false;
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
@@ -718,12 +756,12 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	return true;
 }
 
-void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
-bool ZERNParticleMaterial::Update() const
+bool ZERNParticleMaterial::Update()
 {
 	if (!ZERNMaterial::Update())
 		return false;

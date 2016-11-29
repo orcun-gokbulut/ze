@@ -492,16 +492,6 @@ bool ZERNStageLighting::InitializeInternal()
 	PointLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(PointLightStruct), sizeof(PointLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
 	ProjectiveLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(ProjectiveLightStruct), sizeof(ProjectiveLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
 
-	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
-	if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
-	{
-		Width *= 2;
-		Height *= 2;
-	}
-
-	TiledDeferredOutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
-
 	return Update();
 }
 
@@ -612,6 +602,17 @@ void ZERNStageLighting::SetUseTiledDeferred(bool UseTiledDeferred)
 bool ZERNStageLighting::GetUseTiledDeferred() const
 {
 	return UseTiledDeferred;
+}
+
+void ZERNStageLighting::Resized(ZEUInt Width, ZEUInt Height)
+{
+	if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
+	{
+		Width *= 2;
+		Height *= 2;
+	}
+
+	TiledDeferredOutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 }
 
 bool ZERNStageLighting::Setup(ZEGRContext* Context)

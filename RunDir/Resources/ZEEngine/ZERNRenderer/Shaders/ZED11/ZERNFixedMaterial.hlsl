@@ -115,7 +115,6 @@ TextureCube<float3>	ZERNFixedMaterial_EnvironmentMap			: register(t7);
 Texture2D<float3>	ZERNFixedMaterial_DetailBaseMap			 	: register(t8);
 Texture2D<float3>	ZERNFixedMaterial_DetailNormalMap			: register(t9);
 Texture2D<float>	ZERNFixedMaterial_SpecularGlossMap			: register(t10);
-Texture2D<float>	ZERNFixedMaterial_DitherMap					: register(t25);
 
 SamplerState		ZERNFixedMaterial_TextureSampler			: register(s0);
 SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
@@ -123,16 +122,16 @@ SamplerState		ZERNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
 static const float ThresholdMatrix[8][8] =
-			{
-				{ 0, 32, 8, 40, 2, 34, 10, 42}, 
-				{48, 16, 56, 24, 50, 18, 58, 26}, 
-				{12, 44, 4, 36, 14, 46, 6, 38}, 
-				{60, 28, 52, 20, 62, 30, 54, 22}, 
-				{ 3, 35, 11, 43, 1, 33, 9, 41}, 
-				{51, 19, 59, 27, 49, 17, 57, 25},
-				{15, 47, 7, 39, 13, 45, 5, 37},
-				{63, 31, 55, 23, 61, 29, 53, 21} 
-			};
+{
+	{ 0, 32, 8, 40, 2, 34, 10, 42}, 
+	{48, 16, 56, 24, 50, 18, 58, 26}, 
+	{12, 44, 4, 36, 14, 46, 6, 38}, 
+	{60, 28, 52, 20, 62, 30, 54, 22}, 
+	{ 3, 35, 11, 43, 1, 33, 9, 41}, 
+	{51, 19, 59, 27, 49, 17, 57, 25},
+	{15, 47, 7, 39, 13, 45, 5, 37},
+	{63, 31, 55, 23, 61, 29, 53, 21} 
+};
 			
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -330,8 +329,6 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 		#endif
 		{
 			clip(Alpha - ((ThresholdMatrix[floor(Input.Position.x) % 8][floor(Input.Position.y) % 8] + 1.0f) / 65.0f));
-			//if (ZERNFixedMaterial_DitherMap[float2(floor(Alpha * 255.0f + 0.5f), floor(Input.Position.y) % 32)] == 0.0f)
-			//	discard;
 		}
 		else
 		{
@@ -467,17 +464,17 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		
-		//uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
-		//uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
-		//uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
-		//
-		//uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
-		//for (uint J = 0; J < TilePointLightCount; J++)
-		//	ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
-		//
-		//uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
-		//for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
-		//	ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
+		uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
+		uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
+		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		
+		uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
+		for (uint J = 0; J < TilePointLightCount; J++)
+			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
+		
+		uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
+		for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
+			ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
 		
 		Output.Color = float4(ResultColor + Surface.Ambient + Surface.Emissive, Surface.Opacity);
 	#endif

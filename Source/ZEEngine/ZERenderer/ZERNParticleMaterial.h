@@ -45,32 +45,31 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
-class ZEGRShader;
-class ZEGRRenderStateData;
 class ZEGRBuffer;
+class ZEGRShader;
 class ZEGRSampler;
+class ZEGRRenderStateData;
 
 class ZERNParticleMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNParticleMaterial)
 	private:
-		ZEString								Filename;
+		ZEFlags									DirtyFlags;
 
-		mutable ZEFlags							DirtyFlags;
-
-		mutable ZEHolder<ZEGRShader>			StageParticleRendering_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageParticleRendering_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageParticleRendering_RenderState;
+		ZEHolder<const ZEGRShader>				StageParticleRendering_VertexShader;
+		ZEHolder<const ZEGRShader>				StageParticleRendering_PixelShader;
+		ZEHolder<const ZEGRRenderStateData>		StageParticleRendering_RenderState;
 
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
-		ZEHolder<ZEGRSampler>					Sampler;
 
+		ZEHolder<const ZEGRSampler>				Sampler;
 		ZEHolder<const ZEGRTexture>				DiffuseMap;
 		ZEHolder<const ZEGRTexture>				EmissiveMap;
 		ZEHolder<const ZEGRTexture>				NormalMap;
 		ZEHolder<const ZEGRTexture>				OpacityMap;
 
+		bool									TwoSided;
 		bool									ShadowCaster;
 		bool									AlphaCullEnabled;
 		bool									VertexColorEnabled;
@@ -92,7 +91,7 @@ class ZERNParticleMaterial : public ZERNMaterial
 		bool									OpacityMapEnabled;
 		ZEString								OpacityMapFileName;
 
-		mutable struct
+		struct
 		{
 			ZEVector3							AmbientColor;
 			float								Opacity;
@@ -110,21 +109,25 @@ class ZERNParticleMaterial : public ZERNMaterial
 
 		} Constants;
 
-		void									UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
-		bool									UpdateShaders() const;
-		bool									UpdateRenderState() const;
-		bool									UpdateConstantBuffer() const;
+		void									UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options);
+		bool									UpdateShaders();
+		bool									UpdateRenderState();
+		bool									UpdateConstantBuffer();
 
 		virtual ZETaskResult					LoadInternal();
 		virtual ZETaskResult					UnloadInternal();
 
 												ZERNParticleMaterial();
+		virtual									~ZERNParticleMaterial();
 
 	public:
 		virtual ZEUInt							GetStageMask() const;
 
-		void									SetSampler(ZEHolder<ZEGRSampler> Sampler);
-		ZEHolder<ZEGRSampler>					GetSampler() const;
+		void									SetTwoSided(bool TwoSided);
+		bool									GetTwoSided() const;
+
+		void									SetSampler(const ZEGRSampler* Sampler);
+		const ZEGRSampler*						GetSampler() const;
 
 		void									SetDiffuseMap(const ZEGRTexture* Texture);
 		const ZEGRTexture*						GetDiffuseMap() const;
@@ -216,10 +219,10 @@ class ZERNParticleMaterial : public ZERNMaterial
 		void									SetAlphaCullLimit(float Limit);
 		float									GetAlphaCullLimit() const;
 
-		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 
-		virtual bool							Update() const;
+		virtual bool							Update();
 
 		static ZEHolder<ZERNParticleMaterial>	CreateInstance();
 };
