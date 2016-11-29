@@ -371,10 +371,6 @@ ZETaskResult ZERNStandardMaterial::LoadInternal()
 
 	DirtyFlags.RaiseAll();
 	
-	ZEGRTextureOptions TextureOptions;
-	TextureOptions.Type = ZEGR_TT_2D;
-	DitherMap = ZEGRTexture::LoadResourceShared("#R:/ZEEngine/ZEPostEffects/Textures/grad2-7-1.png", TextureOptions);
-
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	if (ConstantBuffer == NULL)
 		return ZE_TR_FAILED;
@@ -513,16 +509,6 @@ ZERNStandardMaterial::~ZERNStandardMaterial()
 ZEUInt ZERNStandardMaterial::GetStageMask() const
 {
 	return StageMask;
-}
-
-void ZERNStandardMaterial::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString& ZERNStandardMaterial::GetName() const
-{
-	return Name;
 }
 
 void ZERNStandardMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
@@ -1914,7 +1900,6 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 			SpecularGlossMap
 		};
 		Context->SetTextures(ZEGR_ST_PIXEL, 0, 11, Textures);
-		Context->SetTexture(ZEGR_ST_PIXEL, 25, DitherMap);
 	}
 	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION || StageID == ZERN_STAGE_RENDER_DEPTH)
 	{

@@ -55,18 +55,21 @@ ZE_ENUM(ZEParticleEmitterType)
 	ZE_PET_SPHERE
 };
 
-enum ZEParticleSpace
-{
-	ZE_PS_LOCAL,
-	ZE_PS_WORLD,
-	ZE_PS_SCREEN
-};
-
 ZE_ENUM(ZEParticleBillboardType)
 {
 	ZE_PBT_AXIS_ORIENTED,
-	ZE_PBT_SCREEN_ALIGNED,
+	ZE_PBT_VELOCITY_ORIENTED,
 	ZE_PBT_VIEW_POINT_ORIENTED
+};
+
+ZE_ENUM(ZEParticleAxisOrientation)
+{
+	ZE_PAO_X,
+	ZE_PAO_Y,
+	ZE_PAO_Z,
+	ZE_PAO_NEGATIVE_X,
+	ZE_PAO_NEGATIVE_Y,
+	ZE_PAO_NEGATIVE_Z,
 };
 
 class ZEParticleEffect;
@@ -81,9 +84,9 @@ class ZEParticleEmitter : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEParticleModifier;
-	friend class ZEParticlePhysicsModifier;
 	friend class ZEParticleEffect;
 	private:
+		ZEFlags								DirtyFlags;
 		ZEParticleEffect*					Effect;
 		ZEString							Name;
 
@@ -92,33 +95,25 @@ class ZEParticleEmitter : public ZEObject
 		ZEArray<ZEParticle>					SortArray;
 		ZEArray<ZEParticleModifier*>		Modifiers;
 
-		struct InstanceAttributes
-		{
-			ZEVector3						Position;
-			float							Reserved0;
-			ZEVector2						Size;
-			ZEVector2						Cos_NegSin;
-			ZEVector4						Color;
-		};
-
-		ZEVector3							AxisOrientation;
+		ZEParticleAxisOrientation			AxisOrientation;
 		ZEUInt								ParticlesPerSecondMin;
 		ZEUInt								ParticlesPerSecondMax;
 		float								ParticlesAccumulation;
 
 		bool								SortingEnabled;
 		bool								ParticleFixedAspectRatio;
+		bool								LocalSpace;
 
 		ZEAABBox							BoundingBox;
 		ZEVector3							Position;
 		ZEParticleEmitterType				Type;
+		ZEParticleBillboardType				BillboardType;
 
 		ZEVector3							BoxSize;
 		float								SphereRadius;
 		ZEVector2							TorusSize;
 		ZEVector2							PlaneSize;
 
-		ZEParticleSpace						ParticleSpace;
 		ZEVector4							ParticleColorMin;
 		ZEVector4							ParticleColorMax;
 		ZEVector2							ParticleSizeMin;
@@ -126,21 +121,40 @@ class ZEParticleEmitter : public ZEObject
 		float								ParticleLifeMin;
 		float								ParticleLifeMax;
 		bool								ParticleImmortal;
+		bool								ParticleLocalSpace;
+
+		ZERNCommand							RenderCommand;
 
 		ZEHolder<ZERNParticleMaterial>		Material;
-		ZERNCommand							RenderCommand;
-		ZEParticleBillboardType				BillboardType;
 		ZEHolder<ZEGRBuffer>				InstanceBuffer;
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
+		struct
+		{
+			ZEVector3						Axis;
+			ZEUInt							BillboardType;
+		} Constants;
+
+		struct InstanceAttributes
+		{
+			ZEVector3						Position;
+			float							Reserved;
+			ZEVector2						Size;
+			ZEVector2						Cos_NegSin;
+			ZEVector4						Color;
+		};
 
 		bool								Initialize();
 		void								Deinitialize();
 
+		void								UpdateConstantBuffer();
+
+		void								LocalTransformChanged();
+		void								EffectTransformChanged();
+
 		void								GenerateParticle(ZEParticle &Particle);
 		void								UpdateParticles(float ElapsedTime);
 		void								SortParticles(const ZERNView& View);
-
 
 											ZEParticleEmitter();
 		virtual								~ZEParticleEmitter();
@@ -171,6 +185,8 @@ class ZEParticleEmitter : public ZEObject
 		void								SetTorusSize(const ZEVector2& TorusRadius);
 		const ZEVector2&					GetTorusSize() const;
 
+		void								SetLocalSpace(bool LocalSpace);
+		bool								GetLocalSpace() const;
 
 		// Particle Pool
 		const ZEArray<ZEParticle>&			GetPool() const;
@@ -184,8 +200,8 @@ class ZEParticleEmitter : public ZEObject
 
 
 		// Particle
-		void								SetParticleSpace(ZEParticleSpace Space);
-		ZEParticleSpace						GetParticalSpace() const;
+		void								SetParticleLocalSpace(bool ParticleLocalSpace);
+		bool								GetParticleLocalSpace() const;
 
 		void								SetParticlesPerSecond(ZEUInt ParticlesPerSecond);
 		ZEUInt								GetParticlesPerSecond() const;
@@ -226,11 +242,11 @@ class ZEParticleEmitter : public ZEObject
 		// Rendering
 		const ZEAABBox&						GetBoundingBox() const;
 
-		void								SetBillboardType(ZEParticleBillboardType Type);
+		void								SetBillboardType(ZEParticleBillboardType BillboardType);
 		ZEParticleBillboardType				GetBillboardType() const;
 
-		void								SetAxisOrientation(const ZEVector3& Orientation);
-		const ZEVector3&					GetAxisOrientation() const;
+		void								SetAxisOrientation(ZEParticleAxisOrientation AxisOrientation);
+		ZEParticleAxisOrientation			GetAxisOrientation() const;
 
 		void								SetMaterial(ZEHolder<ZERNParticleMaterial> Material);
 		ZEHolder<ZERNParticleMaterial>		GetMaterial() const;

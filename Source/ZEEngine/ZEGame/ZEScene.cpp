@@ -61,8 +61,8 @@
 
 void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 {
-	bool Custom = Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM);
-	bool Initialized = Entity->IsInitialized();
+	if ((!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized()) || !Entity->GetEnabled())
+		return;
 
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
 	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
@@ -72,6 +72,9 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 
 bool ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
+	if (!Entity->GetVisible())
+		return false;
+
 	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
 
 	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
@@ -460,12 +463,25 @@ void ZEScene::Tick(float ElapsedTime)
 		return;
 
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("SceneTick");
+	
+	ZEArray<ZEEntity*> LocalTickList;
+	ZESize Index = 0;
 	TickList.LockRead();
+	{
+		LocalTickList.SetCount(TickList.GetCount());
 
-	ze_for_each(Entity, TickList)
-		TickEntity(Entity.GetPointer(), ElapsedTime);
-
+		ze_for_each(Entity, TickList)
+		{
+			LocalTickList[Index] = Entity.GetPointer();
+			Index++;
+		}
+	}
 	TickList.UnlockRead();
+
+	ze_for_each(Entity, LocalTickList)
+		TickEntity(Entity.GetItem(), ElapsedTime);
+
+
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->EndEvent();
 }
 

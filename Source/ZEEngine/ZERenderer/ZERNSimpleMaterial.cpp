@@ -35,6 +35,7 @@
 
 #include "ZERNSimpleMaterial.h"
 
+#include "ZEFile/ZEPathInfo.h"
 #include "ZERNCommand.h"
 #include "ZERNRenderer.h"
 #include "ZERNShaderSlots.h"
@@ -47,13 +48,12 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
-#include "ZEFile/ZEPathInfo.h"
 
 #define ZERN_SMDF_RENDER_STATE		1
 #define ZERN_SMDF_CONSTANT_BUFFER	2
 #define ZERN_SMDF_SHADERS			4
 
-bool ZERNSimpleMaterial::UpdateShaders() const
+bool ZERNSimpleMaterial::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_SHADERS))
 		return true;
@@ -78,7 +78,7 @@ bool ZERNSimpleMaterial::UpdateShaders() const
 	return true;
 }
 
-bool ZERNSimpleMaterial::UpdateRenderState() const
+bool ZERNSimpleMaterial::UpdateRenderState()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
 		return true;
@@ -116,7 +116,7 @@ bool ZERNSimpleMaterial::UpdateRenderState() const
 	return true;
 }
 
-bool ZERNSimpleMaterial::UpdateConstantBuffer() const
+bool ZERNSimpleMaterial::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_CONSTANT_BUFFER))
 		return true;
@@ -368,7 +368,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if (!Update())
+	if (!const_cast<ZERNSimpleMaterial*>(this)->Update())
 		return false;
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
@@ -390,7 +390,7 @@ void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* 
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
-bool ZERNSimpleMaterial::Update() const
+bool ZERNSimpleMaterial::Update()
 {
 	if (!ZERNMaterial::Update())
 		return false;

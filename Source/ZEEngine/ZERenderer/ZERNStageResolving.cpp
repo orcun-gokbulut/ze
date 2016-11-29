@@ -318,12 +318,16 @@ bool ZERNStageResolving::Setup(ZEGRContext* Context)
 		if (ResolvedGBuffer2 == NULL || ResolvedGBuffer3 == NULL)
 			return false;
 
+		const ZEGRTexture* Textures[] = {GBuffer1, GBuffer2, GBuffer3, DepthTexture};
+		Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, Textures);
 		Context->SetRenderState(ResolveAllGBuffersRenderStateData);
 		const ZEGRRenderTarget* RenderTargets[] = {ResolvedGBuffer1->GetRenderTarget(), ResolvedGBuffer2->GetRenderTarget(), ResolvedGBuffer3->GetRenderTarget()};
 		Context->SetRenderTargets(3, RenderTargets, ResolvedDepthTexture->GetDepthStencilBuffer());
 	}
 	else
 	{
+		Context->SetTexture(ZEGR_ST_PIXEL, 1, GBuffer1);
+		Context->SetTexture(ZEGR_ST_PIXEL, 4, DepthTexture);
 		Context->SetRenderState(ResolveGBuffersRenderStateData);
 		const ZEGRRenderTarget* RenderTarget = ResolvedGBuffer1->GetRenderTarget();
 		Context->SetRenderTargets(1, &RenderTarget, ResolvedDepthTexture->GetDepthStencilBuffer());

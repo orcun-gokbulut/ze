@@ -36,7 +36,6 @@
 #pragma once
 
 #include "ZEResource/ZERSResource.h"
-#include "ZEInitializable.h"
 
 class ZEGRContext;
 class ZERNStage;
@@ -48,6 +47,7 @@ class ZERNMaterial : public ZERSResource
 	ZE_DISALLOW_COPY(ZERNMaterial)
 	protected:
 		ZEGUID							GUID;
+		ZEString						Name;
 
 										ZERNMaterial();
 		virtual							~ZERNMaterial();
@@ -56,11 +56,14 @@ class ZERNMaterial : public ZERSResource
 		void							SetGUID(const ZEGUID& GUID);
 		const ZEGUID&					GetGUID() const;
 
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
+
 		virtual ZEUInt					GetStageMask() const = 0;
 
 		virtual bool					PreRender(ZERNCommand& Command) const;
 		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 
-		virtual bool					Update() const;	
+		virtual bool					Update();	
 };

@@ -336,7 +336,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		Draws[I].RenderCommand.ExtraParameters = &Draws[I];
 		Draws[I].RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEInteriorRoom, Render, this);
 
-		if (!Draws[I].Material->PreRender(Draws[I].RenderCommand))
+		if (Draws[I].Material == NULL || !Draws[I].Material->PreRender(Draws[I].RenderCommand))
 			continue;
 	}
 

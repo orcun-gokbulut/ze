@@ -200,21 +200,25 @@ void ZEParticlePhysicsModifier::Tick(float ElapsedTime)
 				}
 				else
 				{
-					Particles[I].Velocity.x = ZERandom::GetFloatRange(MinVelocity.x, MaxVelocity.x);
-					Particles[I].Velocity.y = ZERandom::GetFloatRange(MinVelocity.y, MaxVelocity.y);
-					Particles[I].Velocity.z = ZERandom::GetFloatRange(MinVelocity.z, MaxVelocity.z);
+					Particles[I].InitialVelocity.x = ZERandom::GetFloatRange(MinVelocity.x, MaxVelocity.x);
+					Particles[I].InitialVelocity.y = ZERandom::GetFloatRange(MinVelocity.y, MaxVelocity.y);
+					Particles[I].InitialVelocity.z = ZERandom::GetFloatRange(MinVelocity.z, MaxVelocity.z);
 				}
 
 				Particles[I].Acceleration.x = ZERandom::GetFloatRange(MinAcceleration.x, MaxAcceleration.x);
 				Particles[I].Acceleration.y = ZERandom::GetFloatRange(MinAcceleration.y, MaxAcceleration.y);
 				Particles[I].Acceleration.z = ZERandom::GetFloatRange(MinAcceleration.z, MaxAcceleration.z);
-				Particles[I].InitialVelocity = Particles[I].Velocity;
+				Particles[I].Velocity = Particles[I].InitialVelocity;
 				break;
 
 			case ZE_PAS_ALIVE:
-				Particles[I].Position += Particles[I].Velocity * ElapsedTime;
-				Particles[I].Velocity += Particles[I].Acceleration * ElapsedTime;
-				break;
+				{
+					float TotalElapsedTime = Particles[I].TotalLife - Particles[I].Life;
+					Particles[I].Velocity = Particles[I].InitialVelocity + Particles[I].Acceleration * TotalElapsedTime;
+					Particles[I].Position = Particles[I].InitialPositionWorld + ((Particles[I].InitialVelocity + Particles[I].Velocity) / 2) * TotalElapsedTime;
+					
+					break;
+				}
 
 			case ZE_PAS_DEAD:
 				break;
@@ -690,7 +694,7 @@ void ZEParticleConfineModifier::Tick(float ElapsedTime)
 		if (Particles[I].State != ZE_PAS_ALIVE)
 			continue;
 
-		if (GetEmitter()->GetParticalSpace() == ZE_PS_WORLD)
+		if (!GetEmitter()->GetLocalSpace())
 			Particles[I].Position = GetEffect()->GetInvWorldTransform() * Particles[I].Position;
 
 		if (Particles[I].Position.x < BoundingBox.Min.x)
@@ -708,7 +712,7 @@ void ZEParticleConfineModifier::Tick(float ElapsedTime)
 		else if (Particles[I].Position.z > BoundingBox.Max.z)
 			Particles[I].Position.z -= Displacement.z;
 
-		if (GetEmitter()->GetParticalSpace() == ZE_PS_WORLD)
+		if (!GetEmitter()->GetLocalSpace())
 			Particles[I].Position = GetEffect()->GetWorldTransform() * Particles[I].Position;
 	}
 }

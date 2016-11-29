@@ -46,16 +46,25 @@
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRSampler.h"
 
+class ZEGRBuffer;
 class ZEGRShader;
 class ZEGRRenderStateData;
-class ZEGRBuffer;
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNSimpleMaterial)
 	private:
-		mutable ZEFlags							DirtyFlags;
+		ZEFlags									DirtyFlags;
+		
+		ZEHolder<const ZEGRShader>				VertexShader;
+		ZEHolder<const ZEGRShader>				PixelShader;
+		ZEHolder<const ZEGRRenderStateData>		RenderStateData;
+
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
+		
+		ZEHolder<const ZEGRSampler>				Sampler;
+		ZEHolder<const ZEGRTexture>				Texture;
 
 		bool									TwoSided;
 		bool									Wireframe;
@@ -64,13 +73,6 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		ZERNStageMask							StageMask;
 		ZEGRPrimitiveType						PrimitiveType;
 		ZEString								TextureFileName;
-		ZEHolder<const ZEGRTexture>				Texture;
-		ZEHolder<const ZEGRSampler>				Sampler;
-		
-		mutable ZEHolder<ZEGRShader>			VertexShader;
-		mutable ZEHolder<ZEGRShader>			PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		mutable ZEHolder<ZEGRBuffer>			ConstantBuffer;
 
 		struct
 		{
@@ -81,9 +83,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 			float								Reserved0;
 		} Constants;
 
-		bool									UpdateShaders() const;
-		bool									UpdateRenderState() const;
-		bool									UpdateConstantBuffer() const;
+		bool									UpdateShaders();
+		bool									UpdateRenderState();
+		bool									UpdateConstantBuffer();
 
 		virtual ZETaskResult					LoadInternal();
 		virtual ZETaskResult					UnloadInternal();
@@ -128,11 +130,11 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void									SetVertexColorEnabled(bool Enable);
 		bool									GetVertexColorEnabled() const;
 
-		virtual bool							Update() const;
-
 		virtual bool							PreRender(ZERNCommand& Command) const;
 		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+
+		virtual bool							Update();
 
 		static ZEHolder<ZERNSimpleMaterial>		CreateInstance();
 };

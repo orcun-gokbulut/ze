@@ -40,6 +40,9 @@
 const ZEGRVertexLayout& ZEMDVertex::GetVertexLayout()
 {
 	static ZEGRVertexLayout VertexLayout;
+	static ZELock Lock;
+
+	Lock.Lock();
 	if (VertexLayout.GetElementCount() == 0)
 	{
 		static ZEGRVertexElement ElementArray[] = 
@@ -52,6 +55,7 @@ const ZEGRVertexLayout& ZEMDVertex::GetVertexLayout()
 
 		VertexLayout.SetElements(ElementArray, 4);
 	}
+	Lock.Unlock();
 
 	return VertexLayout;
 }
@@ -59,6 +63,9 @@ const ZEGRVertexLayout& ZEMDVertex::GetVertexLayout()
 const ZEGRVertexLayout& ZEMDVertexInstance::GetVertexLayout()
 {
 	static ZEGRVertexLayout VertexLayout;
+	static ZELock Lock;
+
+	Lock.Lock();
 	if (VertexLayout.GetElementCount() == 0)
 	{
 		static ZEGRVertexElement ElementArray[] = 
@@ -81,6 +88,7 @@ const ZEGRVertexLayout& ZEMDVertexInstance::GetVertexLayout()
 
 		VertexLayout.SetElements(ElementArray, 14);
 	}
+	Lock.Unlock();
 
 	return VertexLayout;
 }
@@ -88,6 +96,9 @@ const ZEGRVertexLayout& ZEMDVertexInstance::GetVertexLayout()
 const ZEGRVertexLayout& ZEMDVertexSkin::GetVertexLayout()
 {
 	static ZEGRVertexLayout VertexLayout;
+	static ZELock Lock;
+
+	Lock.Lock();
 	if (VertexLayout.GetElementCount() == 0)
 	{
 		static ZEGRVertexElement ElementArray[] = 
@@ -102,6 +113,7 @@ const ZEGRVertexLayout& ZEMDVertexSkin::GetVertexLayout()
 
 		VertexLayout.SetElements(ElementArray, 6);
 	}
+	Lock.Unlock();
 
 	return VertexLayout;
 }

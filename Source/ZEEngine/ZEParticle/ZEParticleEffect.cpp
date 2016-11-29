@@ -105,6 +105,22 @@ void ZEParticleEffect::ResetEmitters()
 		Emitters[I]->ResetPool();
 }
 
+void ZEParticleEffect::LocalTransformChanged()
+{
+	ZEEntity::LocalTransformChanged();
+
+	ze_for_each(Emitter, Emitters)
+		Emitter.GetItem()->EffectTransformChanged();
+}
+
+void ZEParticleEffect::ParentTransformChanged()
+{
+	ZEEntity::ParentTransformChanged();
+
+	ze_for_each(Emitter, Emitters)
+		Emitter.GetItem()->EffectTransformChanged();
+}
+
 ZEParticleEffect::ZEParticleEffect()
 {
 	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);

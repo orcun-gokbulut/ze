@@ -52,6 +52,8 @@ class ZEParticle : public ZEObject
 	ZE_OBJECT
 	public:
 		ZEParticleState				State;
+		ZEVector3					InitialPositionLocal;
+		ZEVector3					InitialPositionWorld;
 		ZEVector3					Position;
 		ZEVector2					Size2D;
 		float						TotalLife;

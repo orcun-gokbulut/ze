@@ -36,8 +36,8 @@
 #include "ZERNMaterial.h"
 
 #include "ZERNStage.h"
-#include "ZERNCommand.h"
 #include "ZERNStageID.h"
+#include "ZERNCommand.h"
 
 ZERNMaterial::ZERNMaterial()
 {
@@ -59,9 +59,23 @@ const ZEGUID& ZERNMaterial::GetGUID() const
 	return GUID;
 }
 
+void ZERNMaterial::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZERNMaterial::GetName() const
+{
+	return Name;
+}
+
 bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 {
+	if (!IsLoaded())
+		return false;
+
 	Command.StageMask = GetStageMask();
+
 	return true;
 }
 
@@ -81,7 +95,7 @@ void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage,
 
 }
 
-bool ZERNMaterial::Update() const
+bool ZERNMaterial::Update()
 {
 	if (!IsLoaded())
 		return false;

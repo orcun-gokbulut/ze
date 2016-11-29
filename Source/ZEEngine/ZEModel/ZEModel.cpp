@@ -596,13 +596,16 @@ bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
+	if (Parameters->Type != ZERN_PRT_SHADOW)
 	{
-		if (AnimationTrack != NULL)
-			AnimationTrack->UpdateAnimation();
+		if (AnimationUpdateMode == ZE_MAUM_VISUAL)
+		{
+			if (AnimationTrack != NULL)
+				AnimationTrack->UpdateAnimation();
 
-		ze_for_each(AnimationTrack, GetAnimationTracks())
-			AnimationTrack->UpdateAnimation();
+			ze_for_each(AnimationTrack, GetAnimationTracks())
+				AnimationTrack->UpdateAnimation();
+		}
 	}
 
 	bool Result = false;
