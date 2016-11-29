@@ -79,14 +79,17 @@ class ZESectorManager : public ZEObject
 		ZESector*							GetOriginSector();
 		bool								AddSector(ZESector* Sector);
 		void								RemoveSector(ZESector* Sector);
+		void								ClearSectors();
 
 		const ZEList2<ZEGeographicEntity>&	GetSelectors() const;
 		bool								AddSelector(ZESectorSelector* Selector);
 		void								RemoveSelector(ZESectorSelector* Selector);
+		void								ClearSelectors();
 
 		const ZEList2<ZEGeographicEntity>&	GetGeographicEntities() const;
 		bool								AddGeographicEntity(ZEGeographicEntity* Entity);
 		void								RemoveGeographicEntity(ZEGeographicEntity* Entity);
+		void								ClearGeographicEntities();
 
 		virtual void						Process(float Time);
 
