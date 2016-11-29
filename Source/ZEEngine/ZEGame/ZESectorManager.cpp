@@ -324,6 +324,14 @@ void ZESectorManager::RemoveSector(ZESector* Sector)
 	Sectors.Remove(&Sector->GeoLink);
 }
 
+void ZESectorManager::ClearSectors()
+{
+	ze_for_each(Sector, Sectors)
+		static_cast<ZESector*>(Sector.GetPointer())->SetManager(NULL);
+
+	Sectors.Clear();
+}
+
 const ZEList2<ZEGeographicEntity>& ZESectorManager::GetSelectors() const
 {
 	return Selectors;
@@ -349,6 +357,11 @@ void ZESectorManager::RemoveSelector(ZESectorSelector* Selector)
 	Selectors.Remove(&Selector->GeoLink);
 }
 
+void ZESectorManager::ClearSelectors()
+{
+	Selectors.Clear();
+}
+
 const ZEList2<ZEGeographicEntity>& ZESectorManager::GetGeographicEntities() const
 {
 	return GeographicEntities;
@@ -372,6 +385,11 @@ void ZESectorManager::RemoveGeographicEntity(ZEGeographicEntity* Entity)
 		"Can not remove entity. Entity is not registered to this manager. Entity Name: \"%s\".", Entity->GetName().ToCString());
 
 	GeographicEntities.Remove(&Entity->GeoLink);
+}
+
+void ZESectorManager::ClearGeographicEntities()
+{
+	GeographicEntities.Clear();
 }
 
 void ZESectorManager::Process(float Time)
@@ -493,14 +511,9 @@ bool ZESectorManager::Unserialize(const ZEString& FileName)
 
 	zeCheckError(SectorManagerNode.GetName() != "ZESectorManager", false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
 
-	ze_for_each(Selector, Selectors)
-		RemoveSelector(static_cast<ZESectorSelector*>(Selector.GetPointer()));
-
-	ze_for_each(Sector, Sectors)
-		RemoveSector(static_cast<ZESector*>(Sector.GetPointer()));
-
-	ze_for_each(GeographicEntity, GeographicEntities)
-		RemoveGeographicEntity(GeographicEntity.GetPointer());
+	ClearSelectors();
+	ClearSectors();
+	ClearGeographicEntities();
 
 	ZEMLReaderNode PropertiesNode = SectorManagerNode.GetNode("Properties");
 	SetCacheDepth(PropertiesNode.ReadUInt32("CacheDepth", 8));

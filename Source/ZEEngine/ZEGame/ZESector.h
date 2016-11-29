@@ -50,7 +50,7 @@ class ZESector : public ZEGeographicEntity
 {
 	friend class ZESectorManager;
 	ZE_OBJECT
-	private:
+	protected:
 		ZEGUID							GUID;
 		ZEString						SectorFile;
 		ZESectorManager*				Manager;
@@ -62,7 +62,6 @@ class ZESector : public ZEGeographicEntity
 		bool							CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck);
 		void							SetManager(ZESectorManager* Manager);				
 
-	protected:
 		virtual ZEEntityResult			LoadInternal();
 
 										ZESector();
