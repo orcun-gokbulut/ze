@@ -726,6 +726,8 @@ bool ZERSResource::ReloadSerial()
 		TargetState = ZERS_RS_LOADED;
 
 	UpdateStateTask.Run();
+
+	return true;
 }
 
 void ZERSResource::WaitStaging() const
