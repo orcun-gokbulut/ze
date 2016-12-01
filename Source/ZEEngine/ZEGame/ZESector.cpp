@@ -138,6 +138,16 @@ ZEEntityResult ZESector::LoadInternal()
 	return ZE_ER_DONE;
 }
 
+ZEEntityResult ZESector::UnloadInternal()
+{
+	ZE_ENTITY_UNLOAD_CHAIN(ZEGeographicEntity);
+
+	ClearChildEntities();
+	IsSectorFileLoaded = false;
+
+	return ZE_ER_DONE;
+}
+
 ZESectorManager* ZESector::GetManager() const
 {
 	return Manager;
