@@ -426,8 +426,7 @@ bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 {
 	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
 
-	ZEGUID Value;
-	Value.FromString(PropertiesNode.ReadString("GUID"));
+	ZEGUID Value = ZEGUID::FromString(PropertiesNode.ReadString("GUID"));
 
 	if (Value == ZEGUID())
 		SetGUID(ZEGUID::Generate());
@@ -464,7 +463,7 @@ bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 		ZESectorLink Link;
 		ZEMLReaderNode LinkNode = LinksNode.GetNode(I);
 
-		Link.Id.FromString(LinkNode.ReadString("GUID"));
+		Link.Id = ZEGUID::FromString(LinkNode.ReadString("GUID"));
 		Link.Depth = LinkNode.ReadUInt32("Depth", 1);
 		SectorLinks[I] = Link;
 	}
