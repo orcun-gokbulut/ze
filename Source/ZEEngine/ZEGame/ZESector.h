@@ -63,6 +63,7 @@ class ZESector : public ZEGeographicEntity
 		void							SetManager(ZESectorManager* Manager);				
 
 		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZESector();
 		virtual							~ZESector();
