@@ -38,137 +38,140 @@
 #include "ZETypes.h"
 #include "ZEIterator.h"
 
-template<typename ZEItemType, typename ZEAllocatorType>
+#define ZE_ARRAY_ITER_TEMPLATE template<typename ZEItemType, typename ZEAllocatorType, typename ZELockType>
+#define ZE_ARRAY_ITER_SPEC ZEItemType, ZEAllocatorType, ZELockType
+
+template<typename ZEItemType, typename ZEAllocatorType, typename ZELockType>
 class ZEArray;
 
-template<typename ZEItemType, typename ZEAllocatorType>
+ZE_ARRAY_ITER_TEMPLATE
 class ZEArrayIterator : public ZEIterator<ZEItemType>
 {
-	friend class ZEArray<ZEItemType, ZEAllocatorType>;
+	friend class ZEArray<ZEItemType, ZEAllocatorType, ZELockType>;
 	private:
-		ZEArray<ZEItemType, ZEAllocatorType>* Array;
-		ZESSize						Index;
+		ZEArray<ZE_ARRAY_ITER_SPEC>*		Array;
+		ZESSize								Index;
 
-									ZEArrayIterator(ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index);
+											ZEArrayIterator(ZEArray<ZE_ARRAY_ITER_SPEC>& Array, ZESize Index);
 
 	public:
-		inline bool					IsValid() const;
+		inline bool							IsValid() const;
 
-		inline ZEItemType&			GetItem() const;
-		inline ZESize				GetIndex() const;
+		inline ZEItemType&					GetItem() const;
+		inline ZESize						GetIndex() const;
 
-		inline void					Prev();
-		inline void					Next();
+		inline void							Prev();
+		inline void							Next();
 
-		bool						operator==(const ZEArrayIterator& Iterator) const;
+		bool								operator==(const ZEArrayIterator& Iterator) const;
 
-		ZEArrayIterator&			operator--();
-		ZEArrayIterator&			operator++();
+		ZEArrayIterator&					operator--();
+		ZEArrayIterator&					operator++();
 
-		ZEItemType&					operator*() const;
-		ZEItemType*					operator->() const;
+		ZEItemType&							operator*() const;
+		ZEItemType*							operator->() const;
 };
 
-template<typename ZEItemType, typename ZEAllocatorType>
+ZE_ARRAY_ITER_TEMPLATE
 class ZEArrayIteratorConst : public ZEIteratorConst<ZEItemType>
 {
-	friend class ZEArray<ZEItemType, ZEAllocatorType>;
+	friend class ZEArray<ZEItemType, ZEAllocatorType, ZELockType>;
 	private:
-		const ZEArray<ZEItemType, ZEAllocatorType>* Array;
-		ZESSize						Index;
+		const ZEArray<ZE_ARRAY_ITER_SPEC>*	Array;
+		ZESSize								Index;
 
-									ZEArrayIteratorConst(const ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index);
+											ZEArrayIteratorConst(const ZEArray<ZE_ARRAY_ITER_SPEC>& Array, ZESize Index);
 
 	public:
-		inline bool					IsValid() const;
+		inline bool							IsValid() const;
 
-		inline const ZEItemType&	GetItem() const;
-		inline ZESize				GetIndex() const;
+		inline const ZEItemType&			GetItem() const;
+		inline ZESize						GetIndex() const;
 
-		inline void					Prev();
-		inline void					Next();
+		inline void							Prev();
+		inline void							Next();
 
-		bool						operator==(const ZEArrayIteratorConst& Iterator) const;
+		bool								operator==(const ZEArrayIteratorConst& Iterator) const;
 
-		ZEArrayIteratorConst&		operator--();
-		ZEArrayIteratorConst&		operator++();
-		const ZEItemType&			operator*() const;
-		const ZEItemType*			operator->() const;
+		ZEArrayIteratorConst&				operator--();
+		ZEArrayIteratorConst&				operator++();
+		const ZEItemType&					operator*() const;
+		const ZEItemType*					operator->() const;
 };
 
 
 // ZEArrayIterator
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIterator<ZEItemType, ZEAllocatorType>::ZEArrayIterator(ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index)
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::ZEArrayIterator(ZEArray<ZE_ARRAY_ITER_SPEC>& Array, ZESize Index)
 {
 	this->Array = &Array;
 	this->Index = Index;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIterator<ZEItemType, ZEAllocatorType>::IsValid() const
+ZE_ARRAY_ITER_TEMPLATE
+bool ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::IsValid() const
 {
 	return (Array != NULL && Index >= 0 && Index < (ZESSize)Array->GetCount());
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType& ZEArrayIterator<ZEItemType, ZEAllocatorType>::GetItem() const
+ZE_ARRAY_ITER_TEMPLATE
+ZEItemType& ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::GetItem() const
 {
 	return Array->GetItem((ZESize)Index);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArrayIterator<ZEItemType, ZEAllocatorType>::GetIndex() const
+ZE_ARRAY_ITER_TEMPLATE
+ZESize ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::GetIndex() const
 {
 	return (ZESize)Index;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArrayIterator<ZEItemType, ZEAllocatorType>::Prev()
+ZE_ARRAY_ITER_TEMPLATE
+void ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::Prev()
 {
 	Index++;
 	if (Index < 0)
 		Index = -1;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArrayIterator<ZEItemType, ZEAllocatorType>::Next()
+ZE_ARRAY_ITER_TEMPLATE
+void ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::Next()
 {	
 	Index++;
 	if (Index >= (ZESSize)Array->GetCount())
 		Index = (ZESSize)Array->GetCount();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator==(const ZEArrayIterator& Iterator) const
+ZE_ARRAY_ITER_TEMPLATE
+bool ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::operator==(const ZEArrayIterator& Iterator) const
 {
 	return (Iterator.Array == Array && Iterator.Index == Index);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIterator<ZEItemType, ZEAllocatorType>& ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator--()
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIterator<ZE_ARRAY_ITER_SPEC>& ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::operator--()
 {
 	Prev();
 	return *this;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIterator<ZEItemType, ZEAllocatorType>& ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator++()
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIterator<ZE_ARRAY_ITER_SPEC>& ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::operator++()
 {
 	Next();
 	return *this;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType& ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator*() const
+ZE_ARRAY_ITER_TEMPLATE
+ZEItemType& ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::operator*() const
 {
 	return GetItem();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator->() const
+ZE_ARRAY_ITER_TEMPLATE
+ZEItemType* ZEArrayIterator<ZE_ARRAY_ITER_SPEC>::operator->() const
 {
 	return &GetItem();
 }
@@ -177,75 +180,75 @@ ZEItemType* ZEArrayIterator<ZEItemType, ZEAllocatorType>::operator->() const
 // ZEArrayIteratorConst
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::ZEArrayIteratorConst(const ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index)
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::ZEArrayIteratorConst(const ZEArray<ZE_ARRAY_ITER_SPEC>& Array, ZESize Index)
 {
 	this->Array = &Array;
 	this->Index = (ZESize)Index;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::IsValid() const
+ZE_ARRAY_ITER_TEMPLATE
+bool ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::IsValid() const
 {
 	return (Array != NULL && Index >= 0 && Index < (ZESSize)Array->GetCount());
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::GetItem() const
+ZE_ARRAY_ITER_TEMPLATE
+const ZEItemType& ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::GetItem() const
 {
 	return Array->GetItem((ZESize)Index);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::GetIndex() const
+ZE_ARRAY_ITER_TEMPLATE
+ZESize ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::GetIndex() const
 {
 	return (ZESize)Index;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::Prev()
+ZE_ARRAY_ITER_TEMPLATE
+void ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::Prev()
 {
 	Index--;
 	if (Index < 0)
 		Index = -1;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::Next()
+ZE_ARRAY_ITER_TEMPLATE
+void ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::Next()
 {	
 	Index++;
 	if (Index >= (ZESSize)Array->GetCount())
 		Index = (ZESSize)Array->GetCount();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::operator==(const ZEArrayIteratorConst& Iterator) const
+ZE_ARRAY_ITER_TEMPLATE
+bool ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::operator==(const ZEArrayIteratorConst& Iterator) const
 {
 	return (Iterator.Array == Array && Iterator.Index == Index);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>& ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::operator--()
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>& ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::operator--()
 {
 	Prev();
 	return *this;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>& ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::operator++()
+ZE_ARRAY_ITER_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>& ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::operator++()
 {
 	Next();
 	return *this;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::operator*() const
+ZE_ARRAY_ITER_TEMPLATE
+const ZEItemType& ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::operator*() const
 {
 	return GetItem();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType* ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::operator->() const
+ZE_ARRAY_ITER_TEMPLATE
+const ZEItemType* ZEArrayIteratorConst<ZE_ARRAY_ITER_SPEC>::operator->() const
 {
 	return &GetItem();
 }

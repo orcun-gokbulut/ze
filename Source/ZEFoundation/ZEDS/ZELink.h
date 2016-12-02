@@ -37,30 +37,25 @@
 #include "ZECommon.h"
 #include "ZETypes.h"
 #include "ZEError.h"
-#include "ZEList2Iterator.h"
 
-template<typename ZEItemType> class ZEList2;
+class ZELockRWDummy;
+
+template<typename ZEItemType, typename ZELockType> class ZEList2;
 
 template<typename ZEItemType>
 class ZELink
 {
-	friend class ZEList2<ZEItemType>;
+	template<typename ZEItemType, typename ZELockType> friend class ZEList2;
 	private:
 		bool								InUse;
 		#ifdef ZE_DEBUG_ENABLE
-		ZEList2<ZEItemType>*				List;
+		ZEList2<ZEItemType, ZELockRW>*		List;
 		#endif
 		ZEItemType*							Item;
 		ZELink*								Prev;
 		ZELink*								Next;
 
 	public:
-		ZEList2Iterator<ZEItemType>			GetIterator();
-		ZEList2IteratorConst<ZEItemType>	GetIteratorConst() const;
-
-		ZEList2Iterator<ZEItemType>			GetIteratorEnd();
-		ZEList2IteratorConst<ZEItemType>	GetIteratorEndConst() const;
-
 		bool								GetInUse() const;
 		ZELink*								GetPrev();
 		const ZELink*						GetPrev() const;
@@ -80,18 +75,6 @@ class ZELink
 
 // ZELink
 /////////////////////////////////////////////////////////////////////////////
-
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType> ZELink<ZEItemType>::GetIterator()
-{
-	return ZEList2Iterator<ZEItemType>(this);
-}
-
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType> ZELink<ZEItemType>::GetIteratorConst() const
-{
-	return ZEList2IteratorConst<ZEItemType>(this);
-}
 
 template<typename ZEItemType>
 bool ZELink<ZEItemType>::GetInUse() const

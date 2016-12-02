@@ -58,3 +58,23 @@ class ZELockRW
 								ZELockRW();
 								~ZELockRW();
 };
+
+class ZELockRWDummy
+{
+	#ifdef ZE_DEBUG_ENABLE
+		ZELock					DebugLock;
+		ZEUInt32				ThreadID;
+	#endif
+
+		void					CheckLockMultipleThreadAccess();
+		void					CheckUnlockMultipleThreadAccess();
+
+	
+	public:
+		void					LockRead();
+		void					UnlockRead();
+
+		void					LockWrite();
+		void					LockWriteNested();
+		void					UnlockWrite();
+};

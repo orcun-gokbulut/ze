@@ -47,8 +47,8 @@ int main(int argc, char** argv)
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	QApplication Application(argc, argv);
-	ZELNLauncher Launcher;
-	Launcher.Initialize();
+	ZELNLauncher* Launcher = ZELNLauncher::GetInstance();
+	Launcher->Initialize();
 
 	return Application.exec();
 }

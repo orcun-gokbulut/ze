@@ -197,8 +197,8 @@ bool ZEDViewport::InitializeInternal()
 	ZERNStageForwardTransparent* StageForwardTransparent = new ZERNStageForwardTransparent();
 	Renderer.AddStage(StageForwardTransparent);
 
-	//ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
-	//Renderer.AddStage(StageParticleRendering);
+	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
+	Renderer.AddStage(StageParticleRendering);
 
 	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
 	Renderer.AddStage(StagePostProcess);
