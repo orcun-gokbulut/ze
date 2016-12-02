@@ -446,7 +446,7 @@ void ZERNRenderer::BindStages()
 
 			if (InputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
 			{
-				for (auto PrevStage = Stage->Link.GetPrev()->GetIteratorConst(); PrevStage.IsValid(); --PrevStage)
+				for (auto PrevStage = Stages.GetIterator(Stage->Link.GetPrev()); PrevStage.IsValid(); --PrevStage)
 				{
 					if (!PrevStage->GetEnabled())
 						continue;
@@ -475,7 +475,7 @@ void ZERNRenderer::BindStages()
 
 			if (OutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
 			{
-				for (auto PrevStage = Stage->Link.GetPrev()->GetIteratorConst(); PrevStage.IsValid(); --PrevStage)
+				for (auto PrevStage = Stages.GetIterator(Stage->Link.GetPrev()); PrevStage.IsValid(); --PrevStage)
 				{
 					if (!PrevStage->GetEnabled())
 						continue;
@@ -501,7 +501,7 @@ void ZERNRenderer::BindStages()
 
 			if (!Valid && OutputResource->CreationFlags.GetFlags(ZERN_SRCF_CREATE_OWN))
 			{
-				for (auto NextStage = Stage->Link.GetNext()->GetIteratorConst(); NextStage.IsValid(); ++NextStage)
+				for (auto NextStage = Stages.GetIterator(Stage->Link.GetNext()); NextStage.IsValid(); ++NextStage)
 				{
 					if (!NextStage->GetEnabled())
 						continue;

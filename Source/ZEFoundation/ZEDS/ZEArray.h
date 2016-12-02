@@ -43,10 +43,15 @@
 
 #include <stdlib.h>
 
-#define ZE_ARRAY_FRIEND template<typename _Type, typename _Allocator> friend class ZEArray; template<typename _Type> friend class ZEAllocatorBase;
-#define ZE_ARRAY_FRIEND_SPECIFIC(Allocator) template<typename _Type, typename _Allocator> friend class ZEArray; template<typename _Type> friend class Allocator;
+#define ZE_ARRAY_FRIEND template<typename _Type, typename _Allocator, typename _Lock> friend class ZEArray; template<typename _Type> friend class ZEAllocatorBase;
 
-template<typename ZEItemType, typename ZEAllocatorType= ZEAllocatorBase<ZEItemType> >
+#define ZE_ARRAY_TEMPLATE template<typename ZEItemType, typename ZEAllocatorType, typename ZELockType>
+#define ZE_ARRAY_SPECIALIZATION ZEItemType, ZEAllocatorType, ZELockType
+
+#define ZE_ARRAY_OTHER_TEMPLATE template<typename ZEAllocatorTypeOther, typename ZELockTypeOther>
+#define ZE_ARRAY_OTHER_SPEC ZEItemType, ZEAllocatorTypeOther, ZELockTypeOther
+
+template<typename ZEItemType, typename ZEAllocatorType = ZEAllocatorBase<ZEItemType>, typename ZELockType = ZELockRW>
 class ZEArray
 {
 	private:
@@ -70,10 +75,12 @@ class ZEArray
 		inline ZEItemType&				GetLastItem();
 		inline const ZEItemType&		GetLastItem() const;
 
-		ZEArrayIterator<ZEItemType, ZEAllocatorType>			GetIterator();
-		ZEArrayIteratorConst <ZEItemType, ZEAllocatorType> 		GetIterator() const;
-		ZEArrayIterator<ZEItemType, ZEAllocatorType> 			GetIteratorEnd();
-		ZEArrayIteratorConst<ZEItemType, ZEAllocatorType> 		GetIteratorEnd() const;
+		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>			GetIterator();
+		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>			GetIterator(ZESize Index);
+		ZEArrayIteratorConst <ZE_ARRAY_SPECIALIZATION> 		GetIterator() const;
+		ZEArrayIteratorConst <ZE_ARRAY_SPECIALIZATION> 		GetIterator(ZESize Index) const;
+		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION> 			GetIteratorEnd();
+		ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION> 		GetIteratorEnd() const;
 
 		inline ZEItemType*				GetCArray();
 		inline const ZEItemType*		GetConstCArray() const;
@@ -87,22 +94,22 @@ class ZEArray
 		inline void						Add(ZEItemType NewItem);
 		inline ZEItemType*				AddMultiple(ZESize ItemCount);
 		inline void						AddMultiple(const ZEItemType* NewItems, ZESize ItemCount);
-		template<typename ZEAllocatorTypeOther>
-		inline void						AddMultiple(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline void						AddMultiple(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
 		inline ZEItemType*				Insert(ZESize Index);
 		inline void						Insert(ZESize Index, ZEItemType NewItem);
 		inline ZEItemType*				InsertMultiple(ZESize Index, ZESize ItemCount);
 		inline void						InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
-		template<typename ZEAllocatorTypeOther>
-		inline void						InsertMultiple(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline void						InsertMultiple(ZESize Index, const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
 		inline void						Remove(ZESize Index);
 		inline void						RemoveMultiple(ZESize Index, ZESize Count);
 		inline void						RemoveValue(ZEItemType Value);
 		
-		template<typename ZEAllocatorTypeOther>
-		inline void						Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline void						Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther, ZELockTypeOther>& OtherArray);
 
 		inline void						Clear();
 		
@@ -128,19 +135,19 @@ class ZEArray
 		inline ZEItemType&				operator[](ZESize Index);	
 		inline const ZEItemType&		operator[](ZESize Index) const;
 
-		template<typename ZEAllocatorTypeOther>
-		inline ZEArray					operator+(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
-		template<typename ZEAllocatorTypeOther>
-		inline ZEArray&					operator+=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline ZEArray					operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline ZEArray&					operator+=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
-		template<typename ZEAllocatorTypeOther>
-		inline bool						operator==(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
-		template<typename ZEAllocatorTypeOther>
-		inline bool						operator!=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline bool						operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline bool						operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
-		template<typename ZEAllocatorTypeOther>
-		inline void						operator=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
-		inline void						operator=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline void						operator=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline void						operator=(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
 
 		void							LockRead() const;
 		void							UnlockRead() const;
@@ -150,26 +157,26 @@ class ZEArray
 		void							UnlockWrite();
 
 										ZEArray();
-										template<typename ZEAllocatorTypeOther>
-										ZEArray(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray);
-										ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray);
+										ZE_ARRAY_OTHER_TEMPLATE
+										ZEArray(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+										ZEArray(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
 										~ZEArray();
 };
 
-template <typename ZEItemType, ZEInt Exponent = 2>
-class ZESmartArray : public ZEArray<ZEItemType, ZESmartAllocator<ZEItemType, Exponent> >
+template <typename ZEItemType, ZEInt Exponent = 2, typename ZELockType = ZELockRW>
+class ZESmartArray : public ZEArray<ZEItemType, ZESmartAllocator<ZEItemType, Exponent>, ZELockType>
 {};
 
-template <typename ZEItemType, ZEInt ChunkSize>
-class ZEChunkArray : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, ChunkSize> >
+template <typename ZEItemType, ZEInt ChunkSize, typename ZELockType = ZELockRW>
+class ZEChunkArray : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, ChunkSize>, ZELockType>
 {};
 
 
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::SetCount(ZESize Count)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::SetCount(ZESize Count)
 {
 	Lock.LockWriteNested();
 
@@ -193,14 +200,14 @@ void ZEArray<ZEItemType, ZEAllocatorType>::SetCount(ZESize Count)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArray<ZEItemType, ZEAllocatorType>::GetCount() const
+ZE_ARRAY_TEMPLATE
+ZESize ZEArray<ZE_ARRAY_SPECIALIZATION>::GetCount() const
 {
 	return Count;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Resize(ZESize Count)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Resize(ZESize Count)
 {
 	Lock.LockWriteNested();
 
@@ -225,14 +232,14 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Resize(ZESize Count)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArray<ZEItemType, ZEAllocatorType>::GetSize() const
+ZE_ARRAY_TEMPLATE
+ZESize ZEArray<ZE_ARRAY_SPECIALIZATION>::GetSize() const
 {
 	return Allocator.GetSize();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::SetItem(ZESize Index, ZEItemType Value)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::SetItem(ZESize Index, ZEItemType Value)
 {
 	Lock.LockWriteNested();
 
@@ -242,82 +249,88 @@ void ZEArray<ZEItemType, ZEAllocatorType>::SetItem(ZESize Index, ZEItemType Valu
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetItem(ZESize Index)
+ZE_ARRAY_TEMPLATE
+ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetItem(ZESize Index)
 {
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	return Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetItem(ZESize Index) const
+ZE_ARRAY_TEMPLATE
+const ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetItem(ZESize Index) const
 {
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	return Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-inline ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetFirstItem()
+ZE_ARRAY_TEMPLATE
+inline ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetFirstItem()
 {
 	return Items[0];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetFirstItem() const
+ZE_ARRAY_TEMPLATE
+const ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetFirstItem() const
 {
 	return Items[0];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetLastItem()
+ZE_ARRAY_TEMPLATE
+ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetLastItem()
 {
 	return Items[Count - 1];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::GetLastItem() const
+ZE_ARRAY_TEMPLATE
+const ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetLastItem() const
 {
 	return Items[Count - 1];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIterator<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::GetIterator()
+ZE_ARRAY_TEMPLATE
+ZEArrayIterator<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::GetIterator()
 {
-	return ZEArrayIterator<ZEItemType, ZEAllocatorType>(*this, 0);
+	return ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>(*this, 0);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIteratorConst<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::GetIterator() const
+ZE_ARRAY_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::GetIterator() const
 {
-	return ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>(*this, 0);
+	return ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION>(*this, 0);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIterator<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::GetIteratorEnd()
+ZE_ARRAY_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::GetIterator(ZESize Index) const
 {
-	return ZEArrayIterator<ZEItemType, ZEAllocatorType>(*this, (Count == 0 ? 0 : Count - 1));
+	return ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION>(*this, Index);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArrayIteratorConst<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::GetIteratorEnd() const
+ZE_ARRAY_TEMPLATE
+ZEArrayIterator<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::GetIteratorEnd()
 {
-	return ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>(*this, (Count == 0 ? 0 : Count - 1));
+	return ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>(*this, (Count == 0 ? 0 : Count - 1));
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::GetCArray()
+ZE_ARRAY_TEMPLATE
+ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::GetIteratorEnd() const
+{
+	return ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION>(*this, (Count == 0 ? 0 : Count - 1));
+}
+
+ZE_ARRAY_TEMPLATE
+ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::GetCArray()
 {
 	return Items;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::GetConstCArray() const
+ZE_ARRAY_TEMPLATE
+const ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::GetConstCArray() const
 {
 	return Items;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESSize ZEArray<ZEItemType, ZEAllocatorType>::FindIndex(ZEItemType Item, ZESize StartIndex = 0) const
+ZE_ARRAY_TEMPLATE
+ZESSize ZEArray<ZE_ARRAY_SPECIALIZATION>::FindIndex(ZEItemType Item, ZESize StartIndex = 0) const
 {
 	Lock.LockRead();
 
@@ -335,14 +348,14 @@ ZESSize ZEArray<ZEItemType, ZEAllocatorType>::FindIndex(ZEItemType Item, ZESize 
 	return -1;	
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArray<ZEItemType, ZEAllocatorType>::Exists(ZEItemType Value) const
+ZE_ARRAY_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::Exists(ZEItemType Value) const
 {
 	return FindIndex(Value) != -1;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESize ZEArray<ZEItemType, ZEAllocatorType>::Circular(ZESSize Index) const
+ZE_ARRAY_TEMPLATE
+ZESize ZEArray<ZE_ARRAY_SPECIALIZATION>::Circular(ZESSize Index) const
 {
 	if (Index < 0)
 	{
@@ -355,8 +368,8 @@ ZESize ZEArray<ZEItemType, ZEAllocatorType>::Circular(ZESSize Index) const
 	}
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Add()
+ZE_ARRAY_TEMPLATE
+ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::Add()
 {
 	Lock.LockWriteNested();
 
@@ -370,8 +383,8 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Add()
 	return &Items[Count - 1];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Add(ZEItemType NewItem)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Add(ZEItemType NewItem)
 {
 	Lock.LockWriteNested();
 	
@@ -384,8 +397,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Add(ZEItemType NewItem)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::AddByRef(const ZEItemType& NewItem)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::AddByRef(const ZEItemType& NewItem)
 {
 	Lock.LockWriteNested();
 
@@ -398,15 +411,15 @@ void ZEArray<ZEItemType, ZEAllocatorType>::AddByRef(const ZEItemType& NewItem)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(ZESize ItemCount)
+ZE_ARRAY_TEMPLATE
+ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::AddMultiple(ZESize ItemCount)
 {
 	Resize(Count + ItemCount);
 	return &Items[Count - ItemCount];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(const ZEItemType* NewItems, ZESize ItemCount)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::AddMultiple(const ZEItemType* NewItems, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
@@ -418,17 +431,17 @@ void ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(const ZEItemType* NewItem
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::AddMultiple(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::AddMultiple(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	OtherArray.LockRead();
 	AddMultiple(OtherArray.GetConstCArray(), OtherArray.GetCount());
 	OtherArray.UnlockRead();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index)
+ZE_ARRAY_TEMPLATE
+ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::Insert(ZESize Index)
 {
 	Lock.LockWriteNested();
 
@@ -455,8 +468,8 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index)
 	return &Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index, ZEItemType NewItem)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Insert(ZESize Index, ZEItemType NewItem)
 {
 	Lock.LockWriteNested();
 
@@ -468,8 +481,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Insert(ZESize Index, ZEItemType NewIt
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, ZESize ItemCount)
+ZE_ARRAY_TEMPLATE
+ZEItemType* ZEArray<ZE_ARRAY_SPECIALIZATION>::InsertMultiple(ZESize Index, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
@@ -495,8 +508,8 @@ ZEItemType* ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, Z
 	return &Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount)
 {
 	Lock.LockWriteNested();
 
@@ -508,17 +521,17 @@ void ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, ZEItemTy
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::InsertMultiple(ZESize Index, const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::InsertMultiple(ZESize Index, const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	OtherArray.LockRead();
 	InsertMultiple(Index, OtherArray.GetConstCArray(), OtherArray.GetCount());
 	OtherArray.UnlockRead();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Remove(ZESize Index)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Remove(ZESize Index)
 {
 	Lock.LockWriteNested();
 
@@ -557,8 +570,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Remove(ZESize Index)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::RemoveMultiple(ZESize Index, ZESize Count)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::RemoveMultiple(ZESize Index, ZESize Count)
 {
 	Lock.LockWriteNested();
 
@@ -598,8 +611,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::RemoveMultiple(ZESize Index, ZESize C
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::RemoveValue(ZEItemType Value)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::RemoveValue(ZEItemType Value)
 {
 	Lock.LockWriteNested();
 
@@ -620,9 +633,9 @@ void ZEArray<ZEItemType, ZEAllocatorType>::RemoveValue(ZEItemType Value)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Copy(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	OtherArray.LockRead();
 
@@ -638,8 +651,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Copy(const ZEArray<ZEItemType, ZEAllo
 	OtherArray.UnlockRead();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Clear()
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Clear()
 {
 	Lock.LockWriteNested();
 
@@ -651,14 +664,14 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Clear()
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Enqueue(ZEItemType Value)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Enqueue(ZEItemType Value)
 {
 	Add(Value);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Dequeue()
+ZE_ARRAY_TEMPLATE
+ZEItemType ZEArray<ZE_ARRAY_SPECIALIZATION>::Dequeue()
 {
 	Lock.LockWriteNested();
 
@@ -671,14 +684,14 @@ ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Dequeue()
 	return Temp;			
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Push(ZEItemType Value)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Push(ZEItemType Value)
 {
 	Add(Value);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Pop()
+ZE_ARRAY_TEMPLATE
+ZEItemType ZEArray<ZE_ARRAY_SPECIALIZATION>::Pop()
 {
 	Lock.LockWriteNested();
 
@@ -691,8 +704,8 @@ ZEItemType ZEArray<ZEItemType, ZEAllocatorType>::Pop()
 	return Temp;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Fill(ZEItemType Value)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Fill(ZEItemType Value)
 {
 	Lock.LockWriteNested();
 
@@ -702,8 +715,8 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Fill(ZEItemType Value)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Traverse()
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Traverse()
 {
 	Lock.LockWriteNested();
 
@@ -717,35 +730,35 @@ void ZEArray<ZEItemType, ZEAllocatorType>::Traverse()
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
+ZE_ARRAY_TEMPLATE
 template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
-void ZEArray<ZEItemType, ZEAllocatorType>::Sort()
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Sort()
 {
 	Lock.LockWriteNested();
 	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
+ZE_ARRAY_TEMPLATE
 template<ZEInt CompareFunction(const ZEItemType&, const ZEItemType&)>
-void ZEArray<ZEItemType, ZEAllocatorType>::Sort2()
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Sort2()
 {
 	Lock.LockWriteNested();
 	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
 {
 	Lock.LockWriteNested();
 	qsort(Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))CompareFunction);
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
+ZE_ARRAY_TEMPLATE
 template<typename ZESearchValueType, ZEInt CompareFunction(const ZEItemType&, ZESearchValueType)>
-ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(ZESearchValueType TargetValue) const
+ZESSize ZEArray<ZE_ARRAY_SPECIALIZATION>::BinarySearch(ZESearchValueType TargetValue) const
 {
 	Lock.LockRead();
 
@@ -774,8 +787,8 @@ ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(ZESearchValueType Tar
 	return -1;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
+ZE_ARRAY_TEMPLATE
+ZESSize ZEArray<ZE_ARRAY_SPECIALIZATION>::BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*))
 {
 	Lock.LockRead();
 	void* Result = bsearch(&Element, Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))(CompareFunction));
@@ -792,23 +805,23 @@ ZESSize ZEArray<ZEItemType, ZEAllocatorType>::BinarySearch(const ZEItemType& Ele
 	}
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::operator[](ZESize Index)
+ZE_ARRAY_TEMPLATE
+ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::operator[](ZESize Index)
 {
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	return Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-const ZEItemType& ZEArray<ZEItemType, ZEAllocatorType>::operator[](ZESize Index) const
+ZE_ARRAY_TEMPLATE
+const ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::operator[](ZESize Index) const
 {
 	zeDebugCheck(Index >= Count, "Index is out of range.");
 	return Items[Index];
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-ZEArray<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::operator+(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	ZEArray Temp;
 	Temp.MassAdd(*this);
@@ -816,17 +829,17 @@ ZEArray<ZEItemType, ZEAllocatorType> ZEArray<ZEItemType, ZEAllocatorType>::opera
 	return Temp;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-ZEArray<ZEItemType, ZEAllocatorType>& ZEArray<ZEItemType, ZEAllocatorType>::operator+=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>& ZEArray<ZE_ARRAY_SPECIALIZATION>::operator+=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	AddMultiple(OtherArray);
 	return *this;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-bool ZEArray<ZEItemType, ZEAllocatorType>::operator==(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	Lock.LockRead();
 
@@ -850,9 +863,9 @@ bool ZEArray<ZEItemType, ZEAllocatorType>::operator==(const ZEArray<ZEItemType, 
 	return true;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-bool ZEArray<ZEItemType, ZEAllocatorType>::operator!=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	Lock.LockRead();
 
@@ -876,75 +889,75 @@ bool ZEArray<ZEItemType, ZEAllocatorType>::operator!=(const ZEArray<ZEItemType, 
 	return true;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::LockRead() const
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::LockRead() const
 {
 	Lock.LockRead();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::UnlockRead() const
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::UnlockRead() const
 {
 	Lock.UnlockRead();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::LockWrite()
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::LockWrite()
 {
 	Lock.LockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType/*= ZEAllocatorBase<ZEItemType> */>
-void ZEArray<ZEItemType, ZEAllocatorType>::LockWriteNested()
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::LockWriteNested()
 {
 	Lock.LockWriteNested();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::UnlockWrite()
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::UnlockWrite()
 {
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-void ZEArray<ZEItemType, ZEAllocatorType>::operator=(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
+ZE_ARRAY_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::operator=(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray)
 {
 	Copy(OtherArray);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-void ZEArray<ZEItemType, ZEAllocatorType>::operator=(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+void ZEArray<ZE_ARRAY_SPECIALIZATION>::operator=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
 {
 	Copy(OtherArray);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType>::ZEArray()
+ZE_ARRAY_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>::ZEArray()
 {
 	Items = NULL;
 	Count = 0;
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType>::ZEArray(const ZEArray<ZEItemType, ZEAllocatorType>& OtherArray)
-{
-	Items = NULL;
-	Count = 0;
-	Copy(OtherArray);
-}
-
-template<typename ZEItemType, typename ZEAllocatorType>
-template<typename ZEAllocatorTypeOther>
-ZEArray<ZEItemType, ZEAllocatorType>::ZEArray(const ZEArray<ZEItemType, ZEAllocatorTypeOther>& OtherArray)
+ZE_ARRAY_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>::ZEArray(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray)
 {
 	Items = NULL;
 	Count = 0;
 	Copy(OtherArray);
 }
 
-template<typename ZEItemType, typename ZEAllocatorType>
-ZEArray<ZEItemType, ZEAllocatorType>::~ZEArray()
+ZE_ARRAY_TEMPLATE
+ZE_ARRAY_OTHER_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>::ZEArray(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
+{
+	Items = NULL;
+	Count = 0;
+	Copy(OtherArray);
+}
+
+ZE_ARRAY_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>::~ZEArray()
 {
 	Clear();
 }

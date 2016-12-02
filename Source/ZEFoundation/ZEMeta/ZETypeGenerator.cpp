@@ -207,7 +207,7 @@ ZEType ZETypeGenerator<ZEString>::GetType()
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEClass>::GetType()
+ZEType ZETypeGenerator<ZEClass*>::GetType()
 {
 	ZEType Type;
 	Type.Type = ZE_TT_CLASS;

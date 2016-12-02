@@ -73,17 +73,17 @@ enum ZELogType
 #endif
 
 class ZELogSession;
-template <typename ZEItemType> class ZEList2;
+template <typename ZEItemType, typename ZELockType> class ZEList2;
 
 class ZELog
 {
 	friend ZELogSession;
 	private:
-		ZELock						Lock;
-		ZELogSession*				RootSession;
-		ZELogSession*				SessionCount;	
-		ZESize						LastSessionId;
-		ZEList2<ZELogSession>*		Sessions;
+		ZELock								Lock;
+		ZELogSession*						RootSession;
+		ZELogSession*						SessionCount;	
+		ZESize								LastSessionId;
+		ZEList2<ZELogSession, ZELockRW>*	Sessions;
 
 		void						LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args);
 

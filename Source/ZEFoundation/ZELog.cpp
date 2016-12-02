@@ -179,7 +179,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 ZELog::ZELog()
 {
 	LastSessionId = 0;
-	Sessions = new ZEList2<ZELogSession>();
+	Sessions = new ZEList2<ZELogSession, ZELockRW>();
 	RootSession = new ZELogSession();
 	RootSession->SetSink(true);
 	RootSession->SetCallback(DefaultCallback);

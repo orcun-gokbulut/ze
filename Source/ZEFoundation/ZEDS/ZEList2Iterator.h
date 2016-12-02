@@ -38,131 +38,134 @@
 
 #include "ZETypes.h"
 
-template<typename ZEItemType> class ZEList2;
+#define ZE_LIST_ITERATOR_TEMPLATE template<typename ZEItemType, typename ZELockType>
+#define ZE_LIST_ITERATOR_SPECIALIZATION ZEItemType, ZELockType
+
+template<typename ZEItemType, typename ZELockType> class ZEList2;
 template<typename ZEItemType> class ZELink;
 
-template<typename ZEItemType>
+ZE_LIST_ITERATOR_TEMPLATE
 class ZEList2Iterator : public ZEIterator<ZEItemType>
 {
-	friend class ZEList2<ZEItemType>;
+	friend class ZEList2<ZEItemType, ZELockType>;
 	private:
-		ZELink<ZEItemType>* Link;
+		ZELink<ZEItemType>*						Link;
 
 	public:
-		inline bool IsValid() const;
+		inline bool								IsValid() const;
 
-		inline ZEItemType& GetItem() const;
-		inline ZEItemType* GetPointer() const;
+		inline ZEItemType&						GetItem() const;
+		inline ZEItemType*						GetPointer() const;
 
-		inline void Prev();
-		inline void Next();
+		inline void								Prev();
+		inline void								Next();
 
-		bool operator==(const ZEList2Iterator& Iterator) const;
+		bool									operator==(const ZEList2Iterator& Iterator) const;
 
-		ZEList2Iterator& operator--();
-		ZEList2Iterator& operator++();
+		ZEList2Iterator&						operator--();
+		ZEList2Iterator&						operator++();
 
-		ZEItemType& operator*() const;
-		ZEItemType* operator->() const;
+		ZEItemType&								operator*() const;
+		ZEItemType*								operator->() const;
 		
-		ZEList2Iterator(ZELink<ZEItemType>* Link);
+												ZEList2Iterator(ZELink<ZEItemType>* Link);
 };
 
-template<typename ZEItemType>
+ZE_LIST_ITERATOR_TEMPLATE
 class ZEList2IteratorConst : public ZEIteratorConst<ZEItemType>
 {
-	friend class ZEList2<ZEItemType>;
+	friend class ZEList2<ZEItemType, ZELockType>;
 	private:
-		const ZELink<ZEItemType>* Link;
+		const ZELink<ZEItemType>*				Link;
 
 	public:
-		inline bool IsValid() const;
+		inline bool								IsValid() const;
 
-		inline ZEItemType& GetItem() const;
-		inline ZEItemType* GetPointer() const;
+		inline ZEItemType&						GetItem() const;
+		inline ZEItemType*						GetPointer() const;
 
-		inline void Prev();
-		inline void Next();
+		inline void								Prev();
+		inline void								Next();
 
-		bool operator==(const ZEList2IteratorConst& Iterator) const;
+		bool									operator==(const ZEList2IteratorConst& Iterator) const;
 
-		ZEList2IteratorConst& operator--();
-		ZEList2IteratorConst& operator++();
+		ZEList2IteratorConst&					operator--();
+		ZEList2IteratorConst&					operator++();
 
-		ZEItemType& operator*() const;
-		ZEItemType* operator->() const;
-									
-		ZEList2IteratorConst(const ZELink<ZEItemType>* Link);
+		ZEItemType&								operator*() const;
+		ZEItemType*								operator->() const;
+													
+												ZEList2IteratorConst(const ZELink<ZEItemType>* Link);
 };
 
 
 // ZEList2Iterator
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType>
-bool ZEList2Iterator<ZEItemType>::IsValid() const
+ZE_LIST_ITERATOR_TEMPLATE
+bool ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::IsValid() const
 {
 	return Link != NULL;
 }
 
-template<typename ZEItemType>
-ZEItemType& ZEList2Iterator<ZEItemType>::GetItem() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType& ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::GetItem() const
 {
 	return *Link->GetItem();
 }
 
-template<typename ZEItemType>
-inline ZEItemType* ZEList2Iterator<ZEItemType>::GetPointer() const
+ZE_LIST_ITERATOR_TEMPLATE
+inline ZEItemType* ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::GetPointer() const
 {
 	return Link->GetItem();
 }
 
-template<typename ZEItemType>
-void ZEList2Iterator<ZEItemType>::Prev()
+ZE_LIST_ITERATOR_TEMPLATE
+void ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::Prev()
 {
 	Link = Link->GetPrev();
 }
 
-template<typename ZEItemType>
-void ZEList2Iterator<ZEItemType>::Next()
+ZE_LIST_ITERATOR_TEMPLATE
+void ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::Next()
 {	
 	Link = Link->GetNext();
 }
 
-template<typename ZEItemType>
-bool ZEList2Iterator<ZEItemType>::operator==(const ZEList2Iterator& Iterator) const
+ZE_LIST_ITERATOR_TEMPLATE
+bool ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::operator==(const ZEList2Iterator& Iterator) const
 {
 	return (Iterator.Link == Link);
 }
 
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType>& ZEList2Iterator<ZEItemType>::operator--()
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>& ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::operator--()
 {
 	Prev();
 	return *this;
 }
 
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType>& ZEList2Iterator<ZEItemType>::operator++()
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>& ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::operator++()
 {
 	Next();
 	return *this;
 }
 
-template<typename ZEItemType>
-ZEItemType& ZEList2Iterator<ZEItemType>::operator*() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType& ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::operator*() const
 {
 	return GetItem();
 }
 
-template<typename ZEItemType>
-ZEItemType* ZEList2Iterator<ZEItemType>::operator->() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType* ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::operator->() const
 {
 	return &GetItem();
 }
 
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType>::ZEList2Iterator(ZELink<ZEItemType>* Link)
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2Iterator<ZE_LIST_ITERATOR_SPECIALIZATION>::ZEList2Iterator(ZELink<ZEItemType>* Link)
 {
 	this->Link = Link;
 }
@@ -170,70 +173,70 @@ ZEList2Iterator<ZEItemType>::ZEList2Iterator(ZELink<ZEItemType>* Link)
 // ZEList2IteratorConst
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType>
-bool ZEList2IteratorConst<ZEItemType>::IsValid() const
+ZE_LIST_ITERATOR_TEMPLATE
+bool ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::IsValid() const
 {
 	return Link != NULL;
 } 
 
-template<typename ZEItemType>
-ZEItemType& ZEList2IteratorConst<ZEItemType>::GetItem() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType& ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::GetItem() const
 {
 	return *Link->GetItem();
 }
 
-template<typename ZEItemType>
-ZEItemType* ZEList2IteratorConst<ZEItemType>::GetPointer() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType* ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::GetPointer() const
 {
 	return Link->GetItem();
 }
 
-template<typename ZEItemType>
-void ZEList2IteratorConst<ZEItemType>::Prev()
+ZE_LIST_ITERATOR_TEMPLATE
+void ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::Prev()
 {
 	Link = Link->GetPrev();
 }
 
-template<typename ZEItemType>
-void ZEList2IteratorConst<ZEItemType>::Next()
+ZE_LIST_ITERATOR_TEMPLATE
+void ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::Next()
 {	
 	Link = Link->GetNext();
 }
 
-template<typename ZEItemType>
-bool ZEList2IteratorConst<ZEItemType>::operator==(const ZEList2IteratorConst& Iterator) const
+ZE_LIST_ITERATOR_TEMPLATE
+bool ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::operator==(const ZEList2IteratorConst& Iterator) const
 {
 	return (Iterator.Link == Link);
 }
 
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType>& ZEList2IteratorConst<ZEItemType>::operator--()
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>& ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::operator--()
 {
 	Prev();
 	return *this;
 }
 
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType>& ZEList2IteratorConst<ZEItemType>::operator++()
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>& ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::operator++()
 {
 	Next();
 	return *this;
 }
 
-template<typename ZEItemType>
-ZEItemType& ZEList2IteratorConst<ZEItemType>::operator*() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType& ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::operator*() const
 {
 	return GetItem();
 }
 
-template<typename ZEItemType>
-ZEItemType* ZEList2IteratorConst<ZEItemType>::operator->() const
+ZE_LIST_ITERATOR_TEMPLATE
+ZEItemType* ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::operator->() const
 {
 	return &GetItem();
 }
 
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType>::ZEList2IteratorConst(const ZELink<ZEItemType>* Link)
+ZE_LIST_ITERATOR_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_ITERATOR_SPECIALIZATION>::ZEList2IteratorConst(const ZELink<ZEItemType>* Link)
 {
 	this->Link = Link;
 }

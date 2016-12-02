@@ -39,23 +39,27 @@
 #include "ZEError.h"
 #include "ZELink.h"
 #include "ZEList2Iterator.h"
-#include "ZEThread\ZELockRW.h"
+#include "ZEThread/ZELockRW.h"
 
-template<typename ZEItemType>
+#define ZE_LIST_TEMPLATE template<typename ZEItemType, typename ZELockType>
+#define ZE_LIST_SPECIALIZATION ZEItemType, ZELockType
+
+template<typename ZEItemType, typename ZELockType = ZELockRW>
 class ZEList2
 {
 	private:
 		ZELink<ZEItemType>*					First;
 		ZELink<ZEItemType>*					Last;
 		ZESize								Count;
-		mutable ZELockRW					Lock;
+		mutable ZELockType					Lock;
 
 	public:
-		ZEList2Iterator<ZEItemType>			GetIterator();
-		ZEList2IteratorConst<ZEItemType>	GetIterator() const;
-
-		ZEList2Iterator<ZEItemType>			GetIteratorEnd();
-		ZEList2IteratorConst<ZEItemType>	GetIteratorEnd() const;
+		ZEList2Iterator<ZE_LIST_SPECIALIZATION>			GetIterator();
+		ZEList2Iterator<ZE_LIST_SPECIALIZATION>			GetIterator(ZELink<ZEItemType>* Item);
+		ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>	GetIterator() const;
+		ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>	GetIterator(const ZELink<ZEItemType>* Item) const;
+		ZEList2Iterator<ZE_LIST_SPECIALIZATION>			GetIteratorEnd();
+		ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>	GetIteratorEnd() const;
 
 		ZESize								GetCount() const;
 
@@ -86,8 +90,10 @@ class ZEList2
 		void								Remove(ZELink<ZEItemType>* Link);
 		void								Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
 
-		void								MergeBegin(ZEList2<ZEItemType>& OtherList);
-		void								MergeEnd(ZEList2<ZEItemType>& OtherList);
+		template<typename ZELockTypeOther>
+		void								MergeBegin(ZEList2<ZEItemType, ZELockTypeOther>& OtherList);
+		template<typename ZELockTypeOther>
+		void								MergeEnd(ZEList2<ZEItemType, ZELockTypeOther>& OtherList);
 
 		void								Reverse();
 		template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
@@ -104,9 +110,11 @@ class ZEList2
 
 		ZEItemType*							operator[](ZESize Index) const;
 
-											//ZE_COPY_NO_ACTION
-											ZEList2& operator=(const ZEList2& Other);
-											ZEList2(const ZEList2& Other);
+											//ZE_COPY_NO_ACTION								
+											template<typename ZELockTypeOther>
+											ZEList2& operator=(const ZEList2<ZEItemType, ZELockTypeOther>& Other);
+											template<typename ZELockTypeOther>
+											ZEList2(const ZEList2<ZEItemType, ZELockTypeOther>& Other);
 
 											ZEList2();
 											~ZEList2();
@@ -116,63 +124,75 @@ class ZEList2
 // ZEList2
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType> ZEList2<ZEItemType>::GetIterator()
+ZE_LIST_TEMPLATE
+ZEList2Iterator<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIterator()
 {
-	return ZEList2Iterator<ZEItemType>(GetFirst());
+	return ZEList2Iterator<ZE_LIST_SPECIALIZATION>(GetFirst());
 }
 
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIterator() const
+ZE_LIST_TEMPLATE
+ZEList2Iterator<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIterator(ZELink<ZEItemType>* Item)
 {
-	return ZEList2IteratorConst<ZEItemType>(GetFirst());
+	return ZEList2Iterator<ZE_LIST_SPECIALIZATION>(Item);
 }
 
-template<typename ZEItemType>
-ZEList2Iterator<ZEItemType> ZEList2<ZEItemType>::GetIteratorEnd()
+ZE_LIST_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIterator() const
 {
-	return ZEList2Iterator<ZEItemType>(GetLast());
+	return ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>(GetFirst());
 }
 
-template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIteratorEnd() const
+ZE_LIST_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIterator(const ZELink<ZEItemType>* Item) const
 {
-	return ZEList2IteratorConst<ZEItemType>(GetLast());
+	return ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>(Item);
 }
 
-template<typename ZEItemType>
-ZELink<ZEItemType>* ZEList2<ZEItemType>::GetFirst()
+ZE_LIST_TEMPLATE
+ZEList2Iterator<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorEnd()
+{
+	return ZEList2Iterator<ZE_LIST_SPECIALIZATION>(GetLast());
+}
+
+ZE_LIST_TEMPLATE
+ZEList2IteratorConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorEnd() const
+{
+	return ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>(GetLast());
+}
+
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetFirst()
 {
 	return First;
 }
 
-template<typename ZEItemType>
-const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetFirst() const
+ZE_LIST_TEMPLATE
+const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetFirst() const
 {
 	return First;
 }
 
-template<typename ZEItemType>
-ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLast()
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLast()
 {
 	return Last;
 }
 
-template<typename ZEItemType>
-const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLast() const
+ZE_LIST_TEMPLATE
+const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLast() const
 {
 	return Last;
 }
 
 
-template<typename ZEItemType>
-ZESize ZEList2<ZEItemType>::GetCount() const
+ZE_LIST_TEMPLATE
+ZESize ZEList2<ZE_LIST_SPECIALIZATION>::GetCount() const
 {
 	return Count;
 }
 
-template<typename ZEItemType>
-ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink)
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink)
 {
 	Lock.LockRead();
 
@@ -197,8 +217,8 @@ ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELi
 	return NULL;
 }
 
-template<typename ZEItemType>
-const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink) const
+ZE_LIST_TEMPLATE
+const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink) const
 {
 	Lock.LockRead();
 
@@ -223,8 +243,8 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, cons
 	return NULL;
 }
 
-template<typename ZEItemType>
-ZESSize ZEList2<ZEItemType>::FindIndex(const ZELink<ZEItemType>* Link) const
+ZE_LIST_TEMPLATE
+ZESSize ZEList2<ZE_LIST_SPECIALIZATION>::FindIndex(const ZELink<ZEItemType>* Link) const
 {
 	Lock.LockRead();
 
@@ -252,8 +272,8 @@ ZESSize ZEList2<ZEItemType>::FindIndex(const ZELink<ZEItemType>* Link) const
 	return -1;
 }
 
-template<typename ZEItemType>
-ZESSize ZEList2<ZEItemType>::FindIndex(const ZEItemType* Item) const
+ZE_LIST_TEMPLATE
+ZESSize ZEList2<ZE_LIST_SPECIALIZATION>::FindIndex(const ZEItemType* Item) const
 {
 	Lock.LockRead();
 
@@ -281,20 +301,20 @@ ZESSize ZEList2<ZEItemType>::FindIndex(const ZEItemType* Item) const
 	return -1;
 }
 
-template<typename ZEItemType>
-bool ZEList2<ZEItemType>::Exists(const ZEItemType* Item) const
+ZE_LIST_TEMPLATE
+bool ZEList2<ZE_LIST_SPECIALIZATION>::Exists(const ZEItemType* Item) const
 {
 	return FindIndex(Item) != -1;
 }
 
-template<typename ZEItemType>
-bool ZEList2<ZEItemType>::Exists(const ZELink<ZEItemType>* Link) const
+ZE_LIST_TEMPLATE
+bool ZEList2<ZE_LIST_SPECIALIZATION>::Exists(const ZELink<ZEItemType>* Link) const
 {
 	return FindIndex(Link) != -1;
 }
 
-template<typename ZEItemType>
-ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index)
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLink(ZESize Index)
 {
 	Lock.LockRead();
 
@@ -310,8 +330,8 @@ ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index)
 	return Cursor;
 }
 
-template<typename ZEItemType>
-const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index) const
+ZE_LIST_TEMPLATE
+const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLink(ZESize Index) const
 {
 	Lock.LockRead();
 
@@ -327,14 +347,14 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index) const
 	return Cursor;
 }
 
-template<typename ZEItemType>
-ZEItemType* ZEList2<ZEItemType>::GetItem(ZESize Index) const
+ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZE_LIST_SPECIALIZATION>::GetItem(ZESize Index) const
 {
 	return GetLink(Index)->GetItem();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::AddBegin(ZELink<ZEItemType>* Link)
 {
 	Lock.LockWriteNested();
 
@@ -360,8 +380,8 @@ void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::AddEnd(ZELink<ZEItemType>* Link)
 {
 	Lock.LockWriteNested();
 
@@ -388,8 +408,8 @@ void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
 	Lock.LockWriteNested();
 
@@ -418,8 +438,8 @@ void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemTy
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
 	Lock.LockWriteNested();
 
@@ -448,8 +468,8 @@ void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemTyp
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::Remove(ZELink<ZEItemType>* Link)
 {
 	Lock.LockWriteNested();
 
@@ -478,8 +498,8 @@ void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 {
 	Lock.LockWriteNested();
 
@@ -511,8 +531,9 @@ void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
+ZE_LIST_TEMPLATE
+template<typename ZELockTypeOther>
+void ZEList2<ZE_LIST_SPECIALIZATION>::MergeBegin(ZEList2<ZEItemType, ZELockTypeOther>& OtherList)
 {
 	Lock.LockWriteNested();
 
@@ -552,8 +573,9 @@ void ZEList2<ZEItemType>::MergeBegin(ZEList2<ZEItemType>& OtherList)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
+ZE_LIST_TEMPLATE
+template<typename ZELockTypeOther>
+void ZEList2<ZE_LIST_SPECIALIZATION>::MergeEnd(ZEList2<ZEItemType, ZELockTypeOther>& OtherList)
 {
 	Lock.LockWriteNested();
 
@@ -593,8 +615,8 @@ void ZEList2<ZEItemType>::MergeEnd(ZEList2<ZEItemType>& OtherList)
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-inline void ZEList2<ZEItemType>::Clear()
+ZE_LIST_TEMPLATE
+inline void ZEList2<ZE_LIST_SPECIALIZATION>::Clear()
 {
 	Lock.LockWriteNested();
 
@@ -618,38 +640,38 @@ inline void ZEList2<ZEItemType>::Clear()
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::LockRead() const
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::LockRead() const
 {
 	Lock.LockRead();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::UnlockRead() const
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::UnlockRead() const
 {
 	Lock.UnlockRead();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::LockWrite()
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::LockWrite()
 {
 	Lock.LockWrite();
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::UnlockWrite()
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::UnlockWrite()
 {
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-const ZEList2<const ZEItemType>& ZEList2<ZEItemType>::ToInspector() const
+ZE_LIST_TEMPLATE
+const ZEList2<const ZEItemType>& ZEList2<ZE_LIST_SPECIALIZATION>::ToInspector() const
 {
 	return *reinterpret_cast<const ZEList2<const ZEItemType>*>(this);
 }
 
-template<typename ZEItemType>
-void ZEList2<ZEItemType>::Reverse()
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::Reverse()
 {
 	Lock.LockWriteNested();
 
@@ -672,41 +694,43 @@ void ZEList2<ZEItemType>::Reverse()
 	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index) const
+ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZE_LIST_SPECIALIZATION>::operator[](ZESize Index) const
 {
 	return GetItem(Index);
 }
 
-template<typename ZEItemType>
-ZEList2<ZEItemType>& ZEList2<ZEItemType>::operator=(const ZEList2<ZEItemType>& Other)
+ZE_LIST_TEMPLATE
+template<typename ZELockTypeOther>
+ZEList2<ZE_LIST_SPECIALIZATION>& ZEList2<ZE_LIST_SPECIALIZATION>::operator=(const ZEList2<ZEItemType, ZELockTypeOther>& Other)
 {
 	return *this;
 }
 
-template<typename ZEItemType>
-ZEList2<ZEItemType>::ZEList2(const ZEList2& Other)
+ZE_LIST_TEMPLATE
+template<typename ZELockTypeOther>
+ZEList2<ZE_LIST_SPECIALIZATION>::ZEList2(const ZEList2<ZEItemType, ZELockTypeOther>& Other)
 {
-	new (this)ZEList2<ZEItemType>();
+	new (this)ZEList2<ZE_LIST_SPECIALIZATION>();
 }
 
-template<typename ZEItemType>
-ZEList2<ZEItemType>::ZEList2()
+ZE_LIST_TEMPLATE
+ZEList2<ZE_LIST_SPECIALIZATION>::ZEList2()
 {
 	First = NULL;
 	Last = NULL;
 	Count = 0;
 }
 
-template<typename ZEItemType>
-ZEList2<ZEItemType>::~ZEList2()
+ZE_LIST_TEMPLATE
+ZEList2<ZE_LIST_SPECIALIZATION>::~ZEList2()
 {
 	Clear();
 }
 
-template<typename ZEItemType>
+ZE_LIST_TEMPLATE
 template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
-void ZEList2<ZEItemType>::Sort()
+void ZEList2<ZE_LIST_SPECIALIZATION>::Sort()
 {
 	Lock.LockWriteNested();
 

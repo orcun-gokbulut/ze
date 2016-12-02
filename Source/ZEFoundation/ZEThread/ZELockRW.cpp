@@ -149,3 +149,53 @@ ZELockRW::~ZELockRW()
 	zeDebugCheck(ReaderCount < 0, "Destroying ZELockRW. Lock is still locked for writing.");
 	zeDebugCheck(ReaderCount > 0 || ReaderCount < 0, "Destroying ZELockRW. Lock is still locked for reading.");
 }
+
+
+void ZELockRWDummy::CheckLockMultipleThreadAccess()
+{
+	#ifdef ZE_DEBUG_ENABLE
+		DebugLock.LockNested();
+		{
+			zeDebugCheck(ThreadID != 0 && ThreadID != ZEThread::GetCurrentThreadId(), "ZELockRWDummy Lock multiple thread access detected !");
+			ThreadID = ZEThread::GetCurrentThreadId();
+		}
+		DebugLock.Unlock();
+	#endif
+}
+
+void ZELockRWDummy::CheckUnlockMultipleThreadAccess()
+{
+	#ifdef ZE_DEBUG_ENABLE
+		DebugLock.LockNested();
+		{
+			zeDebugCheck(ThreadID != ZEThread::GetCurrentThreadId(), "ZELockRWDummy Unlock multiple thread access detected !");
+			ThreadID = 0;
+		}
+		DebugLock.Unlock();
+	#endif
+}
+
+void ZELockRWDummy::LockRead()
+{
+	CheckLockMultipleThreadAccess();
+}
+
+void ZELockRWDummy::UnlockRead()
+{
+	CheckUnlockMultipleThreadAccess();
+}
+
+void ZELockRWDummy::LockWrite()
+{
+	CheckLockMultipleThreadAccess();
+}
+
+void ZELockRWDummy::LockWriteNested()
+{
+	CheckLockMultipleThreadAccess();
+}
+
+void ZELockRWDummy::UnlockWrite()
+{
+	CheckUnlockMultipleThreadAccess();
+}
