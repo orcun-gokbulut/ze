@@ -76,6 +76,7 @@ class ZESectorManager : public ZEObject
 		ZEArray<ZESector*>					GetSectors(const ZEVector3d& Position) const;
 		ZESector*							GetSector(const ZEGUID& Id) const;
 		ZESector*							GetSector(const ZEVector3d& Position, bool Proximity = false) const;
+		ZESector*							GetSector(const ZEString& Name);
 		ZESector*							GetOriginSector();
 		bool								AddSector(ZESector* Sector);
 		void								RemoveSector(ZESector* Sector);
