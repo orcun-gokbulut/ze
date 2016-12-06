@@ -297,6 +297,17 @@ ZESector* ZESectorManager::GetSector(const ZEVector3d& Position, bool Proximity)
 	return static_cast<ZESector*>(ResultSector);
 }
 
+ZESector* ZESectorManager::GetSector(const ZEString& Name)
+{
+	ze_for_each(Sector, Sectors)
+	{
+		if (Sector->GetName() == Name)
+			return static_cast<ZESector*>(Sector.GetPointer());
+	}
+
+	return NULL;
+}
+
 ZESector* ZESectorManager::GetOriginSector()
 {
 	return OriginSector;
