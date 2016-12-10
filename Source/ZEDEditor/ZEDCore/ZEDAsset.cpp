@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDComponent.h
+ Zinek Engine - ZEDAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,51 +33,75 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAsset.h"
+#include "ZEFile\ZEFileInfo.h"
+#include "ZEDAssetManager.h"
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-#include "ZEDestroyable.h"
-
-class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDObjectEvent;
-class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
-class ZEDAssetEvent;
-
-class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
+ZEUInt ZEDAsset::GetHash() const
 {
-	ZE_OBJECT
-	friend class ZEDEditor;
-	private:
-		ZEDEditor*						Editor;
+	return Hash;
+}
 
-	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent& Event);
+void ZEDAsset::SetType(ZEDAssetType* Type)
+{
+	this->Type = Type;
+}
 
-		void							RaiseEvent(const ZEDEvent* Event);
-	
-										ZEDComponent();
-		virtual							~ZEDComponent();
+void ZEDAsset::SetPath(const ZEString& Path)
+{
+	if (this->Path == Path)
+		return;
 
-	public:
-		ZEDEditor*						GetEditor();
-};
+	this->Path = ZEFileInfo(Path).Normalize();
+	this->Hash = this->Path.Hash();
+
+	ZEPathInfo PathInfo(Path);
+	ModificationTime = PathInfo.GetModificationTime();
+}
+
+ZEString ZEDAsset::GetPath() const
+{
+	return Path;
+}
+
+ZEDAssetType* ZEDAsset::GetType() const
+{
+	return Type;
+}
+
+void ZEDAsset::SetCategory(const ZEString& Category)
+{
+	this->Category = Category;
+}
+
+const ZEString& ZEDAsset::GetCategory() const
+{
+	return Category;
+}
+
+void ZEDAsset::SetTags(const ZEArray<ZEString>& Tags)
+{
+	this->Tags = Tags;
+}
+
+const ZEArray<ZEString>& ZEDAsset::GetTags() const
+{
+	return Tags;
+}
+
+ZETimeStamp ZEDAsset::GetModificationTime()
+{
+	return ModificationTime;
+}
+
+ZEDAsset::ZEDAsset()
+{
+	Type = NULL;
+	Hash = 0;
+	ModificationTime = 0;
+}
+
+ZEDAsset::~ZEDAsset()
+{
+
+}

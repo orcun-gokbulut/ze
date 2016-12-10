@@ -163,14 +163,25 @@ class ZEArray
 										~ZEArray();
 };
 
+template <typename ZEItemType, typename ZEAllocatorType = ZEAllocatorBase<ZEItemType>>
+class ZEArrayMT : public ZEArray<ZEItemType, ZEAllocatorType, ZELockRW>
+{};
+
 template <typename ZEItemType, ZEInt Exponent = 2, typename ZELockType = ZELockRW>
 class ZESmartArray : public ZEArray<ZEItemType, ZESmartAllocator<ZEItemType, Exponent>, ZELockType>
+{};
+
+template <typename ZEItemType, ZEInt Exponent = 2>
+class ZESmartArrayMT : public ZEArray<ZEItemType, ZESmartAllocator<ZEItemType, Exponent>, ZELockRW>
 {};
 
 template <typename ZEItemType, ZEInt ChunkSize, typename ZELockType = ZELockRW>
 class ZEChunkArray : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, ChunkSize>, ZELockType>
 {};
 
+template <typename ZEItemType, ZEInt ChunkSize>
+class ZEChunkArrayMT : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, ChunkSize>, ZELockRW>
+{};
 
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////

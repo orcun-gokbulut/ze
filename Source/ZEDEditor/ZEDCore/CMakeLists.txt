@@ -90,6 +90,13 @@ ze_add_source(ZEDViewportManager.h						Sources ZEMC)
 ze_add_source(ZEDViewportController.cpp					Sources)
 ze_add_source(ZEDViewportController.h					Sources ZEMC)
 
+ze_add_source(ZEDAsset.cpp								Sources)
+ze_add_source(ZEDAsset.h								Sources ZEMC)
+ze_add_source(ZEDAssetType.cpp							Sources)
+ze_add_source(ZEDAssetType.h							Sources ZEMC)
+ze_add_source(ZEDAssetManager.cpp						Sources)
+ze_add_source(ZEDAssetManager.h							Sources ZEMC)
+
 ze_add_source(ZEDGizmo.cpp								Sources)
 ze_add_source(ZEDGizmo.h								Sources ZEMC)
 ze_add_source(ZEDGrid.cpp								Sources)
