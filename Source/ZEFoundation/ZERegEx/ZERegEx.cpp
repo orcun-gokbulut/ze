@@ -116,7 +116,7 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 			ZERegExSubMatch& SubMatch = Match.SubMatches[I];
 			SubMatch.Offset = OldOffset + NativeMatches[I + 1].rm_so;
 			SubMatch.Size = NativeMatches[I + 1].rm_eo - NativeMatches[I + 1].rm_so;
-			if (Flags.GetFlags(ZE_REF_NO_MATCH_STRING) == 0)
+			if (Flags.GetFlags(ZE_REF_NO_SUBMATCH_STRING) == 0)
 				SubMatch.String.SetValue(String.ToCString() + SubMatch.Offset, SubMatch.Size);
 		}
 	}

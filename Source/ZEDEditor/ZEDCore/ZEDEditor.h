@@ -53,6 +53,7 @@ class ZEDTransformationManager;
 class ZEDViewportManager;
 class ZEDMainWindow;
 class ZEUIManager;
+class ZEDAssetManager;
 class ZEDMenu;
 
 enum ZEDFileState
@@ -80,6 +81,7 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDViewportManager*					ViewportManager;
 		ZEDMainWindow*						MainWindow;
 		ZEUIManager*						UIManager;
+		ZEDAssetManager*					AssetManager;
 
 		void								PopulateRecentFiles();
 		void								RegisterRecentFile(const ZEString& FileName);
@@ -121,6 +123,7 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDViewportManager*					GetViewportManager();
 		ZEDMainWindow*						GetMainWindow();
 		ZEUIManager*						GetUIManager();
+		ZEDAssetManager*					GetAssetManager();
 
 		ZEDComponent*						GetComponent(ZEClass* Class);
 		const ZEArray<ZEDComponent*>&		GetComponents();

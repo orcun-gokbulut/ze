@@ -55,17 +55,22 @@
 #include <QMessageBox>
 #include <QSettings>
 #include "ZEDUserInterface/ZEDCommandManager.h"
+#include "ZEDAssetManager.h"
 
 
 void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
 {
-	for (ZESize I = 0; I < Components.GetCount(); I++)
+	Components.LockRead();
 	{
-		if (Event->IsAcquired())
-			break;
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Event->IsAcquired())
+				break;
 
-		Components[I]->EventReceived(Event);
+			Components[I]->EventReceived(Event);
+		}
 	}
+	Components.UnlockRead();
 }
 
 void ZEDEditor::RegisterCommands()
@@ -259,6 +264,9 @@ bool ZEDEditor::InitializeInternal()
 	RegisterCommands();
 
 	MainWindow = ZEDMainWindow::CreateInstance();
+
+	AssetManager = ZEDAssetManager::CreateInstance();
+	AddComponent(AssetManager);
 
 	ViewportManager = ZEDViewportManager::CreateInstance();
 	AddComponent(ViewportManager);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDComponent.h
+ Zinek Engine - ZEDAssetType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,62 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-#include "ZEDestroyable.h"
+#include "ZEMeta\ZEObject.h"
 
+#include "ZEDAsset.h"
+
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEList2.h"
+#include "ZEDS\ZEFlags.h"
+#include "ZEThread\ZEThread.h"
+
+
+class QWidget;
 class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDObjectEvent;
-class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
-class ZEDAssetEvent;
+class ZEDAssetPreviewWidget;
+class ZEDAssetThumbnailWidget;
+class ZEDObjectWrapper;
 
-class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
+ZE_ENUM(ZEDAssetEditorType)
+{
+	ZED_AET_NONE,
+	ZED_AET_INTERNAL,
+	ZED_AET_EXTERNAL
+};
+
+ZE_ENUM(ZEDAssetTypeCapability)
+{
+	ZED_ATC_NONE,
+	ZED_ATC_TUMBNAIL,
+	ZED_ATC_PREVIEW,
+	ZED_ATC_WRAPPER
+};
+
+typedef ZEFlagsBase<ZEDAssetTypeCapability> ZEDAssetTypeCapabilities;
+
+class ZEDAssetType : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEDEditor;
-	private:
-		ZEDEditor*						Editor;
-
-	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent& Event);
-
-		void							RaiseEvent(const ZEDEvent* Event);
-	
-										ZEDComponent();
-		virtual							~ZEDComponent();
-
 	public:
-		ZEDEditor*						GetEditor();
+		virtual const char*						GetName() const;
+		virtual const char* const*				GetExtensions() const;
+		virtual ZESize							GetExtensionCount() const;
+
+		virtual ZEDAssetEditorType				GetEditorType();
+		virtual ZEArray<ZEClass*>				GetSupportedEditors();
+
+		virtual ZEDAssetTypeCapabilities		GetCapabilities();
+		virtual QWidget*						CreateThumbnailWidget() const;
+		virtual QWidget*						CreatePreviewWidget() const;
+		virtual ZEDEditor*						CreateEditor() const;
+		virtual ZEDObjectWrapper*				CreateWrapper(ZEClass* EditorClass) const;
+
+		virtual bool							LaunchExternalEditor() const;
+
+		virtual void							UpdateCategory(const ZEString& Path, const ZEString& Category);
+		virtual void							UpdateTags(const ZEString& Path, const ZEArray<ZEString> Tags);
+		
+		virtual bool							Wrap(ZEDAsset* Asset, const ZEString& Path);
 };

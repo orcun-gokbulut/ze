@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDComponent.h
+ Zinek Engine - ZEDAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,62 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-#include "ZEDestroyable.h"
+#include "ZEMeta\ZEObject.h"
 
-class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDObjectEvent;
-class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
-class ZEDAssetEvent;
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZELink.h"
+#include "ZETimeStamp.h"
 
-class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
+
+class ZEDAssetType;
+class ZEDAssetManager;
+
+class ZEDAssetMetaData
+{
+	public:
+		ZEGUID							GUID;
+		ZEUInt							VersionMinor;
+		ZEUInt							VersionMajor;
+		ZEUInt							VersionRevision;
+		ZETimeStamp						CreationDate;
+		ZEString						Description;
+		ZEString						Author;
+		ZEString						Copyright;
+		ZEString						WebSite;
+		ZEString						ProgramName;
+};
+
+class ZEDAsset : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEDEditor;
+	friend class ZEDAssetManager;
 	private:
-		ZEDEditor*						Editor;
-
-	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent& Event);
-
-		void							RaiseEvent(const ZEDEvent* Event);
-	
-										ZEDComponent();
-		virtual							~ZEDComponent();
+		ZEDAssetType*					Type;
+		ZEString						Path;
+		ZEInt							Hash;
+		ZEString						Category;
+		ZEArray<ZEString>				Tags;
+		ZETimeStamp						ModificationTime;
 
 	public:
-		ZEDEditor*						GetEditor();
+		void							SetPath(const ZEString& Path);
+		ZEString						GetPath() const;
+		ZEUInt							GetHash() const;
+
+		void							SetType(ZEDAssetType* Type);
+		ZEDAssetType*					GetType() const;
+	
+		void							SetCategory(const ZEString& Category);
+		const ZEString&					GetCategory() const;
+
+		void							SetTags(const ZEArray<ZEString>& Tags);
+		const ZEArray<ZEString>&		GetTags() const;
+
+		ZETimeStamp						GetModificationTime();
+
+		ZEDAssetMetaData				ReadMetaData();
+
+										ZEDAsset();
+										~ZEDAsset();
 };

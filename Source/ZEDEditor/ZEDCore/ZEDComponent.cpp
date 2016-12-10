@@ -106,6 +106,11 @@ void ZEDComponent::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
 
 }
 
+void ZEDComponent::AssetEvent(const ZEDAssetEvent& Event)
+{
+
+}
+
 void ZEDComponent::RaiseEvent(const ZEDEvent* Event)
 {
 	if (Editor == NULL)

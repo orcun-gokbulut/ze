@@ -41,11 +41,12 @@
 #include "ZEDS/ZEString.h"
 
 typedef ZEFlags ZERegExFlags;
-#define ZE_REF_NONE						0
-#define ZE_REF_CASE_INSENSITIVE			1
-#define ZE_REF_NEW_LINE					2
-#define ZE_REF_NO_SUBMATCH				4
-#define ZE_REF_NO_MATCH_STRING			8		// Only store offset and count in ZERegExMatch structures. Do not store string of actual match.
+#define ZE_REF_NONE						0x00
+#define ZE_REF_CASE_INSENSITIVE			0x01
+#define ZE_REF_NEW_LINE					0x02
+#define ZE_REF_NO_MATCH_STRING			0x04
+#define ZE_REF_NO_SUBMATCH				0x08
+#define ZE_REF_NO_SUBMATCH_STRING		0x10
 
 struct ZERegExSubMatch
 {
