@@ -46,6 +46,7 @@ bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 {
 	if (Code != NULL)
 	{
+		regfree(static_cast<regex_t*>(Code));
 		delete Code;
 		Code = NULL;
 	}
@@ -62,7 +63,7 @@ bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 		return false;
 
 	Code = new regex_t;
-	*(regex_t*)Code = Temp;
+	*static_cast<regex_t*>(Code) = Temp;
 
 	return true;
 }
@@ -77,7 +78,7 @@ bool ZERegEx::Match(const ZEString& String)
 	if (Code == NULL)
 		return false;
 	
-	return (regexec((regex_t*)Code, String.ToCString(), 0, NULL, 0) == REG_OK);
+	return (regexec(static_cast<regex_t*>(Code), String.ToCString(), 0, NULL, 0) == REG_OK);
 }
 
 
@@ -93,9 +94,9 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 		OldOffset = OldMatch->Offset + OldMatch->Size;
 
 	int Result = 
-		regexec((regex_t*)Code, 
+		regexec(static_cast<regex_t*>(Code), 
 			String.ToCString() + OldOffset, 
-			((regex_t*)Code)->re_nsub + 1, 
+			(static_cast<regex_t*>(Code))->re_nsub + 1, 
 			NativeMatches, 
 			(OldMatch != NULL && OldMatch->Offset != 0 ? REG_NOTBOL : 0));
 
@@ -110,8 +111,8 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 
 	if (Flags.GetFlags(ZE_REF_NO_SUBMATCH) == 0)
 	{
-		Match.SubMatches.SetCount(((regex_t*)Code)->re_nsub);
-		for (ZESize I = 0; I < ((regex_t*)Code)->re_nsub; I++)
+		Match.SubMatches.SetCount((static_cast<regex_t*>(Code))->re_nsub);
+		for (ZESize I = 0; I < (static_cast<regex_t*>(Code))->re_nsub; I++)
 		{
 			ZERegExSubMatch& SubMatch = Match.SubMatches[I];
 			SubMatch.Offset = OldOffset + NativeMatches[I + 1].rm_so;
@@ -138,7 +139,10 @@ ZERegEx::ZERegEx(const ZEString& RegEx, ZERegExFlags Flags)
 ZERegEx::~ZERegEx()
 {
 	if (Code != NULL)
+	{
+		regfree(static_cast<regex_t*>(Code));
 		delete Code;
+	}
 }
 
 
