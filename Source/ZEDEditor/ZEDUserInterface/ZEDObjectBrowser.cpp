@@ -96,7 +96,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			return false;
 
 		QMimeData* MimeData = new QMimeData;
-		MimeData->setData("application/vnd.zinek.zeobjectwrapper", QByteArray((const char*)&DragWrapper, sizeof(ZEDObjectWrapper)));
+		MimeData->setData("application/x.zinek.zeobjectwrapper", QByteArray((const char*)&DragWrapper, sizeof(ZEDObjectWrapper)));
 
 		QDrag* Drag = new QDrag(this);
 		Drag->setMimeData(MimeData);
@@ -109,9 +109,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 	{
 		QDragEnterEvent* DragEvent = static_cast<QDragEnterEvent*>(Event);
 		
-		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper") || 
-			DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass") ||
-			DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeasset"))
+		if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper") || 
+			DragEvent->mimeData()->hasFormat("application/x.zinek.zeclass") ||
+			DragEvent->mimeData()->hasFormat("application/x.zinek.zeasset"))
 		{
 			DragEvent->acceptProposedAction();
 			return true;
@@ -131,9 +131,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 		if (TargetWrapper == NULL)
 			return false;
 
-		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper"))
+		if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper"))
 		{
-			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DragEvent->mimeData()->data("application/vnd.zinek.zeobjectwrapper").data();
+			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DragEvent->mimeData()->data("application/x.zinek.zeobjectwrapper").data();
 			
 			if (ObjectWrapper == TargetWrapper)
 				return false;
@@ -147,9 +147,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			DragEvent->acceptProposedAction();
 			return true;
 		}
-		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass"))
+		else if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeclass"))
 		{
-			ZEClass* Class = *(ZEClass**)DragEvent->mimeData()->data("application/vnd.zinek.zeclass").data();
+			ZEClass* Class = *(ZEClass**)DragEvent->mimeData()->data("application/x.zinek.zeclass").data();
 			
 			if (Class->IsAbstract())
 				return false;
@@ -160,7 +160,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			DragEvent->acceptProposedAction();
 			return true;
 		}
-		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeassert"))
+		else if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeassert"))
 		{
 			// Later
 			return false;
@@ -178,9 +178,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 		if (TargetWrapper == NULL)
 			return false;
 
-		if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper"))
+		if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper"))
 		{
-			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DropEvent->mimeData()->data("application/vnd.zinek.zeobjectwrapper").data();
+			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DropEvent->mimeData()->data("application/x.zinek.zeobjectwrapper").data();
 			
 			if (ObjectWrapper == TargetWrapper)
 				return false;
@@ -197,9 +197,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 			return true;
 		}
-		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass"))
+		else if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeclass"))
 		{
-			ZEClass* Class = *(ZEClass**)DropEvent->mimeData()->data("application/vnd.zinek.zeclass").data();
+			ZEClass* Class = *(ZEClass**)DropEvent->mimeData()->data("application/x.zinek.zeclass").data();
 
 			if (Class->IsAbstract())
 				return false;
@@ -213,7 +213,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 			return true;
 		}
-		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeasset"))
+		else if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeasset"))
 		{
 			// Later
 			return false;

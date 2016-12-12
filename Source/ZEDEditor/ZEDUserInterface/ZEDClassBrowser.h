@@ -37,29 +37,22 @@
 
 #include "ZEDWindow.h"
 
-#include <QPoint>
-
-class Ui_ZEDClassBrowser;
-class ZEDClassTree;
 class ZEDObjectWrapper;
+class ZEDClassModel;
+class Ui_ZEDClassBrowser;
 
 class ZEDClassBrowser : public ZEDWindow
 {
 	Q_OBJECT
 	private:
 		QWidget*							Widget;
-		Ui_ZEDClassBrowser*					Form;
-		
-		ZEClass*							DragClass;
-		QPoint								DragStartPos;
-
+		Ui_ZEDClassBrowser*					Form;	
+		ZEDClassModel*						Model;
 		ZEDObjectWrapper*					DestinationWrapper;
 
 		virtual bool						InitializeInternal();
-		virtual bool						DeinitializeInternal();
 
 		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual bool						eventFilter(QObject* Object, QEvent* Event);
 
 		void								UpdateUI();
 
@@ -69,8 +62,6 @@ class ZEDClassBrowser : public ZEDWindow
 		void								btnAdd_clicked();
 
 	public:
-		ZEDClassTree*						GetClassTree();
-
 											ZEDClassBrowser();
 		virtual								~ZEDClassBrowser();
 };
