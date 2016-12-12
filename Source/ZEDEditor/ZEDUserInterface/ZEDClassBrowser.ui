@@ -52,7 +52,7 @@
     </widget>
    </item>
    <item>
-    <widget class="ZEDClassTree" name="trwClasses"/>
+    <widget class="QTreeView" name="trwClasses"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -80,13 +80,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ZEDClassTree</class>
-   <extends>QTreeWidget</extends>
-   <header>ZEDClassTree.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
