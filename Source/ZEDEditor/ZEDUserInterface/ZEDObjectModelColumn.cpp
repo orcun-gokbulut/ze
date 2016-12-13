@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.h
+ Zinek Engine - ZEDObjectModelColumn.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDObjectModelColumn.h"
 
-#include "ZEDEvent.h"
-
-class ZEDObjectWrapper;
-
-enum ZEDObjectEventType
+void ZEDObjectModelColumn::SetProperty(const ZEString& Name)
 {
-	ZED_OET_NONE,
-	ZED_OET_ADDING,
-	ZED_OET_ADDED,
-	ZED_OET_REMOVING,
-	ZED_OET_REMOVED,
-	ZED_OET_CHANGED
-};
+	PropertyName = Name;
+}
 
-class ZEDObjectEvent : public ZEDEvent
+const ZEString& ZEDObjectModelColumn::GetProperty() const
 {
-	ZE_OBJECT
-	friend class ZEDObjectWrapper;
-	private:
-		ZEDObjectEventType						Type;
-		ZEDObjectWrapper*						Wrapper;
+	return PropertyName;
+}
 
-	public:	
-		void									SetType(ZEDObjectEventType Type);
-		ZEDObjectEventType						GetType() const;
+void ZEDObjectModelColumn::SetEditable(bool Editable)
+{
+	this->Editable = Editable;
+}
 
-		void									SetWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper*						GetWrapper() const;
+bool ZEDObjectModelColumn::GetEditable() const
+{
+	return Editable;
+}
 
-												ZEDObjectEvent();
-};
+void ZEDObjectModelColumn::SetSortable(bool Sortable)
+{
+	this->Sortable = Sortable;
+}
+
+bool ZEDObjectModelColumn::GetSortable() const
+{
+	return Sortable;
+}
+
+void ZEDObjectModelColumn::SetCheckedIcon(const ZEString& FileName)
+{
+	CheckedIcon = FileName;
+}
+
+const ZEString& ZEDObjectModelColumn::GetCheckedIcon()
+{
+	return CheckedIcon;
+}
+
+void ZEDObjectModelColumn::SetUncheckedIcon(const ZEString& FileName)
+{
+	UncheckedIcon = FileName;
+}
+
+const ZEString& ZEDObjectModelColumn::GetUncheckedIcon()
+{
+	return UncheckedIcon;
+}

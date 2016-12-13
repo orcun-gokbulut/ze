@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectTree.h
+ Zinek Engine - ZEDObjectModel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,14 +36,15 @@
 #pragma once
 
 #include "ZEDCore/ZEDComponent.h"
-#include <QTreeWidget>
 
 #include "ZEDS/ZEArray.h"
+#include "ZERegEx/ZEWildcard.h"
+
 #include <QRegExp>
+#include <QAbstractItemModel>
 
 class ZEClass;
 class ZEDObjectWrapper;
-class ZEDSelectionManager;
 
 enum ZEDObjectTreeMode
 {
@@ -52,34 +53,27 @@ enum ZEDObjectTreeMode
 	ZED_OTM_TREE
 };
 
-class ZEDObjectTree : public QTreeWidget, public ZEDComponent
+// Read Only
+	// Tree
+	// List
+
+// Write
+// Drag and Drop Support
+
+class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 {
-	Q_OBJECT
 	private:
 		ZEDObjectWrapper*				RootWrapper;
 		ZEDObjectTreeMode				Mode;
 
-		QRegExp							FilterSearch;
+		ZEWildcard						FilterSearch;
+		ZEArray<ZEObject*>				FilterIncludedObjects;
+		ZEArray<ZEObject*>				FilterExcludedObjects;
 		ZEArray<ZEClass*>				FilterIncludedClasses;
 		ZEArray<ZEClass*>				FilterExcludedClasses;
 
-		QTreeWidgetItem*				FindItem(QTreeWidgetItem* Parent, ZEDObjectWrapper* Wrapper)const;
-
-		bool							FilterWrapper(ZEDObjectWrapper* Wrapper);
-
-		bool							CheckWrapper(ZEDObjectWrapper* Wrapper);
-		void							AddWrapper(ZEDObjectWrapper* Wrapper);
-		void							RemoveWrapper(ZEDObjectWrapper* Wrapper);
-		
-		void							UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
-
-		virtual bool					InitializeInternal();
-
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-
-	private slots:
-		void							OnSelectionChanged();
+		bool							Filter(ZEDObjectWrapper* Wrapper) const;
+		bool							FilterHierarchy(ZEDObjectWrapper* Wrapper) const;
 
 	public:
 		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
@@ -87,23 +81,37 @@ class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 
 		void							SetMode(ZEDObjectTreeMode Mode);
 		ZEDObjectTreeMode				GetMode() const;
+		
+		void							SetFilterPattern(const ZEString& Text);
+		const ZEString&					GetFilterPattern() const;
 
+		void							SetFilterIncludedObjects(const ZEArray<ZEObject*>& Objects);
+		const ZEArray<ZEObject*>&		GetFilterIncludedObjects() const;
 
-		ZEDObjectWrapper*				GetWrapper(QTreeWidgetItem* Item) const;
-		QTreeWidgetItem*				GetTreeItem(ZEDObjectWrapper* Wrapper) const;
+		void							SetFilterExcludedObjects(const ZEArray<ZEObject*>& Objects);
+		const ZEArray<ZEObject*>&		GetFilterExcludedObjects() const;
 
-		void							SetFilterPattern(const QString& Text);
-		QString							GetFilterPattern() const;
+		void							SetFilterIncludedClasses(const ZEArray<ZEClass*>& Clases);
+		const ZEArray<ZEClass*>&		GetFilterIncludedClasses() const;
 
-		const ZEArray<ZEClass*>			GetFilterIncludedClasses() const;
-		void							AddFilterIncludedClass(ZEClass* Class);
-		void							RemoveFilterIncludedClass(ZEClass* Class);
+		void							SetFilterExclucedClasses(const ZEArray<ZEClass*>& Classes);
+		const ZEArray<ZEClass*>&		GetFilterExcludedClasses() const;
 
-		const ZEArray<ZEClass*>			GetFilterExcludedClasses() const;
-		void							AddFilterExcludedClass(ZEClass* Class);
-		void							RemoveFilterExcludedClass(ZEClass* Class);
+		ZEDObjectWrapper*				ConvertToWrapper(const QModelIndex& Index) const;
 
-		void							Update();
+	private: /* Events */
+		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
 
-										ZEDObjectTree(QWidget* Parent = 0);
+	public: /* QAbstractItemModel */
+		virtual ZEDObjectWrapper*		indexList(ZEDObjectWrapper* Target, int Row, int& Index) const;
+		virtual QModelIndex				index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+		virtual QModelIndex				parent(const QModelIndex &child) const override;
+		virtual bool					hasChildren(const QModelIndex &parent = QModelIndex()) const;
+		virtual int						rowCountList(ZEDObjectWrapper* Root) const;
+		virtual int						rowCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual int						columnCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual QVariant				data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+		virtual QVariant				headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
+										ZEDObjectModel();
 };

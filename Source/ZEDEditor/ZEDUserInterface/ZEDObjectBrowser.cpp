@@ -35,35 +35,59 @@
 
 #include "ZEDObjectBrowser.h"
 
-#include "ui_ZEDObjectBrowser.h"
+#include "ZEDObjectModel.h"
 #include "ZEDCore\ZEDEditor.h"
 #include "ZEDCore\ZEDObjectWrapper.h"
 #include "ZEDCore\ZEDObjectManager.h"
+#include "ui_ZEDObjectBrowser.h"
 
 #include <QEvent.h>
 #include <QDrag>
 #include <QMimeData>
 #include <QTreeWidget>
 
+
 bool ZEDObjectBrowser::InitializeInternal()
 {
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 
-	GetEditor()->AddComponent(Form->trwObjects);
+	GetEditor()->AddComponent(Model);
 
 	return true;
 }
 
 bool ZEDObjectBrowser::DeinitializeInternal()
 {
-	GetEditor()->RemoveComponent(Form->trwObjects);
+	GetEditor()->RemoveComponent(Model);
 
 	return ZEDWindow::DeinitializeInternal();
 }
 
+void ZEDObjectBrowser::UpdateUI()
+{
+	if (Form->txtSearch->text().isEmpty())
+		Model->SetMode(ZED_OTM_LIST);
+	else
+		Model->SetMode(ZED_OTM_LIST);
+
+	bool RootSelected = false;
+	QModelIndexList Items = Form->trwObjects->selectionModel()->selectedRows();
+	for (int I = 0; I < Items.count(); I++)
+	{
+		if (Model->ConvertToWrapper(Items[I]) == Model->GetRootWrapper())
+		{
+			RootSelected = true;
+			break;
+		}
+	}
+
+	Form->btnDelete->setEnabled(!RootSelected);
+}
+
 bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 {
+	/*
 	if (Object != Form->trwObjects->viewport())
 		return false;
 
@@ -221,47 +245,40 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 		return false;
 	}
-
+	*/
 	return false;
 }
 
-void ZEDObjectBrowser::trwObjects_itemSelectionChanged()
+void ZEDObjectBrowser::trwObjects_itemSelectionChanged(const QItemSelection&, const QItemSelection&)
 {
-	bool RootSelected = false;
-	QList<QTreeWidgetItem*> Items = GetObjectTree()->selectedItems();
-	for (int I = 0; I < Items.count(); I++)
-	{
-		if (GetObjectTree()->GetWrapper(Items[I]) == GetObjectTree()->GetRootWrapper())
-			RootSelected = true;
-	}
-
-	Form->btnDelete->setEnabled(!RootSelected);
+	UpdateUI();
 }
 
 void ZEDObjectBrowser::txtSearch_textChanged(const QString& Text)
 {
-	if (Text.isEmpty())
-		Form->trwObjects->SetMode(ZED_OTM_TREE);
-	else
-		Form->trwObjects->SetMode(ZED_OTM_TREE);
-
-	Form->trwObjects->SetFilterPattern(Text);
-	Form->trwObjects->Update();
+	Model->SetFilterPattern(Text.toUtf8().data());
+	UpdateUI();
 }
 
 void ZEDObjectBrowser::btnDelete_clicked()
 {
 	ZEArray<ZEDObjectWrapper*> Wrappers;
-	QList<QTreeWidgetItem*> Items = GetObjectTree()->selectedItems();
+
+	QModelIndexList Items = Form->trwObjects->selectionModel()->selectedRows();
 	for (int I = 0; I < Items.count(); I++)
-		Wrappers.Add(GetObjectTree()->GetWrapper(Items[I]));
+		Wrappers.Add(Model->ConvertToWrapper(Items[I]));
 
 	GetEditor()->GetObjectManager()->DeleteObjects(Wrappers);
 }
 
-ZEDObjectTree* ZEDObjectBrowser::GetObjectTree()
+void ZEDObjectBrowser::SetRootWrapper(ZEDObjectWrapper* RootWrapper)
 {
-	return Form->trwObjects;
+	Model->SetRootWrapper(RootWrapper);
+}
+
+const ZEDObjectWrapper* ZEDObjectBrowser::GetRootWrapper() const
+{
+	return Model->GetRootWrapper();
 }
 
 ZEDObjectBrowser::ZEDObjectBrowser()
@@ -273,19 +290,29 @@ ZEDObjectBrowser::ZEDObjectBrowser()
 
 	Form = new Ui_ZEDObjectBrowser();
 	Form->setupUi(Widget);
-	
+
+	Model = new ZEDObjectModel();
+	Model->SetMode(ZED_OTM_LIST);
+	Form->trwObjects->setModel(Model);
+	Form->trwObjects->setDragEnabled(true);
+	Form->trwObjects->header()->setStretchLastSection(false);
+	Form->trwObjects->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	Form->trwObjects->setSelectionBehavior(QAbstractItemView::SelectRows);
+	Form->trwObjects->setSelectionMode(QAbstractItemView::SingleSelection);
+	Form->trwObjects->setAlternatingRowColors(true);
+	Form->trwObjects->setDragEnabled(true),
 	Form->trwObjects->setAcceptDrops(true);
-	Form->trwObjects->viewport()->installEventFilter(this);
 
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
 	connect(Form->btnDelete, SIGNAL(clicked()), this, SLOT(btnDelete_clicked()));
-	connect(Form->trwObjects, SIGNAL(itemSelectionChanged()), this, SLOT(trwObjects_itemSelectionChanged()));
+	connect(Form->trwObjects->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(trwObjects_itemSelectionChanged(const QItemSelection&, const QItemSelection&)));
 }
 
 ZEDObjectBrowser::~ZEDObjectBrowser()
 {
 	Deinitialize();
 
+	delete Model;
 	delete Form;
 	delete Widget;
 }

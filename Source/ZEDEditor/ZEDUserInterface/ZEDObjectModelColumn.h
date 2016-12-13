@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.h
+ Zinek Engine - ZEDObjectModelColumn.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,34 +35,30 @@
 
 #pragma once
 
-#include "ZEDEvent.h"
+#include "ZEDS/ZEString.h"
 
-class ZEDObjectWrapper;
-
-enum ZEDObjectEventType
+class ZEDObjectModelColumn
 {
-	ZED_OET_NONE,
-	ZED_OET_ADDING,
-	ZED_OET_ADDED,
-	ZED_OET_REMOVING,
-	ZED_OET_REMOVED,
-	ZED_OET_CHANGED
-};
-
-class ZEDObjectEvent : public ZEDEvent
-{
-	ZE_OBJECT
-	friend class ZEDObjectWrapper;
 	private:
-		ZEDObjectEventType						Type;
-		ZEDObjectWrapper*						Wrapper;
+		ZEString								PropertyName;
+		bool									Editable;
+		bool									Sortable;
+		ZEString								CheckedIcon;
+		ZEString								UncheckedIcon;
 
-	public:	
-		void									SetType(ZEDObjectEventType Type);
-		ZEDObjectEventType						GetType() const;
+	public:
+		void									SetProperty(const ZEString& Name);
+		const ZEString&							GetProperty() const;
 
-		void									SetWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper*						GetWrapper() const;
+		void									SetEditable(bool Editable);
+		bool									GetEditable() const;
 
-												ZEDObjectEvent();
+		void									SetSortable(bool Sortable);
+		bool									GetSortable() const;
+
+		void									SetCheckedIcon(const ZEString& FileName);
+		const ZEString&							GetCheckedIcon();
+
+		void									SetUncheckedIcon(const ZEString& FileName);
+		const ZEString&							GetUncheckedIcon();
 };

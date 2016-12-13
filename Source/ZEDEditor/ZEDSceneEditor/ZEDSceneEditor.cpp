@@ -46,7 +46,6 @@
 #include "ZEDUserInterface/ZEDAssetBrowser.h"
 #include "ZEDUserInterface/ZEDPropertyWindow.h"
 #include "ZEDUserInterface/ZEDClassBrowser.h"
-#include "ZEDUserInterface/ZEDObjectTree.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZESector.h"
 #include "ZEModel/ZEModel.h"
@@ -84,7 +83,7 @@ bool ZEDSceneEditor::InitializeInternal()
 	Scene->Initialize();
 
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
-	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
+	ObjectBrowser->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
 	New();
 

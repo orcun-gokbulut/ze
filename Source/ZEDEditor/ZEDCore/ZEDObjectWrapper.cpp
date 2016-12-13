@@ -393,12 +393,16 @@ bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	if (ChildWrappers.Exists(Wrapper))
 		return false;
 
-	ChildWrappers.Add(Wrapper);
 	Wrapper->SetParent(this);
 	Wrapper->SetManager(Manager);
 
 	ZEDObjectEvent Event;
 	Event.Wrapper = Wrapper;
+	Event.Type = ZED_OET_ADDING;
+	RaiseEvent(&Event);
+
+	ChildWrappers.Add(Wrapper);
+
 	Event.Type = ZED_OET_ADDED;
 	RaiseEvent(&Event);
 
@@ -419,14 +423,17 @@ bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 	if (!ChildWrappers.Exists(Wrapper))
 		return false;
 
+	ZEDObjectEvent Event;
+	Event.Wrapper = Wrapper;
+	Event.Type = ZED_OET_REMOVING;
+	RaiseEvent(&Event);
+
 	Wrapper->Deinitialize();
 
 	ChildWrappers.RemoveValue(Wrapper);
 	Wrapper->SetParent(NULL);
 	Wrapper->SetManager(NULL);
 
-	ZEDObjectEvent Event;
-	Event.Wrapper = Wrapper;
 	Event.Type = ZED_OET_REMOVED;
 	RaiseEvent(&Event);
 
