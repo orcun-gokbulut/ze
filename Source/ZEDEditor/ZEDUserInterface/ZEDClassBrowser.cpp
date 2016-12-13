@@ -35,21 +35,21 @@
 
 #include "ZEDClassBrowser.h"
 
+#include "ZEDS/ZEFormat.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDCore/ZEDSelectionManager.h"
 #include "ZEDCore/ZEDObjectManager.h"
 #include "ZEDClassModel.h"
-#include "ui_ZEDClassBrowser.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEDS/ZEFormat.h"
+#include "ui_ZEDClassBrowser.h"
 
 void ZEDClassBrowser::UpdateUI()
 {
-	QTreeView* TreeView = Form->trwClasses;
 	ZEClass* SelectedClass = NULL;
-	if (TreeView->selectionModel()->selectedIndexes().count() == 1)
-		SelectedClass = Model->ConvertToClass(TreeView->selectionModel()->selectedIndexes()[0]);
+	QModelIndexList SelectedIndexes = Form->trwClasses->selectionModel()->selectedRows();
+	if (SelectedIndexes.count() == 1)
+		SelectedClass = Model->ConvertToClass(SelectedIndexes[0]);
 
 	if (SelectedClass != NULL && !SelectedClass->IsAbstract())
 	{
@@ -86,19 +86,6 @@ bool ZEDClassBrowser::InitializeInternal()
 	if (!ZEDWindow::InitializeInternal())
 		return false;
 
-	Model = new ZEDClassModel();
-	Model->SetRootClass(ZEEntity::Class());
-	Model->SetMode(ZED_CMM_INHERITENCE_TREE);
-	Form->trwClasses->setModel(Model);
-	Form->trwClasses->setDragEnabled(true);
-	Form->trwClasses->header()->setStretchLastSection(false);
-	Form->trwClasses->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-	Form->trwClasses->hideColumn(2);
-	Form->trwClasses->hideColumn(1);
-	Form->trwClasses->setSelectionBehavior(QAbstractItemView::SelectRows);
-	Form->trwClasses->setSelectionMode(QAbstractItemView::SingleSelection);
-	Form->trwClasses->setAlternatingRowColors(true);
-
 	UpdateUI();
 
 	return true;
@@ -115,19 +102,15 @@ void ZEDClassBrowser::txtSearch_textChanged(const QString& Text)
 	UpdateUI();
 }
 
-void ZEDClassBrowser::trwClasses_itemSelectionChanged()
+void ZEDClassBrowser::trwClasses_itemSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
 	UpdateUI();
 }
 
 void ZEDClassBrowser::btnAdd_clicked()
 {
-	QTreeView* TreeView = Form->trwClasses;
-	ZEClass* SelectedClass = NULL;
-	if (TreeView->selectionModel()->selectedIndexes().count() == 1)
-		SelectedClass = Model->ConvertToClass(TreeView->selectionModel()->selectedIndexes()[0]);
-
-	GetEditor()->GetObjectManager()->CreateObject(DestinationWrapper, SelectedClass);
+	QModelIndexList SelectedIndexes = Form->trwClasses->selectionModel()->selectedRows();
+	GetEditor()->GetObjectManager()->CreateObject(DestinationWrapper,  Model->ConvertToClass(SelectedIndexes[0]));
 }
 
 ZEDClassBrowser::ZEDClassBrowser()
@@ -140,8 +123,21 @@ ZEDClassBrowser::ZEDClassBrowser()
 	Form = new Ui_ZEDClassBrowser();
 	Form->setupUi(Widget);
 
+	Model = new ZEDClassModel();
+	Model->SetRootClass(ZEEntity::Class());
+	Model->SetMode(ZED_CMM_INHERITENCE_TREE);
+	Form->trwClasses->setModel(Model);
+	Form->trwClasses->setDragEnabled(true);
+	Form->trwClasses->header()->setStretchLastSection(false);
+	Form->trwClasses->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	Form->trwClasses->hideColumn(2);
+	Form->trwClasses->hideColumn(1);
+	Form->trwClasses->setSelectionBehavior(QAbstractItemView::SelectRows);
+	Form->trwClasses->setSelectionMode(QAbstractItemView::SingleSelection);
+	Form->trwClasses->setAlternatingRowColors(true);
+
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
-	connect(Form->trwClasses, SIGNAL(itemSelectionChanged()), this, SLOT(trwClasses_itemSelectionChanged()));
+	connect(Form->trwClasses->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(trwClasses_itemSelectionChanged(const QItemSelection&, const QItemSelection&)));
 	connect(Form->btnAdd, SIGNAL(clicked()), this, SLOT(btnAdd_clicked()));
 }
 
@@ -149,6 +145,7 @@ ZEDClassBrowser::~ZEDClassBrowser()
 {
 	Deinitialize();
 
+	delete Model;
 	delete Form;
 	delete Widget;
 }

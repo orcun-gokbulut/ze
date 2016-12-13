@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectTreeColumn.cpp
+ Zinek Engine - ZEWildcard.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,80 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectTreeColumn.h"
+#include "ZEWildcard.h"
 
-void ZEDObjectTreeColumn::SetProperty(const ZEString& Name)
+const ZEString& ZEWildcard::GetPattern() const
 {
-	PropertyName = Name;
+	return Pattern;
 }
 
-const ZEString& ZEDObjectTreeColumn::GetProperty() const
+bool ZEWildcard::Compile(const ZEString& Pattern)
 {
-	return PropertyName;
+	this->Pattern = Pattern;
+	return true;
 }
 
-void ZEDObjectTreeColumn::SetEditable(bool Editable)
+bool ZEWildcard::Match(const ZEString& Input) const
 {
-	this->Editable = Editable;
+	if (Pattern.IsEmpty())
+		return false;
+
+	if (Input.IsEmpty())
+		return false;
+
+	const char* pat = Pattern.GetValue();
+	const char* str = Input.GetValue();
+	const char* s;
+	const char* p;
+	bool star = false;
+
+	loopStart:
+		for (s = str, p = pat; *s; ++s, ++p) 
+		{
+			switch (*p) 
+			{
+			case '?':
+				if (*s == '.') goto starCheck;
+				break;
+
+			case '*':
+				star = true;
+				str = s, pat = p;
+				if (!*++pat) 
+					return true;
+				goto loopStart;
+
+			default:
+				if (toupper(*s) != toupper(*p))
+					goto starCheck;
+				break;
+			}
+		}
+
+		if (*p == '*') 
+			++p;
+
+		return (!*p);
+
+	starCheck:
+		if (!star)
+			return false;
+
+	str++;
+	goto loopStart;
 }
 
-bool ZEDObjectTreeColumn::GetEditable() const
+ZEWildcard::ZEWildcard()
 {
-	return Editable;
+
 }
 
-void ZEDObjectTreeColumn::SetSortable(bool Sortable)
+ZEWildcard::ZEWildcard(const ZEString& Pattern)
 {
-	this->Sortable = Sortable;
+	Compile(Pattern);
 }
 
-bool ZEDObjectTreeColumn::GetSortable() const
+ZEWildcard::~ZEWildcard()
 {
-	return Sortable;
-}
 
-void ZEDObjectTreeColumn::SetCheckedIcon(const ZEString& FileName)
-{
-	CheckedIcon = FileName;
-}
-
-const ZEString& ZEDObjectTreeColumn::GetCheckedIcon()
-{
-	return CheckedIcon;
-}
-
-void ZEDObjectTreeColumn::SetUncheckedIcon(const ZEString& FileName)
-{
-	UncheckedIcon = FileName;
-}
-
-const ZEString& ZEDObjectTreeColumn::GetUncheckedIcon()
-{
-	return UncheckedIcon;
 }

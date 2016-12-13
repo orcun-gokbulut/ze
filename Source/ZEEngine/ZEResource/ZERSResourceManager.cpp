@@ -41,7 +41,7 @@
 #include "ZEError.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEDS/ZEFastDelegate.h"
-#include "ZERegEx/ZERegEx.h"
+#include "ZERegEx/ZEWildcard.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZECore/ZEConsole.h"

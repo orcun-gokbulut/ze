@@ -40,6 +40,7 @@
 #include "ZEMeta/ZEProvider.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEFile/ZEPathInfo.h"
+#include "ZEDCore/ZEDObjectEvent.h"
 
 #include <QtGui/QIcon>
 #include <QtCore/QMimeData>
@@ -193,14 +194,17 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 {
 	if (Mode == ZED_CMM_INHERITENCE_TREE)
 	{
+		if (!Parent.isValid())
+			return (RootClass != NULL ? createIndex(Row, Column, RootClass) : QModelIndex());
+
 		ZEClass* ParentClass = ConvertToClass(Parent);
 		if (ParentClass == NULL)
-			ParentClass = RootClass;
+			return QModelIndex();
 
+		ZESize Index = 0;
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
-			ZESize Index = 0;
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
 			{
 				if (Classes[I]->GetParentClass() != ParentClass)
@@ -223,7 +227,7 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 	}
 	else if (Mode == ZED_CMM_LIST)
 	{
-		if (Parent != QModelIndex())
+		if (!Parent.isValid())
 			return QModelIndex();
 
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
@@ -261,27 +265,25 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 {
 	if (Mode == ZED_CMM_INHERITENCE_TREE)
 	{
+		if (!Child.isValid())
+			return QModelIndex();
+
 		ZEClass* ChildClass = ConvertToClass(Child);
-		if (ChildClass == NULL)
+		if (ChildClass == RootClass)
 			return QModelIndex();
 
 		ZEClass* ParentClass = ChildClass->GetParentClass();
-		if (ParentClass == NULL)
-			return QModelIndex();
-
-		ZEClass* ParentParentClass = ParentClass->GetParentClass();
-		if (ParentParentClass == NULL)
-			return createIndex(0, 0, ZEObject::Class());
-		else if (ParentParentClass == RootClass)
+		if (ParentClass == RootClass)
 			return createIndex(0, 0, RootClass);
 
+		int Index = 0;
+		ZEClass* GrandParentClass = ParentClass->GetParentClass();
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
-			ZESize Index = 0;
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
 			{
-				if (Classes[I]->GetParentClass() != ParentParentClass)
+				if (Classes[I]->GetParentClass() != GrandParentClass)
 					continue;
 
 				if (!Filter(Classes[I]->GetParentClass()))
@@ -290,8 +292,9 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 				if (Classes[I] == ParentClass)
 				{
 					Classes.UnlockRead();
-					return createIndex(0, 0, Classes[I]);
+					return createIndex(Index, 0, Classes[I]);
 				}
+
 				Index++;
 			}
 		}
@@ -303,21 +306,60 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 
 bool ZEDClassModel::hasChildren(const QModelIndex& Parent) const
 {
-	if (Mode == ZED_CMM_LIST)
-		return (Parent == QModelIndex());
-	else
-		return QAbstractItemModel::hasChildren(Parent);
+	if (Mode == ZED_CMM_INHERITENCE_TREE)
+	{
+		if (!Parent.isValid())
+			return (RootClass != NULL);
+
+		if (Parent.column() != 0)
+			return false;
+
+		ZEClass* ParentClass = ConvertToClass(Parent);
+		if (ParentClass == NULL)
+			return false;
+
+		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		Classes.LockRead();
+		{
+			for (ZESize I = 0; I < Classes.GetCount(); I++)
+			{
+				if (Classes[I]->GetParentClass() != ParentClass)
+					continue;
+
+				if (!Filter(Classes[I]))
+					continue;
+
+				Classes.UnlockRead();
+				return true;
+			}
+		}
+		Classes.UnlockRead();
+
+		return false;
+	}
+	else if (Mode == ZED_CMM_LIST)
+	{
+		return (!Parent.isValid());
+	}
+
+	return false;
 }
 
 int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 {
 	if (Mode == ZED_CMM_INHERITENCE_TREE)
 	{
-		ZESize Count = 0;
+		if (!Parent.isValid())
+			return (RootClass == NULL ? 0 : 1);
+		
+		if (Parent.column() != 0)
+			return 0;
+		
 		ZEClass* ParentClass = ConvertToClass(Parent);
 		if (ParentClass == NULL)
-			ParentClass = RootClass;
+			return 0;
 
+		int Count = 0;
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
@@ -338,10 +380,10 @@ int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 	}
 	else if (Mode == ZED_CMM_LIST)
 	{
-		if (Parent != QModelIndex())
+		if (Parent.isValid())
 			return 0;
 
-		ZESize Count = 0;
+		int Count = 0;
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
@@ -356,6 +398,8 @@ int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 		Classes.UnlockRead();
 		return Count;
 	}
+
+	return 0;
 }
 
 int ZEDClassModel::columnCount(const QModelIndex& Parent) const
@@ -365,7 +409,7 @@ int ZEDClassModel::columnCount(const QModelIndex& Parent) const
 
 QVariant ZEDClassModel::data(const QModelIndex& Index, int Role) const
 {
-	ZEClass* Class = static_cast<ZEClass*>(Index.internalPointer());
+	ZEClass* Class = ConvertToClass(Index);
 	if (Class == NULL)
 		return QVariant();
 
@@ -401,9 +445,9 @@ QVariant ZEDClassModel::data(const QModelIndex& Index, int Role) const
 
 		case Qt::TextAlignmentRole:
 			if (Index.column() == 0)
-				return (Qt::AlignLeft | Qt::AlignVCenter);
+				return (int)(Qt::AlignLeft | Qt::AlignVCenter);
 			else
-				return (Qt::AlignCenter | Qt::AlignVCenter);
+				return (int)(Qt::AlignCenter | Qt::AlignVCenter);
 			break;
 	}
 
@@ -428,9 +472,9 @@ QVariant ZEDClassModel::headerData(int Section, Qt::Orientation Orientation, int
 
 		case Qt::TextAlignmentRole:
 			if (Section == 0)
-				return (Qt::AlignLeft | Qt::AlignVCenter);
+				return (int)(Qt::AlignLeft | Qt::AlignVCenter);
 			else
-				return (Qt::AlignCenter | Qt::AlignVCenter);
+				return (int)(Qt::AlignCenter | Qt::AlignVCenter);
 			break;
 	}
 

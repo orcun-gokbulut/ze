@@ -35,8 +35,8 @@
 
 #include <QAbstractItemModel>
 
-#include "ZEDS\ZEArray.h"
-#include "..\..\ZEFoundation\ZERegEx\ZERegEx.h"
+#include "ZEDS/ZEArray.h"
+#include "ZERegEx/ZEWildcard.h"
 
 
 class ZEClass;
@@ -89,7 +89,6 @@ class ZEDClassModel : public QAbstractItemModel
 		virtual QVariant				data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 		virtual QVariant				headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 		virtual Qt::ItemFlags			flags(const QModelIndex &index) const; 
-
 		virtual QStringList				mimeTypes() const override;
 		virtual QMimeData*				mimeData(const QModelIndexList &indexes) const override;
 		virtual Qt::DropActions			supportedDragActions() const override;

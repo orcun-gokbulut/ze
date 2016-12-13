@@ -352,7 +352,10 @@ ZEDAssetCategory* ZEDAssetManager::GetCategory(const ZEString& CategoryPath)
 		{
 			ZEDAssetCategory* Parent = GetCategory(ParentName);
 			if (Parent == NULL)
+			{
+				Categories.UnlockRead();
 				return NULL;
+			}
 
 			ZEArray<ZEDAssetCategory*>& SubCatagories = Parent->SubCatagories;
 			for (ZESize I = 0; I < SubCatagories.GetCount(); I++)

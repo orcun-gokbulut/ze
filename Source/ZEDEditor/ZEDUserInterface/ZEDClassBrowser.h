@@ -39,6 +39,7 @@
 
 class ZEDObjectWrapper;
 class ZEDClassModel;
+class QItemSelection;
 class Ui_ZEDClassBrowser;
 
 class ZEDClassBrowser : public ZEDWindow
@@ -58,7 +59,7 @@ class ZEDClassBrowser : public ZEDWindow
 
 	private slots:
 		void								txtSearch_textChanged(const QString& Text);
-		void								trwClasses_itemSelectionChanged();
+		void								trwClasses_itemSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 		void								btnAdd_clicked();
 
 	public:

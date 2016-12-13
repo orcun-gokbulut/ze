@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectTreeColumn.h
+ Zinek Engine - ZEWildcard.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,28 +37,18 @@
 
 #include "ZEDS/ZEString.h"
 
-class ZEDObjectTreeColumn
+class ZEWildcard
 {
 	private:
-		ZEString								PropertyName;
-		bool									Editable;
-		bool									Sortable;
-		ZEString								CheckedIcon;
-		ZEString								UncheckedIcon;
+		ZEString					Pattern;
 
 	public:
-		void									SetProperty(const ZEString& Name);
-		const ZEString&							GetProperty() const;
+		const ZEString&				GetPattern() const;
 
-		void									SetEditable(bool Editable);
-		bool									GetEditable() const;
+		bool						Compile(const ZEString& Pattern);
+		bool						Match(const ZEString& Input) const;
 
-		void									SetSortable(bool Sortable);
-		bool									GetSortable() const;
-
-		void									SetCheckedIcon(const ZEString& FileName);
-		const ZEString&							GetCheckedIcon();
-
-		void									SetUncheckedIcon(const ZEString& FileName);
-		const ZEString&							GetUncheckedIcon();
+									ZEWildcard();
+									ZEWildcard(const ZEString& Pattern);
+									~ZEWildcard();
 };

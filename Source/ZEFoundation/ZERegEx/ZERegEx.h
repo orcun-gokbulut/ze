@@ -69,28 +69,14 @@ class ZERegEx
 		void*			Code;
 
 	public:
-		bool			IsValid();	
+		bool			IsValid() const;	
 
 		bool			Compile(const ZEString& RegEx, ZERegExFlags Flags = ZE_REF_NONE);
 
-		bool			Match(const ZEString& Input);
-		bool			Match(const ZEString& Input, ZERegExMatch& Match, ZERegExFlags Flags = ZE_REF_NONE, ZERegExMatch* OldMatch = NULL);
+		bool			Match(const ZEString& Input) const;
+		bool			Match(const ZEString& Input, ZERegExMatch& Match, ZERegExFlags Flags = ZE_REF_NONE, ZERegExMatch* OldMatch = NULL) const;
 
 						ZERegEx();
 						ZERegEx(const ZEString& RegEx, ZERegExFlags Flags = ZE_REF_NONE);
 						~ZERegEx();
-};
-
-class ZEWildcard
-{
-	private:
-		ZEString		Pattern;
-
-	public:
-		bool			Compile(const ZEString& Pattern);
-		bool			Match(const ZEString& Input);
-
-						ZEWildcard();
-						ZEWildcard(const ZEString& Pattern);
-						~ZEWildcard();
 };

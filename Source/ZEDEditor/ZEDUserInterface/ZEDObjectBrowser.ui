@@ -37,7 +37,7 @@
     </widget>
    </item>
    <item>
-    <widget class="ZEDObjectTree" name="trwObjects"/>
+    <widget class="QTreeView" name="trwObjects"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -72,13 +72,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ZEDObjectTree</class>
-   <extends>QTreeWidget</extends>
-   <header>ZEDObjectTree.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
