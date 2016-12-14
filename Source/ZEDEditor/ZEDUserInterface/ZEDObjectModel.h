@@ -53,13 +53,6 @@ enum ZEDObjectTreeMode
 	ZED_OTM_TREE
 };
 
-// Read Only
-	// Tree
-	// List
-
-// Write
-// Drag and Drop Support
-
 class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 {
 	private:
@@ -102,16 +95,26 @@ class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 	private: /* Events */
 		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
 
+	private: /* QAbstractItemModel */
+		ZEDObjectWrapper*				indexList(ZEDObjectWrapper* Target, int Row, int& Index) const;
+		int								rowCountList(ZEDObjectWrapper* Root) const;
+		bool							dropMimeDataInternal(const QMimeData* Data, Qt::DropAction Action, int Row, int Column, const QModelIndex& Parent, bool Operation) const;
+
 	public: /* QAbstractItemModel */
-		virtual ZEDObjectWrapper*		indexList(ZEDObjectWrapper* Target, int Row, int& Index) const;
 		virtual QModelIndex				index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 		virtual QModelIndex				parent(const QModelIndex &child) const override;
 		virtual bool					hasChildren(const QModelIndex &parent = QModelIndex()) const;
-		virtual int						rowCountList(ZEDObjectWrapper* Root) const;
 		virtual int						rowCount(const QModelIndex &parent = QModelIndex()) const override;
 		virtual int						columnCount(const QModelIndex &parent = QModelIndex()) const override;
 		virtual QVariant				data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 		virtual QVariant				headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+		virtual Qt::ItemFlags			flags(const QModelIndex &index) const;
+		virtual QStringList				mimeTypes() const override;
+		virtual QMimeData*				mimeData(const QModelIndexList& Indexes) const override;
+		virtual bool					canDropMimeData(const QMimeData* Data, Qt::DropAction Action, int row, int Ccolumn, const QModelIndex& Parent) const override;
+		virtual bool					dropMimeData(const QMimeData* Data, Qt::DropAction Action,	int row, int Column, const QModelIndex& Parent) override;
+		virtual Qt::DropActions			supportedDropActions() const override;
+		virtual Qt::DropActions			supportedDragActions() const override;
 
 										ZEDObjectModel();
 };

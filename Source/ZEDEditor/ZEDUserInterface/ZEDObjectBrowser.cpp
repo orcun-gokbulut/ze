@@ -36,16 +36,11 @@
 #include "ZEDObjectBrowser.h"
 
 #include "ZEDObjectModel.h"
+#include "ZEDObjectSelectionModel.h"
 #include "ZEDCore\ZEDEditor.h"
 #include "ZEDCore\ZEDObjectWrapper.h"
 #include "ZEDCore\ZEDObjectManager.h"
 #include "ui_ZEDObjectBrowser.h"
-
-#include <QEvent.h>
-#include <QDrag>
-#include <QMimeData>
-#include <QTreeWidget>
-
 
 bool ZEDObjectBrowser::InitializeInternal()
 {
@@ -53,21 +48,23 @@ bool ZEDObjectBrowser::InitializeInternal()
 		return false;
 
 	GetEditor()->AddComponent(Model);
+	GetEditor()->AddComponent(SelectionModel);
 
 	return true;
 }
 
 bool ZEDObjectBrowser::DeinitializeInternal()
 {
+	GetEditor()->RemoveComponent(SelectionModel);
 	GetEditor()->RemoveComponent(Model);
-
+	
 	return ZEDWindow::DeinitializeInternal();
 }
 
 void ZEDObjectBrowser::UpdateUI()
 {
 	if (Form->txtSearch->text().isEmpty())
-		Model->SetMode(ZED_OTM_LIST);
+		Model->SetMode(ZED_OTM_TREE);
 	else
 		Model->SetMode(ZED_OTM_LIST);
 
@@ -83,170 +80,6 @@ void ZEDObjectBrowser::UpdateUI()
 	}
 
 	Form->btnDelete->setEnabled(!RootSelected);
-}
-
-bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
-{
-	/*
-	if (Object != Form->trwObjects->viewport())
-		return false;
-
-	if (Event->type() == QEvent::MouseButtonPress)
-	{
-		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
-		if ((MouseEvent->buttons() & Qt::LeftButton) == 0)
-			return false;
-
-		QTreeWidgetItem* Item = Form->trwObjects->itemAt(MouseEvent->pos());
-		if (Item == NULL)
-			return false;
-
-		DragWrapper = Form->trwObjects->GetWrapper(Item);
-		if (DragWrapper == NULL)
-			return false;
-
-		DragStartPos = MouseEvent->pos();
-
-		return false;
-	}
-	else if (Event->type() == QEvent::MouseMove)
-	{
-		if (DragWrapper == NULL)
-			return false;
-
-		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
-
-		if ((MouseEvent->pos() - DragStartPos).manhattanLength() < QApplication::startDragDistance())
-			return false;
-
-		QMimeData* MimeData = new QMimeData;
-		MimeData->setData("application/x.zinek.zeobjectwrapper", QByteArray((const char*)&DragWrapper, sizeof(ZEDObjectWrapper)));
-
-		QDrag* Drag = new QDrag(this);
-		Drag->setMimeData(MimeData);
-
-		Qt::DropAction Action = Drag->exec();
-
-		return false;
-	}
-	if (Event->type() == QEvent::DragEnter)
-	{
-		QDragEnterEvent* DragEvent = static_cast<QDragEnterEvent*>(Event);
-		
-		if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper") || 
-			DragEvent->mimeData()->hasFormat("application/x.zinek.zeclass") ||
-			DragEvent->mimeData()->hasFormat("application/x.zinek.zeasset"))
-		{
-			DragEvent->acceptProposedAction();
-			return true;
-		}
-
-		return false;
-	}
-	else if (Event->type() == QEvent::DragMove)
-	{
-		QDragMoveEvent* DragEvent = static_cast<QDragMoveEvent*>(Event);
-
-		QTreeWidgetItem* Item = Form->trwObjects->itemAt(DragEvent->pos());
-		if (Item == NULL)
-			return false;
-
-		ZEDObjectWrapper* TargetWrapper = Form->trwObjects->GetWrapper(Item);
-		if (TargetWrapper == NULL)
-			return false;
-
-		if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper"))
-		{
-			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DragEvent->mimeData()->data("application/x.zinek.zeobjectwrapper").data();
-			
-			if (ObjectWrapper == TargetWrapper)
-				return false;
-
-			if (ObjectWrapper->GetParent() == TargetWrapper)
-				return false;
-
-			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetObjectClass()))
-				return false;
-
-			DragEvent->acceptProposedAction();
-			return true;
-		}
-		else if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeclass"))
-		{
-			ZEClass* Class = *(ZEClass**)DragEvent->mimeData()->data("application/x.zinek.zeclass").data();
-			
-			if (Class->IsAbstract())
-				return false;
-				
-			if (!TargetWrapper->CheckChildrenClass(Class))
-				return false;
-
-			DragEvent->acceptProposedAction();
-			return true;
-		}
-		else if (DragEvent->mimeData()->hasFormat("application/x.zinek.zeassert"))
-		{
-			// Later
-			return false;
-		}
-	}
-	else if (Event->type() == QEvent::Drop)
-	{
-		QDropEvent* DropEvent = static_cast<QDropEvent*>(Event);
-
-		QTreeWidgetItem* TargetItem = Form->trwObjects->itemAt(DropEvent->pos());
-		if (TargetItem == NULL)
-			return false;
-
-		ZEDObjectWrapper* TargetWrapper = Form->trwObjects->GetWrapper(TargetItem);
-		if (TargetWrapper == NULL)
-			return false;
-
-		if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeobjectwrapper"))
-		{
-			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DropEvent->mimeData()->data("application/x.zinek.zeobjectwrapper").data();
-			
-			if (ObjectWrapper == TargetWrapper)
-				return false;
-
-			if (ObjectWrapper->GetParent() == TargetWrapper)
-				return false;
-
-			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetObjectClass()))
-				return false;
-			
-			DropEvent->acceptProposedAction();
-
-			GetEditor()->GetObjectManager()->RelocateObject(TargetWrapper, ObjectWrapper);
-
-			return true;
-		}
-		else if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeclass"))
-		{
-			ZEClass* Class = *(ZEClass**)DropEvent->mimeData()->data("application/x.zinek.zeclass").data();
-
-			if (Class->IsAbstract())
-				return false;
-
-			if (!TargetWrapper->CheckChildrenClass(Class))
-				return false;
-
-			DropEvent->acceptProposedAction();
-			
-			GetEditor()->GetObjectManager()->CreateObject(TargetWrapper, Class);
-
-			return true;
-		}
-		else if (DropEvent->mimeData()->hasFormat("application/x.zinek.zeasset"))
-		{
-			// Later
-			return false;
-		}
-
-		return false;
-	}
-	*/
-	return false;
 }
 
 void ZEDObjectBrowser::trwObjects_itemSelectionChanged(const QItemSelection&, const QItemSelection&)
@@ -292,13 +125,16 @@ ZEDObjectBrowser::ZEDObjectBrowser()
 	Form->setupUi(Widget);
 
 	Model = new ZEDObjectModel();
-	Model->SetMode(ZED_OTM_LIST);
+	Model->SetMode(ZED_OTM_TREE);
+	SelectionModel = new ZEDObjectSelectionModel(Model);
+	SelectionModel->setSelectionBehavior(QAbstractItemView::SelectRows);
 	Form->trwObjects->setModel(Model);
+	Form->trwObjects->setSelectionModel(SelectionModel);
 	Form->trwObjects->setDragEnabled(true);
 	Form->trwObjects->header()->setStretchLastSection(false);
 	Form->trwObjects->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 	Form->trwObjects->setSelectionBehavior(QAbstractItemView::SelectRows);
-	Form->trwObjects->setSelectionMode(QAbstractItemView::SingleSelection);
+	Form->trwObjects->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	Form->trwObjects->setAlternatingRowColors(true);
 	Form->trwObjects->setDragEnabled(true),
 	Form->trwObjects->setAcceptDrops(true);

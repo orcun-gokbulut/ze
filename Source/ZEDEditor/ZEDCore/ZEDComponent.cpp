@@ -130,7 +130,7 @@ ZEDComponent::~ZEDComponent()
 		Editor->RemoveComponent(this);
 }
 
-ZEDEditor* ZEDComponent::GetEditor()
+ZEDEditor* ZEDComponent::GetEditor() const
 {
 	return Editor;
 }
