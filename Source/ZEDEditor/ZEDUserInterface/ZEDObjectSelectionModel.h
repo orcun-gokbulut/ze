@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDComponent.h
+ Zinek Engine - ZEDObjectSelectionModel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,30 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-#include "ZEDestroyable.h"
+#include "ZEDCore/ZEDComponent.h"
 
-class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDObjectEvent;
-class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
-class ZEDAssetEvent;
+#include <QItemSelectionModel>
+#include <QAbstractItemView>
 
-class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZEDObjectWrapper;
+
+class ZEDObjectSelectionModel : public QItemSelectionModel, public ZEDComponent
 {
-	ZE_OBJECT
-	friend class ZEDEditor;
+	Q_OBJECT
 	private:
-		ZEDEditor*						Editor;
+		bool							HandlingEvent;
+		QAbstractItemView::SelectionBehavior SelectionBehavior;
+		QModelIndex						FindIndex(const QModelIndex& Parent, ZEDObjectWrapper* Wrapper, int Column);
+		void							SelectionEvent(const ZEDSelectionEvent* Event) override;
+		void							UpdateSelection();
 
-	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent& Event);
-
-		void							RaiseEvent(const ZEDEvent* Event);
-	
-										ZEDComponent();
-		virtual							~ZEDComponent();
+	private slots:
+		void							this_selectionChanged(const QItemSelection& Selected, const QItemSelection& Deselected);
 
 	public:
-		ZEDEditor*						GetEditor() const;
+		void							setSelectionBehavior(QAbstractItemView::SelectionBehavior Behavior);
+		QAbstractItemView::SelectionBehavior selectionBehavior() const;
+
+		explicit						ZEDObjectSelectionModel(QAbstractItemModel* Model = Q_NULLPTR);
+		explicit						ZEDObjectSelectionModel(QAbstractItemModel* Model, QObject* Parent);
 };

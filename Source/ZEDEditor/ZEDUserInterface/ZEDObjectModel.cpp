@@ -41,8 +41,10 @@
 #include "ZEDCore/ZEDSelectionEvent.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDCore/ZEDObjectEvent.h"
+#include "ZEDCore/ZEDObjectManager.h"
 
 #include <QIcon>
+#include <QMimeData>
 
 bool ZEDObjectModel::Filter(ZEDObjectWrapper* Wrapper) const
 {
@@ -297,7 +299,8 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 			if (!FilterHierarchy(Wrapper))
 				return;
 
-			beginInsertRows(createIndex(0, 0, Wrapper->GetParent()), Wrapper->GetParent()->GetChildWrappers().GetCount(), Wrapper->GetParent()->GetChildWrappers().GetCount());
+			ZESize Index = Wrapper->GetParent()->GetChildWrappers().GetCount();
+			beginInsertRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
 		}
 		else if (Mode == ZED_OTM_LIST)
 		{
@@ -321,7 +324,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 				return;
 
 			ZESSize Index = Wrapper->GetParent()->GetChildWrappers().FindIndex(Wrapper);
-			beginRemoveRows(createIndex(0, 0, Wrapper->GetParent()), Index, Index);
+			beginRemoveRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
 		}
 		else if (Mode == ZED_OTM_LIST)
 		{
@@ -373,6 +376,99 @@ ZEDObjectWrapper* ZEDObjectModel::indexList(ZEDObjectWrapper* Wrapper, int Row, 
 	}
 
 	return NULL;
+}
+
+int ZEDObjectModel::rowCountList(ZEDObjectWrapper* Wrapper) const
+{
+	int Count = (Filter(Wrapper) ? 1 : 0);
+
+	const ZEArray<ZEDObjectWrapper*>& ChildWrappers =  Wrapper->GetChildWrappers();
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		Count += rowCountList(ChildWrappers[I]);
+	}
+
+	return Count;
+}
+
+bool ZEDObjectModel::dropMimeDataInternal(const QMimeData* Data, Qt::DropAction Action, int Row, int Column, const QModelIndex& Parent, bool Operation) const
+{
+	ZEDObjectWrapper* Destination = ConvertToWrapper(index(Row, Column, Parent));
+	if (Destination == NULL)
+		return false;
+
+	if (Data->hasFormat("application/x.zinek.zeobjectwrapper"))
+	{
+		QByteArray Array = Data->data("application/x.zinek.zeobjectwrapper");
+		ZEDObjectWrapper** Wrappers = (ZEDObjectWrapper**)Array.data();
+		ZESize WrapperCount = Data->data("application/x.zinek.zeobjectwrapper").size() / sizeof(ZEDObjectWrapper*);
+
+		if (WrapperCount == 0)
+			return false;
+
+		if (Action == Qt::MoveAction)
+		{
+			for (ZESize I = 0; I < WrapperCount; I++)
+			{
+				if (Destination == Wrappers[I])
+					return false;
+
+				if (!Destination->CheckChildrenClass(Wrappers[I]->GetObjectClass()))
+					return false;
+			}
+
+			if (Operation)
+			{
+				ZEArray<ZEDObjectWrapper*> SourceWrappers;
+				SourceWrappers.AddMultiple(Wrappers, WrapperCount);
+				GetEditor()->GetObjectManager()->RelocateObjects(Destination, SourceWrappers);
+			}
+
+			return true;
+		}
+		else if (Action == Qt::CopyAction)
+		{
+			for (ZESize I = 0; I < WrapperCount; I++)
+			{
+				if (!Destination->CheckChildrenClass(Wrappers[I]->GetObjectClass()))
+					return false;
+			}
+
+
+			if (Operation)
+			{
+				ZEArray<ZEDObjectWrapper*> SourceWrappers;
+				SourceWrappers.AddMultiple(Wrappers, WrapperCount);
+				GetEditor()->GetObjectManager()->CloneObjects(SourceWrappers);
+				GetEditor()->GetObjectManager()->RelocateObjects(Destination, SourceWrappers);
+			}
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if (Data->hasFormat("application/x.zinek.zeclass"))
+	{
+		if (Action != Qt::CopyAction)
+			return false;
+
+		ZEClass* Class = *(ZEClass**)Data->data("application/x.zinek.zeclass").data();
+		if (Class->IsAbstract())
+			return false;
+
+		if (!Destination->CheckChildrenClass(Class))
+			return false;
+
+		if (Operation)
+			GetEditor()->GetObjectManager()->CreateObject(Destination, Class);
+
+		return true;
+	}
+
+	return false;
 }
 
 QModelIndex ZEDObjectModel::index(int Row, int Column, const QModelIndex& Parent) const
@@ -471,19 +567,6 @@ bool ZEDObjectModel::hasChildren(const QModelIndex& Parent) const
 	}
 	
 	return false;
-}
-
-int ZEDObjectModel::rowCountList(ZEDObjectWrapper* Wrapper) const
-{
-	int Count = (Filter(Wrapper) ? 1 : 0);
-		
-	const ZEArray<ZEDObjectWrapper*>& ChildWrappers =  Wrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-	{
-		Count += rowCountList(ChildWrappers[I]);
-	}
-
-	return Count;
 }
 
 int ZEDObjectModel::rowCount(const QModelIndex& Parent) const
@@ -585,6 +668,67 @@ QVariant ZEDObjectModel::headerData(int Section, Qt::Orientation Orientation, in
 	}
 
 	return QVariant();
+}
+
+Qt::ItemFlags ZEDObjectModel::flags(const QModelIndex& Index) const
+{
+	ZEDObjectWrapper* Wrapper = ConvertToWrapper(Index);
+	if (Wrapper == NULL)
+		return QAbstractItemModel::flags(Index);
+
+	Qt::ItemFlags Flags = QAbstractItemModel::flags(Index) | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled; 
+	Flags &= (Wrapper->GetSelectable() && Wrapper->GetFrozen() ? ~Qt::ItemIsSelectable : ~0);
+	return Flags;
+}
+
+QStringList ZEDObjectModel::mimeTypes() const
+{
+	QStringList List;
+	List << "application/x.zinek.zeclass";
+	List << "application/x.zinek.zeobjectwrapper";
+	List << "application/x.zinek.zeasset";
+	return List;
+}
+
+QMimeData* ZEDObjectModel::mimeData(const QModelIndexList& Indexes) const
+{
+	QByteArray Array;
+
+	for (ZESize I = 0; I < Indexes.count(); I++)
+	{
+		if (Indexes[I].column() != 0)
+			continue;
+
+		ZEDObjectWrapper* Wrapper = ConvertToWrapper(Indexes[I]);
+		if (Wrapper == NULL)
+			continue;
+		
+		Array.append((const char*)(&Wrapper), sizeof(ZEDObjectWrapper*));
+	}
+
+	QMimeData* Data = new QMimeData();
+	Data->setData("application/x.zinek.zeobjectwrapper", Array);
+	return Data;
+}
+
+bool ZEDObjectModel::canDropMimeData(const QMimeData* Data, Qt::DropAction Action, int Row, int Column, const QModelIndex& Parent) const
+{
+	return dropMimeDataInternal(Data, Action, Row, Column, Parent, false);
+}
+
+bool ZEDObjectModel::dropMimeData(const QMimeData* Data, Qt::DropAction Action,	int Row, int Column, const QModelIndex& Parent)
+{
+	return dropMimeDataInternal(Data, Action, Row, Column, Parent, true);
+}
+
+Qt::DropActions ZEDObjectModel::supportedDropActions() const
+{
+	return Qt::CopyAction | Qt::MoveAction;
+}
+
+Qt::DropActions ZEDObjectModel::supportedDragActions() const
+{
+	return Qt::CopyAction | Qt::MoveAction;
 }
 
 ZEDObjectModel::ZEDObjectModel()

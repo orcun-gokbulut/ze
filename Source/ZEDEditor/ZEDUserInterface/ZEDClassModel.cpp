@@ -227,9 +227,6 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 	}
 	else if (Mode == ZED_CMM_LIST)
 	{
-		if (!Parent.isValid())
-			return QModelIndex();
-
 		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
