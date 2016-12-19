@@ -53,8 +53,6 @@ class ZEDObjectBrowser : public ZEDWindow
 		Ui_ZEDObjectBrowser*				Form;
 		ZEDObjectModel*						Model;
 		ZEDObjectSelectionModel*			SelectionModel;
-		QPoint								DragStartPos;
-		ZEDObjectWrapper*					DragWrapper;
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();

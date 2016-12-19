@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,81 +35,55 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
+#include "ZEDEvent.h"
 
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
-
-
-class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
-class ZEDAssetManager;
-
-class ZEDAssetMetaData
+ZE_ENUM(ZEDAssetEventType)
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
+	ZED_AET_ASSET_ADDING,
+	ZED_AET_ASSET_ADDED,
+	ZED_AET_ASSET_REMOVING,
+	ZED_AET_ASSET_REMOVED,
+	ZED_AET_ASSET_CATEGORY_CHANGING,
+	ZED_AET_ASSET_CATEGORY_CHANGED,
+	ZED_AET_ASSET_FILE_MODIFIED,
+	ZED_AET_ASSET_PREVIEW_DATA_CHANGED,
+
+	ZED_AET_DIRECTORY_ADDING,
+	ZED_AET_DIRECTORY_ADDED,
+	ZED_AET_DIRECTORY_REMOVING,
+	ZED_AET_DIRECTORY_REMOVED,
+
+	ZED_AET_CATEGORY_ADDING,
+	ZED_AET_CATEGORY_ADDED,
+	ZED_AET_CATEGORY_REMOVING,
+	ZED_AET_CATEGORY_REMOVED,
 };
 
-class ZEDAsset : public ZEObject
+class ZEDAsset;
+class ZEDAssetDirectory;
+class ZEDAssetCategory;
+
+class ZEDAssetEvent : public ZEDEvent
 {
 	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
-	friend class ZEDAssetManager;
 	private:
-		ZEDAssetManager*						Manager;
-
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
-
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
-
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
-
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+		ZEDAssetEventType						Type;
+		void*									Pointer;
+		ZEString								Path;
 
 	public:
-		ZEDAssetManager*						GetManager() const;
+		void									SetType(ZEDAssetEventType Type);
+		ZEDAssetEventType						GetType() const;
+
+		void									SetAsset(ZEDAsset* Asset);
+		ZEDAsset*								GetAsset() const;
+
+		void									SetDirectory(ZEDAssetDirectory* Asset);
 		ZEDAssetDirectory*						GetDirectory() const;
+
+		void									SetCategory(ZEDAssetCategory* Asset);
 		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
-
-		ZEString								GetIconPath();
-
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
-
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
+		void									SetPath(const ZEString& Path);
+		const ZEString&							GetPath() const;
 };

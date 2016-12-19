@@ -34,34 +34,72 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDAsset.h"
-#include "ZEFile\ZEFileInfo.h"
+
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEDAssetDirectory.h"
+#include "ZEDAssetCategory.h"
+#include "ZEDAssetType.h"
 #include "ZEDAssetManager.h"
 
-ZEUInt ZEDAsset::GetHash() const
+ZEDAsset::ZEDAsset() : DirectoryLink(this), CategoryLink(this), TypeLink(this)
 {
-	return Hash;
+	Manager = NULL;
+	Directory = NULL;
+	Category = NULL;
+	Type = NULL;
+	FileSize = 0;
+	ModificationTime = 0;
 }
 
-void ZEDAsset::SetType(ZEDAssetType* Type)
+ZEDAsset::~ZEDAsset()
 {
-	this->Type = Type;
+	if (GetDirectory() != NULL)
+		GetDirectory()->Assets.Remove(&DirectoryLink);
+
+	if (GetCategory() != NULL)
+		GetCategory()->Assets.Remove(&CategoryLink);
+
+	if (GetType() != NULL)
+		GetType()->Assets.Remove(&TypeLink);
 }
 
-void ZEDAsset::SetPath(const ZEString& Path)
+ZEDAssetManager* ZEDAsset::GetManager() const
 {
-	if (this->Path == Path)
-		return;
+	return Manager;
+}
 
-	this->Path = ZEFileInfo(Path).Normalize();
-	this->Hash = this->Path.Hash();
-
-	ZEPathInfo PathInfo(Path);
-	ModificationTime = PathInfo.GetModificationTime();
+ZEDAssetDirectory* ZEDAsset::GetDirectory() const
+{
+	return Directory;
 }
 
 ZEString ZEDAsset::GetPath() const
 {
-	return Path;
+	if (GetDirectory() != NULL)
+		return ZEFormat::Format("{0}/{1}", GetDirectory()->GetPath(), GetName());
+	else
+		return GetName();
+}
+
+ZEDAssetCategory* ZEDAsset::GetCategory() const
+{
+	return Category;
+}
+
+ZEString ZEDAsset::GetCategoryPath() const
+{
+	return CategoryPath;
+}
+
+void ZEDAsset::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZEDAsset::GetName() const
+{
+	return Name;
 }
 
 ZEDAssetType* ZEDAsset::GetType() const
@@ -69,14 +107,9 @@ ZEDAssetType* ZEDAsset::GetType() const
 	return Type;
 }
 
-void ZEDAsset::SetCategory(const ZEString& Category)
+ZEString ZEDAsset::GetIconPath()
 {
-	this->Category = Category;
-}
-
-const ZEString& ZEDAsset::GetCategory() const
-{
-	return Category;
+	return ZEString::Empty;
 }
 
 void ZEDAsset::SetTags(const ZEArray<ZEString>& Tags)
@@ -89,19 +122,17 @@ const ZEArray<ZEString>& ZEDAsset::GetTags() const
 	return Tags;
 }
 
-ZETimeStamp ZEDAsset::GetModificationTime()
+ZESize ZEDAsset::GetFileSize() const
+{
+	return FileSize;
+}
+
+ZETimeStamp ZEDAsset::GetModificationTime() const
 {
 	return ModificationTime;
 }
 
-ZEDAsset::ZEDAsset()
+ZEDAssetMetaData ZEDAsset::GetMetaData() const
 {
-	Type = NULL;
-	Hash = 0;
-	ModificationTime = 0;
-}
-
-ZEDAsset::~ZEDAsset()
-{
-
+	return ZEDAssetMetaData();
 }

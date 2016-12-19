@@ -299,7 +299,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 			if (!FilterHierarchy(Wrapper))
 				return;
 
-			ZESize Index = Wrapper->GetParent()->GetChildWrappers().GetCount();
+			int Index = (int)Wrapper->GetParent()->GetChildWrappers().GetCount();
 			beginInsertRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
 		}
 		else if (Mode == ZED_OTM_LIST)
@@ -476,7 +476,12 @@ QModelIndex ZEDObjectModel::index(int Row, int Column, const QModelIndex& Parent
 	if (Mode == ZED_OTM_TREE)
 	{
 		if (!Parent.isValid())
-			return (RootWrapper != NULL ? createIndex(Row, Column, RootWrapper) : QModelIndex());
+		{
+			if (Row != 0)
+				return QModelIndex();
+
+			return (RootWrapper != NULL ? createIndex(0, Column, RootWrapper) : QModelIndex());
+		}
 
 		ZEDObjectWrapper* ParentWrapper = ConvertToWrapper(Parent);
 		if (ParentWrapper == NULL)
@@ -693,8 +698,7 @@ QStringList ZEDObjectModel::mimeTypes() const
 QMimeData* ZEDObjectModel::mimeData(const QModelIndexList& Indexes) const
 {
 	QByteArray Array;
-
-	for (ZESize I = 0; I < Indexes.count(); I++)
+	for (int I = 0; I < Indexes.count(); I++)
 	{
 		if (Indexes[I].column() != 0)
 			continue;

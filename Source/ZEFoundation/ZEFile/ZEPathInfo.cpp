@@ -76,6 +76,11 @@ bool ZEPathInfo::Normalize(ZEPathTokenizer& Tokenizer)
 	return true;
 }
 
+void ZEPathInfo::NormalizeSelf()
+{
+	Path = Normalize();
+}
+
 void ZEPathInfo::SetPath(const char* Path)
 {
 	this->Path = Path;
@@ -176,7 +181,7 @@ bool ZEPathInfo::IsInsidePackage() const
 	return false;
 }
 
-bool ZEPathInfo::IsParent(const char* ParentPath) const
+bool ZEPathInfo::IsParentOf(const char* ParentPath) const
 {
 	ZEPathTokenizer PathTokens;
 	PathTokens.Tokenize(GetRealPath().Path);
@@ -197,7 +202,35 @@ bool ZEPathInfo::IsParent(const char* ParentPath) const
 		const char* ParentToken = ParentPathTokens.GetToken(I);
 		const char* PathToken = PathTokens.GetToken(I);
 
-		if (strcmp(ParentToken, PathToken) != 0)
+		if (stricmp(ParentToken, PathToken) != 0)
+			return false;
+	}
+
+	return true;
+}
+
+bool ZEPathInfo::IsChildOf(const char* ChildPath) const
+{
+	ZEPathTokenizer PathTokens;
+	PathTokens.Tokenize(GetRealPath().Path);
+	if (!Normalize(PathTokens))
+		return false;
+
+	ZEPathTokenizer ChildPathTokens;
+	ZEPathInfo ChildPathInfo(ChildPath);
+	ChildPathTokens.Tokenize(ChildPathInfo.GetRealPath().Path);
+	if (!Normalize(ChildPathTokens))
+		return false;
+
+	if (PathTokens.GetTokenCount() > ChildPathTokens.GetTokenCount())
+		return false;
+
+	for (ZESize I = 0; I < PathTokens.GetTokenCount(); I++)
+	{
+		const char* ParentToken = ChildPathTokens.GetToken(I);
+		const char* PathToken = PathTokens.GetToken(I);
+
+		if (stricmp(ParentToken, PathToken) != 0)
 			return false;
 	}
 
@@ -216,6 +249,9 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 	if (!Normalize(ParentPathTokens))
 		return "";
 
+	if (PathTokens.GetTokenCount() < ParentPathTokens.GetTokenCount())
+		return "";
+	
 	for (ZESize I = 0; I < ParentPathTokens.GetTokenCount(); I++)
 	{
 		const char* ParentToken = ParentPathTokens.GetToken(I);

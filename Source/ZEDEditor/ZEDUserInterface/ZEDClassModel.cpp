@@ -65,9 +65,9 @@ bool ZEDClassModel::Filter(ZEClass* Class) const
 
 	if (ExcludeFilter.GetCount() != 0)
 	{
-		for (ZESize I = 0; I < IncludeFilter.GetCount(); I++)
+		for (ZESize I = 0; I < ExcludeFilter.GetCount(); I++)
 		{
-			if (ZEClass::IsDerivedFrom(IncludeFilter[I], Class))
+			if (ZEClass::IsDerivedFrom(ExcludeFilter[I], Class))
 				return false;
 		}
 	}

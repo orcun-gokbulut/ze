@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetModelColumn.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAssetModelColumn.h"
 
-#include "ZEMeta/ZEObject.h"
-
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
-
-
-class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
-class ZEDAssetManager;
-
-class ZEDAssetMetaData
+void ZEDAssetModelColumn::SetType(ZEDAssetModelColumnType Type)
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
-};
+	this->Type = Type;
+}
 
-class ZEDAsset : public ZEObject
+ZEDAssetModelColumnType ZEDAssetModelColumn::GetType() const
 {
-	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
-	friend class ZEDAssetManager;
-	private:
-		ZEDAssetManager*						Manager;
+	return Type;
+}
 
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
+void ZEDAssetModelColumn::SetHeaderText(const ZEString& Text)
+{
+	this->HeaderText = Text;
+}
 
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
+const ZEString& ZEDAssetModelColumn::GetHeaderText() const
+{
+	return HeaderText;
+}
 
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
+void ZEDAssetModelColumn::SetAlignmnent(Qt::Alignment Alignment)
+{
+	this->Alignment = Alignment;
+}
 
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+Qt::Alignment ZEDAssetModelColumn::GetAlignmnent() const
+{
+	return Alignment;
+}
 
-	public:
-		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+void ZEDAssetModelColumn::SetSelectable(bool Selectable)
+{
+	this->Selectable = Selectable;
+}
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
+bool ZEDAssetModelColumn::GetSelectable() const
+{
+	return Selectable;
+}
 
-		ZEString								GetIconPath();
+void ZEDAssetModelColumn::SetCustomPropertyName(const ZEString& Name)
+{
+	this->CustomPropertyName = Name;
+}
 
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
+const ZEString& ZEDAssetModelColumn::GetCustomPropertyName() const
+{
+	return CustomPropertyName;
+}
 
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
-};
+ZEDAssetModelColumn::ZEDAssetModelColumn()
+{
+	Type = ZED_AMHT_NONE;
+	Alignment = Qt::AlignLeft | Qt::AlignVCenter;
+	Selectable = false;
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetDirectory.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,81 +35,46 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
+#include "ZEMeta\ZEObject.h"
 
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
+#include "ZEDS\ZEString.h"
+#include "ZEDS\ZEList2.h"
 
-
+class ZEDAsset;
 class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
 class ZEDAssetManager;
 
-class ZEDAssetMetaData
-{
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
-};
-
-class ZEDAsset : public ZEObject
+class ZEDAssetDirectory : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
+	friend class ZEDAsset;
 	friend class ZEDAssetManager;
 	private:
 		ZEDAssetManager*						Manager;
-
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
-
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
-
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
-
+		ZEDAssetDirectory*						ParentDirectory;	
+		ZELink<ZEDAssetDirectory>				ParentDirectoryLink;
 		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+		ZEList2<ZEDAsset>						Assets;
+		ZEList2<ZEDAssetDirectory>				SubDirectories;
+
+												ZEDAssetDirectory();
+		virtual									~ZEDAssetDirectory();
 
 	public:
 		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+		ZEDAssetDirectory*						GetParentDirectory() const;
+		ZEString								GetPath() const;
 
 		void									SetName(const ZEString& Name);
 		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
 
-		ZEString								GetIconPath();
+		const ZEList2<ZEDAsset>&				GetAssets() const;
+		ZEDAsset*								NewAsset(ZEDAssetType* Type, const ZEString& Name);
+		bool									DeleteAsset(ZEDAsset* Asset);
+		bool									CopyAsset(ZEDAsset* Asset, ZEDAssetDirectory* Destination, const ZEString& Rename = ZEString::Empty);
+		bool									MoveAsset(ZEDAsset* Asset, ZEDAssetDirectory* Destination, const ZEString& Rename = ZEString::Empty);
 
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
-
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
+		const ZEList2<ZEDAssetDirectory>&		GetSubDirectories() const;
+		ZEDAssetDirectory*						AddSubDirectory(const ZEString& Name);
+		bool									RemoveSubDirectory(ZEDAssetDirectory* Directory);
 };

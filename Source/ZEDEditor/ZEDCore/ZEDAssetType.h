@@ -41,17 +41,7 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEString.h"
-#include "ZEDS\ZELink.h"
 #include "ZEDS\ZEList2.h"
-#include "ZEDS\ZEFlags.h"
-#include "ZEThread\ZEThread.h"
-
-
-class QWidget;
-class ZEDEditor;
-class ZEDAssetPreviewWidget;
-class ZEDAssetThumbnailWidget;
-class ZEDObjectWrapper;
 
 ZE_ENUM(ZEDAssetEditorType)
 {
@@ -68,22 +58,35 @@ ZE_ENUM(ZEDAssetTypeCapability)
 	ZED_ATC_WRAPPER
 };
 
+class ZEDEditor;
+class ZEDObjectWrapper;
+class QWidget;
+
 typedef ZEFlagsBase<ZEDAssetTypeCapability> ZEDAssetTypeCapabilities;
 
 class ZEDAssetType : public ZEObject
 {
 	ZE_OBJECT
+	friend class ZEDAsset;
+	friend class ZEDAssetManager;
+	private:
+		ZEList2<ZEDAsset>						Assets;
+
+	protected:
+												ZEDAssetType();
+		virtual									~ZEDAssetType();
+
 	public:
 		virtual const char*						GetName() const;
 		virtual const char* const*				GetExtensions() const;
 		virtual ZESize							GetExtensionCount() const;
 
+		const ZEList2<ZEDAsset>&				GetAssets() const;
+
 		virtual ZEDAssetEditorType				GetEditorType();
 		virtual ZEArray<ZEClass*>				GetSupportedEditors();
 
 		virtual ZEDAssetTypeCapabilities		GetCapabilities();
-		virtual QWidget*						CreateThumbnailWidget() const;
-		virtual QWidget*						CreatePreviewWidget() const;
 		virtual ZEDEditor*						CreateEditor() const;
 		virtual ZEDObjectWrapper*				CreateWrapper(ZEClass* EditorClass) const;
 
@@ -92,5 +95,5 @@ class ZEDAssetType : public ZEObject
 		virtual void							UpdateCategory(const ZEString& Path, const ZEString& Category);
 		virtual void							UpdateTags(const ZEString& Path, const ZEArray<ZEString> Tags);
 		
-		virtual bool							Wrap(ZEDAsset* Asset, const ZEString& Path);
+		virtual ZEDAsset*						Wrap(const ZEString& Path);
 };

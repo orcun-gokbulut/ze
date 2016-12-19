@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetDirectory.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,90 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAssetDirectory.h"
 
-#include "ZEMeta/ZEObject.h"
+#include "ZEDAsset.h"
+#include "ZEDS\ZEFormat.h"
 
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
-
-
-class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
-class ZEDAssetManager;
-
-class ZEDAssetMetaData
+ZEDAssetDirectory::ZEDAssetDirectory() : ParentDirectoryLink(this)
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
-};
+	Manager = NULL;
+	ParentDirectory = NULL;
+}
 
-class ZEDAsset : public ZEObject
+ZEDAssetDirectory::~ZEDAssetDirectory()
 {
-	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
-	friend class ZEDAssetManager;
-	private:
-		ZEDAssetManager*						Manager;
+	while (Assets.GetCount() != 0)
+		delete Assets.GetFirst()->GetItem();
 
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
+	while (SubDirectories.GetCount() != 0)
+		delete SubDirectories.GetFirst()->GetItem();
+}
 
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
+ZEDAssetManager* ZEDAssetDirectory::GetManager() const
+{
+	return Manager;
+}
 
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
+ZEDAssetDirectory* ZEDAssetDirectory::GetParentDirectory() const
+{
+	return ParentDirectory;
+}
 
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+void ZEDAssetDirectory::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
 
-	public:
-		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+const ZEString& ZEDAssetDirectory::GetName() const
+{
+	return Name;
+}
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
+ZEString ZEDAssetDirectory::GetPath() const
+{
+	if (GetParentDirectory() == NULL)
+		return Name;
+	else
+		return ZEFormat::Format("{0}/{1}", GetParentDirectory(), Name);
+}
 
-		ZEString								GetIconPath();
+const ZEList2<ZEDAsset>& ZEDAssetDirectory::GetAssets() const
+{
+	return Assets;
+}
 
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
+ZEDAsset* ZEDAssetDirectory::NewAsset(ZEDAssetType* Type, const ZEString& Name)
+{
+	return NULL;
+}
 
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
-};
+bool ZEDAssetDirectory::DeleteAsset(ZEDAsset* Asset)
+{
+	return false;
+}
+
+bool ZEDAssetDirectory::CopyAsset(ZEDAsset* Asset, ZEDAssetDirectory* Destination, const ZEString& Rename)
+{
+	return false;
+}
+
+bool ZEDAssetDirectory::MoveAsset(ZEDAsset* Asset, ZEDAssetDirectory* Destination, const ZEString& Rename)
+{
+	return false;
+}
+
+const ZEList2<ZEDAssetDirectory>& ZEDAssetDirectory::GetSubDirectories() const
+{
+	return SubDirectories;
+}
+
+ZEDAssetDirectory* ZEDAssetDirectory::AddSubDirectory(const ZEString& Name)
+{
+	return NULL;
+}
+
+bool ZEDAssetDirectory::RemoveSubDirectory(ZEDAssetDirectory* Directory)
+{
+	return false;
+}
