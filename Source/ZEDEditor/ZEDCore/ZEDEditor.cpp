@@ -352,6 +352,11 @@ ZEUIManager* ZEDEditor::GetUIManager()
 	return UIManager;
 }
 
+ZEDAssetManager* ZEDEditor::GetAssetManager()
+{
+	return AssetManager;
+}
+
 void ZEDEditor::AddComponent(ZEDComponent* Component)
 {
 	zeCheckError(Component->Editor != NULL, ZE_VOID, "Component is already registered to a module.");

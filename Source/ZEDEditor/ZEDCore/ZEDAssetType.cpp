@@ -35,6 +35,17 @@
 
 #include "ZEDAssetType.h"
 
+ZEDAssetType::ZEDAssetType()
+{
+
+}
+
+ZEDAssetType::~ZEDAssetType()
+{
+	while (Assets.GetCount() != 0)
+		Assets.Remove(Assets.GetFirst());
+}
+
 const char* ZEDAssetType::GetName() const
 {
 	return "";
@@ -50,6 +61,11 @@ ZESize ZEDAssetType::GetExtensionCount() const
 	return 0;
 }
 
+const ZEList2<ZEDAsset>& ZEDAssetType::GetAssets() const
+{
+	return Assets;
+}
+
 ZEDAssetEditorType ZEDAssetType::GetEditorType()
 {
 	return ZED_AET_NONE;
@@ -63,16 +79,6 @@ ZEArray<ZEClass*> ZEDAssetType::GetSupportedEditors()
 ZEDAssetTypeCapabilities ZEDAssetType::GetCapabilities()
 {
 	return ZED_ATC_NONE;
-}
-
-QWidget* ZEDAssetType::CreateThumbnailWidget() const
-{
-	return NULL;
-}
-
-QWidget* ZEDAssetType::CreatePreviewWidget() const
-{
-	return NULL;
 }
 
 ZEDEditor* ZEDAssetType::CreateEditor() const
@@ -100,7 +106,7 @@ void ZEDAssetType::UpdateTags(const ZEString& Path, const ZEArray<ZEString> Tags
 
 }
 
-bool ZEDAssetType::Wrap(ZEDAsset* Asset, const ZEString& Path)
+ZEDAsset* ZEDAssetType::Wrap(const ZEString& Path)
 {
 	return false;
 }

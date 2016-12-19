@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetEvent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAssetEvent.h"
 
-#include "ZEMeta/ZEObject.h"
-
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
-
-
-class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
-class ZEDAssetManager;
-
-class ZEDAssetMetaData
+void ZEDAssetEvent::SetType(ZEDAssetEventType Type)
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
-};
+	this->Type = Type;
+}
 
-class ZEDAsset : public ZEObject
+ZEDAssetEventType ZEDAssetEvent::GetType() const
 {
-	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
-	friend class ZEDAssetManager;
-	private:
-		ZEDAssetManager*						Manager;
+	return Type;
+}
 
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
+void ZEDAssetEvent::SetAsset(ZEDAsset* Asset)
+{
+	Pointer = Asset;
+}
 
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
+ZEDAsset* ZEDAssetEvent::GetAsset() const
+{
+	return static_cast<ZEDAsset*>(Pointer);
+}
 
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
+void ZEDAssetEvent::SetDirectory(ZEDAssetDirectory* Directory)
+{
+	Pointer = Directory;
+}
 
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+ZEDAssetDirectory* ZEDAssetEvent::GetDirectory() const
+{
+	return static_cast<ZEDAssetDirectory*>(Pointer);
+}
 
-	public:
-		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+void ZEDAssetEvent::SetCategory(ZEDAssetCategory* Category)
+{
+	Pointer = Category;
+}
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
+ZEDAssetCategory* ZEDAssetEvent::GetCategory() const
+{
+	return static_cast<ZEDAssetCategory*>(Pointer);
+}
 
-		ZEString								GetIconPath();
-
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
-
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
-};
+void ZEDAssetEvent::SetPath(const ZEString& Path)
+{
+	this->Path = Path;
+}
+const ZEString& ZEDAssetEvent::GetPath() const
+{
+	return Path;
+}

@@ -78,13 +78,15 @@ class ZEPathInfo
 		bool						IsDirectory() const;
 		bool						IsInsidePackage() const;
 
-		bool						IsParent(const char* ParentPath) const;
+		bool						IsParentOf(const char* ParentPath) const;
+		bool						IsChildOf(const char* ParentPath) const;
 		ZEString					GetRelativeTo(const char* ParentPath) const;
 
 		ZETimeStamp					GetCreationDate() const;
 		ZETimeStamp					GetModificationTime() const;
 
 		ZEString					Normalize();
+		void						NormalizeSelf();
 
 		bool						Equals(const ZEPathInfo& OtherPath) const;
 

@@ -35,21 +35,36 @@
 
 #include "ZEDAssetBrowser.h"
 
+#include "ZEDS/ZEFormat.h"
+#include "ZEDAssetModel.h"
+#include "ZEDCore/ZEDEditor.h"
 #include "ui_ZEDAssetBrowser.h"
+
+bool ZEDAssetBrowser::InitializeInternal()
+{
+	if (!ZEDWindow::InitializeInternal())
+		return false;
+
+	GetEditor()->AddComponent(Model);
+
+	return true;
+}
+
+bool ZEDAssetBrowser::DeinitializeInternal()
+{
+	GetEditor()->RemoveComponent(Model);
+
+	return ZEDWindow::DeinitializeInternal();
+}
 
 void ZEDAssetBrowser::txtSearch_textChanged(const QString& Text)
 {
-	Form->trwAssets->SetSearchPattern(Text);
+	Model->SetSearchPattern(ZEFormat::Format("*{0}*", Text.toUtf8().begin()));
 }
 
 void ZEDAssetBrowser::cmbCategories_currentIndexChanged(const QString& text)
 {
 
-}
-
-ZEDAssetTree* ZEDAssetBrowser::GetAssetTree()
-{
-	return Form->trwAssets;
 }
 
 ZEDAssetBrowser::ZEDAssetBrowser()
@@ -61,7 +76,35 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 
 	Form = new Ui_ZEDAssetBrowser();
 	Form->setupUi(Widget);
-	Form->trwAssets->Update();
+
+	Model = new ZEDAssetModel();
+	Model->SetMode(ZED_AMM_TREE);
+	Model->SetHierarcy(ZED_AMH_DIRECTORY);
+	ZEArray<ZEDAssetModelColumn> ModelColumns;
+	ModelColumns.SetCount(4);
+	ModelColumns[0].SetType(ZED_AMHT_NAME);
+	ModelColumns[0].SetHeaderText("Name");
+	ModelColumns[0].SetSelectable(true);
+	ModelColumns[1].SetType(ZED_AMHT_TYPE);
+	ModelColumns[1].SetHeaderText("Type");
+	ModelColumns[1].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
+	ModelColumns[2].SetType(ZED_AMHT_SIZE);
+	ModelColumns[2].SetHeaderText("Size");
+	ModelColumns[2].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
+	ModelColumns[3].SetType(ZED_AMHT_LAST_MODIFICATION_TIME);
+	ModelColumns[3].SetHeaderText("Modified");
+	ModelColumns[3].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
+	Model->SetColumns(ModelColumns);
+
+	Form->trwAssets->setModel(Model);
+	Form->trwAssets->setDragEnabled(true);
+	Form->trwAssets->header()->setStretchLastSection(false);
+	Form->trwAssets->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	Form->trwAssets->setSelectionBehavior(QAbstractItemView::SelectItems);
+	Form->trwAssets->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	Form->trwAssets->setAlternatingRowColors(true);
+	Form->trwAssets->setDragEnabled(true),
+	
 
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
 	connect(Form->cmbCategories, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbCategories_currentIndexChanged(const QString&)));

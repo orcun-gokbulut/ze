@@ -37,8 +37,8 @@
 
 #include "ZEDWindow.h"
 
+class ZEDAssetModel;
 class Ui_ZEDAssetBrowser;
-class ZEDAssetTree;
 
 class ZEDAssetBrowser : public ZEDWindow
 {
@@ -46,14 +46,16 @@ class ZEDAssetBrowser : public ZEDWindow
 	private:
 		QWidget*							Widget;
 		Ui_ZEDAssetBrowser*					Form;
+		ZEDAssetModel*						Model;
+
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
 
 	private slots:
 		void								txtSearch_textChanged(const QString& Text);
 		void								cmbCategories_currentIndexChanged(const QString& Text);
 
 	public:
-		ZEDAssetTree*						GetAssetTree();
-
 											ZEDAssetBrowser();
 											~ZEDAssetBrowser();
 };

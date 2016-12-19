@@ -48,41 +48,16 @@
 class ZEDAsset;
 class ZEDAssetType;
 
-ZE_ENUM(ZEDAssetEventType)
+enum ZEDAssetCrawlerReplayType
 {
-	ZED_AET_ASSET_ADDED,
-	ZED_AET_ASSET_REMOVED,
-	ZED_AET_ASSET_CHANGED,
-	ZED_AET_ASSET_CATEGORY_REMOVED,
-	ZED_AET_ASSET_CATEGORY_ADDED,
-	ZED_AET_ASSET_CATEGORY_CHANGED
+	ZED_ACRT_ADD,
+	ZED_ACRT_DELETE
 };
 
-class ZEDAssetEvent : public ZEDEvent
+class ZEDAssetCrawlerRecord
 {
-	public:
-		ZEDAssetEventType						Type;
-		ZEString								Path;
-};
-
-class ZEDAssetCategory
-{
-	friend class ZEDAssetManager;
-	private:
-		ZEDAssetCategory*						Parent;
-		ZEString								Name;
-		ZESize									Count;
-		ZEArray<ZEDAsset*>						Assets;
-		ZEArray<ZEDAssetCategory*>				SubCatagories;
-
-		ZEString								GetPath();
-};
-
-class ZEDAssetTag
-{
-	private:
-		ZEString								Name;
-		ZEArray<ZEDAsset*>						Assets;
+	bool Delete;
+	ZEDAsset* Asset;
 };
 
 class ZEDAssetManager : public ZEDComponent
@@ -90,65 +65,65 @@ class ZEDAssetManager : public ZEDComponent
 	ZE_OBJECT
 	private:
 		ZEArray<ZEDAssetType*>					AssetTypes;
-		ZESmartArray<ZEDAsset*>					Assets;
-		ZEArray<ZEDAssetCategory*>				Categories;
-
-		ZERegEx									MatchCategoryLast;
-		ZERegEx									MatchCategoryFirst;
-		ZERegEx									MatchCategorySingle;
-
+		ZEDAssetDirectory*						DirectoryRoot;
+		ZEDAssetCategory*						CategoryRoot;
 		ZEThread								CrawlerThread;
+		void*									MonitorThreadHandle;
 		ZEThread								MonitorThread;
-		ZEArray<ZEString>						CrawlLocations;
+		ZEArrayMT<ZEString>						CrawlLocations;
+		ZESmartArrayMT<ZEDAssetCrawlerRecord>	CrawlerRecords;
 
 		ZEString								ResourcePath;
 
-		void									UpdateCachedAsset(const ZEString& Path);
-
+		void									Crawl();
 		void									CrawlerFunction(ZEThread* Thread, void* ExtraParameters);
 		void									MonitorFunction(ZEThread* Thread, void* ExtraParameters);
 
-		void									AddAssetToCache(ZEDAsset* Asset);
-		void									RemoveAssetFromCache(ZEDAsset* Asset);
-		void									UpdateAssetInCache(ZESize Index, const ZEDAsset& Asset);
+		void									UpdateCachedAsset(const ZEString& Path);
 
-		ZEDAssetCategory*						GetCategory(const ZEString& Category);
-		ZEDAssetCategory*						AddCategory(const ZEString& Category);
+		ZEDAsset*								CreateAsset(const ZEString& Path);
+		void									RemoveAsset(ZEDAsset* Asset);
+
+		ZEDAssetDirectory*						CreateDirectory(const ZEString& DirectoryPath);
+		void									RemoveDirectory(ZEDAssetDirectory* Directory);
+
+		ZEDAssetCategory*						CreateCategory(const ZEString& CategoryPath);
 		void									RemoveCategory(ZEDAssetCategory* Category);
-		void									AddAssetToCategory(ZEDAsset* Asset);
-		void									RemoveAssetFromCategory(ZEDAsset* Asset);
-		void									GetCategoriesInternal(ZESmartArray<ZEString>& Output, ZEDAssetCategory* CurrentPath, const ZEString& ParentPathString, bool Recursive);
 
-		const ZEDAssetTag*						GetTag(const ZEString& Name) const;
-		void									AddTag(const ZEString& Name);
-		void									RemoveTag(const ZEString& Name);
-		void									AddAssetToTags(ZEDAsset* Asset);
-		void									RemoveAssetFromTags(ZEDAsset* Asset);
+		void									SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Category);
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 
 		void									Clear();
 
+		virtual void							TickEvent(const ZEDTickEvent* Event) override;
+
 												ZEDAssetManager();
 		virtual									~ZEDAssetManager();
 
 	public:
-		const ZEArray<const ZEDAssetType*>&		GetAssetTypes();
-		void									RegisterAssetType(ZEDAssetType* AssetType);
-		void									UnregisterAssetType(ZEDAssetType* AssetType);
-
 		void									SetResourcePath(const ZEString& ResourceDirectory);
 		const ZEString&							GetResourcePath();
 
-		ZESmartArray<ZEString>					GetCategories(const ZEString& CategoryPath = ZEString::Empty, bool Recursive = false);
-		const ZESmartArray<const ZEDAsset*>&	GetAssetsInCache();
-		ZESmartArray<ZEDAsset>					GetAssetsInDirectory(const ZEString& DirectoryPath, bool Recursive = false, bool IncludeNonAsset = false);
-		ZESmartArray<ZEDAsset>					GetAssetsInCategory(const ZEString& CategoryPath, bool Recursive = false);
-		ZESmartArray<ZEDAsset>					GetAssetsByTags(const ZEArray<ZEString>& Tags);
-		
-		void									UpdateAssetCache(const ZEString& Path);
-		bool									WrapAsset(ZEDAsset* Asset, const ZEString& Path);
+		const ZEArray<const ZEDAssetType*>&		GetAssetTypes();
+		ZEDAssetType*							GetAssetType(const ZEString& Path);
+		void									RegisterAssetType(ZEDAssetType* AssetType);
+		void									UnregisterAssetType(ZEDAssetType* AssetType);
+
+		ZEDAssetDirectory*						GetDirectoryRoot();
+		ZEDAssetCategory*						GetCategoryRoot();
+
+		ZEDAsset*								GetAsset(const ZEString& AssetPath);
+		ZEDAssetDirectory*						GetDirectory(const ZEString& DirectoryPath);
+		ZEDAssetCategory*						GetCategory(const ZEString& CategoryPath);
+
+		ZEDAsset*								ScanFile(const ZEString& FilePath);
+		ZEDAssetDirectory*						ScanDirectory(const ZEString& DirectoryPath, bool Recursive = false);
+
+		void									UpdatePath(const ZEString& FilePath); // Parallel
+
+		virtual void							Process();
 
 		static ZEDAssetManager*					CreateInstance();
 };

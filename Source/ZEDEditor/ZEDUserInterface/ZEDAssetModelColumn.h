@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAssetTree.h
+ Zinek Engine - ZEDAssetModelColumn.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,50 +35,47 @@
 
 #pragma once
 
-#include <QTreeWidget>
+#include "ZEDS\ZEString.h"
+#include "qnamespace.h"
 
-class ZEDObjectWrapper;
-class ZEDSelectionManager;
-
-enum ZEDAssetTreeMode
+enum ZEDAssetModelColumnType
 {
-	ZED_ATM_NONE,
-	ZED_ATM_LIST,
-	ZED_ATM_TREE,
+	ZED_AMHT_NONE,
+	ZED_AMHT_NAME,
+	ZED_AMHT_TYPE,
+	ZED_AMHT_PATH,
+	ZED_AMHT_PARENT,
+	ZED_AMHT_SIZE,
+	ZED_AMHT_LAST_MODIFICATION_TIME,
+	ZED_AMHT_CATEGORY,
+	ZED_AMHT_TAGS,
+	ZED_AMHT_CUSTOM_PROPERTY
 };
 
-class ZEDAssetTree : public QTreeWidget
+class ZEDAssetModelColumn
 {
-	Q_OBJECT
 	private:
-		QString							Path;
-		QString							Extensions;
-		ZEDAssetTreeMode				Mode;
-		QRegExp							SearchPattern;
-		QRegExp							ExtensionPattern;
-
-		bool							Filter(const QString& FileName);
-
-		void							UpdateList();
-		void							UpdateDirectoryTree(const QString& Path, QTreeWidgetItem* PathItem);
-		void							UpdateCatagoryTree(const QString& CategoryPath, QTreeWidgetItem* CategoryItem);
+		ZEDAssetModelColumnType					Type;
+		ZEString								HeaderText;
+		Qt::Alignment							Alignment;
+		ZEString								CustomPropertyName;
+		bool									Selectable;
 
 	public:
-		void							SetPath(const QString& Path);
-		const QString&					GetPath() const;
+		void									SetType(ZEDAssetModelColumnType Type);
+		ZEDAssetModelColumnType					GetType() const;
 
-		void							SetExtensions(const QString& Extensions);
-		QString							GetExtensions() const;
+		void									SetHeaderText(const ZEString& Text);
+		const ZEString&							GetHeaderText() const;
 
-		void							SetMode(ZEDAssetTreeMode Mode);
-		ZEDAssetTreeMode				GetMode() const;
+		void									SetAlignmnent(Qt::Alignment);
+		Qt::Alignment							GetAlignmnent() const;
 
-		void							SetSearchPattern(const QString& Text);
-		QString							GetSearchPattern() const;
+		void									SetSelectable(bool Selectable);
+		bool									GetSelectable() const;
 
-		QString							GetSelectedPath() const;
+		void									SetCustomPropertyName(const ZEString& Name);
+		const ZEString&							GetCustomPropertyName() const;
 
-		void							Update();
-
-										ZEDAssetTree(QWidget* Parent = 0);
+												ZEDAssetModelColumn();
 };

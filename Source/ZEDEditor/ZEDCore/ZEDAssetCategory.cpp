@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAsset.h
+ Zinek Engine - ZEDAssetCategory.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAssetCategory.h"
 
-#include "ZEMeta/ZEObject.h"
+#include "ZEDS/ZEFormat.h"
 
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZELink.h"
-
-
-class ZEDAssetType;
-class ZEDAssetDirectory;
-class ZEDAssetCategory;
-class ZEDAssetManager;
-
-class ZEDAssetMetaData
+ZEDAssetCategory::ZEDAssetCategory()
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
-};
+	Manager = NULL;
+	ParentCategory = NULL;
+	Persistent = false;
+}
 
-class ZEDAsset : public ZEObject
+ZEDAssetCategory::~ZEDAssetCategory()
 {
-	ZE_OBJECT
-	friend class ZEDAssetCategory;
-	friend class ZEDAssetDirectory;
-	friend class ZEDAssetManager;
-	private:
-		ZEDAssetManager*						Manager;
+	while (Assets.GetCount() != 0)
+		Assets.Remove(Assets.GetFirst());
 
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
+	while (SubCatagories.GetCount() != 0)
+		delete SubCatagories.GetFirst()->GetItem();
+}
 
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
+ZEDAssetManager* ZEDAssetCategory::GetManager() const
+{
+	return Manager;
+}
 
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
+ZEDAssetCategory* ZEDAssetCategory::GetParentCategory() const
+{
+	return ParentCategory;
+}
 
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
-	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+ZEString ZEDAssetCategory::GetPath() const
+{
+	if (GetParentCategory() == NULL)
+		return Name;
+	else
+		return ZEFormat::Format("{0}/{1}", GetParentCategory()->GetName(), Name);
+}
 
-	public:
-		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+void ZEDAssetCategory::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
-		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
+const ZEString& ZEDAssetCategory::GetName() const
+{
+	return Name;
+}
 
-		ZEString								GetIconPath();
+void ZEDAssetCategory::SetPersistent(bool Persistent)
+{
+	this->Persistent = Persistent;
+}
 
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
+bool ZEDAssetCategory::GetPersistent()
+{
+	return Persistent;
+}
 
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
-};
+const ZEList2<ZEDAsset>& ZEDAssetCategory::GetAssets() const
+{
+	return Assets;
+}
+
+const ZEList2<ZEDAssetCategory>& ZEDAssetCategory::GetSubCatagories() const
+{
+	return SubCatagories;
+}

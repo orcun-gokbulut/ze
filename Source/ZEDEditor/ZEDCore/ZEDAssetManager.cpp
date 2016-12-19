@@ -37,18 +37,24 @@
 
 #include "ZEDAsset.h"
 #include "ZEDAssetType.h"
-
+#include "ZEDAssetDirectory.h"
+#include "ZEDAssetCategory.h"
+#include "ZERandom.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEFile/ZEPathTokenizer.h"
 #include "ZERegEx/ZERegEx.h"
+
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include "ZEDAssetEvent.h"
 
+#undef CreateDirectory
+#undef RemoveDirectory
 
-#include "ZERandom.h"
 class ZEDTextureAssetType : public ZEDAssetType
 {
 	virtual const char* GetName() const 
@@ -67,11 +73,11 @@ class ZEDTextureAssetType : public ZEDAssetType
 		return 7;
 	}
 	
-	virtual bool Wrap(ZEDAsset* Asset, const ZEString& Path)
+	virtual ZEDAsset* Wrap(const ZEString& Path)
 	{
-		Asset->SetType(this);
-		Asset->SetPath(Path);
-		
+		return new ZEDAsset();
+
+		/*	
 		switch(ZERandom::GetInt() % 10)
 		{
 			case 0:
@@ -101,15 +107,18 @@ class ZEDTextureAssetType : public ZEDAssetType
 			case 6:
 				Asset->SetCategory("SSS ");
 				break;
-		}
+		}*/
 
-		return true;
+		return NULL;
 	}
 };
 
 void ZEDAssetManager::UpdateCachedAsset(const ZEString& Path)
 {
-	ZEPathInfo PathInfo(Path);
+	GetDirectory(Path);
+	CreateDirectory(Path);
+
+	/*ZEPathInfo PathInfo(Path);
 	ZEString PathNormalized = PathInfo.Normalize();
 	ZEUInt PathHash = PathNormalized.Hash();
 	
@@ -162,6 +171,23 @@ void ZEDAssetManager::UpdateCachedAsset(const ZEString& Path)
 		}
 	}
 	Assets.UnlockWrite();
+	*/
+}
+
+void ZEDAssetManager::Crawl()
+{
+	if (CrawlLocations.GetCount() == 0)
+		return;
+
+	ZEString Location = CrawlLocations.Pop();
+	if (ZEDirectoryInfo(Location).IsDirectory())
+	{
+		ScanDirectory(Location, true);
+	}
+	else
+	{
+		ScanFile(Location);
+	}
 }
 
 void ZEDAssetManager::CrawlerFunction(ZEThread* Thread, void* ExtraParameters)
@@ -170,33 +196,25 @@ void ZEDAssetManager::CrawlerFunction(ZEThread* Thread, void* ExtraParameters)
 	{
 		if (CrawlLocations.GetCount() == 0)
 		{
-			Sleep(200);
+			Sleep(500);
 			continue;
 		}
 
-		ZEString Location = CrawlLocations.Pop();
-		if (ZEDirectoryInfo(Location).IsDirectory())
-		{
-			ZEArray<ZEDAsset> Assets = GetAssetsInDirectory(Location, true, false);
-			for (ZESize I = 0; I < Assets.GetCount(); I++)
-				UpdateCachedAsset(Assets[I].GetPath());
-		}
-		else
-		{
-			UpdateCachedAsset(Location);
-		}
+		Crawl();
 	}
 }
 
 void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 {
+	MonitorThreadHandle = GetCurrentThread();
+
 	ZEString ResourcePathOwn = ResourcePath;
 	HANDLE NotificationHandle = NULL;
 	HANDLE ChangeListHandle = NULL;
 
 	while (Thread->ControlPoint())
 	{
-		if (NotificationHandle == NULL || ResourcePathOwn != ResourcePath)
+		if (ChangeListHandle == NULL || ResourcePathOwn != ResourcePath)
 		{
 			if (NotificationHandle != NULL)
 			{
@@ -211,7 +229,6 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 			}
 
 			ZEString ResourcePathReal = ZEDirectoryInfo(ResourcePath).GetRealPath().Path;
-
 			ChangeListHandle = CreateFile(ResourcePathReal, FILE_LIST_DIRECTORY, 
 				FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
 				NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
@@ -223,18 +240,29 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 				continue;
 			}
 
+			/*NotificationHandle = FindFirstChangeNotification(ResourcePathReal, TRUE, 
+				FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | 
+				FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE |
+				FILE_NOTIFY_CHANGE_LAST_WRITE);*/
+
 			ResourcePathOwn = ResourcePath;
 		}
 
+		/*HRESULT WaitResult = WaitForSingleObject(NotificationHandle, 500);
+		if (WaitResult == WAIT_TIMEOUT)
+			continue;
+		else if (WaitResult == WAIT_ABANDONED)
+			continue;*/
 
+		OVERLAPPED Overlapped;
 		FILE_NOTIFY_INFORMATION FileNotifyInfos[1024];
 		DWORD FileNotifyInfoCount = 0;
-		BOOL Result = ReadDirectoryChangesW(ChangeListHandle, FileNotifyInfos, sizeof(FileNotifyInfos), TRUE, 
+		BOOL ReadChangeResult = ReadDirectoryChangesW(ChangeListHandle, FileNotifyInfos, sizeof(FileNotifyInfos), TRUE, 
 			FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | 
 			FILE_NOTIFY_CHANGE_CREATION | FILE_NOTIFY_CHANGE_SIZE |
 			FILE_NOTIFY_CHANGE_LAST_WRITE, &FileNotifyInfoCount, NULL, NULL);
 
-		if (!Result)
+		if (!ReadChangeResult)
 			continue;
 		
 		CrawlLocations.LockWrite();
@@ -269,309 +297,189 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 	}
 }
 
-void ZEDAssetManager::AddAssetToCache(ZEDAsset* Asset)
+ZEDAsset* ZEDAssetManager::CreateAsset(const ZEString& Path)
 {
-	Assets.LockWriteNested();
-	{
-		Assets.Add(Asset);
+	ZEPathInfo PathInfo(Path);
+	PathInfo.NormalizeSelf();
 
-		ZEDAssetEvent Event;
-		Event.Type = ZED_AET_ASSET_ADDED;
-		Event.Path = Asset->GetPath();
-		RaiseEvent(&Event);
-
-		AddAssetToCategory(Asset);
-		AddAssetToTags(Asset);
-	}
-	Assets.UnlockWrite();
-}
-
-void ZEDAssetManager::RemoveAssetFromCache(ZEDAsset* Asset)
-{
-	Assets.LockWriteNested();
-	{
-		ZESSize Index = Assets.FindIndex(Asset);
-		if (Index == -1)
-		{
-			Assets.UnlockWrite();
-			return;
-		}
-
-		RemoveAssetFromCategory(Asset);
-		RemoveAssetFromTags(Asset);
-	
-		const ZEString& Category = Asset->GetCategory();
-		Assets.Remove(Index);
-
-		ZEDAssetEvent Event;
-		Event.Type = ZED_AET_ASSET_REMOVED;
-		Event.Path = Asset->GetPath();
-		RaiseEvent(&Event);
-	}
-	Assets.UnlockWrite();
-}
-
-
-
-void ZEDAssetManager::UpdateAssetInCache(ZESize Index, const ZEDAsset& Asset)
-{
-	Assets.LockWriteNested();
-	{
-		*Assets[Index] = Asset;
-
-		ZEDAssetEvent Event;
-		Event.Type = ZED_AET_ASSET_CHANGED;
-		Event.Path = Asset.GetPath();
-		RaiseEvent(&Event);
-	}
-	Assets.UnlockWrite();
-
-}
-
-ZEDAssetCategory* ZEDAssetManager::GetCategory(const ZEString& CategoryPath)
-{
-	ZERegExMatch Match;
-	ZEString ParentName;
-	ZEString CategoryName;
-	if (MatchCategoryFirst.Match(CategoryPath, Match, ZE_REF_NO_MATCH_STRING))
-	{
-		ParentName = Match.SubMatches[0].String;
-		CategoryName = Match.SubMatches[1].String;
-	}
-	else
-	{
-		if (MatchCategorySingle.Match(CategoryPath, Match, ZE_REF_NO_MATCH_STRING))
-			CategoryName = Match.SubMatches[0].String;
-		else
-			return NULL;
-	}
-
-	Categories.LockRead();
-	{
-		if (!ParentName.IsEmpty())
-		{
-			ZEDAssetCategory* Parent = GetCategory(ParentName);
-			if (Parent == NULL)
-			{
-				Categories.UnlockRead();
-				return NULL;
-			}
-
-			ZEArray<ZEDAssetCategory*>& SubCatagories = Parent->SubCatagories;
-			for (ZESize I = 0; I < SubCatagories.GetCount(); I++)
-			{
-				if (SubCatagories[I]->Name.EqualsIncase(CategoryName))
-				{
-					Categories.UnlockRead();
-					return const_cast<ZEDAssetCategory*>(SubCatagories[I]);
-				}
-			}
-		}
-		else
-		{
-			for (ZESize I = 0; I < Categories.GetCount(); I++)
-			{
-				if (Categories[I]->Name.EqualsIncase(CategoryName))
-				{
-					Categories.UnlockRead();
-					return Categories[I];
-				}
-			}
-		}
-	}
-	Categories.UnlockRead();
-
-	return NULL;
-}
-
-ZEDAssetCategory* ZEDAssetManager::AddCategory(const ZEString& CategoryPath)
-{
-	ZERegExMatch Match;
-	ZEString ParentPath;
-	ZEString CategoryName;
-	if (MatchCategoryLast.Match(CategoryPath, Match, ZE_REF_NO_MATCH_STRING))
-	{
-		ParentPath = Match.SubMatches[0].String;
-		CategoryName = Match.SubMatches[1].String;
-	}
-	else
-	{
-		if (MatchCategorySingle.Match(CategoryPath, Match, ZE_REF_NO_MATCH_STRING))
-			CategoryName = Match.SubMatches[0].String;
-		else
-			return NULL;
-	}
-
-	if (CategoryName.IsEmpty())
+	ZEDAssetType* AssetType = GetAssetType(PathInfo.GetPath());
+	if (AssetType == NULL)
 		return NULL;
 
-	ZEDAssetCategory* NewCategory = NULL;
-	Categories.LockWriteNested();
+	ZEDAssetDirectory* Directory = CreateDirectory(PathInfo.GetParentDirectory());
+	if (Directory == NULL)
+		return NULL;
+
+	ZEString FileName = PathInfo.GetFileName();
+	ze_for_each(Asset, Directory->GetAssets())
 	{
-		if (!ParentPath.IsEmpty())
+		if (Asset->GetName() == FileName)
+			return Asset.GetPointer();
+	}
+
+	ZEDAsset* NewAsset = AssetType->Wrap(PathInfo.GetPath());
+	if (NewAsset == NULL)
+		return NULL;
+
+	ZEDAssetCategory* Category = CreateCategory(NewAsset->GetCategory());
+	
+	NewAsset->Manager = this;
+	NewAsset->SetName(FileName);
+	NewAsset->Type = AssetType;
+	NewAsset->Directory = Directory;
+	NewAsset->Category = Category;
+
+	ZEDAssetEvent Event;
+	Event.SetType(ZED_AET_ASSET_ADDING);
+	Event.SetAsset(NewAsset);
+	Event.SetPath(PathInfo.GetPath());
+	RaiseEvent(&Event);
+
+	AssetType->Assets.AddEnd(&NewAsset->TypeLink);
+	Directory->Assets.AddEnd(&NewAsset->DirectoryLink);
+	if (Category != NULL)
+		Category->Assets.AddEnd(&NewAsset->CategoryLink);
+
+	Event.SetType(ZED_AET_ASSET_ADDED);
+	RaiseEvent(&Event);
+}
+
+void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
+{
+	ZEDAssetEvent Event;
+	Event.SetType(ZED_AET_ASSET_REMOVING);
+	Event.SetAsset(Asset);
+	Event.SetPath(Asset->GetPath());
+	RaiseEvent(&Event);
+
+	Asset->Directory->Assets.Remove(&Asset->DirectoryLink);
+	Asset->Type->Assets.Remove(&Asset->TypeLink);
+	if (Asset->Category != NULL)
+	{
+		Asset->Category->Assets.Remove(&Asset->CategoryLink);
+		RemoveCategory(Asset->Category);
+	}
+	
+	Event.SetType(ZED_AET_ASSET_REMOVED);
+	RaiseEvent(&Event);
+
+	Asset->Manager = NULL;
+	Asset->Type = NULL;
+	Asset->Directory = NULL;
+	Asset->Category = NULL;
+
+	delete Asset;
+}
+
+ZEDAssetDirectory* ZEDAssetManager::CreateDirectory(const ZEString& DirectoryPath)
+{
+	if (GetDirectoryRoot() == NULL)
+		return NULL;
+
+	ZEString RelativePath = ZEPathInfo(DirectoryPath).GetRelativeTo(DirectoryRoot->GetPath());
+	if (RelativePath.IsEmpty() && !ZEPathInfo::Compare(ResourcePath, DirectoryPath))
+		return NULL;
+
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(RelativePath);
+
+	ZEDAssetDirectory* ParentDirectory = GetDirectoryRoot();
+	for (ZESize I = 0; I < Tokenizer.GetTokenCount(); I++)
+	{
+		bool Found = false;
+		const char* Token = Tokenizer.GetToken(I);
+		ze_for_each(SubDirectory, ParentDirectory->GetSubDirectories())
 		{
-			ZEDAssetCategory* ParentCategory = GetCategory(ParentPath);
-			if (ParentCategory == NULL)
-				ParentCategory = AddCategory(ParentPath);
-
-			if (ParentCategory == NULL)
-				return NULL;
-
-			for (ZESize I = 0; I < ParentCategory->SubCatagories.GetCount(); I++)
+			if (SubDirectory->GetName() == Token)
 			{
-				ZEDAssetCategory* SubCatagory = ParentCategory->SubCatagories[I];
-				if (SubCatagory->Name.EqualsIncase(CategoryName))
-				{
-					Categories.UnlockWrite();
-					return SubCatagory;
-				}
+				ParentDirectory = SubDirectory.GetPointer();
+				Found = true;
+				break;
 			}
-
-			NewCategory = new ZEDAssetCategory();
-			NewCategory->Name = CategoryName;
-			NewCategory->Parent = ParentCategory;
-			ParentCategory->SubCatagories.Add(NewCategory);
-
-			ZEDAssetEvent Event;
-			Event.Type = ZED_AET_ASSET_CATEGORY_ADDED;
-			Event.Path = NewCategory->GetPath();
-			RaiseEvent(&Event);
 		}
-		else
-		{
-			for (ZESize I = 0; I < Categories.GetCount(); I++)
-			{
-				if (Categories[I]->Name.EqualsIncase(CategoryName))
-				{
-					Categories.UnlockWrite();
-					return Categories[I];
-				}
-			}
 
-			NewCategory = new ZEDAssetCategory();
-			NewCategory->Name = CategoryName;
-			NewCategory->Parent = NULL;
-			Categories.Add(NewCategory);
+		if (!Found)
+		{
+			ZEDAssetDirectory* NewDirectory = new ZEDAssetDirectory();
+			NewDirectory->Manager = this;
+			NewDirectory->SetName(Token);
+			NewDirectory->ParentDirectory = ParentDirectory;
 
 			ZEDAssetEvent Event;
-			Event.Type = ZED_AET_ASSET_CATEGORY_ADDED;
-			Event.Path = NewCategory->GetPath();
+			Event.SetType(ZED_AET_DIRECTORY_ADDING);
+			Event.SetDirectory(NewDirectory);
+			Event.SetPath(NewDirectory->GetPath());
 			RaiseEvent(&Event);
+
+			ParentDirectory->SubDirectories.AddEnd(&NewDirectory->ParentDirectoryLink);
+			Event.SetType(ZED_AET_DIRECTORY_ADDED);
+			RaiseEvent(&Event);
+
+			ParentDirectory = NewDirectory;
 		}
 	}
-	Categories.UnlockWrite();
 
-	return NewCategory;
+	return ParentDirectory;
+}
+
+void ZEDAssetManager::RemoveDirectory(ZEDAssetDirectory* Directory)
+{
+	ZEDAssetEvent Event;
+	Event.SetType(ZED_AET_DIRECTORY_REMOVING);
+	Event.SetDirectory(Directory);
+	Event.SetPath(Directory->GetPath());
+	RaiseEvent(&Event);
+
+	const ZELink<ZEDAssetDirectory>* DirectoryLink;
+	while (DirectoryLink = Directory->GetSubDirectories().GetFirst())
+	{
+		RemoveDirectory(DirectoryLink->GetItem());
+		delete DirectoryLink->GetItem();
+	}
+
+	const ZELink<ZEDAsset>* AssetLink;
+	while (AssetLink = Directory->GetAssets().GetFirst())
+	{
+		RemoveAsset(AssetLink->GetItem());
+		delete AssetLink->GetItem();
+	}
+
+	Directory->Manager = NULL;
+	Directory->ParentDirectory = NULL;
+	Directory->ParentDirectory->SubDirectories.Remove(&Directory->ParentDirectoryLink);
+	
+	Event.SetType(ZED_AET_DIRECTORY_REMOVED);
+	RaiseEvent(&Event);
+}
+
+ZEDAssetCategory* ZEDAssetManager::CreateCategory(const ZEString& Path)
+{
+	return NULL;
 }
 
 void ZEDAssetManager::RemoveCategory(ZEDAssetCategory* Category)
 {
-	Categories.LockWriteNested();
-	{
-		ZEString CategoryPath = Category->GetPath();
-		if (Category->Parent != NULL)
-		{
-			Category->Parent->SubCatagories.RemoveValue(Category);
-			if (Category->SubCatagories.GetCount() == 0)
-				RemoveCategory(Category->Parent);
-		}
-		else
-		{
-			Categories.RemoveValue(Category);
-		}
-
-		ZEDAssetEvent Event;
-		Event.Type = ZED_AET_ASSET_CATEGORY_REMOVED;
-		Event.Path = CategoryPath;
-		RaiseEvent(&Event);
-	}
-	Categories.UnlockWrite();
+	
 }
 
-void ZEDAssetManager::AddAssetToCategory(ZEDAsset* Asset)
+void ZEDAssetManager::SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Category)
 {
-	Categories.LockWriteNested();
-	{
-		if (Asset->GetCategory().IsEmpty())
-		{
-			Categories.UnlockWrite();
-			return;
-		}
+	ZEDAssetEvent Event;
+	Event.SetType(ZED_AET_ASSET_CATEGORY_CHANGING);
+	Event.SetPath(Asset->GetPath());
+	Event.SetAsset(Asset);
+	RaiseEvent(&Event);
 
-		ZEDAssetCategory* Category = GetCategory(Asset->GetCategory());
-		if (Category == NULL)
-		{
-			Category = AddCategory(Asset->GetCategory());
-			if (Category == NULL)
-			{
-				Categories.UnlockWrite();
-				return;
-			}
-		}
+	if (Asset->GetCategory() != NULL)
+		Asset->Category->Assets.Remove(&Asset->CategoryLink);
 
-		if (!Category->Assets.Exists(Asset))
-		{
-			Category->Assets.Add(Asset);
-			ZEDAssetEvent Event;
-			Event.Type = ZED_AET_ASSET_CATEGORY_CHANGED;
-			Event.Path = Category->GetPath();
-			RaiseEvent(&Event);
-		}
-	}
-	Categories.UnlockWrite();
-}
+	Asset->Category = Category;
 
-void ZEDAssetManager::RemoveAssetFromCategory(ZEDAsset* Asset)
-{
-	Categories.LockWriteNested();
-	{
-		ZEDAssetCategory* Category = GetCategory(Asset->GetCategory());
-		if (Category == NULL)
-		{
-			Categories.UnlockWrite();
-			return;
-		}
+	if (Category != NULL)
+		Category->Assets.AddEnd(&Asset->CategoryLink);
 
-		ZESSize Index = Category->Assets.FindIndex(Asset);
-		if (Index != -1)
-		{
-			Category->Assets.RemoveValue(Asset);
-
-			ZEDAssetEvent Event;
-			Event.Type = ZED_AET_ASSET_CATEGORY_CHANGED;
-			Event.Path = Category->GetPath();
-			RaiseEvent(&Event);
-
-			if (Category->Assets.GetCount() == 0)
-				RemoveCategory(Category);
-		}
-	}
-	Categories.UnlockWrite();
-}
-
-const ZEDAssetTag* ZEDAssetManager::GetTag(const ZEString& Name) const
-{
-	return NULL;
-}
-
-void ZEDAssetManager::AddTag(const ZEString& Name)
-{
-
-}
-
-void ZEDAssetManager::RemoveTag(const ZEString& Name)
-{
-
-}
-
-void ZEDAssetManager::AddAssetToTags(ZEDAsset* Asset)
-{
-
-}
-
-void ZEDAssetManager::RemoveAssetFromTags(ZEDAsset* Asset)
-{
-
+	Event.SetType(ZED_AET_ASSET_CATEGORY_CHANGED);
+	RaiseEvent(&Event);
 }
 
 bool ZEDAssetManager::InitializeInternal()
@@ -579,9 +487,14 @@ bool ZEDAssetManager::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
+	DirectoryRoot = new ZEDAssetDirectory();
+	DirectoryRoot->SetName(ResourcePath);
+
 	CrawlLocations.Add(ResourcePath);
-	CrawlerThread.Run();
+	//CrawlerThread.Run();
 	MonitorThread.Run();
+
+	Crawl();
 
 	return true;
 }
@@ -590,6 +503,7 @@ bool ZEDAssetManager::DeinitializeInternal()
 {
 	CrawlerThread.Exit();
 	MonitorThread.Exit();
+	CancelSynchronousIo(MonitorThreadHandle);
 
 	Clear();
 
@@ -599,7 +513,7 @@ bool ZEDAssetManager::DeinitializeInternal()
 void ZEDAssetManager::Clear()
 {
 	CrawlLocations.LockWrite();
-	Assets.LockWrite();
+	/*Assets.LockWrite();
 	Categories.LockWrite();
 	{
 		CrawlLocations.Clear();
@@ -608,15 +522,19 @@ void ZEDAssetManager::Clear()
 		Categories.Clear();
 	}
 	Categories.UnlockWrite();
-	Assets.UnlockWrite();
+	Assets.UnlockWrite();*/
 	CrawlLocations.UnlockWrite();
+}
+
+void ZEDAssetManager::TickEvent(const ZEDTickEvent* Event)
+{
+	Crawl();
 }
 
 ZEDAssetManager::ZEDAssetManager()
 {
-	MatchCategoryLast.Compile("^(.*)\\.\\s*(\\w*[\\w\\s]*?\\w*)\\s*$");
-	MatchCategoryFirst.Compile("^\\s*(\\w*[\\w\\s]*?\\w*)\\s*\\.(.*)$");
-	MatchCategorySingle.Compile("^\\s*(\\w*[\\w\\s]*?\\w*)\\s*$");
+	DirectoryRoot = NULL;
+	CategoryRoot = NULL;
 	ResourcePath = "#R:/";
 	CrawlerThread.SetFunction(ZEThreadFunction::Create<ZEDAssetManager, &ZEDAssetManager::CrawlerFunction>(this));
 	MonitorThread.SetFunction(ZEThreadFunction::Create<ZEDAssetManager, &ZEDAssetManager::MonitorFunction>(this));
@@ -643,48 +561,6 @@ const ZEString& ZEDAssetManager::GetResourcePath()
 	return ResourcePath;
 }
 
-void ZEDAssetManager::GetCategoriesInternal(ZESmartArray<ZEString>& Output, ZEDAssetCategory* CurrentPath, const ZEString& CurrentPathString, bool Recursive)
-{
-	ZEString* Buffer = Output.AddMultiple(CurrentPath->SubCatagories.GetCount());
-	for (ZESize I = 0; I < CurrentPath->SubCatagories.GetCount(); I++)
-	{
-		Buffer[I] = CurrentPathString + "." + CurrentPath->SubCatagories[I]->Name;
-		if (Recursive)
-			GetCategoriesInternal(Output, CurrentPath->SubCatagories[I], Buffer[I], true);
-	}
-}
-
-ZESmartArray<ZEString> ZEDAssetManager::GetCategories(const ZEString& CategoryPath, bool Recursive)
-{
-	ZESmartArray<ZEString> Output;
-
-	ZEDAssetCategory* RootPath = NULL;
-	ZEDAssetCategory* CurrentPath = NULL;
-
-	Categories.LockRead();
-	{
-		if (!CategoryPath.IsEmpty())
-		{
-			CurrentPath = GetCategory(CategoryPath);
-			if (CurrentPath == NULL)
-			{
-				Categories.UnlockRead();
-				return Output;
-			}
-
-			GetCategoriesInternal(Output, CurrentPath, "", Recursive);
-		}
-		else
-		{
-			for (ZESize I = 0; I < Categories.GetCount(); I++)
-				GetCategoriesInternal(Output, Categories[I], Categories[I]->Name, Recursive);
-		}
-	}
-	Categories.UnlockRead();
-
-	return Output;
-}
-
 const ZEArray<const ZEDAssetType*>& ZEDAssetManager::GetAssetTypes()
 {
 	return *reinterpret_cast<ZEArray<const ZEDAssetType*>*>(&AssetTypes);
@@ -706,14 +582,184 @@ void ZEDAssetManager::UnregisterAssetType(ZEDAssetType* AssetType)
 	AssetTypes.RemoveValue(AssetType);
 }
 
-void ZEDAssetManager::UpdateAssetCache(const ZEString& Path)
+ZEDAssetDirectory* ZEDAssetManager::GetDirectoryRoot()
+{
+	return DirectoryRoot;
+}
+
+ZEDAssetCategory* ZEDAssetManager::GetCategoryRoot()
+{
+	return CategoryRoot;
+}
+
+ZEDAsset* ZEDAssetManager::GetAsset(const ZEString& AssetPath)
+{
+	ZEFileInfo AssetInfo(AssetPath);
+	
+	ZEDAssetDirectory* Directory = GetDirectory(AssetInfo.GetParentDirectory());
+	if (Directory == NULL)
+		return NULL;
+
+	ZEString FileName = AssetInfo.GetFileName();
+	ze_for_each(Asset, Directory->GetAssets())
+	{
+		if (Asset->GetName() == FileName)
+			return Asset.GetPointer();
+	}
+
+	return NULL;
+}
+
+ZEDAssetDirectory* ZEDAssetManager::GetDirectory(const ZEString& DirectoryPath)
+{
+	if (GetDirectoryRoot() == NULL)
+		return NULL;
+
+	ZEString RelativePath = ZEPathInfo(DirectoryPath).GetRelativeTo(DirectoryRoot->GetPath());
+	if (RelativePath.IsEmpty() && !ZEPathInfo::Compare(ResourcePath, DirectoryPath))
+		return NULL;
+
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(RelativePath);
+
+	ZEDAssetDirectory* ParentDirectory = GetDirectoryRoot();
+	for (ZESize I = 0; I < Tokenizer.GetTokenCount(); I++)
+	{
+		bool Found = false;
+		const char* Token = Tokenizer.GetToken(I);
+		ze_for_each(SubDirectory, ParentDirectory->GetSubDirectories())
+		{
+			if (SubDirectory->GetName() == Token)
+			{
+				ParentDirectory = SubDirectory.GetPointer();
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			return NULL;
+	}
+
+	return ParentDirectory;
+}
+
+ZEDAssetCategory* ZEDAssetManager::GetCategory(const ZEString& CategoryPath)
+{
+	return NULL;
+	/*
+	if (GetCategoryRoot() == NULL)
+		return NULL;
+
+	ZEString RelativePath = ZEPathInfo(CategoryPath).GetRelativeTo(CategoryRoot->GetPath());
+	if (RelativePath.IsEmpty())
+		return NULL;
+
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(RelativePath);
+
+	ZEDAssetCategory* ParentCategory = GetCategoryRoot();
+	for (ZESize I = 0; I < Tokenizer.GetTokenCount(); I++)
+	{
+		bool Found = false;
+		const char* Token = Tokenizer.GetToken(I);
+		ze_for_each(SubCategory, ParentCategory->GetSubCatagories())
+		{
+			if (SubCategory->GetName() != Token)
+				continue;
+
+			ParentCategory = SubCategory.GetPointer();
+			Found = true;
+			break;
+		}
+
+		if (!Found)
+			return NULL;
+	}
+
+	return ParentCategory;*/
+}
+
+ZEDAsset* ZEDAssetManager::ScanFile(const ZEString& FilePath)
+{
+	if (!ZEPathInfo(ResourcePath).IsChildOf(FilePath))
+		return NULL;
+
+	ZEFileInfo FileInfo(FilePath);
+	ZEDAsset* Asset = GetAsset(FilePath);
+	bool Exists = FileInfo.IsExists();
+	if (Asset != NULL)
+	{
+		if (!Exists)
+		{
+			RemoveAsset(Asset);
+			return NULL;
+		}
+		else if (Asset->GetModificationTime() != FileInfo.GetModificationTime())
+		{
+			return CreateAsset(FilePath);
+		}
+		else
+		{
+			return Asset;
+		}
+	}
+	else
+	{
+		if (Exists)
+			return CreateAsset(FilePath);
+	}
+
+	return NULL;
+}
+
+ZEDAssetDirectory* ZEDAssetManager::ScanDirectory(const ZEString& DirectoryPath, bool Recursive)
+{
+	if (!ZEPathInfo(ResourcePath).IsChildOf(DirectoryPath))
+		return NULL;
+
+	ZEDirectoryInfo DirectoryInfo(DirectoryPath);
+	ZEDAssetDirectory* Directory = GetDirectory(DirectoryPath);
+	bool Exists = DirectoryInfo.IsExists();
+	if (Directory != NULL)
+	{
+		if (!Exists)
+		{
+			RemoveDirectory(Directory);
+			return NULL;
+		}
+	}
+	else
+	{
+		if (Exists)
+			Directory = CreateDirectory(DirectoryPath);
+	}
+
+	ZEArray<ZEString> Files = DirectoryInfo.GetFiles();
+	for (ZESize I = 0; I < Files.GetCount(); I++)
+		ScanFile(ZEFormat::Format("{0}/{1}", DirectoryInfo.GetPath(), Files[I]));
+
+	if (Recursive)
+	{
+		ZEArray<ZEString> SubDirectories = DirectoryInfo.GetSubDirectories();
+		for (ZESize I = 0; I < SubDirectories.GetCount(); I++)
+			ScanDirectory(ZEFormat::Format("{0}/{1}", DirectoryInfo.GetPath(), SubDirectories[I]), true);
+	}
+}
+
+void ZEDAssetManager::UpdatePath(const ZEString& Path)
 {
 	CrawlLocations.LockWrite();
 	CrawlLocations.Add(Path);
 	CrawlLocations.UnlockWrite();
 }
 
-bool ZEDAssetManager::WrapAsset(ZEDAsset* Asset, const ZEString& Path)
+void ZEDAssetManager::Process()
+{
+
+}
+
+ZEDAssetType* ZEDAssetManager::GetAssetType(const ZEString& Path)
 {
 	ZEFileInfo Info(Path);
 	ZEString Extension = Info.GetExtension();
@@ -728,87 +774,18 @@ bool ZEDAssetManager::WrapAsset(ZEDAsset* Asset, const ZEString& Path)
 			{
 				if (!Extension.EqualsIncase(Extensions[N]))
 					continue;
-
-				bool Result = AssetTypes[I]->Wrap(Asset, Path);
-
+				
 				AssetTypes.UnlockRead();
-				return Result;
+				return AssetTypes[I];
 			}
 		}
 	}
 	AssetTypes.UnlockRead();
 
-	return false;
-}
-
-const ZESmartArray<const ZEDAsset*>& ZEDAssetManager::GetAssetsInCache()
-{
-	return *reinterpret_cast<ZESmartArray<const ZEDAsset*>*>(&Assets);
-}
-
-ZESmartArray<ZEDAsset> ZEDAssetManager::GetAssetsInDirectory(const ZEString& Directory, bool Recursive, bool IncludeNonAsset)
-{
-	ZESmartArray<ZEDAsset> Output;
-
-	ZEDirectoryInfo DirectoryInfo(Directory);
-	ZEArray<ZEString> Files = DirectoryInfo.GetFiles();
-	for (ZESize I = 0; I < Files.GetCount(); I++)
-	{
-		ZEDAsset Asset;
-		WrapAsset(&Asset, ZEFormat::Format("{0}/{1}", Directory, Files[I]));
-		if (Asset.GetType() == NULL && !IncludeNonAsset)
-			continue;
-
-		Output.Add(Asset);
-	}
-
-	if (Recursive)
-	{
-		ZEArray<ZEString> SubDirectories = DirectoryInfo.GetSubDirectories();
-		for (ZESize I = 0; I < SubDirectories.GetCount(); I++)
-			Output += GetAssetsInDirectory(ZEFormat::Format("{0}/{1}", Directory, SubDirectories[I]), true, IncludeNonAsset);
-	}
-
-	return Output;
-}
-
-ZESmartArray<ZEDAsset> ZEDAssetManager::GetAssetsInCategory(const ZEString& Path, bool Recursive)
-{
-	ZESmartArray<ZEDAsset> Output;
-
-	Assets.LockRead();
-	{
-		ZEDAssetCategory* Category = GetCategory(Path);
-		if (Category == NULL)
-		{
-			Assets.UnlockRead();
-			return Output;
-		}
-
-		ZEDAsset* Buffer = Output.AddMultiple(Category->Assets.GetCount());
-		for (ZESize I = 0; I < Category->Assets.GetCount(); I++)
-			Buffer[I] = *Category->Assets[I];
-
-		if (Recursive)
-		{
-			for (ZESize I = 0; I < Category->SubCatagories.GetCount(); I++)
-				Output += GetAssetsInCategory(Category->SubCatagories[I]->GetPath(), true);
-		}
-	}
-	Assets.UnlockRead();
-
-	return Output;
+	return NULL;
 }
 
 ZEDAssetManager* ZEDAssetManager::CreateInstance()
 {
 	return new ZEDAssetManager();
-}
-
-ZEString ZEDAssetCategory::GetPath()
-{
-	if (Parent == NULL)
-		return Name;
-	else
-		return Parent->GetPath() + "." + Name;
 }
