@@ -176,6 +176,9 @@ bool ZEDViewport::InitializeInternal()
 	Renderer.SetOutputTexture(Window->GetOutput()->GetTexture());
 	Renderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
 
+	ZERNStageRenderDepth* StageRenderDepth = new ZERNStageRenderDepth();
+	Renderer.AddStage(StageRenderDepth);
+
 	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
 	Renderer.AddStage(StageGBuffer);
 
@@ -187,9 +190,6 @@ bool ZEDViewport::InitializeInternal()
 
 	ZERNStageAtmosphere* StageAtmosphere = new ZERNStageAtmosphere();
 	Renderer.AddStage(StageAtmosphere);
-
-	ZERNStageRenderDepth* StageRenderDepth = new ZERNStageRenderDepth();
-	Renderer.AddStage(StageRenderDepth);
 
 	ZERNStageForward* StageForward = new ZERNStageForward();
 	Renderer.AddStage(StageForward);

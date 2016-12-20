@@ -189,7 +189,6 @@ void ZEThread::Destroy()
 		Status = ZE_TS_DESTROYED;
 		ThreadId = 0;
 		delete this;
-		ExitThread(EXIT_SUCCESS);
 		CloseHandleSafe(Handle);
 	}
 	else if (Status == ZE_TS_RUNNING)

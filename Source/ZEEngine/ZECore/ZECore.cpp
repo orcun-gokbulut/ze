@@ -580,9 +580,6 @@ void ZECore::ShutDown()
 
 	Console->Deinitialize();
 	CrashHandler->Deinitialize();
-
-	TerminateProcess(GetCurrentProcess(), EXIT_SUCCESS);
-	exit(0);
 }
 
 #include "ZEPhysics/ZEPhysicalWorld.h"
@@ -603,6 +600,9 @@ void ZECore::MainLoop()
 	
 	GetConsole()->Process();
 	SystemMessageManager->ProcessMessages();
+
+	if (GetCoreState() == ZE_CS_SHUTDOWN)
+		return;
 
 	// Game Logic
 	InputModule->Process();
@@ -687,6 +687,7 @@ ZECore::~ZECore()
 	delete CommandManager;
 	delete Console;
 	delete TimerManager;
+	delete Profiler;
 	delete RealTimeClock;
 	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
 	delete SystemMessageHandler;

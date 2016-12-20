@@ -39,7 +39,9 @@
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNStageID.h"
+#include "ZERNRenderer.h"
 
 #define  ZERN_SRDF_OUTPUT	1
 
@@ -64,11 +66,14 @@ bool ZERNStageRenderDepth::DeinitializeInternal()
 
 void ZERNStageRenderDepth::CreateOutput(const ZEString& Name)
 {
-	if (Name == "OpaqueDepthTexture")
+	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
+
+	if (Name == "DepthTexture")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SRDF_OUTPUT))
 		{
-			OpaqueDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, DepthTexture->GetWidth(), DepthTexture->GetHeight(), 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
+			DepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
 			DirtyFlags.UnraiseFlags(ZERN_SRDF_OUTPUT);
 		}
 	}
@@ -95,11 +100,7 @@ bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	if (GetCommands().GetCount() == 0)
-		return false;
-
-	Context->CopyResource(OpaqueDepthTexture, DepthTexture);
-
+	Context->ClearDepthStencilBuffer(DepthTexture->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
 	Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer());
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
 	
@@ -115,8 +116,7 @@ ZERNStageRenderDepth::ZERNStageRenderDepth()
 {
 	DirtyFlags.RaiseAll();
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OpaqueDepthTexture), "OpaqueDepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED | ZERN_SRCF_CREATE_OWN);
 }
 
 ZERNStageRenderDepth::~ZERNStageRenderDepth()

@@ -56,7 +56,7 @@
 #include "ZEGraphics\ZEGRSampler.h"
 #include "ZERNStageAntiAliasing.h"
 
-ZEHolder<ZEGRBuffer>	ZERNRenderer::InstanceVertexBuffer;
+ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
 
 ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -311,8 +311,10 @@ bool ZERNRenderer::InitializeInternal()
 
 	ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-	if (InstanceVertexBuffer == NULL)
-		InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 8192, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
+	if (::InstanceVertexBuffer == NULL)
+		this->InstanceVertexBuffer = ::InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 8192, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
+	else
+		this->InstanceVertexBuffer = ::InstanceVertexBuffer;
 
 	CreatePredefinedSamplers();
 
@@ -326,6 +328,7 @@ bool ZERNRenderer::DeinitializeInternal()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
+	InstanceVertexBuffer.Release();
 
 	Context = NULL;
 	OutputTexture = NULL;

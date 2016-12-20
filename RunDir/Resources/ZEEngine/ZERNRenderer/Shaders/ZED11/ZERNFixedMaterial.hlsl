@@ -90,7 +90,7 @@ cbuffer ZERNFixedMaterial_Constant_Draw_Transform				: register(ZERN_SHADER_CONS
 	float4			ZERNFixedMaterial_ClippingPlane0;
 	float4			ZERNFixedMaterial_ClippingPlane1;
 	float4			ZERNFixedMaterial_ClippingPlane2;
-	float4			ZERNFixedMaterial_ClippingPlane3;	
+	float4			ZERNFixedMaterial_ClippingPlane3;
 };
 
 cbuffer ZERNFixedMaterial_Constant_Draw_Material				: register(ZERN_SHADER_CONSTANT_DRAW_MATERIAL)
@@ -123,27 +123,35 @@ SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
 static const float ThresholdMatrix[8][8] =
 {
-	{ 0, 32, 8, 40, 2, 34, 10, 42}, 
-	{48, 16, 56, 24, 50, 18, 58, 26}, 
-	{12, 44, 4, 36, 14, 46, 6, 38}, 
-	{60, 28, 52, 20, 62, 30, 54, 22}, 
-	{ 3, 35, 11, 43, 1, 33, 9, 41}, 
-	{51, 19, 59, 27, 49, 17, 57, 25},
-	{15, 47, 7, 39, 13, 45, 5, 37},
-	{63, 31, 55, 23, 61, 29, 53, 21} 
+	{ 0.0f / 64.0f, 32.0f / 64.0f, 8.0f / 64.0f, 40.0f / 64.0f, 2.0f / 64.0f, 34.0f / 64.0f, 10.0f / 64.0f, 42.0f / 64.0f}, 
+	{48.0f / 64.0f, 16.0f / 64.0f, 56.0f / 64.0f, 24.0f / 64.0f, 50.0f / 64.0f, 18.0f / 64.0f, 58.0f / 64.0f, 26.0f / 64.0f}, 
+	{12.0f / 64.0f, 44.0f / 64.0f, 4.0f / 64.0f, 36.0f / 64.0f, 14.0f / 64.0f, 46.0f / 64.0f, 6.0f / 64.0f, 38.0f / 64.0f}, 
+	{60.0f / 64.0f, 28.0f / 64.0f, 52.0f / 64.0f, 20.0f / 64.0f, 62.0f / 64.0f, 30.0f / 64.0f, 54.0f / 64.0f, 22.0f / 64.0f}, 
+	{ 3.0f / 64.0f, 35.0f / 64.0f, 11.0f / 64.0f, 43.0f / 64.0f, 1.0f / 64.0f, 33.0f / 64.0f, 9.0f / 64.0f, 41.0f / 64.0f}, 
+	{51.0f / 64.0f, 19.0f / 64.0f, 59.0f / 64.0f, 27.0f / 64.0f, 49.0f / 64.0f, 17.0f / 64.0f, 57.0f / 64.0f, 25.0f / 64.0f},
+	{15.0f / 64.0f, 47.0f / 64.0f, 7.0f / 64.0f, 39.0f / 64.0f, 13.0f / 64.0f, 45.0f / 64.0f, 5.0f / 64.0f, 37.0f / 64.0f},
+	{63.0f / 64.0f, 31.0f / 64.0f, 55.0f / 64.0f, 23.0f / 64.0f, 61.0f / 64.0f, 29.0f / 64.0f, 53.0f / 64.0f, 21.0f / 64.0f} 
 };
-			
+
+//static const float4x4 ThresholdMatrix =
+//{
+//	1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
+//	13.0 / 17.0,  5.0 / 17.0, 15.0 / 17.0,  7.0 / 17.0,
+//	4.0 / 17.0, 12.0 / 17.0,  2.0 / 17.0, 10.0 / 17.0,
+//	16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
+//};
+	
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
 struct ZERNFixedMaterial_VSInput
 {
 	float3 Position			: POSITION0;
-
+	
 	#ifdef ZERN_FM_SKIN_TRANSFORM
-	uint4 BoneIndices		: BLENDINDICES;
+		uint4 BoneIndices	: BLENDINDICES;
 	#endif
-
+	
 	int2 NormalEncoded		: NORMAL0;
 	int2 TangentEncoded		: TANGENT0;
 	float2 Texcoord         : TEXCOORD0;
@@ -151,7 +159,7 @@ struct ZERNFixedMaterial_VSInput
 	#ifdef ZERN_FM_VERTEX_COLOR
 		float4 Color		: COLOR0;
 	#endif
-
+	
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4 BoneWeights	: BLENDWEIGHTS;
 	#endif
@@ -165,7 +173,7 @@ struct ZERNFixedMaterial_VSInput
 	#endif
 };
 
-struct ZERNFixedMaterial_VSOutput 
+struct ZERNFixedMaterial_VSOutput
 {
 	float4 Position			: SV_Position;
 	float3 Normal			: TEXCOORD0;
@@ -186,7 +194,7 @@ struct ZERNFixedMaterial_VSOutput
 	
 	#ifdef ZERN_FM_INSTANCING
 		nointerpolation float4	DrawColor			: TEXCOORD9;
-		nointerpolation uint4	DrawLODTransition	: TEXCOORD10;
+		nointerpolation bool	DrawLODTransition	: TEXCOORD10;
 	#endif
 	
 	#ifdef ZERN_FM_CLIPPING_PLANES
@@ -215,7 +223,7 @@ struct ZERNFixedMaterial_PSInput
 	
 	#ifdef ZERN_FM_INSTANCING
 		nointerpolation float4	DrawColor			: TEXCOORD9;
-		nointerpolation uint4	DrawLODTransition	: TEXCOORD10;
+		nointerpolation bool	DrawLODTransition	: TEXCOORD10;
 	#endif
 };
 
@@ -236,12 +244,22 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput
 	#ifdef ZERN_FM_CLIPPING_PLANES
 		float4 ClipDistance	: SV_ClipDistance;
 	#endif
+	
+	#if defined ZERN_FM_INSTANCING && defined ZERN_FM_DEPTH_PREPASS
+		nointerpolation float	DrawOpacity			: TEXCOORD1;
+		nointerpolation bool	DrawLODTransition	: TEXCOORD2;
+	#endif
 };
 
 struct ZERNFixedMaterial_ShadowMapGenerationStage_PSInput
 {
 	float4 Position			: SV_Position;
 	float2 Texcoord         : TEXCOORD0;
+	
+	#if defined ZERN_FM_INSTANCING && defined ZERN_FM_DEPTH_PREPASS
+		nointerpolation float	DrawOpacity			: TEXCOORD1;
+		nointerpolation bool	DrawLODTransition	: TEXCOORD2;
+	#endif
 };
 
 ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSInput Input)
@@ -268,7 +286,7 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 		float3 BinormalWorld = mul(Input.WorldTransform, float4(Binormal, 0.0f)).xyz;
 		
 		Output.DrawColor = Input.DrawColor;
-		Output.DrawLODTransition = Input.DrawLODTransition;
+		Output.DrawLODTransition = Input.DrawLODTransition.w;
 	#else
 		float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 		float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Normal, 0.0f)).xyz;
@@ -319,27 +337,28 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
 		Alpha *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
 	#endif
-	
+			
 	#ifdef ZERN_FM_DEFERRED
 		if (ZERNFixedMaterial_DitheredOpacityEnabled || 
 		#ifdef ZERN_FM_INSTANCING
-			(Input.DrawLODTransition.w > 0))
+			(Input.DrawLODTransition))
 		#else
 			ZERNFixedMaterial_Draw_LODTransition)
 		#endif
 		{
-			clip(Alpha - ((ThresholdMatrix[floor(Input.Position.x) % 8][floor(Input.Position.y) % 8] + 1.0f) / 65.0f));
+			clip(Alpha - ThresholdMatrix[floor(Input.Position.x) % 8][floor(Input.Position.y) % 8]);
+			//clip(Alpha - ThresholdMatrix[floor(Input.Position.x) % 4][floor(Input.Position.y) % 4]);
 		}
+		#ifdef ZERN_FM_ALPHA_CULL
 		else
 		{
-			#if defined ZERN_FM_ALPHA_CULL
-				if (Alpha <= ZERNFixedMaterial_AlphaCullLimit)
-					discard;
-			#endif
+			clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
 		}
+		#endif
 	#elif defined ZERN_FM_FORWARD
-		if (Alpha <= ZERNFixedMaterial_AlphaCullLimit)
-			discard;
+		#ifdef ZERN_FM_ALPHA_CULL
+			clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
+		#endif
 	#endif
 	
 	float3 Normal = normalize(Input.Normal);
@@ -464,17 +483,17 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		
-		uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
-		uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
-		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
-		
-		uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
-		for (uint J = 0; J < TilePointLightCount; J++)
-			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
-		
-		uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
-		for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
-			ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
+		//uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
+		//uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
+		//uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		//
+		//uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
+		//for (uint J = 0; J < TilePointLightCount; J++)
+		//	ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
+		//
+		//uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
+		//for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
+		//	ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
 		
 		Output.Color = float4(ResultColor + Surface.Ambient + Surface.Emissive, Surface.Opacity);
 	#endif
@@ -492,13 +511,17 @@ ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapG
 		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
 	#endif
 	
+	ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput Output;
 	#ifdef ZERN_FM_INSTANCING
 		float4 PositionWorld = mul(Input.WorldTransform, float4(Input.Position, 1.0f));
+		#ifdef ZERN_FM_DEPTH_PREPASS
+			Output.DrawOpacity = Input.DrawColor.a;
+			Output.DrawLODTransition = Input.DrawLODTransition.w;
+		#endif
 	#else
 		float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	#endif
 	
-	ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput Output;
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Texcoord = Input.Texcoord;
 	
@@ -518,13 +541,42 @@ ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapG
 void ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMaterial_ShadowMapGenerationStage_PSInput Input)
 {
 	float Alpha = ZERNFixedMaterial_Opacity;
-	#ifdef ZERN_FM_OPACITY_MAP
-		Alpha = ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-	#elif defined ZERN_FM_OPACITY_BASE_ALPHA
-		Alpha = ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
+	#ifdef ZERN_FM_DEPTH_PREPASS
+		#ifdef ZERN_FM_INSTANCING
+			Alpha *= Input.DrawOpacity;
+		#else
+			Alpha *= ZERNFixedMaterial_Draw_Color.a;
+		#endif
 	#endif
 	
-	clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
+	#ifdef ZERN_FM_OPACITY_MAP
+		Alpha *= ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
+	#elif defined ZERN_FM_OPACITY_BASE_ALPHA
+		Alpha *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
+	#endif
+	
+	#ifdef ZERN_FM_DEPTH_PREPASS
+		if (ZERNFixedMaterial_DitheredOpacityEnabled || 
+		#ifdef ZERN_FM_INSTANCING
+			(Input.DrawLODTransition))
+		#else
+			(ZERNFixedMaterial_Draw_LODTransition))
+		#endif
+		{
+			clip(Alpha - ThresholdMatrix[floor(Input.Position.x) % 8][floor(Input.Position.y) % 8]);
+			//clip(Alpha - ThresholdMatrix[floor(Input.Position.x) % 4][floor(Input.Position.y) % 4]);
+		}
+		#if defined ZERN_FM_ALPHA_CULL
+		else
+		{
+			clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
+		}
+		#endif
+	#endif
+	
+	#if defined ZERN_FM_ALPHA_CULL
+		clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
+	#endif
 }
 
 #endif

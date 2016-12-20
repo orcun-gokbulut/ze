@@ -259,12 +259,9 @@ ZEPathManager::ZEPathManager()
 
 ZEPathManager* ZEPathManager::GetInstance()
 {
-	static ZEPathManager* PathManager = NULL;
-	if (PathManager == NULL)
-	{
-		PathManager = new ZEPathManager();
-		PathManager->Initialize();
-	}
+	static ZEPathManager PathManager;
 
-	return PathManager;
+		PathManager.Initialize();
+
+	return &PathManager;
 }

@@ -127,7 +127,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 		{
 			if (Identifer != NULL)
 			{
-				if (Resource->GetIdentifier() == NULL && !Identifer->Equals(Resource->GetIdentifier()))
+				if (Resource->GetIdentifier() != NULL && !Identifer->Equals(Resource->GetIdentifier()))
 					continue;
 			}
 		
@@ -309,7 +309,10 @@ ZERSResourceManager::ZERSResourceManager()
 
 ZERSResourceManager::~ZERSResourceManager()
 {
-	ZECommandManager::GetInstance()->UnregisterSection(&Commands);	
+	ZECommandManager::GetInstance()->UnregisterSection(&Commands);
+
+	ze_for_each(ResourceGroup, ResourceGroups)
+		delete ResourceGroup.GetItem();
 }
 
 ZEArray<const ZERSResourceGroup*> ZERSResourceManager::GetResourceGroups()

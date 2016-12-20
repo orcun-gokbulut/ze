@@ -263,5 +263,17 @@ ZETaskPool::ZETaskPool()
 
 ZETaskPool::~ZETaskPool()
 {
+	while (ThreadCount != SuspendedThreads.GetCount() || Tasks.GetCount() != 0);
+
+	ZEArray<ZEThread*> Threads;
+	Threads.SetCount(SuspendedThreads.GetCount());
+	ze_for_each(Thread, Threads)
+		Threads[Thread.GetIndex()] = SuspendedThreads[Thread.GetIndex()];
+
+	SuspendedThreads.Clear();
+
+	ze_for_each(Thread, Threads)
+		Thread.GetItem()->Destroy();
+
 	SetThreadCount(0);
 }
