@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 
-enum ZEGRTextureType
+ZE_ENUM(ZEGRTextureType)
 {
 	ZEGR_TT_NONE	= 0,
 	ZEGR_TT_2D		= 1,

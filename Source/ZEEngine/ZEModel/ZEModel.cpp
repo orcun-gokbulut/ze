@@ -347,6 +347,8 @@ void ZEModel::AddMesh(ZEModelMesh* Mesh)
 		"Can not add mesh. Mesh already added to this Model. Model Name: \"%s\", Mesh Name: \"%s\".",
 		GetName().ToCString(), Mesh->GetName().ToCString());
 
+	DirtyBoundingBox = true;
+
 	Mesh->SetModel(this);
 	Meshes.AddEnd(&Mesh->ModelLink);
 }
@@ -365,6 +367,8 @@ void ZEModel::RemoveMesh(ZEModelMesh* Mesh)
 
 	if (Mesh->GetParent() != NULL)
 		Mesh->GetParent()->RemoveChildMesh(Mesh);
+
+	DirtyBoundingBox = true;
 
 	Mesh->SetModel(NULL);
 	Meshes.Remove(&Mesh->ModelLink);
@@ -405,6 +409,9 @@ void ZEModel::AddBone(ZEModelBone* Bone)
 		"Can not add bone. Bone already added to this Model. Model Name: \"%s\", Bone Name: \"%s\".",
 		GetName().ToCString(), Bone->GetName().ToCString());
 
+	DirtyConstantBufferSkin = true;
+	DirtyBoundingBox = true;
+
 	Bone->SetModel(this);
 	Bones.AddEnd(&Bone->ModelLink);
 }
@@ -423,6 +430,9 @@ void ZEModel::RemoveBone(ZEModelBone* Bone)
 
 	if (Bone->GetParent() != NULL)
 		Bone->GetParent()->RemoveChildBone(Bone);
+
+	DirtyConstantBufferSkin = true;
+	DirtyBoundingBox = true;
 
 	Bone->SetModel(NULL);
 	Bones.Remove(&Bone->ModelLink);

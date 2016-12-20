@@ -91,6 +91,14 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEHolder<ZEGRShader>							StageShadowmapGeneration_Instancing_VertexShader;
 		ZEHolder<ZEGRRenderStateData>					StageShadowmapGeneration_Instancing_RenderState;
 
+		ZEHolder<ZEGRShader>							StageRenderDepth_VertexShader;
+		ZEHolder<ZEGRShader>							StageRenderDepth_PixelShader;
+		ZEHolder<ZEGRRenderStateData>					StageRenderDepth_RenderState;
+
+		ZEHolder<ZEGRShader>							StageRenderDepth_Instancing_VertexShader;
+		ZEHolder<ZEGRShader>							StageRenderDepth_Instancing_PixelShader;
+		ZEHolder<ZEGRRenderStateData>					StageRenderDepth_Instancing_RenderState;
+
 		ZEHolder<ZEGRBuffer>							ConstantBuffer;
 		ZEHolder<ZEGRSampler>							Sampler;
 

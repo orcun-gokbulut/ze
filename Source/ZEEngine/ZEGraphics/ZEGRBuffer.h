@@ -52,6 +52,8 @@ ZE_ENUM(ZEGRBufferType)
 
 class ZEGRBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRBuffer)
 	protected:
 		ZESize								SizeInBytes;
 		ZESize								StrideInBytes;

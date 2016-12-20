@@ -79,7 +79,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEList2<ZERNCommand>						CommandList;
 		ZEList2<ZERNCommand>						CommandListInstanced;
 
-		static ZEHolder<ZEGRBuffer>					InstanceVertexBuffer;
+		ZEHolder<ZEGRBuffer>						InstanceVertexBuffer;
 
 		ZEGRContext*								Context;
 		ZEHolder<const ZEGRTexture>					OutputTexture;

@@ -133,9 +133,6 @@ void ZERNStandardMaterial::UpdateShadowMapGenerationVertexShaderDefinitions(ZEGR
 	if (SkinningEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_SKIN_TRANSFORM"));
 
-	if (VertexColorEnabled)
-		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_VERTEX_COLOR"));
-
 	if (ClippingPlanesEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
 }
@@ -144,6 +141,9 @@ void ZERNStandardMaterial::UpdateShadowMapGenerationPixelShaderDefinitions(ZEGRS
 {
 	if (OpacityMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_MAP"));
+
+	if (AlphaCullEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
 }
 
 bool ZERNStandardMaterial::UpdateShaders()
@@ -181,6 +181,15 @@ bool ZERNStandardMaterial::UpdateShaders()
 	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
 
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEPTH_PREPASS"));
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+	StageRenderDepth_VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageRenderDepth_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Definitions.Remove(Options.Definitions.GetCount() - 1);
+
 	if (!SkinningEnabled)
 	{
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
@@ -189,6 +198,13 @@ bool ZERNStandardMaterial::UpdateShaders()
 		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
 		StageShadowmapGeneration_Instancing_VertexShader = ZEGRShader::Compile(Options);
 		zeCheckError(StageShadowmapGeneration_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEPTH_PREPASS"));
+
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageRenderDepth_Instancing_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageRenderDepth_Instancing_VertexShader == NULL, false, "Cannot set vertex shader.");
 	}
 
 	Options.Definitions.Clear();
@@ -217,6 +233,23 @@ bool ZERNStandardMaterial::UpdateShaders()
 	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
 	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEPTH_PREPASS"));
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
+	StageRenderDepth_PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageRenderDepth_PixelShader == NULL, false, "Cannot set pixel shader.");
+
+	if (!SkinningEnabled)
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_INSTANCING"));
+
+		Options.Type = ZEGR_ST_PIXEL;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
+		StageRenderDepth_Instancing_PixelShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageRenderDepth_Instancing_PixelShader == NULL, false, "Cannot set pixel shader.");
+	}
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
@@ -265,9 +298,7 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
-
-	if (AlphaCullEnabled)
-		RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
 
 	if (SkinningEnabled)
 		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
@@ -290,6 +321,22 @@ bool ZERNStandardMaterial::UpdateRenderState()
 		zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
 	}
 
+	RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, StageRenderDepth_PixelShader);
+
+	StageRenderDepth_RenderState = RenderState.Compile();
+	zeCheckError(StageRenderDepth_RenderState == NULL, false, "Cannot set depth prepass render state.");
+
+	if (!SkinningEnabled)
+	{
+		RenderState.SetVertexLayout(ZEMDVertexInstance::GetVertexLayout());
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_Instancing_VertexShader);
+		RenderState.SetShader(ZEGR_ST_PIXEL, StageRenderDepth_Instancing_PixelShader);
+
+		StageRenderDepth_Instancing_RenderState = RenderState.Compile();
+		zeCheckError(StageRenderDepth_Instancing_RenderState == NULL, false, "Cannot set depth prepass instancing render state.");
+	}
+
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
 	return true;
@@ -301,7 +348,7 @@ bool ZERNStandardMaterial::UpdateStageMask()
 		return true;
 
 	StageMask = ZERN_STAGE_DEBUG;
-	StageMask |= TransparencyEnabled ? (ZERN_STAGE_RENDER_DEPTH | ZERN_STAGE_FORWARD_TRANSPARENT) : ZERN_STAGE_GBUFFER;
+	StageMask |= TransparencyEnabled ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_RENDER_DEPTH | ZERN_STAGE_GBUFFER;
 	StageMask |= ShadowCaster ? ZERN_STAGE_SHADOW_MAP_GENERATION : 0;
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_STAGE_MASK);
@@ -1901,9 +1948,22 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 		};
 		Context->SetTextures(ZEGR_ST_PIXEL, 0, 11, Textures);
 	}
-	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION || StageID == ZERN_STAGE_RENDER_DEPTH)
+	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION)
 	{
 		Context->SetRenderState(Instanced ? StageShadowmapGeneration_Instancing_RenderState : StageShadowmapGeneration_RenderState);
+
+		if (AlphaCullEnabled)
+		{
+			if (OpacityMapEnabled)
+			{
+				Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
+			}
+		}
+	}
+	else if (StageID == ZERN_STAGE_RENDER_DEPTH)
+	{
+		Context->SetRenderState(Instanced ? StageRenderDepth_Instancing_RenderState : StageRenderDepth_RenderState);
 
 		if (AlphaCullEnabled)
 		{

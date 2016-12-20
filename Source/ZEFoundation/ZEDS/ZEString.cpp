@@ -728,7 +728,9 @@ void ZEString::Clear()
 {
 	BufferChanged = true;
 	Allocator.Deallocate(&Buffer);
+	WAllocator.Deallocate(&WBuffer);
 	Buffer = NULL;
+	WBuffer = NULL;
 }
 
 void ZEString::SetBuffer(const void* Buffer, ZESize Size)

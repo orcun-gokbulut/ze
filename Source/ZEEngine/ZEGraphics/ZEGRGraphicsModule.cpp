@@ -103,6 +103,9 @@ bool ZEGRGraphicsModule::InitializeInternal()
 
 bool ZEGRGraphicsModule::DeinitializeInternal()
 {
+	extern ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
+	InstanceVertexBuffer.Release();
+	
 	return ZEModule::DeinitializeInternal();
 }
 

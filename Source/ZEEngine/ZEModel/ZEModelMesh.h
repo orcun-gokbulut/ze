@@ -92,6 +92,13 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		ZEList2<ZEModelMesh>					ChildMeshes;
 		ZEList2<ZEModelMeshLOD>					LODs;
 
+		float									LODTransitionTime;
+		float									LODTransitionElapsedTime;
+		float									LODTransitionSpeed;
+		bool									LODTransitionPlaying;
+		ZEModelMeshLOD*							PrevLOD;
+		ZEModelMeshLOD*							NextLOD;
+
 		bool									CustomDrawOrderEnabled;
 		ZEUInt8									CustomDrawOrder;
 		ZEArray<ZEPlane>						ClippingPlanes;
@@ -106,9 +113,6 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
-
-// 		void									LocalTransformChanged();
-// 		void									ParentTransformChanged();
 
 		void									UpdateConstantBuffer();
 
@@ -166,6 +170,9 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 
 		void									SetWorldScale(const ZEVector3& WorldScale);
 		const ZEVector3							GetWorldScale() const;
+
+		void									SetMeshResource(const ZEMDResourceMesh* MeshResource);	
+		const ZEMDResourceMesh*					GetMeshResource() const;
 
 		void									SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType					GetAnimationType();

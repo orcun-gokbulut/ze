@@ -164,9 +164,12 @@ bool ZED11Module::InitializeInternal()
 	Result = TempDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&Device));
 	if (FAILED(Result))
 	{
+		TempDevice->Release();
 		zeCriticalError("Cannot query ID3D11Device1. Error: %d", Result);
 		return false;
 	}
+	
+	TempDevice->Release();
 
 	ID3D11DeviceContext1* NativeContext;
 	Device->GetImmediateContext1(&NativeContext);
@@ -182,14 +185,17 @@ bool ZED11Module::InitializeInternal()
 
 bool ZED11Module::DeinitializeInternal()
 {
-	ZEGR_RELEASE(Device);
-
 	delete static_cast<ZED11Adapter*>(CurrentAdapter);
 
 	for (ZESize I = 0; I < Adapters.GetCount(); I++)
 		delete static_cast<ZED11Adapter*>(Adapters[I]);
 
 	Adapters.Clear();
+
+	Context.GetContext()->ClearState();
+	Context.GetContext()->Flush();
+
+	ZEGR_RELEASE(Device);
 
 	return ZEGRGraphicsModule::DeinitializeInternal();
 }
