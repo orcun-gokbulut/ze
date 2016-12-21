@@ -46,6 +46,7 @@
 
 #include <QIcon>
 #include <QMimeData>
+#include "ZEDCore/ZEDAssetEvent.h"
 
 
 bool ZEDAssetModel::Filter(ZEObject* Object) const
@@ -209,7 +210,7 @@ bool ZEDAssetModel::FilterBackward(ZEObject* Object) const
 	return false;
 }
 
-bool ZEDAssetModel::FilterHierarcy(ZEObject* Object) const
+bool ZEDAssetModel::FilterHierarchy(ZEObject* Object) const
 {
 	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Object->GetClass()))
 	{
@@ -252,6 +253,233 @@ bool ZEDAssetModel::FilterHierarcy(ZEObject* Object) const
 	}
 
 	return false;
+}
+
+void ZEDAssetModel::AssetEvent(const ZEDAssetEvent* Event)
+{
+	if (GetRootDirectory() == NULL)
+		return;
+
+	if (Event->GetType() == ZED_AET_ASSET_ADDING)
+	{
+		ZEDAsset* Asset = Event->GetAsset();
+		if (!FilterHierarchy(Asset))
+			return;
+
+		if (Mode == ZED_AMM_TREE)
+		{
+			const ZEList2<ZEDAsset>* AssetList = NULL;
+			if (GetHierarcy() == ZED_AMH_DIRECTORY)
+				AssetList = &Asset->GetDirectory()->GetAssets();
+			else if (GetHierarcy() == ZED_AMH_CATAGORY)
+				AssetList = &Asset->GetCategory()->GetAssets();
+			else
+				return;
+
+			int Index = 0;
+			ze_for_each(Current, Asset->GetDirectory()->GetAssets())
+			{
+				if (Asset == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginInsertRows(parent(createIndex(0, 0, Asset)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		else if (Mode == ZED_AMM_LIST)
+		{
+			beginResetModel();
+			CloseEvent = true;
+		}
+
+	}
+	else if (Event->GetType() == ZED_AET_ASSET_ADDED)
+	{
+		if (!CloseEvent)
+			return;
+
+		if (Mode == ZED_AMM_TREE)
+			endInsertRows();
+		else if (Mode == ZED_AMM_LIST)
+			endResetModel();
+
+		CloseEvent = false;
+	}
+	else if (Event->GetType() == ZED_AET_ASSET_REMOVING)
+	{
+		ZEDAsset* Asset = Event->GetAsset();
+		if (!FilterHierarchy(Asset))
+			return;
+
+		if (Mode == ZED_AMM_TREE)
+		{
+			const ZEList2<ZEDAsset>* AssetList = NULL;
+			if (GetHierarcy() == ZED_AMH_DIRECTORY)
+				AssetList = &Asset->GetDirectory()->GetAssets();
+			else if (GetHierarcy() == ZED_AMH_CATAGORY)
+				AssetList = &Asset->GetCategory()->GetAssets();
+			else
+				return;
+
+			int Index = 0;
+			ze_for_each(Current, Asset->GetDirectory()->GetAssets())
+			{
+				if (Asset == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginRemoveRows(parent(createIndex(0, 0, Asset)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		else if (Mode == ZED_AMM_LIST)
+		{
+			beginResetModel();
+			CloseEvent = true;
+		}
+	}
+	else if (Event->GetType() == ZED_AET_ASSET_REMOVED)
+	{
+		if (!CloseEvent)
+			return;
+
+		if (Mode == ZED_AMM_TREE)
+			endRemoveRows();
+		else if (Mode == ZED_AMM_LIST)
+			endResetModel();
+
+		CloseEvent = false;
+	}
+	else if (Hierarcy == ZED_AMH_DIRECTORY && Mode == ZED_AMM_TREE)
+	{		
+		ZEDAssetDirectory* Directory = Event->GetDirectory();
+		if (!FilterHierarchy(Directory))
+			return;
+
+		if (Event->GetType() == ZED_AET_DIRECTORY_ADDING)
+		{
+			int Index = 0;
+			ze_for_each(Current, Directory->GetParentDirectory()->GetSubDirectories())
+			{
+				if (Directory == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginInsertRows(parent(createIndex(0, 0, Directory)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		else if (Event->GetType() == ZED_AET_DIRECTORY_ADDED)
+		{
+			if (!CloseEvent)
+				return;
+
+			endInsertRows();
+			CloseEvent = false;
+		}
+		else if (Event->GetType() == ZED_AET_DIRECTORY_REMOVING)
+		{
+			int Index = 0;
+			ze_for_each(Current, Directory->GetParentDirectory()->GetSubDirectories())
+			{
+				if (Directory == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginRemoveRows(parent(createIndex(0, 0, Directory)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		else if (Event->GetType() == ZED_AET_DIRECTORY_REMOVED)
+		{
+			if (!CloseEvent)
+				return;
+
+			endRemoveRows();
+			CloseEvent = false;
+		}
+	}
+	else if (Hierarcy == ZED_AMH_CATAGORY && Mode == ZED_AMM_TREE)
+	{
+		ZEDAssetCategory* Category = Event->GetCategory();
+		if (!FilterHierarchy(Category))
+			return;
+
+		if (Event->GetType() == ZED_AET_CATEGORY_ADDING)
+		{
+			int Index = 0;
+			ze_for_each(Current, Category->GetParentCategory()->GetSubCatagories())
+			{
+				if (Category == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginInsertRows(parent(createIndex(0, 0, Category)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		if (Event->GetType() == ZED_AET_CATEGORY_ADDED)
+		{
+			if (!CloseEvent)
+				return;
+
+			endInsertRows();
+			CloseEvent = false;
+		}
+		else if (Event->GetType() == ZED_AET_CATEGORY_REMOVING)
+		{
+			int Index = 0;
+			ze_for_each(Current, Category->GetParentCategory()->GetSubCatagories())
+			{
+				if (Category == Current.GetPointer())
+				{
+					CloseEvent = true;
+					beginRemoveRows(parent(createIndex(0, 0, Category)), Index, Index);
+					return;
+				}
+
+				if (FilterHierarchy(Current.GetPointer()))
+					continue;
+
+				Index++;
+			}
+		}
+		else if (Event->GetType() == ZED_AET_CATEGORY_REMOVED)
+		{
+			if (!CloseEvent)
+				return;
+
+			endRemoveRows();
+			CloseEvent = false;
+		}
+	}
+
 }
 
 void ZEDAssetModel::SetMode(ZEDAssetModelMode Mode)
@@ -560,6 +788,67 @@ QString ZEDAssetModel::display(const QModelIndex& Index) const
 	return "";
 }
 
+ZEObject* ZEDAssetModel::indexList(ZEObject* Target, int Row, int& Index) const
+{
+	int Count = 0;
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Target->GetClass()))
+	{
+		if (!Filter(Target))
+			return NULL;
+
+		if (Row == Index)
+			return Target;
+
+		Index++;
+	}
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Target->GetClass()))
+	{
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Target);
+
+		const ZEList2<ZEDAssetDirectory>& SubDirectories = Directory->GetSubDirectories();
+		ze_for_each(SubDirectory, SubDirectories)
+		{
+			ZEObject* Result = indexList(SubDirectory.GetPointer(), Row, Index);
+			if (Result != NULL)
+				return Result;
+		}
+
+		const ZEList2<ZEDAsset>& Assets = Directory->GetAssets();
+		ze_for_each(Asset, Assets)
+		{
+			ZEObject* Result = indexList(Asset.GetPointer(), Row, Index);
+			if (Result != NULL)
+				return Result;
+		}
+	}
+
+	return NULL;
+}
+
+int ZEDAssetModel::rowCountList(ZEObject* Target) const
+{
+	int Count = 0;
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Target->GetClass()))
+	{
+		if (Filter(Target))
+			Count++;
+	}
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Target->GetClass()))
+	{
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Target);
+
+		const ZEList2<ZEDAssetDirectory>& SubDirectories = Directory->GetSubDirectories();
+		ze_for_each(SubDirectory, SubDirectories)
+			Count += rowCountList(SubDirectory.GetPointer());
+
+		const ZEList2<ZEDAsset>& Assets = Directory->GetAssets();
+		ze_for_each(Asset, Assets)
+			Count += rowCountList(Asset.GetPointer());
+	}
+	
+	return Count;
+}
+
 QModelIndex ZEDAssetModel::index(int Row, int Column, const QModelIndex& Parent) const
 {
 	if (GetAssetManager() == NULL)
@@ -584,7 +873,7 @@ QModelIndex ZEDAssetModel::index(int Row, int Column, const QModelIndex& Parent)
 		ZESize Index = 0;
 		ze_for_each(SubDirectory, ParentDirectory->GetSubDirectories())
 		{
-			if (!FilterHierarcy(SubDirectory.GetPointer()))
+			if (!FilterHierarchy(SubDirectory.GetPointer()))
 				continue;
 
 			if (Index == Row)
@@ -596,7 +885,7 @@ QModelIndex ZEDAssetModel::index(int Row, int Column, const QModelIndex& Parent)
 		// Assets
 		ze_for_each(Asset, ParentDirectory->GetAssets())
 		{
-			if (!FilterHierarcy(Asset.GetPointer()))
+			if (!FilterHierarchy(Asset.GetPointer()))
 				continue;
 
 			if (Index == Row)
@@ -604,6 +893,15 @@ QModelIndex ZEDAssetModel::index(int Row, int Column, const QModelIndex& Parent)
 
 			Index++;
 		}
+	}
+	else if (Mode == ZED_AMM_LIST && Hierarcy == ZED_AMH_DIRECTORY)
+	{
+		int Index = 0;
+		ZEObject* Object = indexList(GetRootDirectory(), Row, Index);
+		if (Object == NULL)
+			return QModelIndex();
+
+		return  createIndex(Row, Column, Object);
 	}
 	
 	return QModelIndex();
@@ -642,7 +940,7 @@ QModelIndex ZEDAssetModel::parent(const QModelIndex& Child) const
 		ZESize Index = 0;
 		ze_for_each(CurrentDirectory, GrandParentDirectory->GetSubDirectories())
 		{
-			if (!FilterHierarcy(CurrentDirectory.GetPointer()))
+			if (!FilterHierarchy(CurrentDirectory.GetPointer()))
 				continue;
 
 			if (CurrentDirectory.GetPointer() == ParentDirectory)
@@ -674,7 +972,7 @@ bool ZEDAssetModel::hasChildren(const QModelIndex& Parent) const
 		// SubDirectories
 		ze_for_each(SubDirectory, ParentDirectory->GetSubDirectories())
 		{
-			if (!FilterHierarcy(SubDirectory.GetPointer()))
+			if (!FilterHierarchy(SubDirectory.GetPointer()))
 				continue;
 
 			return true;
@@ -683,19 +981,27 @@ bool ZEDAssetModel::hasChildren(const QModelIndex& Parent) const
 		// Assets
 		ze_for_each(Asset, ParentDirectory->GetAssets())
 		{
-			if (!FilterHierarcy(Asset.GetPointer()))
+			if (!FilterHierarchy(Asset.GetPointer()))
 				continue;
 
 			return true;
 		}
 	}
+	else if (Mode == ZED_AMM_LIST && Hierarcy == ZED_AMH_DIRECTORY)
+	{
+		if (Parent.isValid())
+			return false;
 
-	return 0;
+		int Index = 0;
+		return (indexList(GetRootDirectory(), 0, Index) != 0);
+	}
+
+	return false;
 }
 
 int ZEDAssetModel::rowCount(const QModelIndex& Parent) const
 {
-	if (GetAssetManager() == NULL)
+ 	if (GetAssetManager() == NULL)
 		return 0;
 
 	if (Mode == ZED_AMM_TREE && Hierarcy == ZED_AMH_DIRECTORY)
@@ -714,7 +1020,7 @@ int ZEDAssetModel::rowCount(const QModelIndex& Parent) const
 		ZESize Count = 0;
 		ze_for_each(SubDirectory, ParentDirectory->GetSubDirectories())
 		{
-			if (!FilterHierarcy(SubDirectory.GetPointer()))
+			if (!FilterHierarchy(SubDirectory.GetPointer()))
 				continue;
 
 			Count++;
@@ -723,13 +1029,20 @@ int ZEDAssetModel::rowCount(const QModelIndex& Parent) const
 		// Assets
 		ze_for_each(Asset, ParentDirectory->GetAssets())
 		{
-			if (!FilterHierarcy(Asset.GetPointer()))
+			if (!FilterHierarchy(Asset.GetPointer()))
 				continue;
 
 			Count++;
 		}
 
 		return (int)Count;
+	}
+	else if (Mode == ZED_AMM_LIST && Hierarcy == ZED_AMH_DIRECTORY)
+	{
+		if (Parent.isValid())
+			return 0;
+		else
+			return rowCountList(GetRootDirectory());
 	}
 
 	return 0;
@@ -847,4 +1160,5 @@ Qt::DropActions ZEDAssetModel::supportedDragActions() const
 ZEDAssetModel::ZEDAssetModel()
 {
 	Mode = ZED_AMM_TREE;
+	CloseEvent = false;
 }

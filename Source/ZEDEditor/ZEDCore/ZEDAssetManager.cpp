@@ -179,7 +179,7 @@ void ZEDAssetManager::Crawl()
 	if (CrawlLocations.GetCount() == 0)
 		return;
 
-	ZEString Location = CrawlLocations.Pop();
+	ZEString Location = CrawlLocations.Dequeue();
 	if (ZEDirectoryInfo(Location).IsDirectory())
 	{
 		ScanDirectory(Location, true);
@@ -272,7 +272,7 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 			ZEString FileName = std::wstring(Current->FileName, Current->FileNameLength / sizeof(wchar_t));
 	
 			if (!CrawlLocations.Exists(FileName))
-				CrawlLocations.Add(ZEFormat::Format("{0}/{1}", ResourcePath, FileName));
+				CrawlLocations.Enqueue(ZEFormat::Format("{0}/{1}", ResourcePath, FileName));
 			
 			if (Current->NextEntryOffset == 0)
 				break;
@@ -354,12 +354,10 @@ void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
 
 	Asset->Directory->Assets.Remove(&Asset->DirectoryLink);
 	Asset->Type->Assets.Remove(&Asset->TypeLink);
+	ZEDAssetCategory* Category = Asset->Category;
 	if (Asset->Category != NULL)
-	{
 		Asset->Category->Assets.Remove(&Asset->CategoryLink);
-		RemoveCategory(Asset->Category);
-	}
-	
+
 	Event.SetType(ZED_AET_ASSET_REMOVED);
 	RaiseEvent(&Event);
 
@@ -367,6 +365,9 @@ void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
 	Asset->Type = NULL;
 	Asset->Directory = NULL;
 	Asset->Category = NULL;
+
+	if (Asset->Category != NULL)
+		RemoveCategory(Asset->Category);
 
 	delete Asset;
 }
@@ -756,7 +757,7 @@ void ZEDAssetManager::UpdatePath(const ZEString& Path)
 
 void ZEDAssetManager::Process()
 {
-
+	Crawl();
 }
 
 ZEDAssetType* ZEDAssetManager::GetAssetType(const ZEString& Path)

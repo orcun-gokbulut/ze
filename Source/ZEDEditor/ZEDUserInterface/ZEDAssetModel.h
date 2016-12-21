@@ -72,11 +72,14 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 		ZEWildcard								SearchPattern;
 		ZEArray<ZEDAssetType*>					IncludeFilter;
 		ZEArray<ZEDAssetType*>					ExcludeFilter;
+		bool									CloseEvent;
 
 		bool									Filter(ZEObject* Class) const;
 		bool									FilterForward(ZEObject* Class) const;
 		bool									FilterBackward(ZEObject* Class) const;
-		bool									FilterHierarcy(ZEObject* Class) const;
+		bool									FilterHierarchy(ZEObject* Class) const;
+
+		virtual void							AssetEvent(const ZEDAssetEvent* Event) override;
 
 	public:
 		void									SetMode(ZEDAssetModelMode Mode);
@@ -111,18 +114,21 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 
 	private:
 		QString									display(const QModelIndex &index) const;
+		ZEObject*								indexList(ZEObject* Target, int Row, int& Index) const;
+		int										rowCountList(ZEObject* Root) const;
+
 
 	public: /* QAbstractItemModel */			
-		virtual QModelIndex						index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-		virtual QModelIndex						parent(const QModelIndex &child) const override;
-		virtual bool							hasChildren(const QModelIndex &parent = QModelIndex()) const;
-		virtual int								rowCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual int								columnCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual QVariant						data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-		virtual QVariant						headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-		virtual Qt::ItemFlags					flags(const QModelIndex &index) const; 
+		virtual QModelIndex						index(int Row, int Column, const QModelIndex& Parent = QModelIndex()) const override;
+		virtual QModelIndex						parent(const QModelIndex& Child) const override;
+		virtual bool							hasChildren(const QModelIndex& Parent = QModelIndex()) const;
+		virtual int								rowCount(const QModelIndex& Parent = QModelIndex()) const override;
+		virtual int								columnCount(const QModelIndex& Parent = QModelIndex()) const override;
+		virtual QVariant						data(const QModelIndex& Index, int Role = Qt::DisplayRole) const override;
+		virtual QVariant						headerData(int Section, Qt::Orientation Orientation, int Role = Qt::DisplayRole) const override;
+		virtual Qt::ItemFlags					flags(const QModelIndex& Index) const; 
 		virtual QStringList						mimeTypes() const override;
-		virtual QMimeData*						mimeData(const QModelIndexList &indexes) const override;
+		virtual QMimeData*						mimeData(const QModelIndexList& Indexes) const override;
 		virtual Qt::DropActions					supportedDragActions() const override;
 
 												ZEDAssetModel();
