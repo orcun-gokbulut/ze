@@ -308,7 +308,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 		}
 
 	}
-	if (Event->GetType() == ZED_OET_ADDED)
+	else if (Event->GetType() == ZED_OET_ADDED)
 	{
 		if (Mode == ZED_OTM_TREE)
 			endInsertRows();

@@ -71,7 +71,7 @@ class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyab
 		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
 		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
 		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent& Event);
+		virtual void					AssetEvent(const ZEDAssetEvent* Event);
 
 		void							RaiseEvent(const ZEDEvent* Event);
 	
@@ -80,4 +80,6 @@ class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyab
 
 	public:
 		ZEDEditor*						GetEditor() const;
+
+		virtual void					Process();
 };

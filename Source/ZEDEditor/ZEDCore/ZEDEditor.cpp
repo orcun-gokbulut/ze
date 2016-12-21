@@ -398,6 +398,9 @@ void ZEDEditor::Process(float ElapsedTime)
 	Event.SetElapsedTime(ElapsedTime);
 	DistributeEvent(&Event);
 
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->Process();
+
 	if (GetObjectManager() != NULL)
 		GetObjectManager()->Tick(ElapsedTime);
 }

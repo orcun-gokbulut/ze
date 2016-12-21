@@ -40,6 +40,7 @@
 #include "ZEDSelectionEvent.h"
 #include "ZEDViewportEvent.h"
 #include "ZEDEditorEvent.h"
+#include "ZEDAssetEvent.h"
 
 void ZEDComponent::EventReceived(const ZEDEvent* Event)
 {
@@ -59,6 +60,8 @@ void ZEDComponent::EventReceived(const ZEDEvent* Event)
 		ViewportRenderEvent(static_cast<const ZEDViewportRenderEvent*>(Event));
 	else if (ZEClass::IsDerivedFrom(ZEDEditorEvent::Class(), Event->GetClass()))
 		EditorEvent(static_cast<const ZEDEditorEvent*>(Event));
+	else if (ZEClass::IsDerivedFrom(ZEDAssetEvent::Class(), Event->GetClass()))
+		AssetEvent(static_cast<const ZEDAssetEvent*>(Event));
 }
 
 void ZEDComponent::EditorEvent(const ZEDEditorEvent* Event)
@@ -106,7 +109,7 @@ void ZEDComponent::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
 
 }
 
-void ZEDComponent::AssetEvent(const ZEDAssetEvent& Event)
+void ZEDComponent::AssetEvent(const ZEDAssetEvent* Event)
 {
 
 }
@@ -133,4 +136,9 @@ ZEDComponent::~ZEDComponent()
 ZEDEditor* ZEDComponent::GetEditor() const
 {
 	return Editor;
+}
+
+void ZEDComponent::Process()
+{
+
 }
