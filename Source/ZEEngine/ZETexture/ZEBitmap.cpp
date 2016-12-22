@@ -41,6 +41,7 @@
 
 #include <FreeImage.h>
 #include "ZEFile/ZEPathInfo.h"
+#include "ZEFile/ZEFileInfo.h"
 
 ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)
 {
@@ -381,6 +382,11 @@ bool ZEBitmap::Load(const char* FileName)
 	}
 
 	FREE_IMAGE_FORMAT FIFormat = FreeImage_GetFileType(RealPath.Path, 0);
+
+	if (FIFormat == FIF_UNKNOWN)
+		FIFormat = FreeImage_GetFIFFromFilename(RealPath.Path);
+	ZEString Dasda = FreeImage_GetFormatFromFIF(FIFormat);
+
 	FIBITMAP* FIBitmap = FreeImage_Load(FIFormat, RealPath.Path, 0);
 
 	if (FIBitmap == NULL)
