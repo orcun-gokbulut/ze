@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMain.cpp
+ Zinek Engine - ZEDTextureAssetType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDCore/ZEDAssetType.h"
 
-#include "ZEDCore/ZEDEditorCore.h"
-#include "ZEDEntityEditor/ZEDEntityEditor.h"
-
-#include "qglobal.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+class ZEDTextureAssetType : public ZEDAssetType
 {
-	Q_INIT_RESOURCE(ZEDCommon);
+	public:
+		virtual const char*						GetName() const override;
+		virtual const char* const*				GetExtensions() const override;
+		virtual ZESize							GetExtensionCount() const override;
 
-	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
-	if (!Core->Initialize())
-		return EXIT_FAILURE;
+		virtual const char*						GetIconPath() const override;
+		virtual const char* const*				GetCustomProperties() const override;
+		virtual ZESize							GetCustomPropertyCount() const override;
+		virtual ZEDAssetTypeCapabilities		GetCapabilities() const override;
 
-	Core->ExecuteEditor(ZEDEntityEditor::CreateInstance());
-	Core->Execute();
-
-	Core->Deinitialize();
-
-	return EXIT_SUCCESS;
-}
+												ZEDTextureAssetType();
+};

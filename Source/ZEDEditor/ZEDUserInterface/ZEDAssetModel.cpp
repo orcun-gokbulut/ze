@@ -49,11 +49,11 @@
 #include "ZEDCore/ZEDAssetEvent.h"
 
 
-bool ZEDAssetModel::Filter(ZEObject* Object) const
+bool ZEDAssetModel::Filter(ZEObject* AssetObject) const
 {
-	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Object->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), AssetObject->GetClass()))
 	{
-		ZEDAsset* Asset = static_cast<ZEDAsset*>(Object);
+		ZEDAsset* Asset = static_cast<ZEDAsset*>(AssetObject);
 		if (!SearchPattern.GetPattern().IsEmpty())
 		{
 			bool Found = SearchPattern.Match(Asset->GetName());
@@ -109,18 +109,18 @@ bool ZEDAssetModel::Filter(ZEObject* Object) const
 			}
 		}
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Object);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 		if (!SearchPattern.GetPattern().IsEmpty() &&
 			!SearchPattern.Match(Directory->GetName()))
 		{
 			return false;
 		}
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(Object);
+		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(AssetObject);
 		if (!SearchPattern.GetPattern().IsEmpty() &&
 			!SearchPattern.Match(Category->GetName()))
 		{
@@ -135,11 +135,11 @@ bool ZEDAssetModel::Filter(ZEObject* Object) const
 	return true;
 }
 
-bool ZEDAssetModel::FilterForward(ZEObject* Object) const
+bool ZEDAssetModel::FilterForward(ZEObject* AssetObject) const
 {
-	if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Object);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 
 		const ZEList2<ZEDAsset>& Assets = Directory->GetAssets();
 		ze_for_each(Asset, Assets)
@@ -160,9 +160,9 @@ bool ZEDAssetModel::FilterForward(ZEObject* Object) const
 
 		return false;
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(Object);
+		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(AssetObject);
 
 		const ZEList2<ZEDAsset>& Assets = Category->GetAssets();
 		ze_for_each(Asset, Assets)
@@ -185,22 +185,22 @@ bool ZEDAssetModel::FilterForward(ZEObject* Object) const
 	return false;
 }
 
-bool ZEDAssetModel::FilterBackward(ZEObject* Object) const
+bool ZEDAssetModel::FilterBackward(ZEObject* AssetObject) const
 {
-	if (Object == NULL)
+	if (AssetObject == NULL)
 		return false;
 
-	if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Object);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 		if (Filter(Directory))
 			return true;
 		else
 			return FilterBackward(Directory->GetParentDirectory());
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(Object);
+		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(AssetObject);
 		if (Filter(Category))
 			return true;
 		else
@@ -210,11 +210,11 @@ bool ZEDAssetModel::FilterBackward(ZEObject* Object) const
 	return false;
 }
 
-bool ZEDAssetModel::FilterHierarchy(ZEObject* Object) const
+bool ZEDAssetModel::FilterHierarchy(ZEObject* AssetObject) const
 {
-	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Object->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), AssetObject->GetClass()))
 	{
-		ZEDAsset* Asset = static_cast<ZEDAsset*>(Object);
+		ZEDAsset* Asset = static_cast<ZEDAsset*>(AssetObject);
 		if (Filter(Asset))
 			return true;
 		
@@ -229,9 +229,9 @@ bool ZEDAssetModel::FilterHierarchy(ZEObject* Object) const
 				return true;
 		}
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Object);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 
 		if (Filter(Directory))
 			return true;
@@ -240,9 +240,9 @@ bool ZEDAssetModel::FilterHierarchy(ZEObject* Object) const
 		else if (FilterForward(Directory))
 			return true;
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Object->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(Object);
+		ZEDAssetCategory* Category = static_cast<ZEDAssetCategory*>(AssetObject);
 		
 		if (Filter(Category))
 			return true;
@@ -788,22 +788,22 @@ QString ZEDAssetModel::display(const QModelIndex& Index) const
 	return "";
 }
 
-ZEObject* ZEDAssetModel::indexList(ZEObject* Target, int Row, int& Index) const
+ZEObject* ZEDAssetModel::indexList(ZEObject* AssetObject, int Row, int& Index) const
 {
 	int Count = 0;
-	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Target->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), AssetObject->GetClass()))
 	{
-		if (!Filter(Target))
+		if (!Filter(AssetObject))
 			return NULL;
 
 		if (Row == Index)
-			return Target;
+			return AssetObject;
 
 		Index++;
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Target->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Target);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 
 		const ZEList2<ZEDAssetDirectory>& SubDirectories = Directory->GetSubDirectories();
 		ze_for_each(SubDirectory, SubDirectories)
@@ -825,17 +825,17 @@ ZEObject* ZEDAssetModel::indexList(ZEObject* Target, int Row, int& Index) const
 	return NULL;
 }
 
-int ZEDAssetModel::rowCountList(ZEObject* Target) const
+int ZEDAssetModel::rowCountList(ZEObject* AssetObject) const
 {
 	int Count = 0;
-	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), Target->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDAsset::Class(), AssetObject->GetClass()))
 	{
-		if (Filter(Target))
+		if (Filter(AssetObject))
 			Count++;
 	}
-	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), Target->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDAssetDirectory::Class(), AssetObject->GetClass()))
 	{
-		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(Target);
+		ZEDAssetDirectory* Directory = static_cast<ZEDAssetDirectory*>(AssetObject);
 
 		const ZEList2<ZEDAssetDirectory>& SubDirectories = Directory->GetSubDirectories();
 		ze_for_each(SubDirectory, SubDirectories)
@@ -1069,8 +1069,8 @@ QVariant ZEDAssetModel::data(const QModelIndex& Index, int Role) const
 				QString IconFile;
 
 				ZEDAsset* Asset = ConvertToAsset(Index);
-				if (!Asset)
-					IconFile = ZEPathInfo(Asset->GetIconPath()).GetRealPath().Path;
+				if (Asset != NULL)
+					IconFile = ZEPathInfo(Asset->GetType()->GetIconPath()).GetRealPath().Path;
 				else if (ConvertToDirectory(Index))
 					IconFile = ZEPathInfo("#R:/ZEDEditor/Icons/Directory.png").GetRealPath().Path;
 				else if (!ConvertToCategory(Index))

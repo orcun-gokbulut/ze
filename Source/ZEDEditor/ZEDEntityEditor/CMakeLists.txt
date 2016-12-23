@@ -33,26 +33,43 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
+ze_add_source(ZEDEntityEditor.cpp						Sources)
+ze_add_source(ZEDEntityEditor.h							Sources ZEMC)
+ze_add_source(ZEDSceneWrapper.cpp						Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
+ze_add_source(ZEDEntityWrapper.cpp						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
 
-find_package(Qt5 COMPONENTS Widgets)
+ze_add_source(ZEDMaterialAsset.cpp						Sources)
+ze_add_source(ZEDMaterialAsset.h						Sources ZEMC)
+ze_add_source(ZEDMaterialAssetType.cpp					Sources)
+ze_add_source(ZEDMaterialAssetType.h					Sources ZEMC)
+ze_add_source(ZEDModelAsset.cpp							Sources)
+ze_add_source(ZEDModelAsset.h							Sources ZEMC)
+ze_add_source(ZEDModelAssetType.cpp						Sources)
+ze_add_source(ZEDModelAssetType.h						Sources ZEMC)
+ze_add_source(ZEDPrefabAsset.cpp						Sources)
+ze_add_source(ZEDPrefabAsset.h							Sources ZEMC)
+ze_add_source(ZEDPrefabAssetType.cpp					Sources)
+ze_add_source(ZEDPrefabAssetType.h						Sources ZEMC)
+ze_add_source(ZEDSceneAsset.cpp							Sources)
+ze_add_source(ZEDSceneAsset.h							Sources ZEMC)
+ze_add_source(ZEDSceneAssetType.cpp						Sources)
+ze_add_source(ZEDSceneAssetType.h						Sources ZEMC)
+ze_add_source(ZEDSoundAsset.cpp							Sources)
+ze_add_source(ZEDSoundAsset.h							Sources ZEMC)
+ze_add_source(ZEDSoundAssetType.cpp						Sources)
+ze_add_source(ZEDSoundAssetType.h						Sources ZEMC)
+ze_add_source(ZEDTextureAsset.cpp						Sources)
+ze_add_source(ZEDTextureAsset.h							Sources ZEMC)
+ze_add_source(ZEDTextureAssetType.cpp					Sources)
+ze_add_source(ZEDTextureAssetType.h						Sources ZEMC)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ze_add_library(TARGET ZEDEntityEditor 
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	LIBS ZEFoundation ZEDCore ZEDUserInterface)
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-
-ze_add_source(ZEDMain.cpp		Sources)
-
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor)
-
-qt5_use_modules(ZEDEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDSceneEditor)
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

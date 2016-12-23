@@ -434,7 +434,8 @@ void ZEDEditor::New()
 	FileState = ZED_ES_UNMODIFIED;
 	FileName = "";
 
-	GetObjectManager()->GetRootWrapper()->Clean();
+	if (GetObjectManager()->GetRootWrapper() != NULL)
+		GetObjectManager()->GetRootWrapper()->Clean();
 
 	UpdateCommands();
 

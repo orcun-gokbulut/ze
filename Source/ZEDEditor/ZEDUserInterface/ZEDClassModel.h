@@ -33,65 +33,83 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QAbstractItemModel>
+#include "ZEDCore/ZEDComponent.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEEnumerator.h"
 #include "ZERegEx/ZEWildcard.h"
 
+#include <QAbstractItemModel>
 
-class ZEClass;
-enum ZEDClassModelMode
+ZE_ENUM(ZEDClassModelMode)
 {
-	ZED_CMM_INHERITENCE_TREE,
-	ZED_CMM_CATEGORY_TREE,
+	ZED_CMM_NONE,
+	ZED_CMM_TREE,
 	ZED_CMM_LIST
 };
 
-class ZEDClassModel : public QAbstractItemModel
+
+ZE_ENUM(ZEDClassModelHierarchy)
+{
+	ZED_CMH_NONE,
+	ZED_CMH_INHERITANCE,
+	ZED_CMH_CATEGORY,
+};
+
+class ZEClass;
+
+class ZEDClassModel : public QAbstractItemModel, public ZEDComponent
 {
 	private:
-		ZEClass*						RootClass;
-		ZEDClassModelMode				Mode;
-		bool							ExcludeAbstractClasses;
-		ZEWildcard						SearchPattern;
-		ZEArray<ZEClass*>				IncludeFilter;
-		ZEArray<ZEClass*>				ExcludeFilter;
+		ZEClass*							RootClass;
+		ZEDClassModelMode					Mode;
+		ZEDClassModelHierarchy				Hierarchy;
+		bool								ExcludeAbstractClasses;
+		ZEWildcard							SearchPattern;
+		ZEArray<ZEClass*>					IncludeFilter;
+		ZEArray<ZEClass*>					ExcludeFilter;
 
-		bool							Filter(ZEClass* Class) const;
+		bool								Filter(ZEClass* Class) const;
+		bool								FilterForward(ZEClass* Class) const;
+		bool								FilterBackward(ZEClass* Class) const;
+		bool								FilterHierarchy(ZEClass* Class) const;
 
 	public:
-		void							SetMode(ZEDClassModelMode Mode);
-		ZEDClassModelMode				GetMode() const;
+		void								SetMode(ZEDClassModelMode Mode);
+		ZEDClassModelMode					GetMode() const;
 
-		void							SetRootClass(ZEClass* Class);
-		ZEClass*						GetRootClass() const;
+		void								SetHierarchy(ZEDClassModelHierarchy Hierarchy);
+		ZEDClassModelHierarchy				GetHierarchy() const;
 
-		void							SetSearchPattern(const ZEString& SearchText);
-		const ZEString&					GetSearchPattern() const;
+		void								SetRootClass(ZEClass* Class);
+		ZEClass*							GetRootClass() const;
 
-		void							SetIncludeFilter(const ZEArray<ZEClass*>& Filter);
-		const ZEArray<ZEClass*>&		GetIncludeFilter() const;
+		void								SetSearchPattern(const ZEString& SearchText);
+		const ZEString&						GetSearchPattern() const;
 
-		void							SetExcludeFilter(const ZEArray<ZEClass*>& Filter);
-		const ZEArray<ZEClass*>&		GetExcludeFilter() const;
+		void								SetIncludeFilter(const ZEArray<ZEClass*>& Filter);
+		const ZEArray<ZEClass*>&			GetIncludeFilter() const;
 
-		void							SetExcludeAbstractClasses(bool Enabled);
-		bool							GetExcludeAbstractClasses() const;
+		void								SetExcludeFilter(const ZEArray<ZEClass*>& Filter);
+		const ZEArray<ZEClass*>&			GetExcludeFilter() const;
 
-		ZEClass*						ConvertToClass(const QModelIndex& Index) const;
+		void								SetExcludeAbstractClasses(bool Enabled);
+		bool								GetExcludeAbstractClasses() const;
 
-	public: /* QAbstractItemModel */	
-		virtual QModelIndex				index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
-		virtual QModelIndex				parent(const QModelIndex &child) const override;
-		virtual bool					hasChildren(const QModelIndex &parent = QModelIndex()) const;
-		virtual int						rowCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual int						columnCount(const QModelIndex &parent = QModelIndex()) const override;
-		virtual QVariant				data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-		virtual QVariant				headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-		virtual Qt::ItemFlags			flags(const QModelIndex &index) const; 
-		virtual QStringList				mimeTypes() const override;
-		virtual QMimeData*				mimeData(const QModelIndexList &indexes) const override;
-		virtual Qt::DropActions			supportedDragActions() const override;
+		ZEClass*							ConvertToClass(const QModelIndex& Index) const;
 
-										ZEDClassModel();
+	public: /* QAbstractItemModel */		
+		virtual QModelIndex					index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+		virtual QModelIndex					parent(const QModelIndex &child) const override;
+		virtual bool						hasChildren(const QModelIndex &parent = QModelIndex()) const;
+		virtual int							rowCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual int							columnCount(const QModelIndex &parent = QModelIndex()) const override;
+		virtual QVariant					data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+		virtual QVariant					headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+		virtual Qt::ItemFlags				flags(const QModelIndex &index) const; 
+		virtual QStringList					mimeTypes() const override;
+		virtual QMimeData*					mimeData(const QModelIndexList &indexes) const override;
+		virtual Qt::DropActions				supportedDragActions() const override;
+
+											ZEDClassModel();
 };

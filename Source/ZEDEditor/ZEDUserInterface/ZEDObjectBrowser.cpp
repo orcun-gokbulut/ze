@@ -64,9 +64,9 @@ bool ZEDObjectBrowser::DeinitializeInternal()
 void ZEDObjectBrowser::UpdateUI()
 {
 	if (Form->txtSearch->text().isEmpty())
-		Model->SetMode(ZED_OTM_TREE);
+		Model->SetMode(ZED_OMM_TREE);
 	else
-		Model->SetMode(ZED_OTM_LIST);
+		Model->SetMode(ZED_OMM_LIST);
 
 	bool RootSelected = false;
 	QModelIndexList Items = Form->trwObjects->selectionModel()->selectedRows();
@@ -125,10 +125,11 @@ ZEDObjectBrowser::ZEDObjectBrowser()
 	Form->setupUi(Widget);
 
 	Model = new ZEDObjectModel();
-	Model->SetMode(ZED_OTM_TREE);
+	Model->SetMode(ZED_OMM_TREE);
 	SelectionModel = new ZEDObjectSelectionModel(Model);
 	SelectionModel->setSelectionBehavior(QAbstractItemView::SelectRows);
 	Form->trwObjects->setModel(Model);
+	Form->trwObjects->setExpanded(Model->index(0, 0, QModelIndex()), true);
 	Form->trwObjects->setSelectionModel(SelectionModel);
 	Form->trwObjects->setDragEnabled(true);
 	Form->trwObjects->header()->setStretchLastSection(false);

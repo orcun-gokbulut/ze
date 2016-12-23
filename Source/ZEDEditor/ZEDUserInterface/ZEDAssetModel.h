@@ -49,15 +49,16 @@ class ZEDAssetDirectory;
 class ZEDAssetCategory;
 class ZEDAssetManager;
 
-enum ZEDAssetModelMode
+ZE_ENUM(ZEDAssetModelMode)
 {
 	ZED_AMM_NONE,
 	ZED_AMM_TREE,
 	ZED_AMM_LIST
 };
 
-enum ZEDAssetModelHierarcy
+ZE_ENUM(ZEDAssetModelHierarcy)
 {
+	ZED_AMH_NONE,
 	ZED_AMH_DIRECTORY,
 	ZED_AMH_CATAGORY
 };
@@ -74,10 +75,10 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 		ZEArray<ZEDAssetType*>					ExcludeFilter;
 		bool									CloseEvent;
 
-		bool									Filter(ZEObject* Class) const;
-		bool									FilterForward(ZEObject* Class) const;
-		bool									FilterBackward(ZEObject* Class) const;
-		bool									FilterHierarchy(ZEObject* Class) const;
+		bool									Filter(ZEObject* AssetObject) const;
+		bool									FilterForward(ZEObject* AssetObject) const;
+		bool									FilterBackward(ZEObject* AssetObject) const;
+		bool									FilterHierarchy(ZEObject* AssetObject) const;
 
 		virtual void							AssetEvent(const ZEDAssetEvent* Event) override;
 
@@ -114,8 +115,8 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 
 	private:
 		QString									display(const QModelIndex &index) const;
-		ZEObject*								indexList(ZEObject* Target, int Row, int& Index) const;
-		int										rowCountList(ZEObject* Root) const;
+		ZEObject*								indexList(ZEObject* AssetObject, int Row, int& Index) const;
+		int										rowCountList(ZEObject* AssetObject) const;
 
 
 	public: /* QAbstractItemModel */			

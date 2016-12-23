@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMain.cpp
+ Zinek Engine - ZEDTextureAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDTextureAssetType.h"
 
-#include "ZEDCore/ZEDEditorCore.h"
-#include "ZEDEntityEditor/ZEDEntityEditor.h"
-
-#include "qglobal.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+ZEDTextureAssetType::ZEDTextureAssetType()
 {
-	Q_INIT_RESOURCE(ZEDCommon);
 
-	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
-	if (!Core->Initialize())
-		return EXIT_FAILURE;
+}
 
-	Core->ExecuteEditor(ZEDEntityEditor::CreateInstance());
-	Core->Execute();
+const char* ZEDTextureAssetType::GetName() const
+{
+	return "Texture";
+}
 
-	Core->Deinitialize();
+const char* const* ZEDTextureAssetType::GetExtensions() const
+{
+	static const char* Extensions[9] =
+	{
+		".ZETexture",
+		".bmp",
+		".tga",
+		".png",
+		".tiff",
+		".tif",
+		".jpg",
+		".jpeg",
+		".dds"
+	};
 
-	return EXIT_SUCCESS;
+	return Extensions;
+}
+
+ZESize ZEDTextureAssetType::GetExtensionCount() const
+{
+	return 9;
+}
+
+const char* ZEDTextureAssetType::GetIconPath() const
+{
+	return "";
+}
+
+const char* const* ZEDTextureAssetType::GetCustomProperties() const
+{
+	static const char* Properties[4] = 
+	{
+		"Dimensions"
+		"Width"
+		"Height"
+		"Format"
+	};
+
+	return Properties;
+}
+
+ZESize ZEDTextureAssetType::GetCustomPropertyCount() const 
+{
+	return 4;
+}
+
+ZEDAssetTypeCapabilities ZEDTextureAssetType::GetCapabilities() const
+{
+	return ZED_ATC_THUMBNAIL |ZED_ATC_PREVIEW;
 }

@@ -55,11 +55,13 @@ class ZEDClassBrowser : public ZEDWindow
 
 		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
 
-		void								UpdateUI();
+		void								Update();
 
 	private slots:
 		void								txtSearch_textChanged(const QString& Text);
+		
 		void								trwClasses_itemSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+		void								btnMode_toggled(bool Checked);
 		void								btnAdd_clicked();
 
 	public:

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMain.cpp
+ Zinek Engine - ZEDAssetDependency.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,26 +35,51 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDEditorCore.h"
-#include "ZEDEntityEditor/ZEDEntityEditor.h"
+#include "ZEMeta/ZEObject.h"
 
-#include "qglobal.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMeta/ZEEnumurator.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+ZE_ENUM(ZEDAssetDependencyTargetType)
 {
-	Q_INIT_RESOURCE(ZEDCommon);
+	ZED_ADTT_NONE				= 0,
+	ZED_ADTT_FILE				= 1,
+	ZED_ADTT_DIRECTORY			= 2,
+	ZED_ADTT_PACKAGE			= 3,
+	ZED_ADTT_CUSTOM				= 32
+};
 
-	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
-	if (!Core->Initialize())
-		return EXIT_FAILURE;
+ZE_ENUM(ZEDAssetDependencyType)
+{
+	ZED_ADT_NONE				= 0,
+	ZED_ADT_IMPLICIT			= 1,
+	ZED_ADT_ADDITIONAL			= 2,
+};
 
-	Core->ExecuteEditor(ZEDEntityEditor::CreateInstance());
-	Core->Execute();
+class ZEDAssetDependency : public ZEObject
+{
+	private:
+		ZEDAssetDependencyType			Type;
+		bool							Required;
 
-	Core->Deinitialize();
+		ZEDAssetDependencyTargetType	TargetType;
+		ZEString						Target;
 
-	return EXIT_SUCCESS;
-}
+	public:
+		void							SetType(ZEDAssetDependencyType Type);
+		ZEDAssetDependencyType			GetType() const;
+
+		void							SetRequired(bool Required);
+		bool							GetRequired() const;
+
+		void							SetTargetType(ZEDAssetDependencyTargetType Type);
+		ZEDAssetDependencyTargetType	GetTargetType() const;
+		
+		void							SetTarget(const ZEString& Target);
+		const ZEString&					GetTarget() const;
+
+		bool							Load(ZEMLReaderNode* DependencyNode);
+		bool							Save(ZEMLWriterNode* DependenciesNode) const;
+
+										ZEDAssetDependency();
+};

@@ -53,16 +53,16 @@ ZE_ENUM(ZEDAssetEditorType)
 ZE_ENUM(ZEDAssetTypeCapability)
 {
 	ZED_ATC_NONE,
-	ZED_ATC_TUMBNAIL,
+	ZED_ATC_THUMBNAIL,
 	ZED_ATC_PREVIEW,
-	ZED_ATC_WRAPPER
+	ZED_ATC_WRAPPER,
+	ZED_ATC_EDITOR
 };
+typedef ZEFlags ZEDAssetTypeCapabilities;
 
 class ZEDEditor;
 class ZEDObjectWrapper;
 class QWidget;
-
-typedef ZEFlagsBase<ZEDAssetTypeCapability> ZEDAssetTypeCapabilities;
 
 class ZEDAssetType : public ZEObject
 {
@@ -83,17 +83,10 @@ class ZEDAssetType : public ZEObject
 
 		const ZEList2<ZEDAsset>&				GetAssets() const;
 
-		virtual ZEDAssetEditorType				GetEditorType();
-		virtual ZEArray<ZEClass*>				GetSupportedEditors();
+		virtual const char*						GetIconPath() const;
+		virtual const char* const*				GetCustomProperties() const;
+		virtual ZESize							GetCustomPropertyCount() const;
+		virtual ZEDAssetTypeCapabilities		GetCapabilities() const;
 
-		virtual ZEDAssetTypeCapabilities		GetCapabilities();
-		virtual ZEDEditor*						CreateEditor() const;
-		virtual ZEDObjectWrapper*				CreateWrapper(ZEClass* EditorClass) const;
-
-		virtual bool							LaunchExternalEditor() const;
-
-		virtual void							UpdateCategory(const ZEString& Path, const ZEString& Category);
-		virtual void							UpdateTags(const ZEString& Path, const ZEArray<ZEString> Tags);
-		
 		virtual ZEDAsset*						Wrap(const ZEString& Path);
 };

@@ -57,14 +57,35 @@ bool ZEDAssetBrowser::DeinitializeInternal()
 	return ZEDWindow::DeinitializeInternal();
 }
 
+void ZEDAssetBrowser::Update()
+{
+	if (!Form->txtSearch->text().isEmpty())
+	{
+		Model->SetSearchPattern(ZEFormat::Format("*{0}*", Form->txtSearch->text().toUtf8().begin()));
+		Model->SetMode(Form->btnMode->isChecked() ? ZED_AMM_TREE : ZED_AMM_LIST);
+		Form->btnMode->setEnabled(true);
+	}
+	else
+	{
+		Model->SetSearchPattern("");
+		Model->SetMode(ZED_AMM_TREE);
+		Form->btnMode->setEnabled(false);
+	}
+}
+
 void ZEDAssetBrowser::txtSearch_textChanged(const QString& Text)
 {
-	Model->SetSearchPattern(ZEFormat::Format("*{0}*", Text.toUtf8().begin()));
+	Update();
+}
+
+void ZEDAssetBrowser::btnMode_toggled(bool Checked)
+{
+	Update();
 }
 
 void ZEDAssetBrowser::cmbCategories_currentIndexChanged(const QString& text)
 {
-
+	Update();
 }
 
 ZEDAssetBrowser::ZEDAssetBrowser()
@@ -95,7 +116,8 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	ModelColumns[3].SetHeaderText("Modified");
 	ModelColumns[3].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
 	Model->SetColumns(ModelColumns);
-
+	Form->btnMode->setChecked(Model->GetMode() == ZED_AMM_TREE);
+	Form->trwAssets->setExpanded(Model->index(0, 0, QModelIndex()), true);
 	Form->trwAssets->setModel(Model);
 	Form->trwAssets->setDragEnabled(true);
 	Form->trwAssets->header()->setStretchLastSection(false);
@@ -105,8 +127,10 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	Form->trwAssets->setAlternatingRowColors(true);
 	Form->trwAssets->setDragEnabled(true),
 	
+	Update();
 
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->btnMode, SIGNAL(toggled(bool)), this, SLOT(btnMode_toggled(bool)));
 	connect(Form->cmbCategories, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbCategories_currentIndexChanged(const QString&)));
 }
 
