@@ -55,64 +55,6 @@
 #undef CreateDirectory
 #undef RemoveDirectory
 
-class ZEDTextureAssetType : public ZEDAssetType
-{
-	virtual const char* GetName() const 
-	{
-		return "Texture"; 
-	}
-
-	virtual const char*const* GetExtensions() const 
-	{
-		static const char* A[] = {".bmp", ".png", ".dds", ".tif", ".tiff", ".tga", ".dds"}; 
-		return A;
-	}
-	
-	virtual ZESize GetExtensionCount() const
-	{
-		return 7;
-	}
-	
-	virtual ZEDAsset* Wrap(const ZEString& Path)
-	{
-		return new ZEDAsset();
-
-		/*	
-		switch(ZERandom::GetInt() % 10)
-		{
-			case 0:
-				Asset->SetCategory(" Station Ankara  . Models");
-				break;
-
-			case 1:
-				Asset->SetCategory("Station Ankara . Texture ");
-				break;
-
-			case 2:
-				Asset->SetCategory("Eskisehir .");
-				break;
-
-			case 3:
-				Asset->SetCategory("     Eskisehir. A");
-				break;
-
-			case 4:
-				Asset->SetCategory("  Eskisehir  .	B S");
-				break;
-
-			case 5:
-				Asset->SetCategory("Eskisehir  .	B S . AA");
-				break;
-
-			case 6:
-				Asset->SetCategory("SSS ");
-				break;
-		}*/
-
-		return NULL;
-	}
-};
-
 void ZEDAssetManager::UpdateCachedAsset(const ZEString& Path)
 {
 	GetDirectory(Path);
@@ -180,7 +122,7 @@ void ZEDAssetManager::Crawl()
 		return;
 
 	ZEString Location = CrawlLocations.Dequeue();
-	if (ZEDirectoryInfo(Location).IsDirectory())
+	if (ZEDirectoryInfo(Location).IsDirectory() || GetDirectory(Location) != NULL)
 	{
 		ScanDirectory(Location, true);
 	}
@@ -368,8 +310,6 @@ void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
 
 	if (Asset->Category != NULL)
 		RemoveCategory(Asset->Category);
-
-	delete Asset;
 }
 
 ZEDAssetDirectory* ZEDAssetManager::CreateDirectory(const ZEString& DirectoryPath)
@@ -425,29 +365,30 @@ ZEDAssetDirectory* ZEDAssetManager::CreateDirectory(const ZEString& DirectoryPat
 
 void ZEDAssetManager::RemoveDirectory(ZEDAssetDirectory* Directory)
 {
+	while (Directory->GetSubDirectories().GetFirst() != NULL)
+	{
+		ZEDAssetDirectory* DirectoryLink = Directory->GetSubDirectories().GetFirst()->GetItem();
+		RemoveDirectory(DirectoryLink);
+		delete DirectoryLink;
+	}
+
+
+	while (Directory->GetAssets().GetFirst() != NULL)
+	{
+		ZEDAsset* Asset = Directory->GetAssets().GetFirst()->GetItem();
+		RemoveAsset(Asset);
+		delete Asset;
+	}
+
 	ZEDAssetEvent Event;
 	Event.SetType(ZED_AET_DIRECTORY_REMOVING);
 	Event.SetDirectory(Directory);
 	Event.SetPath(Directory->GetPath());
 	RaiseEvent(&Event);
 
-	const ZELink<ZEDAssetDirectory>* DirectoryLink;
-	while (DirectoryLink = Directory->GetSubDirectories().GetFirst())
-	{
-		RemoveDirectory(DirectoryLink->GetItem());
-		delete DirectoryLink->GetItem();
-	}
-
-	const ZELink<ZEDAsset>* AssetLink;
-	while (AssetLink = Directory->GetAssets().GetFirst())
-	{
-		RemoveAsset(AssetLink->GetItem());
-		delete AssetLink->GetItem();
-	}
-
 	Directory->Manager = NULL;
-	Directory->ParentDirectory = NULL;
 	Directory->ParentDirectory->SubDirectories.Remove(&Directory->ParentDirectoryLink);
+	Directory->ParentDirectory = NULL;
 	
 	Event.SetType(ZED_AET_DIRECTORY_REMOVED);
 	RaiseEvent(&Event);
@@ -539,7 +480,6 @@ ZEDAssetManager::ZEDAssetManager()
 	ResourcePath = "#R:/";
 	CrawlerThread.SetFunction(ZEThreadFunction::Create<ZEDAssetManager, &ZEDAssetManager::CrawlerFunction>(this));
 	MonitorThread.SetFunction(ZEThreadFunction::Create<ZEDAssetManager, &ZEDAssetManager::MonitorFunction>(this));
-	RegisterAssetType(new ZEDTextureAssetType());
 }
 
 ZEDAssetManager::~ZEDAssetManager()

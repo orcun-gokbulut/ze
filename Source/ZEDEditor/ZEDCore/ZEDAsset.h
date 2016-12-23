@@ -41,26 +41,22 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZELink.h"
+#include "ZEDAssetMeta.h"
+#include "ZEDAssetDependency.h"
 
-
+class ZEDAsset;
 class ZEDAssetType;
 class ZEDAssetDirectory;
 class ZEDAssetCategory;
 class ZEDAssetManager;
+class ZEDThumbnailWidget;
+class ZEDPreviewWidget;
+class ZEDEditor;
 
-class ZEDAssetMetaData
+struct ZEDAssetDependencyItem
 {
-	public:
-		ZEGUID							GUID;
-		ZEUInt							VersionMinor;
-		ZEUInt							VersionMajor;
-		ZEUInt							VersionRevision;
-		ZETimeStamp						CreationDate;
-		ZEString						Description;
-		ZEString						Author;
-		ZEString						Copyright;
-		ZEString						WebSite;
-		ZEString						ProgramName;
+	ZEDAsset*							AssetName;
+	ZEDAssetDependency					Dependency;
 };
 
 class ZEDAsset : public ZEObject
@@ -70,46 +66,51 @@ class ZEDAsset : public ZEObject
 	friend class ZEDAssetDirectory;
 	friend class ZEDAssetManager;
 	private:
-		ZEDAssetManager*						Manager;
+		ZEDAssetManager*								Manager;
 
-		ZEDAssetDirectory*						Directory;
-		ZELink<ZEDAsset>						DirectoryLink;
+		ZEDAssetDirectory*								Directory;
+		ZELink<ZEDAsset>								DirectoryLink;
 
-		ZEDAssetCategory*						Category;
-		ZELink<ZEDAsset>						CategoryLink;
+		ZEDAssetCategory*								Category;
+		ZELink<ZEDAsset>								CategoryLink;
 
-		ZEDAssetType*							Type;
-		ZELink<ZEDAsset>						TypeLink;
+		ZEDAssetType*									Type;
+		ZELink<ZEDAsset>								TypeLink;
 
-		ZEString								Name;
-		ZEString								CategoryPath;
-		ZEArray<ZEString>						Tags;
-		ZEString								IconPath;
-		ZESize									FileSize;
-		ZETimeStamp								ModificationTime;
+		ZEString										Name;
+		ZEString										CategoryPath;
+		ZEArray<ZEString>								Tags;
+		ZESize											FileSize;
+		ZETimeStamp										ModificationTime;
 	
-	public:
-												ZEDAsset();
-		virtual									~ZEDAsset();
+	protected:
+														ZEDAsset();
+		virtual											~ZEDAsset();
 
 	public:
-		ZEDAssetManager*						GetManager() const;
-		ZEDAssetDirectory*						GetDirectory() const;
-		ZEDAssetCategory*						GetCategory() const;
-		ZEString								GetCategoryPath() const;
+		ZEDAssetManager*								GetManager() const;
+		ZEDAssetDirectory*								GetDirectory() const;
+		ZEDAssetCategory*								GetCategory() const;
+		ZEString										GetCategoryPath() const;
 
-		void									SetName(const ZEString& Name);
-		const ZEString&							GetName() const;
+		void											SetName(const ZEString& Name);
+		const ZEString&									GetName() const;
 		
-		ZEString								GetPath() const;
-		ZEDAssetType*							GetType() const;
+		ZEString										GetPath() const;
+		ZEDAssetType*									GetType() const;
 
-		ZEString								GetIconPath();
+		const ZEArray<ZEString>&						GetTags() const;
 
-		void									SetTags(const ZEArray<ZEString>& Tags);
-		const ZEArray<ZEString>&				GetTags() const;
+		ZESize											GetFileSize() const;
+		ZETimeStamp										GetModificationTime() const;
+		
+		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName);
+		virtual ZEDThumbnailWidget*						CreateThumbnailWidget();
+		virtual ZEDPreviewWidget*						CreatePreviewWidget();
+		virtual ZEDEditor*								CreateEditor() const;
+		virtual bool									ReadMetaData(ZEDAssetMetaData& MetaData) const;
+		virtual bool									WriteMetaData(const ZEDAssetMetaData& MetaData) const;
 
-		ZESize									GetFileSize() const;
-		ZETimeStamp								GetModificationTime() const;
-		ZEDAssetMetaData						GetMetaData() const;
+		virtual ZEArray<ZEDAssetDependencyItem>			ReadDependencies() const;
+
 };

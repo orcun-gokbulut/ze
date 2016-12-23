@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneEditor.h
+ Zinek Engine - ZEDTextureAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,40 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDTextureAsset.h"
 
-#include "ZEDCore/ZEDEditor.h"
+#include "ZEDS/ZEVariant.h"
 
-class ZEDViewport;
-class ZEDViewportController;
-class ZEDObjectBrowser;
-class ZEDClassBrowser;
-class ZEDAssetBrowser;
-class ZEDPropertyWindow;
-class ZEDSelectionToolbar;
-class ZEDTransformationToolbar;
-class ZEScene;
-
-class ZEDSceneEditor : public ZEDEditor
+ZEVariant ZEDTextureAsset::GetAssetProperty(const ZEString& PropertyName)
 {
-	ZE_OBJECT
-	private:
-		ZEDViewport*						Viewport;
-		ZEDViewportController*				Controller;
-		ZEDObjectBrowser*					ObjectBrowser;
-		ZEDClassBrowser*					ClassBrowser;
-		ZEDAssetBrowser*					AssetBrowser;
-		ZEDPropertyWindow*					PropertyWindow;
-		ZEDSelectionToolbar*				SelectionToolbar;
-		ZEDTransformationToolbar*			TransformationToolbar;
-		ZEScene*							Scene;
-
-		virtual bool						InitializeInternal();
-
-											ZEDSceneEditor();
-		virtual								~ZEDSceneEditor();
-
-	public:
-		static ZEDSceneEditor*				CreateInstance();
+	return ZEVariant();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");
+
+ZEDThumbnailWidget* ZEDTextureAsset::CreateThumbnailWidget()
+{
+	return NULL;
+}
+
+ZEDPreviewWidget* ZEDTextureAsset::CreatePreviewWidget()
+{
+	return NULL;
+}

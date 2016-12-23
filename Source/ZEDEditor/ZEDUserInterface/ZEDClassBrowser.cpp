@@ -44,8 +44,14 @@
 #include "ZEGame/ZEEntity.h"
 #include "ui_ZEDClassBrowser.h"
 
-void ZEDClassBrowser::UpdateUI()
+void ZEDClassBrowser::Update()
 {
+	if (!Form->txtSearch->text().isEmpty())
+		Model->SetSearchPattern(ZEFormat::Format("*{0}*", Form->txtSearch->text().toUtf8().begin()));
+	else
+		Model->SetSearchPattern("");
+
+	Model->SetMode(Form->btnMode->isChecked() ? ZED_CMM_TREE : ZED_CMM_LIST);
 	ZEClass* SelectedClass = NULL;
 	QModelIndexList SelectedIndexes = Form->trwClasses->selectionModel()->selectedRows();
 	if (SelectedIndexes.count() == 1)
@@ -73,12 +79,6 @@ void ZEDClassBrowser::UpdateUI()
 	{
 		Form->btnAdd->setEnabled(false);
 	}
-
-
-	if (Form->txtSearch->text().isEmpty() && Form->cmbCategories->currentIndex() == 0)
-		Model->SetMode(ZED_CMM_INHERITENCE_TREE);
-	else
-		Model->SetMode(ZED_CMM_LIST);
 }
 
 bool ZEDClassBrowser::InitializeInternal()
@@ -86,25 +86,29 @@ bool ZEDClassBrowser::InitializeInternal()
 	if (!ZEDWindow::InitializeInternal())
 		return false;
 
-	UpdateUI();
+	Update();
 
 	return true;
 }
 
 void ZEDClassBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
 {
-	UpdateUI();
+	Update();
 }
 
 void ZEDClassBrowser::txtSearch_textChanged(const QString& Text)
 {
-	Model->SetSearchPattern(ZEFormat::Format("*{0}*", Text.toUtf8().data()));
-	UpdateUI();
+	Update();
 }
 
 void ZEDClassBrowser::trwClasses_itemSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	UpdateUI();
+	Update();
+}
+
+void ZEDClassBrowser::btnMode_toggled(bool Checked)
+{
+	Update();
 }
 
 void ZEDClassBrowser::btnAdd_clicked()
@@ -125,8 +129,11 @@ ZEDClassBrowser::ZEDClassBrowser()
 
 	Model = new ZEDClassModel();
 	Model->SetRootClass(ZEEntity::Class());
-	Model->SetMode(ZED_CMM_INHERITENCE_TREE);
+	Model->SetMode(ZED_CMM_TREE);
+	Model->SetHierarchy(ZED_CMH_INHERITANCE);
+	Form->btnMode->setChecked(Model->GetMode() == ZED_CMM_TREE);
 	Form->trwClasses->setModel(Model);
+	Form->trwClasses->setExpanded(Model->index(0, 0, QModelIndex()), true);
 	Form->trwClasses->setDragEnabled(true);
 	Form->trwClasses->header()->setStretchLastSection(false);
 	Form->trwClasses->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -136,7 +143,10 @@ ZEDClassBrowser::ZEDClassBrowser()
 	Form->trwClasses->setSelectionMode(QAbstractItemView::SingleSelection);
 	Form->trwClasses->setAlternatingRowColors(true);
 
+	Update();
+
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->btnMode, SIGNAL(toggled(bool)), this, SLOT(btnMode_toggled(bool)));
 	connect(Form->trwClasses->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SLOT(trwClasses_itemSelectionChanged(const QItemSelection&, const QItemSelection&)));
 	connect(Form->btnAdd, SIGNAL(clicked()), this, SLOT(btnAdd_clicked()));
 }

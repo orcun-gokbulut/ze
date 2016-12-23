@@ -120,16 +120,43 @@ bool ZEDObjectModel::Filter(ZEDObjectWrapper* Wrapper) const
 	return true;
 }
 
-bool ZEDObjectModel::FilterHierarchy(ZEDObjectWrapper* Wrapper) const
+bool ZEDObjectModel::FilterForward(ZEDObjectWrapper* Wrapper) const
 {
 	const ZEArray<ZEDObjectWrapper*>& ChildWrappers = Wrapper->GetChildWrappers();
+
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
 	{
-		if (FilterHierarchy(ChildWrappers[I]))
+		if (Filter(ChildWrappers[I]))
+			return true;
+
+		if (FilterForward(ChildWrappers[I]))
 			return true;
 	}
 
+	return false;
+}
+
+bool ZEDObjectModel::FilterBackward(ZEDObjectWrapper* Wrapper) const
+{
+	if (Wrapper == NULL)
+		return false;
+
 	if (Filter(Wrapper))
+		return true;
+
+	if (FilterBackward(Wrapper->GetParent()))
+		return true;
+
+	return false;
+}
+
+bool ZEDObjectModel::FilterHierarchy(ZEDObjectWrapper* Wrapper) const
+{
+	if (Filter(Wrapper))
+		return true;
+	else if (FilterBackward(Wrapper->GetParent()))
+		return true;
+	else if (FilterForward(Wrapper))
 		return true;
 
 	return false;
@@ -150,7 +177,7 @@ ZEDObjectWrapper* ZEDObjectModel::GetRootWrapper() const
 	return RootWrapper;
 }
 
-void ZEDObjectModel::SetMode(ZEDObjectTreeMode Mode)
+void ZEDObjectModel::SetMode(ZEDObjectModelMode Mode)
 {
 	if (this->Mode == Mode)
 		return;
@@ -161,7 +188,7 @@ void ZEDObjectModel::SetMode(ZEDObjectTreeMode Mode)
 
 }
 
-ZEDObjectTreeMode ZEDObjectModel::GetMode() const
+ZEDObjectModelMode ZEDObjectModel::GetMode() const
 {
 	return Mode;
 }
@@ -293,7 +320,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 
 	if (Event->GetType() == ZED_OET_ADDING)
 	{
-		if (Mode == ZED_OTM_TREE)
+		if (Mode == ZED_OMM_TREE)
 		{
 			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
 			if (!FilterHierarchy(Wrapper))
@@ -302,7 +329,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 			int Index = (int)Wrapper->GetParent()->GetChildWrappers().GetCount();
 			beginInsertRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
 		}
-		else if (Mode == ZED_OTM_LIST)
+		else if (Mode == ZED_OMM_LIST)
 		{
 			beginResetModel();
 		}
@@ -310,14 +337,14 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 	}
 	else if (Event->GetType() == ZED_OET_ADDED)
 	{
-		if (Mode == ZED_OTM_TREE)
+		if (Mode == ZED_OMM_TREE)
 			endInsertRows();
-		else if (Mode == ZED_OTM_LIST)
+		else if (Mode == ZED_OMM_LIST)
 			endResetModel();
 	}
 	else if (Event->GetType() == ZED_OET_REMOVING)
 	{
-		if (Mode == ZED_OTM_TREE)
+		if (Mode == ZED_OMM_TREE)
 		{
 			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
 			if (!FilterHierarchy(Wrapper))
@@ -326,21 +353,21 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 			ZESSize Index = Wrapper->GetParent()->GetChildWrappers().FindIndex(Wrapper);
 			beginRemoveRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
 		}
-		else if (Mode == ZED_OTM_LIST)
+		else if (Mode == ZED_OMM_LIST)
 		{
 			beginResetModel();
 		}
 	}
 	else if (Event->GetType() == ZED_OET_REMOVED)
 	{
-		if (Mode == ZED_OTM_TREE)
+		if (Mode == ZED_OMM_TREE)
 			endRemoveRows();
-		else if (Mode == ZED_OTM_LIST)
+		else if (Mode == ZED_OMM_LIST)
 			endResetModel();
 	}
 	else if (Event->GetType() == ZED_OET_CHANGED)
 	{
-		if (Mode == ZED_OTM_TREE)
+		if (Mode == ZED_OMM_TREE)
 		{
 			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
 			if (!FilterHierarchy(Wrapper))
@@ -349,7 +376,7 @@ void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
 			ZESSize Index = Wrapper->GetParent()->GetChildWrappers().FindIndex(Wrapper);
 			dataChanged(createIndex(Index, 0, Wrapper->GetParent()), createIndex(Index, columnCount(), Wrapper->GetParent()));
 		}
-		else if (Mode == ZED_OTM_LIST)
+		else if (Mode == ZED_OMM_LIST)
 		{
 			beginResetModel();
 			endResetModel();
@@ -473,7 +500,7 @@ bool ZEDObjectModel::dropMimeDataInternal(const QMimeData* Data, Qt::DropAction 
 
 QModelIndex ZEDObjectModel::index(int Row, int Column, const QModelIndex& Parent) const
 {
-	if (Mode == ZED_OTM_TREE)
+	if (Mode == ZED_OMM_TREE)
 	{
 		if (!Parent.isValid())
 		{
@@ -500,7 +527,7 @@ QModelIndex ZEDObjectModel::index(int Row, int Column, const QModelIndex& Parent
 			Index++;
 		}
 	}
-	else if (Mode == ZED_OTM_LIST)
+	else if (Mode == ZED_OMM_LIST)
 	{		
 		int Index = 0;
 		ZEDObjectWrapper* Wrapper = indexList(RootWrapper, Row, Index);
@@ -512,7 +539,7 @@ QModelIndex ZEDObjectModel::index(int Row, int Column, const QModelIndex& Parent
 
 QModelIndex ZEDObjectModel::parent(const QModelIndex& Child) const
 {
-	if (Mode == ZED_OTM_TREE)
+	if (Mode == ZED_OMM_TREE)
 	{
 		if (!Child.isValid())
 			return QModelIndex();
@@ -545,7 +572,7 @@ QModelIndex ZEDObjectModel::parent(const QModelIndex& Child) const
 
 bool ZEDObjectModel::hasChildren(const QModelIndex& Parent) const
 {
-	if (Mode == ZED_OTM_TREE)
+	if (Mode == ZED_OMM_TREE)
 	{
 		if (!Parent.isValid())
 			return (RootWrapper != NULL);
@@ -566,7 +593,7 @@ bool ZEDObjectModel::hasChildren(const QModelIndex& Parent) const
 			return true;
 		}
 	}
-	else if (Mode == ZED_OTM_LIST)
+	else if (Mode == ZED_OMM_LIST)
 	{
 		return (!Parent.isValid());
 	}
@@ -576,7 +603,7 @@ bool ZEDObjectModel::hasChildren(const QModelIndex& Parent) const
 
 int ZEDObjectModel::rowCount(const QModelIndex& Parent) const
 {
-	if (Mode == ZED_OTM_TREE)
+	if (Mode == ZED_OMM_TREE)
 	{
 		if (!Parent.isValid())
 			return (RootWrapper == NULL ? 0 : 1);
@@ -600,7 +627,7 @@ int ZEDObjectModel::rowCount(const QModelIndex& Parent) const
 
 		return Count;
 	}
-	else if (Mode == ZED_OTM_LIST)
+	else if (Mode == ZED_OMM_LIST)
 	{
 		if (Parent.isValid())
 			return 0;
@@ -738,5 +765,5 @@ Qt::DropActions ZEDObjectModel::supportedDragActions() const
 ZEDObjectModel::ZEDObjectModel()
 {
 	RootWrapper = NULL;
-	Mode = ZED_OTM_TREE;
+	Mode = ZED_OMM_TREE;
 }

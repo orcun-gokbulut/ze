@@ -36,11 +36,16 @@
 #include "ZEDAsset.h"
 
 #include "ZEDS/ZEFormat.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFileInfo.h"
+
 #include "ZEDAssetDirectory.h"
 #include "ZEDAssetCategory.h"
 #include "ZEDAssetType.h"
 #include "ZEDAssetManager.h"
+
 
 ZEDAsset::ZEDAsset() : DirectoryLink(this), CategoryLink(this), TypeLink(this)
 {
@@ -106,17 +111,6 @@ ZEDAssetType* ZEDAsset::GetType() const
 {
 	return Type;
 }
-
-ZEString ZEDAsset::GetIconPath()
-{
-	return ZEString::Empty;
-}
-
-void ZEDAsset::SetTags(const ZEArray<ZEString>& Tags)
-{
-	this->Tags = Tags;
-}
-
 const ZEArray<ZEString>& ZEDAsset::GetTags() const
 {
 	return Tags;
@@ -132,7 +126,56 @@ ZETimeStamp ZEDAsset::GetModificationTime() const
 	return ModificationTime;
 }
 
-ZEDAssetMetaData ZEDAsset::GetMetaData() const
+ZEVariant ZEDAsset::GetAssetProperty(const ZEString& PropertyName)
 {
-	return ZEDAssetMetaData();
+	return ZEVariant();
+}
+
+ZEDThumbnailWidget* ZEDAsset::CreateThumbnailWidget()
+{
+	return NULL;
+}
+
+ZEDPreviewWidget* ZEDAsset::CreatePreviewWidget()
+{
+	return NULL;
+}
+
+ZEDEditor* ZEDAsset::CreateEditor() const
+{
+	return NULL;
+}
+
+bool ZEDAsset::ReadMetaData(ZEDAssetMetaData& MetaData) const
+{
+	ZEMLReader Reader;
+	if (!Reader.Open(ZEFormat::Format("{0}.ZEAsset", GetPath())))
+		return false;
+
+	ZEMLReaderNode AssetNode = Reader.GetRootNode().GetNode("Asset");
+	if (!AssetNode.IsValid())
+		return false;
+
+	return MetaData.Load(&AssetNode);
+}
+
+bool ZEDAsset::WriteMetaData(const ZEDAssetMetaData& MetaData) const
+{
+	ZEMLWriter Writer;
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
+	if (!Writer.Open(ZEFormat::Format("{0}.ZEAsset", GetPath())))
+		return false;
+
+	ZEMLWriterNode RootNode;
+	if (!Writer.OpenRootNode("ZEDAsset", RootNode))
+		return false;
+
+	MetaData.Save(&RootNode);
+	
+	RootNode.CloseNode();
+}
+
+ZEArray<ZEDAssetDependencyItem> ZEDAsset::ReadDependencies() const
+{
+	return ZEArray<ZEDAssetDependencyItem>();
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMain.cpp
+ Zinek Engine - ZEDTextureAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDCore/ZEDAsset.h"
 
-#include "ZEDCore/ZEDEditorCore.h"
-#include "ZEDEntityEditor/ZEDEntityEditor.h"
-
-#include "qglobal.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+class ZEDTextureAsset : public ZEDAsset
 {
-	Q_INIT_RESOURCE(ZEDCommon);
-
-	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
-	if (!Core->Initialize())
-		return EXIT_FAILURE;
-
-	Core->ExecuteEditor(ZEDEntityEditor::CreateInstance());
-	Core->Execute();
-
-	Core->Deinitialize();
-
-	return EXIT_SUCCESS;
-}
+	friend class ZEDTextureAsset;
+	public:
+		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName);
+		virtual ZEDThumbnailWidget*						CreateThumbnailWidget();
+		virtual ZEDPreviewWidget*						CreatePreviewWidget();
+};

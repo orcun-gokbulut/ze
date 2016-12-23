@@ -66,47 +66,27 @@ const ZEList2<ZEDAsset>& ZEDAssetType::GetAssets() const
 	return Assets;
 }
 
-ZEDAssetEditorType ZEDAssetType::GetEditorType()
+const char* ZEDAssetType::GetIconPath() const
 {
-	return ZED_AET_NONE;
+	return "";
 }
 
-ZEArray<ZEClass*> ZEDAssetType::GetSupportedEditors()
+const char* const* ZEDAssetType::GetCustomProperties() const
 {
-	return ZEArray<ZEClass*>();
+	return NULL;
 }
 
-ZEDAssetTypeCapabilities ZEDAssetType::GetCapabilities()
+ZESize ZEDAssetType::GetCustomPropertyCount() const
+{
+	return 0;
+}
+
+ZEDAssetTypeCapabilities ZEDAssetType::GetCapabilities() const
 {
 	return ZED_ATC_NONE;
 }
 
-ZEDEditor* ZEDAssetType::CreateEditor() const
-{
-	return NULL;
-}
-
-ZEDObjectWrapper* ZEDAssetType::CreateWrapper(ZEClass* EditorClass) const
-{
-	return NULL;
-}
-
-bool ZEDAssetType::LaunchExternalEditor() const
-{
-	return false;
-}
-
-void ZEDAssetType::UpdateCategory(const ZEString& Path, const ZEString& Category)
-{
-
-}
-
-void ZEDAssetType::UpdateTags(const ZEString& Path, const ZEArray<ZEString> Tags)
-{
-
-}
-
 ZEDAsset* ZEDAssetType::Wrap(const ZEString& Path)
 {
-	return false;
+	return NULL;
 }

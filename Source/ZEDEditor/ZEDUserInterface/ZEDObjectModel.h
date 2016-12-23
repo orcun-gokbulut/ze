@@ -40,24 +40,23 @@
 #include "ZEDS/ZEArray.h"
 #include "ZERegEx/ZEWildcard.h"
 
-#include <QRegExp>
 #include <QAbstractItemModel>
+
+ZE_ENUM(ZEDObjectModelMode)
+{
+	ZED_OMM_NONE,
+	ZED_OMM_LIST,
+	ZED_OMM_TREE
+};
 
 class ZEClass;
 class ZEDObjectWrapper;
-
-enum ZEDObjectTreeMode
-{
-	ZED_OTM_NONE,
-	ZED_OTM_LIST,
-	ZED_OTM_TREE
-};
 
 class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 {
 	private:
 		ZEDObjectWrapper*				RootWrapper;
-		ZEDObjectTreeMode				Mode;
+		ZEDObjectModelMode				Mode;
 
 		ZEWildcard						FilterSearch;
 		ZEArray<ZEObject*>				FilterIncludedObjects;
@@ -66,14 +65,16 @@ class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 		ZEArray<ZEClass*>				FilterExcludedClasses;
 
 		bool							Filter(ZEDObjectWrapper* Wrapper) const;
+		bool							FilterForward(ZEDObjectWrapper* Wrapper) const;
+		bool							FilterBackward(ZEDObjectWrapper* Wrapper) const;
 		bool							FilterHierarchy(ZEDObjectWrapper* Wrapper) const;
 
 	public:
 		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper*				GetRootWrapper() const;
 
-		void							SetMode(ZEDObjectTreeMode Mode);
-		ZEDObjectTreeMode				GetMode() const;
+		void							SetMode(ZEDObjectModelMode Mode);
+		ZEDObjectModelMode				GetMode() const;
 		
 		void							SetFilterPattern(const ZEString& Text);
 		const ZEString&					GetFilterPattern() const;

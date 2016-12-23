@@ -75,6 +75,50 @@ bool ZEDClassModel::Filter(ZEClass* Class) const
 	return true;
 }
 
+bool ZEDClassModel::FilterForward(ZEClass* Class) const
+{
+	const ZEArray<ZEClass*>& Classes = ZEProvider::GetInstance()->GetClasses();
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if (Classes[I]->GetParentClass() != Class)
+			continue;
+
+		if (Filter(Classes[I]))
+			return true;
+
+		if (FilterForward(Classes[I]))
+			return true;
+	}
+
+	return false;
+}
+
+bool ZEDClassModel::FilterBackward(ZEClass* Class) const
+{
+	if (Class == NULL)
+		return false;
+
+	if (Filter(Class))
+		return true;
+
+	if (FilterBackward(Class->GetParentClass()))
+		return true;
+
+	return false;
+}
+
+bool ZEDClassModel::FilterHierarchy(ZEClass* Class) const
+{
+	if (Filter(Class))
+		return true;
+	else if (FilterBackward(Class->GetParentClass()))
+		return true;
+	else if (FilterForward(Class))
+		return true;
+
+	return false;
+}
+
 void ZEDClassModel::SetMode(ZEDClassModelMode Mode)
 {
 	if (this->Mode == Mode)
@@ -88,6 +132,21 @@ void ZEDClassModel::SetMode(ZEDClassModelMode Mode)
 ZEDClassModelMode ZEDClassModel::GetMode() const
 {
 	return Mode;
+}
+
+void ZEDClassModel::SetHierarchy(ZEDClassModelHierarchy Mode)
+{
+	if (this->Hierarchy == Hierarchy)
+		return;
+
+	beginResetModel();
+	this->Hierarchy = Hierarchy;
+	endResetModel();
+}
+
+ZEDClassModelHierarchy ZEDClassModel::GetHierarchy() const
+{
+	return Hierarchy;
 }
 
 void ZEDClassModel::SetRootClass(ZEClass* Class)
@@ -192,7 +251,7 @@ ZEClass* ZEDClassModel::ConvertToClass(const QModelIndex& Index) const
 
 QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent) const
 {
-	if (Mode == ZED_CMM_INHERITENCE_TREE)
+	if (Mode == ZED_CMM_TREE && Hierarchy == ZED_CMH_INHERITANCE)
 	{
 		if (!Parent.isValid())
 			return (RootClass != NULL ? createIndex(Row, Column, RootClass) : QModelIndex());
@@ -210,7 +269,7 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 				if (Classes[I]->GetParentClass() != ParentClass)
 					continue;
 
-				if (!Filter(Classes[I]->GetParentClass()))
+				if (!FilterHierarchy(Classes[I]))
 					continue;
 
 				if (Index == Row)
@@ -260,7 +319,7 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 
 QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 {
-	if (Mode == ZED_CMM_INHERITENCE_TREE)
+	if (Mode == ZED_CMM_TREE && Hierarchy == ZED_CMH_INHERITANCE)
 	{
 		if (!Child.isValid())
 			return QModelIndex();
@@ -283,7 +342,7 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 				if (Classes[I]->GetParentClass() != GrandParentClass)
 					continue;
 
-				if (!Filter(Classes[I]->GetParentClass()))
+				if (!FilterHierarchy(Classes[I]))
 					continue;
 
 				if (Classes[I] == ParentClass)
@@ -303,7 +362,7 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 
 bool ZEDClassModel::hasChildren(const QModelIndex& Parent) const
 {
-	if (Mode == ZED_CMM_INHERITENCE_TREE)
+	if (Mode == ZED_CMM_TREE && Hierarchy == ZED_CMH_INHERITANCE)
 	{
 		if (!Parent.isValid())
 			return (RootClass != NULL);
@@ -323,7 +382,7 @@ bool ZEDClassModel::hasChildren(const QModelIndex& Parent) const
 				if (Classes[I]->GetParentClass() != ParentClass)
 					continue;
 
-				if (!Filter(Classes[I]))
+				if (!FilterHierarchy(Classes[I]))
 					continue;
 
 				Classes.UnlockRead();
@@ -344,7 +403,7 @@ bool ZEDClassModel::hasChildren(const QModelIndex& Parent) const
 
 int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 {
-	if (Mode == ZED_CMM_INHERITENCE_TREE)
+	if (Mode == ZED_CMM_TREE && Hierarchy == ZED_CMH_INHERITANCE)
 	{
 		if (!Parent.isValid())
 			return (RootClass == NULL ? 0 : 1);
@@ -365,7 +424,7 @@ int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 				if (Classes[I]->GetParentClass() != ParentClass)
 					continue;
 
-				if (!Filter(Classes[I]))
+				if (!FilterHierarchy(Classes[I]))
 					continue;
 
 				Count++;
@@ -513,6 +572,7 @@ Qt::DropActions ZEDClassModel::supportedDragActions() const
 ZEDClassModel::ZEDClassModel()
 {
 	RootClass = NULL;
-	Mode = ZED_CMM_INHERITENCE_TREE;
+	Mode = ZED_CMM_TREE;
+	Hierarchy = ZED_CMH_INHERITANCE;
 	ExcludeAbstractClasses = false;
 }

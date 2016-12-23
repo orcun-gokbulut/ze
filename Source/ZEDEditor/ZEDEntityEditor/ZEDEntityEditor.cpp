@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneEditor.cpp
+ Zinek Engine - ZEDEntityEditor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDSceneEditor.h"
+#include "ZEDEntityEditor.h"
 
 #include "ZEDCore/ZEDGrid.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
@@ -54,11 +54,15 @@
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZEGame/ZEStateScreen.h"
 #include "ZEInterior/ZEInterior.h"
+#include "ZEDTextureAssetType.h"
+#include "ZEDCore/ZEDAssetManager.h"
 
-bool ZEDSceneEditor::InitializeInternal()
+bool ZEDEntityEditor::InitializeInternal()
 {
 	if (!ZEDEditor::InitializeInternal())
 		return false;
+
+	GetAssetManager()->RegisterAssetType(new ZEDTextureAssetType());
 
 	ZEDViewportController* Controller = ZEDViewportController::CreateInstance();
 	AddComponent(Controller);
@@ -110,13 +114,14 @@ bool ZEDSceneEditor::InitializeInternal()
 	Atmosphere->SetSunLight(Light1);
 	Scene->AddEntity(Atmosphere);
 
-	GetObjectManager()->GetRootWrapper()->Update();
+	if (GetObjectManager()->GetRootWrapper() != NULL)
+		GetObjectManager()->GetRootWrapper()->Update();
 	GetMainWindow()->GetMainWindow()->show();
 
 	return true;
 }
 
-ZEDSceneEditor::ZEDSceneEditor()
+ZEDEntityEditor::ZEDEntityEditor()
 {
 	Viewport = NULL;
 	Controller = NULL;
@@ -129,12 +134,12 @@ ZEDSceneEditor::ZEDSceneEditor()
 	Scene = NULL;
 }
 
-ZEDSceneEditor::~ZEDSceneEditor()
+ZEDEntityEditor::~ZEDEntityEditor()
 {
 
 }
 
-ZEDSceneEditor* ZEDSceneEditor::CreateInstance()
+ZEDEntityEditor* ZEDEntityEditor::CreateInstance()
 {
-	return new ZEDSceneEditor();
+	return new ZEDEntityEditor();
 }

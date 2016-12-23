@@ -51,8 +51,11 @@ class ZEDAssetBrowser : public ZEDWindow
 		virtual bool						InitializeInternal() override;
 		virtual bool						DeinitializeInternal() override;
 
+		void								Update();
+
 	private slots:
 		void								txtSearch_textChanged(const QString& Text);
+		void								btnMode_toggled(bool Checked);
 		void								cmbCategories_currentIndexChanged(const QString& Text);
 
 	public:
