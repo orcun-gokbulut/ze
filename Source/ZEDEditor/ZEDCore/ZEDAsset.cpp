@@ -47,6 +47,16 @@
 #include "ZEDAssetManager.h"
 
 
+void ZEDAsset::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+void ZEDAsset::SetType(ZEDAssetType* Type)
+{
+	this->Type = Type;
+}
+
 ZEDAsset::ZEDAsset() : DirectoryLink(this), CategoryLink(this), TypeLink(this)
 {
 	Manager = NULL;
@@ -97,11 +107,6 @@ ZEString ZEDAsset::GetCategoryPath() const
 	return CategoryPath;
 }
 
-void ZEDAsset::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
 const ZEString& ZEDAsset::GetName() const
 {
 	return Name;
@@ -126,22 +131,37 @@ ZETimeStamp ZEDAsset::GetModificationTime() const
 	return ModificationTime;
 }
 
-ZEVariant ZEDAsset::GetAssetProperty(const ZEString& PropertyName)
+bool ZEDAsset::SetAssetProperty(const ZEString& PropertyName, const ZEVariant& Value) const
+{
+	return false;
+}
+
+ZEVariant ZEDAsset::GetAssetProperty(const ZEString& PropertyName) const
 {
 	return ZEVariant();
 }
 
-ZEDThumbnailWidget* ZEDAsset::CreateThumbnailWidget()
+ZEDThumbnailWidget* ZEDAsset::CreateThumbnailWidget() const
 {
 	return NULL;
 }
 
-ZEDPreviewWidget* ZEDAsset::CreatePreviewWidget()
+ZEDPreviewWidget* ZEDAsset::CreatePreviewWidget() const
 {
 	return NULL;
 }
 
 ZEDEditor* ZEDAsset::CreateEditor() const
+{
+	return NULL;
+}
+
+ZEClass* ZEDAsset::GetWrapperObjectClass() const
+{
+	return NULL;
+}
+
+ZEDObjectWrapper* ZEDAsset::CreateWrapper(ZEDEditor* Editor) const
 {
 	return NULL;
 }

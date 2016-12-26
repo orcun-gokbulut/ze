@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSoundAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSoundAsset.h"
+
+#include "ZEDS/ZEVariant.h"
+
+ZEVariant ZEDSoundAsset::GetAssetProperty(const ZEString& PropertyName) const
+{
+	return ZEVariant();
+}
+
+ZEDThumbnailWidget* ZEDSoundAsset::CreateThumbnailWidget() const
+{
+	return NULL;
+}
+
+ZEDPreviewWidget* ZEDSoundAsset::CreatePreviewWidget() const
+{
+	return NULL;
+}

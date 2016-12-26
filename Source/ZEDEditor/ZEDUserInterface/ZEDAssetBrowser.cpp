@@ -102,11 +102,11 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	Model->SetMode(ZED_AMM_TREE);
 	Model->SetHierarcy(ZED_AMH_DIRECTORY);
 	ZEArray<ZEDAssetModelColumn> ModelColumns;
-	ModelColumns.SetCount(4);
+	ModelColumns.SetCount(1);
 	ModelColumns[0].SetType(ZED_AMHT_NAME);
 	ModelColumns[0].SetHeaderText("Name");
 	ModelColumns[0].SetSelectable(true);
-	ModelColumns[1].SetType(ZED_AMHT_TYPE);
+	/*ModelColumns[1].SetType(ZED_AMHT_TYPE);
 	ModelColumns[1].SetHeaderText("Type");
 	ModelColumns[1].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
 	ModelColumns[2].SetType(ZED_AMHT_SIZE);
@@ -114,7 +114,7 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	ModelColumns[2].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
 	ModelColumns[3].SetType(ZED_AMHT_LAST_MODIFICATION_TIME);
 	ModelColumns[3].SetHeaderText("Modified");
-	ModelColumns[3].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
+	ModelColumns[3].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);*/
 	Model->SetColumns(ModelColumns);
 	Form->btnMode->setChecked(Model->GetMode() == ZED_AMM_TREE);
 	Form->trwAssets->setExpanded(Model->index(0, 0, QModelIndex()), true);

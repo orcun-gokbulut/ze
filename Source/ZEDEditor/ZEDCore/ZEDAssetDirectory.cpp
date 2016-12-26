@@ -78,7 +78,7 @@ ZEString ZEDAssetDirectory::GetPath() const
 	if (GetParentDirectory() == NULL)
 		return Name;
 	else
-		return ZEFormat::Format("{0}/{1}", GetParentDirectory(), Name);
+		return ZEFormat::Format("{0}/{1}", GetParentDirectory()->GetPath(), Name);
 }
 
 const ZEList2<ZEDAsset>& ZEDAssetDirectory::GetAssets() const

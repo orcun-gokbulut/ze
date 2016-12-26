@@ -37,17 +37,17 @@
 
 #include "ZEDS/ZEVariant.h"
 
-ZEVariant ZEDTextureAsset::GetAssetProperty(const ZEString& PropertyName)
+ZEVariant ZEDTextureAsset::GetAssetProperty(const ZEString& PropertyName) const
 {
 	return ZEVariant();
 }
 
-ZEDThumbnailWidget* ZEDTextureAsset::CreateThumbnailWidget()
+ZEDThumbnailWidget* ZEDTextureAsset::CreateThumbnailWidget() const
 {
 	return NULL;
 }
 
-ZEDPreviewWidget* ZEDTextureAsset::CreatePreviewWidget()
+ZEDPreviewWidget* ZEDTextureAsset::CreatePreviewWidget() const
 {
 	return NULL;
 }

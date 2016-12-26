@@ -37,9 +37,9 @@
 
 class ZEDTextureAsset : public ZEDAsset
 {
-	friend class ZEDTextureAsset;
+	friend class ZEDTextureAssetType;
 	public:
-		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName);
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget();
-		virtual ZEDPreviewWidget*						CreatePreviewWidget();
+		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const override;
+		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
+		virtual ZEDPreviewWidget*						CreatePreviewWidget() const override;
 };

@@ -57,13 +57,30 @@
 #include "ZEDTextureAssetType.h"
 #include "ZEDCore/ZEDAssetManager.h"
 
+#include "ZEDEntityWrapper.h"
+#include "ZEDSceneWrapper.h"
+
+#include "ZEDMaterialAssetType.h"
+#include "ZEDModelAssetType.h"
+#include "ZEDSceneAssetType.h"
+#include "ZEDSoundAssetType.h"
+#include "ZEDPrefabAssetType.h"
+
 bool ZEDEntityEditor::InitializeInternal()
 {
 	if (!ZEDEditor::InitializeInternal())
 		return false;
 
-	GetAssetManager()->RegisterAssetType(new ZEDTextureAssetType());
+	GetObjectManager()->RegisterWrapperClass(ZEDEntityWrapper::Class());
+	GetObjectManager()->RegisterWrapperClass(ZEDSceneWrapper::Class());
 
+	GetAssetManager()->RegisterAssetType(new ZEDTextureAssetType());
+	GetAssetManager()->RegisterAssetType(new ZEDMaterialAssetType());
+	GetAssetManager()->RegisterAssetType(new ZEDModelAssetType());
+	GetAssetManager()->RegisterAssetType(new ZEDSceneAssetType());
+	GetAssetManager()->RegisterAssetType(new ZEDSoundAssetType());
+	GetAssetManager()->RegisterAssetType(new ZEDPrefabAssetType());
+	
 	ZEDViewportController* Controller = ZEDViewportController::CreateInstance();
 	AddComponent(Controller);
 

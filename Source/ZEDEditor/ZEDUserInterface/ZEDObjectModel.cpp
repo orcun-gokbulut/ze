@@ -45,6 +45,8 @@
 
 #include <QIcon>
 #include <QMimeData>
+#include "ZEDCore/ZEDAsset.h"
+#include "ZEDCore/ZEDAssetType.h"
 
 bool ZEDObjectModel::Filter(ZEDObjectWrapper* Wrapper) const
 {
@@ -420,14 +422,18 @@ int ZEDObjectModel::rowCountList(ZEDObjectWrapper* Wrapper) const
 
 bool ZEDObjectModel::dropMimeDataInternal(const QMimeData* Data, Qt::DropAction Action, int Row, int Column, const QModelIndex& Parent, bool Operation) const
 {
-	ZEDObjectWrapper* Destination = ConvertToWrapper(index(Row, Column, Parent));
+	ZEDObjectWrapper* Destination = NULL;
+	if (Row == -1 || Column == -1)
+		Destination = ConvertToWrapper(Parent);
+	else
+		Destination = ConvertToWrapper(index(Row, Column, Parent));
 	if (Destination == NULL)
 		return false;
 
 	if (Data->hasFormat("application/x.zinek.zeobjectwrapper"))
 	{
 		QByteArray Array = Data->data("application/x.zinek.zeobjectwrapper");
-		ZEDObjectWrapper** Wrappers = (ZEDObjectWrapper**)Array.data();
+		ZEDObjectWrapper** Wrappers = reinterpret_cast<ZEDObjectWrapper**>(Array.data());
 		ZESize WrapperCount = Data->data("application/x.zinek.zeobjectwrapper").size() / sizeof(ZEDObjectWrapper*);
 
 		if (WrapperCount == 0)
@@ -472,17 +478,13 @@ bool ZEDObjectModel::dropMimeDataInternal(const QMimeData* Data, Qt::DropAction 
 
 			return true;
 		}
-		else
-		{
-			return false;
-		}
 	}
 	else if (Data->hasFormat("application/x.zinek.zeclass"))
 	{
-		if (Action != Qt::CopyAction)
+		if (Action != Qt::LinkAction)
 			return false;
 
-		ZEClass* Class = *(ZEClass**)Data->data("application/x.zinek.zeclass").data();
+		ZEClass* Class = *reinterpret_cast<ZEClass**>(Data->data("application/x.zinek.zeclass").data());
 		if (Class->IsAbstract())
 			return false;
 
@@ -491,6 +493,28 @@ bool ZEDObjectModel::dropMimeDataInternal(const QMimeData* Data, Qt::DropAction 
 
 		if (Operation)
 			GetEditor()->GetObjectManager()->CreateObject(Destination, Class);
+
+		return true;
+	}
+	else if (Data->hasFormat("application/x.zinek.zedasset"))
+	{
+
+		ZEDAsset* Asset = *reinterpret_cast<ZEDAsset**>(Data->data("application/x.zinek.zedasset").data());
+		if (!Asset->GetType()->GetCapabilities().GetFlags(ZED_ATC_WRAPPER))
+			return false;
+
+		ZEClass* ObjectClass = Asset->GetWrapperObjectClass();
+		if (!Destination->CheckChildrenClass(ObjectClass))
+			return false;
+
+		if (Operation)
+		{
+			ZEDObjectWrapper* Wrapper = Asset->CreateWrapper(GetEditor());
+			if (Wrapper == NULL)
+				return false;
+
+			GetEditor()->GetObjectManager()->RelocateObject(Destination, Wrapper);
+		}
 
 		return true;
 	}
@@ -754,12 +778,12 @@ bool ZEDObjectModel::dropMimeData(const QMimeData* Data, Qt::DropAction Action,	
 
 Qt::DropActions ZEDObjectModel::supportedDropActions() const
 {
-	return Qt::CopyAction | Qt::MoveAction;
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
 Qt::DropActions ZEDObjectModel::supportedDragActions() const
 {
-	return Qt::CopyAction | Qt::MoveAction;
+	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
 ZEDObjectModel::ZEDObjectModel()

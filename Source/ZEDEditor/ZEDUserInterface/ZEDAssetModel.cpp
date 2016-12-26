@@ -1147,14 +1147,14 @@ QMimeData* ZEDAssetModel::mimeData(const QModelIndexList& Indexes) const
 
 	ZEDAsset* Asset = ConvertToAsset(Indexes[0]);
 	QMimeData* Data = new QMimeData();
-	Data->setText(Asset->GetPath().ToCString());
-	Data->setData("application/x.zinek.zeclass", QByteArray((const char*)&Asset, sizeof(ZEDAsset*)));
+	//Data->setText(Asset->GetPath().ToCString());
+	Data->setData("application/x.zinek.zedasset", QByteArray((const char*)&Asset, sizeof(ZEDAsset*)));
 	return Data;
 }
 
 Qt::DropActions ZEDAssetModel::supportedDragActions() const
 {
-	return Qt::DropAction::CopyAction;
+	return Qt::DropAction::CopyAction | Qt::DropAction::MoveAction | Qt::DropAction::LinkAction;
 }
 
 ZEDAssetModel::ZEDAssetModel()

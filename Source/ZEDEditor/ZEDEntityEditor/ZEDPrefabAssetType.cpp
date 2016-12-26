@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDPrefabAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDPrefabAssetType.h"
+#include "ZEDPrefabAsset.h"
+
+ZEDPrefabAssetType::ZEDPrefabAssetType()
+{
+
+}
+
+const char* ZEDPrefabAssetType::GetName() const
+{
+	return "Prefab";
+}
+
+const char* const* ZEDPrefabAssetType::GetExtensions() const
+{
+	static const char* Extensions[9] =
+	{
+		".ZEPrefab"
+	};
+
+	return Extensions;
+}
+
+ZESize ZEDPrefabAssetType::GetExtensionCount() const
+{
+	return 1;
+}
+
+const char* ZEDPrefabAssetType::GetIconPath() const
+{
+	return "";
+}
+
+const char* const* ZEDPrefabAssetType::GetCustomProperties() const
+{
+	return NULL;
+}
+
+ZESize ZEDPrefabAssetType::GetCustomPropertyCount() const 
+{
+	return 0;
+}
+
+ZEDAssetTypeCapabilities ZEDPrefabAssetType::GetCapabilities() const
+{
+	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+}
+
+ZEDAsset* ZEDPrefabAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDPrefabAsset* Asset = new ZEDPrefabAsset();
+	Asset->SetType(const_cast<ZEDPrefabAssetType*>(this));
+	return Asset;
+}

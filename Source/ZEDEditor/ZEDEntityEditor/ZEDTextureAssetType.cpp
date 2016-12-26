@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDTextureAssetType.h"
+#include "ZEDTextureAsset.h"
 
 ZEDTextureAssetType::ZEDTextureAssetType()
 {
@@ -93,5 +94,12 @@ ZESize ZEDTextureAssetType::GetCustomPropertyCount() const
 
 ZEDAssetTypeCapabilities ZEDTextureAssetType::GetCapabilities() const
 {
-	return ZED_ATC_THUMBNAIL |ZED_ATC_PREVIEW;
+	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+}
+
+ZEDAsset* ZEDTextureAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDTextureAsset* Asset = new ZEDTextureAsset();
+	Asset->SetType(const_cast<ZEDTextureAssetType*>(this));
+	return Asset;
 }

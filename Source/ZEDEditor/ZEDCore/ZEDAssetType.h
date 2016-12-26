@@ -88,5 +88,5 @@ class ZEDAssetType : public ZEObject
 		virtual ZESize							GetCustomPropertyCount() const;
 		virtual ZEDAssetTypeCapabilities		GetCapabilities() const;
 
-		virtual ZEDAsset*						Wrap(const ZEString& Path);
+		virtual ZEDAsset*						Wrap(const ZEString& Path) const;
 };
