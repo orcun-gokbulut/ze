@@ -79,7 +79,7 @@ class ZEDAssetManager : public ZEDComponent
 		void									CrawlerFunction(ZEThread* Thread, void* ExtraParameters);
 		void									MonitorFunction(ZEThread* Thread, void* ExtraParameters);
 
-		void									UpdateCachedAsset(const ZEString& Path);
+		void									AddCrawlLocation(const ZEString& Location);
 
 		ZEDAsset*								CreateAsset(const ZEString& Path);
 		void									RemoveAsset(ZEDAsset* Asset);

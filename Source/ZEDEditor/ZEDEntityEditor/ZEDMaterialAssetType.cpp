@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDMaterialAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDMaterialAssetType.h"
+#include "ZEDMaterialAsset.h"
+
+ZEDMaterialAssetType::ZEDMaterialAssetType()
+{
+
+}
+
+const char* ZEDMaterialAssetType::GetName() const
+{
+	return "Material";
+}
+
+const char* const* ZEDMaterialAssetType::GetExtensions() const
+{
+	static const char* Extensions[9] =
+	{
+		".ZEMaterial",
+	};
+
+	return Extensions;
+}
+
+ZESize ZEDMaterialAssetType::GetExtensionCount() const
+{
+	return 1;
+}
+
+const char* ZEDMaterialAssetType::GetIconPath() const
+{
+	return "";
+}
+
+const char* const* ZEDMaterialAssetType::GetCustomProperties() const
+{
+	return NULL;
+}
+
+ZESize ZEDMaterialAssetType::GetCustomPropertyCount() const 
+{
+	return 0;
+}
+
+ZEDAssetTypeCapabilities ZEDMaterialAssetType::GetCapabilities() const
+{
+	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+}
+
+ZEDAsset* ZEDMaterialAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDMaterialAsset* Asset = new ZEDMaterialAsset();
+	Asset->SetType(const_cast<ZEDMaterialAssetType*>(this));
+	return Asset;
+}

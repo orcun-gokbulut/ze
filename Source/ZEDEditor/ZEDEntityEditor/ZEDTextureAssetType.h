@@ -47,5 +47,7 @@ class ZEDTextureAssetType : public ZEDAssetType
 		virtual ZESize							GetCustomPropertyCount() const override;
 		virtual ZEDAssetTypeCapabilities		GetCapabilities() const override;
 
+		virtual ZEDAsset*						Wrap(const ZEString& Path) const override;
+
 												ZEDTextureAssetType();
 };

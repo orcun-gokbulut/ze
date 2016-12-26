@@ -55,67 +55,6 @@
 #undef CreateDirectory
 #undef RemoveDirectory
 
-void ZEDAssetManager::UpdateCachedAsset(const ZEString& Path)
-{
-	GetDirectory(Path);
-	CreateDirectory(Path);
-
-	/*ZEPathInfo PathInfo(Path);
-	ZEString PathNormalized = PathInfo.Normalize();
-	ZEUInt PathHash = PathNormalized.Hash();
-	
-	Assets.LockWriteNested();
-	{
-		ZETimeStamp ModificiationTime = PathInfo.GetModificationTime();
-		bool PathExists = PathInfo.IsExists();
-
-		for (ZESize I = 0; I < Assets.GetCount(); I++)
-		{
-			ZEDAsset* Asset = Assets[I];
-			if (Asset->GetHash() != PathHash || Asset->GetPath() != PathNormalized)
-				continue;
-
-			if (!PathExists)
-			{
-				RemoveAssetFromCache(Asset);
-				delete Asset;
-			}
-			else
-			{
-				if (Asset->GetModificationTime() != ModificiationTime)
-				{
-					ZEDAsset NewAsset;
-					WrapAsset(&NewAsset, Path);
-					if (NewAsset.GetType() == NULL)
-					{
-						RemoveAssetFromCache(Asset);
-						delete Asset;
-					}
-					else
-					{
-						UpdateAssetInCache(I, NewAsset);
-					}
-				}
-			}
-
-			Assets.UnlockWrite();
-			return;
-		}
-
-		if (PathExists)
-		{
-			ZEDAsset* NewAsset = new ZEDAsset();
-			WrapAsset(NewAsset, Path);
-			if (NewAsset->GetType() != NULL)
-				AddAssetToCache(NewAsset);
-			else
-				delete NewAsset;
-		}
-	}
-	Assets.UnlockWrite();
-	*/
-}
-
 void ZEDAssetManager::Crawl()
 {
 	if (CrawlLocations.GetCount() == 0)
@@ -213,9 +152,7 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 		{
 			ZEString FileName = std::wstring(Current->FileName, Current->FileNameLength / sizeof(wchar_t));
 	
-			if (!CrawlLocations.Exists(FileName))
-				CrawlLocations.Enqueue(ZEFormat::Format("{0}/{1}", ResourcePath, FileName));
-			
+			AddCrawlLocation(ZEFormat::Format("{0}/{1}", ResourcePath, FileName));	
 			if (Current->NextEntryOffset == 0)
 				break;
 
@@ -237,6 +174,14 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 		CloseHandle(ChangeListHandle);
 		ChangeListHandle = NULL;
 	}
+}
+
+void ZEDAssetManager::AddCrawlLocation(const ZEString& Location)
+{
+	CrawlLocations.LockWrite();
+	if (!CrawlLocations.Exists(Location))
+		CrawlLocations.Enqueue(Location);
+	CrawlLocations.UnlockWrite();
 }
 
 ZEDAsset* ZEDAssetManager::CreateAsset(const ZEString& Path)
@@ -432,7 +377,8 @@ bool ZEDAssetManager::InitializeInternal()
 	DirectoryRoot = new ZEDAssetDirectory();
 	DirectoryRoot->SetName(ResourcePath);
 
-	CrawlLocations.Add(ResourcePath);
+	AddCrawlLocation(ResourcePath);
+
 	//CrawlerThread.Run();
 	MonitorThread.Run();
 
@@ -513,6 +459,8 @@ void ZEDAssetManager::RegisterAssetType(ZEDAssetType* AssetType)
 	zeCheckError(AssetTypes.Exists(AssetType), ZE_VOID, "Cannot register AssetType. AssetType is already registered. AssetType: \"%s\".", AssetType->GetName());
 
 	AssetTypes.Add(AssetType);
+
+	AddCrawlLocation(ResourcePath);
 }
 
 void ZEDAssetManager::UnregisterAssetType(ZEDAssetType* AssetType)
@@ -690,9 +638,7 @@ ZEDAssetDirectory* ZEDAssetManager::ScanDirectory(const ZEString& DirectoryPath,
 
 void ZEDAssetManager::UpdatePath(const ZEString& Path)
 {
-	CrawlLocations.LockWrite();
-	CrawlLocations.Add(Path);
-	CrawlLocations.UnlockWrite();
+	AddCrawlLocation(Path);
 }
 
 void ZEDAssetManager::Process()

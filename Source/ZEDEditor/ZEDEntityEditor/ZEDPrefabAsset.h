@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDPrefabAsset.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDCore/ZEDAsset.h"
+
+class ZEDPrefabAsset : public ZEDAsset
+{
+	friend class ZEDPrefabAssetType;
+	public:
+		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const override;
+		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
+		virtual ZEDPreviewWidget*						CreatePreviewWidget() const override;
+};

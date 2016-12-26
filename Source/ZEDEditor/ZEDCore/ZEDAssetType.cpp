@@ -86,7 +86,7 @@ ZEDAssetTypeCapabilities ZEDAssetType::GetCapabilities() const
 	return ZED_ATC_NONE;
 }
 
-ZEDAsset* ZEDAssetType::Wrap(const ZEString& Path)
+ZEDAsset* ZEDAssetType::Wrap(const ZEString& Path) const
 {
 	return NULL;
 }

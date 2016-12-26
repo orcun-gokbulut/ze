@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSceneAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSceneAssetType.h"
+#include "ZEDSceneAsset.h"
+
+ZEDSceneAssetType::ZEDSceneAssetType()
+{
+
+}
+
+const char* ZEDSceneAssetType::GetName() const
+{
+	return "Scene";
+}
+
+const char* const* ZEDSceneAssetType::GetExtensions() const
+{
+	static const char* Extensions[9] =
+	{
+		".ZEScene",
+		".ZESector"
+	};
+
+	return Extensions;
+}
+
+ZESize ZEDSceneAssetType::GetExtensionCount() const
+{
+	return 2;
+}
+
+const char* ZEDSceneAssetType::GetIconPath() const
+{
+	return "";
+}
+
+const char* const* ZEDSceneAssetType::GetCustomProperties() const
+{
+	return NULL;
+}
+
+ZESize ZEDSceneAssetType::GetCustomPropertyCount() const 
+{
+	return 0;
+}
+
+ZEDAssetTypeCapabilities ZEDSceneAssetType::GetCapabilities() const
+{
+	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+}
+
+ZEDAsset* ZEDSceneAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDSceneAsset* Asset = new ZEDSceneAsset();
+	Asset->SetType(const_cast<ZEDSceneAssetType*>(this));
+	return Asset;
+}

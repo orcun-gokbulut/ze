@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDModelAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDModelAsset.h"
+
+#include "ZEModel/ZEModel.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDCore/ZEDObjectManager.h"
+
+ZEClass* ZEDModelAsset::GetWrapperObjectClass() const 
+{
+	return ZEModel::Class();
+}
+
+ZEDObjectWrapper* ZEDModelAsset::CreateWrapper(ZEDEditor* Editor) const 
+{
+	ZEModel* Model = ZEModel::CreateInstance();
+	Model->SetModelFile(GetPath());
+
+	ZEDObjectWrapper* Wrapper = Editor->GetObjectManager()->WrapObject(Model);
+	if (Wrapper == NULL)
+		Model->Destroy();
+
+	return Wrapper;
+}
+
+ZEDThumbnailWidget* ZEDModelAsset::CreateThumbnailWidget() const
+{
+	return NULL;
+}
+
+ZEDPreviewWidget* ZEDModelAsset::CreatePreviewWidget() const
+{
+	return NULL;
+}

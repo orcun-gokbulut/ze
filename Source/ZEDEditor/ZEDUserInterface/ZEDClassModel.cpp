@@ -566,7 +566,7 @@ QMimeData* ZEDClassModel::mimeData(const QModelIndexList& Indexes) const
 
 Qt::DropActions ZEDClassModel::supportedDragActions() const
 {
-	return Qt::DropAction::CopyAction;
+	return Qt::DropAction::LinkAction;
 }
 
 ZEDClassModel::ZEDClassModel()

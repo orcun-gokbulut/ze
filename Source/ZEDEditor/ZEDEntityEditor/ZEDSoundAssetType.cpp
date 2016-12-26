@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSoundAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSoundAssetType.h"
+#include "ZEDSoundAsset.h"
+
+ZEDSoundAssetType::ZEDSoundAssetType()
+{
+
+}
+
+const char* ZEDSoundAssetType::GetName() const
+{
+	return "Sound";
+}
+
+const char* const* ZEDSoundAssetType::GetExtensions() const
+{
+	static const char* Extensions[9] =
+	{
+		".wav",
+		".ogg",
+		".mp3",
+	};
+
+	return Extensions;
+}
+
+ZESize ZEDSoundAssetType::GetExtensionCount() const
+{
+	return 3;
+}
+
+const char* ZEDSoundAssetType::GetIconPath() const
+{
+	return "";
+}
+
+const char* const* ZEDSoundAssetType::GetCustomProperties() const
+{
+	static const char* Properties[4] = 
+	{
+		"Bitrate",
+		"Bit",
+		"SampleCount",
+		"Format"
+	};
+
+	return Properties;
+}
+
+ZESize ZEDSoundAssetType::GetCustomPropertyCount() const 
+{
+	return 4;
+}
+
+ZEDAssetTypeCapabilities ZEDSoundAssetType::GetCapabilities() const
+{
+	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+}
+
+ZEDAsset* ZEDSoundAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDSoundAsset* Asset = new ZEDSoundAsset();
+	Asset->SetType(const_cast<ZEDSoundAssetType*>(this));
+	return Asset;
+}

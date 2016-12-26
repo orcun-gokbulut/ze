@@ -52,6 +52,7 @@ class ZEDAssetManager;
 class ZEDThumbnailWidget;
 class ZEDPreviewWidget;
 class ZEDEditor;
+class ZEDObjectWrapper;
 
 struct ZEDAssetDependencyItem
 {
@@ -84,6 +85,9 @@ class ZEDAsset : public ZEObject
 		ZETimeStamp										ModificationTime;
 	
 	protected:
+		void											SetName(const ZEString& Name);
+		void											SetType(ZEDAssetType* Type);
+
 														ZEDAsset();
 		virtual											~ZEDAsset();
 
@@ -93,7 +97,6 @@ class ZEDAsset : public ZEObject
 		ZEDAssetCategory*								GetCategory() const;
 		ZEString										GetCategoryPath() const;
 
-		void											SetName(const ZEString& Name);
 		const ZEString&									GetName() const;
 		
 		ZEString										GetPath() const;
@@ -104,10 +107,16 @@ class ZEDAsset : public ZEObject
 		ZESize											GetFileSize() const;
 		ZETimeStamp										GetModificationTime() const;
 		
-		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName);
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget();
-		virtual ZEDPreviewWidget*						CreatePreviewWidget();
+		virtual bool									SetAssetProperty(const ZEString& PropertyName, const ZEVariant& Value) const;
+		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const;
+
+		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const;
+		virtual ZEDPreviewWidget*						CreatePreviewWidget() const;
 		virtual ZEDEditor*								CreateEditor() const;
+
+		virtual ZEClass*								GetWrapperObjectClass() const;
+		virtual ZEDObjectWrapper*						CreateWrapper(ZEDEditor* Editor) const;
+
 		virtual bool									ReadMetaData(ZEDAssetMetaData& MetaData) const;
 		virtual bool									WriteMetaData(const ZEDAssetMetaData& MetaData) const;
 
