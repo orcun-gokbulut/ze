@@ -103,14 +103,14 @@ ZEDDeleteOperation::ZEDDeleteOperation()
 
 ZEDDeleteOperation::~ZEDDeleteOperation()
 {
-	if (GetStatus() == ZED_OS_NOT_DONE)
-		return;
-
-	for (ZESize I = 0; I < Items.GetCount(); I++)
+	if (GetStatus() == ZED_OS_DONE)
 	{
-		ZEObject* Object = Items[I].Wrapper->GetObject() ;
-		Items[I].Wrapper->Destroy();
-		Object->GetClass()->Destroy(Object);
+		for (ZESize I = 0; I < Items.GetCount(); I++)
+		{
+			ZEObject* Object = Items[I].Wrapper->GetObject() ;
+			Items[I].Wrapper->Destroy();
+			Object->GetClass()->Destroy(Object);
+		}
 	}
 }
 

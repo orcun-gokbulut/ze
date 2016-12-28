@@ -48,7 +48,7 @@ class ZEDPropertyEditorItemEnumurator : public QObject, public ZEDPropertyEditor
 		virtual bool				InitializeInternal();
 
 	private slots:
-		void						ComboBox_currentTextChanged(const QString& Text);
+		void						ComboBox_currentIndexChanged(int Index);
 
 	public:
 		virtual void				Update();

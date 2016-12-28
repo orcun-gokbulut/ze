@@ -62,6 +62,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		bool								DrawBoundingBox;
 
 		bool								AlterRaycast(ZERayCastCollision& Collision);
+		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity) const;
 
 	protected:
 		ZEGRCanvas							Canvas;

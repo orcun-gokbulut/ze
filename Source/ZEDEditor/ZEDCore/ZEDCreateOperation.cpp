@@ -93,13 +93,13 @@ ZEDCreateOperation::ZEDCreateOperation()
 ZEDCreateOperation::~ZEDCreateOperation()
 {
 	if (GetStatus() != ZED_OS_DONE)
-		return;
+	{
+		if (Wrapper->GetObject() != NULL)
+			delete Wrapper->GetObject();
 
-	if (Wrapper->GetObject() != NULL)
-		delete Wrapper->GetObject();
-
-	if (Wrapper != NULL)
-		Wrapper->Destroy();
+		if (Wrapper != NULL)
+			Wrapper->Destroy();
+	}
 }
 
 ZEDCreateOperation* ZEDCreateOperation::Create(ZEClass* Class, ZEDObjectWrapper* Parent)
