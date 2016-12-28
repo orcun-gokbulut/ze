@@ -36,16 +36,48 @@
 #include "ZEBitmap.h"
 #include "ZEError.h"
 #include "ZETypes.h"
-#include <memory.h>
 #include "ZEMath/ZEMath.h"
-
-#include <FreeImage.h>
-#include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)
+#include <FreeImage.h>
+#include <memory.h>
+
+
+// ZEPixelARGB
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEVector4 ZEPixelARGB::ToVector4() const
 {
-	ZEPixelColor Temp;
+	return ZEVector4((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, (float)a / 255.0f);
+}
+
+ZEPixelARGB::ZEPixelARGB()
+{
+	r = 0x00;
+	g = 0x00;
+	b = 0x00;
+	a = 0xFF;
+}
+
+ZEPixelARGB::ZEPixelARGB(ZEUInt Color)
+{
+	this->a = (Color & 0xFF000000) >> 24;
+	this->r = (Color & 0x00FF0000) >> 16;
+	this->g = (Color & 0x0000FF00) >> 8;
+	this->b = (Color & 0x000000FF);
+}
+
+ZEPixelARGB::ZEPixelARGB(unsigned char a, unsigned char r, unsigned char g, unsigned char b)
+{
+	this->a = a;
+	this->r = r;
+	this->g = g;
+	this->b = b;
+}
+
+ZEPixelARGB ZEPixelARGB::Lerp(const ZEPixelARGB& A, const ZEPixelARGB& B, float T)
+{
+	ZEPixelARGB Temp;
 	Temp.a = (unsigned char)((float)A.a * (1.0f - T) + (float)B.a * T);
 	Temp.r = (unsigned char)((float)A.r * (1.0f - T) + (float)B.r * T);
 	Temp.g = (unsigned char)((float)A.g * (1.0f - T) + (float)B.g * T);
@@ -54,131 +86,265 @@ ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, fl
 	return Temp;
 }
 
-ZEVector4 ZEPixelColor::LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T)
-{
-	ZEVector4 Temp;
-	Temp.w = (unsigned char)((float)A.a * (1.0f - T) + (float)B.a * T);
-	Temp.x = (unsigned char)((float)A.r * (1.0f - T) + (float)B.r * T);
-	Temp.y = (unsigned char)((float)A.g * (1.0f - T) + (float)B.g * T);
-	Temp.z = (unsigned char)((float)A.b * (1.0f - T) + (float)B.b * T);
+// ZEPixelRGB
+//////////////////////////////////////////////////////////////////////////////////////
 
-	return Temp;
+ZEVector4 ZEPixelRGB::ToVector4() const
+{
+	return ZEVector4((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f, 1.0f);
 }
 
-
-ZEPixelColor::ZEPixelColor()
+ZEPixelRGB::ZEPixelRGB()
 {
 	r = 0x00;
 	g = 0x00;
 	b = 0x00;
-	a = 0xFF;
 }
 
-ZEPixelColor::ZEPixelColor(ZEUInt Color)
+ZEPixelRGB::ZEPixelRGB(ZEUInt Color)
 {
-	this->a = (Color & 0xFF000000) >> 24;
 	this->r = (Color & 0x00FF0000) >> 16;
 	this->g = (Color & 0x0000FF00) >> 8;
 	this->b = (Color & 0x000000FF);
 }
 
-ZEPixelColor::ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b)
+ZEPixelRGB::ZEPixelRGB(unsigned char r, unsigned char g, unsigned char b)
 {
-	this->a = a;
 	this->r = r;
 	this->g = g;
 	this->b = b;
 }
 
-bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZESize PixelSize)
+ZEPixelRGB ZEPixelRGB::Lerp(const ZEPixelRGB& A, const ZEPixelRGB& B, float T)
 {
-	if (Pixels != NULL && this->Width == Width && this->Height == Height && this->PixelSize == PixelSize)
-		return true;
+	ZEPixelRGB Temp;
+	Temp.r = (unsigned char)((float)A.r * (1.0f - T) + (float)B.r * T);
+	Temp.g = (unsigned char)((float)A.g * (1.0f - T) + (float)B.g * T);
+	Temp.b = (unsigned char)((float)A.b * (1.0f - T) + (float)B.b * T);
 
-	if (Width == 0 || Height == 0 || PixelSize == 0)
-	{
-		zeError("Can not create bitmap with zero dimension.");
-		return false;
-	}
-	
-	this->Pitch		= (ZESize)Width * PixelSize;
-	this->Width		= Width;
-	this->Height	= Height;
-	this->PixelSize = PixelSize;
-	this->Pixels	= new ZEUInt8[(ZESize)Width * (ZESize)Height * PixelSize];
-
-	return true;
+	return Temp;
 }
 
-ZEUInt ZEBitmap::GetWidth()
+
+// ZEPixelGrayscale
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEVector4 ZEPixelGrayscale::ToVector4() const
+{
+	return ZEVector4((float)l / 255.0f, 0.0f, 0.0f, 1.0f);
+}
+
+ZEPixelGrayscale::ZEPixelGrayscale()
+{
+	l = 0x00;
+}
+
+ZEPixelGrayscale::ZEPixelGrayscale(ZEUInt Color)
+{
+	this->l = Color;
+}
+
+ZEPixelGrayscale ZEPixelGrayscale::Lerp(const ZEPixelGrayscale& A, const ZEPixelGrayscale& B, float T)
+{
+	ZEPixelGrayscale Temp;
+	Temp.l = (unsigned char)((float)A.l * (1.0f - T) + (float)B.l * T);
+	return Temp;
+}
+
+
+// ZEPixelL
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZESize ZEBitmap::GetWidth() const
 {
 	return Width;
 }
 
-ZEUInt ZEBitmap::GetHeight()
+ZESize ZEBitmap::GetHeight() const
 {
 	return Height;
 }
 
-ZESize ZEBitmap::GetPitch()
+ZESize ZEBitmap::GetPitch() const
 {
 	return Pitch;
 }
 
-ZESize ZEBitmap::GetPixelSize()
+ZESize ZEBitmap::GetPixelSize() const
 {
 	return PixelSize;
 }
 
-ZESize ZEBitmap::GetBPP()
+ZESize ZEBitmap::GetBPP() const
 {
 	return PixelSize * 8;
 }
 
-ZESize ZEBitmap::GetSize()
+ZESize ZEBitmap::GetSize() const
 {
-	return (ZESize)Height * (ZESize)Width * PixelSize; 
+	return Height * Width * PixelSize; 
 }
 
-ZEPixelColor* ZEBitmap::GetPixels()
+void ZEBitmap::SetData(void* Data)
 {
-	return (ZEPixelColor*)Pixels;
+
+	memcpy(this->Data, Data, Pitch * Height);
 }
 
-ZEPixelColor& ZEBitmap::GetPixel(ZEUInt x, ZEUInt y)
+void* ZEBitmap::GetData()
 {
-	return *(ZEPixelColor*)((ZEUInt8*)Pixels + (ZESize)y * Pitch + (ZESize)x * 4);
+	return Data;
 }
 
-ZEVector4 ZEBitmap::GetPixelFloat(ZEUInt x, ZEUInt y)
+const void* ZEBitmap::GetData() const
 {
-	ZEPixelColor& Color = GetPixel(x, y);
-	ZEVector4 FloatColor;
-
-	FloatColor.x = (float)Color.r / 255.0f;
-	FloatColor.y = (float)Color.g / 255.0f;
-	FloatColor.z = (float)Color.b / 255.0f;
-	FloatColor.w = (float)Color.a / 255.0f;
-
-	return FloatColor;
+	return Data;
 }
 
-ZEPixelColor* ZEBitmap::GetRow(ZEUInt Index)
+void ZEBitmap::SetRow(ZESize Index, void* Data)
 {
-	return (ZEPixelColor*)((ZEUInt8*)Pixels + (ZESize)Index * Pitch);
+	memcpy(GetRow(Index), Data, Pitch);
 }
 
-ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* UserOptions)
+void* ZEBitmap::GetRow(ZESize Index)
 {
-	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
+	zeDebugCheck(Index >= GetHeight(), "Index is out of range");
 
-	ZEBitmapSamplingOptions* Options;
-	if (UserOptions == NULL)
-		Options = &DefaultOptions;
-	else
-		Options = UserOptions;
+	return (ZEUInt8*)Data + Index * Pitch;
+}
 
-	switch(Options->AddressingX)
+const void* ZEBitmap::GetRow(ZESize Index) const
+{
+	zeDebugCheck(Index >= GetHeight(), "Index is out of range");
+
+	return (ZEUInt8*)Data + Index * Pitch;
+}
+
+ZEPixelARGB* ZEBitmap::GetPixelsARGB()
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_ARGB, "Wrong pixel format");
+
+	return static_cast<ZEPixelARGB*>(GetData());
+}
+
+const ZEPixelARGB* ZEBitmap::GetPixelsARGB() const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_ARGB, "Wrong pixel format");
+
+	return static_cast<const ZEPixelARGB*>(GetData());
+}
+
+ZEPixelRGB* ZEBitmap::GetPixelsRGB()
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+
+	return static_cast<ZEPixelRGB*>(GetData());
+}
+
+const ZEPixelRGB* ZEBitmap::GetPixelsRGB() const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+
+	return static_cast<const ZEPixelRGB*>(GetData());
+}
+
+ZEPixelGrayscale* ZEBitmap::GetPixelsGrayscale()
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_GRAYSCALE, "Wrong pixel format");
+
+	return static_cast<ZEPixelGrayscale*>(GetData());
+}
+
+const ZEPixelGrayscale* ZEBitmap::GetPixelsGrayscale() const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_GRAYSCALE, "Wrong pixel format");
+
+	return static_cast<const ZEPixelGrayscale*>(GetData());
+}
+
+void* ZEBitmap::GetPixel(ZESize x, ZESize y)
+{
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return (ZEBYTE*)GetRow(y) + x * PixelSize;
+}
+
+const void* ZEBitmap::GetPixel(ZESize x, ZESize y) const
+{
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return (ZEBYTE*)GetRow(y) + x * PixelSize;
+}
+
+ZEPixelARGB& ZEBitmap::GetPixelARGB(ZESize x, ZESize y)
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_ARGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<ZEPixelARGB*>((ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelARGB));
+}
+
+const ZEPixelARGB& ZEBitmap::GetPixelARGB(ZESize x, ZESize y) const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_ARGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<const ZEPixelARGB*>((const ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelARGB));
+}
+
+ZEPixelRGB& ZEBitmap::GetPixelRGB(ZESize x, ZESize y)
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<ZEPixelRGB*>((ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelRGB));
+}
+
+const ZEPixelRGB& ZEBitmap::GetPixelRGB(ZESize x, ZESize y) const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<const ZEPixelRGB*>((const ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelRGB));
+}
+
+ZEPixelGrayscale& ZEBitmap::GetPixelGrayscale(ZESize x, ZESize y)
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<ZEPixelGrayscale*>((ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelGrayscale));
+}
+
+const ZEPixelGrayscale& ZEBitmap::GetPixelGrayscale(ZESize x, ZESize y) const
+{
+	zeDebugCheck(GetFormat() != ZE_BPF_RGB, "Wrong pixel format");
+	zeDebugCheck(x >= GetWidth(), "x is out of range");
+
+	return *reinterpret_cast<const ZEPixelGrayscale*>((const ZEBYTE*)GetRow(y) + x * sizeof(ZEPixelGrayscale));
+}
+
+ZEVector4 ZEBitmap::GetPixelVector(ZESize x, ZESize y) const
+{
+	switch (Format)
+	{
+		case ZE_BPF_ARGB:
+			return GetPixelARGB(x, y).ToVector4();
+
+		case ZE_BPF_RGB:
+			return GetPixelRGB(x, y).ToVector4();
+			
+		case ZE_BPF_GRAYSCALE:
+			return GetPixelGrayscale(x, y).ToVector4();
+
+		default:
+			return ZEVector4::Zero;
+	}
+}
+
+void* ZEBitmap::AddressPixel(ZESSize x, ZESSize y, const ZEBitmapAddressingOptions& Options)
+{
+	switch(Options.AddressingX)
 	{
 		case ZE_BAM_WRAP:
 		{
@@ -188,7 +354,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 
 		case ZE_BAM_CLAMP:
 		{
-			if (x >= (ZEInt)Width)
+			if (x >= (ZESSize)Width)
 				x = Width -1;
 			else if (x < 0)
 				x = 0;
@@ -200,14 +366,14 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 			bool Odd = ((x / Width) % 2) == 1;
 			if (Odd)
 			{
-				if (x >= (ZEInt)Width)
+				if (x >= (ZESSize)Width)
 					x = Width - 1;
 				else if (x < 0)
 					x = 0;
 			}
 			else
 			{
-				if (x >= (ZEInt)Width)
+				if (x >= (ZESSize)Width)
 					x = Width - x - 1;
 				else if (x < 0)
 					x = Width - 1;
@@ -217,14 +383,13 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 
 		case ZE_BAM_BORDER:
 		{
-			if (x >= (ZEInt)Width)
-				return Options->BorderColor;
-			else if (x < 0)
-				return Options->BorderColor;
+			if (x < 0 || x >= (ZESSize)Width)
+				return NULL;
+			break;
 		}
 	}
 
-	switch(Options->AddressingY)
+	switch(Options.AddressingY)
 	{
 		case ZE_BAM_WRAP:
 		{
@@ -246,14 +411,14 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 			bool Odd = ((y / Height) % 2) == 1;
 			if (Odd)
 			{
-				if (y >= (ZEInt)Height)
+				if (y >= (ZESSize)Height)
 					y = Height - 1;
 				else if (y < 0)
 					y = 0;
 			}
 			else
 			{
-				if (y >= (ZEInt)Height)
+				if (y >= (ZESSize)Height)
 					y = Height - y - 1;
 				else if (y < 0)	
 					y = Height - 1;
@@ -263,10 +428,8 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 
 		case ZE_BAM_BORDER:
 		{
-			if (y >= (ZEInt)Height)
-				return Options->BorderColor;
-			else if (y < 0)
-				return Options->BorderColor;
+			if (y < 0 || y >= (ZEInt)Height)
+				return NULL;
 			break;
 		}
 	}
@@ -274,51 +437,46 @@ ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* U
 	return GetPixel(x, y);
 }
 
-ZEVector4 ZEBitmap::SamplePixelFloat(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* UserOptions)
+const void* ZEBitmap::AddressPixel(ZESSize x, ZESSize y, const ZEBitmapAddressingOptions& Options) const
 {
-	ZEPixelColor Color = SamplePixel(x, y, UserOptions);
-	ZEVector4 FloatColor;
-
-	FloatColor.x = (float)Color.r / 255.0f;
-	FloatColor.y = (float)Color.g / 255.0f;
-	FloatColor.z = (float)Color.b / 255.0f;
-	FloatColor.w = (float)Color.a / 255.0f;
-
-	return FloatColor;
+	return const_cast<ZEBitmap*>(this)->AddressPixel(x, y, Options);
 }
 
-ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* UserOptions)
+template<typename ZEPixelType>
+ZEVector4 SamplePixelInternal(const ZEBitmap* Bitmap, const ZEVector2& Texcoords, const ZEBitmapSamplingOptions& Options)
 {
-	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
-
-	ZEBitmapSamplingOptions* Options;
-	if (UserOptions == NULL)
-		Options = &DefaultOptions;
-	else
-		Options = UserOptions;
-
-	if (Options->Filter == ZE_BFM_POINT)
+	if (Options.Filter == ZE_BFM_POINT)
 	{
-		return SamplePixelFloat((ZEInt)ZEMath::Floor(TextureCoordinate.x), (ZEInt)ZEMath::Floor(TextureCoordinate.y), Options);
+		ZESSize x = (ZESSize)Texcoords.x;
+		ZESSize y = (ZESSize)Texcoords.y;
+
+		const void* Address = Bitmap->AddressPixel(x, y, Options);
+		return (Address != NULL ? static_cast<const ZEPixelType*>(Address)->ToVector4() : Options.BorderColor);
 	}
-
-	if (Options->Filter == ZE_BFM_BILINEAR)
+	else if (Options.Filter == ZE_BFM_BILINEAR)
 	{
-		ZEInt x = (ZEInt)ZEMath::Floor(TextureCoordinate.x);
-		ZEInt y = (ZEInt)ZEMath::Floor(TextureCoordinate.y);
+		ZESSize x = (ZESSize)Texcoords.x;
+		ZESSize y = (ZESSize)Texcoords.y;
 
-		float RatioU = TextureCoordinate.x - (float)x;
-		float RatioV = TextureCoordinate.y - (float)y;
+		float RatioU = Texcoords.x - (float)x;
+		float RatioV = Texcoords.y - (float)y;
 
-		ZEVector4 A = SamplePixelFloat(x, y, Options);
-		ZEVector4 B = SamplePixelFloat(x + 1, y, Options);
-		ZEVector4 C = SamplePixelFloat(x, y + 1, Options);
-		ZEVector4 D = SamplePixelFloat(x + 1, y + 1, Options);
+		const void* AddressA = Bitmap->AddressPixel(x, y, Options);
+		ZEVector4 A = (AddressA != NULL ? static_cast<const ZEPixelType*>(AddressA)->ToVector4() : Options.BorderColor);
+
+		const void* AddressB = Bitmap->AddressPixel(x + 1, y, Options);
+		ZEVector4 B = (AddressB != NULL ? static_cast<const ZEPixelType*>(AddressB)->ToVector4() : Options.BorderColor);
+
+		const void* AddressC = Bitmap->AddressPixel(x, y + 1, Options);
+		ZEVector4 C = (AddressC != NULL ? static_cast<const ZEPixelType*>(AddressC)->ToVector4() : Options.BorderColor);
+
+		const void* AddressD = Bitmap->AddressPixel(x + 1, y + 1, Options);
+		ZEVector4 D = (AddressD != NULL ? static_cast<const ZEPixelType*>(AddressD)->ToVector4() : Options.BorderColor);
 
 		ZEVector4 Row0, Row1, Output;
 		ZEVector4::Lerp(Row0, A, B, RatioU);
 		ZEVector4::Lerp(Row1, C, D, RatioU);
-		
+
 		ZEVector4::Lerp(Output, Row0, Row1, RatioV);
 
 		return Output;
@@ -327,28 +485,25 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 	return ZEVector4::Zero;
 }
 
-void ZEBitmap::CopyFrom(void* SourceBuffer, ZESize SourcePitch, 
-						ZEUInt Width, ZEUInt Height, 
-						ZEUInt SourceOffsetX, ZEUInt SourceOffsetY,
-						ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY)
-
+ZEVector4 ZEBitmap::SamplePixel(const ZEVector2& Texcoords, const ZEBitmapSamplingOptions& Options) const
 {
-	if (Height == 0)
-		Height = this->Height;
+	switch (Format)
+	{
+		case ZE_BPF_ARGB:
+			return SamplePixelInternal<ZEPixelARGB>(this, Texcoords, Options);
+			
+		case ZE_BPF_RGB:
+			return SamplePixelInternal<ZEPixelRGB>(this, Texcoords, Options);
 
-	if (Width == 0)
-		Width = this->Width;
+		case ZE_BPF_GRAYSCALE:
+			return SamplePixelInternal<ZEPixelGrayscale>(this, Texcoords, Options);
 
-	for (ZESize I = 0; I < (ZESize)Height; I++)
-		memcpy((ZEUInt8*)Pixels + ((ZESize)DestinationOffsetY + I) * Pitch + (ZESize)DestinationOffsetX * PixelSize, 
-			(ZEUInt8*)SourceBuffer + ((ZESize)SourceOffsetY + I) * SourcePitch + (ZESize)SourceOffsetX * PixelSize, 
-			(ZESize)Width * PixelSize);
+		default:
+			return ZEVector4::Zero;
+	}
 }
 
-void ZEBitmap::CopyTo(void* DestinationBuffer, ZESize DestinationPitch, 
-					  ZEUInt Width, ZEUInt Height, 
-					  ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY,
-					  ZEUInt SourceOffsetX, ZEUInt SourceOffsetY)
+void ZEBitmap::CopyFrom(void* SourceBuffer, ZESize SourcePitch, ZESize Width, ZESize Height, ZESize SourceOffsetX, ZESize SourceOffsetY, ZESize DestinationOffsetX, ZESize DestinationOffsetY)
 {
 	if (Height == 0)
 		Height = this->Height;
@@ -357,27 +512,85 @@ void ZEBitmap::CopyTo(void* DestinationBuffer, ZESize DestinationPitch,
 		Width = this->Width;
 
 	for (ZESize I = 0; I < (ZESize)Height; I++)
-		memcpy((ZEUInt8*)DestinationBuffer + ((ZESize)DestinationOffsetY + I) * DestinationPitch + (ZESize)DestinationOffsetX * PixelSize, 
-			(ZEUInt8*)Pixels + ((ZESize)SourceOffsetY + I) * Pitch + (ZESize)SourceOffsetX * PixelSize, 
-			(ZESize)Width * PixelSize);
+	{
+		memcpy((ZEUInt8*)Data + (DestinationOffsetY + I) * Pitch + DestinationOffsetX * PixelSize, 
+			(ZEUInt8*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
+			Width * PixelSize);
+	}
+}
+
+void ZEBitmap::CopyTo(void* DestinationBuffer, ZESize DestinationPitch, ZESize Width, ZESize Height, ZESize DestinationOffsetX, ZESize DestinationOffsetY, ZESize SourceOffsetX, ZESize SourceOffsetY)
+{
+	if (Height == 0)
+		Height = this->Height;
+
+	if (Width == 0)
+		Width = this->Width;
+
+	for (ZESize I = 0; I < Height; I++)
+	{
+		memcpy((ZEUInt8*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
+			(ZEUInt8*)Data + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+			Width * PixelSize);
+	}
 }
 
 void ZEBitmap::Fill(ZEUInt Color)
 {
-	memset(Pixels, Color, (ZESize)Height * Pitch);
+	memset(Data, Color, (ZESize)Height * Pitch);
 }
 
-void ZEBitmap::Clear()
+bool ZEBitmap::Create(ZESize Width, ZESize Height, ZEBitmapPixelFormat Format)
 {
-	Fill(0x00);
+	if (Data != NULL && this->Width == Width && this->Height == Height && this->Format == Format)
+		return true;
+
+	if (Width == 0 || Height == 0)
+	{
+		zeError("Cannot create ZEBitmap. Can not create bitmap with zero dimension.");
+		return false;
+	}
+
+	ZESize PixelSize = 0;
+	switch (Format)
+	{
+		case ZE_BPF_ARGB:
+			PixelSize = 4;
+			break;
+
+		case ZE_BPF_RGB:
+			PixelSize = 3;
+			break;
+
+		case ZE_BPF_GRAYSCALE:
+			PixelSize = 1;
+			break;
+
+		default:
+		case ZE_BPF_NONE:
+			zeError("Cannot create ZEBitmap. Unknown format.");
+			return false;
+	}
+
+	Release();
+
+	this->Pitch		= Width * PixelSize;
+	this->Width		= Width;
+	this->Height	= Height;
+	this->Format	= Format;
+	this->PixelSize = PixelSize;
+	this->Data	= new ZEUInt8[Width * Height * PixelSize];
+
+	return true;
 }
 
-bool ZEBitmap::Load(const char* FileName)
+
+bool ZEBitmap::Load(const ZEString& FileName)
 {
 	ZERealPath RealPath = ZEPathInfo(FileName).GetRealPath();
 	if ((RealPath.Access | ZE_PA_READ) == 0)
 	{
-		zeError("Can not open bitmap file.");
+		zeError("Cannot load ZEBitmap from file. Read access denied. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
@@ -388,78 +601,142 @@ bool ZEBitmap::Load(const char* FileName)
 	ZEString Dasda = FreeImage_GetFormatFromFIF(FIFormat);
 
 	FIBITMAP* FIBitmap = FreeImage_Load(FIFormat, RealPath.Path, 0);
-
 	if (FIBitmap == NULL)
 	{
-		zeError("Can not open bitmap file.");
+		zeError("Cannot load ZEBitmap from file. Internal error. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
-	Width		= FreeImage_GetWidth(FIBitmap);
-	Height		= FreeImage_GetHeight(FIBitmap);
-	Pitch		= (ZESize)FreeImage_GetPitch(FIBitmap);
-	PixelSize	= (ZESize)FreeImage_GetBPP(FIBitmap) / 8;
-	
-	FIBITMAP* FIConvertedBitmap;
-	if (PixelSize != 4)
+
+	ZEUInt Width = FreeImage_GetWidth(FIBitmap);
+	ZEUInt Height = FreeImage_GetHeight(FIBitmap);
+	ZEUInt BPP = FreeImage_GetBPP(FIBitmap);
+	FREE_IMAGE_TYPE Type = FreeImage_GetImageType(FIBitmap);
+
+	ZEBitmapPixelFormat Format = ZE_BPF_NONE;
+
+	if (Type != FIT_BITMAP)
 	{
-		FIConvertedBitmap = FreeImage_ConvertTo32Bits(FIBitmap);
 		FreeImage_Unload(FIBitmap);
+		zeError("Cannot load ZEBitmap from file. Unsupported pixel format. Unsupported pixel format. File Name: \"%s\".", FileName.ToCString());
+		return false;
 	}
-	else
+
+	switch (BPP)
 	{
-		FIConvertedBitmap = FIBitmap;
+		case 8:
+			Format = ZE_BPF_GRAYSCALE;
+			break;
+		
+		case 24:
+			Format = ZE_BPF_RGB;
+			break;
+		
+		case 32:
+			Format = ZE_BPF_ARGB;
+			break;
+
+		default:
+			FreeImage_Unload(FIBitmap);
+			zeError("Cannot load ZEBitmap from file. Unsupported pixel format. Unsupported pixel format. File Name: \"%s\".", FileName.ToCString());
+			return false;
 	}
 
-	PixelSize = 4;
-	this->Create(Width, Height, PixelSize);
+	this->Create(Width, Height, Format);
 
-	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	switch (Format)
+	{
+		case ZE_BPF_ARGB:
+			FreeImage_ConvertToRawBits((BYTE*)Data, FIBitmap, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+			break;
 
-	FreeImage_Unload(FIConvertedBitmap);
+		case ZE_BPF_RGB:
+			FreeImage_ConvertToRawBits((BYTE*)Data, FIBitmap, (int)Pitch, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+			break;
+
+		case ZE_BPF_GRAYSCALE:
+			FreeImage_ConvertToRawBits((BYTE*)Data, FIBitmap, (int)Pitch, 8, 0x000000FF, 0x00000000, 0x00000000, TRUE);
+			break;
+	}
+
+	FreeImage_Unload(FIBitmap);
 
 	return true;
 }
 
-void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
+bool ZEBitmap::Save(const ZEString& FileName, ZEBitmapFileFormat FileFormat) const
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, (int)Width, (int)Height, (int)Pitch, PixelSize * 8, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	FREE_IMAGE_FORMAT FIFormat;
-	switch(Format)
+	switch(FileFormat)
 	{
-		default:
 		case ZE_BFF_BMP:
 			FIFormat = FIF_BMP;
 			break;
+
 		case ZE_BFF_TGA:
 			FIFormat = FIF_TARGA;
 			break;
+
 		case ZE_BFF_PNG:
 			FIFormat = FIF_PNG;
 			break;
+
 		case ZE_BFF_JPG:
 			FIFormat = FIF_JPEG;
 			break;
+
 		case ZE_BFF_TIFF:
 			FIFormat = FIF_TIFF;
 			break;
+	
+		default:
+			zeError("Cannot save ZEBitmap to file. Unknwon file format. File Name: \"%s\".", FileName.ToCString());
+			return false;
 	}
 
-	FreeImage_Save(FIFormat, FIBitmap, FileName);
+
+	FIBITMAP* FIBitmap = NULL;
+	switch (Format)
+	{
+		case ZE_BPF_ARGB:
+			FreeImage_ConvertFromRawBits((BYTE*)Data, (int)Width, (int)Height, (int)Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+			break;
+
+		case ZE_BPF_RGB:
+			FreeImage_ConvertFromRawBits((BYTE*)Data, (int)Width, (int)Height, (int)Pitch, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+			break;
+
+		case ZE_BPF_GRAYSCALE:
+			FreeImage_ConvertFromRawBits((BYTE*)Data, (int)Width, (int)Height, (int)Pitch, 8, 0x00000000, 0x00000000, 0x000000FF, TRUE);
+			break;
+
+		default:
+			zeError("Cannot save ZEBitmap to file. Unknwon pixel format. File Name: \"%s\".", FileName.ToCString());
+			return false;
+	}
+
+	if (!FreeImage_Save(FIFormat, FIBitmap, FileName))
+	{
+		zeError("Cannot save ZEBitmap to file. Internal error. File Name: \"%s\".", FileName.ToCString());
+		return false;
+	}
 
 	FreeImage_Unload(FIBitmap);
+
+	return true;
 }
 
 void ZEBitmap::Release()
 {
-	if (Pixels != NULL)
-		delete[] Pixels;
+	if (Data != NULL)
+		delete[] Data;
 	
 	Width = 0;
 	Height = 0;
+	Format = ZE_BPF_NONE;
 	Pitch = 0;
 	PixelSize = 0;
-	Pixels = NULL;
+	Data = NULL;
 }
 
 ZEBitmap::ZEBitmap()
@@ -468,7 +745,7 @@ ZEBitmap::ZEBitmap()
 	Height = 0;
 	Pitch = 0;
 	PixelSize = 0;
-	Pixels = NULL;
+	Data = NULL;
 }
 
 ZEBitmap::~ZEBitmap()

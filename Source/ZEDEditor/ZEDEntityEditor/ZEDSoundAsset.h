@@ -39,7 +39,4 @@ class ZEDSoundAsset : public ZEDAsset
 {
 	friend class ZEDSoundAssetType;
 	public:
-		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const override;
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
-		virtual ZEDPreviewWidget*						CreatePreviewWidget()  const override;
 };

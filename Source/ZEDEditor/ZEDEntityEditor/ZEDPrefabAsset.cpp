@@ -34,20 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDPrefabAsset.h"
-
-#include "ZEDS/ZEVariant.h"
-
-ZEVariant ZEDPrefabAsset::GetAssetProperty(const ZEString& PropertyName) const
-{
-	return ZEVariant();
-}
-
-ZEDThumbnailWidget* ZEDPrefabAsset::CreateThumbnailWidget() const
-{
-	return NULL;
-}
-
-ZEDPreviewWidget* ZEDPrefabAsset::CreatePreviewWidget() const
-{
-	return NULL;
-}

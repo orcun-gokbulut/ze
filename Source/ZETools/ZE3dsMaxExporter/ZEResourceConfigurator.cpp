@@ -165,13 +165,13 @@ ZEString ZEResourceConfigurator::GetResourceRelativePath(ZEString& RelativeTo, c
 	
 	RelativePathInfo.SetPath(RelativePathInfo.GetParentDirectory());
 
-	if (Path.IsParent(RelativePathInfo.GetPath()))
+	if (Path.IsParentOf(RelativePathInfo.GetPath()))
 		return Path.GetRelativeTo(RelativePathInfo.GetPath());
 
 	ZEPathInfo ParentPathInfo(RelativePathInfo.GetPath());
 	ZEString Result;
 
-	while (Path.IsParent(ParentPathInfo.GetPath()) == false)
+	while (Path.IsParentOf(ParentPathInfo.GetPath()) == false)
 	{
 		ParentPathInfo.SetPath(ParentPathInfo.GetParentDirectory());
 		Result.Append("../");

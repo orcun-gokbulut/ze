@@ -1292,9 +1292,9 @@ ZEDGizmo::ZEDGizmo()
 {
 	DirtyGizmoFlags.RaiseAll();
 
+	Mode = ZED_GM_NONE;
 	HoveredAxis = ZED_GA_NONE;
 	SelectedAxis = ZED_GA_NONE;
-	Mode = ZED_GM_NONE;
 	AxisLength = 0.1f;
 	PickTreshold = 5;
 

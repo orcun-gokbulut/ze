@@ -141,6 +141,11 @@ ZEVariant ZEDAsset::GetAssetProperty(const ZEString& PropertyName) const
 	return ZEVariant();
 }
 
+const QImage* ZEDAsset::GetThumbnailImage() const
+{
+	return NULL;
+}
+
 ZEDThumbnailWidget* ZEDAsset::CreateThumbnailWidget() const
 {
 	return NULL;
@@ -193,6 +198,8 @@ bool ZEDAsset::WriteMetaData(const ZEDAssetMetaData& MetaData) const
 	MetaData.Save(&RootNode);
 	
 	RootNode.CloseNode();
+
+	return true;
 }
 
 ZEArray<ZEDAssetDependencyItem> ZEDAsset::ReadDependencies() const

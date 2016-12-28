@@ -1136,3 +1136,20 @@ bool ZEMLFormatXMLV1::WriteElementClose(ZEFile* File, ZEMLFormatElement& Element
 
 	return true;
 }
+
+ZEMLFormatXMLV1::ZEMLFormatXMLV1()
+{
+	Document = NULL;
+	Root = NULL;
+	CurrentNode = NULL;
+	C14NDepth = 0;
+}
+
+ZEMLFormatXMLV1::~ZEMLFormatXMLV1()
+{
+	if (Document != NULL)
+	{
+		delete Document;
+		Document = NULL;
+	}
+}

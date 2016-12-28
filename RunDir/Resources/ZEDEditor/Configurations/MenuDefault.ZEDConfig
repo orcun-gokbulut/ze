@@ -18,6 +18,10 @@
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">2</Property>
+      <Property Name="TargetName" Type="String">OperationsMenu</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">2</Property>
       <Property Name="TargetName" Type="String">Settings Menu</Property>
      </Node>
     </Node>
@@ -78,21 +82,25 @@
     <Node Name="Items">
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDOperationManager::UndoCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::RedoCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDObjects::CloneCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
       <Property Name="TargetName" Type="String">ZEDSelectionManager::LockSelectionCommand</Property>
-     </Node>
-     <Node Name="Item">
-      <Property Name="Type" Type="UInt8">3</Property>
-     </Node>
-     <Node Name="Item">
-      <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectAllCommand</Property>
-     </Node>
-     <Node Name="Item">
-      <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDSelectionManager::ClearSelectionCommand</Property>
-     </Node>
-     <Node Name="Item">
-      <Property Name="Type" Type="UInt8">3</Property>
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
@@ -107,7 +115,7 @@
      </Node>
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDSelectionManager::SelectionShapeCommand</Property>
+      <Property Name="TargetName" Type="String">ZEDObjects::DeleteCommand</Property>
      </Node>
     </Node>
    </Node>
@@ -120,6 +128,53 @@
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
       <Property Name="TargetName" Type="String">ZEDEditor::CustomizeUICommand</Property>
+     </Node>
+    </Node>
+   </Node>
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">OperationsMenu</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">Operations</Property>
+    <Property Name="Protected" Type="Bool">false</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">2</Property>
+      <Property Name="TargetName" Type="String">Operations | Transformation</Property>
+     </Node>
+    </Node>
+   </Node>
+   <Node Name="Menu">
+    <Property Name="Name" Type="String">Operations | Transformation</Property>
+    <Property Name="Icon" Type="String"></Property>
+    <Property Name="Text" Type="String">Transformation</Property>
+    <Property Name="Protected" Type="Bool">false</Property>
+    <Node Name="Items">
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::SelectCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::MoveCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::RotateCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::ScaleCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">3</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::TransformSpaceCommand</Property>
+     </Node>
+     <Node Name="Item">
+      <Property Name="Type" Type="UInt8">1</Property>
+      <Property Name="TargetName" Type="String">ZEDTransformationManager::TransformPivotCommand</Property>
      </Node>
     </Node>
    </Node>

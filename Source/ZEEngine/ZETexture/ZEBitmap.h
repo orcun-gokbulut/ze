@@ -34,11 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_BITMAP_H__
-#define __ZE_BITMAP_H__
 
 #include "ZETypes.h"
-#include <ZEMath/ZEVector.h>
+#include "ZEPacking.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+
+enum ZEBitmapPixelFormat
+{
+	ZE_BPF_NONE,
+	ZE_BPF_ARGB,
+	ZE_BPF_RGB,
+	ZE_BPF_GRAYSCALE
+};
 
 enum ZEBitmapFileFormat
 {
@@ -63,75 +71,126 @@ enum ZEBitmapFilteringMode
 	ZE_BFM_BILINEAR
 };
 
-struct ZEPixelColor
+#pragma pack(push, 1)
+struct ZEPixelARGB
 {
 	ZEUInt8						b, g, r, a;
 
-	static ZEPixelColor			Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
-	static ZEVector4			LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
+	ZEVector4					ToVector4() const;
 
-								ZEPixelColor();
-								ZEPixelColor(ZEUInt Color);
-								ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
+								ZEPixelARGB();
+								ZEPixelARGB(ZEUInt Color);
+								ZEPixelARGB(ZEUInt8 a, ZEUInt8 r, ZEUInt8 g, ZEUInt8 b);
+
+	static ZEPixelARGB			Lerp(const ZEPixelARGB& A, const ZEPixelARGB& B, float T);
 };
 
-struct ZEBitmapSamplingOptions
+struct ZEPixelRGB
 {
-	ZEBitmapFilteringMode		Filter;
-	ZEBitmapAddressingMode		AddressingX;
-	ZEBitmapAddressingMode		AddressingY;
-	ZEPixelColor				BorderColor;
+	ZEUInt8						b, g, r;
+
+	ZEVector4					ToVector4() const;
+
+								ZEPixelRGB();
+								ZEPixelRGB(ZEUInt Color);
+								ZEPixelRGB(ZEUInt8 r, ZEUInt8 g, ZEUInt8 b);
+
+	static ZEPixelRGB			Lerp(const ZEPixelRGB& A, const ZEPixelRGB& B, float T);
+};
+
+struct ZEPixelGrayscale
+{
+	ZEUInt8						l;
+
+	ZEVector4					ToVector4() const;
+
+								ZEPixelGrayscale();
+								ZEPixelGrayscale(ZEUInt Color);
+
+	static ZEPixelGrayscale		Lerp(const ZEPixelGrayscale& A, const ZEPixelGrayscale& B, float T);
+};
+
+#pragma pack(pop)
+
+struct ZEBitmapAddressingOptions
+{
+	ZEBitmapAddressingMode					AddressingX;
+	ZEBitmapAddressingMode					AddressingY;
+};
+
+struct ZEBitmapSamplingOptions : public ZEBitmapAddressingOptions
+{
+	ZEBitmapFilteringMode					Filter;
+	ZEVector4								BorderColor;
 };
 
 class ZEBitmap
 {
 	private:
-		ZEUInt					Width;
-		ZEUInt					Height;
-		ZESize					Pitch;
-		ZESize					PixelSize;
-		void*					Pixels;
+		ZESize								Width;
+		ZESize								Height;
+		ZESize								Pitch;
+		ZEBitmapPixelFormat					Format;
+		ZESize								PixelSize;
+		void*								Data;
 
 	public:
-		bool					Create(ZEUInt Width, ZEUInt Height, ZESize PixelSize);
+		ZESize								GetWidth() const;
+		ZESize								GetHeight() const;
+		ZESize								GetPitch() const;
+		ZEBitmapPixelFormat					GetFormat() const;
+		ZESize								GetPixelSize() const;
+		ZESize								GetBPP() const;
+		ZESize								GetSize() const;
 
-		ZEUInt					GetWidth();
-		ZEUInt					GetHeight();
-		ZESize					GetPitch();
-		ZESize					GetPixelSize();
-		ZESize					GetBPP();
-		ZESize					GetSize();
+		void								SetData(void* Data);
+		void*								GetData();
+		const void*							GetData() const;
 
-		ZEPixelColor*			GetPixels();
-		ZEPixelColor&			GetPixel(ZEUInt x, ZEUInt y);
-		ZEVector4				GetPixelFloat(ZEUInt x, ZEUInt y);
+		void								SetRow(ZESize Index, void* Data);
+		void*								GetRow(ZESize Index);
+		const void*							GetRow(ZESize Index) const;
 
-		ZEPixelColor&			SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* Options = 0);
-		ZEVector4				SamplePixelFloat(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* Options = 0);		
-		ZEVector4				SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* Options = 0);
-	
-		ZEPixelColor*			GetRow(ZEUInt Index);
+		ZEPixelARGB*						GetPixelsARGB();
+		const ZEPixelARGB*					GetPixelsARGB() const;
+		ZEPixelRGB*							GetPixelsRGB();
+		const ZEPixelRGB*					GetPixelsRGB() const;
+		ZEPixelGrayscale*					GetPixelsGrayscale();
+		const ZEPixelGrayscale*				GetPixelsGrayscale() const;
 
-		void					CopyFrom(void* SourceBuffer, ZESize SourcePitch, 
-									ZEUInt Width, ZEUInt Height, 
-									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0,
-									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0);
+		void*								GetPixel(ZESize x, ZESize y);
+		const void*							GetPixel(ZESize x, ZESize y) const;
+		ZEPixelARGB&						GetPixelARGB(ZESize x, ZESize y);
+		const ZEPixelARGB&					GetPixelARGB(ZESize x, ZESize y) const;
+		ZEPixelRGB&							GetPixelRGB(ZESize x, ZESize y);
+		const ZEPixelRGB&					GetPixelRGB(ZESize x, ZESize y) const;
+		ZEPixelGrayscale&					GetPixelGrayscale(ZESize x, ZESize y);
+		const ZEPixelGrayscale&				GetPixelGrayscale(ZESize x, ZESize y) const;
+		ZEVector4							GetPixelVector(ZESize x, ZESize y) const;
+		
+		void*								AddressPixel(ZESSize x, ZESSize y, const ZEBitmapAddressingOptions& Options);
+		const void*							AddressPixel(ZESSize x, ZESSize y, const ZEBitmapAddressingOptions& Options) const;
 
-		void					CopyTo(void* DestinationBuffer, ZESize DestinationPitch, 
-									ZEUInt Width, ZEUInt Height, 
-									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0,
-									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0);
+		ZEVector4							SamplePixel(const ZEVector2& Texcoords, const ZEBitmapSamplingOptions& Options) const;
 
-		void					Fill(ZEUInt Color);
-		void					Clear();
+		void								Fill(ZEUInt Color);
 
-		bool					Load(const char* Filename);
-		void					Save(const char* FileName, ZEBitmapFileFormat Format);
+		void								CopyFrom(void* SourceBuffer, ZESize SourcePitch, 
+												ZESize Width, ZESize Height, 
+												ZESize SourceOffsetX = 0, ZESize SourceOffsetY = 0,
+												ZESize DestinationOffsetX = 0, ZESize DestinationOffsetY = 0);
 
-		void					Release();
+		void								CopyTo(void* DestinationBuffer, ZESize DestinationPitch, 
+												ZESize Width, ZESize Height, 
+												ZESize DestinationOffsetX = 0, ZESize DestinationOffsetY = 0,
+												ZESize SourceOffsetX = 0, ZESize SourceOffsetY = 0);
 
-								ZEBitmap();
-								~ZEBitmap();
+		bool								Create(ZESize Width, ZESize Height, ZEBitmapPixelFormat Format);
+		void								Release();
+		
+		bool								Load(const ZEString& Filename);
+		bool								Save(const ZEString& FileName, ZEBitmapFileFormat Format) const;
+
+											ZEBitmap();
+											~ZEBitmap();
 };
-
-#endif

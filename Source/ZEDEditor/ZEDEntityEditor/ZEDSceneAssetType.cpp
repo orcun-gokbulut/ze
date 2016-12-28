@@ -62,24 +62,15 @@ ZESize ZEDSceneAssetType::GetExtensionCount() const
 	return 2;
 }
 
-const char* ZEDSceneAssetType::GetIconPath() const
+const ZEVector3& ZEDSceneAssetType::GetColor() const 
 {
-	return "";
+	static ZEVector3 Color(0.957f, 0.263f, 0.212f);
+	return Color;
 }
 
-const char* const* ZEDSceneAssetType::GetCustomProperties() const
+const char* ZEDSceneAssetType::GetIconPath(const ZEString& Extension) const
 {
-	return NULL;
-}
-
-ZESize ZEDSceneAssetType::GetCustomPropertyCount() const 
-{
-	return 0;
-}
-
-ZEDAssetTypeCapabilities ZEDSceneAssetType::GetCapabilities() const
-{
-	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+	return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSceneAsset.png";
 }
 
 ZEDAsset* ZEDSceneAssetType::Wrap(const ZEString& Path) const 

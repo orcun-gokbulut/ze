@@ -153,14 +153,14 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB, float& TLineSegmentA, float &TLineSegmentB)
 {
 	ZEVector3 w(LineSegmentA.p, LineSegmentB.p);
-	float    a = ZEVector3::DotProduct(LineSegmentA.v, LineSegmentA.v);
-    float    b = ZEVector3::DotProduct(LineSegmentA.v, LineSegmentB.v);
-    float    c = ZEVector3::DotProduct(LineSegmentB.v, LineSegmentB.v);
-    float    d = ZEVector3::DotProduct(LineSegmentA.v, w);
-    float    e = ZEVector3::DotProduct(LineSegmentB.v, w);
-    float    D = a*c - b*b;
-    float    sN, sD = D;
-    float    tN, tD = D;
+	float a = ZEVector3::DotProduct(LineSegmentA.v, LineSegmentA.v);
+	float b = ZEVector3::DotProduct(LineSegmentA.v, LineSegmentB.v);
+	float c = ZEVector3::DotProduct(LineSegmentB.v, LineSegmentB.v);
+	float d = ZEVector3::DotProduct(LineSegmentA.v, w);
+	float e = ZEVector3::DotProduct(LineSegmentB.v, w);
+	float D = a*c - b*b;
+	float sN, sD = D;
+	float tN, tD = D;
 
 	if (D < ZE_ZERO_THRESHOLD) 
 	{
@@ -234,14 +234,14 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZER
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray, float& TLineSegment, float& TRay)
 {
 	ZEVector3 w(LineSegment.p, Ray.p);
-	float    a = ZEVector3::DotProduct(LineSegment.v, LineSegment.v);
-    float    b = ZEVector3::DotProduct(LineSegment.v, Ray.v);
-    float    c = ZEVector3::DotProduct(Ray.v, Ray.v);
-    float    d = ZEVector3::DotProduct(LineSegment.v, w);
-    float    e = ZEVector3::DotProduct(Ray.v, w);
-    float    D = a*c - b*b;
-    float    sN, sD = D;
-    float    tN, tD = D;
+	float a = ZEVector3::DotProduct(LineSegment.v, LineSegment.v);
+	float b = ZEVector3::DotProduct(LineSegment.v, Ray.v);
+	float c = ZEVector3::DotProduct(Ray.v, Ray.v);
+	float d = ZEVector3::DotProduct(LineSegment.v, w);
+	float e = ZEVector3::DotProduct(Ray.v, w);
+	float D = a*c - b*b;
+	float sN, sD = D;
+	float tN, tD = D;
 
 	if (D < ZE_ZERO_THRESHOLD) 
 	{

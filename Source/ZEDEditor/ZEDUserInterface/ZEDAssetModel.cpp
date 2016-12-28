@@ -1067,16 +1067,26 @@ QVariant ZEDAssetModel::data(const QModelIndex& Index, int Role) const
 			if (Columns[Index.column()].GetType() == ZED_AMHT_NAME)
 			{
 				QString IconFile;
-
+	
 				ZEDAsset* Asset = ConvertToAsset(Index);
 				if (Asset != NULL)
-					IconFile = ZEPathInfo(Asset->GetType()->GetIconPath()).GetRealPath().Path;
+				{
+					ZEString AssetExtension = ZEPathInfo(Asset->GetName()).GetExtension();
+					IconFile = ZEPathInfo(Asset->GetType()->GetIconPath(AssetExtension)).GetRealPath().Path;
+				}
 				else if (ConvertToDirectory(Index))
-					IconFile = ZEPathInfo("#R:/ZEDEditor/Icons/Directory.png").GetRealPath().Path;
+				{
+					IconFile = ZEPathInfo("#R:/ZEDEditor/Icons/ZEDAsset/ZEDAssetDirectory-Opened.png").GetRealPath().Path;
+				}
 				else if (!ConvertToCategory(Index))
-					IconFile = ZEPathInfo("#R:/ZEDEditor/Icons/Directory.png").GetRealPath().Path;
+				{
+					IconFile = ZEPathInfo("#R:/ZEDEditor/Icons/ZEDAsset/ZEDAssetCategory.png").GetRealPath().Path;
+				}
 
-				return QIcon(IconFile);
+				if (IconFile.isEmpty())
+					return QIcon();
+				else
+					return QIcon(IconFile);
 			}
 			break;
 

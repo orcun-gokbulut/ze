@@ -56,8 +56,8 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureSurface* Surfa
 void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 {
 	ZEBitmap Bitmap;
-	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), 32);
-	ZEPixelColor* Destination = Bitmap.GetPixels();
+	Bitmap.Create(Level->GetWidth(), Level->GetHeight(), ZE_BPF_ARGB);
+	ZEPixelARGB* Destination = Bitmap.GetPixelsARGB();
 	void* Source = Level->GetData();
 
 	ZEGRFormat Format = Level->GetOwner()->GetOwner()->GetPixelFormat();
@@ -65,7 +65,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 	{
 		for (ZESize x = 0; x < Level->GetWidth(); x++)
 		{
-			ZEPixelColor* Current = &Bitmap.GetPixel(x, y);
+			ZEPixelARGB* Current = &Bitmap.GetPixelARGB(x, y);
 			switch(Format)
 			{
 				case ZEGR_TF_R8G8B8A8_UINT:

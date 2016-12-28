@@ -35,8 +35,6 @@
 
 #include "ZEMLFormat.h"
 
-#include "ZEPointer\ZEPointer.h"
-
 class TiXmlElement;
 class TiXmlDocument;
 class TiXmlNode;
@@ -44,7 +42,7 @@ class TiXmlNode;
 class ZEMLFormatXMLV1 : public ZEMLFormat
 {
 	private:
-		ZEPointer<TiXmlDocument>		Document;
+		TiXmlDocument*					Document;
 		TiXmlElement*					Root;
 		TiXmlElement*					CurrentNode;
 		ZEUInt							C14NDepth;
@@ -69,4 +67,7 @@ class ZEMLFormatXMLV1 : public ZEMLFormat
 		virtual bool					WriteHeaderClose(ZEFile* File);
 		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element);
 		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element);
+
+										ZEMLFormatXMLV1();
+										~ZEMLFormatXMLV1();
 };

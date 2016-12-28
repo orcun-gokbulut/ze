@@ -39,9 +39,10 @@
 
 #include "ZEDAsset.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEList2.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEList2.h"
+#include "ZEMath/ZEVector.h"
 
 ZE_ENUM(ZEDAssetEditorType)
 {
@@ -83,7 +84,8 @@ class ZEDAssetType : public ZEObject
 
 		const ZEList2<ZEDAsset>&				GetAssets() const;
 
-		virtual const char*						GetIconPath() const;
+		virtual const ZEVector3&				GetColor() const;
+		virtual const char*						GetIconPath(const ZEString& Extension) const;
 		virtual const char* const*				GetCustomProperties() const;
 		virtual ZESize							GetCustomPropertyCount() const;
 		virtual ZEDAssetTypeCapabilities		GetCapabilities() const;

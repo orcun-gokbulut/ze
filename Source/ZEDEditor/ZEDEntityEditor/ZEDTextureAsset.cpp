@@ -35,19 +35,15 @@
 
 #include "ZEDTextureAsset.h"
 
-#include "ZEDS/ZEVariant.h"
+#include "ZEFile/ZEFileInfo.h"
 
-ZEVariant ZEDTextureAsset::GetAssetProperty(const ZEString& PropertyName) const
+const QImage* ZEDTextureAsset::GetThumbnailImage() const
 {
-	return ZEVariant();
-}
+	if (ThumbnailImage.width() == 0)
+		ThumbnailImage.load(ZEFileInfo(GetPath()).GetRealPath().Path.ToCString());
 
-ZEDThumbnailWidget* ZEDTextureAsset::CreateThumbnailWidget() const
-{
-	return NULL;
-}
+	if (ThumbnailImage.width() == 0)
+		return NULL;
 
-ZEDPreviewWidget* ZEDTextureAsset::CreatePreviewWidget() const
-{
-	return NULL;
+	return &ThumbnailImage;
 }

@@ -36,18 +36,3 @@
 #include "ZEDMaterialAsset.h"
 
 #include "ZEDS/ZEVariant.h"
-
-ZEVariant ZEDMaterialAsset::GetAssetProperty(const ZEString& PropertyName) const
-{
-	return ZEVariant();
-}
-
-ZEDThumbnailWidget* ZEDMaterialAsset::CreateThumbnailWidget() const
-{
-	return NULL;
-}
-
-ZEDPreviewWidget* ZEDMaterialAsset::CreatePreviewWidget() const
-{
-	return NULL;
-}

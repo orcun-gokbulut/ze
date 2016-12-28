@@ -55,13 +55,3 @@ ZEDObjectWrapper* ZEDModelAsset::CreateWrapper(ZEDEditor* Editor) const
 
 	return Wrapper;
 }
-
-ZEDThumbnailWidget* ZEDModelAsset::CreateThumbnailWidget() const
-{
-	return NULL;
-}
-
-ZEDPreviewWidget* ZEDModelAsset::CreatePreviewWidget() const
-{
-	return NULL;
-}

@@ -36,8 +36,9 @@
 #include "ZEDAssetBrowser.h"
 
 #include "ZEDS/ZEFormat.h"
-#include "ZEDAssetModel.h"
 #include "ZEDCore/ZEDEditor.h"
+#include "ZEDAssetModel.h"
+#include "ZEDAssetItemDelegate.h"
 #include "ui_ZEDAssetBrowser.h"
 
 bool ZEDAssetBrowser::InitializeInternal()
@@ -101,6 +102,7 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	Model = new ZEDAssetModel();
 	Model->SetMode(ZED_AMM_TREE);
 	Model->SetHierarcy(ZED_AMH_DIRECTORY);
+	Form->trwAssets->setItemDelegate(new ZEDAssetItemDelegate());
 	ZEArray<ZEDAssetModelColumn> ModelColumns;
 	ModelColumns.SetCount(1);
 	ModelColumns[0].SetType(ZED_AMHT_NAME);

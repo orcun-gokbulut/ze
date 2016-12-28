@@ -35,11 +35,14 @@
 
 #include "ZEDCore/ZEDAsset.h"
 
+#include <QImage>
+
 class ZEDTextureAsset : public ZEDAsset
 {
 	friend class ZEDTextureAssetType;
+	private:
+		mutable QImage									ThumbnailImage;
+		
 	public:
-		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const override;
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
-		virtual ZEDPreviewWidget*						CreatePreviewWidget() const override;
+		virtual const QImage*							GetThumbnailImage() const override;
 };
