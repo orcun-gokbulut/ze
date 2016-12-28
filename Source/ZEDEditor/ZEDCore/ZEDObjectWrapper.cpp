@@ -406,7 +406,7 @@ bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	Event.Type = ZED_OET_ADDED;
 	RaiseEvent(&Event);
 
-	if (IsInitialized())
+	if (IsInitializedOrInitializing())
 	{
 		if (!Wrapper->Initialize())
 			return false;

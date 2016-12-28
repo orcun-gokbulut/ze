@@ -77,19 +77,18 @@ bool ZEDPropertyEditorItemEnumurator::InitializeInternal()
 			ComboBox->addItem(Enumurators[I].Name, Enumurators[I].Value);
 	}
 	
-	connect(ComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(ComboBox_currentTextChanged(const QString&)));
+	connect(ComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(ComboBox_currentIndexChanged(int)));
 
 	return true;
 }
 
-void ZEDPropertyEditorItemEnumurator::ComboBox_currentTextChanged(const QString& Text)
+void ZEDPropertyEditorItemEnumurator::ComboBox_currentIndexChanged(int Index)
 {
 	ZEVariant Value;
+	QVariant Result = ComboBox->itemData(Index);
+	Value.SetEnum(Result.toInt());
 
-	bool Result = false;
-	Value.SetEnum(Text.toInt(&Result));
-
-	if (Result)
+	if (!Result.isValid())
 	{
 		QPalette Palette = ComboBox->palette();
 		Palette.setColor(QPalette::Window, Qt::red);    

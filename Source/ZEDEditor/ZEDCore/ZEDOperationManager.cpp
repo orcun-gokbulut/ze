@@ -61,6 +61,7 @@ bool ZEDOperationManager::InitializeInternal()
 ZEDOperationManager::ZEDOperationManager()
 {
 	StackIndex = -1;
+	OperationIndex = 0;
 }
 
 ZEDOperationManager::~ZEDOperationManager()

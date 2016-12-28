@@ -50,6 +50,55 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEUI/ZEUIFontTrueType.h"
 
+
+ZEAABBox ZEDEntityWrapper::CalculateBoundingBox(ZEEntity* Entity) const
+{
+	if (Entity == NULL)
+		return ZEAABBox();
+
+	ZEAABBox CurrentBoundingBox = Entity->GetBoundingBox();
+
+	ZEArray<ZEEntity*> Components = Entity->GetComponents();
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+	{
+		ZEAABBox ComponentBoundingBox = CalculateBoundingBox(Components[I]);
+
+		for (ZEInt N = 0; N < 8; N++)
+		{
+			ZEVector3 Point = ComponentBoundingBox.GetVertex(N);
+			if (Point.x < CurrentBoundingBox.Min.x) CurrentBoundingBox.Min.x = Point.x;
+			if (Point.y < CurrentBoundingBox.Min.y) CurrentBoundingBox.Min.y = Point.y;
+			if (Point.z < CurrentBoundingBox.Min.z) CurrentBoundingBox.Min.z = Point.z;
+
+			if (Point.x > CurrentBoundingBox.Max.x) CurrentBoundingBox.Max.x = Point.x;
+			if (Point.y > CurrentBoundingBox.Max.y) CurrentBoundingBox.Max.y = Point.y;
+			if (Point.z > CurrentBoundingBox.Max.z) CurrentBoundingBox.Max.z = Point.z;
+		}
+	}
+
+	ZEArray<ZEEntity*> ChildEntities = Entity->GetChildEntities();
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	{
+		const ZEAABBox& ChildEntityBoundingBox = CalculateBoundingBox(ChildEntities[I]);
+
+		for (ZEInt N = 0; N < 8; N++)
+		{
+			ZEVector3 Point = ChildEntityBoundingBox.GetVertex(N);
+			if (Point.x < CurrentBoundingBox.Min.x) CurrentBoundingBox.Min.x = Point.x;
+			if (Point.y < CurrentBoundingBox.Min.y) CurrentBoundingBox.Min.y = Point.y;
+			if (Point.z < CurrentBoundingBox.Min.z) CurrentBoundingBox.Min.z = Point.z;
+
+			if (Point.x > CurrentBoundingBox.Max.x) CurrentBoundingBox.Max.x = Point.x;
+			if (Point.y > CurrentBoundingBox.Max.y) CurrentBoundingBox.Max.y = Point.y;
+			if (Point.z > CurrentBoundingBox.Max.z) CurrentBoundingBox.Max.z = Point.z;
+		}
+	}
+
+	return CurrentBoundingBox;
+}
+
 void ZEDEntityWrapper::UpdateNamingPlate()
 {
 	if (GetManager() == NULL ||
@@ -98,7 +147,7 @@ void ZEDEntityWrapper::UpdateNamingPlate()
 			NamePlateClass->SetFontColor(ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
 			NamePlate->AddChildControl(NamePlateClass);
 
-			UIManager->AddControl(NamePlate);
+			//UIManager->AddControl(NamePlate);
 		}
 
 		if (GetSelected())
@@ -330,7 +379,7 @@ ZEAABBox ZEDEntityWrapper::GetBoundingBox() const
 	if (GetEntity() == NULL)
 		return ZEAABBox();
 
-	return GetEntity()->GetBoundingBox();
+	return CalculateBoundingBox(GetEntity());
 }
 
 ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform() const
