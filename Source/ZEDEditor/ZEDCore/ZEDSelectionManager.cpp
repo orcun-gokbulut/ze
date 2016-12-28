@@ -321,14 +321,14 @@ void ZEDSelectionManager::RegisterCommands()
 	FreezeObjectsCommand.SetCategory("Selection");
 	FreezeObjectsCommand.SetName("ZEDSelectionManager::FreezeObjectsCommand");
 	FreezeObjectsCommand.SetText("Freeze Objects");
-	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Unlock.png");
+	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unlock.png");
 	FreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::FreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&FreezeObjectsCommand);
 
 	UnfreezeObjectsCommand.SetCategory("Selection");
 	UnfreezeObjectsCommand.SetName("ZEDSelectionManager::UnfreezeObjectsCommand");
 	UnfreezeObjectsCommand.SetText("Unfreeze Objects");
-	UnfreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDUI/Unlock.png");
+	UnfreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unlock.png");
 	UnfreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectsCommand);
 

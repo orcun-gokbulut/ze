@@ -69,10 +69,24 @@ ZESize ZEDTextureAssetType::GetExtensionCount() const
 	return 9;
 }
 
-const char* ZEDTextureAssetType::GetIconPath() const
+const ZEVector3& ZEDTextureAssetType::GetColor() const 
 {
-	return "";
+	static ZEVector3 Color(0.247f, 0.318f, 0.027f);
+	return Color;
 }
+
+const char* ZEDTextureAssetType::GetIconPath(const ZEString& Extension) const
+{
+	if (Extension.EqualsIncase(".png"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDTextureAsset-PNG.png";
+	else if (Extension.EqualsIncase(".jpg") || Extension.EqualsIncase(".jpeg"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDTextureAsset-JPEG.png";
+	else if (Extension.EqualsIncase(".tif") || Extension.EqualsIncase(".tiff"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDTextureAsset-TIFF.png";
+	else
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDTextureAsset-General.png";
+}
+
 
 const char* const* ZEDTextureAssetType::GetCustomProperties() const
 {
@@ -94,7 +108,7 @@ ZESize ZEDTextureAssetType::GetCustomPropertyCount() const
 
 ZEDAssetTypeCapabilities ZEDTextureAssetType::GetCapabilities() const
 {
-	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
+	return ZED_ATC_THUMBNAIL;
 }
 
 ZEDAsset* ZEDTextureAssetType::Wrap(const ZEString& Path) const 

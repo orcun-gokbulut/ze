@@ -67,10 +67,10 @@ struct ZEFTFontCharMetrics
 	ZEUInt32	TextureID;
 };
 
-static ZEBitmap* CreateBitmap(ZEUInt32 TextureWidth, ZEUInt32 TextureHeight, ZEUInt32 PixelSize)
+static ZEBitmap* CreateBitmap(ZEUInt32 TextureWidth, ZEUInt32 TextureHeight)
 {
 	ZEBitmap* Bitmap = new ZEBitmap();
-	Bitmap->Create(TextureWidth, TextureHeight, PixelSize);
+	Bitmap->Create(TextureWidth, TextureHeight, ZE_BPF_GRAYSCALE);
 	Bitmap->Fill(0);
 	return Bitmap;
 }
@@ -129,7 +129,7 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 	}
 
 	ZEArray<ZEBitmap*> Bitmaps;
-	Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight, 1));
+	Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight));
 
 	ZEUInt32 TextureId = 0;
 	ZEUInt32 CurrentX = MarginLeft, CurrentY = MarginTop;
@@ -153,7 +153,7 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 				CurrentY = MarginTop;
 
 				TextureId++;
-				Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight, 1));
+				Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight));
 
 				TextureOutputFile.Remove(TextureOutputFile.GetLength() - 5, 5);
 				TextureOutputFile.Append(TextureId);

@@ -39,7 +39,5 @@ class ZEDMaterialAsset : public ZEDAsset
 {
 	friend class ZEDMaterialAssetType;
 	public:
-		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const override;
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
-		virtual ZEDPreviewWidget*						CreatePreviewWidget() const override;
+
 };

@@ -41,8 +41,4 @@ class ZEDModelAsset : public ZEDAsset
 	public:
 		virtual ZEClass*								GetWrapperObjectClass() const override;
 		virtual ZEDObjectWrapper*						CreateWrapper(ZEDEditor* Editor) const override;
-
-		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const override;
-		virtual ZEDPreviewWidget*						CreatePreviewWidget() const override;
-
 };

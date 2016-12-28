@@ -135,7 +135,6 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 		else if (WaitResult == WAIT_ABANDONED)
 			continue;*/
 
-		OVERLAPPED Overlapped;
 		FILE_NOTIFY_INFORMATION FileNotifyInfos[1024];
 		DWORD FileNotifyInfoCount = 0;
 		BOOL ReadChangeResult = ReadDirectoryChangesW(ChangeListHandle, FileNotifyInfos, sizeof(FileNotifyInfos), TRUE, 
@@ -178,7 +177,7 @@ void ZEDAssetManager::MonitorFunction(ZEThread* Thread, void* ExtraParameters)
 
 void ZEDAssetManager::AddCrawlLocation(const ZEString& Location)
 {
-	CrawlLocations.LockWrite();
+	CrawlLocations.LockWriteNested();
 	if (!CrawlLocations.Exists(Location))
 		CrawlLocations.Enqueue(Location);
 	CrawlLocations.UnlockWrite();
@@ -208,7 +207,7 @@ ZEDAsset* ZEDAssetManager::CreateAsset(const ZEString& Path)
 	if (NewAsset == NULL)
 		return NULL;
 
-	ZEDAssetCategory* Category = CreateCategory(NewAsset->GetCategory());
+	ZEDAssetCategory* Category = CreateCategory(NewAsset->GetCategoryPath());
 	
 	NewAsset->Manager = this;
 	NewAsset->SetName(FileName);
@@ -229,6 +228,8 @@ ZEDAsset* ZEDAssetManager::CreateAsset(const ZEString& Path)
 
 	Event.SetType(ZED_AET_ASSET_ADDED);
 	RaiseEvent(&Event);
+
+	return NewAsset;
 }
 
 void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
@@ -634,6 +635,8 @@ ZEDAssetDirectory* ZEDAssetManager::ScanDirectory(const ZEString& DirectoryPath,
 		for (ZESize I = 0; I < SubDirectories.GetCount(); I++)
 			ScanDirectory(ZEFormat::Format("{0}/{1}", DirectoryInfo.GetPath(), SubDirectories[I]), true);
 	}
+
+	return Directory;
 }
 
 void ZEDAssetManager::UpdatePath(const ZEString& Path)

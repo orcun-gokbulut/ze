@@ -318,7 +318,7 @@ class ZEEntity : public ZEObject
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEEntity.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEEntity.png")
 ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, true)
 ZE_META_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
 ZE_META_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)

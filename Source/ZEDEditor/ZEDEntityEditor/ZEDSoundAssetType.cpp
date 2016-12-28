@@ -63,9 +63,22 @@ ZESize ZEDSoundAssetType::GetExtensionCount() const
 	return 3;
 }
 
-const char* ZEDSoundAssetType::GetIconPath() const
+const ZEVector3& ZEDSoundAssetType::GetColor() const 
 {
-	return "";
+	static ZEVector3 Color(1.0f, 0.756f, 0.027f);
+	return Color;
+}
+
+const char* ZEDSoundAssetType::GetIconPath(const ZEString& Extension) const
+{
+	if (Extension.EqualsIncase(".wav") || Extension.EqualsIncase(".wave"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSoundAsset-WAV.png";
+	else if (Extension.EqualsIncase(".mp3"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSoundAsset-MP3.png";
+	else if (Extension.EqualsIncase(".ogg"))
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSoundAsset-OGG.png";
+	else
+		return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSoundAsset-General.png";
 }
 
 const char* const* ZEDSoundAssetType::GetCustomProperties() const
@@ -84,11 +97,6 @@ const char* const* ZEDSoundAssetType::GetCustomProperties() const
 ZESize ZEDSoundAssetType::GetCustomPropertyCount() const 
 {
 	return 4;
-}
-
-ZEDAssetTypeCapabilities ZEDSoundAssetType::GetCapabilities() const
-{
-	return ZED_ATC_THUMBNAIL | ZED_ATC_PREVIEW;
 }
 
 ZEDAsset* ZEDSoundAssetType::Wrap(const ZEString& Path) const 

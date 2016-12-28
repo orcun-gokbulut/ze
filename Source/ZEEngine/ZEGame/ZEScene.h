@@ -152,6 +152,6 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		static ZEScene*							CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEScene.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEScene.png")
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false);

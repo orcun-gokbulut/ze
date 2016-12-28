@@ -125,11 +125,11 @@ bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, Z
 	ZEVector3 temp;
 	ZEVector3::CrossProduct(temp,Line.v, Plane2.n);
 
-	float dots = ZEVector3::DotProduct(Plane1.p, Plane1.n) - ZEVector3::DotProduct(Plane2.p,Plane1.n);
-	dots = dots / ZEVector3::DotProduct(temp,Plane1.n);
+	float dots = ZEVector3::DotProduct(Plane1.p, Plane1.n) - ZEVector3::DotProduct(Plane2.p, Plane1.n);
+	dots /= ZEVector3::DotProduct(temp, Plane1.n);
 
-	ZEVector3::Scale(Line.p,temp,dots);
-	ZEVector3::Add(Line.p,Line.p,Plane2.p);
+	ZEVector3::Scale(Line.p, temp, dots);
+	ZEVector3::Add(Line.p, Line.p, Plane2.p);
 
 	return true;
 }

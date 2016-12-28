@@ -42,11 +42,6 @@ class ZEDPrefabAssetType : public ZEDAssetType
 		virtual const char* const*				GetExtensions() const override;
 		virtual ZESize							GetExtensionCount() const override;
 
-		virtual const char*						GetIconPath() const override;
-		virtual const char* const*				GetCustomProperties() const override;
-		virtual ZESize							GetCustomPropertyCount() const override;
-		virtual ZEDAssetTypeCapabilities		GetCapabilities() const override;
-
 		virtual ZEDAsset*						Wrap(const ZEString& Path) const override;
 
 												ZEDPrefabAssetType();

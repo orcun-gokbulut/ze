@@ -66,9 +66,15 @@ const ZEList2<ZEDAsset>& ZEDAssetType::GetAssets() const
 	return Assets;
 }
 
-const char* ZEDAssetType::GetIconPath() const
+const ZEVector3& ZEDAssetType::GetColor() const
 {
-	return "";
+	static ZEVector3 Color(0.5f, 0.5f, 0.5f);
+	return Color;
+}
+
+const char* ZEDAssetType::GetIconPath(const ZEString& Extension) const
+{
+	return "#R:/ZEDEditor/ZEDFileIcons/File.png";
 }
 
 const char* const* ZEDAssetType::GetCustomProperties() const

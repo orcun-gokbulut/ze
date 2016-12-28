@@ -53,6 +53,7 @@ class ZEDThumbnailWidget;
 class ZEDPreviewWidget;
 class ZEDEditor;
 class ZEDObjectWrapper;
+class QImage;
 
 struct ZEDAssetDependencyItem
 {
@@ -110,6 +111,7 @@ class ZEDAsset : public ZEObject
 		virtual bool									SetAssetProperty(const ZEString& PropertyName, const ZEVariant& Value) const;
 		virtual ZEVariant								GetAssetProperty(const ZEString& PropertyName) const;
 
+		virtual const QImage*							GetThumbnailImage() const;
 		virtual ZEDThumbnailWidget*						CreateThumbnailWidget() const;
 		virtual ZEDPreviewWidget*						CreatePreviewWidget() const;
 		virtual ZEDEditor*								CreateEditor() const;
@@ -121,5 +123,4 @@ class ZEDAsset : public ZEObject
 		virtual bool									WriteMetaData(const ZEDAssetMetaData& MetaData) const;
 
 		virtual ZEArray<ZEDAssetDependencyItem>			ReadDependencies() const;
-
 };
