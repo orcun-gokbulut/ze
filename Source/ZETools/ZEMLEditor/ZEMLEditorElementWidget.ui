@@ -260,12 +260,27 @@
         </item>
         <item>
          <property name="text">
+          <string>Vector2d</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Vector3</string>
          </property>
         </item>
         <item>
          <property name="text">
+          <string>Vector3d</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Vector4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Vector4d</string>
          </property>
         </item>
         <item>
@@ -280,7 +295,17 @@
         </item>
         <item>
          <property name="text">
+          <string>Matrix3x3d</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>Matrix4x4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Matrix4x4d</string>
          </property>
         </item>
        </widget>
