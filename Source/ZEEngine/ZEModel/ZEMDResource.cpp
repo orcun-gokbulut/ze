@@ -305,6 +305,16 @@ ZETaskResult ZEMDResource::UnloadInternal()
 	return ZE_TR_DONE;
 }
 
+ZEMDResource::ZEMDResource()
+{
+	Register();
+}
+
+ZEMDResource::~ZEMDResource()
+{
+	Unregister();
+}
+
 bool ZEMDResource::GetUserDefinedBoundingBoxEnabled() const
 {
 	return BoundingBoxIsUserDefined;
@@ -435,14 +445,14 @@ void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 	Helpers.Remove(&Helper->Link);
 }
 
-ZEMDResource::ZEMDResource()
+ZEMDResource* ZEMDResource::CreateInstance()
 {
-	Register();
+	return new ZEMDResource();
 }
 
-ZEMDResource::~ZEMDResource()
+ZERSHolder<ZEMDResource> ZEMDResource::CreateResource()
 {
-	Unregister();
+	return ZERSTemplates::CreateResource<ZEMDResource>(ZERSTemplates::InstanciatorFunction<ZEMDResource>);
 }
 
 ZERSHolder<ZEMDResource> ZEMDResource::LoadResource(const ZEString& FileName)

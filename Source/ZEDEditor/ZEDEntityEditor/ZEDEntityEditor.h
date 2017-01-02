@@ -39,12 +39,11 @@
 
 class ZEDViewport;
 class ZEDViewportController;
+class ZEDViewportSelectionController;
 class ZEDObjectBrowser;
 class ZEDClassBrowser;
 class ZEDAssetBrowser;
 class ZEDPropertyWindow;
-class ZEDSelectionToolbar;
-class ZEDTransformationToolbar;
 class ZEScene;
 
 class ZEDEntityEditor : public ZEDEditor
@@ -52,13 +51,12 @@ class ZEDEntityEditor : public ZEDEditor
 	ZE_OBJECT
 	private:
 		ZEDViewport*						Viewport;
-		ZEDViewportController*				Controller;
+		ZEDViewportController*				ViewportController;
+		ZEDViewportSelectionController*		ViewportSelectionController;
 		ZEDObjectBrowser*					ObjectBrowser;
 		ZEDClassBrowser*					ClassBrowser;
 		ZEDAssetBrowser*					AssetBrowser;
 		ZEDPropertyWindow*					PropertyWindow;
-		ZEDSelectionToolbar*				SelectionToolbar;
-		ZEDTransformationToolbar*			TransformationToolbar;
 		ZEScene*							Scene;
 
 		virtual bool						InitializeInternal();

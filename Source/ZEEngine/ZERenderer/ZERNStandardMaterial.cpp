@@ -1985,10 +1985,10 @@ void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage
 
 bool ZERNStandardMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 {
-	MaterialNode->WriteUInt8("MajorVersion", 2);
-	MaterialNode->WriteUInt8("MinorVersion", 2);
-	MaterialNode->WriteString("GUID", GetGUID().ToString());
 	MaterialNode->WriteString("Class", GetClass()->GetName());
+	MaterialNode->WriteString("GUID", GetGUID().ToString());
+	MaterialNode->WriteUInt8("VersionMajor", 2);
+	MaterialNode->WriteUInt8("VersionMinor", 2);
 
 	ZEMLWriterNode PropertiesNode;
 	MaterialNode->OpenNode("Properties", PropertiesNode);
@@ -2189,7 +2189,12 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	return true;
 }
 
-ZEHolder<ZERNStandardMaterial> ZERNStandardMaterial::CreateInstance()
+ZERNStandardMaterial* ZERNStandardMaterial::CreateInstance()
+{
+	return new ZERNStandardMaterial();
+}
+
+ZERSHolder<ZERNStandardMaterial> ZERNStandardMaterial::CreateResource()
 {
 	return ZERSTemplates::CreateResource<ZERNStandardMaterial>(ZERSTemplates::InstanciatorFunction<ZERNStandardMaterial>);
 }

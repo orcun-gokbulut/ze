@@ -170,6 +170,11 @@ ZESize ZEBitmap::GetPitch() const
 	return Pitch;
 }
 
+ZEBitmapPixelFormat ZEBitmap::GetFormat() const
+{
+	return Format;
+}
+
 ZESize ZEBitmap::GetPixelSize() const
 {
 	return PixelSize;
@@ -584,21 +589,18 @@ bool ZEBitmap::Create(ZESize Width, ZESize Height, ZEBitmapPixelFormat Format)
 	return true;
 }
 
-
 bool ZEBitmap::Load(const ZEString& FileName)
 {
 	ZERealPath RealPath = ZEPathInfo(FileName).GetRealPath();
-	if ((RealPath.Access | ZE_PA_READ) == 0)
+	if ((RealPath.Access & ZE_PA_READ) == 0)
 	{
 		zeError("Cannot load ZEBitmap from file. Read access denied. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
 	FREE_IMAGE_FORMAT FIFormat = FreeImage_GetFileType(RealPath.Path, 0);
-
 	if (FIFormat == FIF_UNKNOWN)
 		FIFormat = FreeImage_GetFIFFromFilename(RealPath.Path);
-	ZEString Dasda = FreeImage_GetFormatFromFIF(FIFormat);
 
 	FIBITMAP* FIBitmap = FreeImage_Load(FIFormat, RealPath.Path, 0);
 	if (FIBitmap == NULL)

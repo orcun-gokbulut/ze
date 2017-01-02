@@ -36,9 +36,11 @@
 #include "ZEDTransformationManager.h"
 
 #include "ZEMath\ZEAngle.h"
+#include "ZEMath\ZEMath.h"
 #include "ZEDEditor.h"
 #include "ZEDGizmo.h"
 #include "ZEDObjectWrapper.h"
+#include "ZEDObjectWrapper3D.h"
 #include "ZEDOperationManager.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDTransformationOperation.h"
@@ -48,7 +50,7 @@
 #include "ZEDUserInterface\ZEDCommandManager.h"
 #include "ZERenderer\ZERNScreenUtilities.h"
 #include "ZERenderer\ZERNRenderParameters.h"
-#include "ZEMath\ZEMath.h"
+#include "ZEError.h"
 
 
 // ZEDTransformationState
@@ -129,7 +131,6 @@ void ZEDTransformationManager::UpdateGizmo(ZEDGizmo* Gizmo, const ZEVector3& Wor
 	}
 }
 
-
 void ZEDTransformationManager::UpdateGizmos()
 {
 	if (TransformStates.GetCount() == 0)
@@ -139,10 +140,12 @@ void ZEDTransformationManager::UpdateGizmos()
 	{
 		for (ZESize I = 0; I < TransformStates.GetCount(); I++)
 		{
-			if (GetTransformSpace() == ZED_TS_PARENT && TransformStates[I].Wrapper->GetParent() != NULL)
-				UpdateGizmo(TransformStates[I].Gizmo, TransformStates[I].Wrapper->GetParent()->GetPosition(), TransformStates[I].Wrapper->GetParent()->GetRotation());
+			ZEDObjectWrapper3D* Wrapper = TransformStates[I].Wrapper;
+
+			if (GetTransformSpace() == ZED_TS_PARENT && Wrapper->GetParent() != NULL)
+				UpdateGizmo(TransformStates[I].Gizmo, Wrapper->GetParent3D()->GetPosition(), Wrapper->GetParent3D()->GetRotation());
 			else
-				UpdateGizmo(TransformStates[I].Gizmo, TransformStates[I].Wrapper->GetPosition(), TransformStates[I].Wrapper->GetRotation());
+				UpdateGizmo(TransformStates[I].Gizmo, Wrapper->GetPosition(), Wrapper->GetRotation());
 		}
 	}
 	else if (GetTransformPivot() == ZED_TP_SELECTION_CENTER)
@@ -171,10 +174,12 @@ void ZEDTransformationManager::UpdateTransformStates()
 	TransformStates.SetCount(Selection.GetCount());
 	for (ZESize I = 0; I < Selection.GetCount(); I++)
 	{
-		TransformStates[I].Wrapper = Selection[I];
-		TransformStates[I].OriginalPosition = Selection[I]->GetPosition();
-		TransformStates[I].OriginalRotation = Selection[I]->GetRotation();
-		TransformStates[I].OriginalScale = Selection[I]->GetScale();
+		zeDebugCheck(!ZEClass::IsDerivedFrom(ZEDObjectWrapper3D::Class(), Selection[I]->GetClass()), "Wrapper is not derived from ZEDObjectWrapper3D");
+
+		TransformStates[I].Wrapper = static_cast<ZEDObjectWrapper3D*>(Selection[I]);
+		TransformStates[I].OriginalPosition = TransformStates[I].Wrapper->GetPosition();
+		TransformStates[I].OriginalRotation = TransformStates[I].Wrapper->GetRotation();
+		TransformStates[I].OriginalScale = TransformStates[I].Wrapper->GetScale();
 
 		if (TransformStates[I].Wrapper->GetFocused())
 			TransformFocused = &TransformStates[I];
@@ -496,7 +501,7 @@ ZEVector3 ZEDTransformationManager::GetPosition(bool& Valid)
 			}
 
 			if (TargetObject->Wrapper->GetParent() != NULL)
-				return PivotPosition - TargetObject->Wrapper->GetParent()->GetPosition();
+				return PivotPosition - TargetObject->Wrapper->GetParent3D()->GetPosition();
 			else
 				return PivotPosition;
 

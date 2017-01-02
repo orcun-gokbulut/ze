@@ -104,14 +104,14 @@ ZEDAssetBrowser::ZEDAssetBrowser()
 	Model->SetHierarcy(ZED_AMH_DIRECTORY);
 	Form->trwAssets->setItemDelegate(new ZEDAssetItemDelegate());
 	ZEArray<ZEDAssetModelColumn> ModelColumns;
-	ModelColumns.SetCount(1);
+	ModelColumns.SetCount(2);
 	ModelColumns[0].SetType(ZED_AMHT_NAME);
 	ModelColumns[0].SetHeaderText("Name");
 	ModelColumns[0].SetSelectable(true);
-	/*ModelColumns[1].SetType(ZED_AMHT_TYPE);
+	ModelColumns[1].SetType(ZED_AMHT_TYPE);
 	ModelColumns[1].SetHeaderText("Type");
 	ModelColumns[1].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
-	ModelColumns[2].SetType(ZED_AMHT_SIZE);
+	/*ModelColumns[2].SetType(ZED_AMHT_SIZE);
 	ModelColumns[2].SetHeaderText("Size");
 	ModelColumns[2].SetAlignmnent(Qt::AlignHCenter | Qt::AlignVCenter);
 	ModelColumns[3].SetType(ZED_AMHT_LAST_MODIFICATION_TIME);

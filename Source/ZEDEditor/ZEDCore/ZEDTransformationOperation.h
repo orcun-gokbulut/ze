@@ -45,7 +45,7 @@ class ZEDObjectWrapper;
 class ZEDTransformItem
 {
 	public:
-		ZEDObjectWrapper*						Wrapper;
+		ZEDObjectWrapper3D*						Wrapper;
 
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;

@@ -74,5 +74,5 @@ class ZESoundSource3D : public ZESoundSource
 		static ZESoundSource3D*		CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZESound.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);

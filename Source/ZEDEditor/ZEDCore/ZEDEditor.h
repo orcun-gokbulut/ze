@@ -119,10 +119,11 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDObjectManager*					GetObjectManager();
 		ZEDOperationManager*				GetOperationManager();
 		ZEDSelectionManager*				GetSelectionManager();
+		ZEDMainWindow*						GetMainWindow();
 		ZEDTransformationManager*			GetTransformationManager();
 		ZEDViewportManager*					GetViewportManager();
-		ZEDMainWindow*						GetMainWindow();
 		ZEUIManager*						GetUIManager();
+
 		ZEDAssetManager*					GetAssetManager();
 
 		ZEDComponent*						GetComponent(ZEClass* Class);

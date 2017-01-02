@@ -481,7 +481,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* Resou
 			return NULL;
 		}
 
-		if (NewResouce->GetClass() != ResourceClass)
+		if (!ZEClass::IsDerivedFrom(ResourceClass, NewResouce->GetClass()))
 		{
 			zeError("Cannot stage resource. Invalid Instanciator. Resource Class: \"%s\".", ResourceClass->GetName());
 			ManagerLock.Unlock();	 

@@ -41,16 +41,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEAABBox.h"
 
-#include "ZEGame/ZERayCast.h"
-#include "ZEGraphics/ZEGRCanvas.h"
-#include "ZERenderer/ZERNCommand.h"
-#include "ZEMeta/ZEEnumerator.h"
-
-class ZERNPreRenderParameters;
-class ZERNRenderParameters;
 class ZEDObjectEvent;
 class QWidget;
 class QMenu;
@@ -64,19 +55,16 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		ZEDObjectWrapper*							Parent;
 		ZEDObjectManager*							Manager;
 
+		ZEString									IconFileName;
 		bool										Selectable;
 		bool										Selected;
-		bool										Pickable;
 		bool										Focused;
 		bool										Frozen;
-
-		bool										NamePlateVisible;
-		ZEString									IconFileName;
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
 		void										SetManager(ZEDObjectManager* Module);
-		
+
 		void										RaiseEvent(ZEDObjectEvent* Event);
 
 	protected:
@@ -85,8 +73,6 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		virtual bool								InitializeInternal();
 		virtual bool								DeinitializeInternal();
-
-		virtual void								UpdateNamePlate();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
@@ -107,41 +93,17 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								SetName(const ZEString& Name);
 		virtual ZEString							GetName() const;
 
-		virtual ZEAABBox							GetBoundingBox() const;
-		virtual ZEMatrix4x4							GetWorldTransform() const;
-
-		virtual void								SetPosition(const ZEVector3& Position);
-		virtual ZEVector3							GetPosition() const;
-
-		virtual void								SetRotation(const ZEQuaternion& Rotation);
-		virtual ZEQuaternion						GetRotation() const;
-
-		virtual void								SetScale(const ZEVector3& Scale);
-		virtual ZEVector3							GetScale() const;
-
-		virtual void								SetVisible(bool Visible);
-		virtual bool								GetVisible() const;
-
 		virtual void								SetFrozen(bool Locked);
 		bool										GetFrozen() const;
 
 		virtual void								SetSelectable(bool Value);
 		bool										GetSelectable() const;
 
-		void										SetPickable(bool Pickable);
-		bool										GetPickable() const;
-
 		virtual void								SetSelected(bool Selected);
 		bool										GetSelected() const;
 		
 		virtual void								SetFocused(bool Focused);
 		bool										GetFocused() const;
-
-		void										SetNamePlateVisible(bool Visible);
-		bool										GetNamePlateVisible() const;
-
-		void										SetIconFileName(const ZEString& FileName);
-		const ZEString&								GetIconFileName() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
@@ -152,10 +114,10 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual QWidget*							GetCustomWidget() const;
 		virtual QMenu*								GetPopupMenu() const;
 
-		virtual void								PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void								SetIconFileName(const ZEString& FileName);
+		const ZEString&								GetIconFileName() const;
+
 		virtual void								Tick(float ElapsedTime);
-		virtual void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual void								SendChangedEvent();
 
@@ -166,6 +128,7 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual bool								Save(const ZEString& FileName);
 		virtual void								Clean();
 
+		virtual void								UpdateLocal();
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();

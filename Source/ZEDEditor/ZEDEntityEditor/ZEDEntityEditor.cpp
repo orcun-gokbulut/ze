@@ -65,6 +65,7 @@
 #include "ZEDSceneAssetType.h"
 #include "ZEDSoundAssetType.h"
 #include "ZEDPrefabAssetType.h"
+#include "ZEDCore/ZEDViewportSelectionController.h"
 
 bool ZEDEntityEditor::InitializeInternal()
 {
@@ -81,8 +82,11 @@ bool ZEDEntityEditor::InitializeInternal()
 	GetAssetManager()->RegisterAssetType(new ZEDSoundAssetType());
 	GetAssetManager()->RegisterAssetType(new ZEDPrefabAssetType());
 	
-	ZEDViewportController* Controller = ZEDViewportController::CreateInstance();
-	AddComponent(Controller);
+	ViewportController = ZEDViewportController::CreateInstance();
+	AddComponent(ViewportController);
+
+	ViewportSelectionController = ZEDViewportSelectionController::CreateInstance();
+	AddComponent(ViewportSelectionController);
 
 	ObjectBrowser = new ZEDObjectBrowser();
 	GetMainWindow()->AddWindow(ObjectBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_LEFT);
@@ -141,13 +145,11 @@ bool ZEDEntityEditor::InitializeInternal()
 ZEDEntityEditor::ZEDEntityEditor()
 {
 	Viewport = NULL;
-	Controller = NULL;
+	ViewportController = NULL;
 	ObjectBrowser = NULL;
 	ClassBrowser = NULL;
 	AssetBrowser = NULL;
 	PropertyWindow = NULL;
-	SelectionToolbar = NULL;
-	TransformationToolbar = NULL;
 	Scene = NULL;
 }
 

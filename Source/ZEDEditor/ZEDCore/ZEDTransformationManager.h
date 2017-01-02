@@ -44,13 +44,13 @@
 #include "ZEDUserInterface/ZEDCommand.h"
 
 class ZEDEditor;
-class ZEDObjectWrapper;
 class ZEDGizmo;
+class ZEDObjectWrapper3D;
+class ZEDObjectWrapper3D;
 class ZEDSelectionEvent;
 class ZEDViewportKeyboardEvent;
 class ZEDViewportMouseEvent;
 class ZEDViewportChangedEvent;
-class ZERNRenderer;
 class ZEDTransformationToolbar;
 class ZEDTransformationManager;
 
@@ -83,7 +83,7 @@ enum ZEDTransformPivot
 class ZEDTransformationState
 {
 	public:
-		ZEDObjectWrapper*						Wrapper;
+		ZEDObjectWrapper3D*						Wrapper;
 		ZEVector3								Pivot;
 		ZEVector3								OriginalPosition;
 		ZEQuaternion							OriginalRotation;

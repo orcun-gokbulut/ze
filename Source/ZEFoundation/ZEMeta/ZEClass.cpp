@@ -58,7 +58,7 @@ ZESSize ZEClass::Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString
 
 	if (LowIndex == HighIndex)
 	{
-		for (ZESSize I = LowIndex; I < DataSize; I++)
+		for (ZESSize I = LowIndex; I < (ZESSize)DataSize; I++)
 		{
 			if (Data[LowIndex].Hash != Hash)
 				break;
@@ -426,6 +426,14 @@ bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
 	}
 
 	return false;
+}
+
+bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object)
+{
+	if (Object == NULL)
+		return false;
+
+	return IsDerivedFrom(ParentClass, Object->GetClass());
 }
 
 bool ZEClass::Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode)

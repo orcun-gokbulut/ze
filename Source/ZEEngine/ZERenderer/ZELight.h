@@ -160,7 +160,7 @@ class ZELight : public ZEEntity
 		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZERNLight.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false)
 ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color")
 ZE_META_ATTRIBUTE_PROPERTY(Attenuation, ZEDEditor.PropertyEditor.Semantic, "Attenuation");

@@ -86,8 +86,6 @@ class ZEObject
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEObject.png")
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, true)
 ZE_META_ATTRIBUTE_MEMBER(*, ZEMC.Export, true)
 ZE_META_ATTRIBUTE_MEMBER(~*, ZEMC.Accessor, true)
 ZE_META_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)

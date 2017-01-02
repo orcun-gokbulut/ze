@@ -414,7 +414,9 @@ class ZERNStandardMaterial : public ZERNMaterial
 		bool											Serialize(ZEMLWriterNode* Node);
 		bool											Unserialize(ZEMLReaderNode* Node);
 
-		static ZEHolder<ZERNStandardMaterial>			CreateInstance();
+		static ZERNStandardMaterial*					CreateInstance();
+		static ZERSHolder<ZERNStandardMaterial>			CreateResource();
 		static ZERSHolder<ZERNStandardMaterial>			LoadResource(const ZEString& FileName);
 		static ZERSHolder<const ZERNStandardMaterial>	LoadResourceShared(const ZEString& FileName);
-};
+}
+ZE_META_ATTRIBUTE(ZEMC.Instancable, true);

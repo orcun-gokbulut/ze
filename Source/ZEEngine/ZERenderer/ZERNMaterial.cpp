@@ -38,6 +38,42 @@
 #include "ZERNStage.h"
 #include "ZERNStageID.h"
 #include "ZERNCommand.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEMeta/ZEProvider.h"
+#include "ZEResource/ZERSTemplates.h"
+
+ZEClass* ZERNMaterial::DetermineClass(const ZEString& FileName)
+{
+	ZEMLReader MaterialFile;
+	if (!MaterialFile.Open(FileName))
+		return NULL;
+
+	ZEString ClassName = MaterialFile.GetRootNode().ReadString("Class");
+
+	MaterialFile.Close();
+
+	ZEClass* Class = ZEProvider::GetInstance()->GetClass(ClassName);
+	if (Class == NULL)
+		return NULL;
+
+	if (Class == ZERNMaterial::Class())
+		return NULL;
+
+	if (!ZEClass::IsDerivedFrom(ZERNMaterial::Class(), Class))
+		return NULL;
+
+	return Class;
+}
+
+ZERSResource* ZERNMaterial::Instanciator(const void* Params)
+{
+	const ZEString* FileName = static_cast<const ZEString*>(Params);
+	ZEClass* Class = DetermineClass(*FileName);
+	if (Class == NULL)
+		return NULL;
+
+	return static_cast<ZERSResource*>(Class->CreateInstance());
+}
 
 ZERNMaterial::ZERNMaterial()
 {
@@ -101,4 +137,24 @@ bool ZERNMaterial::Update()
 		return false;
 
 	return true;
+}
+
+bool ZERNMaterial::Serialize(ZEMLWriterNode* MaterialNode)
+{
+	return false;
+}
+
+bool ZERNMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
+{
+	return false;
+}
+
+ZEHolder<ZERNMaterial> ZERNMaterial::LoadResource(const ZEString& FileName)
+{
+	return ZERSTemplates::LoadResource<ZERNMaterial>(FileName, &Instanciator, &FileName);
+}
+
+ZEHolder<const ZERNMaterial> ZERNMaterial::LoadResourceShared(const ZEString& FileName)
+{
+	return ZERSTemplates::LoadResourceShared<ZERNMaterial>(FileName, &Instanciator, &FileName);
 }

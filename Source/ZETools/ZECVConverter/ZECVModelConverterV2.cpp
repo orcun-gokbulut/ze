@@ -1087,8 +1087,8 @@ ZECVResult ZECVModelConverterV2::Convert(const ZEString& SourceFileName, const Z
 	ZEMLWriterNode DestinationModelNode;
 	Serializer.OpenRootNode("ZEModel", DestinationModelNode);
 
-	DestinationModelNode.WriteUInt8("MajorVersion", 2);
-	DestinationModelNode.WriteUInt8("MinorVersion", 0);
+	DestinationModelNode.WriteUInt8("VersionMajor", 2);
+	DestinationModelNode.WriteUInt8("VersionMinor", 0);
 
 	if (!ConvertModel(&SourceModelNode, &DestinationModelNode))
 		return ZECV_R_FAILED;
