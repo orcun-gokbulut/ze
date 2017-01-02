@@ -206,8 +206,8 @@ ZECVResult ZECVMaterialConverterV2::Convert(const ZEString& SourceFileName, cons
 	ZEMLWriterNode DestinationMaterialNode;
 	Serializer.OpenRootNode("ZERNMaterial", DestinationMaterialNode);
 
-	DestinationMaterialNode.WriteUInt8("MajorVersion", 2);
-	DestinationMaterialNode.WriteUInt8("MinorVersion", 0);
+	DestinationMaterialNode.WriteUInt8("VersionMajor", 2);
+	DestinationMaterialNode.WriteUInt8("VersionMinor", 0);
 
 	if (!ConvertMaterial(&SourceMaterialNode, &DestinationMaterialNode))
 	{

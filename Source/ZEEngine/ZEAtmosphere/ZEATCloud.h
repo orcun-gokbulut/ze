@@ -128,6 +128,6 @@ class ZEATCloud : public ZEEntity
 
 		static ZEATCloud*						CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, false);
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NameplateVisible, false)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);

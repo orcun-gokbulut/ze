@@ -211,9 +211,6 @@ class ZEEntity : public ZEObject
 		virtual bool							CheckComponent(ZEEntity* Parent);
 		virtual bool							CheckChildEntity(ZEEntity* Parent);
 
-		virtual bool							InitializeSelf() final;
-		virtual bool							DeinitializeSelf() final;
-		
 		void									SetLocalLoadingPercentage(ZEUInt Percentage);
 		ZEUInt									GetLocalLoadingPercentage();
 
@@ -319,7 +316,9 @@ class ZEEntity : public ZEObject
 		ZEDObjectWrapper*						GetWrapper() const;
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEEntity.png")
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper.DrawBoundingBox, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, true)
 ZE_META_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
 ZE_META_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)
 ZE_META_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)

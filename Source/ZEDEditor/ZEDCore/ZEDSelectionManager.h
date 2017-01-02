@@ -38,33 +38,13 @@
 #include "ZEDComponent.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEMath/ZERay.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEDViewportEvent.h"
 #include "ZEDUserInterface/ZEDCommand.h"
 
-enum ZEDSelectionShape
-{
-	ZED_SS_NONE,
-	ZED_SS_RECTANGLE,
-	ZED_SS_CIRCLE,
-	ZED_SS_BRUSH
-};
-
-enum ZEDSelectionMode
-{
-	ZE_SM_NONE,
-	ZE_SM_FULLY_COVERS,
-	ZE_SM_INTERSECTS,
-};
 
 class ZEObject;
 class ZEClass;
-class ZEViewVolume;
 class ZEDEditor;
 class ZEDObjectWrapper;
-class ZEUIFrameControl;
-class ZEFrustum;
 
 class ZEDSelectionManager : public ZEDComponent
 {
@@ -74,23 +54,13 @@ class ZEDSelectionManager : public ZEDComponent
 		ZEArray<ZEDObjectWrapper*>			Selection;
 		ZEArray<ZEDObjectWrapper*>			FrozenObjects;
 		ZEDObjectWrapper*					FocusedObject;
-		ZEDSelectionMode					SelectionMode;
-		ZEDSelectionShape					SelectionShape;
 		ZEClass*							Filter;
 		bool								LockSelection;
-
-		bool								MultiSelection;
-		ZEUIFrameControl*					MultiSelectionBox;
-		ZEVector2							MultiSelectionStartPosition;
 
 		bool								FilterSelection(ZEObject* Object, void* Class);
 		void								UnfrezeeAllInternal(ZEDObjectWrapper* Object);
 
-		void								CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper);
-
 		virtual void						EditorEvent(const ZEDEditorEvent* Event);
-		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void						ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
@@ -104,8 +74,6 @@ class ZEDSelectionManager : public ZEDComponent
 		ZEDCommand							LockSelectionCommand;
 		ZEDCommand							FreezeObjectsCommand;
 		ZEDCommand							UnfreezeObjectsCommand;
-		ZEDCommand							SelectionModeCommand;
-		ZEDCommand							SelectionShapeCommand;
 
 		void								RegisterCommands();
 		void								UpdateCommands();
@@ -115,16 +83,8 @@ class ZEDSelectionManager : public ZEDComponent
 		void								LockSelectionCommand_OnAction(const ZEDCommand* Command);
 		void								FreezeObjectsCommand_OnAction(const ZEDCommand* Command);
 		void								UnfreezeObjectsCommand_OnAction(const ZEDCommand* Command);
-		void								SelectionModeCommand_OnAction(const ZEDCommand* Command);
-		void								SelectionShapeCommand_OnAction(const ZEDCommand* Command);
 
 	public:
-		void								SetSelectionMode(ZEDSelectionMode Mode);
-		ZEDSelectionMode					GetSelectionMode();
-
-		void								SetSelectionShape(ZEDSelectionShape Shape);
-		ZEDSelectionShape					GetSelectionShape();
-
 		void								SetSelectionFilter(ZEClass* Class);
 		ZEClass*							GetSelectionFilter();
 		

@@ -35,20 +35,16 @@
 
 #include "ZEDSelectionManager.h"
 
+#include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectManager.h"
-#include "ZEDGizmo.h"
-#include "ZEDViewPort.h"
-#include "ZEDViewportEvent.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDSelectionEvent.h"
 #include "ZEDEditorEvent.h"
-#include "ZERenderer/ZERNScreenUtilities.h"
-#include "ZEUI/ZEUIFrameControl.h"
-#include "ZEMath/ZEMath.h"
 #include "ZEDUserInterface/ZEDCommandManager.h"
+
 
 bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
 {
@@ -64,193 +60,6 @@ void ZEDSelectionManager::UnfrezeeAllInternal(ZEDObjectWrapper* Object)
 		UnfrezeeAllInternal(ChildObjects[I]);
 }
 
-void ZEDSelectionManager::CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper)
-{
-	const ZEArray<ZEDObjectWrapper*> ChildWrappers = Wrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-	{
-		ZEDObjectWrapper* ChildWrapper = ChildWrappers[I];
-
-		CastVolume(List, Frustum, ChildWrapper);
-
-		if (!ChildWrapper->GetSelectable())
-			continue;
-
-		if (!ChildWrapper->GetPickable())
-			continue;
-
-		if (ChildWrapper->GetFrozen())
-			continue;
-
-		ZEOBBox BoundingBox;
-		ZEAABBox::GenerateOBoundingBox(BoundingBox, ChildWrapper->GetBoundingBox());
-		ZEOBBox WorldBoundingBox;
-		ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), BoundingBox);
-
-		if (GetSelectionMode() == ZE_SM_FULLY_COVERS)
-		{
-			if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) != ZE_IR_COVERS)
-				continue;
-		}
-		else
-		{
-			if (Frustum.IntersectionTestExact(Frustum, WorldBoundingBox) == ZE_IR_NONE)
-				continue;
-		}
-
-		List.Add(ChildWrapper);
-	}
-}
-
-void ZEDSelectionManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
-{
-	if (Event->GetKey() == ZED_VKK_ESCAPE && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
-	{
-		ClearSelection();
-		Event->Acquire();
-	}
-}
-
-void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
-{
-	if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
-	{
-		MultiSelection = true;
-		MultiSelectionStartPosition = Event->GetPosition();
-
-		// Single Selection	
-		ZERayCastParameters Parameters;
-		Parameters.Ray = ZERNScreenUtilities::ScreenToWorld(Event->GetViewport()->GetView(), Event->GetPosition());
-		Parameters.Components |= ZE_RCRE_MULTI_COLLISIONS;
-
-		ZERayCastReport Report;
-		Report.SetParameters(&Parameters);
-		GetEditor()->GetObjectManager()->GetRootWrapper()->RayCast(Report, Parameters);	
-
-		const ZEArray<ZERayCastCollision>& Collisions = Report.GetCollisions();
-		bool HasSelection = false;
-		for (ZESize I = 0; I < Collisions.GetCount(); I++)
-		{
-			ZEDObjectWrapper* Wrapper = static_cast<ZEDObjectWrapper*>(Collisions[I].Object);
-			
-			if (!Wrapper->GetSelectable())
-				continue;
-			
-			if (!Wrapper->GetPickable())
-				continue;
-
-			if (Wrapper->GetFrozen())
-				continue;
-
-			HasSelection = true;
-
-			if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0 || (Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
-			{
-				SelectObject(Wrapper);
-			}
-			else if (Event->GetModifiers() & ZED_VKM_ALT)
-			{
-				DeselectObject(Wrapper);
-			}
-			else
-			{
-				if (Selection.Exists(Wrapper))
-				{
-					FocusObject(Wrapper);
-				}
-				else
-				{
-					ClearSelection();
-					SelectObject(Wrapper);
-				}
-			}
-
-			break;
-		}
-	
-		if (!HasSelection)
-			ClearSelection();
-
-		Event->Acquire();
-	}
-	else if (Event->GetType() == ZED_VIET_MOUSE_MOVED)
-	{
-		if (MultiSelection)
-		{
-			ZEVector2 Size;
-			Size.x = ZEMath::Abs(MultiSelectionStartPosition.x - Event->GetPosition().x);
-			Size.y = ZEMath::Abs(MultiSelectionStartPosition.y - Event->GetPosition().y);
-
-			if (Size.Min() != 0)
-			{
-				ZEVector2 Position;
-				Position.x = MultiSelectionStartPosition.x < Event->GetPosition().x ? MultiSelectionStartPosition.x : Event->GetPosition().x;
-				Position.y = MultiSelectionStartPosition.y < Event->GetPosition().y ? MultiSelectionStartPosition.y : Event->GetPosition().y;
-
-				MultiSelectionBox->SetPosition(Position);
-				MultiSelectionBox->SetSize(Size);
-				MultiSelectionBox->SetVisiblity(true);
-			}
-		}
-		else
-		{
-			MultiSelectionBox->SetVisiblity(false);
-		}
-	}
-	else if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_RELEASED)
-	{
-		if (MultiSelection)
-		{
-			ZEVector2 Size;
-			Size.x = ZEMath::Abs(MultiSelectionStartPosition.x - Event->GetPosition().x);
-			Size.y = ZEMath::Abs(MultiSelectionStartPosition.y - Event->GetPosition().y);
-
-			ZEArray<ZEDObjectWrapper*> List;
-			if (Size.Min() != 0)
-			{
-				ZEVector2 Position;
-				Position.x = MultiSelectionStartPosition.x < Event->GetPosition().x ? MultiSelectionStartPosition.x : Event->GetPosition().x;
-				Position.y = MultiSelectionStartPosition.y < Event->GetPosition().y ? MultiSelectionStartPosition.y : Event->GetPosition().y;
-
-				const ZERNView& View = Event->GetViewport()->GetView();
-				ZERay LeftBottomRay =  ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(0.0f, Size.y));
-				ZERay RightBottomRay = ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(Size.x, Size.y));
-				ZERay LeftTopRay =	ZERNScreenUtilities::ScreenToWorld(View, Position);
-				ZERay RightTopRay = ZERNScreenUtilities::ScreenToWorld(View, Position + ZEVector2(Size.x, 0.0f));
-
-				ZEFrustum Frustum;
-				ZEPlane::Create(Frustum.LeftPlane,	LeftBottomRay.GetPointOn(1.0f),	 LeftBottomRay.p,  LeftTopRay.GetPointOn(1.0f));
-				ZEPlane::Create(Frustum.RightPlane,	RightTopRay.GetPointOn(1.0f),    RightBottomRay.p, RightBottomRay.GetPointOn(1.0f));
-				ZEPlane::Create(Frustum.BottomPlane,	RightBottomRay.GetPointOn(1.0f), LeftBottomRay.p,  LeftBottomRay.GetPointOn(1.0f));
-				ZEPlane::Create(Frustum.TopPlane,	LeftTopRay.GetPointOn(1.0f),	 LeftTopRay.p,	   RightTopRay.GetPointOn(1.0f));
-
-				Frustum.NearPlane.p = View.Position + View.Direction * View.NearZ;
-				Frustum.NearPlane.n = View.Direction;
-				Frustum.FarPlane.p = View.Position + View.Direction * View.FarZ;
-				Frustum.FarPlane.n = -View.Direction;
-
-				ZEDObjectWrapper* RootWrapper = GetEditor()->GetObjectManager()->GetRootWrapper();
-				CastVolume(List, Frustum, RootWrapper);
-
-				if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0 || (Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
-					SelectObjects(List);
-				else if (Event->GetModifiers() & ZED_VKM_ALT)
-					DeselectObjects(List);
-				else
-					SetSelection(List);
-			}
-		}
-
-		MultiSelection = false;
-		MultiSelectionBox->SetVisiblity(false);
-	}
-	else if (Event->GetButton() == ZED_VMB_RIGHT && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
-	{
-		MultiSelection = false;
-		MultiSelectionBox->SetVisiblity(false);
-	}
-}
-
 void ZEDSelectionManager::EditorEvent(const ZEDEditorEvent* Event)
 {
 	if (Event->GetType() == ZED_EET_FILE_CLOSED)
@@ -262,12 +71,6 @@ bool ZEDSelectionManager::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	MultiSelectionBox = new ZEUIFrameControl();
-	MultiSelectionBox->SetBackgroundColor(ZEVector4(0.17f, 0.5f, 1.0f, 0.5f));
-	MultiSelectionBox->SetVisiblity(false);
-	MultiSelectionBox->SetZOrder(1000);
-	GetEditor()->GetUIManager()->AddControl(MultiSelectionBox);
-
 	RegisterCommands();
 
 	return true;
@@ -275,16 +78,12 @@ bool ZEDSelectionManager::InitializeInternal()
 
 bool ZEDSelectionManager::DeinitializeInternal()
 {
-	GetEditor()->GetUIManager()->RemoveControl(MultiSelectionBox);
-	MultiSelectionBox->Destroy();
-
 	return ZEInitializable::DeinitializeInternal();
 }
 
 ZEDSelectionManager::ZEDSelectionManager()
 {
 	LockSelection = false;
-	MultiSelection = false;
 	FocusedObject = NULL;
 	Filter = NULL;
 }
@@ -300,7 +99,7 @@ void ZEDSelectionManager::RegisterCommands()
 	SelectAllCommand.SetName("ZEDSelectionManager::SelectAllCommand");
 	SelectAllCommand.SetText("Select All");
 	SelectAllCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_A));
-	SelectAllCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionModeCommand_OnAction>(this);
+	SelectAllCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectAllCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectAllCommand);
 	
 	ClearSelectionCommand.SetCategory("Selection");
@@ -331,26 +130,6 @@ void ZEDSelectionManager::RegisterCommands()
 	UnfreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unlock.png");
 	UnfreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectsCommand);
-
-	SelectionModeCommand.SetCategory("Selection");
-	SelectionModeCommand.SetName("ZEDSelectionManager::SelectionModeCommand");
-	SelectionModeCommand.SetText("Intersects");
-	SelectionModeCommand.SetType(ZED_CT_TOGGLE);
-	SelectionModeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionModeCommand_OnAction>(this);
-	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionModeCommand);
-
-	SelectionShapeCommand.SetCategory("Selection");
-	SelectionShapeCommand.SetName("ZEDSelectionManager::SelectionShapeCommand");
-	SelectionShapeCommand.SetText("Shape");
-	SelectionShapeCommand.SetType(ZED_CT_LIST);
-	ZEArray<ZEString> Items;
-	Items.Add("Rectangle");
-	Items.Add("Circle");
-	Items.Add("Brush");
-	SelectionShapeCommand.SetListItems(Items);
-	SelectionShapeCommand.SetValueIndex(0);
-	SelectionShapeCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::SelectionShapeCommand_OnAction>(this);
-	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionShapeCommand);
 }
 
 void ZEDSelectionManager::UpdateCommands()
@@ -384,59 +163,6 @@ void ZEDSelectionManager::FreezeObjectsCommand_OnAction(const ZEDCommand* Comman
 void ZEDSelectionManager::UnfreezeObjectsCommand_OnAction(const ZEDCommand* Command)
 {
 	UnfreezeObjects(GetFrozonObjects());
-}
-
-void ZEDSelectionManager::SelectionModeCommand_OnAction(const ZEDCommand* Command)
-{
-	if (Command->GetValueChecked())
-	{
-		SetSelectionMode(ZE_SM_FULLY_COVERS);
-		SelectionModeCommand.SetText("Covers");
-	}
-	else
-	{
-		SetSelectionMode(ZE_SM_INTERSECTS);
-		SelectionModeCommand.SetText("Intersects");
-	}
-}
-
-void ZEDSelectionManager::SelectionShapeCommand_OnAction(const ZEDCommand* Command)
-{
-	SetSelectionShape((ZEDSelectionShape)Command->GetValueIndex());
-}
-
-void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
-{
-	SelectionMode = Mode;
-
-	UpdateCommands();
-
-	ZEDSelectionEvent Event;
-	Event.SetManager(this);
-	Event.SetType(ZED_SET_MANAGER_STATE_CHANGED);
-	RaiseEvent(&Event);
-}
-
-ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
-{
-	return SelectionMode;
-}
-
-void ZEDSelectionManager::SetSelectionShape(ZEDSelectionShape Shape)
-{
-	SelectionShape = Shape;
-
-	UpdateCommands();
-
-	ZEDSelectionEvent Event;
-	Event.SetManager(this);
-	Event.SetType(ZED_SET_MANAGER_STATE_CHANGED);
-	RaiseEvent(&Event);
-}
-
-ZEDSelectionShape ZEDSelectionManager::GetSelectionShape()
-{
-	return SelectionShape;
 }
 
 void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)

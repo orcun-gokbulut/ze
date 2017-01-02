@@ -35,14 +35,12 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDObjectWrapper.h"
-
-#include "ZEDEntityWrapper.h"
-#include "ZEGame/ZERayCast.h"
+#include "ZEDCore/ZEDObjectWrapper3D.h"
 
 class ZEScene;
+class ZEDEntityWrapper;
 
-class ZEDSceneWrapper : public ZEDObjectWrapper
+class ZEDSceneWrapper : public ZEDObjectWrapper3D
 {
 	ZE_OBJECT
 	private:

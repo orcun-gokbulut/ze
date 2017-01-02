@@ -103,7 +103,7 @@ bool ZEDSceneWrapper::CheckChildrenClass(ZEClass* Class)
 
 void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	ZEArray<ZEDObjectWrapper*> Wrappers = GetChildWrappers();
+	ZEArray<ZEDObjectWrapper3D*> Wrappers = GetChildWrapper3Ds();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (!Parameters.Filter(Wrappers[I]))
@@ -195,7 +195,7 @@ bool ZEDSceneWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 
 bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
-	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
+	if (!ZEDObjectWrapper3D::RemoveChildWrapper(Wrapper, Update))
 		return false;
 
 	if (!Update)
@@ -204,7 +204,7 @@ bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 			GetScene()->RemoveEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
 	}
 
-	return true;
+	return ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update);
 }
 
 void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)

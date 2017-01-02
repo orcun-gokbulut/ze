@@ -37,19 +37,8 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZEGRBuffer.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZERenderer/ZERNSimpleMaterial.h"
-#include "ZERenderer/ZERNRenderParameters.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNShaderSlots.h"
-#include "ZERenderer/ZERNScreenUtilities.h"
-#include "ZEUI/ZEUILabel.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectManager.h"
-#include "ZEDS/ZEFormat.h"
-#include "ZEUI/ZEUIFontTrueType.h"
-
 
 ZEAABBox ZEDEntityWrapper::CalculateBoundingBox(ZEEntity* Entity) const
 {
@@ -99,179 +88,20 @@ ZEAABBox ZEDEntityWrapper::CalculateBoundingBox(ZEEntity* Entity) const
 	return CurrentBoundingBox;
 }
 
-void ZEDEntityWrapper::UpdateNamingPlate()
-{
-	if (GetManager() == NULL ||
-		GetManager()->GetEditor() == NULL || 
-		GetManager()->GetEditor()->GetUIManager() == NULL)
-	{
-		return;
-	}
-
-	ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
-
-	if (GetEntity() == NULL || !GetNamePlateVisible())
-	{
-		if (NamePlate != NULL)
-		{	
-			UIManager->RemoveControl(NamePlate);
-			NamePlate->Destroy();
-			NamePlate = NULL;
-			NamePlateIcon = NULL;
-			NamePlateName = NULL;
-			NamePlateClass = NULL;
-		}
-		return;
-	}
-	else
-	{
-		if (NamePlate == NULL)
-		{
-			NamePlate = new ZEUIControl();
-			NamePlate->SetSize(ZEVector2(200, 40));
-
-			NamePlateIcon = new ZEUIFrameControl();
-			NamePlateIcon->SetSize(ZEVector2(32.0f, 32.0f));
-			NamePlateIcon->SetPosition(ZEVector2::Zero);
-			NamePlate->AddChildControl(NamePlateIcon);
-
-			NamePlateName = ZEUILabel::CreateInstance();
-			NamePlateName->SetSize(ZEVector2(200.0f, 40.0f));
-			NamePlateName->SetPosition(ZEVector2(36.0f, 2.0f));
-			NamePlateName->SetFontResource(ZEUIFontTrueType::LoadResourceShared("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Bold.ttf", 14).GetPointer());
-			NamePlate->AddChildControl(NamePlateName);
-			
-			NamePlateClass = ZEUILabel::CreateInstance();
-			NamePlateClass->SetSize(ZEVector2(200.0f, 40.0f));
-			NamePlateClass->SetPosition(ZEVector2(36.0f, 16.0f));
-			NamePlateClass->SetFontColor(ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
-			NamePlate->AddChildControl(NamePlateClass);
-
-			//UIManager->AddControl(NamePlate);
-		}
-
-		if (GetSelected())
-		{
-			if (GetFocused())
-				NamePlateName->SetFontColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
-			else
-				NamePlateName->SetFontColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-		}
-		else
-		{
-			NamePlateName->SetFontColor(ZEVector4(0.75f, 0.75f, 0.75f, 1.0f));
-		}
-		
-		NamePlateIcon->SetTextureFileName(GetIconFileName());
-		NamePlateName->SetText(ZEFormat::Format("{0} ({1})", GetName(), GetId()));
-		NamePlateClass->SetText(ZEFormat::Format("Class: {0}", GetObjectClass()->GetName()));
-	}
-}
-
 bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
 {
 	Collision.Object = this;
 	return true;
 }
 
-bool ZEDEntityWrapper::UpdateGraphics()
-{
-	Canvas.Clean();
-
-	if (DrawBoundingBox)
-	{
-		if (GetSelected())
-		{
-			if (GetFocused())
-				Canvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
-			else
-				Canvas.SetColor(ZEVector4::One);
-		}
-		else
-		{
-			Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
-		}
-
-		Canvas.ResetTransforms();
-		ZEAABBox BoundingBox = GetBoundingBox();
-		Canvas.ApplyTranslation(BoundingBox.GetCenter());
-		Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
-	}
-
-	if (Canvas.GetBufferSize() != 0)
-	{
-		if (VertexBuffer.IsNull() ||
-			VertexBuffer->GetSize() < Canvas.GetBufferSize())
-		{
-			VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Canvas.GetBufferSize(), sizeof(ZECanvasVertex), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
-		}
-
-		void* Buffer;
-		VertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, &Buffer);
-		memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetBufferSize());
-		VertexBuffer->Unmap();
-	}
-
-	return true;
-}
-
-void ZEDEntityWrapper::UpdateConstantBuffer()
-{
-	if (ConstantBuffer != NULL)
-		ConstantBuffer->SetData(&GetWorldTransform());
-}
-
-bool ZEDEntityWrapper::InitializeInternal()
-{
-	Material = ZERNSimpleMaterial::CreateInstance();
-	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
-	Material->SetVertexColorEnabled(true);
-	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
-	Material->SetDepthTestDisabled(false);
-	Material->Load();
-
-	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-
-	if (!ZEDObjectWrapper::InitializeInternal())
-		return false;
-
-	return true;
-}
-
-bool ZEDEntityWrapper::DeinitializeInternal()
-{
-	if (NamePlate != NULL)
-	{
-		ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
-		UIManager->RemoveControl(NamePlate);
-		NamePlate->Destroy();
-		NamePlate = NULL;
-	}
-
-	Material.Release();
-	ConstantBuffer.Release();
-	VertexBuffer.Release();
-
-	return ZEDObjectWrapper::DeinitializeInternal();
-}
-
-ZEDEntityWrapper::ZEDEntityWrapper()
-{
-	NamePlate = NULL;
-	NamePlateIcon = NULL;
-	NamePlateName = NULL;
-	NamePlateClass = NULL;
-}
-
-ZEDEntityWrapper::~ZEDEntityWrapper()
-{
-	Deinitialize();
-}
-
 void ZEDEntityWrapper::SetId(ZEInt Id)
 {
-	ZEDObjectWrapper::SetId(Id);
+	if (GetEntity()->GetEntityId() == Id)
+		return;
+
 	GetEntity()->SetEntityId(Id);
+
+	ZEDObjectWrapper3D::SetId(Id);
 }
 
 ZEInt ZEDEntityWrapper::GetId() const
@@ -281,8 +111,15 @@ ZEInt ZEDEntityWrapper::GetId() const
 
 void ZEDEntityWrapper::SetName(const ZEString& Name)
 {
-	ZEDObjectWrapper::SetName(Name);
+	if (GetEntity() == NULL)
+		return;
+
+	if (GetEntity()->GetName() == Name)
+		return;
+
 	GetEntity()->SetName(Name);
+
+	ZEDObjectWrapper3D::SetName(Name);
 }
 
 ZEString ZEDEntityWrapper::GetName() const
@@ -299,9 +136,8 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 		return;
 
 	static_cast<ZEEntity*>(Object)->SetWrapper(this);
-	DrawBoundingBox =  Object->GetClass()->CheckAttributeHasValue("ZEDEditor.EntityWrapper.DrawBoundingBox", "true");
-
-	ZEDObjectWrapper::SetObject(Object);
+	
+	ZEDObjectWrapper3D::SetObject(Object);
 }
 
 ZEEntity* ZEDEntityWrapper::GetEntity() const
@@ -311,28 +147,15 @@ ZEEntity* ZEDEntityWrapper::GetEntity() const
 
 void ZEDEntityWrapper::SetVisible(bool Value)
 {
-	static_cast<ZEEntity*>(GetObject())->SetVisible(Value);
-	Update();
+	if (GetEntity() == NULL)
+		return;
+
+	GetEntity()->SetVisible(Value);
 }
 
 bool ZEDEntityWrapper::GetVisible() const
 {
-	return static_cast<ZEEntity*>(GetObject())->GetVisible();
-}
-
-void ZEDEntityWrapper::SetDrawBoundingBox(bool Enabled)
-{
-	if (DrawBoundingBox == Enabled)
-		return;
-
-	DrawBoundingBox = Enabled;
-
-	Update();
-}
-
-bool ZEDEntityWrapper::GetDrawBoundingBox()
-{
-	return DrawBoundingBox;
+	return GetEntity()->GetVisible();
 }
 
 bool ZEDEntityWrapper::CheckChildrenClass(ZEClass* Class)
@@ -345,7 +168,7 @@ bool ZEDEntityWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
 		return false;
 
-	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
+	if (!ZEDObjectWrapper3D::AddChildWrapper(Wrapper, Update))
 		return false;
 
 	if (!Update)
@@ -362,7 +185,7 @@ bool ZEDEntityWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
 		return false;
 
-	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
+	if (!ZEDObjectWrapper3D::RemoveChildWrapper(Wrapper, Update))
 		return false;
 
 	if (!Update)
@@ -396,9 +219,8 @@ void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 		return;
 
 	GetEntity()->SetWorldPosition(NewPosition);
-	ZEDObjectWrapper::SetPosition(NewPosition);
-
-	Update();
+	
+	ZEDObjectWrapper3D::SetPosition(NewPosition);
 }
 
 ZEVector3 ZEDEntityWrapper::GetPosition() const
@@ -415,9 +237,8 @@ void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 		return;
 
 	GetEntity()->SetWorldRotation(NewRotation);
-	ZEDObjectWrapper::SetRotation(NewRotation);
 
-	Update();
+	ZEDObjectWrapper3D::SetRotation(NewRotation);
 }
 
 ZEQuaternion ZEDEntityWrapper::GetRotation() const
@@ -433,10 +254,9 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 	if (GetObject() == NULL)
 		return;
 
-	ZEDObjectWrapper::SetScale(NewScale);
 	GetEntity()->SetScale(NewScale);
 
-	Update();
+	ZEDObjectWrapper3D::SetScale(NewScale);
 }
 
 ZEVector3 ZEDEntityWrapper::GetScale() const
@@ -447,24 +267,6 @@ ZEVector3 ZEDEntityWrapper::GetScale() const
 	return GetEntity()->GetWorldScale();
 }
 
-void ZEDEntityWrapper::SetSelected(bool Selected)
-{
-	if (GetSelected() == Selected)
-		return;
-
-	ZEDObjectWrapper::SetSelected(Selected);
-	Update();
-}
-
-void ZEDEntityWrapper::SetFocused(bool Focused)
-{
-	if (GetFocused() == Focused)
-		return;
-
-	ZEDObjectWrapper::SetFocused(Focused);
-	Update();
-}
-
 void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	Report.SetModifierFunction(ZEDelegateMethod(ZERayCastModifierFunction, ZEDEntityWrapper, RayCastModifier, this));
@@ -472,59 +274,9 @@ void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 	Report.SetModifierFunction(ZERayCastModifierFunction());
 }
 
-void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	if (Canvas.GetBufferSize() != 0)
-	{
-		if (!Material->PreRender(Command))
-			return;
-
-		Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
-		Parameters->Renderer->AddCommand(&Command);
-	}
-
-	if (NamePlate != NULL)
-	{
-		if (GetVisible() && !GetFrozen() &&
-			ZEVector3::DotProduct(Parameters->View->Direction, GetPosition() - Parameters->View->Position) > 0.0f)
-		{
-			ZEVector2 ScreenPosition = ZERNScreenUtilities::WorldToScreen(*Parameters->View, GetPosition());
-			NamePlate->SetPosition(ZEVector2((ZEInt)ScreenPosition.x, (ZEInt)ScreenPosition.y));
-			NamePlate->SetZOrder(ZEMath::Abs(Parameters->View->Position.z - GetPosition().z));
-			NamePlate->SetVisiblity(true);
-		}
-		else
-		{
-			NamePlate->SetVisiblity(false);
-		}
-	}
-}
-
-void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-{
-	ZEDObjectWrapper::Render(Parameters, Command);
-
-	if (GetObject() == NULL)
-		return;
-
-	if (Canvas.GetBufferSize() == 0)
-		return;
-
-	ZEGRContext* Context = Parameters->Context;
-
-	if (!Material->SetupMaterial(Context, Parameters->Stage))
-		return;
-
-	Context->SetVertexBuffer(0, VertexBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->Draw(VertexBuffer->GetElementCount(), 0);
-
-	Material->CleanupMaterial(Context, Parameters->Stage);
-}
-
 void ZEDEntityWrapper::Tick(float ElapsedTime)
 {
-	ZEDObjectWrapper::Tick(ElapsedTime);
+	ZEDObjectWrapper3D::Tick(ElapsedTime);
 
 	if (GetEntity() != NULL && GetEntity()->GetState() == ZE_ES_LOADING)
 		Update();
@@ -532,21 +284,17 @@ void ZEDEntityWrapper::Tick(float ElapsedTime)
 
 void ZEDEntityWrapper::Update()
 {
-	ZEDObjectWrapper::Update();
-
 	if (GetEntity() == NULL)
 	{
 		ClearChildWrappers();
 		return;
 	}
 	
-	UpdateNamingPlate();
-	UpdateConstantBuffer();
-	UpdateGraphics();
-
 	LockWrapper();
 	SyncronizeChildWrappers((ZEObject*const*)GetEntity()->GetChildEntities().GetConstCArray(), GetEntity()->GetChildEntities().GetCount());
 	UnlockWrapper();
+
+	ZEDObjectWrapper3D::Update();
 }
 
 void ZEDEntityWrapper::Clean()

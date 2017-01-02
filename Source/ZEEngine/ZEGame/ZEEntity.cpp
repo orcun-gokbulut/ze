@@ -700,16 +700,6 @@ bool ZEEntity::GetSerialOperation() const
 	return SerialOperation;
 }
 
-bool ZEEntity::InitializeSelf()
-{
-	return true;
-}
-
-bool ZEEntity::DeinitializeSelf()
-{
-	return true;
-}
-
 void ZEEntity::SetLocalLoadingPercentage(ZEUInt Percentage)
 {
 	if (Percentage > 100)

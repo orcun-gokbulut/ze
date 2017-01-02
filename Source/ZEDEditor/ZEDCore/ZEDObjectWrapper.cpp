@@ -35,12 +35,9 @@
 
 #include "ZEDObjectWrapper.h"
 
-#include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEMath.h"
 #include "ZEDEditor.h"
 #include "ZEDObjectManager.h"
 #include "ZEDObjectEvent.h"
-#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEFile/ZEPathInfo.h"
 
 void ZEDObjectWrapper::SetManager(ZEDObjectManager* Manager)
@@ -82,11 +79,6 @@ bool ZEDObjectWrapper::DeinitializeInternal()
 		ChildWrappers[I]->Deinitialize();
 
 	return ZEInitializable::DeinitializeInternal();
-}
-
-void ZEDObjectWrapper::UpdateNamePlate()
-{
-
 }
 
 void ZEDObjectWrapper::SyncronizeChildWrappers(ZEObject*const*  TargetList, ZESize TargetListSize)
@@ -148,10 +140,8 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 	Manager = NULL;
 	Selectable = true;
 	Selected = false;
-	Pickable = true;
 	Frozen = false;
 	Focused = false;
-	NamePlateVisible = true;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
@@ -170,9 +160,7 @@ void ZEDObjectWrapper::SetObject(ZEObject* Object)
 		return;
 
 	Selectable =  Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper.Selectable", "true");
-	Pickable =  Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper.Pickable", "true");
-	NamePlateVisible = Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper.NamePlateVisible", "true");
-	IconFileName = Object->GetClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon", 0, "");
+	IconFileName =  Object->GetClass()->GetAttributeValue("ZEDEditor.ObjectWrapper.Icon");
 
 	ClearChildWrappers();
 	this->Object = Object;
@@ -211,10 +199,7 @@ ZEDObjectManager* ZEDObjectWrapper::GetManager() const
 
 void ZEDObjectWrapper::SetId(ZEInt Id)
 {
-	if (GetId() == Id)
-		return;
-
-	UpdateNamePlate();
+	UpdateLocal();
 }
 
 ZEInt ZEDObjectWrapper::GetId() const
@@ -224,10 +209,7 @@ ZEInt ZEDObjectWrapper::GetId() const
 
 void ZEDObjectWrapper::SetName(const ZEString& Name)
 {
-	if (GetName() == Name)
-		return;
-
-	UpdateNamePlate();
+	UpdateLocal();
 }
 
 ZEString ZEDObjectWrapper::GetName() const
@@ -235,53 +217,11 @@ ZEString ZEDObjectWrapper::GetName() const
 	return ZEString::Empty;
 }
 
-ZEAABBox ZEDObjectWrapper::GetBoundingBox() const
-{
-	return ZEAABBox::Zero;
-}
-
-ZEMatrix4x4 ZEDObjectWrapper::GetWorldTransform() const
-{
-	return ZEMatrix4x4::Identity;
-}
-
-void ZEDObjectWrapper::SetPosition(const ZEVector3& NewPosition)
-{
-	ZEDObjectEvent Event;
-}
-
-ZEVector3 ZEDObjectWrapper::GetPosition() const
-{
-	return ZEVector3::Zero;
-}
-
-void ZEDObjectWrapper::SetRotation(const ZEQuaternion& NewRotation)
-{
-	
-}
-
-ZEQuaternion ZEDObjectWrapper::GetRotation() const
-{
-	return ZEQuaternion::Identity;
-}
-
-void ZEDObjectWrapper::SetScale(const ZEVector3& NewScale)
-{
-	
-}
-
-ZEVector3 ZEDObjectWrapper::GetScale() const
-{
-	return ZEVector3::One;
-}
-
 void ZEDObjectWrapper::SetFrozen(bool Value)
 {
-	if (Frozen == Value)
-		return;
-
 	Frozen = Value;
-	UpdateNamePlate();
+
+	UpdateLocal();
 }
 
 bool ZEDObjectWrapper::GetFrozen() const
@@ -292,6 +232,8 @@ bool ZEDObjectWrapper::GetFrozen() const
 void ZEDObjectWrapper::SetSelectable(bool Value)
 {
 	this->Selectable = Selectable;
+
+	UpdateLocal();
 }
 
 bool ZEDObjectWrapper::GetSelectable() const
@@ -305,6 +247,8 @@ void ZEDObjectWrapper::SetSelected(bool Selected)
 
 	if (!Selected)
 		Focused = false;
+
+	UpdateLocal();
 }
 
 bool ZEDObjectWrapper::GetSelected() const
@@ -315,59 +259,13 @@ bool ZEDObjectWrapper::GetSelected() const
 void ZEDObjectWrapper::SetFocused(bool Focused)
 {
 	this->Focused = Focused;
+
+	UpdateLocal();
 }
 
 bool ZEDObjectWrapper::GetFocused() const
 {
 	return Focused;
-}
-
-void ZEDObjectWrapper::SetVisible(bool Value)
-{
-	
-}
-
-bool ZEDObjectWrapper::GetVisible() const
-{
-	return true;
-}
-
-void ZEDObjectWrapper::SetNamePlateVisible(bool Visible)
-{
-	if (NamePlateVisible == Visible)
-		return;
-
-	NamePlateVisible = Visible;
-	UpdateNamePlate();
-}
-
-bool ZEDObjectWrapper::GetNamePlateVisible() const
-{
-	return NamePlateVisible;
-}
-
-void ZEDObjectWrapper::SetIconFileName(const ZEString& FileName)
-{
-	if (ZEPathInfo::Compare(IconFileName, FileName))
-		return;
-
-	IconFileName = FileName;
-	UpdateNamePlate();
-}
-
-const ZEString& ZEDObjectWrapper::GetIconFileName() const
-{
-	return IconFileName;
-}
-
-void ZEDObjectWrapper::SetPickable(bool Pickable)
-{
-	this->Pickable = Pickable;
-}
-
-bool ZEDObjectWrapper::GetPickable() const
-{
-	return Pickable;
 }
 
 QWidget* ZEDObjectWrapper::GetCustomWidget() const
@@ -378,6 +276,21 @@ QWidget* ZEDObjectWrapper::GetCustomWidget() const
 QMenu* ZEDObjectWrapper::GetPopupMenu() const
 {
 	return NULL;
+}
+
+void ZEDObjectWrapper::SetIconFileName(const ZEString& FileName)
+{
+	if (ZEPathInfo::Compare(IconFileName, FileName))
+		return;
+
+	IconFileName = FileName;
+
+	UpdateLocal();
+}
+
+const ZEString& ZEDObjectWrapper::GetIconFileName() const
+{
+	return IconFileName;
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
@@ -410,6 +323,8 @@ bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	{
 		if (!Wrapper->Initialize())
 			return false;
+
+		Wrapper->Update();
 	}
 
 	return true;
@@ -445,25 +360,10 @@ bool ZEDObjectWrapper::CheckChildrenClass(ZEClass* Class)
 	return true;
 }
 
-void ZEDObjectWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-
-}
-
-void ZEDObjectWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-{
-
-}
-
 void ZEDObjectWrapper::Tick(float ElapsedTime)
 {
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
 		ChildWrappers[I]->Tick(ElapsedTime);
-}
-
-void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-
 }
 
 void ZEDObjectWrapper::SendChangedEvent()
@@ -501,9 +401,17 @@ void ZEDObjectWrapper::Clean()
 
 }
 
+void ZEDObjectWrapper::UpdateLocal()
+{
+
+}
+
 void ZEDObjectWrapper::Update()
 {
-	UpdateNamePlate();
+	UpdateLocal();
+
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+		ChildWrappers[I]->Update();
 }
 
 ZEDObjectWrapper* ZEDObjectWrapper::Clone()

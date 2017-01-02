@@ -37,12 +37,11 @@
 
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
+#include "ZEFile/ZEFileInfo.h"
 #include "ZEModelMeshLOD.h"
 #include "ZEMDResource.h"
 #include "ZEMDResourceLOD.h"
 #include "ZERenderer/ZERNMaterial.h"
-#include "ZERenderer/ZERNStandardMaterial.h"
-#include "ZEFile/ZEFileInfo.h"
 
 void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
 {
@@ -71,7 +70,7 @@ void ZEMDResourceDraw::SetMaterialFileName(const ZEString& FileName)
 
 	MaterialFileName = FileName;
 	
-	SetMaterial(ZERNStandardMaterial::LoadResourceShared(FileName).GetPointer());
+	SetMaterial(ZERNMaterial::LoadResourceShared(FileName).GetPointer());
 }
 
 const ZEString& ZEMDResourceDraw::GetMaterialFileName()
@@ -107,7 +106,7 @@ bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)
 
 	SetOffset(DrawNode.ReadUInt32("Offset", 0));
 	SetCount(DrawNode.ReadUInt32("Count", 0));
-	SetMaterialFileName(ZEFileInfo(DrawNode.GetFile()->GetPath()).GetParentDirectory() + "/" + DrawNode.ReadString("MaterialFilePath"));
+	SetMaterialFileName(ZEPathInfo::CombineRelativePath(DrawNode.GetFile()->GetPath(), DrawNode.ReadString("MaterialFilePath")));
 
 	return true;
 }

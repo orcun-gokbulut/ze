@@ -35,9 +35,10 @@
 
 #include "ZEDRelocateOperation.h"
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDObjectEvent.h"
 #include "ZEDEditor.h"
+#include "ZEDObjectWrapper.h"
+#include "ZEDObjectWrapper3D.h"
+#include "ZEDObjectEvent.h"
 
 bool ZEDRelocateOperation::Apply()
 {
@@ -49,19 +50,31 @@ bool ZEDRelocateOperation::Apply()
 		if (Wrapper == NULL)
 			continue;
 		
-		ZEVector3 Position = Wrapper->GetPosition();
-		ZEQuaternion Rotation = Wrapper->GetRotation();
-		ZEVector3 Scale = Wrapper->GetScale();
+		ZEDObjectWrapper3D* Wrapper3D = ZEClass::Cast<ZEDObjectWrapper3D>(Wrapper);
+		if (Wrapper3D != NULL)
+		{
+			ZEVector3 Position = Wrapper3D->GetPosition();
+			ZEQuaternion Rotation = Wrapper3D->GetRotation();
+			ZEVector3 Scale = Wrapper3D->GetScale();
 
-		if (Item.OldParent != NULL)
-			Item.OldParent->RemoveChildWrapper(Wrapper);
+			if (Item.OldParent != NULL)
+				Item.OldParent->RemoveChildWrapper(Wrapper);
 
-		if (Item.NewParent != NULL)
-			Item.NewParent->AddChildWrapper(Wrapper);
+			if (Item.NewParent != NULL)
+				Item.NewParent->AddChildWrapper(Wrapper);
 
-		Wrapper->SetPosition(Position);
-		Wrapper->SetRotation(Rotation);
-		Wrapper->SetScale(Scale);
+			Wrapper3D->SetPosition(Position);
+			Wrapper3D->SetRotation(Rotation);
+			Wrapper3D->SetScale(Scale);
+		}
+		else
+		{
+			if (Item.OldParent != NULL)
+				Item.OldParent->RemoveChildWrapper(Wrapper);
+
+			if (Item.NewParent != NULL)
+				Item.NewParent->AddChildWrapper(Wrapper);
+		}
 	}
 
 	return true;
@@ -74,19 +87,32 @@ bool ZEDRelocateOperation::Revert()
 		ZEDRelocatedItem& Item = Items[I];
 		ZEDObjectWrapper* Wrapper = Item.Wrapper;
 		
-		ZEVector3 Position = Wrapper->GetPosition();
-		ZEQuaternion Rotation = Wrapper->GetRotation();
-		ZEVector3 Scale = Wrapper->GetScale();
+		ZEDObjectWrapper3D* Wrapper3D = ZEClass::Cast<ZEDObjectWrapper3D>(Wrapper);
+		if (Wrapper3D != NULL)
+		{
+			ZEVector3 Position = Wrapper3D->GetPosition();
+			ZEQuaternion Rotation = Wrapper3D->GetRotation();
+			ZEVector3 Scale = Wrapper3D->GetScale();
 
-		if (Item.NewParent != NULL)
-			Item.NewParent->RemoveChildWrapper(Wrapper);
+			if (Item.NewParent != NULL)
+				Item.NewParent->RemoveChildWrapper(Wrapper3D);
 
-		if (Item.OldParent != NULL)
-			Item.OldParent->AddChildWrapper(Wrapper);
+			if (Item.OldParent != NULL)
+				Item.OldParent->AddChildWrapper(Wrapper3D);
 
-		Wrapper->SetPosition(Position);
-		Wrapper->SetRotation(Rotation);
-		Wrapper->SetScale(Scale);
+			Wrapper3D->SetPosition(Position);
+			Wrapper3D->SetRotation(Rotation);
+			Wrapper3D->SetScale(Scale);
+		}
+		else
+		{
+
+			if (Item.NewParent != NULL)
+				Item.NewParent->RemoveChildWrapper(Wrapper);
+
+			if (Item.OldParent != NULL)
+				Item.OldParent->AddChildWrapper(Wrapper);
+		}
 	}
 
 	return true;

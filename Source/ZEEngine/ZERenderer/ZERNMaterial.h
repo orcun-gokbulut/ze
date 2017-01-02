@@ -46,24 +46,33 @@ class ZERNMaterial : public ZERSResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNMaterial)
 	protected:
-		ZEGUID							GUID;
-		ZEString						Name;
+		ZEGUID										GUID;
+		ZEString									Name;
 
-										ZERNMaterial();
-		virtual							~ZERNMaterial();
+		static ZEClass*								DetermineClass(const ZEString& FileName);
+		static ZERSResource*						Instanciator(const void* Params);
+
+													ZERNMaterial();
+		virtual										~ZERNMaterial();
 
 	public:
-		void							SetGUID(const ZEGUID& GUID);
-		const ZEGUID&					GetGUID() const;
+		void										SetGUID(const ZEGUID& GUID);
+		const ZEGUID&								GetGUID() const;
 
-		void							SetName(const ZEString& Name);
-		const ZEString&					GetName() const;
+		void										SetName(const ZEString& Name);
+		const ZEString&								GetName() const;
 
-		virtual ZEUInt					GetStageMask() const = 0;
+		virtual ZEUInt								GetStageMask() const = 0;
 
-		virtual bool					PreRender(ZERNCommand& Command) const;
-		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
-		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual bool								PreRender(ZERNCommand& Command) const;
+		virtual bool								SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual void								CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
 
-		virtual bool					Update();	
+		virtual bool								Update();	
+
+		virtual bool								Serialize(ZEMLWriterNode* MaterialNode);
+		virtual bool								Unserialize(ZEMLReaderNode* MaterialNode);
+
+		static ZEHolder<ZERNMaterial>				LoadResource(const ZEString& FileName);
+		static ZEHolder<const ZERNMaterial>			LoadResourceShared(const ZEString& FileName);
 };

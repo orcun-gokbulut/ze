@@ -51,11 +51,12 @@ class ZEParticleEffect : public ZEEntity
 	private:
 		ZEArray<ZEParticleEmitter*>			Emitters;
 
-		virtual ZEEntityResult				InitializeInternal();
-		virtual ZEEntityResult				DeinitializeInternal();
-		
 		virtual void						LocalTransformChanged();
 		virtual void						ParentTransformChanged();
+
+	protected:
+		virtual ZEEntityResult				InitializeInternal();
+		virtual ZEEntityResult				DeinitializeInternal();
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();

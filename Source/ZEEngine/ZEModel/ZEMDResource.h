@@ -99,6 +99,8 @@ class ZEMDResource : public ZERSResource
 		void											AddHelper(ZEMDResourceHelper* Helper);
 		void											RemoveHelper(ZEMDResourceHelper* Helper);
 
+		static ZEMDResource*							CreateInstance();
+		static ZERSHolder<ZEMDResource>					CreateResource();
 		static ZERSHolder<ZEMDResource>					LoadResource(const ZEString& FileName);
 		static ZERSHolder<const ZEMDResource>			LoadResourceShared(const ZEString& FileName);
 };

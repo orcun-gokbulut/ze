@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDEntityWrapper.h
+ Zinek Engine - ZEDViewportSelectionController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,58 +35,74 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDObjectWrapper3D.h"
+#include "ZEDComponent.h"
 
-class ZERayCastCollision;
+#include "ZEDViewportEvent.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
-class ZEDEntityWrapper : public ZEDObjectWrapper3D
+enum ZEDSelectionShape
+{
+	ZED_SS_NONE,
+	ZED_SS_RECTANGLE,
+	ZED_SS_CIRCLE,
+	ZED_SS_BRUSH
+};
+
+enum ZEDSelectionMode
+{
+	ZE_SM_NONE,
+	ZE_SM_FULLY_COVERS,
+	ZE_SM_INTERSECTS,
+};
+
+class ZEObject;
+class ZEFrustum;
+class ZEViewVolume;
+class ZEDObjectWrapper;
+class ZEUIFrameControl;
+class ZEDSelectionManager;
+
+class ZEDViewportSelectionController : public ZEDComponent
 {
 	ZE_OBJECT
+	friend class ZEDEditorCore;
 	private:
-		bool								AlterRaycast(ZERayCastCollision& Collision);
-		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity) const;
+		ZEDSelectionMode						SelectionMode;
+		ZEDSelectionShape						SelectionShape;
 
-	protected:
-		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
+		bool									MultiSelection;
+		ZEUIFrameControl*						MultiSelectionBox;
+		ZEVector2								MultiSelectionStartPosition;
+
+		ZEDSelectionManager*					GetSelectionManager();
+
+		void									CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper);
+
+		virtual void							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
+		virtual void							ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
+
+												ZEDViewportSelectionController();
+		virtual									~ZEDViewportSelectionController();
+
+	private: /* COMMANDS */
+		ZEDCommand								SelectionModeCommand;
+		ZEDCommand								SelectionShapeCommand;
+
+		void									RegisterCommands();
+		void									UpdateCommands();
+
+		void									SelectionModeCommand_OnAction(const ZEDCommand* Command);
+		void									SelectionShapeCommand_OnAction(const ZEDCommand* Command);
 
 	public:
-		virtual void						SetObject(ZEObject* Object);
-		ZEEntity*							GetEntity() const;
+		void									SetSelectionMode(ZEDSelectionMode Mode);
+		ZEDSelectionMode						GetSelectionMode() const;
 
-		virtual void						SetId(ZEInt Id);
-		virtual ZEInt						GetId() const;
+		void									SetSelectionShape(ZEDSelectionShape Shape);
+		ZEDSelectionShape						GetSelectionShape() const;
 
-		virtual void						SetName(const ZEString& Name);
-		virtual ZEString					GetName() const;
-
-		virtual ZEAABBox					GetBoundingBox() const;
-		virtual ZEMatrix4x4					GetWorldTransform() const;
-
-		virtual void						SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3					GetPosition() const;
-		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion				GetRotation() const;
-		virtual void						SetScale(const ZEVector3& NewScale);
-		virtual ZEVector3					GetScale() const;
-
-		virtual void						SetVisible(bool Value);
-		virtual bool						GetVisible() const;
-
-		virtual bool						CheckChildrenClass(ZEClass* Class);
-
-		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
-		virtual bool						RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
-
-		virtual void						Tick(float ElapsedTime);
-		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
-		virtual void						Update();
-
-		virtual void						Clean();
-
-		virtual void						LockWrapper();
-		virtual void						UnlockWrapper();
-
-		static ZEDEntityWrapper*			CreateInstance();
-}
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);
+		static ZEDViewportSelectionController*	CreateInstance();
+};

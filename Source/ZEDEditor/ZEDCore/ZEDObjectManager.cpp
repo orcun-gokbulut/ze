@@ -69,8 +69,8 @@ bool ZEDObjectManager::InitializeInternal()
 	
 	if (RootWrapper != NULL)
 	{
-		RootWrapper->Update();
 		RootWrapper->Initialize();
+		RootWrapper->Update();
 	}
 
 	return true;
@@ -172,11 +172,8 @@ void ZEDObjectManager::RegisterWrapperClass(ZEClass* WrapperClass)
 	}
 
 	const char* TargetClassName = WrapperClass->GetAttributeValue("ZEDObjectWrapper.TargetClass");
-	if (TargetClassName == NULL)
-	{
-		zeError("Wrapper class does not have \"ZEDObjectWrapper.TargetClass\" attribute. Wrapper Class Name: \"%s\".", WrapperClass->GetName());
+	if (strcmp(TargetClassName, "") == 0)
 		return;
-	}
 
 	ZEClass* TargetClass = ZEProvider::GetInstance()->GetClass(TargetClassName);
 	if (TargetClass == NULL)
@@ -214,13 +211,23 @@ void ZEDObjectManager::SetRootWrapper(ZEDObjectWrapper* Wrapper)
 	if (RootWrapper == Wrapper)
 		return;
 
+	if (RootWrapper != NULL)
+	{
+		RootWrapper->Deinitialize();
+		RootWrapper->SetManager(NULL);
+	}
+
 	RootWrapper = Wrapper;
+
+	if (RootWrapper == NULL)
+		return;
+
 	RootWrapper->SetManager(this);
 
 	if (IsInitialized())
 	{
-		RootWrapper->Update();
 		RootWrapper->Initialize();
+		RootWrapper->Update();
 	}
 }
 

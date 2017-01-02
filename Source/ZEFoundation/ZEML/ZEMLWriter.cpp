@@ -262,6 +262,7 @@ ZEMLWriterNode::~ZEMLWriterNode()
 
 void ZEMLWriter::SetFormat(ZEMLFormat* Format)
 {
+	zeCheckError(File != NULL, ZE_VOID, "Cannot change format. Format cannot be changed after file had been opened.");
 	this->Format = Format;
 }
 

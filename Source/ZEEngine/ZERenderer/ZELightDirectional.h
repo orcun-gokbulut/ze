@@ -121,4 +121,4 @@ class ZELightDirectional : public ZELight
 
 		static ZELightDirectional*			CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlateVisible, false);
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false);

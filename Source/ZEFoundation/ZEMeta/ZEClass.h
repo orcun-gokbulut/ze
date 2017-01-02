@@ -254,7 +254,8 @@ class ZEClass : public ZEMTDeclaration
 		bool							Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode);
 		bool							UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& PropertiesNode);
 
-		static bool						IsDerivedFrom(ZEClass* Parent, ZEClass* Target);
+		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class);
+		static bool						IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object);
 		template<typename ZECastedObjectType>
 		static ZECastedObjectType*		Cast(ZEObject* Object);
 };

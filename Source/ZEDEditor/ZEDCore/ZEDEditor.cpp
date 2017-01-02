@@ -56,6 +56,7 @@
 #include <QSettings>
 #include "ZEDUserInterface/ZEDCommandManager.h"
 #include "ZEDAssetManager.h"
+#include "ZEDObjectWrapper3D.h"
 
 
 void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
@@ -418,9 +419,10 @@ void ZEDEditor::PostProcess(float ElapsedTime)
 		PreRenderParameters.Renderer = Viewports[I]->GetRenderer();
 		PreRenderParameters.View = &Viewports[I]->GetView();
 		
-		if (GetObjectManager()->GetRootWrapper() != NULL)
-			GetObjectManager()->GetRootWrapper()->PreRender(&PreRenderParameters);
-		
+		ZEDObjectWrapper3D* RootWrapper = ZEClass::Cast<ZEDObjectWrapper3D>(GetObjectManager()->GetRootWrapper());
+		if (RootWrapper != NULL)
+			RootWrapper->PreRender(&PreRenderParameters);
+
 		UIManager->Render(Renderer);
 	}
 
