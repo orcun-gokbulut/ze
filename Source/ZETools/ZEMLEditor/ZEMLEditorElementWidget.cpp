@@ -299,13 +299,13 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 		const ZEVector4d& Value = Property->GetValue().GetVector4d();
 
 		Form->txtValueFloat11->setVisible(true);
-		Form->txtValueFloat11->setText(QString::number(Property->GetValue().GetVector4().x, 'g', 14));
+		Form->txtValueFloat11->setText(QString::number(Property->GetValue().GetVector4d().x, 'g', 14));
 		Form->txtValueFloat12->setVisible(true);
-		Form->txtValueFloat12->setText(QString::number(Property->GetValue().GetVector4().y, 'g', 14));
+		Form->txtValueFloat12->setText(QString::number(Property->GetValue().GetVector4d().y, 'g', 14));
 		Form->txtValueFloat13->setVisible(true);
-		Form->txtValueFloat13->setText(QString::number(Property->GetValue().GetVector4().z, 'g', 14));
+		Form->txtValueFloat13->setText(QString::number(Property->GetValue().GetVector4d().z, 'g', 14));
 		Form->txtValueFloat14->setVisible(true);
-		Form->txtValueFloat14->setText(QString::number(Property->GetValue().GetVector4().w, 'g', 14));
+		Form->txtValueFloat14->setText(QString::number(Property->GetValue().GetVector4d().w, 'g', 14));
 	}
 	else if (Property->GetValueType() == ZEML_VT_QUATERNION)
 	{
