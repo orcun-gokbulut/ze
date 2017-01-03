@@ -58,6 +58,11 @@ ZESize ZECVTestAsset::GetFileExtensionCount() const
 	return 3;
 }
 
+const char* ZECVTestAsset::GetOutputExtension() const
+{
+	return ".ZECVTestAsset";
+}
+
 ZECVConverter* const* ZECVTestAsset::GetConverters() const
 {
 	ZECVVersion Temp;

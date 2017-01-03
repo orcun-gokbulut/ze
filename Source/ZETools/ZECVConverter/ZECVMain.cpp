@@ -94,8 +94,19 @@ int main(int argc, char** argv)
 	const char* Destination = argv[2];
 	if (argc == 3)
 	{
-		bool Result = ZECVProcessor::GetInstance()->Convert(Source, Destination);
-		return Result ? EXIT_SUCCESS : EXIT_FAILURE;
+		ZECVResult Result = ZECVProcessor::GetInstance()->Convert(Source, Destination);
+		switch (Result)
+		{
+			case ZECV_R_DONE:
+			case ZECV_R_IGNORED:
+			case ZECV_R_LATEST_VERSION:
+				return EXIT_SUCCESS;
+
+			default:
+			case ZECV_R_UNKNOWN_FORMAT:
+			case ZECV_R_FAILED:
+				return EXIT_FAILURE;
+		}
 	}
 	else if (argc == 2)
 	{

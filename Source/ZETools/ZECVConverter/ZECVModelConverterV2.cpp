@@ -597,30 +597,32 @@ void ZECVModelConverterV2::ConvertVertexData(ZEArray<ZEVertexTypeV2>& Output, co
 
 	ZEVector3 TriangleTangent;
 	ZEVector3 TriangleBinormal;
-	for (ZESize I = 0 ; I < Input.GetCount(); I += 3)
+	ZESize IterationCount = Input.GetCount() / 3;
+	for (ZESize I = 0 ; I < IterationCount; I++)
 	{
+		ZESize Index = 3 * I;
 		ZETriangle TrianglePosition;
-		TrianglePosition.V0 = Input[I].Position;
-		TrianglePosition.V1 = Input[I + 1].Position;
-		TrianglePosition.V2 = Input[I + 2].Position;
+		TrianglePosition.V0 = Input[Index].Position;
+		TrianglePosition.V1 = Input[Index + 1].Position;
+		TrianglePosition.V2 = Input[Index + 2].Position;
 		float Area = ZETriangle::GetArea(TrianglePosition);
 		if (Area <= 0.00001)
 		{
-			zeError("Degenerate triangle (position) detected. Triangle Index: %u. Vertex Indexes: %u, %u, %u.", I / 3, I, I + 1, I + 2);
+			zeError("Degenerate triangle (position) detected. Triangle Index: %u. Vertex Indexes: %u, %u, %u.", I, Index, Index + 1, Index + 2);
 			DegenerateFaceDetected = true;
 		}
 
-		ConvertVertexBase(Output[I], Input[I]);
-		ConvertVertexNormals(Input[I], Output[I], I, TriangleTangent, TriangleBinormal);
+		ConvertVertexBase(Output[Index], Input[Index]);
+		ConvertVertexNormals(Input[Index], Output[Index], Index, TriangleTangent, TriangleBinormal);
 		//VerifyVertexNormals(Input[I], Output[I], I);
 
-		ConvertVertexBase(Output[I + 1], Input[I + 1]);
-		ConvertVertexNormals(Input[I + 1], Output[I + 1], I + 1, TriangleTangent, TriangleBinormal);
-		//VerifyVertexNormals(Input[I + 1], Output[I + 1], I);
+		ConvertVertexBase(Output[Index + 1], Input[Index + 1]);
+		ConvertVertexNormals(Input[Index + 1], Output[Index + 1], Index + 1, TriangleTangent, TriangleBinormal);
+		//VerifyVertexNormals(Input[Index + 1], Output[Index + 1], I);
 
-		ConvertVertexBase(Output[I + 2], Input[I + 2]);
-		ConvertVertexNormals(Input[I + 2], Output[I + 2], I + 2, TriangleTangent, TriangleBinormal);
-		//VerifyVertexNormals(Input[I + 2], Output[I + 2], I);
+		ConvertVertexBase(Output[Index + 2], Input[Index + 2]);
+		ConvertVertexNormals(Input[Index + 2], Output[Index + 2], Index + 2, TriangleTangent, TriangleBinormal);
+		//VerifyVertexNormals(Input[Index + 2], Output[Index + 2], I);
 	}
 }
 

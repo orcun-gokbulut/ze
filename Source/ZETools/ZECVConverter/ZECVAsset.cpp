@@ -39,6 +39,11 @@
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEDS\ZEFormat.h"
 
+const char* ZECVAsset::GetOutputExtension() const
+{
+	return NULL;
+}
+
 ZECVVersion ZECVAsset::GetMinimumVersion() const
 {
 	ZECVVersion Version;

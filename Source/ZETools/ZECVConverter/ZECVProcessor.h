@@ -39,20 +39,20 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
 class ZECVAsset;
 
 class ZECVProcessor
 {
-	private:
-		
 	public:
-		ZECVAsset* const*			GetAssets() const;
-		ZESize						GetAssetCount() const;
-		ZECVAsset*					FindAsset(const ZEString& Extension) const;
+		ZECVAsset* const*				GetAssets() const;
+		ZESize							GetAssetCount() const;
+		ZECVAsset*						FindAsset(const ZEString& Extension) const;
 
-		bool						Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const;
-		void						ConvertDirectory(const ZEString& DirectoryName) const;
+		ZEString						FixExtension(ZECVAsset* Asset, const ZEString& FileName) const;
+		ZECVResult						Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const;
+		void							ConvertDirectory(const ZEString& DirectoryName) const;
 
-		static ZECVProcessor*		GetInstance();
+		static ZECVProcessor*			GetInstance();
 };
