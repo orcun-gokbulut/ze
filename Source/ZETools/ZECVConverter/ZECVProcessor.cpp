@@ -88,7 +88,32 @@ ZECVAsset* ZECVProcessor::FindAsset(const ZEString& Extension) const
 	return NULL;
 }
 
-bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const
+
+
+ZEString ZECVProcessor::FixExtension(ZECVAsset* Asset, const ZEString& FileName) const
+{
+	ZEPathInfo FileInfo(FileName);
+	if (Asset->GetOutputExtension() != NULL)
+	{
+		return ZEFormat::Format("{0}/{1}{2}", FileInfo.GetParentDirectory(), FileInfo.GetName(), Asset->GetOutputExtension());
+	}
+	else
+	{
+		ZEString FileExtension = FileInfo.GetExtension();
+		const char* const* Extensions = Asset->GetFileExtensions();
+		ZESize ExtensionCount = Asset->GetFileExtensionCount();
+		for (ZESize I = 0; I < ExtensionCount; I++)
+		{
+			const char* Extension = Extensions[I];
+			if (FileExtension.EqualsIncase(Extension))
+				return ZEFormat::Format("{0}/{1}{2}", FileInfo.GetParentDirectory(), FileInfo.GetName(), Extension);
+		}
+	}
+
+	return FileName;
+}
+
+ZECVResult ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& DestinationFileName) const
 {
 	ZELogSession ItemLogSession;
 	ItemLogSession.BeginSession();
@@ -103,7 +128,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 	if (Asset == NULL)
 	{
 		zeLog("Unknown asset type. Ignoring file. File Name: \"%s\"", SourceFileName.ToCString());
-		return false;
+		return ZECV_R_IGNORED;
 	}
 
 	zeLog("Asset type found. Processing. Extension: \"%s\", Asset Type: \"%s\".", Extension.ToCString(), Asset->GetName());
@@ -125,16 +150,16 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 					Asset->GetCurrentVersion().Major, Asset->GetCurrentVersion().Minor);
 			}
 			zeLog("File's version is already latest version. No conversion done. File Name: \"%s\".", SourceFileName.ToCString());
-			return true;
+			return ZECV_R_LATEST_VERSION;
 
 		case ZECV_R_UNKNOWN_FORMAT:
 			zeError("File's format is unknown. File Name: \"%s\".", SourceFileName.ToCString());
-			return false;
+			return ZECV_R_FAILED;
 
 		default:
 		case ZECV_R_FAILED:
 			zeError("File check failed. Skipping. File Name: \"%s\".", SourceFileName.ToCString());
-			return false;
+			return ZECV_R_FAILED;
 	}
 
 	ZEString LogFileName = ZEFormat::Format("{0}.ZECVConvert-{1}.log", SourceFileName, ZETimeStamp::Now().ToString("%Y%m%d%H%M"));
@@ -204,8 +229,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 
 		zeLog("Converting to %d.%d...", DestinationVersion.Major, DestinationVersion.Minor);
 
-
-		if (InputFileName == OutputFileName) // Direct Convert
+		if (ZEPathInfo::Compare(InputFileName, OutputFileName)) // Direct Convert
 		{
 			OutputFileName = ZEFormat::Format("{0}.{1}.{2}.ZECVConvert.tmp", SourceFileName, Converter->GetDestinationVersion().Major, Converter->GetDestinationVersion().Minor);
 			
@@ -213,23 +237,26 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 			if (Result != ZECV_R_DONE)
 			{
 				zeError("Conversion failed. File Name: \"%s\".", SourceFileName.ToCString());
-				return false;
+				return ZECV_R_FAILED;
 			}
 			
 			if (!ZEFileInfo(InputFileName).Delete())
 			{
 				zeError("Conversion failed. Cannot delete source file to replace it with temporary file. File Name: \"%s\".", SourceFileName.ToCString());
-				return false;
+				return ZECV_R_FAILED;
 			}
 
 			if (!ZEFileInfo(OutputFileName).Move(InputFileName))
 			{
 				zeError("Conversion failed. Cannot rename temporary file. File Name: \"%s\".", SourceFileName.ToCString());	
-				return false;
+				return ZECV_R_FAILED;
 			}
 		}
 		else
 		{
+			if (LastLink)
+				OutputFileName = FixExtension(Asset, OutputFileName);
+
 			ZECVResult Result = Converter->Convert(InputFileName, OutputFileName);
 
 			// Remove Temp File
@@ -239,7 +266,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 			if (Result != ZECV_R_DONE)
 			{
 				zeError("Conversion failed. File Name: \"%s\".", SourceFileName.ToCString());
-				return false;
+				return ZECV_R_FAILED;
 			}
 		}
 
@@ -253,7 +280,7 @@ bool ZECVProcessor::Convert(const ZEString& SourceFileName, const ZEString& Dest
 
 	ConvertLogSession.EndSession();
 	ItemLogSession.EndSession();
-	return true;
+	return ZECV_R_DONE;
 }
 
 
@@ -287,13 +314,53 @@ void ZECVProcessor::ConvertDirectory(const ZEString& DirectoryName) const
 	ZESmartArray<ZEString> FileNames;
 	ZEPathInfo::Operate(DirectoryName, ZEPathOperationFunction::Create<OperationWarpper>(), ZE_POE_FILE, true, &FileNames);
 
+	ZESmartArray<ZEString> IgnoredFiles;
+	ZESmartArray<ZEString> LatestFiles;
+	ZESmartArray<ZEString> ConvertedFiles;
+	ZESmartArray<ZEString> FailedFiles;
+
 	zeLog("Processing files...");
 	#pragma omp parallel
 	{
 		#pragma omp for schedule(dynamic)
 		for (ZESSize I = 0; I < FileNames.GetCount(); I++)
-			Convert(FileNames[I], FileNames[I]);
+		{
+			ZECVResult Result = Convert(FileNames[I], FileNames[I]);
+			switch (Result)
+			{
+				case ZECV_R_IGNORED:
+					IgnoredFiles.Add(FileNames[I]);
+					break;
+
+				case ZECV_R_LATEST_VERSION:
+					LatestFiles.Add(FileNames[I]);
+					break;
+
+				case ZECV_R_DONE:
+					ConvertedFiles.Add(FileNames[I]);
+					break;
+
+				default:
+				case ZECV_R_UNKNOWN_FORMAT:
+				case ZECV_R_FAILED:
+					FailedFiles.Add(FileNames[I]);
+					break;
+			}			
+		}
 	}
+
+	zeLog("--Conversation Report--");
+	for (ZESize I = 0; I < IgnoredFiles.GetCount(); I++)
+		zeLog("Ignored - %s", IgnoredFiles[I].ToCString());
+	
+	for (ZESize I = 0; I < LatestFiles.GetCount(); I++)
+		zeLog("Latest - %s", LatestFiles[I].ToCString());
+	
+	for (ZESize I = 0; I < ConvertedFiles.GetCount(); I++)
+		zeLog("Converted - %s", ConvertedFiles[I].ToCString());
+	
+	for (ZESize I = 0; I < FailedFiles.GetCount(); I++)
+		zeLog("Failed - %s", FailedFiles[I].ToCString());
 
 	LogSession.EndSession();
 }

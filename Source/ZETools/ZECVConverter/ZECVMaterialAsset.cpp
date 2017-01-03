@@ -61,7 +61,7 @@ ZESize ZECVMaterialAsset::GetFileExtensionCount() const
 	return 3;
 }
 
- ZECVConverter* const* ZECVMaterialAsset::GetConverters() const
+ZECVConverter* const* ZECVMaterialAsset::GetConverters() const
 {
 	static ZECVMaterialConverterV2 Version2;
 	static ZECVConverter* Converters[] =
@@ -87,8 +87,8 @@ ZECVResult ZECVMaterialAsset::Check(const ZEString& SourceFileName, ZECVVersion&
 	if (SourceModelNode.GetName() != "Material" && SourceModelNode.GetName() != "ZERNMaterial" && SourceModelNode.GetName() != "ZERNStandardMaterial")
 		return ZECV_R_UNKNOWN_FORMAT;
 
-	Version.Major = SourceModelNode.ReadUInt8("MajorVersion", 1);
-	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
+	Version.Major = SourceModelNode.ReadUInt8("VersionMajor", SourceModelNode.ReadUInt8("MajorVersion", 1));
+	Version.Minor = SourceModelNode.ReadUInt8("VersionMinor", SourceModelNode.ReadUInt8("MinorVersion"));
 
 	if (Version.Major > 2 ||
 		Version.Major == 2 && Version.Minor >= 0)

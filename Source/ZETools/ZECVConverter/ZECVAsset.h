@@ -48,6 +48,7 @@ class ZECVAsset
 		virtual const char*					GetName() const = 0;
 		virtual const char* const* 			GetFileExtensions() const = 0;
 		virtual ZESize						GetFileExtensionCount() const = 0;
+		virtual const char*					GetOutputExtension() const;
 
 		virtual ZECVConverter* const* 		GetConverters() const = 0;
 		virtual ZESize						GetConverterCount() const = 0;

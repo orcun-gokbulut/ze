@@ -60,7 +60,12 @@ ZESize ZECVModelAsset::GetFileExtensionCount() const
 	return 2;
 }
 
- ZECVConverter* const* ZECVModelAsset::GetConverters() const
+const char* ZECVModelAsset::GetOutputExtension() const
+{
+	return ".ZEModel";
+}
+
+ZECVConverter* const* ZECVModelAsset::GetConverters() const
 {
 	static ZECVModelConverterV2 Version2;
 	static ZECVConverter* Converters[] =
@@ -86,8 +91,8 @@ ZECVResult ZECVModelAsset::Check(const ZEString& SourceFileName, ZECVVersion& Ve
 	if (SourceModelNode.GetName() != "ZEModel")
 		return ZECV_R_UNKNOWN_FORMAT;
 
-	Version.Major = SourceModelNode.ReadUInt8("MajorVersion", 1);
-	Version.Minor = SourceModelNode.ReadUInt8("MinorVersion");
+	Version.Major = SourceModelNode.ReadUInt8("VersionMajor", SourceModelNode.ReadUInt8("MajorVersion", 1));
+	Version.Minor = SourceModelNode.ReadUInt8("VersionMinor", SourceModelNode.ReadUInt8("MinorVersion"));
 
 	if (Version.Major > 2 ||
 		Version.Major == 2 && Version.Minor >= 0)

@@ -59,7 +59,7 @@ ZESize ZECVSceneAsset::GetFileExtensionCount() const
 	return 1;
 }
 
- ZECVConverter* const* ZECVSceneAsset::GetConverters() const
+ZECVConverter* const* ZECVSceneAsset::GetConverters() const
 {
 	static ZECVSceneConverterV1 Version1;
 	static ZECVConverter* Converters[] =
@@ -108,8 +108,8 @@ ZECVResult ZECVSceneAsset::Check(const ZEString& SourceFileName, ZECVVersion& Ve
 	if (SourceSceneNode.GetName() != "ZEScene")
 		return ZECV_R_UNKNOWN_FORMAT;
 
-	Version.Major = SourceSceneNode.ReadUInt8("MajorVersion", 1);
-	Version.Minor = SourceSceneNode.ReadUInt8("MinorVersion", 0);
+	Version.Major = SourceSceneNode.ReadUInt8("VersionMajor", SourceSceneNode.ReadUInt8("MajorVersion", 0));
+	Version.Minor = SourceSceneNode.ReadUInt8("VersionMinor", SourceSceneNode.ReadUInt8("MinorVersion"));
 
 	if (Version.Major > 1 ||
 		Version.Major == 1 && Version.Minor >= 0)
