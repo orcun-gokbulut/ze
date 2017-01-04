@@ -172,6 +172,7 @@ ZETaskResult ZESoundResourceWAV::UnloadInternal()
 ZESoundResourceWAV::ZESoundResourceWAV()
 {
 	Data = NULL;
+	Register();
 }
 
 ZESoundResourceWAV::~ZESoundResourceWAV()

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AL_SOUND_SOURCE_H__
-#define __ZE_AL_SOUND_SOURCE_H__
 
 #include "ZESound/ZESoundSource.h"
 #include "ZEALComponentBase.h"
@@ -46,46 +44,44 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 {
 	friend class ZEALModule;
 	private:
-		bool						Allocated;
-		ALuint						ALSource;
-		ALuint						ALBuffer1;
-		ALuint						ALBuffer2;
-		char*						InnerStreamBuffer;
+		bool							Allocated;
+		ALuint							ALSource;
+		ALuint							ALBuffer1;
+		ALuint							ALBuffer2;
+		char*							InnerStreamBuffer;
 
-		ZESize						BufferPosition;
-		ZESize						BufferSampleCount;
-		ZESize						OldBufferPosition;
-		ZESize						StreamPosition;
+		ZESize							BufferPosition;
+		ZESize							BufferSampleCount;
+		ZESize							OldBufferPosition;
+		ZESize							StreamPosition;
 
-		bool						CreateBuffer();
-		void						ResetParameters();
-		void						DestroyBufferSource();
+		virtual void					UpdateResource();
 
-		void						Stream();
-		void						ResetStream();
-		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+		bool							CreateBuffer();
+		void							ResetParameters();
+		void							DestroyBufferSource();
 
-									ZEALSoundSource();
-		virtual						~ZEALSoundSource();
+		void							Stream();
+		void							ResetStream();
+		void							StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+
+										ZEALSoundSource();
+		virtual							~ZEALSoundSource();
 
 	public:
-		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(ZESize SampleIndex);
-		virtual ZESize				GetCurrentPosition();
+		virtual void					SetSoundSourceState(ZESoundSourceState State);
+		virtual void					SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize					GetCurrentPosition();
 
-		virtual void				SetPan(ZEInt NewPan);
-		virtual void				SetPlaybackSpeed(float Speed);
-		virtual void				SetVolume(ZEUInt NewVolume);
-		virtual void				SetLooping(bool Enabled);				
+		virtual void					SetPan(ZEInt NewPan);
+		virtual void					SetPlaybackSpeed(float Speed);
+		virtual void					SetVolume(ZEUInt NewVolume);
+		virtual void					SetLooping(bool Enabled);				
 							
-		virtual void				Play();
-		virtual void				Resume();
-		virtual void				Pause();
-		virtual void				Stop();
+		virtual void					Play();
+		virtual void					Resume();
+		virtual void					Pause();
+		virtual void					Stop();
 
-		void						Update(float ElapsedTime);
-
-		virtual void				SetSoundResource(ZEHolder<const ZESoundResource> Resource);
+		void							Update(float ElapsedTime);
 };
-
-#endif

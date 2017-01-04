@@ -61,7 +61,7 @@ const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 
 ZEHolder<const ZEUIFont> ZEUIManager::GetDefaultFontResource()
 {
-	return ZEUIFontTrueType::LoadResourceShared("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Regular.ttf", 12);
+	return ZEUIFontTrueType::LoadResourceShared("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Regular.ttf", 12).GetPointer();
 }
 
 ZEUIManager::ZEUIManager() 
@@ -427,7 +427,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (ZEInt32 I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
+	for (ZESize I = ParentControl->GetChildControls().GetCount() - 1; I >= 0; I--)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))

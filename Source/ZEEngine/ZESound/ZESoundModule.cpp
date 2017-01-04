@@ -39,7 +39,30 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOptionManager.h"
 
+#include <mpg123.h>
+
 ZEOptionSection  ZESoundModule::SoundOptions;
+
+bool ZESoundModule::InitializeInternal()
+{
+	if (!ZEModule::InitializeInternal())
+		return false;
+
+	if (mpg123_init() != MPG123_OK)
+	{
+		zeError("Initialization failed. Cannot initialize mp3 decoder.");
+		return false;
+	}
+
+	return true;
+}
+
+bool ZESoundModule::DeinitializeInternal()
+{
+	mpg123_exit();
+
+	return ZEModule::DeinitializeInternal();
+}
 
 void OnOptionsChanged(ZEOption* Option)
 {

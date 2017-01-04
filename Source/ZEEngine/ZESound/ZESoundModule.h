@@ -80,6 +80,9 @@ class ZESoundModule : public ZEModule
 	public:
 		static ZEOptionSection					SoundOptions;
 
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+
 	public:
 		static void								BaseInitialize();
 		static void								BaseDeinitialize();

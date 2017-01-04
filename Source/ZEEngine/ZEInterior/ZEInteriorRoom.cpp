@@ -50,6 +50,7 @@
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEModel/ZEMDVertex.h"
 
 #define ZE_IRDF_TRANSFORM						1
 #define ZE_IRDF_WORLD_TRANSFORM					2
@@ -276,6 +277,41 @@ void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 	IsPersistentDraw = Enabled;
 }
 
+template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex)
+{
+	const ZEVector3& Normal = InputVertex.Normal;
+	const ZEVector3& Tangent = InputVertex.Tangent;
+	const ZEVector3& Binormal = InputVertex.Binormal;
+
+	OutputVertex.Normal.M[0] = (ZEInt16)(Normal.x * (float)0x7FFF);
+	OutputVertex.Normal.M[1] = (ZEInt16)(Normal.y * (float)0x7FFF);
+	if (Normal.z < 0.0f)
+		OutputVertex.Normal.M[0] &= 0xFFFE;
+	else
+		OutputVertex.Normal.M[0] |= 0x0001;
+
+	OutputVertex.Tangent.M[0] = (ZEInt16)(Tangent.x * (float)0x7FFF);
+	OutputVertex.Tangent.M[1] = (ZEInt16)(Tangent.y * (float)0x7FFF);
+	if (Tangent.z < 0.0f)
+		OutputVertex.Tangent.M[0] &= 0xFFFE;
+	else
+		OutputVertex.Tangent.M[0] |= 0x0001;
+
+	ZEVector3 CalculatedBinormal;
+	ZEVector3::CrossProduct(CalculatedBinormal, Tangent, Normal);
+	CalculatedBinormal.NormalizeSelf();
+	if (ZEVector3::DotProduct(CalculatedBinormal, Binormal) < 0.0f) // Mirrored
+	{
+		CalculatedBinormal *= -1.0f;
+		OutputVertex.Tangent.M[1] &= 0xFFFE;
+	}
+	else
+	{
+		OutputVertex.Tangent.M[1] |= 0x0001;
+	}
+}
+
 bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
 {	
 	this->Owner = Owner;
@@ -293,7 +329,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	Processed.SetCount(PolygonCount);
 	Processed.Fill(false);
 
-	ZEArray<ZEInteriorVertex> Vertices;
+	ZEArray<ZEMDVertex> Vertices;
 	Vertices.SetCount(PolygonCount * 3);
 
 	ZESize CurrentVertexIndex = 0;
@@ -310,7 +346,20 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 				if (Resource->Polygons[I].Material != Material)
 					continue;
 
-				memcpy(&Vertices[CurrentVertexIndex], Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
+				Vertices[CurrentVertexIndex].Position = Resource->Polygons[I].Vertices[0].Position;
+				Vertices[CurrentVertexIndex].Reserved0 = 1.0;
+				Vertices[CurrentVertexIndex].Texcoords = Resource->Polygons[I].Vertices[0].Texcoord;
+				ConvertVertexNormals(Resource->Polygons[I].Vertices[0], Vertices[CurrentVertexIndex]);
+
+				Vertices[CurrentVertexIndex + 1].Position = Resource->Polygons[I].Vertices[1].Position;
+				Vertices[CurrentVertexIndex + 1].Reserved0 = 1.0;
+				Vertices[CurrentVertexIndex + 1].Texcoords = Resource->Polygons[I].Vertices[1].Texcoord;
+				ConvertVertexNormals(Resource->Polygons[I].Vertices[1], Vertices[CurrentVertexIndex + 1]);
+
+				Vertices[CurrentVertexIndex + 2].Position = Resource->Polygons[I].Vertices[2].Position;
+				Vertices[CurrentVertexIndex + 2].Reserved0 = 1.0;
+				Vertices[CurrentVertexIndex + 2].Texcoords = Resource->Polygons[I].Vertices[2].Texcoord;
+				ConvertVertexNormals(Resource->Polygons[I].Vertices[2], Vertices[CurrentVertexIndex + 2]);
 
 				CurrentVertexIndex += 3;
 				Processed[I] = true;
@@ -325,7 +374,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		}
 	}
 
-	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEInteriorVertex), sizeof(ZEInteriorVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray());
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEMDVertex), sizeof(ZEMDVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray());
 
 	ZESize DrawCount = Draws.GetCount();
 	for (ZESize I = 0; I < DrawCount; I++)
@@ -396,10 +445,12 @@ void ZEInteriorRoom::Deinitialize()
 void ZEInteriorRoom::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	IsDrawn = true;
-	
 	ZESize RenderCommandCount = Draws.GetCount();
 	for(ZESize I = 0; I < RenderCommandCount; I++)
+	{
+		Draws[I].Material->PreRender(Draws[I].RenderCommand);
 		Parameters->Renderer->AddCommand(&Draws[I].RenderCommand);
+	}
 }
 
 void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)

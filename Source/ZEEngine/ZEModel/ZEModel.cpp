@@ -246,6 +246,9 @@ ZEEntityResult ZEModel::LoadInternal()
 			return ZE_ER_FAILED_CLEANUP;
 	}
 
+	ze_for_each(AnimationTrack, AnimationTracks)
+		AnimationTrack->BindAnimation();
+
 	DirtyConstantBufferSkin = true;
 	DirtyBoundingBox = true;
 
@@ -495,6 +498,7 @@ void ZEModel::AddAnimationTrack(ZEModelAnimationTrack* Track)
 
 	Track->Model = this;
 	AnimationTracks.AddEnd(&Track->ModelLink);
+	Track->BindAnimation();
 }
 
 void ZEModel::RemoveAnimationTrack(ZEModelAnimationTrack* Track)
@@ -503,6 +507,7 @@ void ZEModel::RemoveAnimationTrack(ZEModelAnimationTrack* Track)
 	zeCheckError(Track->GetModel() != this, ZE_VOID, "Can not remove animation track. Track belongs to another model.");
 
 	Track->Model = NULL;
+	Track->ResourceAnimation = NULL;
 	AnimationTracks.Remove(&Track->ModelLink);
 }
 

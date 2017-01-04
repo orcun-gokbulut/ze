@@ -94,6 +94,27 @@ static ALenum GetBufferFormat(const ZESoundResource* SoundResource)
 	}
 }
 
+void ZEALSoundSource3D::UpdateResource()
+{
+	ZESoundSource3D::UpdateResource();
+
+	if (GetSoundResource() != NULL)
+	{
+		SetLimitsEnabled(LimitsEnabled);
+		if (!CreateBuffer())
+		{
+			SoundResource = NULL;
+			return;
+		}
+		SoundSourceState = ZE_SSS_STOPPED;		
+	}
+	else
+	{
+		DestroyBufferSource();
+		SoundSourceState = ZE_SSS_NONE;
+	}
+}
+
 bool ZEALSoundSource3D::CreateBuffer()
 {
 	ALenum Error; // Notation sucks
@@ -533,29 +554,6 @@ void ZEALSoundSource3D::Update(float ElapsedTime)
 	// Stream
 	if (Streaming)
 		Stream();
-}
-
-void ZEALSoundSource3D::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
-{
-	if (SoundResource == Resource)
-		return;
-
-	if (Resource != NULL)
-	{
-		SoundResource = Resource;
-		SetLimitsEnabled(LimitsEnabled);
-		if (!CreateBuffer())
-		{
-			SoundResource = NULL;
-			return;
-		}
-		SoundSourceState = ZE_SSS_STOPPED;		
-	}
-	else
-	{
-		DestroyBufferSource();
-		SoundSourceState = ZE_SSS_NONE;
-	}
 }
 
 /////////////////////////////////////////////////

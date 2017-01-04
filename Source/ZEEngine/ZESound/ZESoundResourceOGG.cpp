@@ -156,6 +156,7 @@ ZESoundResourceOGG::ZESoundResourceOGG()
 	DataSize = 0;
 	MemoryCursor = 0;
 	memset(&OggFile, 0, sizeof(OggVorbis_File));
+	Register();
 }
 
 ZESoundResourceOGG::~ZESoundResourceOGG()

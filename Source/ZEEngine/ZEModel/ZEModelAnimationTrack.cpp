@@ -58,6 +58,23 @@ void ZEModelAnimationTrack::SetState(ZEModelAnimationState State)
 		GetModel()->AnimationStateChanged();
 }
 
+
+void ZEModelAnimationTrack::BindAnimation()
+{
+	if (ModelResource.IsNull())  // No External Resource
+		return;
+
+	if (Model == NULL)
+		ResourceAnimation = NULL;
+
+	if (Model->GetModelResource() == NULL)
+		ResourceAnimation = NULL;
+
+	ResourceAnimation = GetModel()->GetModelResource()->GetAnimation(AnimationName);
+
+	ApplyLimits();
+}
+
 void ZEModelAnimationTrack::UpdateAnimation()
 {
 	if (GetState() == ZE_MAS_PLAYING && !(BlendFactor == 0.0f)) // && !(LOD != -1 && Model->ActiveLOD > LOD) //ActiveLOD Removed from Model.
@@ -189,14 +206,29 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 	}
 }
 
-ZEModel* ZEModelAnimationTrack::GetModel()
+ZEModel* ZEModelAnimationTrack::GetModel() const
 {
 	return Model;
 }
 
-ZEModelAnimationState ZEModelAnimationTrack::GetState()
+ZEModelAnimationState ZEModelAnimationTrack::GetState() const
 {
 	return State;
+}
+
+void ZEModelAnimationTrack::SetAnimation(const ZEString& Animation)
+{
+	if (AnimationName == Animation)
+		return;
+
+	AnimationName = Animation;
+
+	BindAnimation();
+}
+
+const ZEString& ZEModelAnimationTrack::GetAnimation() const
+{
+	return AnimationName;
 }
 
 void ZEModelAnimationTrack::SetLOD(ZEUInt LOD)
@@ -204,12 +236,12 @@ void ZEModelAnimationTrack::SetLOD(ZEUInt LOD)
 	this->LOD = LOD;
 }
 
-ZEUInt ZEModelAnimationTrack::GetLOD()
+ZEUInt ZEModelAnimationTrack::GetLOD() const
 {
 	return LOD;
 }
 
-void ZEModelAnimationTrack::SetResource(const ZEMDResourceAnimation* ResourceAnimation)
+void ZEModelAnimationTrack::SetExternalResource(const ZEMDResourceAnimation* ResourceAnimation)
 {
 	if (this->ResourceAnimation == ResourceAnimation)
 		return;
@@ -217,14 +249,16 @@ void ZEModelAnimationTrack::SetResource(const ZEMDResourceAnimation* ResourceAni
 	Stop();
 
 	if (ResourceAnimation != NULL)
-		Resource = ResourceAnimation->GetResource();
+		ModelResource = ResourceAnimation->GetResource();
+	else
+		ModelResource = NULL;
 
 	this->ResourceAnimation = ResourceAnimation;
 
 	ApplyLimits();
 }
 
-const ZEMDResourceAnimation* ZEModelAnimationTrack::GetResource()
+const ZEMDResourceAnimation* ZEModelAnimationTrack::GetExternalResource() const
 {
 	return ResourceAnimation;
 }
@@ -283,12 +317,12 @@ void ZEModelAnimationTrack::SetCurrentFrameByPercentage(float Percentage)
 
 }
 
-float ZEModelAnimationTrack::GetCurrentFrame()
+float ZEModelAnimationTrack::GetCurrentFrame() const
 {
 	return CurrentFrame;
 }
 
-float ZEModelAnimationTrack::GetCurrentFrameByTime()
+float ZEModelAnimationTrack::GetCurrentFrameByTime() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -300,7 +334,7 @@ float ZEModelAnimationTrack::GetCurrentFrameByTime()
 
 }
 
-float ZEModelAnimationTrack::GetCurrentFrameByPercentage()
+float ZEModelAnimationTrack::GetCurrentFrameByPercentage() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -357,12 +391,12 @@ void ZEModelAnimationTrack::SetStartFrameByPercentage(float Percentage)
 	}
 }
 
-ZEUInt ZEModelAnimationTrack::GetStartFrame()
+ZEUInt ZEModelAnimationTrack::GetStartFrame() const
 {
 	return StartFrame;
 }
 
-float ZEModelAnimationTrack::GetStartFrameByTime()
+float ZEModelAnimationTrack::GetStartFrameByTime() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -373,7 +407,7 @@ float ZEModelAnimationTrack::GetStartFrameByTime()
 	return (float)StartFrame / GetFrameRate();
 }
 
-float ZEModelAnimationTrack::GetStartFrameByPercentage()
+float ZEModelAnimationTrack::GetStartFrameByPercentage() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -431,12 +465,12 @@ void ZEModelAnimationTrack::SetEndFrameByPercentage(float Percentage)
 
 }
 
-ZEUInt ZEModelAnimationTrack::GetEndFrame()
+ZEUInt ZEModelAnimationTrack::GetEndFrame() const
 {
 	return EndFrame;
 }
 
-float ZEModelAnimationTrack::GetEndFrameByTime()
+float ZEModelAnimationTrack::GetEndFrameByTime() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -447,7 +481,7 @@ float ZEModelAnimationTrack::GetEndFrameByTime()
 	return (float)EndFrame / GetFrameRate();
 }
 
-float ZEModelAnimationTrack::GetEndFrameByPercentage()
+float ZEModelAnimationTrack::GetEndFrameByPercentage() const
 {
 	if (ResourceAnimation == NULL)
 		return 0.0f;
@@ -463,7 +497,7 @@ void ZEModelAnimationTrack::SetLooping(bool Enabled)
 	Looping = Enabled;
 }
 
-bool ZEModelAnimationTrack::GetLooping()
+bool ZEModelAnimationTrack::GetLooping() const
 {
 	return Looping;
 }
@@ -511,7 +545,7 @@ ZEModelAnimationTrack::ZEModelAnimationTrack() : ModelLink(this)
 
 ZEModelAnimationTrack::~ZEModelAnimationTrack()
 {
-	SetResource(NULL);
+	SetExternalResource(NULL);
 
 	if (GetModel() != NULL)
 		GetModel()->RemoveAnimationTrack(this);
@@ -524,7 +558,7 @@ void ZEModelAnimationTrack::SetLimitsEnabled(bool Enabled)
 	ApplyLimits();
 }
 
-bool ZEModelAnimationTrack::GetLimitsEnabled()
+bool ZEModelAnimationTrack::GetLimitsEnabled() const
 {
 	return LimitsEnabled;
 }
@@ -534,7 +568,7 @@ void ZEModelAnimationTrack::SetBlendFactor(float Factor)
 	BlendFactor = Factor;
 }
 
-float ZEModelAnimationTrack::GetBlendFactor()
+float ZEModelAnimationTrack::GetBlendFactor() const
 {
 	return BlendFactor;
 }
@@ -544,12 +578,12 @@ void ZEModelAnimationTrack::SetSpeed(float Speed)
 	this->Speed = Speed;
 }
 
-float ZEModelAnimationTrack::GetSpeed()
+float ZEModelAnimationTrack::GetSpeed() const
 {
 	return Speed;
 }
 
-float ZEModelAnimationTrack::GetFrameRate()
+float ZEModelAnimationTrack::GetFrameRate() const
 {
 	if (ResourceAnimation != NULL)
 		return ResourceAnimation->GetFramesPerSecond() * Speed;
@@ -562,7 +596,7 @@ void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
 	this->BlendMode = Mode;
 }
 
-ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode()
+ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode() const
 {
 	return this->BlendMode;
 }

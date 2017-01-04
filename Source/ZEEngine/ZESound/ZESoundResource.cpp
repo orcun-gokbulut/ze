@@ -62,11 +62,11 @@ ZERSResource* ZESoundResource::Instanciator(const void* Parameters)
 {
 	ZEPathInfo FileInfo(*reinterpret_cast<const ZEString*>(Parameters));
 
-	if (FileInfo.GetExtension().Lower() == "mp3")
+	if (FileInfo.GetExtension().EqualsIncase(".mp3"))
 		return new ZESoundResourceMP3();
-	else if(FileInfo.GetExtension().Lower() == "wav")
+	else if(FileInfo.GetExtension().EqualsIncase(".wav"))
 		return  new ZESoundResourceWAV();
-	else if(FileInfo.GetExtension().Lower() == "ogg")
+	else if(FileInfo.GetExtension().EqualsIncase(".ogg"))
 		return  new ZESoundResourceOGG();
 	
 	return  NULL;

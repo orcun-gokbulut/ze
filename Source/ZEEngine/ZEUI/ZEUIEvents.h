@@ -34,12 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_EVENTS_H__
-#define __ZE_UI_EVENTS_H__
 
-#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEDelegate.h"
-#include "ZEUI/ZEUIManager.h"
+#include "ZEMath/ZEVector.h"
 
 enum ZEUIInputKey;
 enum ZEUIMouseKey
@@ -68,9 +65,3 @@ typedef ZEDelegate<void (ZEUIInputKey)>						ZEUIEventKeyReleased;
 // Component Event
 typedef ZEDelegate<void ()>									ZEUIEventFocusLost;
 typedef ZEDelegate<void ()>									ZEUIEventFocusGained;
-
-#endif
-
-
-
-

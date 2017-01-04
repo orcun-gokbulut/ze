@@ -102,6 +102,9 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
+		ZEEntity*								GetEntityInternal(ZEEntity* ParentEntity, const ZEString& Name);
+		ZEArray<ZEEntity*>						GetEntitiesInternal(ZEEntity* ParentEntity, ZEClass* Class);
+
 		bool									InitializeInternal();
 		bool									DeinitializeInternal();
 
@@ -135,7 +138,8 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEUInt									GetLoadingPercentage();
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
-		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
+		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class, bool Recursive = false);
+		ZEArray<ZEEntity*>						GetEntities(const ZEString& Name, bool Recursive = false);
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		void									ClearEntities();

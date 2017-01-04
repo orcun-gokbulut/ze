@@ -209,8 +209,8 @@ ZETaskResult ZEMDResource::LoadInternal()
 	zeCheckError(!ModelNode.IsValid(), ZE_TR_FAILED, "Cannot load model resource. Invalid Model node. File Name: \"%s\".", GetFileName().ToCString());
 	zeCheckError(ModelNode.GetName() != "ZEModel", ZE_TR_FAILED, "Cannot load model resource. Invalid Model node name. File Name: \"%s\".", GetFileName().ToCString());
 
-	ZEUInt8 MajorVersion = ModelNode.ReadUInt8("MajorVersion");
-	ZEUInt8 MinorVersion = ModelNode.ReadUInt8("MinorVersion");
+	ZEUInt8 MajorVersion = ModelNode.ReadUInt8("VersionMajor", ModelNode.ReadUInt8("MajorVersion", 0));
+	ZEUInt8 MinorVersion = ModelNode.ReadUInt8("VersionMinor", ModelNode.ReadUInt8("MinorVersion", 0));
 	if (MajorVersion != 2)
 	{
 		zeError("Cannot load model resource. Major version mismatch. Please run converter tool on this file. Current Version: 2.0. File Version: %d.%d, File Name: \"%s\".", MajorVersion, MinorVersion, GetFileName().ToCString());
@@ -335,6 +335,22 @@ const ZEList2<const ZEMDResourceMesh>& ZEMDResource::GetMeshes() const
 	return Meshes.ToInspector();
 }
 
+ZEMDResourceMesh* ZEMDResource::GetMesh(const ZEString& Name)
+{
+	ze_for_each(Mesh, Meshes)
+	{
+		if (Mesh->GetName() == Name)
+			return Mesh.GetPointer();
+	}
+
+	return NULL;
+}
+
+const ZEMDResourceMesh* ZEMDResource::GetMesh(const ZEString& Name) const
+{
+	return const_cast<ZEMDResource*>(this)->GetMesh(Name);
+}
+
 void ZEMDResource::AddMesh(ZEMDResourceMesh* Mesh)
 {
 	zeCheckError(Mesh == NULL, ZE_VOID, "Cannot add mesh. Mesh is NULL.");
@@ -377,6 +393,22 @@ const ZEList2<const ZEMDResourceBone>& ZEMDResource::GetBones() const
 	return Bones.ToInspector();
 }
 
+ZEMDResourceBone* ZEMDResource::GetBone(const ZEString& Name)
+{
+	ze_for_each(Bone, Bones)
+	{
+		if (Bone->GetName() == Name)
+			return Bone.GetPointer();
+	}
+
+	return NULL;
+}
+
+const ZEMDResourceBone* ZEMDResource::GetBone(const ZEString& Name) const
+{
+	return const_cast<ZEMDResource*>(this)->GetBone(Name);
+}
+
 void ZEMDResource::AddBone(ZEMDResourceBone* Bone)
 {
 	zeCheckError(Bone == NULL, ZE_VOID, "Cannot add bone. Bone is NULL.");
@@ -402,6 +434,22 @@ const ZEList2<ZEMDResourceAnimation>& ZEMDResource::GetAnimations()
 const ZEList2<const ZEMDResourceAnimation>& ZEMDResource::GetAnimations() const
 {
 	return Animations.ToInspector();
+}
+
+ZEMDResourceAnimation* ZEMDResource::GetAnimation(const ZEString& Name)
+{
+	ze_for_each(Animation, Animations)
+	{
+		if (Animation->GetName() == Name)
+			return Animation.GetPointer();
+	}
+
+	return NULL;
+}
+
+const ZEMDResourceAnimation* ZEMDResource::GetAnimation(const ZEString& Name) const
+{
+	return const_cast<ZEMDResource*>(this)->GetAnimation(Name);
 }
 
 void ZEMDResource::AddAnimation(ZEMDResourceAnimation* Animation)
@@ -435,6 +483,23 @@ void ZEMDResource::AddHelper(ZEMDResourceHelper* Helper)
 	Helper->Resource = this;
 	Helpers.AddEnd(&Helper->Link);
 }
+
+ZEMDResourceHelper* ZEMDResource::GetHelper(const ZEString& Name)
+{
+	ze_for_each(Helper, Helpers)
+	{
+		if (Helper->GetName() == Name)
+			return Helper.GetPointer();
+	}
+
+	return NULL;
+}
+
+const ZEMDResourceHelper* ZEMDResource::GetHelper(const ZEString& Name) const
+{
+	return const_cast<ZEMDResource*>(this)->GetHelper(Name);
+}
+
 
 void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 {

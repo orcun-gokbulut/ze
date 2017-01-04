@@ -183,75 +183,75 @@ void ZEScene::AddToTickList(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
 	 
 	TickList.LockWrite();
-	
-	if (Entity->TickListLink.GetInUse())
 	{
-		TickList.UnlockWrite();
-		return;
+		if (Entity->TickListLink.GetInUse())
+		{
+			TickList.UnlockWrite();
+			return;
+		}
+
+		TickList.AddEnd(&Entity->TickListLink);
 	}
-
-	TickList.AddEnd(&Entity->TickListLink);
-
 	TickList.UnlockWrite();
 }
 
 void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 {
 	TickList.LockWrite();
-
-	if (!Entity->TickListLink.GetInUse())
 	{
-		TickList.UnlockWrite();
-		return;
+		if (!Entity->TickListLink.GetInUse())
+		{
+			TickList.UnlockWrite();
+			return;
+		}
+
+		TickList.Remove(&Entity->TickListLink);
 	}
-
-	TickList.Remove(&Entity->TickListLink);
-
 	TickList.UnlockWrite();
 }
 
 void ZEScene::AddToRenderList(ZEEntity* Entity)
 {
 	RenderList.LockWrite();
-
-	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
-	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
+	{
+		zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
+		zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
 	
-	if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
-	{
-		RenderList.UnlockWrite();
-		return;
-	}
+		if (Entity->RenderListLink.GetInUse() || Entity->RenderListOctree != NULL)
+		{
+			RenderList.UnlockWrite();
+			return;
+		}
 
-	if (SpatialDatabase && 
-		Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
-		Entity->GetStatic())
-	{
-		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		if (SpatialDatabase && 
+			Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
+			Entity->GetStatic())
+		{
+			Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		}
+		else
+		{
+			RenderList.AddEnd(&Entity->RenderListLink);
+		}
 	}
-	else
-	{
-		RenderList.AddEnd(&Entity->RenderListLink);
-	}
-
 	RenderList.UnlockWrite();
 }
 
 void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 {
 	RenderList.LockWrite();
-	
-	if (Entity->RenderListLink.GetInUse())
 	{
-		RenderList.Remove(&Entity->RenderListLink);
-		Entity->RenderListOctree = NULL;
+		if (Entity->RenderListLink.GetInUse())
+		{
+			RenderList.Remove(&Entity->RenderListLink);
+			Entity->RenderListOctree = NULL;
+		}
+		else if (Entity->RenderListOctree != NULL)
+		{
+			Entity->RenderListOctree->RemoveItem(Entity);
+			Entity->RenderListOctree = NULL;
+		}
 	}
-	else if (Entity->RenderListOctree != NULL)
-	{
-		Entity->RenderListOctree->RemoveItem(Entity);
-		Entity->RenderListOctree = NULL;
-	}
-	
 	RenderList.UnlockWrite();
 }
 
@@ -265,12 +265,12 @@ void ZEScene::UpdateOctree(ZEEntity* Entity)
 		return;
 
 	RenderList.LockWrite();
-	
-	if (Entity->RenderListOctree != NULL)
-		Entity->RenderListOctree->RemoveItem(Entity);
+	{
+		if (Entity->RenderListOctree != NULL)
+			Entity->RenderListOctree->RemoveItem(Entity);
 
-	Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
-	
+		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+	}
 	RenderList.UnlockWrite();
 }
 
@@ -378,7 +378,7 @@ ZEUInt ZEScene::GetLoadingPercentage()
 	TotalScore.Score = 0;
 	TotalScore.Count = 0;
 
-	ZE_LOCK_SECTION(SceneLock)
+	Entities.LockRead();
 	{
 		for (ZESize I = 0; I < Entities.GetCount(); I++)
 		{
@@ -387,6 +387,7 @@ ZEUInt ZEScene::GetLoadingPercentage()
 			TotalScore.Count += EntityScore.Count;
 		}
 	}
+	Entities.UnlockRead();
 
 	if (TotalScore.Count == 0)
 		return 100;
@@ -399,20 +400,42 @@ const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 	return Entities;
 }
 
-ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
+ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class, bool Recursive)
 {
-	ZEArray<ZEEntity*> ProperEntities;
-	ZEEntity* CurrentEntity = NULL;
-	ProperEntities.Clear();
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
+	ZEArray<ZEEntity*> Output;
+	Entities.LockRead();
 	{
-		CurrentEntity = Entities[I];
-		if (Class->IsDerivedFrom(Class, CurrentEntity->GetClass()))
-			ProperEntities.Add(CurrentEntity);
-	}
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(Class, Entities[I]))
+				Output.Add(Entities[I]);
 
-	return ProperEntities;
+			if (Recursive)
+				Entities[I]->GetChildEntitiesInternal(Class, Output);
+		}
+	}
+	Entities.UnlockRead();
+
+	return Output;
+}
+
+ZEArray<ZEEntity*> ZEScene::GetEntities(const ZEString& Name, bool Recursive)
+{
+	ZEArray<ZEEntity*> Output;
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (Entities[I]->GetName() == Name)
+				Output.Add(Entities[I]);
+
+			if (Recursive)
+				Entities[I]->GetChildEntitiesInternal(Name, Output);
+		}
+	}
+	Entities.UnlockRead();
+
+	return Output;
 }
 
 void ZEScene::AddEntity(ZEEntity* Entity)
@@ -420,11 +443,12 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 	zeCheckError(Entity == NULL, ZE_VOID, "Entity is NULL.");
 	zeCheckError(Entity->GetScene() != NULL, ZE_VOID, "Entity is already added to a scene.");
 
-	ZE_LOCK_SECTION(SceneLock)
+	Entities.LockWrite();
 	{
 		Entity->SetEntityId(LastEntityId++);
 		Entities.Add(Entity);
 	}
+	Entities.UnlockWrite();
 	
 	Entity->SetScene(this);
 	Entity->Load();
@@ -445,16 +469,21 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 	Entity->Deinitialize();
 	Entity->SetScene(NULL);
 
-	ZE_LOCK_SECTION(SceneLock)
+	Entities.LockWriteNested();
 	{
 		Entities.RemoveValue(Entity);
 	}
+	Entities.UnlockWrite();
 }
 
 void ZEScene::ClearEntities()
 {
-	while(Entities.GetCount() != 0)
-		Entities.GetFirstItem()->Destroy();
+	Entities.LockWriteNested();
+	{
+		while(Entities.GetCount() != 0)
+			Entities.GetFirstItem()->Destroy();
+	}
+	Entities.UnlockWrite();
 }
 
 void ZEScene::Tick(float ElapsedTime)
@@ -512,40 +541,40 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 	float TotalCullRatio = 0.0f;
 
 	RenderList.LockRead();
-
-	TotalRenderableEntity = RenderListOctree.GetTotalItemCount() + RenderList.GetCount();
-
-	ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
 	{
-		OctreeVisitedNodeCount++;
-		OctreeProcessedEntity += Node->GetItems().GetCount();
-		for (ZESize I = 0; I < Node->GetItems().GetCount(); I++)
-		{		
-			ZEEntity* Entity = Node->GetItems()[I];
-			if (PreRenderEntity(Entity, Parameters))
+		TotalRenderableEntity = RenderListOctree.GetTotalItemCount() + RenderList.GetCount();
+
+		ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
+		{
+			OctreeVisitedNodeCount++;
+			OctreeProcessedEntity += Node->GetItems().GetCount();
+			for (ZESize I = 0; I < Node->GetItems().GetCount(); I++)
+			{		
+				ZEEntity* Entity = Node->GetItems()[I];
+				if (PreRenderEntity(Entity, Parameters))
+					RenderedEntity++;
+				else
+					ViewTestCulledEntity++;
+			}
+		}
+
+		OctreeCulledEntity = RenderListOctree.GetTotalItemCount() - OctreeProcessedEntity;
+		OctreeCullRatio = (float)OctreeCulledEntity / (float)RenderListOctree.GetTotalItemCount();
+		OctreePerformanceRatio = 1.0f - (float)(OctreeProcessedEntity + OctreeVisitedNodeCount) / (float)RenderListOctree.GetTotalItemCount();
+
+		ze_for_each(Entity, RenderList)
+		{
+			if (PreRenderEntity(Entity.GetPointer(), Parameters))
 				RenderedEntity++;
 			else
 				ViewTestCulledEntity++;
 		}
+		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)RenderList.GetCount();
+
+		RenderRatio = (float)RenderedEntity / (float)TotalRenderableEntity;
+		CulledEntity = TotalRenderableEntity - RenderedEntity;
+		CullRatio = (float)CulledEntity / (float)TotalRenderableEntity;
 	}
-
-	OctreeCulledEntity = RenderListOctree.GetTotalItemCount() - OctreeProcessedEntity;
-	OctreeCullRatio = (float)OctreeCulledEntity / (float)RenderListOctree.GetTotalItemCount();
-	OctreePerformanceRatio = 1.0f - (float)(OctreeProcessedEntity + OctreeVisitedNodeCount) / (float)RenderListOctree.GetTotalItemCount();
-
-	ze_for_each(Entity, RenderList)
-	{
-		if (PreRenderEntity(Entity.GetPointer(), Parameters))
-			RenderedEntity++;
-		else
-			ViewTestCulledEntity++;
-	}
-	ViewTestCullRatio = (float)ViewTestCulledEntity / (float)RenderList.GetCount();
-
-	RenderRatio = (float)RenderedEntity / (float)TotalRenderableEntity;
-	CulledEntity = TotalRenderableEntity - RenderedEntity;
-	CullRatio = (float)CulledEntity / (float)TotalRenderableEntity;
-	
 	RenderList.UnlockRead();
 
 	Parameters->Renderer->EndScene();

@@ -76,7 +76,7 @@ const ZEGRTexture* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 	if (FileName == "")
 		return NULL;
 
-	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
+	/*for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture2D();
 
@@ -86,8 +86,8 @@ const ZEGRTexture* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 		zeError("Can not load texture file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
-	TextureResources.Add(NewTextureResource);
-	return NewTextureResource->GetTexture2D();
+	TextureResources.Add(NewTextureResource);*/
+	return NULL; //NewTextureResource->GetTexture2D();
 }
 
 bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
@@ -418,7 +418,7 @@ const char* ZEInteriorResource::GetResourceType() const
 	return "Interior Resource";
 }
 
-const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
+const ZEArray<ZEHolder<ZEGRTexture>>& ZEInteriorResource::GetTextures() const
 {
 	return TextureResources;
 }
@@ -520,8 +520,5 @@ ZEInteriorResource* ZEInteriorResource::LoadResource(const ZEString& FileName)
 
 ZEInteriorResource::~ZEInteriorResource()
 {
-	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
-		TextureResources[I]->Release();
 
-	TextureResources.Clear();
 }

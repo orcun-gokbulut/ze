@@ -80,10 +80,12 @@ class ZESoundSource : public ZEEntity
 		ZESize								EndPosition;
 
 	protected:
+		ZEString							SoundFileName;
 		ZEHolder<const ZESoundResource>		SoundResource;
+		bool								SoundResourceExternal;
 		ZESoundSourceState					SoundSourceState;
 		ZESoundSourceType					SoundSourceType;
-
+		
 		ZEInt								Pan;
 		float								PlaybackSpeed;
 		ZEUInt								Volume;
@@ -97,7 +99,11 @@ class ZESoundSource : public ZEEntity
 		ZESize								EffectiveEndPosition;
 		bool								LimitsEnabled;
 
+		virtual void						UpdateResource();
 		void								ResetParameters();
+		
+		virtual ZEEntityResult				LoadInternal() override;
+		virtual ZEEntityResult				UnloadInternal() override;
 
 											ZESoundSource();
 		virtual 							~ZESoundSource();
@@ -159,7 +165,10 @@ class ZESoundSource : public ZEEntity
 		virtual void						Pause() = 0;
 		virtual void						Stop() = 0;
 
-		virtual void						SetSoundResource(ZEHolder<const ZESoundResource> Resource) = 0;
+		void								SetSoundFileName(const ZEString& FileName);
+		const ZEString&						GetSoundFileName() const;
+
+		void								SetSoundResource(ZEHolder<const ZESoundResource> Resource);
 		ZEHolder<const ZESoundResource>		GetSoundResource() const;
 
 		static ZESoundSource*				CreateInstance();

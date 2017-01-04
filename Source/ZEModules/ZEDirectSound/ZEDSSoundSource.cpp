@@ -38,6 +38,27 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZEMath.h"
 
+
+void ZEDSSoundSource::UpdateResource()
+{
+	ZESoundSource::UpdateResource();
+
+	if (GetSoundResource() != NULL)
+	{
+		CreateBuffer(false);
+		SetLimitsEnabled(LimitsEnabled);
+	}
+	else
+	{
+		SoundSourceState = ZE_SSS_NONE;
+		if (DSBuffer != NULL)
+		{
+			DSBuffer->Release();
+			DSBuffer = NULL;
+		}
+	}
+}
+
 bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 {
 	if (DSBuffer != NULL)
@@ -452,29 +473,4 @@ void ZEDSSoundSource::Update(float ElapsedTime)
 	// Stream
 	if (Streaming)
 		Stream();
-}
-
-void ZEDSSoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
-{
-	if (SoundResource == Resource)
-		return;
-
-	SoundResource = Resource;
-
-	if (Resource != NULL)
-	{
-
-		CreateBuffer(false);
-		SetLimitsEnabled(LimitsEnabled);
-
-	}
-	else
-	{
-		SoundSourceState = ZE_SSS_NONE;
-		if (DSBuffer != NULL)
-		{
-			DSBuffer->Release();
-			DSBuffer = NULL;
-		}
-	}
 }
