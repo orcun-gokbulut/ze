@@ -46,6 +46,7 @@
 #include "ZEDViewportEvent.h"
 #include "ZEDUserInterface/ZEDCommandManager.h"
 #include "ZEUI/ZEUIFrameControl.h"
+#include "ZEUI/ZEUIManager.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZEError.h"

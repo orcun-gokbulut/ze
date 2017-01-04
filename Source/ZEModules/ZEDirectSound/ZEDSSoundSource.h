@@ -34,54 +34,49 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_SOUND_SOURCE_H__
-#define __ZE_DS_SOUND_SOURCE_H__
 
-#include "ZETypes.h"
-#include "ZEDSComponentBase.h"
 #include "ZESound/ZESoundSource.h"
+#include "ZEDSComponentBase.h"
 
 #include <dsound.h>
-
+#undef UpdateResource
 
 class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 {
 	friend class ZEDSModule;
 	private:
-		LPDIRECTSOUNDBUFFER			DSBuffer;
-		ZESize						BufferSampleCount;
-		ZESize						OldBufferPosition;
-		ZESize						StreamPosition;
-		ZEInt						LastUpdatedBufferChunk;
+		LPDIRECTSOUNDBUFFER				DSBuffer;
+		ZESize							BufferSampleCount;
+		ZESize							OldBufferPosition;
+		ZESize							StreamPosition;
+		ZEInt							LastUpdatedBufferChunk;
 
-		bool						CreateBuffer(bool Is3D);
-		void						ResetParameters();
+		virtual void					UpdateResource() override;
 
-		void						Stream();
-		void						ResetStream();
-		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+		bool							CreateBuffer(bool Is3D);
+		void							ResetParameters();
 
-									ZEDSSoundSource();
-		virtual						~ZEDSSoundSource();
+		void							Stream();
+		void							ResetStream();
+		void							StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+
+										ZEDSSoundSource();
+		virtual							~ZEDSSoundSource();
 
 	public:
-		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(ZESize SampleIndex);
-		virtual ZESize				GetCurrentPosition();
+		virtual void					SetSoundSourceState(ZESoundSourceState State);
+		virtual void					SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize					GetCurrentPosition();
 
-		virtual void				SetPan(ZEInt NewPan);
-		virtual void				SetPlaybackSpeed(float Speed);
-		virtual void				SetVolume(ZEUInt NewVolume);
-		virtual void				SetLooping(bool Enabled);				
+		virtual void					SetPan(ZEInt NewPan);
+		virtual void					SetPlaybackSpeed(float Speed);
+		virtual void					SetVolume(ZEUInt NewVolume);
+		virtual void					SetLooping(bool Enabled);				
 							
-		virtual void				Play();
-		virtual void				Resume();
-		virtual void				Pause();
-		virtual void				Stop();
+		virtual void					Play();
+		virtual void					Resume();
+		virtual void					Pause();
+		virtual void					Stop();
 
-		void						Update(float ElapsedTime);
-
-		virtual void				SetSoundResource(ZEHolder<const ZESoundResource> Resource);
+		void							Update(float ElapsedTime);
 };
-
-#endif

@@ -314,7 +314,7 @@ bool ZEGRWindow::GetCursorVisible() const
 
 bool ZEGRWindow::GetCursorLocked() const
 {
-	return LastCursorLock == this;
+	return CursorLocked;
 }
 
 void ZEGRWindow::SetManageInputAcquisition(bool Enabled)

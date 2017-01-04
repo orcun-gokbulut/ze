@@ -172,6 +172,12 @@ class ZEEntity : public ZEObject
 		bool									DestroyInternalChainCheck;
 		#endif
 
+		void 									GetComponentsInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const;
+		void 									GetComponentsInternal(const ZEString& Name, ZEArray<ZEEntity*>& Output) const;
+
+		void 									GetChildEntitiesInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const;
+		void									GetChildEntitiesInternal(const ZEString& Name, ZEArray<ZEEntity*>& Output) const;
+
 		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
 		void									UpdateStateSerial();
 		void									UpdateState();
@@ -199,6 +205,8 @@ class ZEEntity : public ZEObject
 		virtual ZEEntityResult					DeinitializeInternal();
 
 		const ZEArray<ZEEntity*>&				GetComponents() const;
+		const ZEArray<ZEEntity*>				GetComponents(ZEClass* Class, bool Recursive = false) const;
+		const ZEArray<ZEEntity*>				GetComponents(const ZEString& Name, bool Recursive = false) const;
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
 		void									ClearComponents();
@@ -230,6 +238,8 @@ class ZEEntity : public ZEObject
 		virtual ZEEntityFlags					GetEntityFlags() const final;
 
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
+		const ZEArray<ZEEntity*>				GetChildEntities(ZEClass* Class, bool Recursive = false) const;
+		const ZEArray<ZEEntity*>				GetChildEntities(const ZEString& Name, bool Recursive = false) const;
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
 		void									ClearChildEntities();

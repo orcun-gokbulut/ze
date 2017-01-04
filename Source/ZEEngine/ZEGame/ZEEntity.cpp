@@ -53,6 +53,65 @@
 #define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
 #define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
 
+void ZEEntity::GetComponentsInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const
+{
+	Components.LockRead();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetName() == Name)
+				Output.Add(Components[I]);
+
+			GetComponentsInternal(Name, Output);
+		}
+	}
+	Components.UnlockRead();
+}
+
+void ZEEntity::GetComponentsInternal(const ZEString& Name, ZEArray<ZEEntity*>& Output) const
+{
+	Components.LockRead();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetName() == Name)
+				Output.Add(Components[I]);
+
+			GetComponentsInternal(Name, Output);
+		}
+	}
+	Components.UnlockRead();
+}
+
+void ZEEntity::GetChildEntitiesInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const
+{
+	ChildEntities.LockRead();
+	{
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(Class, ChildEntities[I]))
+				Output.Add(ChildEntities[I]);
+
+			GetChildEntitiesInternal(Name, Output);
+		}
+	}
+	ChildEntities.UnlockRead();
+}
+
+void ZEEntity::GetChildEntitiesInternal(const ZEString& Name, ZEArray<ZEEntity*>& Output) const
+{
+	ChildEntities.LockRead();
+	{
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetName() == Name)
+				Output.Add(ChildEntities[I]);
+
+			GetChildEntitiesInternal(Name, Output);
+		}
+	}
+	ChildEntities.UnlockRead();
+}
 
 void ZEEntity::SetWrapper(ZEDObjectWrapper* Wrapper)
 {
@@ -860,9 +919,85 @@ const ZEArray<ZEEntity*>& ZEEntity::GetComponents() const
 	return Components;
 }
 
+const ZEArray<ZEEntity*> ZEEntity::GetComponents(ZEClass* Class, bool Recursive) const
+{
+	ZEArray<ZEEntity*> Output;
+	Components.LockRead();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(Class, Components[I]))
+				Output.Add(Components[I]);
+
+			if (Recursive)
+				GetComponentsInternal(Class, Output);
+		}
+	}
+	Components.UnlockRead();
+	
+	return Output;
+}
+
+const ZEArray<ZEEntity*> ZEEntity::GetComponents(const ZEString& Name, bool Recursive) const
+{
+	ZEArray<ZEEntity*> Output;
+	Components.LockRead();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetName() == Name)
+				Output.Add(Components[I]);
+
+			if (Recursive)
+				GetComponentsInternal(Name, Output);
+		}
+	}
+	Components.UnlockRead();
+
+	return Output;
+}
+
 const ZEArray<ZEEntity*>& ZEEntity::GetChildEntities() const
 {
 	return ChildEntities; 
+}
+
+const ZEArray<ZEEntity*> ZEEntity::GetChildEntities(ZEClass* Class, bool Recursive) const
+{
+	ZEArray<ZEEntity*> Output;
+	ChildEntities.LockRead();
+	{
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(Class, ChildEntities[I]))
+				Output.Add(ChildEntities[I]);
+
+			if (Recursive)
+				GetChildEntitiesInternal(Class, Output);
+		}
+	}
+	ChildEntities.UnlockRead();
+
+	return Output;
+}
+
+const ZEArray<ZEEntity*> ZEEntity::GetChildEntities(const ZEString& Name, bool Recursive) const
+{
+	ZEArray<ZEEntity*> Output;
+	ChildEntities.LockRead();
+	{
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetName() == Name)
+				Output.Add(ChildEntities[I]);
+
+			if (Recursive)
+				GetChildEntitiesInternal(Name, Output);
+		}
+	}
+	ChildEntities.UnlockRead();
+
+	return Output;
 }
 
 const ZEAABBox& ZEEntity::GetBoundingBox() const

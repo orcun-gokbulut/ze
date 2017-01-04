@@ -34,7 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUILabel.h"
+
 #include "ZEUIFont.h"
+#include "ZEUIRenderer.h"
+#include "ZEUIManager.h"
 #include "ZEGraphics/ZEGRTexture.h"
 
 void ZEUILabel::UpdateCharacters()

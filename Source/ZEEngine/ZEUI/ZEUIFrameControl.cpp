@@ -34,11 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIFrameControl.h"
+
 #include "ZEUIRenderer.h"
 #include "ZEUICheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
+#include "ZEUIManager.h"
 #include "ZEGraphics/ZEGRTexture.h"
-#include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEPathInfo.h"
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)

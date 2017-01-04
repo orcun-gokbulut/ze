@@ -34,9 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSSoundSource3D.h"
+
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZEMath.h"
+#include "ZESound/ZESoundModule.h"
+
+void ZEDSSoundSource3D::UpdateResource()
+{
+	ZESoundSource3D::UpdateResource();
+
+	if (GetSoundResource() != NULL)
+	{
+		if (GetSoundResource()->GetChannelCount() != 1)
+		{
+			zeError("Other than one channel (mono) sound resources can not be assigned to 3d sound source.");
+			return;
+		}
+
+		SoundSourceState = ZE_SSS_STOPPED;
+		CreateBuffer();
+		SetLimitsEnabled(LimitsEnabled);
+	}
+	else
+	{
+		SoundSourceState = ZE_SSS_NONE;
+		if (DSBuffer != NULL)
+		{
+			DSBuffer->Release();
+			DSBuffer = NULL;
+		}
+	}
+}
 
 bool ZEDSSoundSource3D::CreateBuffer()
 {
@@ -47,7 +76,7 @@ bool ZEDSSoundSource3D::CreateBuffer()
 	}
 
 	// Check streaming available and use it necessary
-	Streaming = !zeSound->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / (ZESize)SoundResource->GetSamplesPerSecond() > zeSound->GetMaxBufferSize();
+	Streaming = !ZESoundModule::GetInstance()->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / (ZESize)SoundResource->GetSamplesPerSecond() > zeSound->GetMaxBufferSize();
 
 	// Calculate streaming buffer
 	if (Streaming)
@@ -515,46 +544,6 @@ void ZEDSSoundSource3D::Update(float ElapsedTime)
 	}
 
 }
-
-void ZEDSSoundSource3D::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
-{
-	if (SoundResource == Resource)
-		return;
-
-	SoundResource = Resource;
-
-	if (Resource != NULL)
-	{
-		if (Resource->GetChannelCount() != 1)
-		{
-			zeError("Other than one channel (mono) sound resources can not be assigned to 3d sound source.");
-			return;
-		}
-
-		SoundSourceState = ZE_SSS_STOPPED;
-		CreateBuffer();
-		SetLimitsEnabled(LimitsEnabled);
-	}
-	else
-	{
-		SoundSourceState = ZE_SSS_NONE;
-		if (DSBuffer != NULL)
-		{
-			DSBuffer->Release();
-			DSBuffer = NULL;
-		}
-	}
-}
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 
 void ZEDSSoundSource3D::SetPosition(const ZEVector3& NewPosition)
 {

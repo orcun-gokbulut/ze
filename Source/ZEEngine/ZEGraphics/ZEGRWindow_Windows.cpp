@@ -495,6 +495,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		}
 
 		case WM_MBUTTONDOWN:
+			SetCursor(DefaultCursor);
 			ManageCursorLock(this, false);
 			break;
 
@@ -522,46 +523,28 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		case WM_PAINT:
 			ValidateRect((HWND)Handle, NULL);
 			break;
-			
+
+		/*case WM_MOUSEMOVE:
+			if (!CursorVisible)
+			{
+				TRACKMOUSEEVENT tme;
+				tme.cbSize = sizeof(TRACKMOUSEEVENT);
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = (HWND)GetHandle();
+				TrackMouseEvent(&tme);
+			}
+			break;
+
+		case WM_MOUSELEAVE:
+			break;*/
+
 		// Cursor notification
 		case WM_SETCURSOR:
 		{
-			ZEInt32 HitCode = (ZEInt32)(short)LOWORD(lParam);
-			
-			switch (HitCode)
-			{
-				case HTCLIENT:
-					// User defined cursor can be set here
-					if (!CursorVisible)
-						SetCursor(NULL);
-					else
-						SetCursor(DefaultCursor);
-					break;
-
-				case HTTOP:
-				case HTBOTTOM:
-					SetCursor(SNSizeIcon);
-					break;
-
-				case HTLEFT:
-				case HTRIGHT:
-					SetCursor(WESizeIcon);
-					break;
-
-				case HTTOPRIGHT:
-				case HTBOTTOMLEFT:
-					SetCursor(NESWSizeIcon);
-					break;
-
-				case HTTOPLEFT:
-				case HTBOTTOMRIGHT:
-					SetCursor(NWSESizeIcon);
-					break;
-
-				default:
-					SetCursor(DefaultCursor);
-					break;
-			}
+			if (LOWORD(lParam) == HTCLIENT && Focused && Handle == GetHandle()) 
+				SetCursor(CursorVisible ? DefaultCursor : NULL);
+			else
+				return DefWindowProc((HWND)Handle, Message, wParam, lParam);
 			break;
 		}
 
@@ -569,16 +552,17 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		case WM_SETFOCUS:
 		{
 			Focused = true;
+			ManageCursorLock(this, GetCursorLocked());
 			OnFocusGain();
-
 			break;
 		}
 		
 		case WM_KILLFOCUS:
 		{
 			Focused = false;
+			ManageCursorLock(this, false);			
 			OnFocusLoose();
-
+			SetCursor(DefaultCursor);
 			break;
 		}
 

@@ -34,15 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
 
 #include "ZEMeta/ZEObject.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEUIRenderer.h"
 #include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
 #include "ZEUIFont.h"
+#include "ZEInput/ZEInputMap.h"
 
 enum ZEUIInputKey
 {
@@ -225,9 +224,3 @@ class ZEUIManager : public ZEObject, public ZEInitializable
 		static const ZEVector4&				GetDefaultForegroundColor();
 		static ZEHolder<const ZEUIFont>		GetDefaultFontResource();
 };
-
-#endif
-
-
-
-

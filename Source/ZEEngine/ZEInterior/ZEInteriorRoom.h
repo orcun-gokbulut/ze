@@ -76,8 +76,8 @@ class ZEInteriorRoom : public ZEObject
 		ZEArray<ZEInteriorDoor*>				Doors;
 		ZESmartArray<ZEInteriorRoomDraw>		Draws;
 
-		ZEHolder<ZEGRBuffer>				VertexBuffer;
-		ZEHolder<ZEGRBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRBuffer>					VertexBuffer;
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
 		bool									CullPass;
 		bool									IsDrawn;

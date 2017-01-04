@@ -44,25 +44,34 @@ class ZESoundResourceMP3 : public ZESoundResource
 {
 	friend class ZESoundResource;
 	private:
-		unsigned char*					Data;
-		ZESize							DataSize;
+		unsigned char*								Data;
+		ZESize										DataSize;
 
-		mpg123_handle_struct*			mpg123;
-		ZESize							MemoryCursor;
-		mutable ZELock					DecodeLock;
-		
-		ZETaskResult					LoadInternal();
-		ZETaskResult					UnloadInternal();
 
-										ZESoundResourceMP3();
-		virtual							~ZESoundResourceMP3();
+		int											Index;
+		mpg123_handle_struct*						mpg123;
+		ZESize										MemoryCursor;
+		mutable ZELock								DecodeLock;
 
-		static long						MP3Read(ZEInt fd, void *buffer, ZESize nbytes);
-		static long						MP3Seek(ZEInt fd, long offset, ZEInt whence);
+		ZETaskResult								LoadInternal();
+		ZETaskResult								UnloadInternal();
+
+		ZESoundResourceMP3();
+		virtual										~ZESoundResourceMP3();
+
+		static volatile int							LastResourceIndex;
+		static ZESmartArray<ZESoundResourceMP3*>	IndexedResources;
+
+		static int									CreateResourceIndex(ZESoundResourceMP3* Resource);
+		static void									RemoveResourceIndex(ZESoundResourceMP3* Resource);
+		static ZESoundResourceMP3*					IndexResource(int Index);
+
+		static long									MP3Read(ZEInt fd, void *buffer, ZESize nbytes);
+		static long									MP3Seek(ZEInt fd, long offset, ZEInt whence);
 
 	public:
-		virtual ZESize					GetDataSize() const;		
-		virtual const void*				GetData() const;
+		virtual ZESize								GetDataSize() const;		
+		virtual const void*							GetData() const;
 
-		virtual bool					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount) const;
+		virtual bool								Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount) const;
 };

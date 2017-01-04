@@ -34,7 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUTextEditControl.h"
+
 #include "ZEUIFont.h"
+#include "ZEUIManager.h"
 #include "ZEGraphics/ZEGRTexture.h"
 
 void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)

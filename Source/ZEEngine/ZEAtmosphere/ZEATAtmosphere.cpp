@@ -468,6 +468,13 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEATAtmosphere/Clouds.dds");
 	Stars->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/StarMap.dds");
 
+	SunLight = ZELightDirectional::CreateInstance();
+	AddComponent(SunLight);
+
+	MoonLight = ZELightDirectional::CreateInstance();
+	AddComponent(MoonLight);
+
+
 	if (!Update())
 		return ZE_ER_FAILED_CLEANUP;
 

@@ -35,9 +35,49 @@
 
 #include "ZESoundSource.h"
 #include "ZESoundModule.h"
+#include "ZEFile\ZEPathInfo.h"
+
+void ZESoundSource::UpdateResource()
+{
+
+}
+
+ZEEntityResult ZESoundSource::LoadInternal()
+{
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
+
+	ZE_ENTITY_RESOURCE_FENCE_LOADED(SoundResource, ZE_ER_FAILED)
+	{
+		if (!SoundResourceExternal)
+			SoundResource = ZESoundResource::LoadResourceShared(SoundFileName);
+		
+		return ZE_ER_WAIT;
+	}
+
+	if (!LimitsEnabled)
+	{
+		EffectiveStartPosition = 0;
+		EffectiveEndPosition = SoundResource->GetSampleCount();
+	}
+
+	UpdateResource();
+
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZESoundSource::UnloadInternal()
+{
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	
+	if (!SoundResourceExternal)
+		SoundResource.Release();
+
+	return ZE_ER_DONE;
+}
 
 ZESoundSource::ZESoundSource()
 {
+	SoundResourceExternal = false;
 	SoundSourceState = ZE_SSS_NONE;
 	SoundSourceType = ZE_SST_NONE;
 	Pan = ZE_SS_PAN_MIDDLE;
@@ -336,18 +376,32 @@ float ZESoundSource::GetLoopingLenghtPercent()
 	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
 }
 
+void ZESoundSource::SetSoundFileName(const ZEString& FileName)
+{
+	if (ZEPathInfo::Compare(SoundFileName, FileName))
+		return;
+
+	SoundFileName = FileName;
+	
+	if (IsLoadedOrLoading() && !SoundResourceExternal)
+		Reload();
+}
+
+const ZEString& ZESoundSource::GetSoundFileName() const
+{
+	return SoundFileName;
+}
+
 void ZESoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
 {
 	if(SoundResource == Resource)
 		return;
 
-	if (!LimitsEnabled)
-	{
-		EffectiveStartPosition = 0;
-		EffectiveEndPosition = SoundResource->GetSampleCount();
-	}
-
 	SoundResource = Resource;
+	SoundResourceExternal = (Resource != NULL);
+
+	if (IsLoaded())
+		UpdateResource();
 }
 
 ZEHolder<const ZESoundResource> ZESoundSource::GetSoundResource() const

@@ -92,6 +92,26 @@ static ALenum GetBufferFormat(const ZESoundResource* SoundResource)
 			return 0;
 	}
 }
+
+void ZEALSoundSource::UpdateResource()
+{
+	ZESoundSource::UpdateResource();
+
+	if (GetSoundResource() != NULL)
+	{
+		SetLimitsEnabled(LimitsEnabled);
+		if (!CreateBuffer())
+			return;
+
+		SoundSourceState = ZE_SSS_STOPPED;		
+	}
+	else
+	{
+		DestroyBufferSource();
+		SoundSourceState = ZE_SSS_NONE;
+	}
+}
+
 bool ZEALSoundSource::CreateBuffer()
 {
 	ALenum Error; // Notation sucks
@@ -100,7 +120,7 @@ bool ZEALSoundSource::CreateBuffer()
 	DestroyBufferSource();
 
 
-	// Check streaming available and use it necessery
+	// Check streaming available and use it necessary
 	Streaming = !GetModule()->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > GetModule()->GetMaxBufferSize();
 
 	// Calculate streaming buffer
@@ -529,26 +549,4 @@ void ZEALSoundSource::Update(float ElapsedTime)
 	// Stream
 	if (Streaming)
 		Stream();
-}
-
-void ZEALSoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
-{
-	if (SoundResource == Resource)
-		return;
-
-	if (Resource != NULL)
-	{
-		SoundResource = Resource;
-		SetLimitsEnabled(LimitsEnabled);
-		if (!CreateBuffer())
-		{
-			SoundResource = NULL;
-			return;
-		}
-	}
-	else
-	{
-		DestroyBufferSource();
-		SoundSourceState = ZE_SSS_NONE;
-	}
 }

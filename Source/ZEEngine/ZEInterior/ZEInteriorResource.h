@@ -144,7 +144,7 @@ class ZEFile;
 class ZEInteriorResource : public ZEResource
 {
 	private:
-		ZEArray<ZETexture2DResource*>					TextureResources;
+		ZEArray<ZEHolder<ZEGRTexture>>					TextureResources;
 		ZEArray<ZEHolder<const ZERNMaterial>>			Materials;
 		ZEArray<ZEInteriorResourceDoor>					Doors;
 		ZEArray<ZEInteriorResourceRoom>					Rooms;
@@ -155,7 +155,7 @@ class ZEInteriorResource : public ZEResource
 		bool											ReadHelpers(ZEMLReaderNode* HelpersNode);
 		bool											ReadMaterials(ZEMLReaderNode* MaterialsNode);
 
-		const ZEGRTexture*							ManageInteriorMaterialTextures(const ZEString& FileName);
+		const ZEGRTexture*								ManageInteriorMaterialTextures(const ZEString& FileName);
 		bool  											ReadInteriorFromFile(ZEFile* ResourceFile);
 
 		virtual											~ZEInteriorResource();
@@ -163,7 +163,7 @@ class ZEInteriorResource : public ZEResource
 	public:
 		const char*										GetResourceType() const;
 
-		const ZEArray<ZETexture2DResource*>&			GetTextures() const;
+		const ZEArray<ZEHolder<ZEGRTexture>>&			GetTextures() const;
 		const ZEArray<ZEHolder<const ZERNMaterial>>&	GetMaterials() const;
 		const ZEArray<ZEInteriorResourceRoom>&			GetRooms() const;
 		const ZEArray<ZEInteriorResourceDoor>&			GetDoors() const;

@@ -81,21 +81,29 @@ class ZEMDResource : public ZERSResource
 
 		const ZEList2<ZEMDResourceMesh>&				GetMeshes();
 		const ZEList2<const ZEMDResourceMesh>&			GetMeshes() const;
+		ZEMDResourceMesh*								GetMesh(const ZEString& Name);
+		const ZEMDResourceMesh*							GetMesh(const ZEString& Name) const;	
 		void											AddMesh(ZEMDResourceMesh* Mesh);
 		void											RemoveMesh(ZEMDResourceMesh* Mesh);
 
 		const ZEList2<ZEMDResourceBone>&				GetBones();
 		const ZEList2<const ZEMDResourceBone>&			GetBones() const;
+		ZEMDResourceBone*								GetBone(const ZEString& Name);
+		const ZEMDResourceBone*							GetBone(const ZEString& Name) const;	
 		void											AddBone(ZEMDResourceBone* Bone);
 		void											RemoveBone(ZEMDResourceBone* Bone);
 
 		const ZEList2<ZEMDResourceAnimation>&			GetAnimations();
 		const ZEList2<const ZEMDResourceAnimation>&		GetAnimations() const;
+		ZEMDResourceAnimation*							GetAnimation(const ZEString& Name);
+		const ZEMDResourceAnimation*					GetAnimation(const ZEString& Name) const;	
 		void											AddAnimation(ZEMDResourceAnimation* Animation);
 		void											RemoveAnimation(ZEMDResourceAnimation* Animation);
 
 		const ZEList2<ZEMDResourceHelper>&				GetHelpers();
 		const ZEList2<const ZEMDResourceHelper>&		GetHelpers() const;
+		ZEMDResourceHelper*								GetHelper(const ZEString& Name);
+		const ZEMDResourceHelper*						GetHelper(const ZEString& Name) const;	
 		void											AddHelper(ZEMDResourceHelper* Helper);
 		void											RemoveHelper(ZEMDResourceHelper* Helper);
 

@@ -38,6 +38,8 @@
 #include "ZEUIRenderer.h"
 #include "ZEUILabel.h"
 #include "ZEUIFontTrueType.h"
+#include "ZEUIControl.h"
+#include "ZEUIManager.h"
 
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {

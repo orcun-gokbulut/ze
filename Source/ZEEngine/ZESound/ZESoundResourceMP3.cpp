@@ -34,21 +34,54 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceMP3.h"
+
 #include "ZEError.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEFile/ZEFile.h"
 
 #include <mpg123.h>
 #include <stdio.h>
-#include "ZEFile/ZEFile.h"
 
-static ZEChunkArray<ZESoundResourceMP3*, 50> Indexes;
-static ZELock IndexesLock;
+
+ZESmartArray<ZESoundResourceMP3*> ZESoundResourceMP3::IndexedResources;
+volatile int  ZESoundResourceMP3::LastResourceIndex = 0;
+
+int ZESoundResourceMP3::CreateResourceIndex(ZESoundResourceMP3* Resource)
+{
+	IndexedResources.LockWrite();
+	{
+		IndexedResources.Add(Resource);
+		Resource->Index = LastResourceIndex;
+		LastResourceIndex++;
+	}
+	IndexedResources.UnlockWrite();
+
+	return Resource->Index;
+}
+
+void ZESoundResourceMP3::RemoveResourceIndex(ZESoundResourceMP3* Resource)
+{
+	IndexedResources.RemoveValue(Resource);
+}
+
+ZESoundResourceMP3* ZESoundResourceMP3::IndexResource(int Index)
+{
+	IndexedResources.LockRead();
+	{
+		for (ZESize I = 0; I < IndexedResources.GetCount(); I++)
+		{
+			if (IndexedResources[I]->Index == Index)
+				return IndexedResources[I];
+		}
+	}
+	IndexedResources.UnlockRead();
+
+	return NULL;
+}
 
 ssize_t ZESoundResourceMP3::MP3Read(ZEInt fd, void *buffer, ZESize nbyte)
 {
-	IndexesLock.Lock();
-	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
-	IndexesLock.Unlock();
+	ZESoundResourceMP3* Resource = IndexResource(fd);
 
 	if (Resource->MemoryCursor == Resource->DataSize)
 		return 0;
@@ -62,7 +95,7 @@ ssize_t ZESoundResourceMP3::MP3Read(ZEInt fd, void *buffer, ZESize nbyte)
 
 off_t ZESoundResourceMP3::MP3Seek(ZEInt fd, off_t offset, ZEInt whence)
 {
-	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
+	ZESoundResourceMP3* Resource = IndexResource(fd);
 
 	switch(whence)
 	{
@@ -126,12 +159,9 @@ ZETaskResult ZESoundResourceMP3::LoadInternal()
 		return ZE_TR_FAILED;	
 	}
 
-	IndexesLock.Lock();
-	Indexes.Add(this);
-	int fd = (int)Indexes.GetCount();
-	IndexesLock.Unlock();
+	int Index = CreateResourceIndex(this);
 
-	if (mpg123_open_fd(mpg123, fd) != MPG123_OK)
+	if (mpg123_open_fd(mpg123, Index) != MPG123_OK)
 	{
 		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
 		return ZE_TR_FAILED;	
@@ -180,6 +210,8 @@ ZETaskResult ZESoundResourceMP3::UnloadInternal()
 		Data = NULL;
 	}
 
+	RemoveResourceIndex(this);
+
 	DataSize = 0;
 	MemoryCursor = 0;
 	ChannelCount = 0;
@@ -195,6 +227,7 @@ ZESoundResourceMP3::ZESoundResourceMP3()
 {
 	mpg123 = NULL;
 	Data = NULL;
+	Register();
 }
 
 ZESoundResourceMP3::~ZESoundResourceMP3()

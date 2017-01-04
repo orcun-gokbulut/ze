@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AL_SOUND_SOURCE_3D_H__
-#define __ZE_AL_SOUND_SOURCE_3D_H__
 
 #include "ZESound/ZESoundSource3D.h"
 #include "ZEALComponentBase.h"
@@ -46,54 +44,53 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 {
 	friend class ZEALModule;
 	private:
-		bool					Allocated;
-		ALuint					ALSource;
-		ALuint					ALBuffer1;
-		ALuint					ALBuffer2;
-		char*					InnerStreamBuffer;
+		bool							Allocated;
+		ALuint							ALSource;
+		ALuint							ALBuffer1;
+		ALuint							ALBuffer2;
+		char*							InnerStreamBuffer;
 
-		ZESize					BufferPosition;
-		ZESize					BufferSampleCount;
-		ZESize					OldBufferPosition;
-		ZESize					StreamPosition;
+		ZESize							BufferPosition;
+		ZESize							BufferSampleCount;
+		ZESize							OldBufferPosition;
+		ZESize							StreamPosition;
 
-		bool					CreateBuffer();
-		void					ResetParameters();
-		void					DestroyBufferSource();
+		virtual void					UpdateResource();
 
-		void					Stream();
-		void					ResetStream();
-		void					StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+		bool							CreateBuffer();
+		void							ResetParameters();
+		void							DestroyBufferSource();
 
-								ZEALSoundSource3D();
-		virtual					~ZEALSoundSource3D();
+		void							Stream();
+		void							ResetStream();
+		void							StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+
+										ZEALSoundSource3D();
+		virtual							~ZEALSoundSource3D();
 
 	public:
-		virtual void			SetSoundSourceState(ZESoundSourceState State);
-		virtual void			SetCurrentPosition(ZESize SampleIndex);
-		virtual ZESize			GetCurrentPosition();
+		virtual void					SetSoundSourceState(ZESoundSourceState State);
+		virtual void					SetCurrentPosition(ZESize SampleIndex);
+		virtual ZESize					GetCurrentPosition();
 
-		virtual void			SetPan(ZEInt NewPan);
-		virtual void			SetPlaybackSpeed(float Speed);
-		virtual void			SetVolume(ZEUInt NewVolume);
-		virtual void			SetLooping(bool Enabled);				
-							
-		virtual void			Play();
-		virtual void			Resume();
-		virtual void			Pause();
-		virtual void			Stop();
+		virtual void					SetPan(ZEInt NewPan);
+		virtual void					SetPlaybackSpeed(float Speed);
+		virtual void					SetVolume(ZEUInt NewVolume);
+		virtual void					SetLooping(bool Enabled);				
 
-		void					Update(float ElapsedTime);
+		virtual void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
-		virtual void			SetSoundResource(ZEHolder<const ZESoundResource> Resource);
+		virtual void					SetMinDistance(float  NewMinDistance);
+		virtual void					SetMaxDistance(float  NewMaxDistance);
+		virtual void					SetConeInsideAngle(ZEUInt NewInsideAngle);
+		virtual void					SetConeOutsideAngle(ZEUInt NewOutsideAngle);			
+		virtual void					SetConeOutsideVolume(ZEUInt NewOutsideVolume);
 
-		virtual void			SetPosition(const ZEVector3& NewPosition);
-		virtual void			SetRotation(const ZEQuaternion& NewRotation);
+		virtual void					Play();
+		virtual void					Resume();
+		virtual void					Pause();
+		virtual void					Stop();
 
-		virtual void			SetMinDistance(float  NewMinDistance);
-		virtual void			SetMaxDistance(float  NewMaxDistance);
-		virtual void			SetConeInsideAngle(ZEUInt NewInsideAngle);
-		virtual void			SetConeOutsideAngle(ZEUInt NewOutsideAngle);			
-		virtual void			SetConeOutsideVolume(ZEUInt NewOutsideVolume);
+		void							Update(float ElapsedTime);
 };
-#endif
