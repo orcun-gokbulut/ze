@@ -45,5 +45,9 @@ int main(int argc, char** argv)
 	QApplication Application(argc, argv);
 	ZEMLEditorWindow Widget;
 	Widget.show();
+	
+	if (argc == 2)
+		Widget.OpenFile(argv[1]);
+
 	return Application.exec();
 }

@@ -64,9 +64,11 @@ class ZEMLEditorWindow : public QMainWindow
 		void							RegisterRecentFile(const ZEString& FileName);
 		void							LoadRecentFiles();
 
+	public:
 		void							OpenFile(const ZEString& FileName);
 		void							SaveFile(const ZEString& FileName);
 
+	private:
 		void							ConfigureUI();
 
 	private slots:
