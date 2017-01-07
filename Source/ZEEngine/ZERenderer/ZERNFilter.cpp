@@ -101,7 +101,7 @@ bool ZERNFilter::UpdateShaders()
 
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
 

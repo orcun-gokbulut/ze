@@ -51,7 +51,7 @@ ZEString ZEEnumerator::ToText(ZEInt Value, const char* Default)
 	}
 
 	if (Default == NULL)
-		return ZEString(Value);
+		return ZEString::FromInt32(Value);
 	else
 		return Default;
 }

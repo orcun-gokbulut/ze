@@ -372,9 +372,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	Entity->SetParent(this);
 	Entity->SetScene(this->Scene);
 
-	ChildEntities.LockWrite();
 	ChildEntities.Add(Entity);
-	ChildEntities.UnlockWrite();
 
 	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
 		Entity->Load();
@@ -914,6 +912,72 @@ ZEScene* ZEEntity::GetScene() const
 	return Scene;
 }
 
+ZEEntity* ZEEntity::GetComponent(ZEClass* Class, bool Recursive)
+{
+	Components.LockRead();
+	{
+		ZEEntity* Output = NULL;
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (!ZEClass::IsDerivedFrom(Class, Components[I]))
+				continue;
+
+			Output = Components[I];
+			Components.UnlockRead();
+			return Output;
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+			{
+				Output = Components[I]->GetComponent(Class, true);
+				if (Output == NULL)
+					continue;
+
+				Components.UnlockRead();
+				return Output;
+			}
+		}
+	}
+	Components.UnlockRead();
+
+	return NULL;
+}
+
+ZEEntity* ZEEntity::GetComponent(const ZEString& Name, bool Recursive)
+{
+	Components.LockRead();
+	{
+		ZEEntity* Output = NULL;
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetName() != Name)
+				continue;
+
+			Output = Components[I];
+			Components.UnlockRead();
+			return Output;
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+			{
+				Output = Components[I]->GetComponent(Name, true);
+				if (Output == NULL)
+					continue;
+
+				Components.UnlockRead();
+				return Output;
+			}
+		}
+	}
+	Components.UnlockRead();
+
+	return NULL;
+}
+
 const ZEArray<ZEEntity*>& ZEEntity::GetComponents() const
 {
 	return Components;
@@ -955,6 +1019,72 @@ const ZEArray<ZEEntity*> ZEEntity::GetComponents(const ZEString& Name, bool Recu
 	Components.UnlockRead();
 
 	return Output;
+}
+
+ZEEntity* ZEEntity::GetChildEntity(ZEClass* Class, bool Recursive)
+{
+	ChildEntities.LockRead();
+	{
+		ZEEntity* Output = NULL;
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (!ZEClass::IsDerivedFrom(Class, ChildEntities[I]))
+				continue;
+
+			Output = ChildEntities[I];
+			ChildEntities.UnlockRead();
+			return Output;
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			{
+				Output = ChildEntities[I]->GetChildEntity(Class, true);
+				if (Output == NULL)
+					continue;
+
+				ChildEntities.UnlockRead();
+				return Output;
+			}
+		}
+	}
+	ChildEntities.UnlockRead();
+
+	return NULL;
+}
+
+ZEEntity* ZEEntity::GetChildEntity(const ZEString& Name, bool Recursive)
+{
+	ChildEntities.LockRead();
+	{
+		ZEEntity* Output = NULL;
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetName() != Name)
+				continue;
+
+			Output = ChildEntities[I];
+			ChildEntities.UnlockRead();
+			return Output;
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			{
+				Output = ChildEntities[I]->GetChildEntity(Name, true);
+				if (Output == NULL)
+					continue;
+
+				ChildEntities.UnlockRead();
+				return Output;
+			}
+		}
+	}
+	ChildEntities.UnlockRead();
+
+	return NULL;
 }
 
 const ZEArray<ZEEntity*>& ZEEntity::GetChildEntities() const
@@ -1286,14 +1416,16 @@ ZEUInt ZEEntity::GetLoadingPercentage()
 ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 {
 	ZEEntityLoadingScore TotalScore;
-	TotalScore.Count = 1;
-	TotalScore.Score = GetLocalLoadingPercentage();
+	if (!IsFailed())
+	{
+		TotalScore.Count = 1;
+		TotalScore.Score = GetLocalLoadingPercentage();
+	}
 
 	Components.LockRead();
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 	{
 		ZEEntityLoadingScore ComponentScore = Components[I]->GetLoadingScore();
-		zeDebugCheck(ComponentScore.Score / ComponentScore.Count > 100, "DUR");
 		TotalScore.Count += ComponentScore.Count;
 		TotalScore.Score += ComponentScore.Score;
 	}
@@ -1303,7 +1435,6 @@ ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 	{
 		ZEEntityLoadingScore ChildEntityScore = ChildEntities[I]->GetLoadingScore();
-		zeDebugCheck(ChildEntityScore.Score / ChildEntityScore.Count > 100, "DUR");
 		TotalScore.Count += ChildEntityScore.Count;
 		TotalScore.Score += ChildEntityScore.Score;
 	}
@@ -1586,54 +1717,50 @@ bool ZEEntity::Unserialize(ZEMLReaderNode* Unserializer)
 	if (!SubEntitiesNode.IsValid())
 		return true;
 
-	ChildEntities.SetCount(SubEntitiesNode.GetNodeCount("Entity"));
 
+	ZESize ChildEntityCount = SubEntitiesNode.GetNodeCount("Entity");
 	ZEClass* NewSubEntityClass = NULL;
 	ZEEntity* NewSubEntity = NULL;
-
 	ChildEntities.LockWrite();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 	{
-		ZEMLReaderNode SubEntityNode = SubEntitiesNode.GetNode("Entity", I);
-		NewSubEntityClass = ZEProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
-
-		if (NewSubEntityClass == NULL)
+		for (ZESize I = 0; I < ChildEntityCount; I++)
 		{
-			zeError("Unserialization failed. Child Entity class is not registered. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
-			ChildEntities.UnlockWrite();
-			return false;
+			ZEMLReaderNode SubEntityNode = SubEntitiesNode.GetNode("Entity", I);
+
+			NewSubEntityClass = ZEProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
+			if (NewSubEntityClass == NULL)
+			{
+				zeError("Unserialization failed. Child Entity class is not registered. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+				ChildEntities.UnlockWrite();
+				return false;
+			}
+
+			NewSubEntity = ZEClass::Cast<ZEEntity>(NewSubEntityClass->CreateInstance());
+			if (NewSubEntity == NULL)
+			{
+				zeError("Unserialization failed. Cannot create instance of a child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+				NewSubEntity->Destroy();
+				ChildEntities.UnlockWrite();
+				return false;
+			}
+
+			if (!NewSubEntity->Unserialize(&SubEntityNode))
+			{
+				zeError("Unserialization failed. Unserialization of child entity has failed. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+				NewSubEntity->Destroy();
+				ChildEntities.UnlockWrite();
+				return false;
+			}
+
+			if (!AddChildEntity(NewSubEntity))
+			{
+				zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+				ChildEntities[I] = NULL;
+				NewSubEntity->Destroy();
+				ChildEntities.UnlockWrite();
+				return false;
+			}
 		}
-
-		NewSubEntity = (ZEEntity*)NewSubEntityClass->CreateInstance();
-
-		if (NewSubEntity == NULL)
-		{
-			zeError("Unserialization failed. Cannot create instance of a child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
-			NewSubEntity->Destroy();
-			ChildEntities.UnlockWrite();
-			return false;
-		}
-
-		if (!NewSubEntity->Unserialize(&SubEntityNode))
-		{
-			zeError("Unserialization failed. Unserialization of child entity has failed. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
-			NewSubEntity->Destroy();
-			ChildEntities.UnlockWrite();
-			return false;
-		}
-
-		ChildEntities[I] = NewSubEntity;
-
-		if (!NewSubEntity->CheckParent(this))
-		{
-			zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
-			ChildEntities[I] = NULL;
-			NewSubEntity->Destroy();
-			ChildEntities.UnlockWrite();
-			return false;
-		}
-
-		NewSubEntity->SetParent(this);
 	}
 	ChildEntities.UnlockWrite();
 

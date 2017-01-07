@@ -174,7 +174,7 @@ void ZEProgressDialogTask::SetValue(ZEInt8 Value)
 	TaskPersentage = Value;
 	
 	if (Value > 0)
-		TreeItem->setText(1, (ZEString(Value) + "%").ToCString());
+		TreeItem->setText(1, (ZEString::FromUInt8(Value) + "%").ToCString());
 }
 
 ZEInt8 ZEProgressDialogTask::GetValue() const

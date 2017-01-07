@@ -141,6 +141,7 @@ ZERNParticleMaterial_VertexShader_Output ZERNParticleMaterial_VertexShader_Main(
 float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_Input Input) : SV_Target0
 {
 	float Alpha = ZERNParticleMaterial_Opacity * Input.Color.a;
+	
 	#ifdef ZERN_PM_OPACITY_MAP
 		Alpha *= ZERNParticleMaterial_OpacityMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord);
 	#elif defined ZERN_PM_DIFFUSE_MAP

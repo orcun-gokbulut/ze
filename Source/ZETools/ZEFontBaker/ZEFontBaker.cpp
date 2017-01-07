@@ -135,7 +135,7 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 	ZEUInt32 CurrentX = MarginLeft, CurrentY = MarginTop;
 
 	ZEString TextureOutputFile = OutputFilePath;
-	TextureOutputFile.Append(TextureId);
+	TextureOutputFile.Append(ZEString::FromUInt32(TextureId));
 	TextureOutputFile.Append(".png");
 
 	for(ZESize I = 0; I < FTBitmaps.GetCount(); I++)
@@ -156,7 +156,7 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 				Bitmaps.Add(CreateBitmap(TextureWidth, TextureHeight));
 
 				TextureOutputFile.Remove(TextureOutputFile.GetLength() - 5, 5);
-				TextureOutputFile.Append(TextureId);
+				TextureOutputFile.Append(ZEString::FromUInt32(TextureId));
 				TextureOutputFile.Append(".png");
 			}
 		}
@@ -208,7 +208,7 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 	{
 		TexturesNode.OpenNode("Texture", TextureNode);
 		ZEString TextureFileName;
-		TextureFileName.Append(I);
+		TextureFileName.Append(ZEString::FromUInt32(I));
 		TextureFileName.Append(".png");
 		TextureNode.WriteString("FileName", TextureFileName);
 		TextureNode.CloseNode();

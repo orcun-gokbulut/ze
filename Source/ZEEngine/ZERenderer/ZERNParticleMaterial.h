@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
+#include "ZERNStandardMaterial.h"
 
 class ZEGRBuffer;
 class ZEGRShader;
@@ -62,6 +63,8 @@ class ZERNParticleMaterial : public ZERNMaterial
 		ZEHolder<const ZEGRRenderStateData>		StageParticleRendering_RenderState;
 
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
+
+		ZERNTransparencyMode					TransparencyMode;
 
 		ZEHolder<const ZEGRSampler>				Sampler;
 		ZEHolder<const ZEGRTexture>				DiffuseMap;
@@ -125,6 +128,9 @@ class ZERNParticleMaterial : public ZERNMaterial
 
 		void									SetTwoSided(bool TwoSided);
 		bool									GetTwoSided() const;
+
+		void									SetTransparencyMode(ZERNTransparencyMode Mode);
+		ZERNTransparencyMode					GetTransparencyMode() const;
 
 		void									SetSampler(const ZEGRSampler* Sampler);
 		const ZEGRSampler*						GetSampler() const;

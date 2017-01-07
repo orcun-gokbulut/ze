@@ -105,7 +105,7 @@ bool ZEATAtmosphere::UpdateShaders()
 
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFastLightScattering.hlsl";
 	Options.Model = ZEGR_SM_5_0;
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFastLightScattering_PixelShader_Main";

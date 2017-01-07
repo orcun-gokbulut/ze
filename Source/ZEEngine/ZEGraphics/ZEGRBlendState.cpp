@@ -121,7 +121,7 @@ ZEGRColorMask ZEGRBlendRenderTarget::GetWriteMask() const
 void ZEGRBlendRenderTarget::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZEBlendStateData));
-
+	StateData.BlendEnable = false;
 	StateData.Operation = ZEGR_BE_ADD;
 	StateData.Source = ZEGR_BO_ONE;
 	StateData.Destination = ZEGR_BO_ZERO;

@@ -79,7 +79,7 @@ bool ZERNParticleMaterial::UpdateShaders()
 
 	UpdateShaderDefinitions(Options);
 
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNParticleMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
 
@@ -110,6 +110,37 @@ bool ZERNParticleMaterial::UpdateRenderState()
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RenderState.SetRasterizerState(RasterizerState);
 
+	if (TransparencyMode == ZERN_TM_ADDITIVE)
+	{
+		ZEGRBlendRenderTarget RenderTargetBlend;
+		RenderTargetBlend.SetBlendEnable(true);
+		RenderTargetBlend.SetSource(ZEGR_BO_SRC_ALPHA);
+		RenderTargetBlend.SetDestination(ZEGR_BO_ONE);
+		RenderTargetBlend.SetOperation(ZEGR_BE_ADD);
+
+		ZEGRBlendState State;
+		State.SetBlendEnable(true);
+		State.SetRenderTargetBlend(0, RenderTargetBlend);
+		RenderState.SetBlendState(State);
+	}
+	else if (TransparencyMode == ZERN_TM_ORDERED)
+	{
+		ZEGRBlendRenderTarget RenderTargetBlend;
+		RenderTargetBlend.SetBlendEnable(true);
+		RenderTargetBlend.SetSource(ZEGR_BO_SRC_ALPHA);
+		RenderTargetBlend.SetDestination(ZEGR_BO_INV_SRC_ALPHA);
+		RenderTargetBlend.SetOperation(ZEGR_BE_ADD);
+		
+		ZEGRBlendState BlendState;
+		BlendState.SetBlendEnable(true);
+		BlendState.SetRenderTargetBlend(0, RenderTargetBlend);	
+		RenderState.SetBlendState(BlendState);
+	}
+	else
+	{
+		ZEGRBlendState BlendState;
+		RenderState.SetBlendState(BlendState);
+	}
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageParticleRendering_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageParticleRendering_PixelShader);
 
@@ -188,6 +219,7 @@ ZERNParticleMaterial::ZERNParticleMaterial()
 	ShadowCaster = false;
 	AlphaCullEnabled = false;
 	VertexColorEnabled = false;
+	TransparencyMode = ZERN_TM_ADDITIVE;
 	AmbientEnabled = true;
 	AmbientFactor = 1.0f;
 	AmbientColor = ZEVector3::One;
@@ -204,7 +236,7 @@ ZERNParticleMaterial::ZERNParticleMaterial()
 
 	Constants.Opacity = 1.0f;
 	Constants.SceneAmbientEnabled = false;
-	Constants.AlphaCullLimit = 1.0f;
+	Constants.AlphaCullLimit = 0.0f;
 	Constants.SoftParticle = false;
 	Constants.DistanceMax = 2.0f;
 	Constants.ContrastPower = 2.0f;
@@ -241,6 +273,21 @@ void ZERNParticleMaterial::SetTwoSided(bool TwoSided)
 bool ZERNParticleMaterial::GetTwoSided() const
 {
 	return TwoSided;
+}
+
+void ZERNParticleMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
+{
+	if (this->TransparencyMode == Mode)
+		return;
+
+	this->TransparencyMode = Mode;
+
+	DirtyFlags.RaiseFlags(ZERN_PMDF_RENDER_STATE | ZERN_PMDF_SHADERS);
+}
+
+ZERNTransparencyMode ZERNParticleMaterial::GetTransparencyMode() const
+{
+	return TransparencyMode;
 }
 
 void ZERNParticleMaterial::SetSampler(const ZEGRSampler* Sampler)

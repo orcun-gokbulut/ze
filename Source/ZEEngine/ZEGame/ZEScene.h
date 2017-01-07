@@ -117,12 +117,6 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		const ZEGRBuffer*						GetConstantBuffer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
-		void									SetActiveCamera(ZECamera* Camera);
-		ZECamera*								GetActiveCamera();
-
-		void									SetActiveListener(ZEListener* Listener);
-		ZEListener*								GetActiveListener();
-
 		void									SetEnabled(bool Enabled);
 		bool									GetEnabled() const;
 
@@ -140,9 +134,14 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		const ZESmartArray<ZEEntity*>&			GetEntities();
 		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class, bool Recursive = false);
 		ZEArray<ZEEntity*>						GetEntities(const ZEString& Name, bool Recursive = false);
+		ZEEntity*								GetEntity(ZEClass* Class, bool Recursive = false);
+		ZEEntity*								GetEntity(const ZEString& Name, bool Recursive = false);
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		void									ClearEntities();
+
+		bool									IsLoaded();
+		bool									IsInitialized();
 
 		void									Tick(float ElapsedTime);
 		void									PreRender(const ZERNPreRenderParameters* Parameters);

@@ -94,7 +94,7 @@ bool ZERNStageForward::UpdateShaders()
 	Options.Type = ZEGR_ST_COMPUTE;
 	Options.EntryPoint = "ZERNTiledDeferredShadingCompute_ComputeShader_Main";
 
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_TILED_FORWARD"));
 	TiledForwardComputeShader = ZEGRShader::Compile(Options);
 	zeCheckError(TiledForwardComputeShader == NULL, false, "Cannot set compute shader.");

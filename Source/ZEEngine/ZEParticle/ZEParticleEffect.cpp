@@ -40,9 +40,9 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
 
-ZEEntityResult ZEParticleEffect::InitializeInternal()
+ZEEntityResult ZEParticleEffect::LoadInternal()
 {
-	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Initialize();
@@ -50,12 +50,13 @@ ZEEntityResult ZEParticleEffect::InitializeInternal()
 	return ZE_ER_DONE;
 }
 
-ZEEntityResult ZEParticleEffect::DeinitializeInternal()
+ZEEntityResult ZEParticleEffect::UnloadInternal()
 {
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Deinitialize();
 
-	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+
 	return ZE_ER_DONE;
 }
 

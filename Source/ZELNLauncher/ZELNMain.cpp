@@ -47,8 +47,12 @@ int main(int argc, char** argv)
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	QApplication Application(argc, argv);
-	ZELNLauncher* Launcher = ZELNLauncher::GetInstance();
+	ZELNLauncher* Launcher = ZELNLauncher::CreateInstance();
 	Launcher->Initialize();
 
-	return Application.exec();
+	int Result = Application.exec();
+
+	Launcher->Destroy();
+
+	return Result;
 }

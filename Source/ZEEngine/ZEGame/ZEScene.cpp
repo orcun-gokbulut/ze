@@ -297,27 +297,6 @@ ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
 	return PhysicalWorld;
 }
 
-void ZEScene::SetActiveCamera(ZECamera* Camera)
-{
-	ActiveCamera = Camera;
-}
-
-ZECamera* ZEScene::GetActiveCamera()
-{
-	return ActiveCamera;
-}
-
-void ZEScene::SetActiveListener(ZEListener* Listener)
-{
-	ActiveListener = Listener;
-	zeSound->SetActiveListener(Listener);
-}
-
-ZEListener* ZEScene::GetActiveListener()
-{
-	return ActiveListener;
-}
-
 void ZEScene::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
@@ -438,6 +417,73 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(const ZEString& Name, bool Recursive)
 	return Output;
 }
 
+
+ZEEntity* ZEScene::GetEntity(const ZEString& Name, bool Recursive)
+{
+	ZEEntity* Entity = NULL;
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (Entities[I]->GetName() == Name)
+			{
+				Entity = Entities[I];
+				Entities.UnlockRead();
+				return Entity;
+			}
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < Entities.GetCount(); I++)
+			{
+				Entity = Entities[I]->GetChildEntity(Name, true);
+				if (Entity == NULL)
+					continue;
+
+				Entities.UnlockRead();
+				return Entity;
+			}
+		}
+	}
+	Entities.UnlockRead();
+
+	return NULL;
+}
+
+ZEEntity* ZEScene::GetEntity(ZEClass* Class, bool Recursive)
+{
+	ZEEntity* Entity = NULL;
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (!ZEClass::IsDerivedFrom(Class, Entities[I]))
+				continue;
+
+			Entity = Entities[I];
+			Entities.UnlockRead();
+			return Entity;
+		}
+
+		if (Recursive)
+		{
+			for (ZESize I = 0; I < Entities.GetCount(); I++)
+			{
+				Entity = Entities[I]->GetChildEntity(Class, true);
+				if (Entity == NULL)
+					continue;
+
+				Entities.UnlockRead();
+				return Entity;
+			}
+		}
+	}
+	Entities.UnlockRead();
+
+	return NULL;
+}
+
 void ZEScene::AddEntity(ZEEntity* Entity)
 {
 	zeCheckError(Entity == NULL, ZE_VOID, "Entity is NULL.");
@@ -454,7 +500,7 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 	Entity->Load();
 
 	if(Entity->GetName().GetLength() == 0)
-		Entity->SetName(Entity->GetClass()->GetName() + ZEString(LastEntityId));
+		Entity->SetName(Entity->GetClass()->GetName() + ZEString::FromUInt32(LastEntityId));
 
 	if (IsInitializedOrInitializing())
 		Entity->Initialize();
@@ -484,6 +530,48 @@ void ZEScene::ClearEntities()
 			Entities.GetFirstItem()->Destroy();
 	}
 	Entities.UnlockWrite();
+}
+
+bool ZEScene::IsLoaded()
+{
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (Entities[I]->IsFailed()) // Ignore
+				continue;
+
+			if (Entities[I]->IsLoaded())
+				continue;
+
+			Entities.UnlockRead();
+			return false;
+		}
+	}
+	Entities.UnlockRead();
+
+	return true;
+}
+
+bool ZEScene::IsInitialized()
+{
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			if (Entities[I]->IsFailed()) // Ignore
+				continue;
+
+			if (Entities[I]->IsInitialized())
+				continue;
+
+			Entities.UnlockRead();
+			return false;
+		}
+	}
+	Entities.UnlockRead();
+
+	return true;
 }
 
 void ZEScene::Tick(float ElapsedTime)

@@ -495,10 +495,6 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		}
 
 		case WM_MBUTTONDOWN:
-			SetCursor(DefaultCursor);
-			ManageCursorLock(this, false);
-			break;
-
 		case WM_LBUTTONDOWN:
 		case WM_RBUTTONDOWN:
 			ManageCursorLock(this, true);

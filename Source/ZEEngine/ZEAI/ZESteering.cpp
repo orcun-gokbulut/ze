@@ -41,7 +41,7 @@ void ZESteeringOutput::SetZero()
 	AngularAcceleration = ZEQuaternion::Identity;
 }
 
-ZEActor* ZESteering::GetOwner()
+ZEActor* ZESteering::GetOwner() const
 {
 	return Owner;
 }
@@ -51,7 +51,7 @@ void ZESteering::SetOwner(ZEActor*	Owner)
 	this->Owner = Owner;
 }
 
-ZEUInt ZESteering::GetPriority()
+ZEUInt ZESteering::GetPriority() const
 {
 	return Priority;
 }
@@ -61,7 +61,7 @@ void ZESteering::SetPriority(ZEUInt Priority)
 	this->Priority = Priority;
 }
 
-float ZESteering::GetWeight()
+float ZESteering::GetWeight() const
 {
 	return Weight;
 }
@@ -71,7 +71,7 @@ void ZESteering::SetWeight(float Weight)
 	this->Weight = Weight;
 }
 
-bool ZESteering::GetEnabled()
+bool ZESteering::GetEnabled() const
 {
 	return Enabled;
 }
@@ -81,7 +81,7 @@ void ZESteering::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 }
 
-ZEActor* ZESteering::GetTarget()
+ZEActor* ZESteering::GetTarget() const
 {
 	return Target;
 }

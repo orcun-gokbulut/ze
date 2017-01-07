@@ -355,7 +355,8 @@ void ZELNLauncher::Launch()
 
 ZELNLauncher::ZELNLauncher()
 {
-	Instance = NULL;
+	zeDebugCheck(Instance != NULL, "Multi instance detected.");
+	Instance = this;
 	ApplicationName = "Zinek Engine";
 	ApplicationVersionMajor = ZEVersion::GetZinekVersion().Major;
 	ApplicationVersionMinor = ZEVersion::GetZinekVersion().Minor;
@@ -369,4 +370,9 @@ ZELNLauncher::~ZELNLauncher()
 ZELNLauncher* ZELNLauncher::GetInstance()
 {
 	return Instance;
+}
+
+ZELNLauncher* ZELNLauncher::CreateInstance()
+{
+	return new ZELNLauncher();
 }

@@ -334,8 +334,11 @@ bool ZECore::InitializeModule(ZEModule* Module)
 		return false;
 	}
 
+	Module->RegisterClasses();
+
 	if (Module->Initialize() == false)
 	{
+		Module->UnregisterClasses();
 		Module->Destroy();
 		const char* ModuleName =  Module->GetClass()->GetName();
 		zeError("Can not initialize module. Module Name : \"%s\".", ModuleName);
@@ -347,7 +350,11 @@ bool ZECore::InitializeModule(ZEModule* Module)
 void ZECore::DeInitializeModule(ZEModule** Module)
 {
 	if (*Module != NULL)
+	{
+		(*Module)->UnregisterClasses();
 		(*Module)->Deinitialize();
+	}
+
 	*Module = NULL;
 }
 
@@ -399,6 +406,14 @@ bool ZECore::InitializeModules()
 		return false;
 	}
 
+	// Application module !
+	zeLog("Initializing Application Module.");	
+	if (Application != NULL && !InitializeModule(Application))
+	{
+		zeError("Can not initialize application module.");
+		return false;
+	}
+
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 
 	zeLog("Modules initialized.");
@@ -437,19 +452,12 @@ void ZECore::DeinitializeModules()
 	}
 }
 
-void ZECore::LoadClasses()
+void ZECore::RegisterClasses()
 {
 	#undef RegisterClass
 
-	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
-	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
-	#include "../ZEMetaRegister.h"
-	#include "../../ZEModules/ZEMetaRegister.h"
-	#undef ZE_META_REGISTER_ENUM
-	#undef ZE_META_REGISTER_CLASS
-	
-	#define ZE_META_REGISTER_ENUM(Name) ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
-	#define ZE_META_REGISTER_CLASS(Name) ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration(); ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
+	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "../ZEMetaRegister.h"
 	#include "../../ZEModules/ZEMetaRegister.h"
 	#undef ZE_META_REGISTER_ENUM
@@ -498,7 +506,10 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Initializing core...");
 
 	zeLog("Loading ZEMeta classes.");
-	LoadClasses();
+	RegisterClasses();
+
+	if (Application != NULL)
+		Application->StartUp();
 
 	zeLog("Initializing Modules...");
 	if (!InitializeModules())
@@ -510,15 +521,6 @@ bool ZECore::StartUp(void* WindowHandle)
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core initialized.");
 
-	if (Application != NULL)
-		Application->StartUp();
-
-	if (Application != NULL)
-	{
-		if (!Application->Initialize())
-			zeCriticalError("Can not initialize application module.");
-	}
-
 	return true;
 }
 
@@ -528,6 +530,7 @@ void ZECore::ShutDown()
 	SetCoreState(ZE_CS_SHUTDOWN);
 
 	zeLog("Deinitializing application module.");
+	
 	if (Application != NULL)
 	{
 		Application->Deinitialize();

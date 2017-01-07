@@ -59,6 +59,17 @@ void ZEModule::PostProcess()
 
 }
 
+
+void ZEModule::RegisterClasses()
+{
+
+}
+
+void ZEModule::UnregisterClasses()
+{
+
+}
+
 ZEModule::ZEModule()
 {
 	Core = NULL;

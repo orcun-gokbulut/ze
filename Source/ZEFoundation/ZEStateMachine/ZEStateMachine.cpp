@@ -139,3 +139,62 @@ ZEStateMachine::~ZEStateMachine()
 		delete States[I];
 	}
 }
+
+/*
+const ZEArray<ZEState2> ZEStateMachine2::GetStates() const
+{
+
+}
+
+bool ZEStateMachine2::AddState(ZEInt ID, const ZEString& Name, ZEStateCallback EnterCallback = ZEStateCallback(), ZEStateCallback ExitCallback = ZEStateCallback(), ZEStateCallback LoopCallback = ZEStateCallback())
+{
+
+}
+
+bool ZEStateMachine2::RemoveState(ZEInt ID)
+{
+
+}
+bool ZEStateMachine2::RemoveState(const ZEString& Name)
+{
+
+}
+
+void ZEStateMachine2::SetCurrentState(ZEInt ID)
+{
+
+}
+
+void ZEStateMachine2::SetCurrentState(const ZEString& Name)
+{
+
+}
+
+const ZEString& ZEStateMachine2::GetCurrentStateName() const
+{
+
+}
+
+ZEInt ZEStateMachine2::GetCurrentStateID() const
+{
+
+}
+
+bool ZEStateMachine2::Transition(ZEInt ID)
+{
+
+}
+
+bool ZEStateMachine2::Transition(const ZEString& Name)
+{
+
+}
+void ZEStateMachine2::Loop()
+{
+
+}
+
+ZEStateMachine2::ZEStateMachine2()
+{
+
+}*/
