@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESpawner.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,39 +30,69 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZECanvasBrush.cpp			Sources)
-ze_add_source(ZECanvasBrush.h			Sources Headers ZEMC)
-ze_add_source(ZEEntity.cpp				Sources)
-ze_add_source(ZEEntity.h				Sources Headers ZEMC)
-ze_add_source(ZEEntityMacros.cpp		Sources)
-ze_add_source(ZEEntityMacros.h			Sources Headers)
-ze_add_source(ZEPlayer.cpp				Sources)
-ze_add_source(ZEPlayer.h				Sources Headers ZEMC)
-ze_add_source(ZERayCast.cpp				Sources)
-ze_add_source(ZERayCast.h				Sources Headers)
-ze_add_source(ZEVolumeCast.cpp			Sources)
-ze_add_source(ZEVolumeCast.h			Sources Headers)
-ze_add_source(ZEScene.cpp				Sources)
-ze_add_source(ZEScene.h					Sources Headers ZEMC)
-ze_add_source(ZEGeographicEntity.cpp	Sources)
-ze_add_source(ZEGeographicEntity.h		Sources Headers ZEMC)
-ze_add_source(ZESector.cpp				Sources)
-ze_add_source(ZESector.h				Sources Headers ZEMC)
-ze_add_source(ZESectorManager.cpp		Sources)
-ze_add_source(ZESectorManager.h			Sources Headers ZEMC)
-ze_add_source(ZESectorSelector.cpp		Sources)
-ze_add_source(ZESectorSelector.h		Sources Headers ZEMC)
-ze_add_source(ZEStateScreen.cpp			Sources)
-ze_add_source(ZEStateScreen.h			Sources Headers ZEMC)
-ze_add_source(ZESpawner.cpp				Sources)
-ze_add_source(ZESpawner.h				Sources Headers ZEMC)
+#include "ZEEntity.h"
 
-ze_add_library(TARGET ZEGame 
-	ZEMC ${ZEMC}
-	SOURCES ${Sources}
-	HEADERS ${Headers})
+struct ZESpawn
+{
+	ZEEntity*							Entity;
+	ZEVector3							Postion;
+	ZEQuaternion						Rotation;
+	ZEVector3							Scale;
+	bool								Enabled;
+	bool								Visible;
+};
+
+class ZESpawner : public ZEEntity
+{
+	ZE_OBJECT
+	private:
+		ZEArray<ZESpawn>				Spawns;
+
+		bool							AutoSpawn;
+		bool							AutoRespawn;
+		float							AutoSpawnDelay;
+		bool							Spawned;
+
+		float							SpawnTimer;
+
+		void							UpdateSpawns(ZESize Index);
+
+		virtual ZEEntityResult			InitializeInternal();
+		virtual ZEEntityResult			DeinitializeInternal();
+
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
+
+										ZESpawner();
+		virtual							~ZESpawner();
+
+	public:
+		const ZEArray<ZESpawn>&			GetSpawns() const;
+
+		void							SetAutoSpawn(bool AutoSpawn);
+		bool							GetAutoSpawn() const;
+
+		void							SetAutoRespawn(bool Respawn);
+		bool							GetAutoRespawn() const;
+
+		void							SetAutoSpawnDelay(float Seconds);
+		float							GetAutoSpawnDelay() const;
+
+		virtual bool					AddChildEntity(ZEEntity* Entity) override;
+		virtual void					RemoveChildEntity(ZEEntity* Entity) override;
+
+		bool							IsSpawned();
+
+		bool							Spawn();
+		void							Despawn();
+		bool							Respawn();
+
+		virtual void					Tick(float ElapsedTime);
+
+		static ZESpawner*				CreateInstance();
+};

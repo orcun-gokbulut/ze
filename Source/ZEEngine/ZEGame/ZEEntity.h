@@ -204,6 +204,8 @@ class ZEEntity : public ZEObject
 		virtual ZEEntityResult					InitializeInternal();
 		virtual ZEEntityResult					DeinitializeInternal();
 
+		ZEEntity*								GetComponent(ZEClass* Class, bool Recursive = false);
+		ZEEntity*								GetComponent(const ZEString& Name, bool Recursive = false);
 		const ZEArray<ZEEntity*>&				GetComponents() const;
 		const ZEArray<ZEEntity*>				GetComponents(ZEClass* Class, bool Recursive = false) const;
 		const ZEArray<ZEEntity*>				GetComponents(const ZEString& Name, bool Recursive = false) const;
@@ -237,11 +239,13 @@ class ZEEntity : public ZEObject
 
 		virtual ZEEntityFlags					GetEntityFlags() const final;
 
+		ZEEntity*								GetChildEntity(ZEClass* Class, bool Recursive = false);
+		ZEEntity*								GetChildEntity(const ZEString& Name, bool Recursive = false);
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
 		const ZEArray<ZEEntity*>				GetChildEntities(ZEClass* Class, bool Recursive = false) const;
 		const ZEArray<ZEEntity*>				GetChildEntities(const ZEString& Name, bool Recursive = false) const;
-		bool									AddChildEntity(ZEEntity* Entity);
-		void									RemoveChildEntity(ZEEntity* Entity);
+		virtual bool							AddChildEntity(ZEEntity* Entity);
+		virtual void							RemoveChildEntity(ZEEntity* Entity);
 		void									ClearChildEntities();
 
 		void									SetBoundingBox(const ZEAABBox& BoundingBox, bool NoEvent = false);

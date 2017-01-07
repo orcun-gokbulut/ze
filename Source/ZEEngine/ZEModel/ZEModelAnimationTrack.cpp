@@ -61,14 +61,20 @@ void ZEModelAnimationTrack::SetState(ZEModelAnimationState State)
 
 void ZEModelAnimationTrack::BindAnimation()
 {
-	if (ModelResource.IsNull())  // No External Resource
+	if (!ModelResource.IsNull())  // No External Resource
 		return;
 
 	if (Model == NULL)
+	{
 		ResourceAnimation = NULL;
+		return;
+	}
 
 	if (Model->GetModelResource() == NULL)
+	{
 		ResourceAnimation = NULL;
+		return;
+	}
 
 	ResourceAnimation = GetModel()->GetModelResource()->GetAnimation(AnimationName);
 

@@ -163,7 +163,7 @@ void ZEDEditor::SaveCommand_OnAction(const ZEDCommand* Command)
 
 	if (FileName.IsEmpty())
 	{
-		QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save", QString(), GetExtensions().ToCString());
+		QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save", QString(), GetExtensions().ToCString(), NULL, QFileDialog::DontResolveSymlinks);
 		if (Result.isEmpty())
 			return;
 
@@ -182,7 +182,7 @@ void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 	if (FileState == ZED_ES_NONE)
 		return;
 
-	QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save As", GetFileName().ToCString(), GetExtensions().ToCString());
+	QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save As", GetFileName().ToCString(), GetExtensions().ToCString(), NULL, QFileDialog::DontResolveSymlinks);
 	if (Result.isEmpty())
 		return;
 
@@ -221,7 +221,8 @@ void ZEDEditor::ExitCommand_OnAction(const ZEDCommand* Command)
 
 void ZEDEditor::RecentFilesCommand_OnAction(const ZEDCommand* Command)
 {
-	Load(Command->GetListItems()[Command->GetValueIndex()]);
+	if (!Load(Command->GetListItems()[Command->GetValueIndex()]))
+		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot load file.", "Error", QMessageBox::Ok);
 }
 
 void ZEDEditor::PopulateRecentFiles()

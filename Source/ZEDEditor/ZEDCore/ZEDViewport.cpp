@@ -63,6 +63,7 @@
 #include "ZERenderer\ZERNStageResolving.h"
 #include "ZERenderer\ZERNRenderParameters.h"
 #include "ZEDGrid.h"
+#include "ZERenderer\ZERNStageAO.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -181,6 +182,14 @@ bool ZEDViewport::InitializeInternal()
 
 	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
 	Renderer.AddStage(StageGBuffer);
+
+	ZERNStageAO* StageAO = new ZERNStageAO();
+	StageAO->SetSampleCount(ZERN_AOSC_MEDIUM);
+	StageAO->SetIntensity(18.0f);
+	StageAO->SetNormalBias(0.05f);
+	StageAO->SetOcclusionRadius(0.5f);
+	StageAO->SetDistanceThreshold(100.0f);
+	Renderer.AddStage(StageAO);
 
 	ZERNStageShadowing* StageShadowing = new ZERNStageShadowing();
 	Renderer.AddStage(StageShadowing);

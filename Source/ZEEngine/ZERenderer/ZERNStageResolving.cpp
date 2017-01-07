@@ -96,7 +96,7 @@ bool ZERNStageResolving::UpdateRenderStates()
 		return true;
 
 	ZEGRShaderCompileOptions ShaderCompileOptions;
-	ShaderCompileOptions.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEGRGraphicsModule::SAMPLE_COUNT));
+	ShaderCompileOptions.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	ShaderCompileOptions.Model = ZEGR_SM_5_0;
 	ShaderCompileOptions.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNResolving.hlsl";
 

@@ -51,7 +51,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	bool StopMainLoop = false;
 	QApplication Application(argc, argv);
 	
-	zeCore->LoadClasses();
+	zeCore->RegisterClasses();
 
 	ZEDConsoleWidget Widget;
 	Widget.show();

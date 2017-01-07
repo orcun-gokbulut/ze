@@ -71,7 +71,10 @@ ZESoundResourceMP3* ZESoundResourceMP3::IndexResource(int Index)
 		for (ZESize I = 0; I < IndexedResources.GetCount(); I++)
 		{
 			if (IndexedResources[I]->Index == Index)
+			{
+				IndexedResources.UnlockRead();
 				return IndexedResources[I];
+			}
 		}
 	}
 	IndexedResources.UnlockRead();

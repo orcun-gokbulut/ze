@@ -63,37 +63,35 @@ class ZEActor;
 class ZESteering
 {
 	friend class ZEActor;
-
 	private:
-		ZEActor*					Owner;
-		ZEActor*					Target;
+		ZEActor*						Owner;
+		ZEActor*						Target;
 
-		ZEInt						Priority;
-		bool						Enabled;
+		ZEInt							Priority;
+		bool							Enabled;
 
-		float						Weight;
+		float							Weight;
 
 	public:
-		ZEActor*					GetOwner();
-		virtual void				SetOwner(ZEActor*	Owner);
+		ZEActor*						GetOwner() const;
+		virtual void					SetOwner(ZEActor* Owner);
 
-		ZEUInt						GetPriority();
-		void						SetPriority(ZEUInt Priority);
+		ZEUInt							GetPriority() const;
+		void							SetPriority(ZEUInt Priority);
 
-		float						GetWeight();
-		virtual void				SetWeight(float Weight);
+		float							GetWeight() const;
+		virtual void					SetWeight(float Weight);
 
-		bool						GetEnabled();
-		virtual void				SetEnabled(bool Enabled);
+		bool							GetEnabled() const;
+		virtual void					SetEnabled(bool Enabled);
 
-		ZEActor*					GetTarget();
-		virtual void				SetTarget(ZEActor* Target);
+		ZEActor*						GetTarget() const;
+		virtual void					SetTarget(ZEActor* Target);
 
-		virtual 
-		ZESteeringOutput			Process(float ElapsedTime) = 0;
+		virtual ZESteeringOutput		Process(float ElapsedTime) = 0;
 		
-									ZESteering();
-		virtual						~ZESteering();
+										ZESteering();
+		virtual							~ZESteering();
 };
 
 #endif

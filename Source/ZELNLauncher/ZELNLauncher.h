@@ -38,6 +38,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 class ZELNModule;
 class ZELNLauncherWindow;
@@ -59,7 +60,7 @@ struct ZELNLaunchInformation
 	ZEInt64				ProcessId;
 };
 
-class ZELNLauncher : public ZEInitializable
+class ZELNLauncher : public ZEInitializable, public ZEDestroyable
 {
 	private:
 		static ZELNLauncher*			Instance;
@@ -109,4 +110,5 @@ class ZELNLauncher : public ZEInitializable
 		void							Update();
 
 		static ZELNLauncher*			GetInstance();
+		static ZELNLauncher*			CreateInstance();
 };

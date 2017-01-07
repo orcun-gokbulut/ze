@@ -2043,72 +2043,6 @@ ZEString& ZEString::operator=(const std::wstring& String)
 	return *this;
 }
 
-ZEString& ZEString::operator=(ZEInt8 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEInt16 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEInt32 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEInt64 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEUInt8 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEUInt16 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEUInt32 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(ZEUInt64 Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(float Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(double Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
-ZEString& ZEString::operator=(bool Value)
-{
-	SetValue(Value);
-	return *this;
-}
-
 ZEString ZEString::operator+(const ZEString& String) const
 {
 	ZEString Temp(*this);
@@ -2148,61 +2082,6 @@ ZEString ZEString::operator+(const std::wstring& String) const
 	return Result;
 }
 
-ZEString ZEString::operator+(ZEInt8 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEInt16 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEInt32 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEInt64 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEUInt8 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEUInt16 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEUInt32 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(ZEUInt64 Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(float Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(double Value) const
-{
-	return *this + ZEString(Value);
-}
-
-ZEString ZEString::operator+(bool Value) const
-{
-	return *this + ZEString(Value);
-}
-
 ZEString& ZEString::operator+=(const ZEString& String)
 {
 	Append(String);
@@ -2232,72 +2111,6 @@ ZEString& ZEString::operator+=(const std::wstring& String)
 {
 	ZEString Temp(String);
 	Append(Temp);
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEInt8 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEInt16 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEInt32 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEInt64 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEUInt8 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEUInt16 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEUInt32 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(ZEUInt64 Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(float Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(double Value)
-{
-	Append(ZEString(Value));
-	return *this;
-}
-
-ZEString& ZEString::operator+=(bool Value)
-{
-	Append(ZEString(Value));
 	return *this;
 }
 
@@ -2404,82 +2217,10 @@ ZEString::ZEString(const std::wstring& String)
 	SetValue(String.c_str());
 }
 
-ZEString::ZEString(wchar_t Character)
-{
-	new(this) ZEString();
-	SetValue(Character);
-}
-
 ZEString::ZEString(const ZECharacter& Character)
 {
 	new(this) ZEString();
 	SetValue(Character);
-}
-
-ZEString::ZEString(ZEInt8 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEInt16 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEInt32 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEInt64 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEUInt8 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEUInt16 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEUInt32 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(ZEUInt64 Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(float Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(double Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
-}
-
-ZEString::ZEString(bool Value)
-{
-	new(this) ZEString();
-	SetValue(Value);
 }
 
 ZEString::ZEString(const char* Start, const char* End)
@@ -2514,83 +2255,6 @@ ZEString operator+(const wchar_t* String1, const ZEString& String2)
 {
 	ZEString Temp(String1);
 	Temp.Append(String2);
-	return Temp;
-}
-
-ZEString operator+(ZEInt8 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEInt16 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEInt32 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEInt64 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEUInt8 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEUInt16 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEUInt32 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(ZEUInt64 Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(float Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(double Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
-	return Temp;
-}
-
-ZEString operator+(bool Value, const ZEString& String)
-{
-	ZEString Temp(Value);
-	Temp.Append(String);
 	return Temp;
 }
 

@@ -263,7 +263,7 @@ class ZEClass : public ZEMTDeclaration
 template<typename ZECastedObjectType>
 ZECastedObjectType* ZEClass::Cast(ZEObject* Object)
 {
-	if (ZEClass::IsDerivedFrom(ZECastedObjectType::Class(), Object->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZECastedObjectType::Class(), Object))
 		return static_cast<ZECastedObjectType*>(Object);
 	
 	return NULL;

@@ -114,7 +114,7 @@ class ZECore
 		ZESystemMessageHandler*			SystemMessageHandler;
 		
 	public:
-		void							LoadClasses();
+		void							RegisterClasses();
 
 		ZEModule*						FindModule(ZEClass* Class, const char* Name);
 		bool							InitializeModule(ZEModule* Module);

@@ -50,6 +50,9 @@ class ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool							Enabled;
 
 	protected:
+		virtual void					RegisterClasses();
+		virtual void					UnregisterClasses();
+
 										ZEModule();
 		virtual							~ZEModule();
 

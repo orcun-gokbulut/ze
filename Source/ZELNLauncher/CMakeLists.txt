@@ -99,16 +99,16 @@ ze_add_executable(TARGET ZELNLauncher
 
 qt5_use_modules(ZELNLauncher Widgets)
 
-add_custom_command(TARGET ZELNLauncher POST_BUILD
+#add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Cored.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Guid.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgetsd.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Debug"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Cored.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Guid.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgetsd.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Debug"
 	# RELEASE
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Core.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Gui.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
-	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgets.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Release"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Core.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Gui.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
+	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgets.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Release"
 	# Output Message
-	COMMENT "Copying Qt binaries" VERBATIM)
+	#COMMENT "Copying Qt binaries" VERBATIM)
 	
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

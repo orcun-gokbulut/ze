@@ -208,11 +208,25 @@ ZESize ZEALModule::GetMaxBufferSize()
 
 void ZEALModule::ProcessSound(float ElapsedTime)
 {
-	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
-		SoundSources[I]->Update(ElapsedTime);
+	SoundSources.LockRead();
+	{
+		for (ZESize I = 0; I < SoundSources.GetCount(); I++)
+		{
+			if (SoundSources[I]->IsLoaded())
+				SoundSources[I]->Update(ElapsedTime);
+		}
+	}
+	SoundSources.UnlockRead();
 
-	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
-		SoundSources3D[I]->Update(ElapsedTime);
+	SoundSources3D.LockRead();
+	{
+		for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
+		{
+			if (SoundSources3D[I]->IsLoaded())
+				SoundSources3D[I]->Update(ElapsedTime);
+		}
+	}
+	SoundSources3D.UnlockRead();
 }
 
 #undef PlaySound

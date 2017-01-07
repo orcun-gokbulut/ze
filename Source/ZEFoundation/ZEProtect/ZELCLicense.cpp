@@ -194,7 +194,7 @@ ZEString ZELCLicense::GeneratePreActivationCode() const
 {
 	ZELCActivationData ActivationData;
 	if (!ZELCActivationData::Generate(ActivationData, *this))
-		return false;
+		return ZEString::Empty;
 
 	ZEArray<ZEBYTE> Buffer;
 	ZELCEncryption::RSAEncrypt(Buffer, &ActivationData, sizeof(ZELCActivationData), ZELCKeys::GetPreActivationPublicKey(), ZELCKeys::GetPreActivationPublicKeySize());

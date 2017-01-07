@@ -138,7 +138,7 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEValue** Arguments, ZES
 					if (ArgumentIndexStringIndex >= 3)
 					{
 						zeError("Formatting error. Argument index is too big.");
-						return false;
+						return "!ARGUMENT_INDEX_ERROR!";
 					}
 
 					ArgumentIndexString[ArgumentIndexStringIndex] = *CurrentInput;

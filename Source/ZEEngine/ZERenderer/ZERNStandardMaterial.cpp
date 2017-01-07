@@ -209,7 +209,7 @@ bool ZERNStandardMaterial::UpdateShaders()
 
 	Options.Definitions.Clear();
 	UpdateGBufferForwardPixelShaderDefinitions(Options);
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFixedMaterial_PixelShader";
@@ -282,6 +282,20 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_Forward_PixelShader);
+
+	if (TransparencyEnabled && TransparencyMode == ZERN_TM_ADDITIVE)
+	{
+		ZEGRBlendRenderTarget RenderTargetBlend;
+		RenderTargetBlend.SetBlendEnable(true);
+		RenderTargetBlend.SetSource(ZEGR_BO_SRC_ALPHA);
+		RenderTargetBlend.SetDestination(ZEGR_BO_ONE);
+		RenderTargetBlend.SetOperation(ZEGR_BE_ADD);
+
+		ZEGRBlendState State;
+		State.SetBlendEnable(true);
+		State.SetRenderTargetBlend(0, RenderTargetBlend);
+		RenderState.SetBlendState(State);
+	}
 
 	StageGBuffer_Forward_RenderState = RenderState.Compile();
 	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer/forward render state.");
@@ -521,7 +535,7 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 	Constants.HeightMapOffset = 0.0f;
 	Constants.DitheredOpacityEnabled = ZEGR_FALSE;
 	Constants.EmissiveColor = ZEVector3::One;
-	Constants.AlphaCullLimit = 1.0f;
+	Constants.AlphaCullLimit = 0.0f;
 	Constants.ReflectionColor = ZEVector3::One;
 	Constants.SceneAmbientEnabled = false;
 	Constants.RefractionColor = ZEVector3::One;
@@ -650,7 +664,7 @@ void ZERNStandardMaterial::SetTransparencyEnabled(bool Enabled)
 
 	TransparencyEnabled = Enabled;
 
-	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_STAGE_MASK);
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_RENDER_STATE | ZERN_FMDF_STAGE_MASK);
 }
 
 bool ZERNStandardMaterial::GetTransparencyEnabled() const
@@ -665,7 +679,8 @@ void ZERNStandardMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
 
 	TransparencyMode = Mode;
 
-	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
+	if (TransparencyEnabled)
+		DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_RENDER_STATE | ZERN_FMDF_STAGE_MASK);
 }
 
 ZERNTransparencyMode ZERNStandardMaterial::GetTransparencyMode() const

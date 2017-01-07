@@ -77,7 +77,7 @@ struct ZESoundDevice
 class ZESoundModule : public ZEModule
 {
 	ZE_OBJECT
-	public:
+	protected:
 		static ZEOptionSection					SoundOptions;
 
 		virtual bool							InitializeInternal() override;
