@@ -67,9 +67,8 @@ class ZELightDirectional : public ZELight
 		ZEArray<ZECascade>					Cascades;
 
 		float								CascadeDistanceFactor;
-		bool								UseSunLight;
-		bool								UseMoonLight;
 
+		bool								IsTerrestrial;
 		ZEVector3							TerrestrialColor;
 		float								TerrestrialIntensity;
 
@@ -100,11 +99,8 @@ class ZELightDirectional : public ZELight
 		void								SetCascadeNormalBias(ZEUInt CascadeIndex, float CascadeNormalBias);
 		float								GetCascadeNormalBias(ZEUInt CascadeIndex) const;
 
-		void								SetUseSunLight(bool UseSunLight);
-		bool								GetUseSunLight() const;
-
-		void								SetUseMoonLight(bool UseMoonLight);
-		bool								GetUseMoonLight() const;
+		void								SetIsTerrestrial(bool Value);
+		bool								GetIsTerrestrial() const;
 
 		void								SetTerrestrialColor(const ZEVector3& TerrestrialColor);
 		const ZEVector3&					GetTerrestrialColor() const;

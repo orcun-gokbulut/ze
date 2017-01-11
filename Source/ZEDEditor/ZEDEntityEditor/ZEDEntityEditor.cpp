@@ -112,17 +112,10 @@ bool ZEDEntityEditor::InitializeInternal()
 	//Sponza->SetInteriorFile("#R:/GraphicsTest/Sponza/Sponza.ZEINTERIOR");
 	//Scene->AddEntity(Sponza);
 
-	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
-	Light1->SetIntensity(3.0f);
-	Light1->SetColor(ZEVector3::One);
-	Light1->SetUseSunLight(true);
-	Scene->AddEntity(Light1);
-
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
 
 	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
-	Atmosphere->SetSunLight(Light1);
 	Scene->AddEntity(Atmosphere);
 
 	if (GetObjectManager()->GetRootWrapper() != NULL)

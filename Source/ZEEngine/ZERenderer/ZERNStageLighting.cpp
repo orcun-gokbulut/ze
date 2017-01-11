@@ -344,7 +344,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 				DestLight.DirectionView.NormalizeSelf();
 				DestLight.CastShadow = (ZEBool32)(DirectionalLight->GetCastsShadow() & ShadowingEnabled);
 
-				if (DirectionalLight->GetUseSunLight() || DirectionalLight->GetUseMoonLight())
+				if (DirectionalLight->GetIsTerrestrial())
 					DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetTerrestrialIntensity();
 				else
 					DestLight.Color = DirectionalLight->GetColor() * DirectionalLight->GetIntensity();

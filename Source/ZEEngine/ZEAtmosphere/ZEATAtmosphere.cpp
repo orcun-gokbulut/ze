@@ -484,8 +484,6 @@ ZEEntityResult ZEATAtmosphere::UnloadInternal()
 	SkyConstantBuffer.Release();
 	PrecomputedSingleScatteringBuffer.Release();
 	PrecomputedMultipleScatteringBuffer.Release();
-	SunLight = NULL;
-	MoonLight = NULL;
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
@@ -550,9 +548,6 @@ ZEATAtmosphere::ZEATAtmosphere()
 	OrderCount = 4;
 	UseMultipleScattering = true;
 
-	SunLight = NULL;
-	MoonLight = NULL;
-
 	memset(&Constants, 0, sizeof(Constants));
 
 	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
@@ -563,30 +558,14 @@ ZEATAtmosphere::~ZEATAtmosphere()
 
 }
 
-void ZEATAtmosphere::SetSunLight(ZELightDirectional* SunLight)
-{
-	if (SunLight != NULL && SunLight->GetUseSunLight())
-		this->SunLight = SunLight;
-	else
-		this->SunLight = NULL;
-}
-
 ZELightDirectional* ZEATAtmosphere::GetSunLight()
 {
-	return SunLight;
-}
-
-void ZEATAtmosphere::SetMoonLight(ZELightDirectional* MoonLight)
-{
-	if (MoonLight != NULL && MoonLight->GetUseMoonLight())
-		this->MoonLight = MoonLight;
-	else
-		this->MoonLight = NULL;
+	return Sun->GetSunLight();
 }
 
 ZELightDirectional* ZEATAtmosphere::GetMoonLight()
 {
-	return MoonLight;
+	return Moon->GetMoonLight();
 }
 
 void ZEATAtmosphere::SetCloudCoverage(float CloudCoverage)
@@ -670,7 +649,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	float Clearness = ZEMath::Saturate(1.0f - ZEMath::Power(CloudOpacity + Fog->GetDensity(), 0.25f));
 	Clearness = ZEMath::Clamp(Clearness, 0.0f, 1.0f);
 
-	float SunIntensity = (SunLight != NULL) ? SunLight->GetIntensity() : 5.0f;
+	float SunIntensity = (GetSunLight() != NULL) ? GetSunLight()->GetIntensity() : 5.0f;
 	ZEVector3 CloudAmbient = ZEVector3(0.5f); 
 	float StarBrightness = 0.0f;
 	float FogBrightness = 2.0f;
@@ -695,22 +674,24 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		CloudAmbient = ZEVector3(0.005f);
 	}
 
-	if (SunLight != NULL)
+	if (GetSunLight() != NULL)
 	{
 		ZEQuaternion SunRotation;
 		ZEQuaternion::CreateFromDirection(SunRotation, -SunDirection);
 
+		ZELightDirectional* SunLight = GetSunLight();
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
 		SunLight->SetTerrestrialColor(TerrestrialSunColor);
 		SunLight->SetTerrestrialIntensity(Clearness * SunLight->GetIntensity());
 	}
 
-	if (MoonLight != NULL)
+	if (GetMoonLight() != NULL)
 	{
 		ZEQuaternion MoonRotation;
 		ZEQuaternion::CreateFromDirection(MoonRotation, -MoonDirection);
 
+		ZELightDirectional* MoonLight = GetMoonLight();
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
@@ -774,8 +755,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	if (SunLight != NULL)
+	if (GetSunLight() != NULL)
 	{
+		ZELightDirectional* SunLight = GetSunLight();
 		ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
 		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 5.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 5.0f;
@@ -794,8 +776,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
 
-	if (MoonLight != NULL)
+	if (GetMoonLight() != NULL)
 	{
+		ZELightDirectional* MoonLight = GetMoonLight();
 		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity();
 		Constants.MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.MoonDirection.NormalizeSelf();

@@ -103,9 +103,6 @@ class ZEATAtmosphere : public ZEEntity
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;
 
-		ZELightDirectional*				SunLight;
-		ZELightDirectional*				MoonLight;
-
 		struct
 		{
 			ZEVector3					SunDirection;
@@ -152,10 +149,8 @@ class ZEATAtmosphere : public ZEEntity
 		void							SetMultipleScattering(bool MultipleScattering);
 		bool							GetMultipleScattering();
 
-		void							SetSunLight(ZELightDirectional* SunLight);
 		ZELightDirectional*				GetSunLight();
 
-		void							SetMoonLight(ZELightDirectional* MoonLight);
 		ZELightDirectional*				GetMoonLight();
 
 		void							SetCloudCoverage(float CloudCoverage);

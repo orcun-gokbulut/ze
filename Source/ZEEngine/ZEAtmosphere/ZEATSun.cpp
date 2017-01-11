@@ -51,6 +51,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
+#include "ZERenderer/ZELightDirectional.h"
 
 #define ZEAT_SDF_SHADERS				1
 #define ZEAT_SDF_RENDER_STATES			2
@@ -184,6 +185,29 @@ ZEATSun::ZEATSun()
 	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
 	DiskRadius = 0.266f;
 
+	SunLight = ZELightDirectional::CreateInstance();
+	SunLight->SetName("SunLight");
+	SunLight->SetVisible(true);
+	SunLight->SetEnabled(true);
+	SunLight->SetCastsShadow(true);
+	SunLight->SetRange(500.0f);
+	SunLight->SetCascadeCount(4);
+	SunLight->SetCascadeDistanceFactor(0.8f);
+	SunLight->SetCascadeDepthBias(0, 0.00005f);
+	SunLight->SetCascadeDepthBias(1, 0.00005f);
+	SunLight->SetCascadeDepthBias(2, 0.00005f);
+	SunLight->SetCascadeDepthBias(3, 0.0004f);
+	SunLight->SetCascadeNormalBias(0, 0.1f);
+	SunLight->SetCascadeNormalBias(1, 0.1f);
+	SunLight->SetCascadeNormalBias(2, 0.2f);
+	SunLight->SetCascadeNormalBias(3, 0.4f);
+	SunLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
+	SunLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
+	SunLight->SetIntensity(5.0f);
+	SunLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	SunLight->SetIsTerrestrial(true);
+	AddComponent(SunLight);
+
 	Constants.Color = ZEVector3::One;
 
 	SetEntityFlags(ZE_EF_RENDERABLE);
@@ -191,7 +215,7 @@ ZEATSun::ZEATSun()
 
 ZEATSun::~ZEATSun()
 {
-
+	ClearComponents();
 }
 
 void ZEATSun::SetDirection(const ZEVector3& Direction)
@@ -227,6 +251,11 @@ void ZEATSun::SetColor(const ZEVector3& Color)
 const ZEVector3& ZEATSun::GetColor() const
 {
 	return Constants.Color;
+}
+
+ZELightDirectional* ZEATSun::GetSunLight() const
+{
+	return SunLight;
 }
 
 bool ZEATSun::PreRender(const ZERNPreRenderParameters* Parameters)
