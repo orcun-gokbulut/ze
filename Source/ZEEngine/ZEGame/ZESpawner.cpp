@@ -156,6 +156,8 @@ bool ZESpawner::AddChildEntity(ZEEntity* Entity)
 		}
 	}
 	Spawns.UnlockWrite();
+
+	return true;
 }
 
 void ZESpawner::RemoveChildEntity(ZEEntity* Entity)

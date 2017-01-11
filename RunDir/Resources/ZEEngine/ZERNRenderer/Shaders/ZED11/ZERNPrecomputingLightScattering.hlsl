@@ -262,8 +262,8 @@ float3 ZERNPrecomputingLightScattering_AddOrders_PixelShader_Main(float4 Positio
 float3 ZERNPrecomputingLightScattering_SkyAmbient_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
 	float CosSunEarthNormal = ((PositionViewport.x - 0.5f) / 1023.0f) * 2.0f - 1.0f;
-	CosSunEarthNormal = clamp(CosSunEarthNormal, -1.0f, + 1.0f);
-	float3 PositionWorld = float3(0.0f, 20.0f, 0.0f);
+	CosSunEarthNormal = clamp(CosSunEarthNormal, -1.0f, +1.0f);
+	float3 PositionWorld = float3(0.0f, 900.0f, 0.0f);
 	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);
 	float3 SunDirection;
 	SunDirection.x = sqrt(saturate(1.0f - CosSunEarthNormal * CosSunEarthNormal));

@@ -41,57 +41,53 @@
 #include "ZERNMath.hlsl"
 #include "ZERNSamplers.hlsl"
 
+#define INPUT_CPOINTS	16
+#define OUTPUT_CPOINTS	16
+
 struct ZERNCloud_Plane_VertexShader_Input
 {
 	float3			Position									: POSITION0;
 	float2			TexCoord									: TEXCOORD0;
-};                                                                
+};
 
-struct ZERNCloud_Plane_HullShader_Input                           
-{                                                                 
+struct ZERNCloud_Plane_HullShader_Input
+{
 	float3			Position									: POSITION0;
 	float2			TexCoord									: TEXCOORD0;
-};                                                                
+};
 
-struct ZERNCloud_Plane_HullShader_ConstantData_Output             
-{                                                                 
+struct ZERNCloud_Plane_HullShader_ConstantData_Output
+{
 	float 			Edges[4]									: SV_TessFactor;
 	float 			Inside[2]									: SV_InsideTessFactor;
-};                                                                
+};
 
-struct ZERNCloud_Plane_DomainShader_Input                         
-{                                                                 
+struct ZERNCloud_Plane_DomainShader_Input
+{
 	float3			Position									: POSITION0;
 	float2			TexCoord									: TEXCOORD0;
-};                                                                
+};
 
-struct ZERNCloud_Plane_PixelShader_Input                          
-{                                                                 
+struct ZERNCloud_Plane_PixelShader_Input
+{
 	float4			Position									: SV_Position;
 	float2			TexCoord									: TEXCOORD0;
 	float3			PositionWorld								: TEXCOORD1;
 };
 
-cbuffer ZERNCloud_Plane_Constant_Draw_Transform					: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
-{
-	float4x4		ZERNCloud_Plane_WorldMatrix;
-};
-
 cbuffer ZERNCloud_Plane_Constants								: register(b9)
-{
-	float			ZERNCloud_PlaneSubdivision;
-	float			ZERNCloud_CloudCoverage;
-	float			ZERNCloud_CloudDensity;
-	float			ZERNCloud_Reserved0;
-	
+{	
 	float3			ZERNCloud_LightColor;
-	float			ZERNCloud_Inscattering;
+	float			ZERNCloud_PlaneSubdivision;
+
+	float3			ZERNCloud_Inscattering;
+	uint			ZERNCloud_CloudCoverage;
 	
 	float3			ZERNCloud_LightDirection;
-	float			ZERNCloud_Reserved1;
+	float			ZERNCloud_CloudDensity;
 	
 	float2			ZERNCloud_Translation;
-	float2			ZERNCloud_Reserved2;
+	float2			ZERNCloud_TileFactor;
 };
 
 Texture2D			ZERNCloud_CloudTexture						: register(t5);
@@ -105,10 +101,10 @@ ZERNCloud_Plane_HullShader_Input ZERNCloud_Plane_VertexShader_Main(ZERNCloud_Pla
 	return Output;
 }
 
-ZERNCloud_Plane_HullShader_ConstantData_Output ZERNCloud_Plane_HullShader_Constant(InputPatch<ZERNCloud_Plane_HullShader_Input, 16> Patch, uint PatchID : SV_PrimitiveID)
+ZERNCloud_Plane_HullShader_ConstantData_Output ZERNCloud_Plane_HullShader_Constant(InputPatch<ZERNCloud_Plane_HullShader_Input, INPUT_CPOINTS> Patch, uint PatchID : SV_PrimitiveID)
 {
 	ZERNCloud_Plane_HullShader_ConstantData_Output Output;
-	
+
 	Output.Edges[0] = ZERNCloud_PlaneSubdivision;
 	Output.Edges[1] = ZERNCloud_PlaneSubdivision;
 	Output.Edges[2] = ZERNCloud_PlaneSubdivision;
@@ -122,16 +118,16 @@ ZERNCloud_Plane_HullShader_ConstantData_Output ZERNCloud_Plane_HullShader_Consta
 
 [domain("quad")]
 [partitioning("integer")]
-[outputtopology("triangle_cw")]
-[outputcontrolpoints(16)]
+[outputtopology("triangle_ccw")]
+[outputcontrolpoints(OUTPUT_CPOINTS)]
 [patchconstantfunc("ZERNCloud_Plane_HullShader_Constant")]
-ZERNCloud_Plane_DomainShader_Input ZERNCloud_Plane_HullShader_Main(InputPatch<ZERNCloud_Plane_HullShader_Input, 16> Patch, uint I : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID)
+ZERNCloud_Plane_DomainShader_Input ZERNCloud_Plane_HullShader_Main(InputPatch<ZERNCloud_Plane_HullShader_Input, INPUT_CPOINTS> Patch, uint I : SV_OutputControlPointID, uint PatchID : SV_PrimitiveID)
 {
 	ZERNCloud_Plane_DomainShader_Input Output;
-	
+
 	Output.Position	= Patch[I].Position;
 	Output.TexCoord	= Patch[I].TexCoord;
-	
+
 	return Output;
 }
 
@@ -145,7 +141,7 @@ float4 BernsteinBasis(float T)
                    T * T * T );
 }
 
-float3 CubicBezierSumPosition(const OutputPatch<ZERNCloud_Plane_DomainShader_Input, 16> Patch, float4 BasisU, float4 BasisV)
+float3 CubicBezierSumPosition(const OutputPatch<ZERNCloud_Plane_DomainShader_Input, OUTPUT_CPOINTS> Patch, float4 BasisU, float4 BasisV)
 {
     float3 Result = 0.0f;
 	
@@ -157,7 +153,7 @@ float3 CubicBezierSumPosition(const OutputPatch<ZERNCloud_Plane_DomainShader_Inp
     return Result;
 }
 
-float2 CubicBezierSumTexCoord(const OutputPatch<ZERNCloud_Plane_DomainShader_Input, 16> Patch, float4 BasisU, float4 BasisV)
+float2 CubicBezierSumTexCoord(const OutputPatch<ZERNCloud_Plane_DomainShader_Input, OUTPUT_CPOINTS> Patch, float4 BasisU, float4 BasisV)
 {
     float2 Result = 0.0f;
 	
@@ -170,49 +166,47 @@ float2 CubicBezierSumTexCoord(const OutputPatch<ZERNCloud_Plane_DomainShader_Inp
 }
 
 [domain("quad")]
-ZERNCloud_Plane_PixelShader_Input ZERNCloud_Plane_DomainShader_Main(ZERNCloud_Plane_HullShader_ConstantData_Output Input, float2 UV : SV_DomainLocation, const OutputPatch<ZERNCloud_Plane_DomainShader_Input, 16> Patch)
+ZERNCloud_Plane_PixelShader_Input ZERNCloud_Plane_DomainShader_Main(ZERNCloud_Plane_HullShader_ConstantData_Output Input, float2 UV : SV_DomainLocation, const OutputPatch<ZERNCloud_Plane_DomainShader_Input, OUTPUT_CPOINTS> Patch)
 {
 	float4 BasisU = BernsteinBasis(UV.x);
 	float4 BasisV = BernsteinBasis(UV.y);
-	
+
 	float3 Position = CubicBezierSumPosition(Patch, BasisU, BasisV);
 	float2 TexCoord = CubicBezierSumTexCoord(Patch, BasisU, BasisV);
-	
-	float4 PositionWorld = mul(ZERNCloud_Plane_WorldMatrix, float4(Position, 1.0f));
-	
+
+	Position += ZERNView_Position;
+	TexCoord += ZERNCloud_Translation;
+
 	ZERNCloud_Plane_PixelShader_Input Output;
-	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
+	Output.Position = ZERNTransformations_WorldToProjection(float4(Position, 1.0f));
 	Output.Position.z = 0.0f;
 	Output.TexCoord = TexCoord;
-	Output.PositionWorld = PositionWorld.xyz;
+	Output.PositionWorld = Position;
 	
 	return Output;
 }
 
 float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0
-{	
+{
+	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNSampler_LinearWrap, ZERNCloud_TileFactor * Input.TexCoord, 0.0f);
+	
+	if (!any(CloudSample))
+		discard;
+	
 	float3 ViewDirection = normalize(ZERNView_Position - Input.PositionWorld);
 	float CosLightView = dot(ZERNCloud_LightDirection, ViewDirection);
 	
-	float G = 0.9f;
-	float GG = G * G;
-	float AngularFactor = (1.0f / (64.0f * ZERNMath_PI));
+	const float G = 0.94f;
+	const float GG = G * G;
+	const float AngularFactor = (1.0f / (8.0f * ZERNMath_PI));
 	float PhaseMie = AngularFactor * ((1.0f - GG) * (1.0f + CosLightView * CosLightView)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f));
 	
-	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
-	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNSampler_LinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
+	float Density = ZERNCloud_CloudDensity * dot(CloudSample, float4((ZERNCloud_CloudCoverage >= 1), (ZERNCloud_CloudCoverage >= 2), (ZERNCloud_CloudCoverage >= 3), (ZERNCloud_CloudCoverage >= 4)));
+	float Transmittance = exp(-Density * 3.0f);
 	
-	//float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(0.25f, 0.50f, 0.75f, 0.75f));
-	//float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
-	//float4 CloudPathLengthPerLayer = max(0.0f, CloudSample - (1.0f - ZERNCloud_CloudCoverage));
-	//float CloudCoverage = dot(ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
-	float CloudPathLength = dot(CloudSample + ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
-	
-	float Exponent = ZERNCloud_CloudDensity * CloudPathLength;
-	float Transmittance = exp(-Exponent * Exponent);
-	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * Transmittance + ZERNCloud_Inscattering;
-	
-	return float4(ResultColor, max(1.0f - Transmittance, 0.0f));
+	float Airmass = clamp(0.0f, 2.0f, 1.0f / dot(-ViewDirection, float3(0.0f, 1.0f, 0.0f)));
+
+	return float4(ZERNCloud_LightColor * PhaseMie * Density * Transmittance + ZERNCloud_Inscattering * Airmass, max(1.0f - Transmittance, 0.0f));
 }
 
 #endif

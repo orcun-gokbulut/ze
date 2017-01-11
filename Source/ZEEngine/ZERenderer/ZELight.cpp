@@ -287,7 +287,7 @@ void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constan
 		}
 		while(FunctionResult < Intensity / 256.0f);
 
-		SetRange(ApproximateRoot);
+		//SetRange(ApproximateRoot);
 	}
 }
 

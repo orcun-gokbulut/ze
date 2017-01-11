@@ -254,16 +254,19 @@ ZEVector3 ZEATAtmosphere::GetAmbientColorFromLUT(float CosLightZenith)
 	ZEUInt Index1 = ZEMath::Ceil(Index);
 	float Weight = Index - Index0;
 
-	ZEVector4 Color0 = (Index0 >= 0 && Index0 < 1024) ? SkyAmbient[Index0] : ZEVector4::Zero;
-	ZEVector4 Color1 = (Index1 >= 0 && Index1 < 1024) ? SkyAmbient[Index1] : ZEVector4::Zero;
+	ZEVector3 Color0 = (Index0 >= 0 && Index0 < 1024) ? ZEATSkyAmbient[Index0] : ((Index0 >= 1024) ? ZEATSkyAmbient[1023] : ZEATSkyAmbient[0]);
+	ZEVector3 Color1 = (Index1 >= 0 && Index1 < 1024) ? ZEATSkyAmbient[Index1] : ((Index1 >= 1024) ? ZEATSkyAmbient[1023] : ZEATSkyAmbient[0]);
 
-	ZEVector4 InterpolatedAmbient = (1.0f - Weight) * Color0 + Weight * Color1;
+	ZEVector3 InterpolatedAmbient = (1.0f - Weight) * Color0 + Weight * Color1;
 
-	return InterpolatedAmbient.ToVector3();
+	return InterpolatedAmbient;
 }
 
 void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 {
+	PrecomputedSingleScatteringBuffer = ZEGRTexture::CreateResource(ZEGR_TT_3D, 32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 64 * 16);
+	PrecomputedMultipleScatteringBuffer = ZEGRTexture::CreateResource(ZEGR_TT_3D, 32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 64 * 16);
+
 	ZEHolder<ZEGRBuffer> PrecomputeConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(PrecomputeConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ZEArray<const ZEGRRenderTarget*> MultipleScatteringRenderTargets;
@@ -350,24 +353,24 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
-	ZEHolder<ZEGRTexture> PrecomputedSkyAmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC);
-	const ZEGRRenderTarget* SkyAmbientRenderTarget = PrecomputedSkyAmbientBuffer->GetRenderTarget();
-
-	Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
-	Context->SetRenderTargets(1, &SkyAmbientRenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 1024.0f, 1.0f));
-
-	Context->Draw(3, 0);
-
-	ZEHolder<ZEGRTexture> AmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STAGING, ZEGR_RBF_NONE);
-
-	Context->CopyResource(AmbientBuffer, PrecomputedSkyAmbientBuffer);
-
-	float* Data;
-	AmbientBuffer->Map(ZEGR_RMT_WRITE, reinterpret_cast<void**>(&Data));
-		memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
-	AmbientBuffer->Unmap();
+	//ZEHolder<ZEGRTexture> PrecomputedSkyAmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STATIC);
+	//const ZEGRRenderTarget* SkyAmbientRenderTarget = PrecomputedSkyAmbientBuffer->GetRenderTarget();
+	//
+	//Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
+	//Context->SetRenderTargets(1, &SkyAmbientRenderTarget, NULL);
+	//Context->SetTexture(ZEGR_ST_PIXEL, 0, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
+	//Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 1024.0f, 1.0f));
+	//
+	//Context->Draw(3, 0);
+	//
+	//ZEHolder<ZEGRTexture> AmbientBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_STAGING, ZEGR_RBF_NONE);
+	//
+	//Context->CopyResource(AmbientBuffer, PrecomputedSkyAmbientBuffer);
+	//
+	//float* Data;
+	//AmbientBuffer->Map(ZEGR_RMT_READ, reinterpret_cast<void**>(&Data));
+	//	memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
+	//AmbientBuffer->Unmap();
 
 	PrecomputeExtinctionPixelShader.Release();
 	PrecomputeSingleScatteringPixelShader.Release();
@@ -456,8 +459,6 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	CreateRandomVectors();
-
 	SkyConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ZEGRTextureOptions TextureOptions;
@@ -468,16 +469,8 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEATAtmosphere/Clouds.dds");
 	Stars->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/StarMap.dds");
 
-	SunLight = ZELightDirectional::CreateInstance();
-	AddComponent(SunLight);
-
-	MoonLight = ZELightDirectional::CreateInstance();
-	AddComponent(MoonLight);
-
-
 	if (!Update())
 		return ZE_ER_FAILED_CLEANUP;
-
 	return ZE_ER_DONE;
 }
 
@@ -648,8 +641,11 @@ ZEVector3 ZEATAtmosphere::GetTerrestrialMoonAmbientColor()
 
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
+	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
 	SunDirection.NormalizeSelf();
+
+	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
 	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
 	MoonDirection.NormalizeSelf();
 
@@ -660,8 +656,44 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	ComputeAmbientColors(CosSunZenith, CosMoonZenith);
 
-	bool SunVisible = CosSunZenith >= 0.0f;
-	bool MoonVisible = CosMoonZenith >= 0.0f;
+	bool SunVisible = CosSunZenith > -ZEAngle::Sin(ZEAngle::ToRadian(SunDiskRadiusDegree));
+	bool MoonVisible = CosMoonZenith > -ZEAngle::Sin(ZEAngle::ToRadian(MoonDiskRadiusDegree));
+
+	float NightStart = ZEAngle::Sin(ZEAngle::ToRadian(18.0f + SunDiskRadiusDegree));
+
+	bool Night = CosSunZenith < -NightStart;
+	bool Daylight = SunVisible;
+	bool Twilight = !Daylight && !Night;
+
+	float CloudOpacity = (Cloud->GetCloudCoverage() / 4.0f) * 0.9f + Cloud->GetCloudDensity() * 0.1f;
+
+	float Clearness = ZEMath::Saturate(1.0f - ZEMath::Power(CloudOpacity + Fog->GetDensity(), 0.25f));
+	Clearness = ZEMath::Clamp(Clearness, 0.0f, 1.0f);
+
+	float SunIntensity = (SunLight != NULL) ? SunLight->GetIntensity() : 5.0f;
+	ZEVector3 CloudAmbient = ZEVector3(0.5f); 
+	float StarBrightness = 0.0f;
+	float FogBrightness = 2.0f;
+
+	if (Daylight)
+	{
+		CloudAmbient = SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
+	}
+	else if (Twilight)
+	{
+		float Weight = ZEMath::Max(0.0f, CosSunZenith + NightStart) / NightStart;
+
+		SunIntensity = ZEMath::Lerp(0.2f, 5.0f, Weight);
+		StarBrightness = ZEMath::Lerp(0.1f, 0.0f, Weight);
+		CloudAmbient = SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
+		ZEVector3::Lerp(CloudAmbient, ZEVector3::One * 0.005f, CloudAmbient, Weight);
+	}
+	else
+	{
+		SunIntensity = 0.2f;
+		StarBrightness = 0.1f;
+		CloudAmbient = ZEVector3(0.005f);
+	}
 
 	if (SunLight != NULL)
 	{
@@ -671,9 +703,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
 		SunLight->SetTerrestrialColor(TerrestrialSunColor);
-		SunLight->SetTerrestrialIntensity(ZEMath::Exp(-Cloud->GetCloudDensity()) * SunLight->GetIntensity());
-
-		TerrestrialSunAmbientColor *= SunLight->GetIntensity();
+		SunLight->SetTerrestrialIntensity(Clearness * SunLight->GetIntensity());
 	}
 
 	if (MoonLight != NULL)
@@ -684,25 +714,22 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
-		MoonLight->SetTerrestrialIntensity(ZEMath::Exp(-Cloud->GetCloudDensity()) * MoonLight->GetIntensity());
-
-		TerrestrialMoonAmbientColor *= MoonLight->GetIntensity();
+		MoonLight->SetTerrestrialIntensity(Clearness * MoonLight->GetIntensity());
 	}
 
-	ZEVector3 AmbientColor = ZEVector3(0.005f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
-	//GetScene()->SetAmbientColor(AmbientColor);
-	//GetScene()->SetAmbientFactor(1.0f);
+	ZEVector3 SceneAmbientColor = ZEVector3(0.01f);
+	ZEVector3::Lerp(SceneAmbientColor, SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith)), CloudAmbient, 1.0f - Clearness);
+	GetScene()->SetAmbientColor(SceneAmbientColor);
+	GetScene()->SetAmbientFactor(0.2f);
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
-	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 50.0f);
+	Sun->SetColor(TerrestrialSunColor * 20.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);
 
-	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
 	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
 	Moon->SetColor(TerrestrialMoonColor * 1.0f);
 	Moon->SetDirection(MoonDirection);
@@ -711,24 +738,23 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (SunVisible)
 	{
-		float SunInscattering = (CosSunZenith * 0.5f + 0.5f);
-
 		Cloud->SetLightDirection(-SunDirection);
-		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
-		Cloud->SetInscattering(SunInscattering * SunLight->GetTerrestrialIntensity());
-		Stars->SetBrightness(0.0f);
-		Fog->SetColor(ZEVector3(SunInscattering));
+		Cloud->SetLightColor(TerrestrialSunColor * SunIntensity);
+	}
+	else if (MoonVisible)
+	{
+		Cloud->SetLightDirection(-MoonDirection);
+		Cloud->SetLightColor(TerrestrialMoonColor * 0.01f);
 	}
 	else
 	{
-		float MoonInscattering = (CosMoonZenith * 0.5f + 0.5f);
-
-		Cloud->SetLightDirection(-MoonDirection);
-		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);
-		Cloud->SetInscattering(MoonInscattering * MoonLight->GetTerrestrialIntensity());
-		Stars->SetBrightness(0.5f);
-		Fog->SetColor(ZEVector3(MoonInscattering));
+		Cloud->SetLightDirection(ZEVector3::UnitY);
+		Cloud->SetLightColor(ZEVector3(0.05f));
 	}
+
+	Cloud->SetInscattering(CloudAmbient * 0.2f);
+	Stars->SetBrightness(StarBrightness);
+	Fog->SetColor(ZEVector3(FogBrightness) * ZEVector3::DotProduct(SceneAmbientColor, ZEVector3(0.33f)));
 
 	double SunTransit, Sunrise, Sunset;
 	ZEATAstronomy::GetSunTransitSunriseSunsetTime(SunTransit, Sunrise, Sunset, Observer);
@@ -752,9 +778,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	{
 		ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
-		float SunIntensity = (CosSunZenith > -0.2f) ? 5.0f : 0.5f;
+		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 5.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 5.0f;
 
-		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * SunIntensity;
+		Constants.SunColor = SunLight->GetColor() * SunIntensity;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.SunDirection.NormalizeSelf();
 

@@ -132,7 +132,7 @@ ZERNStageAtmosphere::ZERNStageAtmosphere()
 
 ZERNStageAtmosphere::~ZERNStageAtmosphere()
 {
-	DeinitializeInternal();
+	Deinitialize();
 }
 
 ZEGRRenderState ZERNStageAtmosphere::GetRenderState()
@@ -140,7 +140,7 @@ ZEGRRenderState ZERNStageAtmosphere::GetRenderState()
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
 
-	if(!Initialized)
+	if (!Initialized)
 	{
 		Initialized = true;
 
@@ -151,7 +151,7 @@ ZEGRRenderState ZERNStageAtmosphere::GetRenderState()
 		RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 	}
 
 	return RenderState;

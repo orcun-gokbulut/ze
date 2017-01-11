@@ -62,7 +62,7 @@ class ZEATAtmosphere : public ZEEntity
 		ZEFlags							DirtyFlags;
 		ZERNCommand						Command;
 		ZEATObserver					Observer;
-		ZEVector4						SkyAmbient[1024];
+		//ZEVector4						SkyAmbient[1024];
 		ZEVector3						TerrestrialSunColor;
 		ZEVector3						TerrestrialSunAmbientColor;
 		ZEVector3						TerrestrialMoonColor;

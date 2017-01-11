@@ -80,29 +80,31 @@ void ZEATCloud::CreatePlane()
 		ZEVector2 Texcoord;
 	};
 
-	float Height = 0.5f;
-
-	Vertex Vertices[16] = 
+	float Height1 = 0.0f;
+	float Radius1 = 1.0f;
+	float CurveOffset1 = 0.11f;
+	float EdgePoint1 = Radius1 / 3.0f;
+	Vertex Vertices[] = 
 	{
-		{ ZEVector3(-10.0f, 0.0f, 10.0f), ZEVector2(0.0f, 0.0f) },
-		{ ZEVector3(-5.0f, 0.0f, 10.0f), ZEVector2(0.25f, 0.0f) },
-		{ ZEVector3(5.0f, 0.0f, 10.0f), ZEVector2(0.75f, 0.0f) },
-		{ ZEVector3(10.0f, 0.0f, 10.0f), ZEVector2(1.0f, 0.0f) },
+		{ ZEVector3(-Radius1, Height1, Radius1), ZEVector2(0.0f, 0.0f) },
+		{ ZEVector3(-EdgePoint1, Height1, Radius1), ZEVector2(0.33f, 0.0f) },
+		{ ZEVector3(EdgePoint1, Height1, Radius1), ZEVector2(0.66f, 0.0f) },
+		{ ZEVector3(Radius1, Height1, Radius1), ZEVector2(1.0f, 0.0f) },
 
-		{ ZEVector3(-10.0f, 0.0f, 5.0f), ZEVector2(0.0f, 0.25f) },
-		{ ZEVector3(-5.0f, Height, 5.0f), ZEVector2(0.25f, 0.25f) },
-		{ ZEVector3(5.0f, Height, 5.0f), ZEVector2(0.75f, 0.25f) },
-		{ ZEVector3(10.0f, 0.0f, 5.0f), ZEVector2(1.0f, 0.25f) },
+		{ ZEVector3(-Radius1, Height1, EdgePoint1), ZEVector2(0.0f, 0.33f) },
+		{ ZEVector3(-EdgePoint1, Height1 + CurveOffset1, EdgePoint1), ZEVector2(0.0001f, 0.0001f) },
+		{ ZEVector3(EdgePoint1, Height1 + CurveOffset1, EdgePoint1), ZEVector2(0.9999f, 0.0001f) },
+		{ ZEVector3(Radius1, Height1, EdgePoint1), ZEVector2(1.0f, 0.33f) },
 
-		{ ZEVector3(-10.0f, 0.0f, -5.0f), ZEVector2(0.0f, 0.5f) },
-		{ ZEVector3(-5.0f, Height, -5.0f), ZEVector2(0.25f, 0.5f) },
-		{ ZEVector3(5.0f, Height, -5.0f), ZEVector2(0.75f, 0.5f) },
-		{ ZEVector3(10.0f, 0.0f, -5.0f), ZEVector2(1.0f, 0.5f) },
+		{ ZEVector3(-Radius1, Height1, -EdgePoint1), ZEVector2(0.0f, 0.66f) },
+		{ ZEVector3(-EdgePoint1, Height1 + CurveOffset1, -EdgePoint1), ZEVector2(0.0001f, 0.9999f) },
+		{ ZEVector3(EdgePoint1, Height1 + CurveOffset1, -EdgePoint1), ZEVector2(0.9999f, 0.9999f) },
+		{ ZEVector3(Radius1, Height1, -EdgePoint1), ZEVector2(1.0f, 0.66f) },
 
-		{ ZEVector3(-10.0f, 0.0f, -10.0f), ZEVector2(0.0f, 1.0f) },
-		{ ZEVector3(-5.0f, 0.0f, -10.0f), ZEVector2(0.25f, 1.0f) },
-		{ ZEVector3(5.0f, 0.0f, -10.0f), ZEVector2(0.75f, 1.0f) },
-		{ ZEVector3(10.0f, 0.0f, -10.0f), ZEVector2(1.0f, 1.0f) }
+		{ ZEVector3(-Radius1, Height1, -Radius1), ZEVector2(0.0f, 1.0f) },
+		{ ZEVector3(-EdgePoint1, Height1, -Radius1), ZEVector2(0.33f, 1.0f) },
+		{ ZEVector3(EdgePoint1, Height1, -Radius1), ZEVector2(0.66f, 1.0f) },
+		{ ZEVector3(Radius1, Height1, -Radius1), ZEVector2(1.0f, 1.0f) },
 	};
 
 	PlaneVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, 16 * sizeof(Vertex), sizeof(Vertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices);
@@ -151,11 +153,6 @@ bool ZEATCloud::UpdateRenderStates()
 	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_16_CONTROL_POINT_PATCHLIST);
 	RenderState.SetVertexLayout(GetPositionTexcoordVertexLayout());
-
-	ZEGRRasterizerState RasterizerStateFrontCCW;
-	RasterizerStateFrontCCW.SetFrontIsCounterClockwise(true);
-
-	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
 
 	ZEGRBlendState BlendState;
 	BlendState.SetBlendEnable(true);
@@ -213,9 +210,6 @@ ZEEntityResult ZEATCloud::LoadInternal()
 
 	CreatePlane();
 
-	PlaneTransformConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-	zeCheckError(PlaneTransformConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
-
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
@@ -227,13 +221,14 @@ ZEEntityResult ZEATCloud::LoadInternal()
 
 ZEEntityResult ZEATCloud::UnloadInternal()
 {
+	DirtyFlags.RaiseAll();
+
 	PlaneVertexShader.Release();
 	PlaneHullShader.Release();
 	PlaneDomainShader.Release();
 	PlanePixelShader.Release();
 	PlaneRenderStateData.Release();
 	PlaneVertexBuffer.Release();
-	PlaneTransformConstantBuffer.Release();
 	ConstantBuffer.Release();
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
@@ -250,13 +245,14 @@ ZEATCloud::ZEATCloud()
 
 	CloudTexture = NULL;
 
-	Constants.PlaneSubdivision = 10.0f;
+	Constants.PlaneSubdivision = 16.0f;
 	Constants.CloudCoverage = 0.0f;
 	Constants.CloudDensity = 0.0f;
 	Constants.LightColor = ZEVector3::One;
-	Constants.Inscattering = 0.05f;
+	Constants.Inscattering = ZEVector3::One * 0.5f;
 	Constants.LightDirection = ZEVector3::One;
 	Constants.Translation = ZEVector2::Zero;
+	Constants.TextureTileFactor = ZEVector2(4.0f, 4.0f);
 
 	SetEntityFlags(ZE_EF_RENDERABLE);
 }
@@ -285,24 +281,24 @@ const ZEString& ZEATCloud::GetCloudTexture() const
 
 void ZEATCloud::SetCloudCoverage(float CloudCoverage)
 {
-	CloudCoverage = ZEMath::Max(0.0f, CloudCoverage);
+	CloudCoverage = ZEMath::Clamp(CloudCoverage, 0.0f, 4.0f);
 
-	if (Constants.CloudCoverage == CloudCoverage)
+	if (Constants.CloudCoverage == (ZEUInt)CloudCoverage)
 		return;
 
-	Constants.CloudCoverage = CloudCoverage;
+	Constants.CloudCoverage = (ZEUInt)CloudCoverage;
 
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
 float ZEATCloud::GetCloudCoverage() const
 {
-	return Constants.CloudCoverage;
+	return (float)Constants.CloudCoverage;
 }
 
 void ZEATCloud::SetCloudDensity(float CloudDensity)
 {
-	CloudDensity = ZEMath::Max(0.0f, CloudDensity);
+	CloudDensity = ZEMath::Clamp(CloudDensity, 0.0f, 1.0f);
 
 	if (Constants.CloudDensity == CloudDensity)
 		return;
@@ -332,7 +328,7 @@ const ZEVector3& ZEATCloud::GetLightColor() const
 	return Constants.LightColor;
 }
 
-void ZEATCloud::SetInscattering(float Inscattering)
+void ZEATCloud::SetInscattering(const ZEVector3& Inscattering)
 {
 	if (Constants.Inscattering == Inscattering)
 		return;
@@ -342,7 +338,7 @@ void ZEATCloud::SetInscattering(float Inscattering)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-float ZEATCloud::GetInscattering() const
+const ZEVector3& ZEATCloud::GetInscattering() const
 {
 	return Constants.Inscattering;
 }
@@ -382,7 +378,7 @@ bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	static ZEVector2 Translation = ZEVector2(0.0f, 0.0f);
+	static ZEVector2 Translation = ZEVector2::Zero;
 	Translation += Parameters->ElapsedTime * ZEVector2(0.0001f, 0.0003f);
 
 	if (Translation.x > 1.0f)
@@ -403,19 +399,12 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	if (!Update())
 		return;
 
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, Parameters->View->Position, ZEVector3::One);
-
-	PlaneTransformConstantBuffer->SetData(&WorldMatrix);
-
 	ZEGRContext* Context = Parameters->Context;	
 	const ZERNStage* Stage = Parameters->Stage;
 
-	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneTransformConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 9, ConstantBuffer);
 	Context->SetRenderState(PlaneRenderStateData);
-	const ZEGRTexture* Texture = CloudTexture;
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture);
 	Context->SetVertexBuffer(0, PlaneVertexBuffer);
 
 	Context->Draw(PlaneVertexBuffer->GetElementCount(), 0);
