@@ -37,6 +37,7 @@
 
 #include "ZEDAsset.h"
 #include "ZEDAssetType.h"
+#include "ZEDAssetEvent.h"
 #include "ZEDAssetDirectory.h"
 #include "ZEDAssetCategory.h"
 #include "ZERandom.h"
@@ -45,12 +46,12 @@
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEPathTokenizer.h"
+#include "ZEMeta/ZEProvider.h"
 #include "ZERegEx/ZERegEx.h"
 
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEDAssetEvent.h"
 
 #undef CreateDirectory
 #undef RemoveDirectory
@@ -370,10 +371,24 @@ void ZEDAssetManager::SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Catego
 	RaiseEvent(&Event);
 }
 
+void ZEDAssetManager::RegisterAssetTypes()
+{
+	ZEArray<ZEClass*> AssetTypeClasses = ZEProvider::GetInstance()->GetClasses(ZEDAssetType::Class(), true);
+	for (ZESize I = 0; I < AssetTypeClasses.GetCount(); I++)
+	{
+		if (AssetTypeClasses[I]->IsAbstract())
+			continue;
+
+		RegisterAssetType(static_cast<ZEDAssetType*>(AssetTypeClasses[I]->CreateInstance()));
+	}
+}
+
 bool ZEDAssetManager::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())
 		return false;
+
+	RegisterAssetTypes();
 
 	DirectoryRoot = new ZEDAssetDirectory();
 	DirectoryRoot->SetName(ResourcePath);

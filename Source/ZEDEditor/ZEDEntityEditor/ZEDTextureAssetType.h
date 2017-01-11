@@ -37,6 +37,7 @@
 
 class ZEDTextureAssetType : public ZEDAssetType
 {
+	ZE_OBJECT
 	public:
 		virtual const char*						GetName() const override;
 		virtual const char* const*				GetExtensions() const override;

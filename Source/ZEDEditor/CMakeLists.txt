@@ -55,4 +55,4 @@ ze_add_executable(TARGET ZEDEditor
 
 qt5_use_modules(ZEDEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDSceneEditor ZETrainIGModule HavalsanCombatModule)
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIGModule HavalsanCombatModule)

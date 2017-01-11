@@ -54,12 +54,12 @@ bool ZEDDeleteOperation::Apply()
 		const const ZEArray<ZEDObjectWrapper*>& ChildWrappers =  Wrapper->GetChildWrappers();
 		while(ChildWrappers.GetCount() != 0)
 		{
-			ZEDObjectWrapper* ChildeWrapper = ChildWrappers.GetFirstItem();
+			ZEDObjectWrapper* ChildWrapper = ChildWrappers.GetFirstItem();
 
 			ZEDRelocatedItem RelocatedItem;
 			RelocatedItem.NewParent = Parent;
 			RelocatedItem.OldParent = Wrapper;
-			RelocatedItem.Wrapper = ChildWrappers[I];
+			RelocatedItem.Wrapper = ChildWrapper;
 			Item.RelocatedItems.Add(RelocatedItem);
 
 			Wrapper->RemoveChildWrapper(RelocatedItem.Wrapper);

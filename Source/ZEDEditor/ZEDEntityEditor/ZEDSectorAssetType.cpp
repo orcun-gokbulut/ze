@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSectorAssetType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSectorAssetType.h"
+#include "ZEDSectorAsset.h"
+
+ZEDSectorAssetType::ZEDSectorAssetType()
+{
+
+}
+
+const char* ZEDSectorAssetType::GetName() const
+{
+	return "Sector";
+}
+
+const char* const* ZEDSectorAssetType::GetExtensions() const
+{
+	static const char* Extensions[1] =
+	{
+		".ZESector"
+	};
+
+	return Extensions;
+}
+
+ZESize ZEDSectorAssetType::GetExtensionCount() const
+{
+	return 1;
+}
+
+const ZEVector3& ZEDSectorAssetType::GetColor() const
+{
+	static ZEVector3 Color(0.541f, 0.886f, 0.204f);
+	return Color;
+}
+
+const char* ZEDSectorAssetType::GetIconPath(const ZEString& Extension) const
+{
+	return "#R:/ZEDEditor/Icons/ZEDAsset/ZEDSectorAsset.png";
+}
+
+ZEDAssetTypeCapabilities ZEDSectorAssetType::GetCapabilities() const
+{
+	return ZED_ATC_WRAPPER;
+}
+
+ZEDAsset* ZEDSectorAssetType::Wrap(const ZEString& Path) const 
+{
+	ZEDSectorAsset* SectorAsset = new ZEDSectorAsset();
+	SectorAsset->SetType(const_cast<ZEDSectorAssetType*>(this));
+	return SectorAsset;
+}

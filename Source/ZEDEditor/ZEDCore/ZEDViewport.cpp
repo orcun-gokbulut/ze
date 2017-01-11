@@ -91,11 +91,11 @@ bool ZEDViewport::UpdateView()
 	View.VerticalFOV = GetVerticalFOV();
 	View.VerticalFOVTop = View.VerticalFOV / 2.0f;
 	View.VerticalFOVBottom = View.VerticalFOV / 2.0f;
-	View.HorizontalFOV = View.AspectRatio * View.VerticalFOV;
+	View.HorizontalFOV = ZEAngle::ArcTan(ZEAngle::Tan(View.VerticalFOV) * View.AspectRatio);
 	View.HorizontalFOVLeft = View.HorizontalFOV / 2.0f;
 	View.HorizontalFOVRight = View.HorizontalFOV / 2.0f;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
-	View.NearZ = 1.0f;
+	View.NearZ = 0.1f;
 	View.FarZ = 2000.0f;
 
 	ZEMatrix4x4::CreateViewTransform(View.ViewTransform, View.Position, View.Rotation);

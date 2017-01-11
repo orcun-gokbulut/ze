@@ -48,7 +48,7 @@ const char* ZEDModelAssetType::GetName() const
 
 const char* const* ZEDModelAssetType::GetExtensions() const
 {
-	static const char* Extensions[9] =
+	static const char* Extensions[1] =
 	{
 		".ZEModel"
 	};

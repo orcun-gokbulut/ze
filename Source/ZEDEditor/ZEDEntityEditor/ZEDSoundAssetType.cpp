@@ -48,7 +48,7 @@ const char* ZEDSoundAssetType::GetName() const
 
 const char* const* ZEDSoundAssetType::GetExtensions() const
 {
-	static const char* Extensions[9] =
+	static const char* Extensions[3] =
 	{
 		".wav",
 		".ogg",

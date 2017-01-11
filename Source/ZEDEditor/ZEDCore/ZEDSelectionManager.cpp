@@ -120,7 +120,7 @@ void ZEDSelectionManager::RegisterCommands()
 	FreezeObjectsCommand.SetCategory("Selection");
 	FreezeObjectsCommand.SetName("ZEDSelectionManager::FreezeObjectsCommand");
 	FreezeObjectsCommand.SetText("Freeze Objects");
-	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unlock.png");
+	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Lock.png");
 	FreezeObjectsCommand.OnAction += ZEDCommandDelegate::Create<ZEDSelectionManager, &ZEDSelectionManager::FreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&FreezeObjectsCommand);
 
@@ -137,7 +137,7 @@ void ZEDSelectionManager::UpdateCommands()
 	ClearSelectionCommand.SetEnabled(GetSelection().GetCount() != 0);
 	LockSelectionCommand.SetValueChecked(GetLockSelection());
 	FreezeObjectsCommand.SetEnabled(GetSelection().GetCount() != 0);
-	UnfreezeObjectsCommand.SetEnabled(GetFrozonObjects().GetCount() != 0);
+	UnfreezeObjectsCommand.SetEnabled(GetFrozenObjects().GetCount() != 0);
 }
 
 void ZEDSelectionManager::SelectAllCommand_OnAction(const ZEDCommand* Command)
@@ -162,7 +162,7 @@ void ZEDSelectionManager::FreezeObjectsCommand_OnAction(const ZEDCommand* Comman
 
 void ZEDSelectionManager::UnfreezeObjectsCommand_OnAction(const ZEDCommand* Command)
 {
-	UnfreezeObjects(GetFrozonObjects());
+	UnfreezeObjects(GetFrozenObjects());
 }
 
 void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)
@@ -418,7 +418,7 @@ void ZEDSelectionManager::ClearFocus()
 	RaiseEvent(&Event);
 }
 
-const ZEArray<ZEDObjectWrapper*> ZEDSelectionManager::GetFrozonObjects()
+const ZEArray<ZEDObjectWrapper*> ZEDSelectionManager::GetFrozenObjects()
 {
 	return FrozenObjects;
 }

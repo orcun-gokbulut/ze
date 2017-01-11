@@ -105,7 +105,7 @@ class ZEDSelectionManager : public ZEDComponent
 		void								FocusObject(ZEDObjectWrapper* Object);
 		void								ClearFocus();
 
-		const ZEArray<ZEDObjectWrapper*>	GetFrozonObjects();
+		const ZEArray<ZEDObjectWrapper*>	GetFrozenObjects();
 		void								FreezeObject(ZEDObjectWrapper* Object);
 		void								FreezeObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 		void								UnfreezeObject(ZEDObjectWrapper* Object);
