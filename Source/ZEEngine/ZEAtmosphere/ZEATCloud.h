@@ -65,7 +65,6 @@ class ZEATCloud : public ZEEntity
 		ZEHolder<ZEGRShader>					PlanePixelShader;
 		ZEHolder<ZEGRRenderStateData>			PlaneRenderStateData;
 		ZEHolder<ZEGRBuffer>					PlaneVertexBuffer;
-		ZEHolder<ZEGRBuffer>					PlaneTransformConstantBuffer;
 
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 
@@ -73,19 +72,17 @@ class ZEATCloud : public ZEEntity
 
 		struct  
 		{
-			float								PlaneSubdivision;
-			float								CloudCoverage;
-			float								CloudDensity;
-			float								Reserved0;
-
 			ZEVector3							LightColor;
-			float								Inscattering;
+			float								PlaneSubdivision;
+
+			ZEVector3							Inscattering;
+			ZEUInt								CloudCoverage;
 
 			ZEVector3							LightDirection;
-			float								Reserved1;
+			float								CloudDensity;
 
 			ZEVector2							Translation;
-			ZEVector2							Reserved2;
+			ZEVector2							TextureTileFactor;
 		} Constants;
 
 		void									CreatePlane();
@@ -114,8 +111,8 @@ class ZEATCloud : public ZEEntity
 		void									SetLightColor(const ZEVector3& LightColor);
 		const ZEVector3&						GetLightColor() const;
 
-		void									SetInscattering(float Inscattering);
-		float									GetInscattering() const;
+		void									SetInscattering(const ZEVector3& Inscattering);
+		const ZEVector3&						GetInscattering() const;
 
 		void									SetLightDirection(const ZEVector3& SunDirection);
 		const ZEVector3&						GetLightDirection() const;

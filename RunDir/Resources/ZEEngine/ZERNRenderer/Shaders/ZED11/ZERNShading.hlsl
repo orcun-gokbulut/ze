@@ -214,9 +214,7 @@ float3 ZERNShading_TotalBRDF(float3 LightDirectionView, ZERNShading_Surface Surf
 
 float ZERNShading_DistanceAttenuation(float3 Attenuation, float Range, float DistanceToLight)
 {
-	return 1.0f / dot(Attenuation.zyx, float3(1.0f, DistanceToLight, DistanceToLight * DistanceToLight));
-	//return (Range - DistanceToLight) / Range;
-	//return 1.0f / (DistanceToLight * DistanceToLight);
+	return saturate((Range - DistanceToLight) / Range) / (((DistanceToLight * DistanceToLight) / Range) + exp(3.0f * DistanceToLight / Range));
 }
 
 float3 ZERNShading_DirectionalShadowing(ZERNShading_DirectionalLight DirectionalLight, ZERNShading_Surface Surface)
