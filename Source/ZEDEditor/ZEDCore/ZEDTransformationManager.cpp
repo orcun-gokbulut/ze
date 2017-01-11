@@ -185,7 +185,7 @@ void ZEDTransformationManager::UpdateTransformStates()
 			TransformFocused = &TransformStates[I];
 	}
 
-	if (TransformStates.GetCount())
+	if (TransformStates.GetCount() != 0)
 	{
 		if (TransformPivot == ZED_TP_OBJECT)
 		{
@@ -522,11 +522,16 @@ ZEVector3 ZEDTransformationManager::GetScale(bool& Valid)
 
 void ZEDTransformationManager::ObjectEvent(const ZEDObjectEvent* Event)
 {
+	if (TransformActive)
+		return;
+
 	UpdateTransformStates();
 }
 
 void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent* Event)
 {
+	zeDebugCheck(TransformActive, "Selection changed while a transformation is active");
+
 	ResetTransform();
 	UpdateTransformStates();
 }
@@ -600,6 +605,7 @@ void ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent* E
 				TransformGizmo->StartMoveProjection(View, Ray);
 				
 				Event->Acquire();
+				break;
 
 			case ZED_TT_ROTATE:
 				StartTransform(TransformState->Gizmo);
@@ -608,6 +614,7 @@ void ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent* E
 				TransformGizmo->StartRotationProjection();
 				
 				Event->Acquire();
+				break;
 
 			case ZED_TT_SCALE:
 				StartTransform(TransformState->Gizmo);
@@ -616,6 +623,8 @@ void ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent* E
 				TransformGizmo->StartScaleProjection();
 				
 				Event->Acquire();
+				break;
+
 
 			default:
 				return;
