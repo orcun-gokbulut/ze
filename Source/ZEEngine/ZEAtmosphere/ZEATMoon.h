@@ -48,6 +48,7 @@ class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRBuffer;
 class ZEGRTexture;
+class ZELightDirectional;
 
 class ZEATMoon : public ZEEntity
 {
@@ -66,6 +67,8 @@ class ZEATMoon : public ZEEntity
 
 		ZEVector3							Direction;
 		float								DiskRadius;
+
+		ZELightDirectional*					MoonLight;
 
 		struct
 		{
@@ -101,6 +104,8 @@ class ZEATMoon : public ZEEntity
 
 		void								SetColor(const ZEVector3& Color);
 		const ZEVector3&					GetColor() const;
+
+		ZELightDirectional*					GetMoonLight() const;
 
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

@@ -51,8 +51,8 @@ ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEDEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZETrainIGModule HavalsanCombatModule)
+	LIBS ZEEngine ZEDEntityEditor ZETrainIGModule CustHCombatModule)
 
 qt5_use_modules(ZEDEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIGModule HavalsanCombatModule)
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIGModule CustHCombatModule)

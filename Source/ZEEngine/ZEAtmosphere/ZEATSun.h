@@ -47,6 +47,7 @@
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRBuffer;
+class ZELightDirectional;
 
 class ZEATSun : public ZEEntity
 {
@@ -63,6 +64,8 @@ class ZEATSun : public ZEEntity
 
 		ZEVector3						Direction;
 		float							DiskRadius;
+
+		ZELightDirectional*				SunLight;
 
 		struct 
 		{
@@ -95,6 +98,8 @@ class ZEATSun : public ZEEntity
 
 		void							SetColor(const ZEVector3& Color);
 		const ZEVector3&				GetColor() const;
+
+		ZELightDirectional*				GetSunLight() const;
 
 		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

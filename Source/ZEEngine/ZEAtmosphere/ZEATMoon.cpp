@@ -51,6 +51,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
+#include "ZERenderer/ZELightDirectional.h"
 
 #define ZEAT_MDF_SHADERS				1
 #define ZEAT_MDF_RENDER_STATES			2
@@ -182,6 +183,16 @@ ZEATMoon::ZEATMoon()
 	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
 	DiskRadius = 0.257f;
 
+	MoonLight = ZELightDirectional::CreateInstance();
+	MoonLight->SetName("MoonLight");
+	MoonLight->SetVisible(true);
+	MoonLight->SetEnabled(true);
+	MoonLight->SetCastsShadow(false);
+	MoonLight->SetIntensity(0.001f);
+	MoonLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	MoonLight->SetIsTerrestrial(true);
+	AddComponent(MoonLight);
+
 	Constants.Phase = 31.5f / 53.0f;
 	Constants.Color = ZEVector3::One;
 
@@ -190,7 +201,7 @@ ZEATMoon::ZEATMoon()
 
 ZEATMoon::~ZEATMoon()
 {
-
+	ClearComponents();
 }
 
 void ZEATMoon::SetDirection(const ZEVector3& Direction)
@@ -226,6 +237,11 @@ void ZEATMoon::SetColor(const ZEVector3& Color)
 const ZEVector3& ZEATMoon::GetColor() const
 {
 	return Constants.Color;
+}
+
+ZELightDirectional* ZEATMoon::GetMoonLight() const
+{
+	return MoonLight;
 }
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)

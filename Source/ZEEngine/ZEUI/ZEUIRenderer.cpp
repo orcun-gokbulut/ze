@@ -197,7 +197,7 @@ ZEUIRenderer::~ZEUIRenderer()
 
 void ZEUIRenderer::AddRectangle(ZEUIRectangle* Rectangle)
 {
-//	Rectangles.Add(*Rectangle);
+	Rectangles.Add(*Rectangle);
 }
 
 void ZEUIRenderer::AddCustomCommand(ZEUInt ZOrder, ZERNCommand* Command)

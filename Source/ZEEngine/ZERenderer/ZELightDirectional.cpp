@@ -204,8 +204,7 @@ ZELightDirectional::ZELightDirectional()
 	Cascades.SetCount(3);
 
 	CascadeDistanceFactor = 0.5f;
-	UseSunLight = false;
-	UseMoonLight = false;
+	IsTerrestrial = false;
 
 	TerrestrialColor = ZEVector3::Zero;
 	TerrestrialIntensity = 0.0f;
@@ -266,24 +265,14 @@ float ZELightDirectional::GetCascadeNormalBias(ZEUInt CascadeIndex) const
 	return Cascades[CascadeIndex].NormalBias;
 }
 
-void ZELightDirectional::SetUseSunLight(bool UseSunLight)
+void ZELightDirectional::SetIsTerrestrial(bool Value)
 {
-	this->UseSunLight = UseSunLight;
+	this->IsTerrestrial = Value;
 }
 
-bool ZELightDirectional::GetUseSunLight() const
+bool ZELightDirectional::GetIsTerrestrial() const
 {
-	return UseSunLight;
-}
-
-void ZELightDirectional::SetUseMoonLight(bool UseMoonLight)
-{
-	this->UseMoonLight = UseMoonLight;
-}
-
-bool ZELightDirectional::GetUseMoonLight() const
-{
-	return UseMoonLight;
+	return IsTerrestrial;
 }
 
 void ZELightDirectional::SetTerrestrialColor(const ZEVector3& TerrestrialColor)
