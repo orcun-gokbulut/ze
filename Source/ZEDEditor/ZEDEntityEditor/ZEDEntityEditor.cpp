@@ -71,16 +71,6 @@ bool ZEDEntityEditor::InitializeInternal()
 {
 	if (!ZEDEditor::InitializeInternal())
 		return false;
-
-	GetObjectManager()->RegisterWrapperClass(ZEDEntityWrapper::Class());
-	GetObjectManager()->RegisterWrapperClass(ZEDSceneWrapper::Class());
-
-	GetAssetManager()->RegisterAssetType(new ZEDTextureAssetType());
-	GetAssetManager()->RegisterAssetType(new ZEDMaterialAssetType());
-	GetAssetManager()->RegisterAssetType(new ZEDModelAssetType());
-	GetAssetManager()->RegisterAssetType(new ZEDSceneAssetType());
-	GetAssetManager()->RegisterAssetType(new ZEDSoundAssetType());
-	GetAssetManager()->RegisterAssetType(new ZEDPrefabAssetType());
 	
 	ViewportController = ZEDViewportController::CreateInstance();
 	AddComponent(ViewportController);

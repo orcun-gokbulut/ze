@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSectorAsset.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSectorAsset.h"
+
+#include "ZEGame/ZESector.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDCore/ZEDObjectManager.h"
+
+ZEClass* ZEDSectorAsset::GetWrapperObjectClass() const 
+{
+	return ZESector::Class();
+}
+
+ZEDObjectWrapper* ZEDSectorAsset::CreateWrapper(ZEDEditor* Editor) const 
+{
+	ZESector* Sector = ZESector::CreateInstance();
+	Sector->SetSectorFile(GetPath());
+
+	ZEDObjectWrapper* Wrapper = Editor->GetObjectManager()->WrapObject(Sector);
+	if (Wrapper == NULL)
+		Sector->Destroy();
+
+	return Wrapper;
+}

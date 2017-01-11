@@ -48,7 +48,7 @@ const char* ZEDMaterialAssetType::GetName() const
 
 const char* const* ZEDMaterialAssetType::GetExtensions() const
 {
-	static const char* Extensions[9] =
+	static const char* Extensions[1] =
 	{
 		".ZEMaterial",
 	};

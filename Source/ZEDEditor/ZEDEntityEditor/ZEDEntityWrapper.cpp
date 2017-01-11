@@ -278,7 +278,7 @@ void ZEDEntityWrapper::Tick(float ElapsedTime)
 {
 	ZEDObjectWrapper3D::Tick(ElapsedTime);
 
-	if (GetEntity() != NULL && GetEntity()->GetState() == ZE_ES_LOADING)
+	if (GetEntity() != NULL && GetEntity()->GetState() == ZE_ES_LOADED)
 		Update();
 }
 

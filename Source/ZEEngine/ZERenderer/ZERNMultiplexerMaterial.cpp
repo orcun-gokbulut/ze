@@ -225,6 +225,7 @@ bool ZERNMultiplexerMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 
 	ZEMLWriterNode PropertiesNode;
 	MaterialNode->OpenNode("Properties", PropertiesNode);
+	PropertiesNode.WriteString("Name", GetName());
 	PropertiesNode.WriteString("DefaultMaterial", DefaultMaterialName);
 
 	ZEMLWriterNode MaterialsNode;

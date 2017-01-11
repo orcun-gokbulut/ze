@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSectorAssetType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDCore/ZEDAssetType.h"
+
+class ZEDSectorAssetType : public ZEDAssetType
+{
+	ZE_OBJECT
+	public:
+		virtual const char*						GetName() const override;
+		virtual const char* const*				GetExtensions() const override;
+		virtual ZESize							GetExtensionCount() const override;
+		virtual const ZEVector3&				GetColor() const;
+		virtual const char*						GetIconPath(const ZEString& Extension) const override;
+		virtual ZEDAssetTypeCapabilities		GetCapabilities() const override;
+
+		virtual ZEDAsset*						Wrap(const ZEString& Path) const override;
+
+												ZEDSectorAssetType();
+};

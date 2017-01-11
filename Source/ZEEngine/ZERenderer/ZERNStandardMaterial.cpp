@@ -142,6 +142,9 @@ void ZERNStandardMaterial::UpdateShadowMapGenerationPixelShaderDefinitions(ZEGRS
 	if (OpacityMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_MAP"));
 
+	if (BaseMapEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_BASE_MAP"));
+
 	if (AlphaCullEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
 }
@@ -1939,13 +1942,13 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 
+	const ZEGRSampler* Samplers[] = {Sampler, Sampler, Sampler, Sampler};
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 4, Samplers);
+
 	ZEUInt StageID = Stage->GetId();
 	if (StageID == ZERN_STAGE_GBUFFER || StageID == ZERN_STAGE_FORWARD_TRANSPARENT)
 	{
 		Context->SetRenderState(Instanced ? StageGBuffer_Forward_Instancing_RenderState : StageGBuffer_Forward_RenderState);
-
-		const ZEGRSampler* Samplers[] = {Sampler, Sampler, Sampler, Sampler};
-		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 4, Samplers);
 
 		const ZEGRTexture* Textures[] = 
 		{
@@ -1970,10 +1973,9 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 		if (AlphaCullEnabled)
 		{
 			if (OpacityMapEnabled)
-			{
-				Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
-			}
+			else if (BaseMapEnabled)
+				Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
 		}
 	}
 	else if (StageID == ZERN_STAGE_RENDER_DEPTH)
@@ -1983,10 +1985,9 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 		if (AlphaCullEnabled)
 		{
 			if (OpacityMapEnabled)
-			{
-				Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
-			}
+			else if (BaseMapEnabled)
+				Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
 		}
 	}
 

@@ -334,10 +334,10 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	
 	#ifdef ZERN_FM_OPACITY_MAP
 		Alpha *= ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
+	#elif defined ZERN_FM_BASE_MAP
 		Alpha *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
 	#endif
-			
+	
 	#ifdef ZERN_FM_DEFERRED
 		if (ZERNFixedMaterial_DitheredOpacityEnabled || 
 		#ifdef ZERN_FM_INSTANCING
@@ -551,7 +551,7 @@ void ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMateri
 	
 	#ifdef ZERN_FM_OPACITY_MAP
 		Alpha *= ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-	#elif defined ZERN_FM_OPACITY_BASE_ALPHA
+	#elif defined ZERN_FM_BASE_MAP
 		Alpha *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
 	#endif
 	

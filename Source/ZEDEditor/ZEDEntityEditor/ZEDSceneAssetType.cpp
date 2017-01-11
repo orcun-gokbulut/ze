@@ -48,10 +48,9 @@ const char* ZEDSceneAssetType::GetName() const
 
 const char* const* ZEDSceneAssetType::GetExtensions() const
 {
-	static const char* Extensions[9] =
+	static const char* Extensions[1] =
 	{
-		".ZEScene",
-		".ZESector"
+		".ZEScene"
 	};
 
 	return Extensions;
@@ -59,7 +58,7 @@ const char* const* ZEDSceneAssetType::GetExtensions() const
 
 ZESize ZEDSceneAssetType::GetExtensionCount() const
 {
-	return 2;
+	return 1;
 }
 
 const ZEVector3& ZEDSceneAssetType::GetColor() const 

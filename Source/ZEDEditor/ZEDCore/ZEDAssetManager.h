@@ -92,6 +92,8 @@ class ZEDAssetManager : public ZEDComponent
 
 		void									SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Category);
 
+		void									RegisterAssetTypes();
+
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 

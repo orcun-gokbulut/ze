@@ -52,17 +52,30 @@
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
 
+enum ZECameraFOVAxis
+{
+	ZE_CFA_HORIZONTAL,
+	ZE_CFA_VERTICAL
+};
+
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 		mutable ZERNView				View;
+		
+		ZECameraFOVAxis					FOVAxis;
+		bool							AutoFOV;
+		bool							AutoAspectRatio;
+		float							AspectRatio;
 
 		ZEViewFrustum					ViewFrustum;
-		bool							AutoAspectRatio;
 
 										ZECamera();
+		
+		void							UpdateAutoAspectRatio();
+		void							UpdateAutoFOV();
 
 		virtual void					LocalTransformChanged();
 		virtual void					ParentTransformChanged();
@@ -78,11 +91,32 @@ class ZECamera : public ZEEntity
 		void							SetFarZ(float FarZ);
 		float							GetFarZ() const;
 
-		void							SetHorizontalFOV(float FOV);
+		void							SetFOVAxis(ZECameraFOVAxis FOVAxis);
+		ZECameraFOVAxis					GetFOVAxis() const;
+		
+		void							SetFOV(float FOV);
+		float							GetFOV() const;
+
+		void							SetAutoFOV(bool Enabled);
+		bool							GetAutoFOV() const;
+
+		void							SetHorizontalFOV(float HorizontalFOV);
 		float							GetHorizontalFOV() const;
 
-		void							SetVerticalFOV(float FOV);
+		void							SetVerticalFOV(float VerticalFOV);
 		float							GetVerticalFOV() const;
+
+		void							SetTopFOV(float VerticalFovTop);
+		float							GetTopFOV() const;
+
+		void							SetBottomFOV(float VerticalFovBottom);
+		float							GetBottomFOV() const;
+
+		void							SetRightFOV(float HorizontalFovRight);
+		float							GetRightFOV() const;
+
+		void							SetLeftFOV(float HorizontalFovLeft);
+		float							GetLeftFOV() const;
 
 		void							SetAutoAspectRatio(bool Enabled);
 		bool							GetAutoAspectRatio() const;
@@ -99,18 +133,6 @@ class ZECamera : public ZEEntity
 		void							SetProjectionType(ZERNProjectionType ProjectionType);
 		ZERNProjectionType				GetProjectionType() const;
 
-		void							SetTopFOV(float VerticalFovTop);
-		float							GetTopFOV() const;
-
-		void							SetBottomFOV(float VerticalFovBottom);
-		float							GetBottomFOV() const;
-
-		void							SetRightFOV(float HorizontalFovRight);
-		float							GetRightFOV() const;
-
-		void							SetLeftFOV(float HorizontalFovLeft);
-		float							GetLeftFOV() const;
-
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetInvViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();
@@ -125,4 +147,6 @@ class ZECamera : public ZEEntity
 
 		static ZECamera*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZECamera.png");
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZECamera.png")
+ZE_META_ATTRIBUTE_PROPERTY(HorizontalFOV, ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(VerticalFOV, ZEMeta.Serialization, false);

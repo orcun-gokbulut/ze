@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESea.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+//#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+//#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEEntityProvider.h"
+//#include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+//#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEMath/ZEMath.h"
 
 ZESea::ZESea()
@@ -175,6 +175,8 @@ ZESea::ZESea()
 	}
 
 	VertexBuffer->Unlock();*/
+
+	SetEntityFlags(ZE_EF_TICKABLE | ZE_EF_RENDERABLE);
 }
 
 ZESea::~ZESea()
@@ -188,11 +190,6 @@ void ZESea::Tick(float ElapsedTime)
 	NormalOffset += NormalVelocity * ElapsedTime;
 
 	ZEEntity::Tick(ElapsedTime);
-}
-
-ZEDrawFlags ZESea::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 ZESea* ZESea::CreateInstance()

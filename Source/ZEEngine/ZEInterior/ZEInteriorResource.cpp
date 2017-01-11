@@ -407,7 +407,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 			return false;
 
 		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
-		Materials[I] = ZERNStandardMaterial::LoadResourceShared(MaterialPath);
+		Materials[I] = ZERNMaterial::LoadResourceShared(MaterialPath);
 	}
 
 	return true;
