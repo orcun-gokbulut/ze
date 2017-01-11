@@ -43,6 +43,8 @@ ze_add_source(ZEDEntityWrapper.cpp						Sources)
 ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
 ze_add_source(ZEDSectorWrapper.cpp						Sources)
 ze_add_source(ZEDSectorWrapper.h						Sources ZEMC)
+ze_add_source(ZEDWaypointPathWrapper.cpp				Sources)
+ze_add_source(ZEDWaypointPathWrapper.h					Sources ZEMC)
 
 ze_add_source(ZEDMaterialAsset.cpp						Sources)
 ze_add_source(ZEDMaterialAsset.h						Sources)

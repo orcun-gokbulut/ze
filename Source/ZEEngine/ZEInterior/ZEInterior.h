@@ -107,4 +107,5 @@ class ZEInterior : public ZEEntity
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEInterior.png");

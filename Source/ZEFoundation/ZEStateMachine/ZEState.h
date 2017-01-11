@@ -34,75 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_STATE_H__
-#define	__ZE_STATE_H__
+
+#include "ZEMeta/ZEObject.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEMeta/ZEEnumerator.h"
+#include "ZEMeta/ZEEvent.h"
 
-#include "ZEStateMachine.h"
+class ZEStateMachine;
+class ZEStateTransition;
 
-typedef ZEDelegate<void (ZEState*, ZEState*, bool&)> ZEStateEventEntering;
-typedef ZEDelegate<void (ZEState*, ZEState*)> ZEStateEventEntered;
-typedef ZEDelegate<void (ZEState*, ZEState*, bool&)> ZEStateEventLeaving;
-typedef ZEDelegate<void (ZEState*, ZEState*)> ZEStateEventLeft;
-
-class ZEState
+ZE_ENUM(ZEStateTransitionRule)
 {
-	friend class ZEStateMachine;
-
-	private:
-		ZEString					Name;
-		ZEStateMachine*				Owner;
-		ZEArray<ZEState*>			Transitions;
-
-	protected:
-									ZEState();
-		virtual						~ZEState();
-
-	public:
-		const ZEStateMachine&		GetOwner();
-
-		void						SetName(const ZEString& Name);
-		const ZEString&				GetName();
-
-		virtual void				OnEntering(ZEState* From, ZEState* To, bool& Cancel);
-		virtual void				OnEntered(ZEState* From, ZEState* To);
-		virtual void				OnLeaving(ZEState* From, ZEState* To, bool& Cancel);
-		virtual void				OnLeft(ZEState* From, ZEState* To);
-
-		const ZEArray<ZEState*>&	GetTransitions();
-		virtual bool				AddTransition(ZEState* State);
-		virtual bool				RemoveTransition(ZEState* State);
-};	
-
-class ZEDelegatedState : public ZEState
-{
-	private:
-		ZEStateEventEntering		EnteringEvent;
-		ZEStateEventEntered			EnteredEvent;
-		ZEStateEventLeaving			LeavingEvent;
-		ZEStateEventLeft			LeftEvent;
-
-	public:
-		virtual void				OnEntering(ZEState* From, ZEState* To, bool& Cancel);
-		virtual void				OnEntered(ZEState* From, ZEState* To);
-		virtual void				OnLeaving(ZEState* From, ZEState* To, bool& Cancel);
-		virtual void				OnLeft(ZEState* From, ZEState* To);
-
-		void						SetEnteringEvent(const ZEStateEventEntering& Event);
-		const ZEStateEventEntering&	GetEnteringEvent();
-
-		void						SetEnteredEvent(const ZEStateEventEntered& Event);
-		const ZEStateEventEntered&	GetEnteredEvent();
-
-		void						SetLeavingEvent(const ZEStateEventLeaving& Event);
-		const ZEStateEventLeaving&	GetLeavingEvent();
-
-		void						SetLeftEvent(const ZEStateEventLeft& Event);
-		const ZEStateEventLeft&		GetLeftEvent();
-
+	ZE_STL_NONE,
+	ZE_STL_ALLOW_LIST,
+	ZE_STL_DENY_LIST
 };
 
-#endif
+class ZEState : public ZEObject
+{
+	ZE_OBJECT
+	friend class ZEStateMachine;
+	private:
+		ZEString							Name;
+		ZEUInt								NameHash;
+		ZEStateMachine*						StateMachine;
+		ZEStateTransitionRule				TransitionRule;
+		ZEArray<ZEStateTransition*>			TransitionList;
+
+		void								StriptStateFromTransition(ZEState* State);
+
+	protected:
+		virtual void						Entering(ZEStateTransition* Transition, bool& Cancel);
+		virtual void						Entered(ZEStateTransition* Transition);
+		virtual void						Looping();
+		virtual void						Leaving(ZEStateTransition* Transition, bool& Cancel);
+		virtual void						Left(ZEStateTransition* Transition);
+
+	public:
+		ZEStateMachine*						GetStateMachine() const;
+
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName() const;
+
+		void								SetTransitionRule(ZEStateTransitionRule Rule);
+		ZEStateTransitionRule				GetTransitionRule() const;
+
+		const ZEArray<ZEStateTransition*>&	GetTransitionList() const;
+		virtual bool						AddToTransitionList(ZEStateTransition* Transition);
+		virtual bool						RemoveFromTransitionList(ZEStateTransition* Transition);
+
+		ZE_EVENT(							OnEntering,(ZEStateTransition* Transition, bool& Reject));
+		ZE_EVENT(							OnEntered,(ZEStateTransition* Transition));
+		ZE_EVENT(							OnLooping,(ZEState* Transition));
+		ZE_EVENT(							OnLeaving,(ZEStateTransition* Transition, bool& Reject));
+		ZE_EVENT(							OnLeft,(ZEStateTransition* Transition));
+
+		void								Tick();
+
+											ZEState();
+		virtual								~ZEState();
+};

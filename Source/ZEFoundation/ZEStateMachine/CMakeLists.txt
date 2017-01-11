@@ -35,12 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEState.cpp				Sources)
-ze_add_source(ZEState.h					Sources Headers)
-ze_add_source(ZEStateMachine.cpp		Sources)
-ze_add_source(ZEStateMachine.h			Sources Headers)
+ze_add_source(ZEState.cpp						Sources)
+ze_add_source(ZEState.h							Sources Headers ZEMC)
+ze_add_source(ZEStateTransition.cpp				Sources)
+ze_add_source(ZEStateTransition.h				Sources Headers ZEMC)
+ze_add_source(ZEStateMachine.cpp				Sources)
+ze_add_source(ZEStateMachine.h					Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEStateMachine
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEDS)

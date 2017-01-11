@@ -35,96 +35,178 @@
 
 #include "ZEStateMachine.h"
 #include "ZEState.h"
+#include "ZEStateTransition.h"
+
+void ZEStateMachine::Pushed()
+{
+
+}
+
+void ZEStateMachine::Popped()
+{
+	SetCurrentState(NULL);
+}
 
 const ZEArray<ZEState*>& ZEStateMachine::GetStates()
 {
 	return States;
 }
 
+
+ZEState* ZEStateMachine::GetState(const ZEString& Name)
+{
+	ZEUInt NameHash = Name.Hash();
+	for (ZESize I = 0; I < States.GetCount(); I++)
+	{
+		if (States[I]->NameHash == NameHash &&
+			States[I]->Name == Name)
+		{
+			return States[I];
+		}
+	}
+}
+
 bool ZEStateMachine::AddState(ZEState* State)
 {
-	zeDebugCheck(State == NULL, "State cannot be NULL.");
+	zeCheckError(State == NULL, false, "Cannot add state. State is NULL.");
+	zeCheckError(State->StateMachine != NULL, false, "Cannot add state. State is already added to a state machine. State Name: \"%s\".", State->GetName().ToCString());
 
-	if (State == NULL)
-		return false;
-
-	if(States.Exists(State))
-		return false;
-
-	if(State->Owner != NULL)
-		return false;
-
+	State->StateMachine = this;
 	States.Add(State);
-	State->Owner = this;
 
 	return true;
 }
 
-bool ZEStateMachine::DeleteState(ZEState* State)
+bool ZEStateMachine::RemoveState(ZEState* State)
 {
-	zeDebugCheck(State == NULL, "State cannot be NULL.");
-
-	if (State == NULL)
-		return false;
-
-	if (State->Owner != this)
-		return false;
-
-	delete State;
-
+	zeCheckError(State == NULL, false, "Cannot remove state. State is NULL.");
+	zeCheckError(State->StateMachine != NULL, false, "Cannot remove state. State does not belong to this state machine. State Name: \"%s\".", State->GetName().ToCString());
+	
+	State->StateMachine = NULL;
+	States.RemoveValue(State);
 	return true;
 }
 
-bool ZEStateMachine::SetCurrentState(ZEState* TargetState, bool Forced)
+void ZEStateMachine::SetCurrentState(const ZEString& TargetStateName)
 {
-	zeDebugCheck(TargetState == NULL, "TargetState cannot be NULL.");
+	ZEState* TargetState = GetState(TargetStateName);
+	zeCheckError(TargetState == NULL, ZE_VOID, "Cannot change current state. Cannot find TargetState. Target State Name: \"%s\".", TargetStateName.ToCString());
 
-	if (TargetState == NULL)
-		return false;
+	SetCurrentState(TargetState);
+}
 
-	zeDebugCheck(TargetState->Owner != this, "TargetState is not member of this state machine.");
+void ZEStateMachine::SetCurrentState(ZEState* TargetState)
+{
+	zeCheckError(TargetState == NULL, ZE_VOID, "Cannot change current state. TargetState is NULL.");
+	zeCheckError(TargetState->StateMachine == NULL, ZE_VOID, "Cannot change current state. TargetState does not belong to this state machine.");
 
-	if (Forced)
+	if (CurrentState != NULL)
+		CurrentState->Left(NULL);
+
+	CurrentState = TargetState;
+
+	if (TargetState != NULL)
+		TargetState->Entered(NULL);
+}
+
+const ZEState* ZEStateMachine::GetCurrentState()
+{
+	return CurrentState;
+}
+
+/*void ZEStateMachine::PushStateMachine(ZEStateMachine* Machine)
+{
+	StateMachineStack.Push(Machine);
+	Machine->Pushed();
+}
+
+void ZEStateMachine::PopStateMachine()
+{
+	StateMachineStack
+}*/
+
+bool ZEStateMachine::Transfer(const ZEString& TargetStateName)
+{
+	ZEState* TargetState = GetState(TargetStateName);
+	zeCheckError(TargetState == NULL, false, "Cannot transfer state. Cannot find TargetState. Target State Name: \"%s\".", TargetStateName.ToCString());
+
+	return Transfer(TargetState);
+}
+
+bool ZEStateMachine::Transfer(ZEState* TargetState)
+{
+	zeCheckError(TargetState == NULL, false, "Cannot change current state. TargetState is NULL.");
+	zeCheckError(TargetState->StateMachine != NULL, false, "Cannot change current state. TargetState does not belong to this state machine.");
+
+
+	if (TargetState == CurrentState)
 	{
-		CurrentState = TargetState;
+		TargetState->Looping();
 		return true;
 	}
-
-	if (TargetState->Owner != this)
-		return false;
-
+	
+	ZEStateTransition PlaceHolderTransition;
+	ZEStateTransition* Transition = NULL;
 	if(CurrentState != NULL)
 	{
-		if(!CurrentState->Transitions.Exists(TargetState))
-			return false;
+		if (CurrentState->GetTransitionRule() == ZE_STL_ALLOW_LIST)
+		{
+			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
+			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
+			{
+				if (TransitionList[I]->GetTargetState() == TargetState)
+				{
+					Transition = NULL;
+					break;
+				}
+			}
+		}
+		else if (CurrentState->GetTransitionRule() == ZE_STL_DENY_LIST)
+		{
+			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
+			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
+			{
+				if (TransitionList[I]->GetTargetState() == TargetState)
+					return false;
+			}
+		}
 
-		bool CancelLeaving;
-		CurrentState->OnLeaving(CurrentState, TargetState, CancelLeaving);
-	
-		if (CancelLeaving)
+		ZEStateTransition PlaceHolderTransition;
+		if (Transition == NULL)
+		{
+			PlaceHolderTransition.State = CurrentState;
+			PlaceHolderTransition.TargetState = TargetState;
+			Transition = &PlaceHolderTransition;
+		}
+		
+		bool Rejected;
+		CurrentState->Leaving(Transition, Rejected);
+
+		if (Rejected)
 			return false;
 	}
 
-	bool CancelEntering;
-	TargetState->OnEntering(CurrentState, TargetState, CancelEntering);
+	bool Rejected;
+	TargetState->Entering(Transition, Rejected);
 
-	if (CancelEntering)
+	if (Rejected)
 		return false;
 
 	ZEState* OldState = CurrentState;
 	CurrentState = TargetState;
 
 	if (OldState != NULL)
-		OldState->OnLeft(OldState, CurrentState);
+		OldState->Left(Transition);
 
-	CurrentState->OnEntered(OldState, CurrentState);
+	CurrentState->Entered(Transition);
 
 	return true;
 }
 
-const ZEState* ZEStateMachine::GetCurrentState()
+void ZEStateMachine::Tick()
 {
-	return CurrentState;
+	if (CurrentState != NULL)
+		CurrentState->Tick();
 }
 
 ZEStateMachine::ZEStateMachine()
@@ -134,67 +216,6 @@ ZEStateMachine::ZEStateMachine()
 
 ZEStateMachine::~ZEStateMachine()
 {
-	for (ZESize I = 0; I < States.GetCount(); I++)
-	{
-		delete States[I];
-	}
+	while (States.GetCount() != 0)
+		delete States.GetFirstItem();
 }
-
-/*
-const ZEArray<ZEState2> ZEStateMachine2::GetStates() const
-{
-
-}
-
-bool ZEStateMachine2::AddState(ZEInt ID, const ZEString& Name, ZEStateCallback EnterCallback = ZEStateCallback(), ZEStateCallback ExitCallback = ZEStateCallback(), ZEStateCallback LoopCallback = ZEStateCallback())
-{
-
-}
-
-bool ZEStateMachine2::RemoveState(ZEInt ID)
-{
-
-}
-bool ZEStateMachine2::RemoveState(const ZEString& Name)
-{
-
-}
-
-void ZEStateMachine2::SetCurrentState(ZEInt ID)
-{
-
-}
-
-void ZEStateMachine2::SetCurrentState(const ZEString& Name)
-{
-
-}
-
-const ZEString& ZEStateMachine2::GetCurrentStateName() const
-{
-
-}
-
-ZEInt ZEStateMachine2::GetCurrentStateID() const
-{
-
-}
-
-bool ZEStateMachine2::Transition(ZEInt ID)
-{
-
-}
-
-bool ZEStateMachine2::Transition(const ZEString& Name)
-{
-
-}
-void ZEStateMachine2::Loop()
-{
-
-}
-
-ZEStateMachine2::ZEStateMachine2()
-{
-
-}*/

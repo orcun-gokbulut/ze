@@ -66,6 +66,7 @@
 #include "ZEDSoundAssetType.h"
 #include "ZEDPrefabAssetType.h"
 #include "ZEDCore/ZEDViewportSelectionController.h"
+#include "ZEDWaypointPathWrapper.h"
 
 bool ZEDEntityEditor::InitializeInternal()
 {
@@ -101,6 +102,7 @@ bool ZEDEntityEditor::InitializeInternal()
 	ObjectBrowser->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
 	New();
+	Scene->LoadEntities();
 
  	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetModelFile("#R:/ZETrainSimulator/Actors/Vehicles/DE24000/DE24000.ZEMODEL");

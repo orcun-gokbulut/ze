@@ -34,91 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_STATE_MACHINE_H__
-#define	__ZE_STATE_MACHINE_H__
+
+#include "ZEMeta/ZEObject.h"
 
 #include "ZEDS/ZEArray.h"
 
 class ZEState;
 
-class ZEStateMachine
+class ZEStateMachine : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEState;
-
 	private:
-		ZEArray<ZEState*>			States;
-		ZEState*					CurrentState;
+		ZEArray<ZEState*>				States;
+		ZEState*						CurrentState;
+		ZEArray<ZEStateMachine*>		StateMachineStack;
+
+		void							Pushed();
+		void							Popped();
 
 	public:
-		const ZEArray<ZEState*>&	GetStates();
+		const ZEArray<ZEState*>&		GetStates();
+		ZEState*						GetState(const ZEString& Name);
+		bool							AddState(ZEState* State);
+		bool							RemoveState(ZEState* State);
 
-		virtual bool				AddState(ZEState* State);
-		virtual bool				DeleteState(ZEState* State);
-
-		virtual bool				SetCurrentState(ZEState* NextState, bool Forced = false);
-		virtual const ZEState*		GetCurrentState();
-
-
-
-									ZEStateMachine();
-		virtual						~ZEStateMachine();
-};
+		void							SetCurrentState(const ZEString& TargetStateName);
+		void							SetCurrentState(ZEState* TargetState);
+		const ZEState*					GetCurrentState();
 /*
-typedef ZEDelegate<bool (const ZEState& State)> ZEStateCallback;
+//		void							PushStateMachine(ZEStateMachine* Machine);
+// 		void							PopStateMachine();
+*/
+		bool							Transfer(const ZEString& TargetStateName);
+		bool							Transfer(ZEState* TargetState);
+		void							Tick();
 
-class ZEState2
-{
-	private:
-		ZEStateMachine2*			StateMachine;
-		ZEInt						ID;
-		ZEString					Name;
-		ZEStateCallback				EnterFunction;
-		ZEStateCallback				ExitFunction;
-		ZEStateCallback				LoopFunction;
-
-	public:
-		ZEStateMachine2*			StateMachine;
-		ZEInt						ID;
-		ZEString					Name;
-		
-		void						GetEnterFunction(const ZEStateCallback&);
-		const ZEStateCallback&		GetEnterFunction();
-
-		void						GetExitFunction(const ZEStateCallback&);
-		const ZEStateCallback&		GetExitFunction();
-
-				GetLoopFunction(const ZEStateCallback&);
-		const ZEStateCallback&		GetLoopFunction();
+										ZEStateMachine();
+		virtual							~ZEStateMachine();
 };
-
-class ZEStateMachine2
-{
-	private:
-		ZEArray<ZEState>			States;
-		ZESize						CurrentStateIndex;
-		ZEState*					TransitioningState;
-
-	public:
-		ZEArray<ZEState2>&			GetState();
-		const ZEArray<ZEState2>&	GetStates() const;
-		bool						AddState(const ZEState& State);
-		bool						RemoveState(ZEInt ID);
-		bool						RemoveState(const ZEString& Name);
-
-		void						SetCurrentState(ZEInt ID);
-		void						SetCurrentState(const ZEString& Name);
-
-		const ZEString&				GetCurrentStateName() const;
-		ZEInt						GetCurrentStateID() const;
-
-		ZEState*					GetTransitioningState();
-
-		bool						Transition(ZEInt ID);
-		bool						Transition(const ZEString& Name);
-
-		void						Loop();
-
-									ZEStateMachine2();
-};*/
-
-#endif

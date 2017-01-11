@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+ Zinek Engine - ZEDWaypointPathWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,43 +35,17 @@
 
 #pragma once
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
+#include "ZEDEntityWrapper.h"
 
-class ZEGeographicEntity : public ZEEntity
+class ZERayCastCollision;
+
+class ZEDWaypointPathWrapper : public ZEDEntityWrapper
 {
-	friend class ZESectorManager;
-	ZE_OBJECT;
+	ZE_OBJECT
 	private:
-		ZELink<ZEGeographicEntity>			GeoLink;
-		mutable ZEFlags						GeographicEntityDirtyFlags;
-
-		ZEVector3d							GeographicPosition;
-		ZEQuaternion						GeographicRotation;
-		ZEVector3d							GeographicScale;
-
-		mutable ZEMatrix4x4d				GeographicTransform;
-		mutable ZEMatrix4x4d				InvGeographicTransform;
-
-	protected:
-		virtual void						GeographicTransformChanged();
-
-											ZEGeographicEntity();
+		virtual void								UpdateCanvas() override;
 
 	public:
-		const ZEMatrix4x4d&					GetGeographicTransform() const;
-		const ZEMatrix4x4d&					GetInvGeographicTransform() const;
-
-		virtual void						SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d							GetGeographicPosition() const;
-
-		virtual void						SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion						GetGeographicRotation() const;
-
-		virtual void						SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d							GetGeographicScale() const;
-
-		static ZEGeographicEntity*			CreateInstance();
+		static ZEDWaypointPathWrapper*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEWaypointPath);

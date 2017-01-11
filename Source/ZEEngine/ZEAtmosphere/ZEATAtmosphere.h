@@ -173,6 +173,7 @@ class ZEATAtmosphere : public ZEEntity
 
 		static ZEATAtmosphere*			CreateInstance();
 }
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEATAtmosphere.png")
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false);

@@ -144,6 +144,9 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 	if(Characters.GetCount() == 0)
 		return;
 
+	if (!GetVisiblity())
+		return;
+
 	ZEUIRectangle OutputCharacter, TempCharacter;
 	ZESSize DrawLineIndex = -1;
 	ZERectangle TempRenderRect = TextRenderingArea;

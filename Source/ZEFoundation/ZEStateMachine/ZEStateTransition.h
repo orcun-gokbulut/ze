@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+ Zinek Engine - ZEStateTransition.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,43 +35,48 @@
 
 #pragma once
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
+#include "ZEMeta/ZEObject.h"
 
-class ZEGeographicEntity : public ZEEntity
+#include "ZEDS/ZEString.h"
+#include "ZEMeta/ZEEvent.h"
+
+class ZEState;
+
+class ZEStateTransition : public ZEObject
 {
-	friend class ZESectorManager;
-	ZE_OBJECT;
+	ZE_OBJECT
+	friend class ZEState;
+	friend class ZEStateMachine;
 	private:
-		ZELink<ZEGeographicEntity>			GeoLink;
-		mutable ZEFlags						GeographicEntityDirtyFlags;
-
-		ZEVector3d							GeographicPosition;
-		ZEQuaternion						GeographicRotation;
-		ZEVector3d							GeographicScale;
-
-		mutable ZEMatrix4x4d				GeographicTransform;
-		mutable ZEMatrix4x4d				InvGeographicTransform;
+		ZEState*							State;
+		ZEString							Name;
+		ZEState*							TargetState;
+		bool								AutoTransition;
+		ZEInt								AutoTransitionPriority;
 
 	protected:
-		virtual void						GeographicTransformChanged();
-
-											ZEGeographicEntity();
+		virtual	bool						CheckTransitionCondition() const;
+		virtual	void						Transition();
 
 	public:
-		const ZEMatrix4x4d&					GetGeographicTransform() const;
-		const ZEMatrix4x4d&					GetInvGeographicTransform() const;
+		ZEState*							GetState() const;
 
-		virtual void						SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d							GetGeographicPosition() const;
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName() const;
 
-		virtual void						SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion						GetGeographicRotation() const;
+		void								SetTargetState(ZEState* State);
+		ZEState*							GetTargetState() const;
 
-		virtual void						SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d							GetGeographicScale() const;
+		void								SetAutoTransition(bool Enabled);
+		bool								GetAutoTransition() const;
 
-		static ZEGeographicEntity*			CreateInstance();
-}
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");
+		void								SetAutoTransitionPriority(ZEInt Priority);
+		ZEInt								GetAutoTransitionPriority();
+
+		ZE_EVENT(							OnCheckTransitionCondition,(const ZEStateTransition* Transition, bool& Result));
+		ZE_EVENT(							OnTransition,(const ZEStateTransition* Transition));
+
+											ZEStateTransition();
+											ZEStateTransition(ZEState* TargetState);
+											~ZEStateTransition();
+};

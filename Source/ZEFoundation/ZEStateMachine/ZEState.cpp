@@ -34,23 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEState.h"
+#include "ZEStateMachine.h"
+#include "ZEStateTransition.h"
 
-void ZEState::OnEntering(ZEState* From, ZEState* To, bool& Cancel)
+void ZEState::Entering(ZEStateTransition* Transition, bool& Reject)
 {
-	Cancel = false;
+	Reject = false;
+	OnEntering(Transition, Reject);
 }
 
-void ZEState::OnEntered(ZEState* From, ZEState* To)
+void ZEState::Entered(ZEStateTransition* Transition)
 {
+	OnEntered(Transition);
 }
 
-void ZEState::OnLeaving(ZEState* From, ZEState* To, bool& Cancel)
+void ZEState::Looping()
 {
-	Cancel = false;
+	OnLooping(this);
 }
 
-void ZEState::OnLeft(ZEState* From, ZEState* To)
+void ZEState::Leaving(ZEStateTransition* Transition, bool& Reject)
 {
+	Reject = false;
+	OnLeaving(Transition, Reject);
+}
+
+void ZEState::Left(ZEStateTransition* Transition)
+{
+	OnLeft(Transition);
+}
+
+ZEStateMachine* ZEState::GetStateMachine() const
+{
+	return StateMachine;
 }
 
 void ZEState::SetName(const ZEString& Name)
@@ -58,136 +74,85 @@ void ZEState::SetName(const ZEString& Name)
 	this->Name = Name;
 }
 
-const ZEString& ZEState::GetName()
+const ZEString& ZEState::GetName() const
 {
 	return Name;
 }
 
-const ZEStateMachine& ZEState::GetOwner()
+
+void ZEState::SetTransitionRule(ZEStateTransitionRule Rule)
 {
-	return *Owner;
+	TransitionRule = Rule;
 }
 
-const ZEArray<ZEState*>& ZEState::GetTransitions()
+ZEStateTransitionRule ZEState::GetTransitionRule() const
 {
-	return Transitions;
+	return TransitionRule;
 }
 
-bool ZEState::AddTransition(ZEState* State)
+const ZEArray<ZEStateTransition*>& ZEState::GetTransitionList() const
 {
-	zeDebugCheck(State == NULL, "State cannot be NULL.");
+	return TransitionList;
+}
 
-	if (State == NULL)
-		return false;
+bool ZEState::AddToTransitionList(ZEStateTransition* Transition)
+{
+	zeCheckError(Transition == NULL, "Cannot add transition to state. Transition is NULL. State Name: \"%s\".", GetName().ToCString());
+	zeCheckError(Transition->State != NULL, "Cannot add transition to state. Transition is already added to a state. State Name: \"%s\". Transition Name: \"%s\".", 
+		GetName().ToCString(), Transition->GetName().ToCString());
 
-	if (Owner == NULL)
-		return false;
+	Transition->State = this;
+	TransitionList.Add(Transition);
 
-	if (Transitions.Exists(State))
-		return false;
-
-	if (Owner != State->Owner)
-		return false;
-
-	Transitions.Add(State);
 	return true;
 }
 
-bool ZEState::RemoveTransition(ZEState* State)
+bool ZEState::RemoveFromTransitionList(ZEStateTransition* Transition)
 {
-	zeDebugCheck(State == NULL, "State cannot be NULL.");
+	zeCheckError(Transition == NULL, "Cannot remove transition from state. Transition is NULL. State Name: \"%s\".", GetName().ToCString());
+	zeCheckError(Transition->State != this, "Cannot remove transition from state. Transition does not belong to this state. State Name: \"%s\". Transition Name: \"%s\".", 
+		GetName().ToCString(), Transition->GetName().ToCString());
+		
+	Transition->State = NULL;
+	TransitionList.RemoveValue(Transition);
 
-	if (State == NULL)
-		return false;
-
-	if(!Transitions.Exists(State))
-		return false;
-
-	Transitions.RemoveValue(State);
 	return true;
+}
+
+void ZEState::Tick()
+{
+	ZEStateTransition* AutoTransitionTarget = NULL;
+	for (ZESize I = 0; I < TransitionList.GetCount(); I++)
+	{
+		ZEStateTransition* Transition = TransitionList[I];
+
+		if (!Transition->GetAutoTransition())
+			continue;
+
+		if (AutoTransitionTarget != NULL && AutoTransitionTarget->GetAutoTransitionPriority() > Transition->GetAutoTransitionPriority())
+			continue;
+
+		if (!Transition->CheckTransitionCondition())
+			continue;
+
+		AutoTransitionTarget = Transition;
+	}
+
+	if (AutoTransitionTarget != NULL)
+		GetStateMachine()->Transfer(AutoTransitionTarget->GetTargetState());
 }
 
 ZEState::ZEState()
 {
-	Name = "";
-	Owner = NULL;
+	NameHash = 0;
+	StateMachine = NULL;
 }
 
 ZEState::~ZEState()
 {
-	if(Owner == NULL)
-		return;
+	if(StateMachine == NULL)
+		StateMachine->RemoveState(this);
 
-	for (ZESize I = 0; I < Owner->States.GetCount(); I++)
-		Owner->States[I]->RemoveTransition(this);
-
-	Owner->States.RemoveValue(this);
-}
-
-void ZEDelegatedState::OnEntering(ZEState* From, ZEState* To, bool& Cancel)
-{
-	Cancel = false;
-
-	if (EnteringEvent != NULL)
-		EnteringEvent(From, To, Cancel);
-}
-
-void ZEDelegatedState::OnEntered(ZEState* From, ZEState* To)
-{
-	if (EnteredEvent != NULL)
-		EnteredEvent(From, To);
-}
-
-void ZEDelegatedState::OnLeaving(ZEState* From, ZEState* To, bool& Cancel)
-{
-	Cancel = false;
-
-	if (LeavingEvent != NULL)
-		LeavingEvent(From, To, Cancel);
-}
-
-void ZEDelegatedState::OnLeft(ZEState* From, ZEState* To)
-{
-	if (LeftEvent != NULL)
-		LeftEvent(From, To);
-}
-
-void ZEDelegatedState::SetEnteringEvent(const ZEStateEventEntering& Event)
-{
-	EnteringEvent = Event;
-}
-
-const ZEStateEventEntering& ZEDelegatedState::GetEnteringEvent()
-{
-	return EnteringEvent;
-}
-
-void ZEDelegatedState::SetEnteredEvent(const ZEStateEventEntered& Event)
-{
-	EnteredEvent = Event;
-}
-
-const ZEStateEventEntered& ZEDelegatedState::GetEnteredEvent()
-{
-	return EnteredEvent;
-}
-
-void ZEDelegatedState::SetLeavingEvent(const ZEStateEventLeaving& Event)
-{
-	LeavingEvent = Event;
-}
-
-const ZEStateEventLeaving& ZEDelegatedState::GetLeavingEvent()
-{
-	return LeavingEvent;
-}
-
-void ZEDelegatedState::SetLeftEvent(const ZEStateEventLeft& Event)
-{
-	LeftEvent = Event;
-}
-
-const ZEStateEventLeft& ZEDelegatedState::GetLeftEvent()
-{
-	return LeftEvent;
+	while (TransitionList.GetCount() != 0)
+		delete TransitionList.GetFirstItem();
 }

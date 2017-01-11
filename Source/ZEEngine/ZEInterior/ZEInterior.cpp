@@ -147,7 +147,9 @@ ZEInteriorHelper* ZEInterior::GetHelper(const ZEString& Name)
 ZEEntityResult ZEInterior::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
+
 	LoadInteriorResource();
+	
 	return ZE_ER_DONE;
 }
 
@@ -164,9 +166,9 @@ ZEEntityResult ZEInterior::UnloadInternal()
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
 		Helpers[I]->Deinitialize();
 	Helpers.Clear();
-
-
+	
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	
 	return ZE_ER_DONE;
 }
 
