@@ -40,11 +40,12 @@
 struct ZESpawn
 {
 	ZEEntity*							Entity;
-	ZEVector3							Postion;
+	ZEVector3							Position;
 	ZEQuaternion						Rotation;
 	ZEVector3							Scale;
 	bool								Enabled;
 	bool								Visible;
+	bool								Spawned;
 };
 
 class ZESpawner : public ZEEntity
@@ -95,4 +96,7 @@ class ZESpawner : public ZEEntity
 		virtual void					Tick(float ElapsedTime);
 
 		static ZESpawner*				CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZESpawner.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+ Zinek Engine - ZEStateTransition.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,79 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEStateTransition.h"
+#include "ZEState.h"
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
-
-class ZEGeographicEntity : public ZEEntity
+void ZEStateTransition::SetName(const ZEString& Name)
 {
-	friend class ZESectorManager;
-	ZE_OBJECT;
-	private:
-		ZELink<ZEGeographicEntity>			GeoLink;
-		mutable ZEFlags						GeographicEntityDirtyFlags;
-
-		ZEVector3d							GeographicPosition;
-		ZEQuaternion						GeographicRotation;
-		ZEVector3d							GeographicScale;
-
-		mutable ZEMatrix4x4d				GeographicTransform;
-		mutable ZEMatrix4x4d				InvGeographicTransform;
-
-	protected:
-		virtual void						GeographicTransformChanged();
-
-											ZEGeographicEntity();
-
-	public:
-		const ZEMatrix4x4d&					GetGeographicTransform() const;
-		const ZEMatrix4x4d&					GetInvGeographicTransform() const;
-
-		virtual void						SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d							GetGeographicPosition() const;
-
-		virtual void						SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion						GetGeographicRotation() const;
-
-		virtual void						SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d							GetGeographicScale() const;
-
-		static ZEGeographicEntity*			CreateInstance();
+	this->Name = Name;
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");
+
+const ZEString& ZEStateTransition::GetName() const
+{
+	return Name;
+}
+
+void ZEStateTransition::SetTargetState(ZEState* State)
+{
+	TargetState = State;
+}
+
+ZEState* ZEStateTransition::GetTargetState() const
+{
+	return TargetState;
+}
+
+void ZEStateTransition::SetAutoTransition(bool Enabled)
+{
+	this->AutoTransition = Enabled;
+}
+
+bool ZEStateTransition::GetAutoTransition() const
+{
+	return AutoTransition;
+}
+
+void ZEStateTransition::SetAutoTransitionPriority(ZEInt Priority)
+{
+	AutoTransitionPriority = Priority;
+}
+
+ZEInt ZEStateTransition::GetAutoTransitionPriority()
+{
+	return AutoTransitionPriority;
+}
+
+bool ZEStateTransition::CheckTransitionCondition() const
+{
+	bool Result = false;
+	OnCheckTransitionCondition(this, Result);
+	return Result;
+}
+
+void ZEStateTransition::Transition()
+{
+	OnTransition(this);
+}
+
+ZEStateTransition::ZEStateTransition()
+{
+	State = NULL;
+	TargetState = NULL;
+	AutoTransition = false;
+	AutoTransitionPriority = 0;
+}
+
+ZEStateTransition::ZEStateTransition(ZEState* Destination)
+{
+	State = NULL;
+	this->TargetState = Destination;
+	AutoTransition = false;
+	AutoTransitionPriority = 0;
+}
+
+ZEStateTransition::~ZEStateTransition()
+{
+	if (State != NULL)
+		State->RemoveFromTransitionList(this);
+}

@@ -44,6 +44,9 @@
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
+	if (!GetVisiblity())
+		return;
+
 	Frame.Color = GetBackgroundColor();
 	ZEUIRectangle TempRect = Frame;
 	TempRect.Positions.SetPosition(GetScreenPosition());

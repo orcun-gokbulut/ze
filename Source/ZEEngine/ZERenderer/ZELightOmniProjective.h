@@ -75,4 +75,5 @@ class ZELightOmniProjective : public ZELight
 
 		static ZELightOmniProjective*	CreateInstance();
 }
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightOmniProjective.png");
 ZE_META_ATTRIBUTE_PROPERTY(ProjectionTextureFileName, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");

@@ -46,7 +46,7 @@ void ZESpawner::UpdateSpawns(ZESize Index)
 	ChildEntities.LockRead();
 	{
 		Spawns[Index].Entity = ChildEntities[Index];
-		Spawns[Index].Postion = ChildEntities[Index]->GetPosition();
+		Spawns[Index].Position = ChildEntities[Index]->GetPosition();
 		Spawns[Index].Rotation = ChildEntities[Index]->GetRotation();
 		Spawns[Index].Scale = ChildEntities[Index]->GetScale();
 		Spawns[Index].Visible = ChildEntities[Index]->GetVisible();
@@ -59,7 +59,8 @@ void ZESpawner::UpdateSpawns(ZESize Index)
 ZEEntityResult ZESpawner::InitializeInternal()
 {
 	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
-
+	
+	
 	if (AutoSpawn && AutoSpawnDelay == 0.0f)
 		Spawn();
 	
@@ -70,6 +71,8 @@ ZEEntityResult ZESpawner::DeinitializeInternal()
 {
 	Despawn();
 
+
+
 	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
 
 	return ZE_ER_DONE;
@@ -79,12 +82,25 @@ ZEEntityResult ZESpawner::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
+	if (GetWrapper() == NULL)
+	{
+		const ZEArray<ZEEntity*>& ChildEntities = GetChildEntities();
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			ZEEntity::RemoveChildEntity(ChildEntities[I]);
+	}
+
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZESpawner::UnloadInternal()
 {
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+
+	if (GetWrapper() == NULL)
+	{
+		for (ZESize I = 0; I < Spawns.GetCount(); I++)
+			ZEEntity::AddChildEntity(Spawns[I].Entity);
+	}
 
 	return ZE_ER_DONE;
 }
@@ -100,6 +116,11 @@ ZESpawner::ZESpawner()
 ZESpawner::~ZESpawner()
 {
 	Unload();
+}
+
+const ZEArray<ZESpawn>& ZESpawner::GetSpawns() const
+{
+	return Spawns;
 }
 
 void ZESpawner::SetAutoSpawn(bool AutoSpawn)
@@ -134,19 +155,27 @@ bool ZESpawner::AddChildEntity(ZEEntity* Entity)
 {
 	Spawns.LockWriteNested();
 	{
+		for (ZESize I = 0; I < Spawns.GetCount(); I++)
+		{
+			if (Spawns[I].Entity == Entity)
+			{
+				zeError("Cannot add entity. Entitiy is alread added as spawn. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
+					GetName().ToCString(), Entity->GetName().ToCString());
+				return false;
+			}
+		}
+
 		ZESpawn NewSpawn;
 		NewSpawn.Entity = Entity;
-		NewSpawn.Postion = Entity->GetPosition();
-		NewSpawn.Rotation = Entity->GetRotation();
-		NewSpawn.Scale = Entity->GetScale();
 		NewSpawn.Visible = Entity->GetVisible();
 		NewSpawn.Enabled = Entity->GetEnabled();
+		NewSpawn.Spawned = false;
 
 		if (ZEEntity::AddChildEntity(Entity))
 		{
-			Entity->Deinitialize();
-			Entity->SetEnabled(false);
-			Entity->SetVisible(false);
+			NewSpawn.Position = Entity->GetWorldPosition();
+			NewSpawn.Rotation = Entity->GetWorldRotation();
+			NewSpawn.Scale = Entity->GetWorldScale();
 			Spawns.Add(NewSpawn);
 		}
 		else
@@ -164,12 +193,15 @@ void ZESpawner::RemoveChildEntity(ZEEntity* Entity)
 {
 	Spawns.LockWriteNested();
 	{
-		ZEEntity::RemoveChildEntity(Entity);
-
 		for (ZESize I = 0; I < Spawns.GetCount(); I++)
 		{
 			if (Spawns[I].Entity == Entity)
+			{
+				if (!Spawns[I].Spawned)
+					ZEEntity::RemoveChildEntity(Entity);
+
 				Spawns.Remove(I);
+			}
 		}
 	}
 	Spawns.LockWrite();
@@ -207,24 +239,23 @@ bool ZESpawner::Spawn()
 		}
 
 		for (ZESize I = 0; I < Spawns.GetCount(); I++)
-		{
-			ZEVector3 WorldPostion = Spawns[I].Entity->GetWorldPosition();
-			ZEQuaternion WorldRotation = Spawns[I].Entity->GetWorldRotation();
-			ZEVector3 WorldScale = Spawns[I].Entity->GetWorldScale();
-			ZEEntity::RemoveChildEntity(Spawns[I].Entity);
+		{			
+			if (Spawns[I].Entity->GetParent() == this)
+				ZEEntity::RemoveChildEntity(Spawns[I].Entity);
 
-			Spawns[I].Entity->SetEnabled(true);
-			Spawns[I].Entity->SetVisible(true);
+			Spawns[I].Entity->SetEnabled(Spawns[I].Enabled);
+			Spawns[I].Entity->SetVisible(Spawns[I].Visible);
 
 			if (GetParent() != NULL)
 				GetParent()->ZEEntity::AddChildEntity(Spawns[I].Entity);
 			else
 				GetScene()->AddEntity(Spawns[I].Entity);
 
-			Spawns[I].Entity->SetWorldPosition(WorldPostion);
-			Spawns[I].Entity->SetWorldRotation(WorldRotation);
-			Spawns[I].Entity->SetWorldScale(WorldScale);
-			Spawns[I].Entity->Initialize();
+			Spawns[I].Entity->SetWorldPosition(Spawns[I].Position);
+			Spawns[I].Entity->SetWorldRotation(Spawns[I].Rotation);
+			Spawns[I].Entity->SetWorldScale(Spawns[I].Scale);
+			Spawns[I].Spawned = true;
+			Spawns[I].Entity->Reinitialize();
 		}
 
 		Spawned = true;
@@ -252,15 +283,15 @@ void ZESpawner::Despawn()
 			if (Spawns[I].Entity->GetParent() != NULL)
 				Spawns[I].Entity->GetParent()->ZEEntity::RemoveChildEntity(Spawns[I].Entity);
 			else
-				GetScene()->RemoveEntity(Spawns[I].Entity);
+				Spawns[I].Entity->GetScene()->RemoveEntity(Spawns[I].Entity);
 
-			ZEEntity::AddChildEntity(Spawns[I].Entity);
 			Spawns[I].Entity->Deinitialize();
-			Spawns[I].Entity->SetEnabled(false);
-			Spawns[I].Entity->SetVisible(false);
-			Spawns[I].Entity->SetPosition(Spawns[I].Postion);
+			Spawns[I].Entity->SetPosition(Spawns[I].Position);
 			Spawns[I].Entity->SetRotation(Spawns[I].Rotation);
 			Spawns[I].Entity->SetScale(Spawns[I].Scale);	
+			Spawns[I].Entity->SetEnabled(Spawns[I].Enabled);
+			Spawns[I].Entity->SetVisible(Spawns[I].Visible);
+			Spawns[I].Spawned = false;
 		}
 	}
 	Spawns.UnlockWrite();

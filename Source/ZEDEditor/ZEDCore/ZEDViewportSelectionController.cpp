@@ -81,10 +81,18 @@ void ZEDViewportSelectionController::CastVolume(ZEArray<ZEDObjectWrapper*>& List
 		if (ChildWrapper->GetFrozen())
 			continue;
 
-		ZEOBBox BoundingBox;
-		ZEAABBox::GenerateOBoundingBox(BoundingBox, ChildWrapper->GetBoundingBox());
+		const ZEAABBox& BoundingBox = ChildWrapper->GetBoundingBox();
+		if (!BoundingBox.Min.IsValidNotInf() || 
+			!BoundingBox.Max.IsValidNotInf() ||
+			BoundingBox.Min == BoundingBox.Max)
+		{
+			continue;
+		}
+
+		ZEOBBox OrientedBoundingBox;
+		ZEAABBox::GenerateOBoundingBox(OrientedBoundingBox, ChildWrapper->GetBoundingBox());
 		ZEOBBox WorldBoundingBox;
-		ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), BoundingBox);
+		ZEOBBox::Transform(WorldBoundingBox, ChildWrapper->GetWorldTransform(), OrientedBoundingBox);
 
 		if (GetSelectionMode() == ZE_SM_FULLY_COVERS)
 		{

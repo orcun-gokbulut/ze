@@ -154,9 +154,6 @@ bool ZEScene::InitializeInternal()
 		return false;
 	}
 
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Initialize();
-
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	SceneDirtyFlags.RaiseAll();
 
@@ -284,6 +281,67 @@ void ZEScene::UpdateConstantBuffer()
 	ConstantBuffer->SetData(&Constants);
 
 	SceneDirtyFlags.UnraiseFlags(ZE_SDF_CONSTANT_BUFFER);
+}
+
+
+void ZEScene::InitializeEntities()
+{
+	if (!IsInitialized())
+		return;
+
+	EntityState = ZE_ES_INITIALIZED;
+
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Entities[I]->Initialize();
+	}
+	Entities.UnlockRead();
+}
+
+void ZEScene::DeinitializeEntities()
+{
+	if (!IsInitialized() && GetInitializationState() != ZE_IS_DEINITIALIZING)
+		return;
+
+	EntityState = ZE_ES_LOADED;
+
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Entities[I]->Deinitialize();
+	}
+	Entities.UnlockRead();
+}
+
+void ZEScene::LoadEntities()
+{
+	if (!IsInitialized())
+		return;
+
+	EntityState = ZE_ES_LOADED;
+
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Entities[I]->Load();
+	}
+	Entities.UnlockRead();
+}
+
+void ZEScene::UnloadEntities()
+{
+	if (!IsInitialized() && GetInitializationState() != ZE_IS_DEINITIALIZING)
+		return;
+
+	EntityState = ZE_ES_NONE;
+
+	Entities.LockRead();
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Entities[I]->Unload();
+	}
+	Entities.UnlockRead();
 }
 
 const ZEGRBuffer* ZEScene::GetConstantBuffer()
@@ -502,8 +560,10 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 	if(Entity->GetName().GetLength() == 0)
 		Entity->SetName(Entity->GetClass()->GetName() + ZEString::FromUInt32(LastEntityId));
 
-	if (IsInitializedOrInitializing())
+	if (EntityState == ZE_ES_INITIALIZED)
 		Entity->Initialize();
+	else if (EntityState == ZE_ES_LOADED)
+		Entity->Load();
 }
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
@@ -532,7 +592,7 @@ void ZEScene::ClearEntities()
 	Entities.UnlockWrite();
 }
 
-bool ZEScene::IsLoaded()
+bool ZEScene::IsEntitiesLoaded()
 {
 	Entities.LockRead();
 	{
@@ -553,7 +613,7 @@ bool ZEScene::IsLoaded()
 	return true;
 }
 
-bool ZEScene::IsInitialized()
+bool ZEScene::IsEntitiesInitialized()
 {
 	Entities.LockRead();
 	{
@@ -831,6 +891,7 @@ ZEScene::ZEScene()
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.1f;
 	SpatialDatabase = false;
+	EntityState = ZE_ES_NONE;
 
 	Constants.AmbientColor = ZEVector3::Zero;
 

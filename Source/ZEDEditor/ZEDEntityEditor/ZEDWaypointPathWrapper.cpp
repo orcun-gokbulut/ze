@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+ Zinek Engine - ZEDWaypointPathWrapper.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDWaypointPathWrapper.h"
+#include "ZEApplications\CustHCombat\ZEWaypoint.h"
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
-
-class ZEGeographicEntity : public ZEEntity
+void ZEDWaypointPathWrapper::UpdateCanvas()
 {
-	friend class ZESectorManager;
-	ZE_OBJECT;
-	private:
-		ZELink<ZEGeographicEntity>			GeoLink;
-		mutable ZEFlags						GeographicEntityDirtyFlags;
+	ZEDEntityWrapper::UpdateCanvas();
 
-		ZEVector3d							GeographicPosition;
-		ZEQuaternion						GeographicRotation;
-		ZEVector3d							GeographicScale;
+	ZEGRCanvas* Canvas = GetCanvas();
+	if (GetSelected())
+	{
+		if (GetFocused())
+			Canvas->SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+		else
+			Canvas->SetColor(ZEVector4::One);
+	}
+	else
+	{
+		Canvas->SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
+	}
 
-		mutable ZEMatrix4x4d				GeographicTransform;
-		mutable ZEMatrix4x4d				InvGeographicTransform;
+	const ZEArray<ZEEntity*>& Waypoints = GetEntity()->GetChildEntities(ZEWaypoint::Class());
+	for (ZESize I = 1; I < Waypoints.GetCount(); I++)
+	{
+		ZEVector3 PrevPosition;
+		ZEMatrix4x4::Transform(PrevPosition, GetEntity()->GetInvWorldTransform(), Waypoints[I- 1]->GetWorldPosition());
 
-	protected:
-		virtual void						GeographicTransformChanged();
+		ZEVector3 NextPosition;
+		ZEMatrix4x4::Transform(NextPosition, GetEntity()->GetInvWorldTransform(), Waypoints[I]->GetWorldPosition());
 
-											ZEGeographicEntity();
-
-	public:
-		const ZEMatrix4x4d&					GetGeographicTransform() const;
-		const ZEMatrix4x4d&					GetInvGeographicTransform() const;
-
-		virtual void						SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d							GetGeographicPosition() const;
-
-		virtual void						SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion						GetGeographicRotation() const;
-
-		virtual void						SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d							GetGeographicScale() const;
-
-		static ZEGeographicEntity*			CreateInstance();
+		PrevPosition.y += 0.5f;
+		NextPosition.y += 0.5f;
+		Canvas->AddLine(PrevPosition, NextPosition);
+	}
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");
+
+ZEDWaypointPathWrapper* ZEDWaypointPathWrapper::CreateInstance()
+{
+	return new ZEDWaypointPathWrapper();
+}

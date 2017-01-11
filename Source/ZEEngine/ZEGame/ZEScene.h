@@ -59,6 +59,7 @@ class ZEPhysicalWorld;
 class ZERNRenderer;
 class ZEGRBuffer;
 class ZERNPreRenderParameters;
+enum ZEEntityState;
 
 class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
@@ -77,7 +78,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEVector3								AmbientColor;
 		ZELock									SceneLock;
 		bool									SpatialDatabase;
-
+		ZEEntityState							EntityState;
 		ZEList2<ZEEntity>						TickList;
 		ZEList2<ZEEntity>						RenderList;
 		ZEOctree<ZEEntity*>						RenderListOctree;
@@ -140,8 +141,14 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void									RemoveEntity(ZEEntity* Entity);
 		void									ClearEntities();
 
-		bool									IsLoaded();
-		bool									IsInitialized();
+		bool									IsEntitiesLoaded();
+		bool									IsEntitiesInitialized();
+		
+		void									InitializeEntities();
+		void									DeinitializeEntities();
+
+		void									LoadEntities();
+		void									UnloadEntities();
 
 		void									Tick(float ElapsedTime);
 		void									PreRender(const ZERNPreRenderParameters* Parameters);

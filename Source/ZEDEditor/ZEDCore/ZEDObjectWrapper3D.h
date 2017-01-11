@@ -83,8 +83,12 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 		void										SetNameplateIconFileName(const ZEString& String);
 		const ZEString&								GetNameplateIconFileName();*/
 
+		ZEGRCanvas*									GetCanvas();
+		ZEUIControl*								GetNameplate();
+
 		virtual void								UpdateNameplate();
-		virtual void								UpdateGraphics();
+		virtual void								UpdateCanvas();
+		void										UpdateGraphics();
 
 		virtual bool								InitializeInternal() override;
 		virtual bool								DeinitializeInternal() override;

@@ -473,6 +473,9 @@ void ZEUIControl::FocusGained()
 
 void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 {
+	if (!GetVisiblity())
+		return;
+
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
 		ChildControls[I]->Draw(Renderer);
 }

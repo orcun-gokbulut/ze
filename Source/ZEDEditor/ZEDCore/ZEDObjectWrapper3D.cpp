@@ -82,6 +82,16 @@ bool ZEDObjectWrapper3D::DeinitializeInternal()
 	return ZEDObjectWrapper::DeinitializeInternal();
 }
 
+ZEGRCanvas* ZEDObjectWrapper3D::GetCanvas()
+{
+	return &Canvas;
+}
+
+ZEUIControl* ZEDObjectWrapper3D::GetNameplate()
+{
+	return Nameplate;
+}
+
 void ZEDObjectWrapper3D::UpdateNameplate()
 {
 	if (GetNameplateVisible())
@@ -125,6 +135,8 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 
 		if (GetSelected())
 		{
+			NameplateName->SetVisiblity(true);
+			NameplateClass->SetVisiblity(true);
 			if (GetFocused())
 				NameplateName->SetFontColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
 			else
@@ -132,7 +144,8 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 		}
 		else
 		{
-			NameplateName->SetFontColor(ZEVector4(0.75f, 0.75f, 0.75f, 1.0f));
+			NameplateName->SetVisiblity(false);
+			NameplateClass->SetVisiblity(false);
 		}
 
 		NameplateIcon->SetTextureFileName(GetIconFileName());
@@ -165,6 +178,28 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 	}
 }
 
+void ZEDObjectWrapper3D::UpdateCanvas()
+{
+	ConstantBuffer->SetData(&GetWorldTransform());
+
+	if (GetSelected())
+	{
+		if (GetFocused())
+			Canvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+		else
+			Canvas.SetColor(ZEVector4::One);
+	}
+	else
+	{
+		Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
+	}
+
+	Canvas.ResetTransforms();
+	ZEAABBox BoundingBox = GetBoundingBox();
+	Canvas.ApplyTranslation(BoundingBox.GetCenter());
+	Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
+}
+
 void ZEDObjectWrapper3D::UpdateGraphics()
 {
 	Canvas.Clean();
@@ -184,24 +219,7 @@ void ZEDObjectWrapper3D::UpdateGraphics()
 		if (ConstantBuffer.IsNull())
 			ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
-		ConstantBuffer->SetData(&GetWorldTransform());
-
-		if (GetSelected())
-		{
-			if (GetFocused())
-				Canvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
-			else
-				Canvas.SetColor(ZEVector4::One);
-		}
-		else
-		{
-			Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
-		}
-
-		Canvas.ResetTransforms();
-		ZEAABBox BoundingBox = GetBoundingBox();
-		Canvas.ApplyTranslation(BoundingBox.GetCenter());
-		Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
+		UpdateCanvas();
 
 		if (Canvas.GetBufferSize() != 0)
 		{

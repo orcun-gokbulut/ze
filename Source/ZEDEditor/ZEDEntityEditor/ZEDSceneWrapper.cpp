@@ -149,6 +149,8 @@ bool ZEDSceneWrapper::Load(const ZEString& FileName)
 	if (!GetScene()->Unserialize(FileName))
 		return false;
 
+	GetScene()->LoadEntities();
+
 	Update();
 
 	return true;
