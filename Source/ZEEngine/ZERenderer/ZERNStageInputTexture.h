@@ -36,14 +36,17 @@
 #pragma once
 
 #include "ZERNStage.h"
+
 #include "ZEPointer\ZEHolder.h"
+
+class ZEGRTexture;
 
 class ZERNStageInputTexture : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		//ZERNStageBuffer						Buffer;
-		//ZEHolder<const ZEGRTexture2D>		Texture;
+		ZEHolder<const ZEGRTexture>			InputTexture;
+		ZEString							InputName;
 
 											ZERNStageInputTexture();
 
@@ -51,11 +54,12 @@ class ZERNStageInputTexture : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		//void								SetBuffer(ZERNStageBuffer Output);
-		//ZERNStageBuffer						GetBuffer() const;
-		//
-		//void								SetTextures(const ZEGRTexture2D* Texture);
-		//const ZEGRTexture2D*				GetTexture() const;
-		//
-		//virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		void								SetInputName(const ZEString& Name);
+		const ZEString&						GetInputName() const;
+		
+		void								SetInputTexture(const ZEGRTexture* Texture);
+		const ZEGRTexture*					GetInputTexture() const;
+
+		static ZERNStageInputTexture*		CreateInstance();
+
 };
