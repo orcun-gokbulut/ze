@@ -685,7 +685,8 @@ bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (Parameters->Type == ZERN_PRT_SHADOW && !GetMaterial()->GetShadowCaster())
 		return false;
 
-	UpdateParticles(zeCore->GetElapsedTime());
+	if (Effect->GetState() != ZE_PES_RUNNING)
+		UpdateParticles(zeCore->GetElapsedTime());
 
 	if (GetAliveParticleCount() == 0)
 		return false;

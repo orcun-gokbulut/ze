@@ -42,6 +42,13 @@
 
 class ZEState;
 
+enum ZEStateTransitionType
+{
+	ZE_STT_PLANAR,
+	ZE_STT_HIERARCHICAL,
+	ZE_STT_BOTH
+};
+
 class ZEStateTransition : public ZEObject
 {
 	ZE_OBJECT
@@ -50,6 +57,8 @@ class ZEStateTransition : public ZEObject
 	private:
 		ZEState*							State;
 		ZEString							Name;
+		ZEStateTransitionType				Type;
+
 		ZEState*							TargetState;
 		bool								AutoTransition;
 		ZEInt								AutoTransitionPriority;
@@ -64,6 +73,9 @@ class ZEStateTransition : public ZEObject
 		void								SetName(const ZEString& Name);
 		const ZEString&						GetName() const;
 
+		void								SetType(ZEStateTransitionType Type);
+		ZEStateTransitionType				GetType() const;
+
 		void								SetTargetState(ZEState* State);
 		ZEState*							GetTargetState() const;
 
@@ -77,6 +89,5 @@ class ZEStateTransition : public ZEObject
 		ZE_EVENT(							OnTransition,(const ZEStateTransition* Transition));
 
 											ZEStateTransition();
-											ZEStateTransition(ZEState* TargetState);
 											~ZEStateTransition();
 };

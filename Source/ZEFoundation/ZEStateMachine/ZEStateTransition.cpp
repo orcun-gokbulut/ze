@@ -46,6 +46,16 @@ const ZEString& ZEStateTransition::GetName() const
 	return Name;
 }
 
+void ZEStateTransition::SetType(ZEStateTransitionType Type)
+{
+	this->Type = Type;
+}
+
+ZEStateTransitionType ZEStateTransition::GetType() const
+{
+	return Type;
+}
+
 void ZEStateTransition::SetTargetState(ZEState* State)
 {
 	TargetState = State;
@@ -91,15 +101,8 @@ void ZEStateTransition::Transition()
 ZEStateTransition::ZEStateTransition()
 {
 	State = NULL;
+	Type = ZE_STT_BOTH;
 	TargetState = NULL;
-	AutoTransition = false;
-	AutoTransitionPriority = 0;
-}
-
-ZEStateTransition::ZEStateTransition(ZEState* Destination)
-{
-	State = NULL;
-	this->TargetState = Destination;
 	AutoTransition = false;
 	AutoTransitionPriority = 0;
 }

@@ -64,8 +64,6 @@ class ZEState : public ZEObject
 		ZEStateTransitionRule				TransitionRule;
 		ZEArray<ZEStateTransition*>			TransitionList;
 
-		void								StriptStateFromTransition(ZEState* State);
-
 	protected:
 		virtual void						Entering(ZEStateTransition* Transition, bool& Cancel);
 		virtual void						Entered(ZEStateTransition* Transition);
