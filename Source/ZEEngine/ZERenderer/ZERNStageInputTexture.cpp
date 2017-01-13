@@ -41,7 +41,6 @@
 
 ZERNStageInputTexture::ZERNStageInputTexture()
 {
-	//Buffer = ZERN_SO_COLOR;
 }
 
 ZEInt ZERNStageInputTexture::GetId() const
@@ -51,34 +50,38 @@ ZEInt ZERNStageInputTexture::GetId() const
 
 const ZEString& ZERNStageInputTexture::GetName() const
 {
-	static const ZEString Name = "Input";
+	static const ZEString Name = "InputTexture";
 	return Name;
 }
 
-//void ZERNStageInputTexture::SetBuffer(ZERNStageBuffer Output)
-//{
-//	this->Buffer = Output;
-//}
-//
-//ZERNStageBuffer ZERNStageInputTexture::GetBuffer() const
-//{
-//	return Buffer;
-//}
-//
-//void ZERNStageInputTexture::SetTextures(const ZEGRTexture2D* Texture)
-//{
-//	this->Texture = Texture;
-//}
-//
-//const ZEGRTexture2D* ZERNStageInputTexture::GetTexture() const
-//{
-//	return Texture;
-//}
-//
-//const ZEGRTexture2D* ZERNStageInputTexture::GetOutput(ZERNStageBuffer Output) const
-//{
-//	if (GetBuffer() == Output)
-//		return Texture;
-//
-//	return ZERNStage::GetOutput(Output);
-//}
+void ZERNStageInputTexture::SetInputName(const ZEString& Name)
+{
+	if (InputName == Name)
+		return;
+
+	RemoveOutputResource(InputName);
+
+	InputName = Name;
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&InputTexture), InputName, ZERN_SRUT_READ, ZERN_SRCF_CREATE_OWN);
+}
+
+const ZEString& ZERNStageInputTexture::GetInputName() const
+{
+	return InputName;
+}
+
+void ZERNStageInputTexture::SetInputTexture(const ZEGRTexture* Texture)
+{
+	InputTexture = Texture;
+}
+
+const ZEGRTexture* ZERNStageInputTexture::GetInputTexture() const
+{
+	return InputTexture;
+}
+
+ZERNStageInputTexture* ZERNStageInputTexture::CreateInstance()
+{
+	return new ZERNStageInputTexture();
+}
