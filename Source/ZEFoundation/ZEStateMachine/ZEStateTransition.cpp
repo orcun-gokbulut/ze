@@ -36,6 +36,12 @@
 #include "ZEStateTransition.h"
 #include "ZEState.h"
 
+
+ZEState* ZEStateTransition::GetState() const
+{
+	return State;
+}
+
 void ZEStateTransition::SetName(const ZEString& Name)
 {
 	this->Name = Name;

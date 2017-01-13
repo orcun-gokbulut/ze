@@ -221,7 +221,7 @@ bool ZEStateMachine::Transfer(ZEState* TargetState)
 
 	if (TargetState == CurrentState)
 	{
-		TargetState->Looping();
+		//TargetState->Looping();
 		return true;
 	}
 	
