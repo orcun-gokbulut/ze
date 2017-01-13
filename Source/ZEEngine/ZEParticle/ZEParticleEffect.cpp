@@ -40,6 +40,33 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
 
+
+void ZEParticleEffect::LocalTransformChanged()
+{
+	ZEEntity::LocalTransformChanged();
+
+	ze_for_each(Emitter, Emitters)
+		Emitter.GetItem()->EffectTransformChanged();
+}
+
+void ZEParticleEffect::ParentTransformChanged()
+{
+	ZEEntity::ParentTransformChanged();
+
+	ze_for_each(Emitter, Emitters)
+		Emitter.GetItem()->EffectTransformChanged();
+}
+
+ZEEntityResult ZEParticleEffect::InitializeInternal()
+{
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+
+	if (AutoStart)
+		Start();
+
+	return ZE_ER_DONE;
+}
+
 ZEEntityResult ZEParticleEffect::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
@@ -60,21 +87,20 @@ ZEEntityResult ZEParticleEffect::UnloadInternal()
 	return ZE_ER_DONE;
 }
 
-bool ZEParticleEffect::PreRender(const ZERNPreRenderParameters* Parameters)
+
+ZEParticleEffect::ZEParticleEffect()
 {
-	if (!ZEEntity::PreRender(Parameters))
-		return false;
-
-	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-			Emitters[I]->PreRender(Parameters);
-
-	return true;
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
 }
 
-void ZEParticleEffect::Tick(float TimeElapsed)
+ZEParticleEffect::~ZEParticleEffect()
 {
-	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-		Emitters[I]->Tick(TimeElapsed);
+
+}
+
+const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
+{
+	return Emitters;
 }
 
 void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
@@ -83,6 +109,7 @@ void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 	zeCheckError(Emitter->Effect != NULL, ZE_VOID, "Emitter is already registered to a Particle Effect.");
 
 	Emitter->Effect = this;
+	Emitter->ResetPool();
 	Emitters.Add(Emitter);
 }
 
@@ -95,41 +122,79 @@ void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 	Emitters.RemoveValue(Emitter);
 }
 
-const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
+void ZEParticleEffect::SetAutoStart(bool Enabled)
 {
-	return Emitters;
+	AutoStart = Enabled;
+	
+	if (IsLoaded())
+		Start();
 }
 
-void ZEParticleEffect::ResetEmitters()
+bool ZEParticleEffect::GetAutoStart()
+{
+	return AutoStart;
+}
+
+void ZEParticleEffect::SetEffectState(ZEParticleEffectState State)
+{
+	if (EffectState == State)
+		return;
+
+	EffectState = State;
+
+	if (EffectState == ZE_PES_STOPPED)
+		Reset();
+}
+
+ZEParticleEffectState ZEParticleEffect::GetEffectState() const
+{
+	return EffectState;
+}
+
+bool ZEParticleEffect::IsRunning()
+{
+	return (EffectState == ZE_PES_RUNNING);
+}
+
+void ZEParticleEffect::Start()
+{
+	SetEffectState(ZE_PES_RUNNING);
+}
+
+void ZEParticleEffect::Stop()
+{
+	SetEffectState(ZE_PES_STOPPED);
+}
+
+void ZEParticleEffect::Pause()
+{
+	SetEffectState(ZE_PES_PAUSED);
+}
+
+void ZEParticleEffect::Reset()
 {
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->ResetPool();
 }
 
-void ZEParticleEffect::LocalTransformChanged()
+void ZEParticleEffect::Tick(float TimeElapsed)
 {
-	ZEEntity::LocalTransformChanged();
+	if (GetState() != ZE_PES_RUNNING)
+		return;
 
-	ze_for_each(Emitter, Emitters)
-		Emitter.GetItem()->EffectTransformChanged();
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Tick(TimeElapsed);
 }
 
-void ZEParticleEffect::ParentTransformChanged()
+bool ZEParticleEffect::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	ZEEntity::ParentTransformChanged();
+	if (!ZEEntity::PreRender(Parameters))
+		return false;
 
-	ze_for_each(Emitter, Emitters)
-		Emitter.GetItem()->EffectTransformChanged();
-}
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->PreRender(Parameters);
 
-ZEParticleEffect::ZEParticleEffect()
-{
-	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
-}
-
-ZEParticleEffect::~ZEParticleEffect()
-{
-
+	return true;
 }
 
 ZEParticleEffect* ZEParticleEffect::CreateInstance()

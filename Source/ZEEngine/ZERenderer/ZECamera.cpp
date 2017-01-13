@@ -604,7 +604,13 @@ ZECamera::ZECamera()
 	View.Entity = this;
 	View.FarZ = 1000.0f;
 	View.NearZ = 1.0f;
-	View.AspectRatio = 1.777777f;
+	View.VerticalFOV = ZE_PI_4;
+	View.VerticalFOVBottom = -ZE_PI_8;
+	View.VerticalFOVTop = ZE_PI_8;
+	View.HorizontalFOV = ZE_PI_4;
+	View.HorizontalFOVLeft = -ZE_PI_8;
+	View.HorizontalFOVRight = ZE_PI_8;
+	View.AspectRatio = 1.0f;
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
 	View.ShadowDistance = 100.0f;

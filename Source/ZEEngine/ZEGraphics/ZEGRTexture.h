@@ -118,7 +118,8 @@ class ZEGRTexture : public ZEGRResource
 		ZEUInt												GetSampleCount() const;
 		ZEUInt												GetDepthOrArrayCount() const;
 		ZEGRTextureType										GetTextureType() const;
-		
+		virtual void*										GetNativeTexture() const = 0;
+
 		virtual ZEGRResourceType							GetResourceType() const;
 
 		virtual const ZEGRRenderTarget*						GetRenderTarget(ZEUInt DepthOrArrayIndex = 0, ZEUInt Level = 0) const = 0;

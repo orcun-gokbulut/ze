@@ -43,18 +43,28 @@
 
 class ZERNPreRenderParameters;
 
+ZE_ENUM(ZEParticleEffectState)
+{
+	ZE_PES_STOPPED,
+	ZE_PES_RUNNING,
+	ZE_PES_PAUSED
+};
+
 class ZEParticleEffect : public ZEEntity
 {
-	friend class ZEParticleEmitter;
-	
 	ZE_OBJECT
+	friend class ZEParticleEmitter;
 	private:
 		ZEArray<ZEParticleEmitter*>			Emitters;
+		ZEParticleEffectState				EffectState;
+		bool								AutoStart;
 
 		virtual void						LocalTransformChanged();
 		virtual void						ParentTransformChanged();
 
 	protected:
+		virtual ZEEntityResult				InitializeInternal();
+
 		virtual ZEEntityResult				LoadInternal();
 		virtual ZEEntityResult				UnloadInternal();
 
@@ -63,13 +73,26 @@ class ZEParticleEffect : public ZEEntity
 
 	public:
 		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
-		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
+
+		void								SetAutoStart(bool Enabled);
+		bool								GetAutoStart();
+
+		void								SetEffectState(ZEParticleEffectState State);
+		ZEParticleEffectState				GetEffectState() const;
+
+		bool								IsRunning();
+
+		void								Start();
+		void								Pause();
+		void								Stop();
+		void								Reset();
 
 		virtual void						Tick(float TimeElapsed);
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 
+		
 		static ZEParticleEffect*			CreateInstance();
 
 }

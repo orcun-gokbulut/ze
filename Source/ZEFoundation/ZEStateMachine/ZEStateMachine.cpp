@@ -64,6 +64,8 @@ ZEState* ZEStateMachine::GetState(const ZEString& Name)
 			return States[I];
 		}
 	}
+
+	return NULL;
 }
 
 bool ZEStateMachine::AddState(ZEState* State)
@@ -97,8 +99,7 @@ void ZEStateMachine::SetCurrentState(const ZEString& TargetStateName)
 
 void ZEStateMachine::SetCurrentState(ZEState* TargetState)
 {
-	zeCheckError(TargetState == NULL, ZE_VOID, "Cannot change current state. TargetState is NULL.");
-	zeCheckError(TargetState->StateMachine == NULL, ZE_VOID, "Cannot change current state. TargetState does not belong to this state machine.");
+	zeCheckError(TargetState != NULL && TargetState->StateMachine == NULL, ZE_VOID, "Cannot change current state. TargetState does not belong to this state machine.");
 
 	if (CurrentState != NULL)
 		CurrentState->Left(NULL);
@@ -114,16 +115,97 @@ const ZEState* ZEStateMachine::GetCurrentState()
 	return CurrentState;
 }
 
-/*void ZEStateMachine::PushStateMachine(ZEStateMachine* Machine)
+bool ZEStateMachine::TransferInnerState(const ZEString& TargetStateName)
 {
-	StateMachineStack.Push(Machine);
-	Machine->Pushed();
+	ZEState* TargetState = GetState(TargetStateName);
+	zeCheckError(TargetState == NULL, false, "Cannot transfer state. Cannot find TargetState. Target State Name: \"%s\".", TargetStateName.ToCString());
+
+	return Transfer(TargetState);	
 }
 
-void ZEStateMachine::PopStateMachine()
+bool ZEStateMachine::TransferInnerState(ZEState* TargetState)
 {
-	StateMachineStack
-}*/
+	zeCheckError(TargetState == NULL, false, "Cannot transition to inner state. Inner TargetState cannot be NULL.");
+	zeCheckError(TargetState->StateMachine != this, false, "Cannot transition to inner state. TargetState does not belong to this state machine.");
+	zeCheckError(TargetState == CurrentState, false, "Cannot transition to inner state. Recursion detected.");
+
+	ZEStateTransition PlaceHolderTransition;
+	ZEStateTransition* Transition = NULL;
+	if (CurrentState != NULL)
+	{
+		if (CurrentState->GetTransitionRule() == ZE_STL_ALLOW_LIST)
+		{
+			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
+			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
+			{
+				if (TransitionList[I]->GetType() != ZE_STT_HIERARCHICAL && TransitionList[I]->GetType() == ZE_STT_BOTH)
+					continue;
+
+				if (TransitionList[I]->GetTargetState() != TargetState)
+					continue;
+
+				Transition = NULL;
+				break;
+			}
+		}
+		else if (CurrentState->GetTransitionRule() == ZE_STL_DENY_LIST)
+		{
+			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
+			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
+			{
+				if (TransitionList[I]->GetType() != ZE_STT_HIERARCHICAL && TransitionList[I]->GetType() == ZE_STT_BOTH)
+					continue;
+
+				if (TransitionList[I]->GetTargetState() != TargetState)
+					continue;
+				
+				return false;
+			}
+		}
+
+		ZEStateTransition PlaceHolderTransition;
+		if (Transition == NULL)
+		{
+			PlaceHolderTransition.State = CurrentState;
+			PlaceHolderTransition.TargetState = TargetState;
+			Transition = &PlaceHolderTransition;
+		}
+	}
+
+	bool Rejected;
+	TargetState->Entering(Transition, Rejected);
+
+	if (Rejected)
+		return false;
+
+	StateStack.Push(CurrentState);
+
+	CurrentState = TargetState;
+	if (CurrentState != NULL)
+		CurrentState->Entered(Transition);
+
+	return true;
+}
+
+bool ZEStateMachine::ExitInnerState()
+{
+	ZEStateTransition Transition;
+	Transition.State = CurrentState;
+	Transition.TargetState = StateStack.GetFirstItem();
+	Transition.Type = ZE_STT_HIERARCHICAL;
+
+	bool Rejected;
+	CurrentState->Leaving(&Transition, Rejected);
+
+	if (Rejected)
+		return false;
+
+	CurrentState->Left(&Transition);
+
+	CurrentState = StateStack.Pop();
+
+	return true;
+}
 
 bool ZEStateMachine::Transfer(const ZEString& TargetStateName)
 {
@@ -135,9 +217,7 @@ bool ZEStateMachine::Transfer(const ZEString& TargetStateName)
 
 bool ZEStateMachine::Transfer(ZEState* TargetState)
 {
-	zeCheckError(TargetState == NULL, false, "Cannot change current state. TargetState is NULL.");
-	zeCheckError(TargetState->StateMachine != NULL, false, "Cannot change current state. TargetState does not belong to this state machine.");
-
+	zeCheckError(TargetState != NULL && TargetState->StateMachine != this, false, "Cannot change current state. TargetState does not belong to this state machine.");
 
 	if (TargetState == CurrentState)
 	{
@@ -154,11 +234,14 @@ bool ZEStateMachine::Transfer(ZEState* TargetState)
 			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
 			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
 			{
-				if (TransitionList[I]->GetTargetState() == TargetState)
-				{
-					Transition = NULL;
-					break;
-				}
+				if (TransitionList[I]->GetType() != ZE_STT_PLANAR && TransitionList[I]->GetType() == ZE_STT_BOTH)
+					continue;
+
+				if (TransitionList[I]->GetTargetState() != TargetState)
+					continue;
+
+				Transition = NULL;
+				break;
 			}
 		}
 		else if (CurrentState->GetTransitionRule() == ZE_STL_DENY_LIST)
@@ -166,8 +249,13 @@ bool ZEStateMachine::Transfer(ZEState* TargetState)
 			const ZEArray<ZEStateTransition*>& TransitionList = CurrentState->GetTransitionList();
 			for (ZESize I = 0; I < TransitionList.GetCount(); I++)
 			{
-				if (TransitionList[I]->GetTargetState() == TargetState)
-					return false;
+				if (TransitionList[I]->GetType() != ZE_STT_PLANAR && TransitionList[I]->GetType() == ZE_STT_BOTH)
+					continue;
+
+				if (TransitionList[I]->GetTargetState() != TargetState)
+					continue;
+
+				return false;
 			}
 		}
 
@@ -187,7 +275,8 @@ bool ZEStateMachine::Transfer(ZEState* TargetState)
 	}
 
 	bool Rejected;
-	TargetState->Entering(Transition, Rejected);
+	if (TargetState != NULL)
+		TargetState->Entering(Transition, Rejected);
 
 	if (Rejected)
 		return false;
@@ -198,13 +287,22 @@ bool ZEStateMachine::Transfer(ZEState* TargetState)
 	if (OldState != NULL)
 		OldState->Left(Transition);
 
-	CurrentState->Entered(Transition);
+	if (CurrentState != NULL)
+		CurrentState->Entered(Transition);
 
 	return true;
 }
 
 void ZEStateMachine::Tick()
 {
+	/*for (ZESize I = 0; I < StateStack.GetCount(); I++)
+	{
+		if (StateStack[I] == NULL)
+			continue;
+
+		StateStack[I]->Tick();
+	}*/
+
 	if (CurrentState != NULL)
 		CurrentState->Tick();
 }

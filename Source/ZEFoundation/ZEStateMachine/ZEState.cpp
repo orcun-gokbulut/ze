@@ -72,6 +72,7 @@ ZEStateMachine* ZEState::GetStateMachine() const
 void ZEState::SetName(const ZEString& Name)
 {
 	this->Name = Name;
+	NameHash = Name.Hash();
 }
 
 const ZEString& ZEState::GetName() const
@@ -140,12 +141,15 @@ void ZEState::Tick()
 
 	if (AutoTransitionTarget != NULL)
 		GetStateMachine()->Transfer(AutoTransitionTarget->GetTargetState());
+	else
+		Looping();
 }
 
 ZEState::ZEState()
 {
 	NameHash = 0;
 	StateMachine = NULL;
+	TransitionRule = ZE_STL_NONE;
 }
 
 ZEState::~ZEState()

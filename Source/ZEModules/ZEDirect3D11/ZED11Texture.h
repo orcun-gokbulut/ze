@@ -64,4 +64,7 @@ class ZED11Texture : public ZEGRTexture, public ZED11ComponentBase
 
 												ZED11Texture();
 		virtual									~ZED11Texture();
+
+	public:
+		virtual void*							GetNativeTexture() const;
 };

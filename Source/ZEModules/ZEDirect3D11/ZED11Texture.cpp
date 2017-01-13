@@ -553,3 +553,8 @@ ZED11Texture::~ZED11Texture()
 {
 	Deinitialize();
 }
+
+void* ZED11Texture::GetNativeTexture() const
+{
+	return Resource;
+}

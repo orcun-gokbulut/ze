@@ -48,7 +48,7 @@ class ZEStateMachine : public ZEObject
 	private:
 		ZEArray<ZEState*>				States;
 		ZEState*						CurrentState;
-		ZEArray<ZEStateMachine*>		StateMachineStack;
+		ZEArray<ZEState*>				StateStack;
 
 		void							Pushed();
 		void							Popped();
@@ -66,8 +66,15 @@ class ZEStateMachine : public ZEObject
 //		void							PushStateMachine(ZEStateMachine* Machine);
 // 		void							PopStateMachine();
 */
+
+		bool							TransferInnerState(const ZEString& TargetStateName);
+		bool							TransferInnerState(ZEState* TargetState);
+		
+		bool							ExitInnerState();
+		
 		bool							Transfer(const ZEString& TargetStateName);
 		bool							Transfer(ZEState* TargetState);
+
 		void							Tick();
 
 										ZEStateMachine();
