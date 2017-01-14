@@ -36,6 +36,9 @@
 #include "ZEError.h"
 #include "ZEALSoundSource.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZESound/ZEListener.h"
+#include "ZEMath/ZEMath.h"
 
 static const char* ConvertErrorToString(ALenum Error)
 {
@@ -99,16 +102,15 @@ void ZEALSoundSource::UpdateResource()
 
 	if (GetSoundResource() != NULL)
 	{
-		SetLimitsEnabled(LimitsEnabled);
 		if (!CreateBuffer())
 			return;
 
-		SoundSourceState = ZE_SSS_STOPPED;		
+		SetSoundSourceState(ZE_SSS_STOPPED);
 	}
 	else
 	{
 		DestroyBufferSource();
-		SoundSourceState = ZE_SSS_NONE;
+		SetSoundSourceState(ZE_SSS_NONE);
 	}
 }
 
@@ -119,14 +121,13 @@ bool ZEALSoundSource::CreateBuffer()
 	// Delete old buffer and source
 	DestroyBufferSource();
 
-
 	// Check streaming available and use it necessary
-	Streaming = !GetModule()->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > GetModule()->GetMaxBufferSize();
+	SetStreaming(!GetModule()->GetStreamingDisabled()  && (1000 * GetSoundResource()->GetSampleCount()) / GetSoundResource()->GetSamplesPerSecond() > GetModule()->GetMaxBufferSize());
 
 	// Calculate streaming buffer
-	if (Streaming)
+	if (IsStreaming())
 	{
-		BufferSampleCount = (GetModule()->GetMaxBufferSize() * SoundResource->GetSamplesPerSecond()) / 1000;
+		BufferSampleCount = (GetModule()->GetMaxBufferSize() * GetSoundResource()->GetSamplesPerSecond()) / 1000;
 	}
 
 	BufferSampleCount /= 2;
@@ -134,7 +135,7 @@ bool ZEALSoundSource::CreateBuffer()
 	// Create Buffer
 	alGetError();
 	alGenBuffers(1, &ALBuffer1);
-	if (Streaming)
+	if (IsStreaming())
 		alGenBuffers(1, &ALBuffer2);
 
 	if ((Error = alGetError()) != AL_NO_ERROR)
@@ -154,13 +155,13 @@ bool ZEALSoundSource::CreateBuffer()
 		return false;
 	}
 
-	if (!Streaming)
+	if (!IsStreaming())
 	{
-		unsigned char* ALStupidBuffer = new unsigned char[SoundResource->GetUncompressedDataSize()];
-		SoundResource->Decode(ALStupidBuffer, 0, SoundResource->GetSampleCount());
+		unsigned char* ALStupidBuffer = new unsigned char[GetSoundResource()->GetUncompressedDataSize()];
+		GetSoundResource()->Decode(ALStupidBuffer, 0, GetSoundResource()->GetSampleCount());
 		
 		alGetError();
-		alBufferData(ALBuffer1, GetBufferFormat(SoundResource), ALStupidBuffer, (ALsizei)SoundResource->GetUncompressedDataSize(), (ALsizei)SoundResource->GetSamplesPerSecond());
+		alBufferData(ALBuffer1, GetBufferFormat(GetSoundResource()), ALStupidBuffer, (ALsizei)GetSoundResource()->GetUncompressedDataSize(), (ALsizei)GetSoundResource()->GetSamplesPerSecond());
 		if ((Error = alGetError()) != AL_NO_ERROR)
 		{
 			DestroyBufferSource();
@@ -177,40 +178,83 @@ bool ZEALSoundSource::CreateBuffer()
 			zeError("Can not assign OpenAL buffer to OpenAL source. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 			return false;
 		}
-
 	}
 	else
 	{
 		if (InnerStreamBuffer != NULL)
 			delete[] InnerStreamBuffer;
 
-		InnerStreamBuffer = new char[BufferSampleCount * SoundResource->GetBlockAlign()];
+		InnerStreamBuffer = new char[BufferSampleCount * GetSoundResource()->GetBlockAlign()];
 	}
 
-	// If sound was playing continue to play.
-	if (SoundSourceState == ZE_SSS_PLAYING)
-		Resume();
+	Allocated = true;
 
 	// Reset properties to apply sound buffer
-	ResetParameters();
+	UpdateParameters();
+	UpdateOrientation();
 
-	Allocated = true;
 	return true;
 }
 
-
-void ZEALSoundSource::ResetParameters()
+void ZEALSoundSource::UpdateParameters()
 {
-	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
-	alSourcef(ALSource, AL_PITCH, PlaybackSpeed);
-	alSourcef(ALSource, AL_GAIN, EffectiveVolume / 100.0f);
-	//alSourcei(ALSource, AL_LOOPING, (Streaming ? AL_FALSE : AL_TRUE));
-	alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
-    alSource3f(ALSource, AL_POSITION, 0.0, 0.0, 0.0);
-	alSource3f(ALSource, AL_VELOCITY, 0.0, 0.0, 0.0);
-	alSource3f(ALSource, AL_DIRECTION, 0.0, 0.0, 0.0);
-	alSourcef(ALSource, AL_ROLLOFF_FACTOR, 0.0);
-	alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
+	if (!Allocated)
+		return;
+
+	alSourcef(ALSource, AL_PITCH, GetSpeed());
+	alSourcef(ALSource, AL_GAIN, GetEffectiveVolume(GetVolume()));
+	alSourcei(ALSource, AL_LOOPING, (!IsStreaming() && GetLooping() ? AL_TRUE : AL_FALSE));
+	
+	if (!GetPositional())
+	{
+		float Pan = ZEMath::Saturate(GetPan());
+		alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
+		alSource3f(ALSource, AL_POSITION, Pan, 0.0f, 1.0f - Pan);
+		alSource3f(ALSource, AL_VELOCITY, 0.0, 0.0, 0.0);
+		alSource3f(ALSource, AL_DIRECTION, 0.0, 0.0, 0.0);
+		alSourcef(ALSource, AL_MIN_GAIN, 1.0f);
+		alSourcef(ALSource, AL_MAX_GAIN, 1.0f);
+		alSourcef(ALSource, AL_ROLLOFF_FACTOR, 0.0);
+	}
+	else
+	{
+		alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
+		alSourcef(ALSource, AL_MAX_DISTANCE, GetMaxDistance());
+		alSourcef(ALSource, AL_REFERENCE_DISTANCE, (GetMaxDistance() - GetMinDistance()) / 2.0f);
+		alSourcef(ALSource, AL_MIN_GAIN, 0.0f);
+		alSourcef(ALSource, AL_MAX_GAIN, 1.0f);
+		alSourcef(ALSource, AL_CONE_INNER_ANGLE, ZEAngle::ToDegree(GetConeInsideAngle()));
+		alSourcef(ALSource, AL_CONE_OUTER_ANGLE, ZEAngle::ToDegree(GetConeOutsideAngle()));
+		alSourcef(ALSource, AL_CONE_OUTER_GAIN, ZEMath::Saturate(GetConeOutsideVolume()));
+		alSourcef(ALSource, AL_ROLLOFF_FACTOR, GetModule()->GetActiveListener()->GetRollOffFactor());
+	}
+}
+
+void ZEALSoundSource::UpdateOrientation()
+{
+	if (!Allocated)
+		return;
+
+	ZEVector3 Position = GetWorldPosition();
+	alSource3f(ALSource, AL_POSITION, Position.x, Position.y, Position.z);
+
+	ZEVector3 Direction = GetWorldFront();
+	alSource3f(ALSource, AL_DIRECTION, Direction.x, Direction.y, Direction.z);
+
+	ZEVector3 Velocity = GetVelocity();
+	alSource3f(ALSource, AL_VELOCITY, Velocity.x, Velocity.y, Velocity.z);
+}
+
+void ZEALSoundSource::LocalTransformChanged()
+{
+	UpdateOrientation();
+	ZESoundSource::LocalTransformChanged();
+}
+
+void ZEALSoundSource::ParentTransformChanged()
+{
+	UpdateOrientation();
+	ZESoundSource::ParentTransformChanged();
 }
 
 void ZEALSoundSource::DestroyBufferSource()
@@ -235,55 +279,53 @@ void ZEALSoundSource::DestroyBufferSource()
 
 void ZEALSoundSource::ResetStream()
 {	
-	StreamPosition = CurrentPosition;
-	if (StreamPosition > EffectiveEndPosition)
-		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+	StreamPosition = GetCurrentPosition();
+	if (StreamPosition > GetEffectiveEndPosition())
+		StreamPosition = (StreamPosition - GetEffectiveEndPosition()) + GetEffectiveStartPosition();
 
 	StreamDecodeAndFill((ZESize)ALBuffer1, StreamPosition, BufferSampleCount);
 	StreamPosition += BufferSampleCount;
-	if (StreamPosition > EffectiveEndPosition)
-		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+	if (StreamPosition > GetEffectiveEndPosition())
+		StreamPosition = (StreamPosition - GetEffectiveEndPosition()) + GetEffectiveStartPosition();
 
 	StreamDecodeAndFill((ZESize)ALBuffer2, StreamPosition, BufferSampleCount);
 	StreamPosition += BufferSampleCount;
-	if (StreamPosition > EffectiveEndPosition)
-		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+	if (StreamPosition > GetEffectiveEndPosition())
+		StreamPosition = (StreamPosition - GetEffectiveEndPosition()) + GetEffectiveStartPosition();
 
 	OldBufferPosition = 0;
 	alSourcei(ALSource, AL_SAMPLE_OFFSET, 0);
 	alSourcei(ALSource, AL_BUFFER, NULL);
 	alSourceQueueBuffers(ALSource, 1, &ALBuffer1);
 	alSourceQueueBuffers(ALSource, 1, &ALBuffer2);
-
 }
-
 
 void ZEALSoundSource::StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount)
 {
-	if (Position + SampleCount < EffectiveEndPosition)
+	if (Position + SampleCount < GetEffectiveEndPosition())
 	{
-		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
+		GetSoundResource()->Decode(InnerStreamBuffer, Position, SampleCount);
 	}
 	else
 	{
-		SampleCount = EffectiveEndPosition - Position;
-		SoundResource->Decode((void*)InnerStreamBuffer, Position, SampleCount);
+		SampleCount = GetEffectiveEndPosition() - Position;
+		GetSoundResource()->Decode((void*)InnerStreamBuffer, Position, SampleCount);
 
 		ZESize RemainingSampleCount = BufferSampleCount - SampleCount;
-		void* RemainingSampleBuffer = ((ZEUInt8*)InnerStreamBuffer) + SampleCount * SoundResource->GetBlockAlign();
+		void* RemainingSampleBuffer = ((ZEUInt8*)InnerStreamBuffer) + SampleCount * GetSoundResource()->GetBlockAlign();
 
-		if (Looping)
+		if (GetLooping())
 		{
-			SoundResource->Decode(RemainingSampleBuffer, EffectiveStartPosition, RemainingSampleCount);
+			GetSoundResource()->Decode(RemainingSampleBuffer, GetEffectiveStartPosition(), RemainingSampleCount);
 		}
 		else
 		{
-			memset(RemainingSampleBuffer, (SoundResource->GetBitsPerSample() == 8 ? 0x80 : 0x00), RemainingSampleCount * SoundResource->GetBlockAlign());
+			memset(RemainingSampleBuffer, (GetSoundResource()->GetBitsPerSample() == 8 ? 0x80 : 0x00), RemainingSampleCount * GetSoundResource()->GetBlockAlign());
 		}
 	}
 
 
-	alBufferData((ALuint)BufferPosition, GetBufferFormat(SoundResource), InnerStreamBuffer, (ALsizei)(BufferSampleCount * SoundResource->GetBlockAlign()), (ALsizei)SoundResource->GetSamplesPerSecond());
+	alBufferData((ALuint)BufferPosition, GetBufferFormat(GetSoundResource()), InnerStreamBuffer, (ALsizei)(BufferSampleCount * GetSoundResource()->GetBlockAlign()), (ALsizei)GetSoundResource()->GetSamplesPerSecond());
 }
 
 void ZEALSoundSource::Stream()
@@ -299,9 +341,9 @@ void ZEALSoundSource::Stream()
 
 		StreamDecodeAndFill((ZESize)Buffer, StreamPosition, BufferSampleCount);
 		StreamPosition += BufferSampleCount;
-		if (StreamPosition > EffectiveEndPosition)
+		if (StreamPosition > GetEffectiveEndPosition())
 		{
-			StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+			StreamPosition = (StreamPosition - GetEffectiveEndPosition()) + GetEffectiveStartPosition();
 		}
 
 		alSourceQueueBuffers(ALSource, 1, &Buffer);
@@ -324,39 +366,18 @@ ZEALSoundSource::~ZEALSoundSource()
 	DestroyBufferSource();
 }
 
-void ZEALSoundSource::SetSoundSourceState(ZESoundSourceState State)
-{
-	if (State != SoundSourceState)
-		switch(State)
-		{
-			case ZE_SSS_STOPPED:
-				Stop();
-				break;
-			case ZE_SSS_PLAYING:
-				Play();
-				break;
-			case ZE_SSS_PAUSED:
-				Pause();
-				break;
-			default:
-			case ZE_SSS_NONE:
-				SoundSourceState = ZE_SSS_NONE;
-				break;
-		}
-}
-
 void ZEALSoundSource::SetCurrentPosition(ZESize SampleIndex)
 {
-	if (SoundResource != NULL)
+	if (GetSoundResource() != NULL)
 	{
-		if (SampleIndex > SoundResource->GetSampleCount())
+		if (SampleIndex > GetSoundResource()->GetSampleCount())
 		{
-			SampleIndex = SoundResource->GetSampleCount();
+			SampleIndex = GetSoundResource()->GetSampleCount();
 		}
 
-		if (Streaming)
+		if (IsStreaming())
 		{
-			CurrentPosition = SampleIndex;
+			ZESoundSource::SetCurrentPosition(SampleIndex);
 			ResetStream();
 		}
 		else
@@ -366,104 +387,113 @@ void ZEALSoundSource::SetCurrentPosition(ZESize SampleIndex)
 	}
 }
 
-ZESize ZEALSoundSource::GetCurrentPosition()
+void ZEALSoundSource::SetSpeed(float Speed)
 {
-	if (Streaming)
-	{
-		return CurrentPosition;
-	}
-	else
-	{
-		if (SoundResource != NULL)
-		{
-			ALint Position;
-			alGetSourcei(ALSource, AL_SAMPLE_OFFSET, &Position);
-			return (ZESize)Position;
-		}
-		else
-		{
-			return 0;
-		}
-	}
+	if (GetSpeed() == Speed)
+		return;
+
+	ZESoundSource::SetSpeed(Speed);
+
+	UpdateParameters();
 }
 
-void ZEALSoundSource::SetPan(ZEInt NewPan)
+void ZEALSoundSource::SetVolume(float Volume)
 {
-	if (NewPan> ZE_SS_PAN_RIGHT)
-		Pan = ZE_SS_PAN_RIGHT;
-	else if (NewPan < ZE_SS_PAN_LEFT)
-		Pan = ZE_SS_PAN_LEFT;
-	else
-		Pan = NewPan;
+	if (GetVolume() == Volume)
+		return;
 
-	zeLog("Panning is not supported with OpenAL");
-
-	// No panning support in OpenAL!
-}
-
-void ZEALSoundSource::SetPlaybackSpeed(float Speed)
-{
-	PlaybackSpeed = Speed;
-
-	if (Allocated)
-		alSourcef(ALSource, AL_PITCH, Speed);
-}
-
-void ZEALSoundSource::SetVolume(ZEUInt NewVolume)
-{
-	if (NewVolume > ZE_SS_VOLUME_MAX)
-		Volume = ZE_SS_VOLUME_MAX;
-	else
-		Volume = NewVolume;
-
-	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
+	ZESoundSource::SetVolume(Volume);
 	
-	if (SoundResource != NULL)
-		alSourcef(ALSource, AL_GAIN, EffectiveVolume / 100);
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetPan(float Pan)
+{
+	if (GetPan() == Pan)
+		return;
+
+	ZESoundSource::SetPan(Pan);
+
+	UpdateParameters();
 }
 
 void ZEALSoundSource::SetLooping(bool Enabled)
 {
-	Looping = Enabled;
-	if (SoundResource != NULL && !Streaming)
-		alSourcei(ALSource, AL_LOOPING, Looping || Streaming ? AL_TRUE : AL_FALSE);
+	if (GetLooping() == Enabled)
+		return;
+
+	ZESoundSource::SetLooping(Enabled);
+
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetMinDistance(float Distance)
+{
+	if (GetMinDistance() == Distance)
+		return;
+
+	ZESoundSource::SetMinDistance(Distance);
+
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetMaxDistance(float Distance)
+{
+	if (GetMaxDistance() == Distance)
+		return;
+
+	ZESoundSource::SetMaxDistance(Distance);
+
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetConeInsideAngle(float Angle)
+{
+	if (GetConeInsideAngle() == Angle)
+		return;
+
+	ZESoundSource::SetConeInsideAngle(Angle);
+
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetConeOutsideAngle(float Angle)
+{
+	if (GetConeOutsideAngle() == Angle)
+		return;
+
+	ZESoundSource::SetConeInsideAngle(Angle);
+
+	UpdateParameters();
+}
+
+void ZEALSoundSource::SetConeOutsideVolume(float Volume)
+{
+	if (GetConeOutsideVolume() == Volume)
+		return;
+
+	ZESoundSource::SetConeOutsideVolume(Volume);
+
+	UpdateParameters();
 }
 
 void ZEALSoundSource::Play()
 {
-	CurrentPosition = EffectiveStartPosition;
+	if (GetState() == ZE_SSS_PLAYING || GetState() == ZE_SSS_NONE)
+		return;
 
 	if (Allocated)
 	{
-		SoundSourceState = ZE_SSS_PLAYING;
+		SetSoundSourceState(ZE_SSS_PLAYING);
 		
-		if (Streaming)
+		if (IsStreaming())
 		{
 			ResetStream();
 		}
 		else
 		{
-			OldBufferPosition = CurrentPosition;
-			alBufferi(ALSource, AL_SAMPLE_OFFSET, (ALint)CurrentPosition);
-		}
-
-		alSourcePlay(ALSource);
-	}
-}
-
-void ZEALSoundSource::Resume()
-{
-	if (SoundResource != NULL)
-	{
-		SoundSourceState = ZE_SSS_PLAYING;
-		
-		if (Streaming)
-		{
-			ResetStream();
-		}
-		else
-		{
-			alSourcei(ALSource, AL_SAMPLE_OFFSET, (ALint)EffectiveStartPosition);
+			OldBufferPosition = GetCurrentPosition();
+			alBufferi(ALSource, AL_SAMPLE_OFFSET, (ALint)OldBufferPosition);
 		}
 
 		alSourcePlay(ALSource);
@@ -472,37 +502,41 @@ void ZEALSoundSource::Resume()
 
 void ZEALSoundSource::Pause()
 {
+	if (GetSoundSourceState() == ZE_SSS_PLAYING)
+		return;
+
 	if (Allocated)
 	{
-		SoundSourceState = ZE_SSS_PAUSED;
+		SetSoundSourceState(ZE_SSS_PAUSED);
 		alSourceStop(ALSource);
 	}
 }
 
 void ZEALSoundSource::Stop()
 {
+	if (GetSoundSourceState() == ZE_SSS_STOPPED)
+		return;
+
 	if (Allocated)
 	{
 		alSourceStop(ALSource);
 
-		if (Streaming)
-		{
-			CurrentPosition = EffectiveStartPosition;
-		}
+		if (IsStreaming())
+			ZESoundSource::SetCurrentPosition(GetEffectiveStartPosition());
 		else
-		{
-			alSourcei(ALSource, AL_SAMPLE_OFFSET, (ALint)CurrentPosition);
-		}
+			alSourcei(ALSource, AL_SAMPLE_OFFSET, (ALint)GetEffectiveStartPosition());
 
-		SoundSourceState = ZE_SSS_STOPPED;
+		SetSoundSourceState(ZE_SSS_STOPPED);
 	}
 }
 
 void ZEALSoundSource::Update(float ElapsedTime)
 {
-	if (!Allocated || SoundSourceState != ZE_SSS_PLAYING)
+	UpdateVelocity(ElapsedTime);
+
+	if (!Allocated || GetSoundSourceState() != ZE_SSS_PLAYING)
 		return;
-		
+
 	ALint ALBufferPosition;
 	alGetSourcei(ALSource, AL_SAMPLE_OFFSET, &ALBufferPosition);
 	BufferPosition = (ZESize)ALBufferPosition;
@@ -510,14 +544,16 @@ void ZEALSoundSource::Update(float ElapsedTime)
 	// Update CurrentPosition
 	bool BufferRewinded = false;
 
-	if (Streaming)
+	if (IsStreaming())
 	{
 		if (BufferPosition >= OldBufferPosition)
-			CurrentPosition += BufferPosition - OldBufferPosition;
+		{
+			ZESoundSource::SetCurrentPosition(GetCurrentPosition() + BufferPosition - OldBufferPosition);
+		}
 		else
 		{
 			BufferRewinded = true;
-			CurrentPosition += (BufferSampleCount - OldBufferPosition) + BufferPosition;
+			ZESoundSource::SetCurrentPosition(GetCurrentPosition() + BufferSampleCount - OldBufferPosition + BufferPosition);
 		}
 
 		OldBufferPosition = BufferPosition;
@@ -527,26 +563,27 @@ void ZEALSoundSource::Update(float ElapsedTime)
 		if (OldBufferPosition > BufferPosition)
 			BufferRewinded = true;
 
-		CurrentPosition = BufferPosition;
+		ZESoundSource::SetCurrentPosition(BufferPosition);
 		OldBufferPosition = BufferPosition;
 	}
 
 	// Check Limits
-	if (CurrentPosition < EffectiveStartPosition || CurrentPosition > EffectiveEndPosition || (!Streaming && BufferRewinded && (EffectiveStartPosition < EffectiveEndPosition)))
+	if (GetCurrentPosition() < GetEffectiveStartPosition() || 
+		GetCurrentPosition() > GetEffectiveEndPosition() || 
+		(!IsStreaming() && BufferRewinded && (GetEffectiveStartPosition() < GetEffectiveEndPosition())))
 	{
-		if (Looping)
+		if (GetLooping())
 		{
-			SetCurrentPosition(EffectiveStartPosition);
+			SetCurrentPosition(GetEffectiveStartPosition());
 		}
 		else
 		{
-			SoundSourceState = ZE_SSS_STOPPED;
-			alSourceStop(ALSource);
+			Stop();
 			return;
 		}
 	}
 
 	// Stream
-	if (Streaming)
+	if (IsStreaming())
 		Stream();
 }

@@ -43,7 +43,6 @@
 #include "ZESound/ZESoundSource.h"
 
 class ZEALSoundSource;
-class ZEALSoundSource3D;
 class ZEALListener;
 struct ALCdevice_struct;
 struct ALCcontext_struct;
@@ -56,7 +55,6 @@ class ZEALModule : public ZESoundModule
 	ZE_OBJECT
 	friend class ZEALSoundListener;
 	friend class ZEALSoundSource;
-	friend class ZEALSoundSource3D;
 	private:
 		ZEArray<ZESoundDevice>					DeviceList;
 
@@ -65,8 +63,8 @@ class ZEALModule : public ZESoundModule
 		ALCdevice_struct*						Device;
 		ALCcontext_struct*						Context;
 
-		ZEUInt									MasterVolume;
-		ZEUInt									TypeVolumes[ZE_SS_MAX_TYPE];
+		float									MasterVolume;
+		float									TypeVolumes[ZE_SS_MAX_TYPE];
 
 		bool									StreamingDisabled;
 		ZESize									MaxBufferSize;
@@ -74,7 +72,6 @@ class ZEALModule : public ZESoundModule
 		ZEALListener*							ActiveListener;
 		ZESmartArray<ZEALListener*>				Listeners;
 		ZESmartArray<ZEALSoundSource*>			SoundSources;
-		ZESmartArray<ZEALSoundSource3D*>		SoundSources3D;
 
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
@@ -94,11 +91,11 @@ class ZEALModule : public ZESoundModule
 		virtual void							SetSpeakerLayout(ZESpeakerLayout Layout);
 		virtual ZESpeakerLayout					GetSpeakerLayout();
 
-		virtual void							SetMasterVolume(ZEUInt Volume);
-		virtual ZEUInt							GetMasterVolume();
+		virtual void							SetMasterVolume(float Volume);
+		virtual float							GetMasterVolume();
 
-		virtual void							SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume);
-		virtual ZEUInt							GetTypeVolume(ZESoundSourceType Type);
+		virtual void							SetTypeVolume(ZESoundSourceType Type, float Volume);
+		virtual float							GetTypeVolume(ZESoundSourceType Type);
 
 		virtual void							SetStreamingDisabled(bool Disabled);
 		virtual bool							GetStreamingDisabled();
@@ -114,7 +111,6 @@ class ZEALModule : public ZESoundModule
 		virtual ZEListener*						GetActiveListener();
 
 		virtual ZESoundSource*					CreateSoundSource();
-		virtual ZESoundSource3D*				CreateSoundSource3D();
 		virtual ZEListener*						CreateListener();
 
 		static ZEALModule*						CreateInstance();

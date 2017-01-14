@@ -40,7 +40,6 @@
 class ZEListener: public ZEEntity
 {
 	ZE_OBJECT
-
 	protected:
 		float					DistanceFactor;
 		float					DopplerFactor;
@@ -54,13 +53,13 @@ class ZEListener: public ZEEntity
 		void					SetActiveListener();
 
 		float					GetDistanceFactor() const;
-		virtual void			SetDistanceFactor(float NewDistanceFactor);
+		virtual void			SetDistanceFactor(float Factor);
 		
 		float					GetDopplerFactor() const;
-		virtual void			SetDopplerFactor(float NewDopplerFactor);
+		virtual void			SetDopplerFactor(float Factor);
 		
 		float					GetRollOffFactor() const;
-		virtual void			SetRollOffFactor(float NewRollOffFactor);
+		virtual void			SetRollOffFactor(float Factor);
 
 		static ZEListener*		CreateInstance();
 }

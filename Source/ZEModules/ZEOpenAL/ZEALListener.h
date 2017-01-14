@@ -44,10 +44,16 @@ class ZEALListener : public ZEListener, public ZEALComponentBase
 {	
 	friend class ZEALModule;
 	private:
+		ZEVector3					Velocity;
+		ZEVector3					PositionOld;
 		float						UpdateTreshold;
 		bool						ListenerDirtyFlag;
 
-		void						ResetParameters();
+		virtual void				LocalTransformChanged() override;
+		virtual void				ParentTransformChanged() override;
+
+		void						UpdateOrientation();
+		void						UpdateParameters();
 
 									ZEALListener();
 		virtual						~ZEALListener();
@@ -56,14 +62,9 @@ class ZEALListener : public ZEListener, public ZEALComponentBase
 		bool						IsActiveListener();
 		void						SetActiveListener();
 
-		virtual void				SetPosition(const ZEVector3& NewPosition);
-		virtual void				SetRotation(const ZEQuaternion& NewRotation);
-
 		virtual void				SetDistanceFactor(float NewDistanceFactor);	
 		virtual void				SetDopplerFactor(float NewDopplerFactor);
 		virtual void				SetRollOffFactor(float NewRollOffFactor);
-
-		virtual void				OwnerWorldTransformChanged();
 
 		virtual void				Tick(float ElapsedTime);
 };

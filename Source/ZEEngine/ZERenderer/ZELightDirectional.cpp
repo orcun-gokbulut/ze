@@ -344,6 +344,11 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
 		return;
 
+	// Do not update shadow map for second channel
+	// Reuse the generated one for the first channel
+	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS))
+		return;
+
 	UpdateCascadeShadowMaps();
 	UpdateCascadeTransforms(*Parameters->View);
 
@@ -370,7 +375,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		ZERNPreRenderParameters ShadowParameters;
 		ShadowParameters.Renderer = &ShadowRenderer;
 		ShadowParameters.View = &View;
-		ShadowParameters.Type = ZERN_PRT_SHADOW;
+		ShadowParameters.Type = ZERN_RT_SHADOW;
 		
 		Parameters->Renderer->BeginNestedRenderer();
 		GetScene()->PreRender(&ShadowParameters);

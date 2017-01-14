@@ -611,7 +611,7 @@ bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	if (Parameters->Type != ZERN_PRT_SHADOW)
+	if (Parameters->Type != ZERN_RT_SHADOW)
 	{
 		if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 		{

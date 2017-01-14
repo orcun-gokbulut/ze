@@ -36,12 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
-
-typedef ZEFlags ZERNRenderFlags;
-#define ZERN_RF_NONE				0x0
-#define ZERN_RF_DRAW				0x1
-#define ZERN_RF_CULL				0x2
-#define ZERN_RF_PROBE				0x4
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRContext;
 ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
@@ -50,12 +45,31 @@ ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
 ZE_META_FORWARD_DECLARE(ZERNCommand, "ZERNCommand.h");
 ZE_META_FORWARD_DECLARE(ZERNView, "ZERNView.h");
 
-ZE_ENUM(ZERNPreRenderType)
+ZE_ENUM(ZERNRenderType)
 {
-	ZERN_PRT_COLOR,
-	ZERN_PRT_SHADOW,
-	ZERN_PRT_OTHER
+	ZERN_RT_COLOR,
+	ZERN_RT_SHADOW,
+	ZERN_RT_ENVIRONMENT,
+	ZERN_RT_OTHER
 };
+
+ZE_ENUM(ZERNRenderFlag)
+{
+	ZERN_RF_NONE				= 0x00,
+	ZERN_RF_STERIO				= 0x10,
+	ZERN_RF_STERIO_LEFT			= 0x11,
+	ZERN_RF_STERIO_RIGHT		= 0x12,
+	ZERN_RF_STERIO_FIRST_PASS	= 0x11,
+	ZERN_RF_STERIO_SECOND_PASS	= 0x12,
+	ZERN_RF_CUBE				= 0x20,
+	ZERN_RF_CUBE_NX				= 0x21,
+	ZERN_RF_CUBE_PX				= 0x22,
+	ZERN_RF_CUBE_NY				= 0x23,
+	ZERN_RF_CUBE_PY				= 0x24,
+	ZERN_RF_CUBE_NZ				= 0x25,
+	ZERN_RF_CUBE_PZ				= 0x26
+};
+typedef ZEFlags ZERNRenderFlags;
 
 class ZERNPreRenderParameters : public ZEObject
 {
@@ -66,7 +80,8 @@ class ZERNPreRenderParameters : public ZEObject
 		float						Time;
 		ZERNRenderer*				Renderer;
 		const ZERNView*				View;
-		ZERNPreRenderType			Type;
+		ZERNRenderType				Type;
+		ZERNRenderFlags				Flags;
 
 		void						UpdateTime();
 
@@ -81,6 +96,9 @@ class ZERNRenderParameters : public ZEObject
 		float						ElapsedTime;
 		float						Time;
 		ZEGRContext*				Context;
+		ZERNRenderType				Type;
+		ZERNRenderFlags				Flags;
+
 		ZERNRenderer*				Renderer;
 		const ZERNView*				View;
 		const ZERNStage*			Stage;

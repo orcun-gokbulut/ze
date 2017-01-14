@@ -36,10 +36,86 @@
 #include "ZESoundSource.h"
 #include "ZESoundModule.h"
 #include "ZEFile\ZEPathInfo.h"
+#include "ZEMath\ZEAngle.h"
+#include "ZEMath\ZEMath.h"
+
+void ZESoundSource::SetStreaming(bool Streaming)
+{
+	this->Streaming = Streaming;
+}
+
+ZEVector3 ZESoundSource::GetVelocity() const
+{
+	return Velocity;
+}
+
+ZESize ZESoundSource::GetEffectiveStartPosition() const
+{
+	return EffectiveStartPosition;
+}
+
+ZESize ZESoundSource::GetEffectiveEndPosition() const
+{
+	return EffectiveEndPosition;
+}
+
+float ZESoundSource::GetEffectiveVolume(float Volume) const
+{
+	return ZEMath::Saturate(ZEMath::Saturate(Volume) * zeSound->GetTypeVolume(GetSoundSourceType()));
+}
+
+void ZESoundSource::ApplyLimits()
+{
+	if (!LimitsEnabled)
+	{
+		EffectiveStartPosition = 0;
+		EffectiveEndPosition = SoundResource->GetSampleCount();
+	}
+	else
+	{
+		EffectiveStartPosition = StartPosition % SoundResource->GetSampleCount();	
+		EffectiveEndPosition = EndPosition % SoundResource->GetSampleCount();	
+	}
+}
 
 void ZESoundSource::UpdateResource()
 {
+	ApplyLimits();
+}
 
+void ZESoundSource::UpdateVelocity(float ElapsedTime)
+{
+	ZEVector3 WorldPosition = GetWorldPosition();
+	ZEVector3 NewVelocity = VelocityOldPosition - WorldPosition;
+	ZEVector3::Lerp(NewVelocity, Velocity, NewVelocity, 8 * ElapsedTime);
+
+	if (NewVelocity.LengthSquare() > 83 * 83)
+		NewVelocity = NewVelocity.Normalize() * 83;
+
+	Velocity = NewVelocity;
+	VelocityOldPosition = WorldPosition;
+}
+
+ZEEntityResult ZESoundSource::InitializeInternal()
+{
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+
+	Velocity = ZEVector3::Zero;
+	VelocityOldPosition = GetWorldPosition();
+
+	if (GetAutoPlay())
+		Play();
+
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZESoundSource::DeinitializeInternal()
+{
+	Stop();
+
+	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
+	
+	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZESoundSource::LoadInternal()
@@ -52,12 +128,6 @@ ZEEntityResult ZESoundSource::LoadInternal()
 			SoundResource = ZESoundResource::LoadResourceShared(SoundFileName);
 		
 		return ZE_ER_WAIT;
-	}
-
-	if (!LimitsEnabled)
-	{
-		EffectiveStartPosition = 0;
-		EffectiveEndPosition = SoundResource->GetSampleCount();
 	}
 
 	UpdateResource();
@@ -77,12 +147,16 @@ ZEEntityResult ZESoundSource::UnloadInternal()
 
 ZESoundSource::ZESoundSource()
 {
+	Velocity = ZEVector3::Zero;
+	VelocityOldPosition = ZEVector3::Zero;
+	Positional = true;
 	SoundResourceExternal = false;
 	SoundSourceState = ZE_SSS_NONE;
 	SoundSourceType = ZE_SST_NONE;
-	Pan = ZE_SS_PAN_MIDDLE;
-	PlaybackSpeed = 1.0f;
-	Volume = ZE_SS_VOLUME_MAX;
+	AutoPlay = false;
+	Pan = 0.0f;
+	Speed = 1.0f;
+	Volume = 1.0f;
 	Looping = false;
 	Streaming = false;
 	LimitsEnabled = false;
@@ -93,6 +167,11 @@ ZESoundSource::ZESoundSource()
 	LocalOldPosition = 0;
 	EffectiveStartPosition = 0;
 	EffectiveEndPosition = 0;
+	MinDistance = 0.0f;
+	MaxDistance = 100.0f;
+	ConeInsideAngle = ZE_PIx2;
+	ConeOutsideAngle = ZE_PIx2;
+	ConeOutsideVolume = 1.0f;
 }
 
 ZESoundSource::~ZESoundSource()
@@ -103,6 +182,16 @@ ZESoundSource::~ZESoundSource()
 bool ZESoundSource::IsStreaming() const
 {
 	return Streaming;
+}
+
+void ZESoundSource::SetPositional(bool Enabled)
+{
+	Positional = Enabled;
+}
+
+bool ZESoundSource::GetPositional() const
+{
+	return Positional;
 }
 
 void ZESoundSource::SetSoundSourceState(ZESoundSourceState State)		
@@ -118,12 +207,9 @@ ZESoundSourceState ZESoundSource::GetSoundSourceState() const
 void ZESoundSource::SetSoundSourceType(ZESoundSourceType Type)
 {
 	SoundSourceType = Type;
-	
-	// Update Volume
-	SetVolume(GetVolume());
 }
 
-ZESoundSourceType ZESoundSource::GetSoundSourceType()
+ZESoundSourceType ZESoundSource::GetSoundSourceType() const
 {
 	return SoundSourceType;
 }
@@ -181,16 +267,7 @@ void ZESoundSource::SetLimitsEnabled(bool Enabled)
 {
 	LimitsEnabled = Enabled;
 
-	if (!LimitsEnabled)
-	{
-		EffectiveStartPosition = 0;
-		EffectiveEndPosition = SoundResource->GetSampleCount();
-	}
-	else
-	{
-		EffectiveStartPosition = StartPosition % SoundResource->GetSampleCount();	
-		EffectiveEndPosition = EndPosition % SoundResource->GetSampleCount();	
-	}
+	ApplyLimits();
 }
 
 bool ZESoundSource::GetLimitsEnabled() const
@@ -310,40 +387,32 @@ float ZESoundSource::GetEndPositionPercentage() const
 		return 0.0f;
 }
 
-void ZESoundSource::SetPan(ZEInt NewPan)
+void ZESoundSource::SetPan(float Pan)
 {
-	if (Pan > ZE_SS_PAN_RIGHT)
-		Pan = 100;
-	else if (Pan < ZE_SS_PAN_LEFT)
-		Pan = -100;
-	else
-		Pan = NewPan;
+	this->Pan = Pan;
 }	
 
-ZEInt ZESoundSource::GetPan() const
+float ZESoundSource::GetPan() const
 {
 	return Pan;
 }
 
-void ZESoundSource::SetPlaybackSpeed(float Speed)
+void ZESoundSource::SetSpeed(float Speed)
 {
-	PlaybackSpeed = Speed;
+	this->Speed = Speed;
 }
 
-float ZESoundSource::GetPlaybackSpeed() const
+float ZESoundSource::GetSpeed() const
 {
-	return PlaybackSpeed;
+	return Speed;
 }
 
-void ZESoundSource::SetVolume(ZEUInt NewVolume)
+void ZESoundSource::SetVolume(float Volume)
 {
-	if (NewVolume > ZE_SS_VOLUME_MAX)
-		NewVolume = ZE_SS_VOLUME_MAX;
-
-	Volume = (ZEUInt)((float)NewVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX));
+	this->Volume = Volume;
 }
 
-ZEUInt ZESoundSource::GetVolume() const
+float ZESoundSource::GetVolume() const
 {
 	return Volume;
 }
@@ -358,7 +427,17 @@ bool ZESoundSource::GetLooping() const
 	return Looping;
 }
 
-ZESize ZESoundSource::GetLoopingLength()
+void ZESoundSource::SetAutoPlay(bool AutoPlay)
+{
+	AutoPlay = true;
+}
+
+bool ZESoundSource::GetAutoPlay() const
+{
+	return AutoPlay;
+}
+
+ZESize ZESoundSource::GetLoopingLength() const
 {
 	if (StartPosition < EndPosition)
 		return EndPosition - StartPosition;
@@ -366,14 +445,72 @@ ZESize ZESoundSource::GetLoopingLength()
 		return StartPosition + (SoundResource->GetSampleCount() - EndPosition);
 }
 
-float ZESoundSource::GetLoopingLenghtTime()
+float ZESoundSource::GetLoopingLenghtTime() const
 {
 	return (float)GetLoopingLength() / (float)SoundResource->GetSamplesPerSecond();
 }
 
-float ZESoundSource::GetLoopingLenghtPercent()
+float ZESoundSource::GetLoopingLenghtPercent() const
 {
 	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
+}
+
+void ZESoundSource::SetMinDistance(float Distance)
+{
+	MinDistance = MinDistance;
+}
+
+
+float ZESoundSource::GetMinDistance() const
+{
+	return MinDistance;
+}
+
+void ZESoundSource::SetMaxDistance(float Distance)
+{
+	MaxDistance = Distance;
+}
+
+float ZESoundSource::GetMaxDistance() const
+{
+	return MaxDistance;
+}
+
+void ZESoundSource::SetConeInsideAngle(float Angle)
+{
+	ConeInsideAngle = Angle;
+}
+
+float ZESoundSource::GetConeInsideAngle() const
+{
+	return ConeInsideAngle;
+}
+
+void ZESoundSource::SetConeOutsideAngle(float Angle)
+{
+	ConeOutsideAngle = Angle;
+}
+
+float ZESoundSource::GetConeOutsideAngle() const
+{
+	return ConeOutsideAngle;
+}
+
+void ZESoundSource::SetConeOutsideVolume(float Volume)
+{
+	ConeOutsideVolume = Volume;
+}
+
+float ZESoundSource::GetConeOutsideVolume() const
+{
+	return ConeOutsideVolume;
+}
+
+
+void ZESoundSource::Replay()
+{
+	Stop();
+	Play();
 }
 
 void ZESoundSource::SetSoundFileName(const ZEString& FileName)
