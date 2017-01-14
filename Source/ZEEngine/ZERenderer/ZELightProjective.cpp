@@ -234,6 +234,11 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
 		return;
 
+	// Do not update shadow map for second channel
+	// Reuse the generated one for the first channel
+	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS)) 
+		return;
+
 	if (GetScene() == NULL)
 		return;
 
@@ -257,7 +262,7 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	ZERNPreRenderParameters PreRenderParameters;
 	PreRenderParameters.Renderer = &ShadowRenderer;
 	PreRenderParameters.View = &View;
-	PreRenderParameters.Type = ZERN_PRT_SHADOW;
+	PreRenderParameters.Type = ZERN_RT_SHADOW;
 
 	ZEGRContext* Context = Parameters->Context;
 	ShadowRenderer.SetContext(Context);

@@ -682,7 +682,7 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 
 bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (Parameters->Type == ZERN_PRT_SHADOW && !GetMaterial()->GetShadowCaster())
+	if (Parameters->Type == ZERN_RT_SHADOW && !GetMaterial()->GetShadowCaster())
 		return false;
 
 	if (Effect->GetState() != ZE_PES_RUNNING)

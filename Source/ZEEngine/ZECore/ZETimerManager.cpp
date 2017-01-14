@@ -59,9 +59,6 @@ void ZETimerManager::RegisterTimer(ZETimer* Timer)
 
 void ZETimerManager::UnregisterTimer(ZETimer* Timer)
 {
-	if(!TimerList.Exists(Timer))
-		return;
-
 	TimerList.RemoveValue(Timer);
 }
 

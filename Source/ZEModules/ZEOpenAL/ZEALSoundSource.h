@@ -44,44 +44,51 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 {
 	friend class ZEALModule;
 	private:
-		bool							Allocated;
-		ALuint							ALSource;
-		ALuint							ALBuffer1;
-		ALuint							ALBuffer2;
-		char*							InnerStreamBuffer;
+		bool								Allocated;
+		ALuint								ALSource;
+		ALuint								ALBuffer1;
+		ALuint								ALBuffer2;
+		char*								InnerStreamBuffer;
 
-		ZESize							BufferPosition;
-		ZESize							BufferSampleCount;
-		ZESize							OldBufferPosition;
-		ZESize							StreamPosition;
+		ZESize								BufferPosition;
+		ZESize								BufferSampleCount;
+		ZESize								OldBufferPosition;
+		ZESize								StreamPosition;
 
-		virtual void					UpdateResource();
+		bool								CreateBuffer();
+		void								DestroyBufferSource();
 
-		bool							CreateBuffer();
-		void							ResetParameters();
-		void							DestroyBufferSource();
+		void								Stream();
+		void								ResetStream();
+		void								StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
 
-		void							Stream();
-		void							ResetStream();
-		void							StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
+		virtual void						UpdateResource() override;
+		void								UpdateParameters();
+		void								UpdateOrientation();
 
-										ZEALSoundSource();
-		virtual							~ZEALSoundSource();
+		virtual void						LocalTransformChanged() override;
+		virtual void						ParentTransformChanged() override;
+
+											ZEALSoundSource();
+		virtual								~ZEALSoundSource() override;
 
 	public:
-		virtual void					SetSoundSourceState(ZESoundSourceState State);
-		virtual void					SetCurrentPosition(ZESize SampleIndex);
-		virtual ZESize					GetCurrentPosition();
+		virtual void						SetCurrentPosition(ZESize SampleIndex) override;
 
-		virtual void					SetPan(ZEInt NewPan);
-		virtual void					SetPlaybackSpeed(float Speed);
-		virtual void					SetVolume(ZEUInt NewVolume);
-		virtual void					SetLooping(bool Enabled);				
-							
-		virtual void					Play();
-		virtual void					Resume();
-		virtual void					Pause();
-		virtual void					Stop();
+		virtual void						SetSpeed(float Speed) override;
+		virtual void						SetVolume(float Volume) override;
+		virtual void						SetPan(float Pan) override;
+		virtual void						SetLooping(bool Enabled) override;				
 
-		void							Update(float ElapsedTime);
+		virtual void						SetMinDistance(float  NewMinDistance);
+		virtual void						SetMaxDistance(float  NewMaxDistance);
+		virtual void						SetConeInsideAngle(float NewInsideAngle);
+		virtual void						SetConeOutsideAngle(float NewOutsideAngle);
+		virtual void						SetConeOutsideVolume(float NewOutsideVolume);
+
+		virtual void						Play() override;
+		virtual void						Pause() override;
+		virtual void						Stop() override;
+
+		void								Update(float ElapsedTime);
 };

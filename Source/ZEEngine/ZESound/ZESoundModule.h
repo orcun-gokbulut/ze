@@ -42,7 +42,6 @@
 #include "ZECore/ZEOptionSection.h"
 
 class ZESoundSource;
-class ZESoundSource3D;
 class ZEListener;
 class ZESoundResource;
 
@@ -92,8 +91,8 @@ class ZESoundModule : public ZEModule
 		virtual void							SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
 		virtual ZESpeakerLayout					GetSpeakerLayout() = 0;
 
-		virtual void							SetMasterVolume(ZEUInt Volume) = 0;
-		virtual ZEUInt 							GetMasterVolume() = 0;
+		virtual void							SetMasterVolume(float Volume) = 0;
+		virtual float 							GetMasterVolume() = 0;
 
 		virtual void							ProcessSound(float ElapsedTime) = 0;
 
@@ -105,8 +104,8 @@ class ZESoundModule : public ZEModule
 		virtual void							SetMaxBufferSize(ZESize BufferSize) = 0; 
 		virtual ZESize							GetMaxBufferSize() = 0;
 
-		virtual void							SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume) = 0;
-		virtual ZEUInt							GetTypeVolume(ZESoundSourceType Type) = 0;
+		virtual void							SetTypeVolume(ZESoundSourceType Type, float Volume) = 0;
+		virtual float							GetTypeVolume(ZESoundSourceType Type) = 0;
 
 		virtual	void							SetActiveListener(ZEListener* NewListener) = 0;
 		virtual ZEListener*						GetActiveListener() = 0;
@@ -114,7 +113,6 @@ class ZESoundModule : public ZEModule
 		virtual void							OptionsChanged();
 
 		virtual ZESoundSource*					CreateSoundSource() = 0;
-		virtual ZESoundSource3D*				CreateSoundSource3D() = 0;
 		virtual ZEListener*						CreateListener() = 0;
 
 		static ZESoundModule*					GetInstance();

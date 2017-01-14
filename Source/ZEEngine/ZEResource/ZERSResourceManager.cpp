@@ -48,7 +48,7 @@
 #include "ZECore/ZECommand.h"
 #include "ZECore/ZECommandSection.h"
 #include "ZECore/ZECommandManager.h"
-
+#include "ZEMeta/ZEObject.h"
 
 static __declspec(thread) bool StagingInstanciator = false;
 
@@ -133,6 +133,13 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 		
 			return Resource.GetPointer();
 		}
+	}
+
+	ze_for_each(SubGroup, Group->ChildGroups)
+	{
+		ZERSHolder<const ZERSResource> Resource = GetResourceInternal(SubGroup.GetItem()->ResourceClass, FileName, Identifer);
+		if (!Resource.IsNull())
+			return Resource.GetPointer();
 	}
 
 	return NULL;
@@ -425,6 +432,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* Resou
 	{
 		StagingInstanciator = true;
 		ZERSResource* NewResouce = Insanciator(InstanciatorParameter);
+		
 		StagingInstanciator = false;
 
 		if (NewResouce == NULL)

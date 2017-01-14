@@ -40,7 +40,6 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEALListener.h"
 #include "ZEALSoundSource.h"
-#include "ZEALSoundSource3D.h"
 
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
@@ -55,19 +54,11 @@ void ZEALModule::UpdateVolumes(ZESoundSourceType SourceType)
 	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		if (SoundSources[I]->GetSoundSourceType() == SourceType)
 			SoundSources[I]->SetVolume(SoundSources[I]->GetVolume());
-
-	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
-		if (SoundSources3D[I]->GetSoundSourceType() == SourceType)
-			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());
-
 }
 
 void ZEALModule::UpdateStreams()
 {
 	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
-		SoundSources[I]->CreateBuffer();
-
-	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources[I]->CreateBuffer();
 }
 
@@ -97,10 +88,8 @@ bool ZEALModule::InitializeInternal()
 
 	if (!ZESoundModule::InitializeInternal())
 		return false;
-	
 
-	zeLog("Opening device.");
-	Device = alcOpenDevice(NULL); // select the "preferred device"
+	Device = alcOpenDevice(NULL);
 	if (Device == NULL) 
 	{
 		zeError("Can not open OpenAL device.");
@@ -114,18 +103,20 @@ bool ZEALModule::InitializeInternal()
 
 	for(ZESize I = 0; I < ZE_SS_MAX_TYPE; I++)
 	{
-		TypeVolumes[I] = 100;
+		TypeVolumes[I] = 1.0f;
 	}
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
 	SetMaxBufferSize((ZESize)SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInt32());
-	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInt32());
+	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetFloat());
 	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInt32());
-	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInt32());
-	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInt32());
-	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInt32());
-	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInt32());
-	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInt32());
+	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetFloat());
+	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetFloat());
+	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetFloat());
+	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetFloat());
+	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetFloat());
+
+	alDistanceModel(AL_INVERSE_DISTANCE);
 
 	zeLog("OpenAL module initialized.");
 
@@ -164,32 +155,26 @@ bool ZEALModule::GetStreamingDisabled()
 	return StreamingDisabled;
 }
 
-void ZEALModule::SetMasterVolume(ZEUInt Volume)
+void ZEALModule::SetMasterVolume(float Volume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
-		MasterVolume = ZE_SS_VOLUME_MAX;
-	else
-		MasterVolume = Volume;
+	MasterVolume = Volume;
 	
-	alListenerf(AL_GAIN, MasterVolume / 100.0f);
+	alListenerf(AL_GAIN, MasterVolume);
 }
 
-ZEUInt ZEALModule::GetMasterVolume()
+float ZEALModule::GetMasterVolume()
 {
 	return MasterVolume;
 }
 
-void ZEALModule::SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume)
+void ZEALModule::SetTypeVolume(ZESoundSourceType Type, float Volume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
-		Volume = ZE_SS_VOLUME_MAX;
-	else
-		TypeVolumes[Type] = Volume;
+	TypeVolumes[Type] = Volume;
 
 	UpdateVolumes(Type);
 }
 
-ZEUInt ZEALModule::GetTypeVolume(ZESoundSourceType Type)
+float ZEALModule::GetTypeVolume(ZESoundSourceType Type)
 {
 	zeDebugCheck(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
@@ -217,16 +202,6 @@ void ZEALModule::ProcessSound(float ElapsedTime)
 		}
 	}
 	SoundSources.UnlockRead();
-
-	SoundSources3D.LockRead();
-	{
-		for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
-		{
-			if (SoundSources3D[I]->IsLoaded())
-				SoundSources3D[I]->Update(ElapsedTime);
-		}
-	}
-	SoundSources3D.UnlockRead();
 }
 
 #undef PlaySound
@@ -238,7 +213,7 @@ void ZEALModule::PlaySound(ZESoundResource* SoundResource)
 void ZEALModule::SetActiveListener(ZEListener* Listener)
 {
 	ActiveListener = (ZEALListener*)Listener;
-	ActiveListener->ResetParameters();
+	ActiveListener->UpdateParameters();
 }
 
 ZEListener* ZEALModule::GetActiveListener()
@@ -251,14 +226,6 @@ ZESoundSource* ZEALModule::CreateSoundSource()
 	ZEALSoundSource* NewSoundSource = new ZEALSoundSource();
 	SoundSources.Add(NewSoundSource);
 	return NewSoundSource;
-}
-
-ZESoundSource3D* ZEALModule::CreateSoundSource3D()
-{
-	ZEALSoundSource3D* NewSoundSource = new ZEALSoundSource3D();
-	SoundSources3D.Add(NewSoundSource);
-	return NewSoundSource;
-	return NULL;
 }
 
 ZEListener* ZEALModule::CreateListener()

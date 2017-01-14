@@ -78,13 +78,13 @@ void ZESoundModule::BaseInitialize()
 	SoundOptions.AddOption(new ZEOption("DeviceId", 0, ZE_OA_NORMAL));
 	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZE_OA_NORMAL));
 	SoundOptions.AddOption(new ZEOption("MaxBufferSize", 2000, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("MasterVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MasterVolume", 1.0f, ZE_OA_NORMAL));
 	SoundOptions.AddOption(new ZEOption("SpeakerLayout", 1, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("EffectVolume", 100, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("DialogVolume", 100, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("MusicVolume", 100, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("VideoVolume", 100, ZE_OA_NORMAL));
-	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("EffectVolume", 1.0f, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("DialogVolume", 1.0f, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MusicVolume", 1.0f, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("VideoVolume", 1.0f, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 1.0f, ZE_OA_NORMAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&SoundOptions);
 }
 
@@ -112,7 +112,7 @@ void ZESoundModule::OptionsChanged()
 	Current = SoundOptions.GetOption("MasterVolume");
 	if (Current->IsChanged())
 	{
-		SetMasterVolume(Current->GetValue().GetInt32());
+		SetMasterVolume(Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetMasterVolume());
 	}
 
@@ -126,35 +126,35 @@ void ZESoundModule::OptionsChanged()
 	Current = SoundOptions.GetOption("EffectVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_EFFECT, Current->GetValue().GetInt32());
+		SetTypeVolume(ZE_SST_EFFECT, Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_EFFECT));
 	}
 
 	Current = SoundOptions.GetOption("DialogVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_DIALOG, Current->GetValue().GetInt32());
+		SetTypeVolume(ZE_SST_DIALOG, Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_DIALOG));
 	}
 
 	Current = SoundOptions.GetOption("MusicVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_MUSIC, Current->GetValue().GetInt32());
+		SetTypeVolume(ZE_SST_MUSIC, Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_MUSIC));
 	}
 
 	Current = SoundOptions.GetOption("VideoVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_VIDEO, Current->GetValue().GetInt32());
+		SetTypeVolume(ZE_SST_VIDEO, Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_VIDEO));
 	}
 
 	Current = SoundOptions.GetOption("PlayerCommVolume");
 	if (Current->IsChanged())
 	{
-		SetTypeVolume(ZE_SST_PLAYER_COMM, Current->GetValue().GetInt32());
+		SetTypeVolume(ZE_SST_PLAYER_COMM, Current->GetValue().GetFloat());
 		Current->SetValue((ZEInt)GetTypeVolume(ZE_SST_PLAYER_COMM));
 	}
 }

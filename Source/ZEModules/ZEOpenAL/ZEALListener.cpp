@@ -34,40 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEALListener.h"
-#define ZE_LISTENER_UPDATE_TRESHOLD 0.5f
 
-void ZEALListener::ResetParameters()
+void ZEALListener::LocalTransformChanged()
 {
-	if (IsActiveListener())
-	{
-		const ZEVector3& WorldPosition = GetWorldPosition();
-		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
+	UpdateOrientation();
 
-		float Orientation[6];
-		const ZEQuaternion& WorldRotation = GetWorldRotation();
-		ZEVector3 Temp;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
-		Orientation[0] = Temp.x;
-		Orientation[1] = Temp.y;
-		Orientation[2] = Temp.z;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
-		Orientation[3] = Temp.x;
-		Orientation[4] = Temp.y;
-		Orientation[5] = Temp.z;
-		alListenerfv(AL_ORIENTATION, Orientation);
+	return ZEListener::LocalTransformChanged();
+}
 
-		const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
-		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
+void ZEALListener::ParentTransformChanged()
+{
+	UpdateOrientation();
 
-		alSpeedOfSound(DistanceFactor * 343.3f);
-		alDopplerFactor(DopplerFactor);
-		// Roll off factor
-		// Update all sound sources roll off factor
-	}
+	ZEListener::ParentTransformChanged();
+}
+
+void ZEALListener::UpdateOrientation()
+{
+	if (!IsActiveListener())
+		return;
+
+	const ZEVector3& WorldPosition = GetWorldPosition();
+	alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
+
+	ZEVector3 Orientation[2];
+	Orientation[0] = GetWorldFront();
+	Orientation[1] = GetWorldUp();
+	alListenerfv(AL_ORIENTATION, (ALfloat*)Orientation);
+
+	const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
+	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
+}
+
+void ZEALListener::UpdateParameters()
+{
+	if (!IsActiveListener())
+		return;
+
+	alSpeedOfSound(DistanceFactor * 343.3f);
+	alDopplerFactor(DopplerFactor);
 }
 
 ZEALListener::ZEALListener()
 {
+	DistanceFactor = 1.0f;
+	RollOffFactor = 1.0f;
+	DopplerFactor = 1.0f;
+
+	UpdateParameters();
+
 	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
@@ -86,95 +101,39 @@ bool ZEALListener::IsActiveListener()
 	return (GetModule()->GetActiveListener() == this);
 }
 
-void ZEALListener::SetPosition(const ZEVector3& Position)
-{
-	ZEEntity::SetPosition(Position);
-
-	if (IsActiveListener())
-	{
-		const ZEVector3& WorldPosition = GetWorldPosition();
-		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
-	}
-}
-
-void ZEALListener::SetRotation(const ZEQuaternion& Rotation)
-{
-	ZEEntity::SetRotation(Rotation);
-
-	if (IsActiveListener())
-	{
-		float Orientation[6];
-		const ZEQuaternion& WorldRotation = GetWorldRotation();
-		ZEVector3 Temp;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
-		Orientation[0] = Temp.x;
-		Orientation[1] = Temp.y;
-		Orientation[2] = Temp.z;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
-		Orientation[3] = Temp.x;
-		Orientation[4] = Temp.y;
-		Orientation[5] = Temp.z;
-		
-		alListenerfv(AL_ORIENTATION, Orientation);
-	}
-}
-
 void ZEALListener::SetDistanceFactor(float Value)
 {
+	if (DistanceFactor == Value)
+		return;
+
 	DistanceFactor = Value;
-	if(IsActiveListener())
-		alSpeedOfSound(Value * 343.3f);
+
+	UpdateParameters();
 }
 
 void ZEALListener::SetDopplerFactor(float Value)
 {
-	DopplerFactor = Value;
-	ListenerDirtyFlag = true;
+	if (DopplerFactor == Value)
+		return;
 
-	if (IsActiveListener())
-		alDopplerFactor(Value);
+	DopplerFactor = Value;
+
+	UpdateParameters();
 }
 
 void ZEALListener::SetRollOffFactor(float Value)
 {
+	if (RollOffFactor == Value)
+		return;
+
 	RollOffFactor = Value;
-	ListenerDirtyFlag = true;
 
-	if (IsActiveListener())
-	{
-		// Not Supported
-	}
-}
-
-void ZEALListener::OwnerWorldTransformChanged()
-{
-	if (IsActiveListener())
-	{
-		const ZEVector3& WorldPosition = GetWorldPosition();
-		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
-
-		float Orientation[6];
-		const ZEQuaternion& WorldRotation = GetWorldRotation();
-		ZEVector3 Temp;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
-		Orientation[0] = Temp.x;
-		Orientation[1] = Temp.y;
-		Orientation[2] = Temp.z;
-		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
-		Orientation[3] = Temp.x;
-		Orientation[4] = Temp.y;
-		Orientation[5] = Temp.z;
-		alListenerfv(AL_ORIENTATION, Orientation);
-
-		const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
-		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
-	}
+	UpdateOrientation();
 }
 
 void ZEALListener::Tick(float ElapsedTime)
 {
-	ZEEntity::Tick(ElapsedTime);
 
-	const ZEVector3& WorldVelocity = ZEVector3::Zero; /*GetWorldVelocity();*/
-	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
+
+	ZEEntity::Tick(ElapsedTime);
 }

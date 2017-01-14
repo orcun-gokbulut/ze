@@ -48,6 +48,7 @@ ZETimer::ZETimer()
 
 ZETimer::~ZETimer()
 {
+	ZETimerManager::GetInstance()->UnregisterTimer(this);
 }
 
 void ZETimer::SetRepeating(bool Value)

@@ -300,5 +300,4 @@ ZEHolder<ZERNMultiplexerMaterial> ZERNMultiplexerMaterial::LoadResource(const ZE
 ZEHolder<const ZERNMultiplexerMaterial> ZERNMultiplexerMaterial::LoadResourceShared(const ZEString& FileName)
 {
 	return ZERSTemplates::LoadResourceShared<ZERNMultiplexerMaterial>(FileName, &ZERSTemplates::InstanciatorFunction<ZERNMultiplexerMaterial>);
-
 }

@@ -53,7 +53,7 @@ ZERNPreRenderParameters::ZERNPreRenderParameters()
 	Time = 0.0f;
 	View = NULL;
 	Renderer = NULL;
-	Type = ZERN_PRT_COLOR;
+	Type = ZERN_RT_COLOR;
 
 	UpdateTime();
 }
