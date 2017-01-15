@@ -85,6 +85,8 @@ class ZESoundSource : public ZEEntity
 		bool								Streaming;
 		ZEVector3							Velocity;
 		ZEVector3							VelocityOldPosition;
+		float								AttenuationStart;
+		float								AttenuationRollOff;
 		float								MinDistance;
 		float								MaxDistance;
 		float								ConeInsideAngle;
@@ -176,6 +178,12 @@ class ZESoundSource : public ZEEntity
 		float								GetLoopingLenghtTime() const;
 		float								GetLoopingLenghtPercent() const;
 
+		virtual void						SetAttenuationStart(float Distance);
+		float								GetAttenuationStart() const;
+
+		virtual void						SetAttenuationRollOff(float Factor);
+		float								GetAttenuationRollOff() const;
+
 		virtual void						SetMinDistance(float Distance);
 		float								GetMinDistance() const;
 
@@ -191,16 +199,16 @@ class ZESoundSource : public ZEEntity
 		virtual void						SetConeOutsideVolume(float Volume);
 		float								GetConeOutsideVolume() const;
 
-		virtual void						Play() = 0;
-		void								Replay();
-		virtual void						Pause() = 0;
-		virtual void						Stop() = 0;
-
 		void								SetSoundFileName(const ZEString& FileName);
 		const ZEString&						GetSoundFileName() const;
 
 		void								SetSoundResource(ZEHolder<const ZESoundResource> Resource);
 		ZEHolder<const ZESoundResource>		GetSoundResource() const;
+
+		virtual void						Play() = 0;
+		void								Replay();
+		virtual void						Pause() = 0;
+		virtual void						Stop() = 0;
 
 		static ZESoundSource*				CreateInstance();
 }

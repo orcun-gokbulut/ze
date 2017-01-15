@@ -116,7 +116,7 @@ bool ZEALModule::InitializeInternal()
 	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetFloat());
 	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetFloat());
 
-	alDistanceModel(AL_INVERSE_DISTANCE);
+	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 
 	zeLog("OpenAL module initialized.");
 

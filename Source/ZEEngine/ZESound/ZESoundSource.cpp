@@ -124,9 +124,10 @@ ZEEntityResult ZESoundSource::LoadInternal()
 
 	ZE_ENTITY_RESOURCE_FENCE_LOADED(SoundResource, ZE_ER_FAILED)
 	{
-		if (!SoundResourceExternal)
-			SoundResource = ZESoundResource::LoadResourceShared(SoundFileName);
-		
+		if (SoundResourceExternal || SoundFileName.IsEmpty())
+			return ZE_ER_DONE;
+
+		SoundResource = ZESoundResource::LoadResourceShared(SoundFileName);
 		return ZE_ER_WAIT;
 	}
 
@@ -167,8 +168,10 @@ ZESoundSource::ZESoundSource()
 	LocalOldPosition = 0;
 	EffectiveStartPosition = 0;
 	EffectiveEndPosition = 0;
+	AttenuationStart = 1.0f;
+	AttenuationRollOff = 0.5f;
 	MinDistance = 0.0f;
-	MaxDistance = 100.0f;
+	MaxDistance = 150.0f;
 	ConeInsideAngle = ZE_PIx2;
 	ConeOutsideAngle = ZE_PIx2;
 	ConeOutsideVolume = 1.0f;
@@ -453,6 +456,26 @@ float ZESoundSource::GetLoopingLenghtTime() const
 float ZESoundSource::GetLoopingLenghtPercent() const
 {
 	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
+}
+
+void ZESoundSource::SetAttenuationStart(float Distance)
+{
+	AttenuationStart = Distance;
+}
+
+float ZESoundSource::GetAttenuationStart() const
+{
+	return AttenuationStart;
+}
+
+void ZESoundSource::SetAttenuationRollOff(float Factor)
+{
+	AttenuationRollOff = Factor;
+}
+
+float ZESoundSource::GetAttenuationRollOff() const
+{
+	return AttenuationRollOff;
 }
 
 void ZESoundSource::SetMinDistance(float Distance)
