@@ -39,7 +39,10 @@
 #include "ZECore/ZEOption.h"
 #include "ZECore/ZEOptionManager.h"
 
+#include <DirectXTex.h>
 #include <FreeImage.h>
+
+using namespace DirectX;
 
 ZEUInt ZEGRGraphicsModule::SAMPLE_COUNT = 4;
 
@@ -98,6 +101,23 @@ ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()
 
 bool ZEGRGraphicsModule::InitializeInternal()
 {
+	HRESULT HR = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	if (FAILED(HR))
+	{
+		zeError("CoInitializeEx failed. Result: 0x%X", HR);
+		return false;
+	}
+
+	bool IsWic2 = false;
+	IWICImagingFactory* WICFactory = GetWICFactory(IsWic2);
+	if (WICFactory == NULL)
+	{
+		zeError("WIC Factory creation failed.");
+		return false;
+	}
+
+	SetWICFactory(WICFactory);
+
 	return ZEModule::InitializeInternal();
 }
 
@@ -106,6 +126,8 @@ bool ZEGRGraphicsModule::DeinitializeInternal()
 	extern ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
 	InstanceVertexBuffer.Release();
 	
+	CoUninitialize();
+
 	return ZEModule::DeinitializeInternal();
 }
 
