@@ -795,7 +795,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Visible)
 		return false;
 
-	if (GetModel()->GetMeshes().GetCount() > 1 || GetModel()->GetBones().GetCount() > 0)
+	if (GetModel()->GetMeshes().GetCount() > 1 && GetModel()->GetBones().GetCount() == 0)
 	{
 		if (Parameters->View->ViewVolume != NULL && !Parameters->View->ViewVolume->IntersectionTest(GetWorldBoundingBox()))
 			return false;

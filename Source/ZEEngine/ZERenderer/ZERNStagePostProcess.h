@@ -65,7 +65,8 @@ class ZERNStagePostProcess : public ZERNStage
 		virtual const ZEString&				GetName() const;
 
 		const ZEList2<ZERNFilter>&			GetFilters() const;
-		ZERNFilter*							GetFilter(ZEClass* Class) const;
+		ZEArray<ZERNFilter*>				GetFilters(ZEClass* Class) const;
+		ZERNFilter*							GetFilter(ZESize Index) const;
 		void								AddFilter(ZERNFilter* Filter);
 		void								RemoveFilter(ZERNFilter* Filter);
 
