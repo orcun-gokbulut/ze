@@ -1421,6 +1421,11 @@ ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 		TotalScore.Count = 1;
 		TotalScore.Score = GetLocalLoadingPercentage();
 	}
+	else
+	{
+		TotalScore.Count = 0;
+		TotalScore.Score = 0;
+	}
 
 	Components.LockRead();
 	for (ZESize I = 0; I < Components.GetCount(); I++)

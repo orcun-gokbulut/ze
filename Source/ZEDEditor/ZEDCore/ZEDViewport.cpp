@@ -197,20 +197,17 @@ bool ZEDViewport::InitializeInternal()
 	ZERNStageLighting* StageLighting = new ZERNStageLighting();
 	Renderer.AddStage(StageLighting);
 
-	ZERNStageAtmosphere* StageAtmosphere = new ZERNStageAtmosphere();
-	Renderer.AddStage(StageAtmosphere);
-
 	ZERNStageForward* StageForward = new ZERNStageForward();
 	Renderer.AddStage(StageForward);
+
+	ZERNStageAtmosphere* StageAtmosphere = new ZERNStageAtmosphere();
+	Renderer.AddStage(StageAtmosphere);
 
 	ZERNStageForwardTransparent* StageForwardTransparent = new ZERNStageForwardTransparent();
 	Renderer.AddStage(StageForwardTransparent);
 
 	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
 	Renderer.AddStage(StageParticleRendering);
-
-	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
-	Renderer.AddStage(StagePostProcess);
 
 	ZERNStageHDR* StageHDR = new ZERNStageHDR();
 	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
@@ -234,6 +231,10 @@ bool ZEDViewport::InitializeInternal()
 
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
+
+	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
+	StagePostProcess->SetEnabled(false);
+	Renderer.AddStage(StagePostProcess);
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);

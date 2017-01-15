@@ -101,7 +101,7 @@ ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()
 
 bool ZEGRGraphicsModule::InitializeInternal()
 {
-	HRESULT HR = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	HRESULT HR = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	if (FAILED(HR))
 	{
 		zeError("CoInitializeEx failed. Result: 0x%X", HR);
