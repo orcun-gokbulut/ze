@@ -220,13 +220,13 @@ void ZEALSoundSource::UpdateParameters()
 	{
 		alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
 		alSourcef(ALSource, AL_MAX_DISTANCE, GetMaxDistance());
-		alSourcef(ALSource, AL_REFERENCE_DISTANCE, (GetMaxDistance() - GetMinDistance()) / 2.0f);
+		alSourcef(ALSource, AL_REFERENCE_DISTANCE, GetAttenuationStart());
+		alSourcef(ALSource, AL_ROLLOFF_FACTOR, GetAttenuationRollOff());
 		alSourcef(ALSource, AL_MIN_GAIN, 0.0f);
 		alSourcef(ALSource, AL_MAX_GAIN, 1.0f);
 		alSourcef(ALSource, AL_CONE_INNER_ANGLE, ZEAngle::ToDegree(GetConeInsideAngle()));
 		alSourcef(ALSource, AL_CONE_OUTER_ANGLE, ZEAngle::ToDegree(GetConeOutsideAngle()));
 		alSourcef(ALSource, AL_CONE_OUTER_GAIN, ZEMath::Saturate(GetConeOutsideVolume()));
-		alSourcef(ALSource, AL_ROLLOFF_FACTOR, GetModule()->GetActiveListener()->GetRollOffFactor());
 	}
 }
 
