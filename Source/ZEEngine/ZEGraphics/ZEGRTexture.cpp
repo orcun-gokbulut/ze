@@ -45,7 +45,7 @@
 #include "ZEResource/ZERSTemplates.h"
 #include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
-#include "DirectXTex.h"
+#include <DirectXTex.h>
 
 using namespace DirectX;
 
