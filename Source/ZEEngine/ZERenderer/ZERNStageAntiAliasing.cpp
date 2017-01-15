@@ -373,7 +373,7 @@ void ZERNStageAntiAliasing::CreateOutput(const ZEString& Name)
 {
 	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_AADF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_AADF_OUTPUT) || OutputTexture == GetRenderer()->GetOutputTexture())
 		{
 			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat()).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_AADF_OUTPUT);

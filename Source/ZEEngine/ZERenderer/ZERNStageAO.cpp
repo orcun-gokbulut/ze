@@ -48,7 +48,6 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZERNFilter.h"
 #include "ZERNStageID.h"
 #include "ZERNRenderer.h"
 
@@ -429,8 +428,6 @@ bool ZERNStageAO::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
-
-	Filter.Initialize();
 
 	CreateSphereSamples();
 	CreateRandomVectors();

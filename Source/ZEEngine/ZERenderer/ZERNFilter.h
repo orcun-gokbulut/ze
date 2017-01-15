@@ -35,13 +35,17 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNFilterCommon.h"
 
 class ZEGRShader;
 class ZEGRContext;
@@ -51,53 +55,204 @@ class ZEGRRenderStateData;
 class ZEGRComputeRenderStateData;
 class ZEGRRenderTarget;
 
-class ZERNFilter : public ZEInitializable
+class ZERNFilter : public ZEObject, public ZEInitializable
 {
-	private:
+	ZE_OBJECT
+	friend class ZERNStagePostProcess;
+	protected:
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
+		ZELink<ZERNFilter>						Link;
 
 		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
-		ZEHolder<ZEGRShader>					BlurHorizontalPixelShader;
-		ZEHolder<ZEGRShader>					BlurVerticalPixelShader;
-		ZEHolder<ZEGRShader>					BlurHorizontalComputeShader;
-		ZEHolder<ZEGRShader>					BlurVerticalComputeShader;
-		ZEHolder<ZEGRShader>					ScalePixelShader;
-		ZEHolder<ZEGRShader>					EdgeDetectionPixelShader;
+		
+		const ZEGRTexture*						InputTexture;
+		ZEUInt									InputSubresource;
 
-		ZEHolder<ZEGRRenderStateData>			BlurHorizontalGraphicsRenderStateData;
-		ZEHolder<ZEGRRenderStateData>			BlurVerticalGraphicsRenderStateData;
-		ZEHolder<ZEGRRenderStateData>			ScaleGraphicsRenderStateData;
-		ZEHolder<ZEGRRenderStateData>			EdgeDetectionGraphicsRenderStateData;
-
-		ZEHolder<ZEGRComputeRenderStateData>	BlurHorizontalComputeRenderStateData;
-		ZEHolder<ZEGRComputeRenderStateData>	BlurVerticalComputeRenderStateData;
-
-		ZEHolder<ZEGRBuffer>					ConstantBuffer;
-
-		ZEHolder<ZEGRTexture>					TempTexture;
-
-		struct FilterConstants
-		{
-			ZEUInt								KernelRadius;
-			ZEVector3							Reserved;
-		} Constants;
+		const ZEGRTexture*						OutputTexture;
+		ZEUInt									OutputSubresource;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 
-		bool									UpdateShaders();
-		bool									UpdateRenderStates();
-		bool									UpdateConstantBuffer();
+		virtual bool							UpdateShaders();
+		virtual bool							UpdateRenderStates();
+		virtual bool							UpdateConstantBuffers();
+
 		bool									Update();
 
 	public:
-		void									ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader = true);
-		void									ApplyScale(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRRenderTarget* OutputRenderTarget);
-		void									ApplyEdgeDetection(ZEGRContext* Context, float StencilRef);
+		virtual void							SetInputTexture(const ZEGRTexture* InputTexture);
+		const ZEGRTexture*						GetInputTexture() const;
+
+		virtual void							SetOutputTexture(const ZEGRTexture* OutputTexture);
+		const ZEGRTexture*						GetOutputTexture() const;
+
+		virtual void							Apply(ZEGRContext* Context);
 
 												ZERNFilter();
 		virtual									~ZERNFilter();
 
 		static void								GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
+};
+
+class ZERNFilterGaussianBlur : public ZERNFilter
+{
+	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRShader>					BlurHorizontalPixelShader;
+		ZEHolder<ZEGRShader>					BlurVerticalPixelShader;
+		ZEHolder<ZEGRShader>					BlurHorizontalComputeShader;
+		ZEHolder<ZEGRShader>					BlurVerticalComputeShader;
+
+		ZEHolder<ZEGRRenderStateData>			BlurHorizontalGraphicsRenderStateData;
+		ZEHolder<ZEGRRenderStateData>			BlurVerticalGraphicsRenderStateData;
+
+		ZEHolder<ZEGRComputeRenderStateData>	BlurHorizontalComputeRenderStateData;
+		ZEHolder<ZEGRComputeRenderStateData>	BlurVerticalComputeRenderStateData;
+
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
+		ZEHolder<ZEGRTexture>					TempTexture;
+
+		bool									UseComputeShader;
+
+		struct
+		{
+			ZEUInt								KernelRadius;
+			float								StandartDeviation;
+			ZEVector2							Reserved;
+		} Constants;
+
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+
+		virtual bool							UpdateShaders() override;
+		virtual bool							UpdateRenderStates() override;
+		virtual bool							UpdateConstantBuffers() override;
+
+	public:
+		void									SetUseComputeShader(bool UseComputeShader);
+		bool									GetUseComputeShader() const;
+
+		void									SetKernelRadius(ZEUInt KernelRadius);
+		ZEUInt									GetKernelRadius() const;
+
+		void									SetStandartDeviation(float StandartDeviation);
+		float									GetStandartDeviation() const;
+
+		virtual void							Apply(ZEGRContext* Context) override;
+
+												ZERNFilterGaussianBlur();
+};
+
+class ZERNFilterImageTransform : public ZERNFilter
+{
+	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRShader>					ScalePixelShader;
+
+		ZEHolder<ZEGRRenderStateData>			ScaleGraphicsRenderStateData;
+
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+
+		virtual bool							UpdateShaders() override;
+		virtual bool							UpdateRenderStates() override;
+
+	public:
+		virtual void							Apply(ZEGRContext* Context) override;
+
+												ZERNFilterImageTransform();
+};
+
+class ZERNFilterEdgeDetection : public ZERNFilter
+{
+	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRShader>					EdgeDetectionPixelShader;
+
+		ZEHolder<ZEGRRenderStateData>			EdgeDetectionGraphicsRenderStateData;
+
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+
+		virtual bool							UpdateShaders() override;
+		virtual bool							UpdateRenderStates() override;
+
+	public:
+		virtual void							Apply(ZEGRContext* Context) override;
+
+												ZERNFilterEdgeDetection();
+};
+
+class ZERNFilterColorTransform : public ZERNFilter
+{
+	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRShader>					ColorTransformPixelShader;
+	
+		ZEHolder<ZEGRRenderStateData>			ColorTransformGraphicsRenderStateData;
+
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
+
+		struct
+		{
+			ZEMatrix4x4							ColorMatrix;
+		} Constants;
+
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+	
+		virtual bool							UpdateShaders() override;
+		virtual bool							UpdateRenderStates() override;
+		virtual bool							UpdateConstantBuffers() override;
+	
+	public:
+		void									SetColorMatrix(const ZEMatrix4x4& ColorMatrix);
+		const ZEMatrix4x4&						GetColorMatrix() const;
+
+		virtual void							Apply(ZEGRContext* Context) override;
+	
+												ZERNFilterColorTransform();
+};
+
+class ZERNFilterNoise : public ZERNFilter
+{
+	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRShader>					GenerateNoiseComputeShader;
+		ZEHolder<ZEGRShader>					NoisePixelShader;
+	
+		ZEHolder<ZEGRComputeRenderStateData>	GenerateNoiseComputeRenderStateData;
+		ZEHolder<ZEGRRenderStateData>			NoiseGraphicsRenderStateData;
+	
+		ZEHolder<ZEGRBuffer>					ConstantBuffer;
+		ZEHolder<ZEGRTexture>					NoiseTexture;
+	
+		struct
+		{
+			float								Weight;
+			ZEUInt								Granularity;
+			ZEVector2							Size;
+		} Constants;
+	
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+	
+		virtual bool							UpdateShaders() override;
+		virtual bool							UpdateRenderStates() override;
+		virtual bool							UpdateConstantBuffers() override;
+
+	public:
+		virtual void							SetInputTexture(const ZEGRTexture* InputTexture) override;
+
+		void									SetWeight(float Weight);
+		float									GetWeight() const;
+	
+		void									SetGranularity(ZEUInt Granularity);
+		ZEUInt									GetGranularity() const;
+	
+		virtual void							Apply(ZEGRContext* Context) override;
+		
+												ZERNFilterNoise();
 };

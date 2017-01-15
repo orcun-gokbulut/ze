@@ -42,41 +42,41 @@
 #include "ZERNSamplers.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
+#include "ZERNRenderer.hlsl"
+#include "ZERNFilteringCommon.hlsl"
 
-cbuffer ZERNFiltering_Constants									: register(b9)
+cbuffer ZERNFiltering_GaussianBlur_Constants						: register(b9)
 {
-	uint			ZERNFiltering_KernelRadius;
-	float3			ZERNFiltering_Reserved;
+	uint			ZERNFiltering_GaussianBlur_KernelRadius;
+	float			ZERNFiltering_GaussianBlur_StandartDeviation;
+	float2			ZERNFiltering_GaussianBlur_Reserved;
 };
 
-Texture2D			ZERNFiltering_InputTexture					: register(t5);
-
-static const float	ZERNFiltering_StandartDeviationSquare = 2.0f * 2.0f;
-
-float ZERNFiltering_GetGaussianWeight(float SampleOffset)
+cbuffer ZERNFiltering_ColorTransform_Constants						: register(b9)
 {
-	float Temp = 1.0f / sqrt(2.0f * ZERNMath_PI * ZERNFiltering_StandartDeviationSquare);
-    return Temp * exp(-(SampleOffset * SampleOffset) / (2.0f * ZERNFiltering_StandartDeviationSquare));
-}
+	float4x4		ZERNFiltering_ColorTransform_Matrix;
+};
 
-float4 ZERNFiltering_ApplyBlur(float2 PositionViewport, float2 SampleDirection)
+cbuffer ZERNFiltering_Noise_Constants								: register(b9)
 {
-	float4 ResultColor = ZERNFiltering_InputTexture[PositionViewport] * ZERNFiltering_GetGaussianWeight(0.0f);
-	
-	for (uint I = 1; I <= ZERNFiltering_KernelRadius; I++)
-		ResultColor += (ZERNFiltering_InputTexture[PositionViewport.xy - I * SampleDirection] + ZERNFiltering_InputTexture[PositionViewport.xy + I * SampleDirection]) * ZERNFiltering_GetGaussianWeight(I);
-	
-	return ResultColor;
-}
+	float			ZERNFiltering_Noise_Weight;
+	uint			ZERNFiltering_Noise_Granularity;
+	float2			ZERNFiltering_Noise_Size;
+};
+
+Texture2D<float4>	ZERNFiltering_InputTexture						: register(t5);
+Texture2D<float4>	ZERNFiltering_NoiseTexture						: register(t6);
+
+RWTexture2D<float4>	ZERNFiltering_OutputTexture						: register(u0);
 
 float4 ZERNFiltering_BlurHorizontal_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	return ZERNFiltering_ApplyBlur(PositionViewport.xy, float2(1.0f, 0.0f));
+	return ZERNFilteringCommon_GaussianBlur(ZERNFiltering_InputTexture, PositionViewport.xy, float2(1.0f, 0.0f), ZERNFiltering_GaussianBlur_KernelRadius, ZERNFiltering_GaussianBlur_StandartDeviation);
 }
 
 float4 ZERNFiltering_BlurVertical_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	return ZERNFiltering_ApplyBlur(PositionViewport.xy, float2(0.0f, 1.0f));
+	return ZERNFilteringCommon_GaussianBlur(ZERNFiltering_InputTexture, PositionViewport.xy, float2(0.0f, 1.0f), ZERNFiltering_GaussianBlur_KernelRadius, ZERNFiltering_GaussianBlur_StandartDeviation);
 }
 
 float4 ZERNFiltering_Scale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
@@ -101,6 +101,36 @@ void ZERNFiltering_EdgeDetection_PixelShader(float4 PositionViewport : SV_Positi
 	
 	if (!EdgePixel)
 		discard;
+}
+
+float4 ZERNFiltering_ColorTransform_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	float4 InputColor = ZERNFiltering_InputTexture[PositionViewport.xy];
+	
+	return mul(ZERNFiltering_ColorTransform_Matrix, InputColor);
+}
+
+[numthreads(32, 32, 1)]
+void ZERNFiltering_GenerateNoise_ComputeShader(uint3 ThreadId : SV_DispatchThreadID)
+{
+	uint State = ThreadId.y * 1024 + ThreadId.x;
+	State *= ZERNRenderer_FrameId;
+	
+	ZERNFiltering_OutputTexture[ThreadId.xy] = ZERNFilteringCommon_Random_LCG(ZERNFilteringCommon_Random_WangHash(State), 1664525, 1013904223) * (1.0f / 4294967296.0f);
+}
+
+float4 ZERNFiltering_Noise_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	uint2 PixelCoord = floor(PositionViewport.xy);
+	uint2 NoisePixelCoord = PixelCoord / ZERNFiltering_Noise_Granularity;
+	
+	uint State = NoisePixelCoord.y * ZERNFiltering_Noise_Size.x + NoisePixelCoord.x;
+	State *= ZERNRenderer_FrameId;
+	
+	float Noise = ZERNFilteringCommon_Random_LCG(ZERNFilteringCommon_Random_WangHash(State), 1664525, 1013904223) * (1.0f / 4294967296.0f);
+	float4 Color = ZERNFiltering_InputTexture[PixelCoord];
+	
+	return lerp(Color, (float4)Noise, ZERNFiltering_Noise_Weight);
 }
 
 #endif

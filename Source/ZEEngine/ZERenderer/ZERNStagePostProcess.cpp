@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
+#include "ZERNFilter.h"
 
 #define ZERN_SPDF_OUTPUT	1
 
@@ -50,6 +51,9 @@ bool ZERNStagePostProcess::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
+	ze_for_each(Filter, Filters)
+		Filter->Initialize();
+
 	return true;
 }
 
@@ -57,22 +61,26 @@ bool ZERNStagePostProcess::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
-	ColorTexture = NULL;
-	DepthTexture = NULL;
+	InputTexture = NULL;
+	OutputTexture = NULL;
+
+	while (Filters.GetFirst() != NULL)
+	{
+		ZERNFilter* Filter = Filters.GetFirst()->GetItem();
+		RemoveFilter(Filter);
+		delete Filter;
+	}
 
 	return ZERNStage::DeinitializeInternal();
 }
 
 void ZERNStagePostProcess::CreateOutput(const ZEString& Name)
 {
-	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
-
 	if (Name == "ColorTexture")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SPDF_OUTPUT))
 		{
-			ColorTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
+			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputTexture->GetWidth(), InputTexture->GetHeight(), 1, InputTexture->GetFormat()).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SPDF_OUTPUT);
 		}
 	}
@@ -89,8 +97,53 @@ const ZEString& ZERNStagePostProcess::GetName() const
 	return Name;
 }
 
+const ZEList2<ZERNFilter>& ZERNStagePostProcess::GetFilters() const
+{
+	return Filters;
+}
+
+ZERNFilter* ZERNStagePostProcess::GetFilter(ZEClass* Class) const
+{
+	ze_for_each(Filter, Filters)
+	{
+		if (Filter->GetClass() == Class)
+			return Filter.GetPointer();
+	}
+
+	return NULL;
+}
+
+void ZERNStagePostProcess::AddFilter(ZERNFilter* Filter)
+{
+	zeCheckError(Filter == NULL, ZE_VOID, "Filter cannot be null.");
+	//zeCheckError(Stage->GetRenderer() != NULL, ZE_VOID, "Stage is already added to a renderer.");
+
+	Filters.AddEnd(&Filter->Link);
+	//Stage->Renderer = this;
+
+	if (IsInitialized())
+		Filter->Initialize();
+}
+
+void ZERNStagePostProcess::RemoveFilter(ZERNFilter* Filter)
+{
+	zeCheckError(Filter == NULL, ZE_VOID, "Filter cannot be null.");
+	//zeCheckError(Stage->GetRenderer() != this, ZE_VOID, "Stage doesn't belong to this renderer.");
+
+	Filter->Deinitialize();
+	//Stage->Renderer = NULL;
+	Filters.Remove(&Filter->Link);
+}
+
 void ZERNStagePostProcess::Resized(ZEUInt Width, ZEUInt Height)
 {
+	if (Filters.GetCount() > 0)
+	{
+		TempTextures.SetCount(Filters.GetCount() - 1);
+		ze_for_each(Texture, TempTextures)
+			Texture.GetItem() = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+	}
+
 	DirtyFlags.RaiseFlags(ZERN_SPDF_OUTPUT);
 }
 
@@ -99,11 +152,37 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	if (GetCommands().GetCount() == 0)
+	if (Filters.GetCount() == 0)
 		return false;
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, DepthTexture);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)ColorTexture->GetWidth(), (float)ColorTexture->GetHeight()));
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
+
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)OutputTexture->GetWidth(), (float)OutputTexture->GetHeight()));
+
+	if (Filters.GetCount() == 1)
+	{
+		Filters[0]->SetInputTexture(InputTexture);
+		Filters[0]->SetOutputTexture(OutputTexture);
+		Filters[0]->Apply(Context);
+	}
+	else
+	{
+		for (ZEUInt I = 0; I < (Filters.GetCount() - 1); I++)
+		{
+			if (I > 0)
+				Filters[I]->SetInputTexture(TempTextures[I - 1]);
+			else
+				Filters[I]->SetInputTexture(InputTexture);
+
+			Filters[I]->SetOutputTexture(TempTextures[I]);
+			Filters[I]->Apply(Context);
+		}
+
+		Filters[(Filters.GetCount() - 1)]->SetInputTexture(TempTextures.GetLastItem());
+		Filters[(Filters.GetCount() - 1)]->SetOutputTexture(OutputTexture);
+		Filters[(Filters.GetCount() - 1)]->Apply(Context);
+	}
 
 	return true;
 }
@@ -117,9 +196,9 @@ ZERNStagePostProcess::ZERNStagePostProcess()
 {
 	DirtyFlags.RaiseAll();
 
-	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&InputTexture), "ColorTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ColorTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
 
 ZERNStagePostProcess::~ZERNStagePostProcess()
@@ -142,8 +221,8 @@ ZEGRRenderState ZERNStagePostProcess::GetRenderState()
 
 		RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
-		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
+		RenderState.SetDepthStencilFormat(ZEGR_TF_NONE);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	}
 
 	return RenderState;

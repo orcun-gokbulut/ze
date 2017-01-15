@@ -106,12 +106,16 @@ bool ZERNStageAtmosphere::Setup(ZEGRContext* Context)
 	if (RenderTarget == NULL)
 		return false;
 
-	const ZEGRDepthStencilBuffer* DepthBufferReadonly = DepthTexture->GetDepthStencilBuffer(true);
-	if (DepthBufferReadonly == NULL)
-		return false;
+	const ZEGRDepthStencilBuffer* DepthBufferReadonly = NULL;
+	if (DepthTexture != NULL)
+	{
+		DepthBufferReadonly = DepthTexture->GetDepthStencilBuffer(true);
+		if (DepthBufferReadonly == NULL)
+			return false;
+	}
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthBufferReadonly);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
 	return true;
 }

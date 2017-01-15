@@ -42,7 +42,6 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZERNFilter.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -64,7 +63,6 @@ class ZERNStageAO : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
-		ZERNFilter							Filter;
 		ZEGRViewport						Viewport;
 		ZERNSSAOSampleCount					SampleCount;
 		ZEArray<ZEVector4>					RandomVectors;

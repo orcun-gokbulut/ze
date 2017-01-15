@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderer.hlsl
+ Zinek Engine - ZERNFilteringCommon.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_RENDERER_H__
-#define __ZERN_RENDERER_H__
+#ifndef __ZERN_FILTERING_COMMON_H__
+#define __ZERN_FILTERING_COMMON_H__
 
-#include "ZERNShaderSlots.hlsl"
+#include "ZERNMath.hlsl"
 
-// SHADER RESOURCES
-///////////////////////////////////////////////////////////////////////////////
-
-cbuffer ZERNRenderer_Constants	: register(ZERN_SHADER_CONSTANT_RENDERER)
+float ZERNFilteringCommon_GetGaussianWeight(float SampleOffset, float StandartDeviation)
 {
-	float		ZERNRenderer_ElapsedTime;
-	float		ZERNRenderer_Time;
-	uint		ZERNRenderer_FrameId;
-	uint		ZERNRenderer_Reserved0;
-	float2		ZERNRenderer_OutputSize;
-	float2		ZERNRenderer_InvOutputSize;
-	float4x4	ZERNRenderer_ScreenTransform;
-};
+	float Temp = 1.0f / sqrt(2.0f * ZERNMath_PI * StandartDeviation * StandartDeviation);
+    return Temp * exp(-(SampleOffset * SampleOffset) / (2.0f * StandartDeviation * StandartDeviation));
+}
+
+float4 ZERNFilteringCommon_GaussianBlur(Texture2D<float4> Texture, uint2 PixelCoord, uint2 SampleDirection, uint KernelRadius, float StandartDeviation)
+{
+	float4 ResultColor = Texture[PixelCoord] * ZERNFilteringCommon_GetGaussianWeight(0.0f, StandartDeviation);
+	
+	for (uint I = 1; I <= KernelRadius; I++)
+		ResultColor += (Texture[PixelCoord - I * SampleDirection] + Texture[PixelCoord + I * SampleDirection]) * ZERNFilteringCommon_GetGaussianWeight(I, StandartDeviation);
+	
+	return ResultColor;
+}
+
+uint ZERNFilteringCommon_Random_WangHash(uint Seed)
+{
+	Seed = (Seed ^ 61) ^ (Seed >> 16);
+	Seed *= 9;
+	Seed = Seed ^ (Seed >> 4);
+	Seed *= 0x27d4eb2d;
+	Seed = Seed ^ (Seed >> 15);
+	
+	return Seed;
+}
+
+uint ZERNFilteringCommon_Random_LCG(uint State, uint C1, uint C2)
+{
+	return C1 * State + C2;
+}
+
+uint ZERNFilteringCommon_Random_Taus(uint State, int C1, int C2, int C3, uint M)
+{
+	uint Temp = (((State << C1) ^ State) >> C2);
+	return ((State & M) << C3) ^ Temp;
+}
+
+uint ZERNFilteringCommon_Random_TausLCG(uint4 State)
+{
+	return (
+	ZERNFilteringCommon_Random_Taus(State.x, 13, 19, 12, 4294967294) ^ 
+	ZERNFilteringCommon_Random_Taus(State.y, 2, 25, 4, 4294967294) ^ 
+	ZERNFilteringCommon_Random_Taus(State.z, 3, 11, 17, 4294967294) ^ 
+	ZERNFilteringCommon_Random_LCG(State.w, 1664525, 1013904223)
+	);
+}
 
 #endif

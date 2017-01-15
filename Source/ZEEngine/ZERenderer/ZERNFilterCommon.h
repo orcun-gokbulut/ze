@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderer.hlsl
+ Zinek Engine - ZERNFilterCommon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_RENDERER_H__
-#define __ZERN_RENDERER_H__
+#pragma once
 
-#include "ZERNShaderSlots.hlsl"
+#include "ZETypes.h"
+#include "ZEMath/ZEMatrix.h"
 
-// SHADER RESOURCES
-///////////////////////////////////////////////////////////////////////////////
-
-cbuffer ZERNRenderer_Constants	: register(ZERN_SHADER_CONSTANT_RENDERER)
+class ZERNFilterColorMatrix
 {
-	float		ZERNRenderer_ElapsedTime;
-	float		ZERNRenderer_Time;
-	uint		ZERNRenderer_FrameId;
-	uint		ZERNRenderer_Reserved0;
-	float2		ZERNRenderer_OutputSize;
-	float2		ZERNRenderer_InvOutputSize;
-	float4x4	ZERNRenderer_ScreenTransform;
+	public:
+		static const ZEMatrix4x4		Normal;
+		static const ZEMatrix4x4		Sepia;
+		static const ZEMatrix4x4		GrayScale;
+		static const ZEMatrix4x4		Red;
+		static const ZEMatrix4x4		Green;
+		static const ZEMatrix4x4		Blue;
+		static const ZEMatrix4x4		Black;
+		static const ZEMatrix4x4		White;
+		static const ZEMatrix4x4		NightVision;
+		static const ZEMatrix4x4		Inverse;
 };
-
-#endif
