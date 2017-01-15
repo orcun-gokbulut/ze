@@ -44,7 +44,7 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZERenderer/ZERNStagePostProcess.h"
+#include "ZERenderer/ZERNStageAtmosphere.h"
 
 #define	ZEAT_FDF_SHADERS			1
 #define ZEAT_FDF_RENDER_STATES		2
@@ -81,7 +81,7 @@ bool ZEATFog::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZEAT_FDF_RENDER_STATES))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
 	ZEGRBlendState BlendStateAlphaBlend;
@@ -99,7 +99,7 @@ bool ZEATFog::UpdateRenderStates()
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
 	RenderStateData = RenderState.Compile();
-	zeCheckError(RenderStateData == NULL, false, "Can not compiel render state");
+	zeCheckError(RenderStateData == NULL, false, "Can not compile render state");
 
 	DirtyFlags.UnraiseFlags(ZEAT_FDF_RENDER_STATES);
 
@@ -163,7 +163,7 @@ ZEATFog::ZEATFog()
 
 	Command.Entity = this;
 	Command.Priority = 5;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.StageMask = ZERN_STAGE_ATMOSPHERE;
 
 	Constants.Density = 0.5f;
 	Constants.StartDistance = 0.0f;

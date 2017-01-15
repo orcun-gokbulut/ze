@@ -41,6 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture;
+class ZERNFilter;
 
 class ZERNStagePostProcess : public ZERNStage
 {
@@ -48,8 +49,11 @@ class ZERNStagePostProcess : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture>			ColorTexture;
-		ZEHolder<const ZEGRTexture>			DepthTexture;
+		ZEHolder<const ZEGRTexture>			InputTexture;
+		ZEHolder<const ZEGRTexture>			OutputTexture;
+
+		ZEList2<ZERNFilter>					Filters;
+		ZEArray<ZEHolder<ZEGRTexture>>		TempTextures;
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
@@ -59,6 +63,11 @@ class ZERNStagePostProcess : public ZERNStage
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
+
+		const ZEList2<ZERNFilter>&			GetFilters() const;
+		ZERNFilter*							GetFilter(ZEClass* Class) const;
+		void								AddFilter(ZERNFilter* Filter);
+		void								RemoveFilter(ZERNFilter* Filter);
 
 		virtual void						Resized(ZEUInt Width, ZEUInt Height);
 

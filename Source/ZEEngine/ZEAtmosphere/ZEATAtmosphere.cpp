@@ -471,6 +471,7 @@ ZEEntityResult ZEATAtmosphere::LoadInternal()
 
 	if (!Update())
 		return ZE_ER_FAILED_CLEANUP;
+
 	return ZE_ER_DONE;
 }
 
@@ -706,13 +707,13 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 20.0f);
+	Sun->SetColor(TerrestrialSunColor * 100.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);
 
 	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
-	Moon->SetColor(TerrestrialMoonColor * 1.0f);
+	Moon->SetColor(TerrestrialMoonColor * 10.0f);
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 	Moon->SetVisible(MoonVisible);
@@ -762,7 +763,7 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
 		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 5.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 5.0f;
 
-		Constants.SunColor = SunLight->GetColor() * SunIntensity;
+		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * SunIntensity;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.SunDirection.NormalizeSelf();
 

@@ -73,7 +73,8 @@ class ZERNStageHDR : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
-		ZERNFilter							Filter;
+		ZERNFilterGaussianBlur				FilterGaussianBlur;
+		ZERNFilterImageTransform			FilterTransform;
 		ZEGRViewport						Viewport;
 
 		ZEHolder<ZEGRShader>				ScreenCoverPositionTexcoordVertexShader;

@@ -46,6 +46,7 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZERNStage.h"
 
 #define	ZERN_FDF_SHADERS			1
 #define ZERN_FDF_RENDER_STATE		2
@@ -66,9 +67,7 @@ bool ZERNFilter::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(FilterConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-
-	return Update();
+	return true;
 }
 
 bool ZERNFilter::DeinitializeInternal()
@@ -76,6 +75,129 @@ bool ZERNFilter::DeinitializeInternal()
 	DirtyFlags.RaiseAll();
 
 	ScreenCoverVertexShader.Release();
+
+	InputTexture = NULL;
+	InputSubresource = 0;
+
+	OutputTexture = NULL;
+	OutputSubresource = 0;
+
+	return ZEInitializable::DeinitializeInternal();
+}
+
+bool ZERNFilter::UpdateShaders()
+{
+	ZEGRShaderCompileOptions Options;
+	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
+	ScreenCoverVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(ScreenCoverVertexShader == NULL, false, "Cannot set vertex shader.");
+
+	return true;
+}
+
+bool ZERNFilter::UpdateRenderStates()
+{
+	return true;
+}
+
+bool ZERNFilter::UpdateConstantBuffers()
+{
+	return true;
+}
+
+bool ZERNFilter::Update()
+{
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderStates())
+		return false;
+
+	if (!UpdateConstantBuffers())
+		return false;
+
+	return true;
+}
+
+void ZERNFilter::SetInputTexture(const ZEGRTexture* InputTexture)
+{
+	this->InputTexture = InputTexture;
+}
+
+const ZEGRTexture* ZERNFilter::GetInputTexture() const
+{
+	return InputTexture;
+}
+
+void ZERNFilter::SetOutputTexture(const ZEGRTexture* OutputTexture)
+{
+	this->OutputTexture = OutputTexture;
+}
+
+const ZEGRTexture* ZERNFilter::GetOutputTexture() const
+{
+	return OutputTexture;
+}
+
+void ZERNFilter::Apply(ZEGRContext* Context)
+{
+	zeDebugCheck(Context == NULL, "Context cannot be null");
+	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
+	zeDebugCheck(InputTexture->GetLevelCount() * InputTexture->GetDepthOrArrayCount() <= InputSubresource, "Input subresource index is out-of-range");
+	zeDebugCheck(InputTexture == OutputTexture, "Input texture cannot be the same as output texture");
+	//zeDebugCheck(OutputTexture == NULL, "Output texture cannot be null");
+}
+
+ZERNFilter::ZERNFilter() : Link(this)
+{
+	DirtyFlags.RaiseAll();
+
+	InputTexture = NULL;
+	InputSubresource = 0;
+
+	OutputTexture = NULL;
+	OutputSubresource = 0;
+}
+
+ZERNFilter::~ZERNFilter()
+{
+	Deinitialize();
+}
+
+void ZERNFilter::GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal)
+{
+	if(Values.GetCount() != Size)
+		Values.Resize(Size);
+
+	ZEInt HalfSize = Size / 2;
+
+	for(ZEInt I = 0; I < Size; ++I)
+	{
+		Values[I].x = Horizontal ? I - HalfSize : 0.0f;
+		Values[I].y = !Horizontal ? I - HalfSize : 0.0f;
+		Values[I].z = 0.0f;
+		Values[I].w = GausianFunction((Values[I].x + Values[I].y), StandartDeviation);
+	}
+}
+
+bool ZERNFilterGaussianBlur::InitializeInternal()
+{
+	if (!ZERNFilter::InitializeInternal())
+		return false;
+
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+
+	return true;
+}
+
+bool ZERNFilterGaussianBlur::DeinitializeInternal()
+{
 	BlurHorizontalPixelShader.Release();
 	BlurVerticalPixelShader.Release();
 	BlurHorizontalComputeShader.Release();
@@ -88,27 +210,24 @@ bool ZERNFilter::DeinitializeInternal()
 	BlurVerticalComputeRenderStateData.Release();
 
 	ConstantBuffer.Release();
-	
 	TempTexture.Release();
 
-	return ZEInitializable::DeinitializeInternal();
+	return ZERNFilter::DeinitializeInternal();
 }
 
-bool ZERNFilter::UpdateShaders()
+bool ZERNFilterGaussianBlur::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FDF_SHADERS))
 		return true;
+
+	if (!ZERNFilter::UpdateShaders())
+		return false;
 
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
 	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
-
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
-	ScreenCoverVertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(ScreenCoverVertexShader == NULL, false, "Cannot set vertex shader.");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFiltering_BlurHorizontal_PixelShader";
@@ -119,15 +238,6 @@ bool ZERNFilter::UpdateShaders()
 	Options.EntryPoint = "ZERNFiltering_BlurVertical_PixelShader";
 	BlurVerticalPixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(BlurVerticalPixelShader == NULL, false, "Cannot set pixel shader.");
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNFiltering_Scale_PixelShader";
-	ScalePixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(ScalePixelShader == NULL, false, "Cannot set pixel shader.");
-
-	Options.EntryPoint = "ZERNFiltering_EdgeDetection_PixelShader";
-	EdgeDetectionPixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(EdgeDetectionPixelShader == NULL, false, "Cannot set pixel shader.");
 
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNBlurCompute.hlsl";
 
@@ -147,22 +257,13 @@ bool ZERNFilter::UpdateShaders()
 	return true;
 }
 
-bool ZERNFilter::UpdateConstantBuffer()
-{
-	if (!DirtyFlags.GetFlags(ZERN_FDF_CONSTANT_BUFFER))
-		return true;
-
-	ConstantBuffer->SetData(&Constants);
-
-	DirtyFlags.UnraiseFlags(ZERN_FDF_CONSTANT_BUFFER);
-
-	return true;
-}
-
-bool ZERNFilter::UpdateRenderStates()
+bool ZERNFilterGaussianBlur::UpdateRenderStates()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FDF_RENDER_STATE))
 		return true;
+
+	if (!ZERNFilter::UpdateRenderStates())
+		return false;
 
 	ZEGRRenderState RenderState;
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
@@ -174,24 +275,6 @@ bool ZERNFilter::UpdateRenderStates()
 	RenderState.SetShader(ZEGR_ST_PIXEL, BlurVerticalPixelShader);
 	BlurVerticalGraphicsRenderStateData = RenderState.Compile();
 	zeCheckError(BlurVerticalGraphicsRenderStateData == NULL, false, "Cannot set render state.");
-
-	RenderState.SetShader(ZEGR_ST_PIXEL, ScalePixelShader);
-	ScaleGraphicsRenderStateData = RenderState.Compile();
-	zeCheckError(ScaleGraphicsRenderStateData == NULL, false, "Cannot set render state.");
-
-	ZEGRDepthStencilState DepthStencilStateWriteStencil;
-	DepthStencilStateWriteStencil.SetDepthTestEnable(true);
-	DepthStencilStateWriteStencil.SetDepthWriteEnable(false);
-	DepthStencilStateWriteStencil.SetDepthFunction(ZEGR_CF_LESS);
-	DepthStencilStateWriteStencil.SetStencilTestEnable(true);
-	DepthStencilStateWriteStencil.SetFrontStencilPass(ZEGR_SO_REPLACE);
-	DepthStencilStateWriteStencil.SetBackStencilPass(ZEGR_SO_REPLACE);
-
-	RenderState.SetDepthStencilState(DepthStencilStateWriteStencil);
-	RenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
-
-	EdgeDetectionGraphicsRenderStateData = RenderState.Compile();
-	zeCheckError(EdgeDetectionGraphicsRenderStateData == NULL, false, "Cannot set render state.");
 
 	ZEGRComputeRenderState ComputeRenderState;
 
@@ -208,32 +291,65 @@ bool ZERNFilter::UpdateRenderStates()
 	return true;
 }
 
-bool ZERNFilter::Update()
+bool ZERNFilterGaussianBlur::UpdateConstantBuffers()
 {
-	if (!UpdateShaders())
+	if (!DirtyFlags.GetFlags(ZERN_FDF_CONSTANT_BUFFER))
+		return true;
+
+	if (!ZERNFilter::UpdateConstantBuffers())
 		return false;
 
-	if (!UpdateRenderStates())
-		return false;
+	zeDebugCheck(Constants.KernelRadius == 0, "Kernel radius cannot be zero");
+	zeDebugCheck(Constants.StandartDeviation == 0.0f, "Standart deviation cannot be zero");
 
-	if (!UpdateConstantBuffer())
-		return false;
+	ConstantBuffer->SetData(&Constants);
 
-	return true;
+	DirtyFlags.UnraiseFlags(ZERN_FDF_CONSTANT_BUFFER);
 }
 
-void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader)
+void ZERNFilterGaussianBlur::SetUseComputeShader(bool UseComputeShader)
 {
-	zeDebugCheck(Context == NULL, "Context cannot be null");
-	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
-	zeDebugCheck(KernelRadius == 0, "Kernel radius cannot be zero");
-	zeDebugCheck(StandartDeviation == 0.0f, "Standart deviation cannot be zero");
+	this->UseComputeShader = UseComputeShader;
+}
 
-	if (Constants.KernelRadius != KernelRadius)
-	{
-		Constants.KernelRadius = KernelRadius;
-		DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
-	}
+bool ZERNFilterGaussianBlur::GetUseComputeShader() const
+{
+	return UseComputeShader;
+}
+
+void ZERNFilterGaussianBlur::SetKernelRadius(ZEUInt KernelRadius)
+{
+	if (Constants.KernelRadius == KernelRadius)
+		return;
+
+	Constants.KernelRadius = KernelRadius;
+
+	DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+}
+
+ZEUInt ZERNFilterGaussianBlur::GetKernelRadius() const
+{
+	return Constants.KernelRadius;
+}
+
+void ZERNFilterGaussianBlur::SetStandartDeviation(float StandartDeviation)
+{
+	if (Constants.StandartDeviation == StandartDeviation)
+		return;
+
+	Constants.StandartDeviation = StandartDeviation;
+
+	DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+}
+
+float ZERNFilterGaussianBlur::GetStandartDeviation() const
+{
+	return Constants.StandartDeviation;
+}
+
+void ZERNFilterGaussianBlur::Apply(ZEGRContext* Context)
+{
+	ZERNFilter::Apply(Context);
 
 	if (!Update())
 		return;
@@ -245,12 +361,12 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* Inpu
 		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
 		TempTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
 
-	if (PixelShader)
+	if (!UseComputeShader)
 	{
 		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, InputTexture->GetWidth(), InputTexture->GetHeight()));
 
-		const ZEGRRenderTarget* OutputRenderTarget = InputTexture->GetRenderTarget();
+		const ZEGRRenderTarget* OutputRenderTarget = (OutputTexture != NULL) ? OutputTexture->GetRenderTarget() : InputTexture->GetRenderTarget();
 		const ZEGRRenderTarget* TempRenderTarget = TempTexture->GetRenderTarget();
 
 		Context->SetRenderState(BlurHorizontalGraphicsRenderStateData);
@@ -285,27 +401,172 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture* Inpu
 	}
 }
 
-void ZERNFilter::ApplyScale(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRRenderTarget* OutputRenderTarget)
+ZERNFilterGaussianBlur::ZERNFilterGaussianBlur()
 {
-	zeDebugCheck(Context == NULL, "Context cannot be null");
-	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
-	zeDebugCheck(OutputRenderTarget == NULL, "Output texture cannot be null");
+	UseComputeShader = false;
+
+	Constants.KernelRadius = 5;
+	Constants.StandartDeviation = 2.0f;
+}
+
+bool ZERNFilterImageTransform::InitializeInternal()
+{
+	if (!ZERNFilter::InitializeInternal())
+		return false;
+
+	return Update();
+}
+
+bool ZERNFilterImageTransform::DeinitializeInternal()
+{
+	ScalePixelShader.Release();
+	ScaleGraphicsRenderStateData.Release();
+
+	return ZERNFilter::DeinitializeInternal();
+}
+
+bool ZERNFilterImageTransform::UpdateShaders()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_SHADERS))
+		return true;
+
+	if (!ZERNFilter::UpdateShaders())
+		return false;
+
+	ZEGRShaderCompileOptions Options;
+	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFiltering_Scale_PixelShader";
+	ScalePixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ScalePixelShader == NULL, false, "Cannot set pixel shader.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterImageTransform::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_RENDER_STATE))
+		return true;
+
+	if (!ZERNFilter::UpdateRenderStates())
+		return false;
+
+	ZEGRRenderState RenderState;
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, ScalePixelShader);
+	ScaleGraphicsRenderStateData = RenderState.Compile();
+	zeCheckError(ScaleGraphicsRenderStateData == NULL, false, "Cannot set render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+void ZERNFilterImageTransform::Apply(ZEGRContext* Context)
+{
+	ZERNFilter::Apply(Context);
 
 	if (!Update())
 		return;
 
-	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
-	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
+	Viewport.SetWidth((float)OutputTexture->GetWidth());
+	Viewport.SetHeight((float)OutputTexture->GetHeight());
+
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
 
 	Context->SetRenderState(ScaleGraphicsRenderStateData);
-	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
 }
 
-void ZERNFilter::ApplyEdgeDetection(ZEGRContext* Context, float StencilRef)
+ZERNFilterImageTransform::ZERNFilterImageTransform()
 {
+
+}
+
+bool ZERNFilterEdgeDetection::InitializeInternal()
+{
+	if (!ZERNFilter::InitializeInternal())
+		return false;
+
+	return Update();
+}
+
+bool ZERNFilterEdgeDetection::DeinitializeInternal()
+{
+	EdgeDetectionPixelShader.Release();
+	EdgeDetectionGraphicsRenderStateData.Release();
+
+	return ZERNFilter::DeinitializeInternal();
+}
+
+bool ZERNFilterEdgeDetection::UpdateShaders()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_SHADERS))
+		return true;
+
+	if (!ZERNFilter::UpdateShaders())
+		return false;
+
+	ZEGRShaderCompileOptions Options;
+	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
+
+	Options.EntryPoint = "ZERNFiltering_EdgeDetection_PixelShader";
+	EdgeDetectionPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(EdgeDetectionPixelShader == NULL, false, "Cannot set pixel shader.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterEdgeDetection::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_RENDER_STATE))
+		return true;
+
+	if (!ZERNFilter::UpdateRenderStates())
+		return false;
+
+	ZEGRRenderState RenderState;
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+
+	ZEGRDepthStencilState DepthStencilStateWriteStencil;
+	DepthStencilStateWriteStencil.SetDepthTestEnable(true);
+	DepthStencilStateWriteStencil.SetDepthWriteEnable(false);
+	DepthStencilStateWriteStencil.SetDepthFunction(ZEGR_CF_LESS);
+	DepthStencilStateWriteStencil.SetStencilTestEnable(true);
+	DepthStencilStateWriteStencil.SetFrontStencilPass(ZEGR_SO_REPLACE);
+	DepthStencilStateWriteStencil.SetBackStencilPass(ZEGR_SO_REPLACE);
+
+	RenderState.SetDepthStencilState(DepthStencilStateWriteStencil);
+	RenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
+
+	EdgeDetectionGraphicsRenderStateData = RenderState.Compile();
+	zeCheckError(EdgeDetectionGraphicsRenderStateData == NULL, false, "Cannot set render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+void ZERNFilterEdgeDetection::Apply(ZEGRContext* Context)
+{
+	ZERNFilter::Apply(Context);
+
 	ZEGRTexture* DepthTexture;
 	Context->GetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthTexture);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = static_cast<ZEGRTexture*>(DepthTexture)->GetDepthStencilBuffer(true);
@@ -315,34 +576,304 @@ void ZERNFilter::ApplyEdgeDetection(ZEGRContext* Context, float StencilRef)
 
 	Context->SetRenderState(EdgeDetectionGraphicsRenderStateData);
 	Context->SetRenderTargets(0, NULL, DepthStencilBuffer);
-	Context->SetStencilRef(StencilRef);
+	//Context->SetStencilRef(StencilRef);
 	Context->Draw(3, 0);
 }
 
-ZERNFilter::ZERNFilter()
+ZERNFilterEdgeDetection::ZERNFilterEdgeDetection()
 {
-	DirtyFlags.RaiseAll();
 
-	memset(&Constants, 0, sizeof(Constants));
 }
 
-ZERNFilter::~ZERNFilter()
+bool ZERNFilterColorTransform::InitializeInternal()
 {
-	Deinitialize();
+	if (!ZERNFilter::InitializeInternal())
+		return false;
+
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+
+	return Update();
 }
 
-void ZERNFilter::GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal)
+bool ZERNFilterColorTransform::DeinitializeInternal()
 {
-	if(Values.GetCount() != Size)
-		Values.Resize(Size);
+	ColorTransformPixelShader.Release();
+	ColorTransformGraphicsRenderStateData.Release();
+	ConstantBuffer.Release();
 
-	ZEInt HalfSize = Size / 2;
+	return ZERNFilter::DeinitializeInternal();
+}
 
-	for(ZEInt I = 0; I < Size; ++I)
+bool ZERNFilterColorTransform::UpdateShaders()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_SHADERS))
+		return true;
+
+	if (!ZERNFilter::UpdateShaders())
+		return false;
+
+	ZEGRShaderCompileOptions Options;
+	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFiltering_ColorTransform_PixelShader";
+	ColorTransformPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ColorTransformPixelShader == NULL, false, "Cannot set pixel shader.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterColorTransform::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_RENDER_STATE))
+		return true;
+
+	if (!ZERNFilter::UpdateRenderStates())
+		return false;
+
+	ZEGRRenderState RenderState;
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, ColorTransformPixelShader);
+	ColorTransformGraphicsRenderStateData = RenderState.Compile();
+	zeCheckError(ColorTransformGraphicsRenderStateData == NULL, false, "Cannot set render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterColorTransform::UpdateConstantBuffers()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_CONSTANT_BUFFER))
+		return true;
+
+	if (!ZERNFilter::UpdateConstantBuffers())
+		return false;
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+
+	return true;
+}
+
+void ZERNFilterColorTransform::SetColorMatrix(const ZEMatrix4x4& ColorMatrix)
+{
+	if (Constants.ColorMatrix == ColorMatrix)
+		return;
+
+	Constants.ColorMatrix = ColorMatrix;
+
+	DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+}
+
+const ZEMatrix4x4& ZERNFilterColorTransform::GetColorMatrix() const
+{
+	return Constants.ColorMatrix;
+}
+
+void ZERNFilterColorTransform::Apply(ZEGRContext* Context)
+{
+	ZERNFilter::Apply(Context);
+
+	if (!Update())
+		return;
+
+	Viewport.SetWidth((float)OutputTexture->GetWidth());
+	Viewport.SetHeight((float)OutputTexture->GetHeight());
+
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
+	Context->SetRenderState(ColorTransformGraphicsRenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
+	Context->SetViewports(1, &Viewport);
+	Context->Draw(3, 0);
+}
+
+ZERNFilterColorTransform::ZERNFilterColorTransform()
+{
+	Constants.ColorMatrix = ZEMatrix4x4::Identity;
+}
+
+bool ZERNFilterNoise::InitializeInternal()
+{
+	if (!ZERNFilter::InitializeInternal())
+		return false;
+
+	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	NoiseTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, 1024, 1024, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
+
+	return Update();
+}
+
+bool ZERNFilterNoise::DeinitializeInternal()
+{
+	GenerateNoiseComputeShader.Release();
+	NoisePixelShader.Release();
+
+	GenerateNoiseComputeRenderStateData.Release();
+	NoiseGraphicsRenderStateData.Release();
+
+	ConstantBuffer.Release();
+	NoiseTexture.Release();
+
+	return ZERNFilter::DeinitializeInternal();
+}
+
+bool ZERNFilterNoise::UpdateShaders()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_SHADERS))
+		return true;
+
+	if (!ZERNFilter::UpdateShaders())
+		return false;
+
+	ZEGRShaderCompileOptions Options;
+	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFiltering.hlsl";
+
+	Options.Type = ZEGR_ST_COMPUTE;
+	Options.EntryPoint = "ZERNFiltering_GenerateNoise_ComputeShader";
+	GenerateNoiseComputeShader = ZEGRShader::Compile(Options);
+	zeCheckError(GenerateNoiseComputeShader == NULL, false, "Cannot set compute shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFiltering_Noise_PixelShader";
+	NoisePixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(NoisePixelShader == NULL, false, "Cannot set pixel shader.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterNoise::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_RENDER_STATE))
+		return true;
+
+	if (!ZERNFilter::UpdateRenderStates())
+		return false;
+
+	ZEGRComputeRenderState ComputeRenderState;
+	ComputeRenderState.SetComputeShader(GenerateNoiseComputeShader);
+	GenerateNoiseComputeRenderStateData = ComputeRenderState.Compile();
+	zeCheckError(GenerateNoiseComputeRenderStateData == NULL, false, "Cannot set compute render state.");
+
+	ZEGRRenderState GraphicsRenderState;
+	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, NoisePixelShader);
+
+	NoiseGraphicsRenderStateData = GraphicsRenderState.Compile();
+	zeCheckError(NoiseGraphicsRenderStateData == NULL, false, "Cannot set graphics render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNFilterNoise::UpdateConstantBuffers()
+{
+	if (!DirtyFlags.GetFlags(ZERN_FDF_CONSTANT_BUFFER))
+		return true;
+
+	if (!ZERNFilter::UpdateConstantBuffers())
+		return false;
+
+	if (InputTexture != NULL)
 	{
-		Values[I].x = Horizontal ? I - HalfSize : 0.0f;
-		Values[I].y = !Horizontal ? I - HalfSize : 0.0f;
-		Values[I].z = 0.0f;
-		Values[I].w = GausianFunction((Values[I].x + Values[I].y), StandartDeviation);
+		Constants.Size.x = InputTexture->GetWidth() / Constants.Granularity;
+		Constants.Size.y = InputTexture->GetHeight() / Constants.Granularity;
 	}
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+
+	return true;
+}
+
+void ZERNFilterNoise::SetInputTexture(const ZEGRTexture* InputTexture)
+{
+	if (this->InputTexture == NULL || (InputTexture != NULL && 
+		this->InputTexture->GetWidth() != InputTexture->GetWidth() || 
+		this->InputTexture->GetHeight() != InputTexture->GetHeight()))
+		DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+
+	ZERNFilter::SetInputTexture(InputTexture);
+}
+
+void ZERNFilterNoise::SetWeight(float Weight)
+{
+	if (Constants.Weight == Weight)
+		return;
+
+	Constants.Weight = Weight;
+
+	DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+}
+
+float ZERNFilterNoise::GetWeight() const
+{
+	return Constants.Weight;
+}
+
+void ZERNFilterNoise::SetGranularity(ZEUInt Granularity)
+{
+	if (Constants.Granularity == Granularity)
+		return;
+
+	Constants.Granularity = Granularity;
+
+	DirtyFlags.RaiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+}
+
+ZEUInt ZERNFilterNoise::GetGranularity() const
+{
+	return Constants.Granularity;
+}
+
+void ZERNFilterNoise::Apply(ZEGRContext* Context)
+{
+	ZERNFilter::Apply(Context);
+
+	if (!Update())
+		return;
+
+	//Context->SetRWTexture(0, NoiseTexture);
+	//Context->SetComputeRenderState(GenerateNoiseComputeRenderStateData);
+	//Context->Dispatch(32, 32, 1);
+
+	Viewport.SetWidth((float)OutputTexture->GetWidth());
+	Viewport.SetHeight((float)OutputTexture->GetHeight());
+
+	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
+	Context->SetRenderState(NoiseGraphicsRenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
+	//Context->SetTexture(ZEGR_ST_PIXEL, 6, NoiseTexture);
+	Context->SetViewports(1, &Viewport);
+	Context->Draw(3, 0);
+}
+
+ZERNFilterNoise::ZERNFilterNoise()
+{
+	Constants.Weight = 0.5f;
+	Constants.Granularity = 1;
+	Constants.Size = ZEVector2(1024.0f, 1024.0f);
 }
