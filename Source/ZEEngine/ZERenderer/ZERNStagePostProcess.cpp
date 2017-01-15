@@ -102,15 +102,25 @@ const ZEList2<ZERNFilter>& ZERNStagePostProcess::GetFilters() const
 	return Filters;
 }
 
-ZERNFilter* ZERNStagePostProcess::GetFilter(ZEClass* Class) const
+ZEArray<ZERNFilter*> ZERNStagePostProcess::GetFilters(ZEClass* Class) const
 {
+	ZEArray<ZERNFilter*> Output;
+
 	ze_for_each(Filter, Filters)
 	{
-		if (Filter->GetClass() == Class)
-			return Filter.GetPointer();
+		if (ZEClass::IsDerivedFrom(Class, Filter->GetClass()))
+			Output.Add(Filter.GetPointer());
 	}
 
-	return NULL;
+	return Output;
+}
+
+ZERNFilter* ZERNStagePostProcess::GetFilter(ZESize Index) const
+{
+	if (Index >= Filters.GetCount())
+		return NULL;
+
+	return Filters.GetItem(Index);
 }
 
 void ZERNStagePostProcess::AddFilter(ZERNFilter* Filter)

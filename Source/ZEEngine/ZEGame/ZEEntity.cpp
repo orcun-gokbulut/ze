@@ -59,10 +59,10 @@ void ZEEntity::GetComponentsInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output)
 	{
 		for (ZESize I = 0; I < Components.GetCount(); I++)
 		{
-			if (Components[I]->GetName() == Name)
+			if (ZEClass::IsDerivedFrom(Class, Components[I]))
 				Output.Add(Components[I]);
 
-			GetComponentsInternal(Name, Output);
+			Components[I]->GetComponentsInternal(Class, Output);
 		}
 	}
 	Components.UnlockRead();
@@ -77,7 +77,7 @@ void ZEEntity::GetComponentsInternal(const ZEString& Name, ZEArray<ZEEntity*>& O
 			if (Components[I]->GetName() == Name)
 				Output.Add(Components[I]);
 
-			GetComponentsInternal(Name, Output);
+			Components[I]->GetComponentsInternal(Name, Output);
 		}
 	}
 	Components.UnlockRead();
@@ -92,7 +92,7 @@ void ZEEntity::GetChildEntitiesInternal(ZEClass* Class, ZEArray<ZEEntity*>& Outp
 			if (ZEClass::IsDerivedFrom(Class, ChildEntities[I]))
 				Output.Add(ChildEntities[I]);
 
-			GetChildEntitiesInternal(Name, Output);
+			ChildEntities[I]->GetChildEntitiesInternal(Class, Output);
 		}
 	}
 	ChildEntities.UnlockRead();
@@ -107,7 +107,7 @@ void ZEEntity::GetChildEntitiesInternal(const ZEString& Name, ZEArray<ZEEntity*>
 			if (ChildEntities[I]->GetName() == Name)
 				Output.Add(ChildEntities[I]);
 
-			GetChildEntitiesInternal(Name, Output);
+			ChildEntities[I]->GetChildEntitiesInternal(Name, Output);
 		}
 	}
 	ChildEntities.UnlockRead();
