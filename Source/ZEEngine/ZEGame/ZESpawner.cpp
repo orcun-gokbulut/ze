@@ -280,6 +280,9 @@ void ZESpawner::Despawn()
 
 		for (ZESize I = 0; I < Spawns.GetCount(); I++)
 		{
+			if (Spawns[I].Spawned && IsDestroyed())
+				continue;
+
 			if (Spawns[I].Entity->GetParent() != NULL)
 				Spawns[I].Entity->GetParent()->ZEEntity::RemoveChildEntity(Spawns[I].Entity);
 			else

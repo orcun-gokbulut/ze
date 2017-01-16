@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
@@ -80,7 +81,7 @@ class ZERNParticleMaterial;
 class ZERNRenderParameters;
 class ZERNPreRenderParameters;
 
-class ZEParticleEmitter : public ZEObject
+class ZEParticleEmitter : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZEParticleModifier;
@@ -144,8 +145,8 @@ class ZEParticleEmitter : public ZEObject
 			ZEVector4						Color;
 		};
 
-		bool								Initialize();
-		void								Deinitialize();
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
 
 		void								UpdateConstantBuffer();
 
@@ -197,7 +198,6 @@ class ZEParticleEmitter : public ZEObject
 
 		void								SetSortingEnabled(bool SortingEnabled);
 		bool								GetSortingEnabled() const;
-
 
 		// Particle
 		void								SetParticleLocalSpace(bool ParticleLocalSpace);

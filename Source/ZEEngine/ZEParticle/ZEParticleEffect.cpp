@@ -110,6 +110,8 @@ void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 
 	Emitter->Effect = this;
 	Emitter->ResetPool();
+	if (IsLoadedOrLoading())
+		Emitter->Initialize();
 	Emitters.Add(Emitter);
 }
 
@@ -119,6 +121,7 @@ void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 	zeCheckError(Emitter->Effect != this, ZE_VOID, "Emitter is not registered to this Particle Effect.");
 
 	Emitter->Effect = NULL;
+	Emitter->Deinitialize();
 	Emitters.RemoveValue(Emitter);
 }
 

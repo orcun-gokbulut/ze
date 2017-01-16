@@ -83,15 +83,18 @@ static ZEVector3 ConvertAxisOrientation(ZEParticleAxisOrientation AxisOrientatio
 	}
 }
 
-bool ZEParticleEmitter::Initialize()
+bool ZEParticleEmitter::InitializeInternal()
 {
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
 	InstanceBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(InstanceAttributes) * 1000, 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return true;
 }
 
-void ZEParticleEmitter::Deinitialize()
+bool ZEParticleEmitter::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -104,6 +107,8 @@ void ZEParticleEmitter::Deinitialize()
 
 	InstanceBuffer.Release();
 	ConstantBuffer.Release();
+
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void ZEParticleEmitter::UpdateConstantBuffer()
@@ -134,9 +139,6 @@ void ZEParticleEmitter::EffectTransformChanged()
 
 void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 {
-	if (Particle.State != ZE_PAS_DEAD)
-		return;
-
 	switch (Type)
 	{
 		case ZE_PET_POINT:
@@ -246,7 +248,7 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 	}
 
 	// Create Them
-	ParticlesAccumulation += ZERandom::GetFloatRange((float)ParticlesPerSecondMin, (float)ParticleLifeMax) * ElapsedTime;
+	ParticlesAccumulation += ZERandom::GetFloatRange((float)ParticlesPerSecondMin, (float)ParticlesPerSecondMax) * ElapsedTime;
 	if (ParticlesAccumulation >= 1.0f)
 	{
 		for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
@@ -327,6 +329,8 @@ ZEParticleEmitter::ZEParticleEmitter()
 
 ZEParticleEmitter::~ZEParticleEmitter()
 {
+	Deinitialize();
+
 	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
 		delete Modifiers[I];
 
