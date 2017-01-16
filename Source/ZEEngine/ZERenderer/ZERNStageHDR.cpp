@@ -166,9 +166,12 @@ bool ZERNStageHDR::UpdateTextures()
 	ZEUInt CurrentWidth = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt CurrentHeight = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	BrightTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 2, CurrentHeight / 2, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture4x = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 4, CurrentHeight / 4, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture8x = ZEGRTexture::CreateResource(ZEGR_TT_2D, CurrentWidth / 8, CurrentHeight / 8, 1, ZEGR_TF_R11G11B10_FLOAT);
+	for (ZEUInt I = 1; I <= DownScaledTextures.GetCount(); I++)
+	{
+		ZEUInt Width = CurrentWidth >> I;
+		ZEUInt Height = CurrentHeight >> I;
+		DownScaledTextures[I - 1] = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT);
+	}
 
 	ZEInt ExponentWidth = (ZEInt)(ZEMath::Log10((float)CurrentWidth) / ZEMath::Log10(2.0f));
 	ZEInt ExponentHeight = (ZEInt)(ZEMath::Log10((float)CurrentHeight) / ZEMath::Log10(2.0f));
@@ -251,7 +254,7 @@ void ZERNStageHDR::CalculateAdaptedLuminance(ZEGRContext* Context)
 
 const ZEGRTexture* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
 {
-	const ZEGRRenderTarget* RenderTarget = BrightTexture->GetRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = DownScaledTextures.GetFirstItem()->GetRenderTarget();
 
 	Viewport.SetWidth((float)RenderTarget->GetWidth());
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
@@ -266,43 +269,32 @@ const ZEGRTexture* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
 	Context->Draw(3, 0);
 
 	FilterGaussianBlur.SetKernelRadius(6);
-	FilterGaussianBlur.SetStandartDeviation(2.0f);
-	
-	FilterGaussianBlur.SetInputTexture(BrightTexture);
+	FilterGaussianBlur.SetStandartDeviation(1.0f);
+
+	for (ZEUInt I = 0; I < (DownScaledTextures.GetCount() - 1); I++)
+	{
+		FilterGaussianBlur.SetInputTexture(DownScaledTextures[I]);
+		FilterGaussianBlur.Apply(Context);
+
+		FilterTransform.SetInputTexture(DownScaledTextures[I]);
+		FilterTransform.SetOutputTexture(DownScaledTextures[I + 1]);
+		FilterTransform.Apply(Context);
+	}
+
+	for (ZEUInt I = (DownScaledTextures.GetCount() - 1); I > 0; I--)
+	{
+		FilterGaussianBlur.SetInputTexture(DownScaledTextures[I]);
+		FilterGaussianBlur.Apply(Context);
+
+		FilterTransform.SetInputTexture(DownScaledTextures[I]);
+		FilterTransform.SetOutputTexture(DownScaledTextures[I - 1]);
+		FilterTransform.Apply(Context);
+	}
+
+	FilterGaussianBlur.SetInputTexture(DownScaledTextures.GetFirstItem());
 	FilterGaussianBlur.Apply(Context);
 
-	FilterTransform.SetInputTexture(BrightTexture);
-	FilterTransform.SetOutputTexture(DownScaledTexture4x);
-	FilterTransform.Apply(Context);
-
-	FilterGaussianBlur.SetInputTexture(DownScaledTexture4x);
-	FilterGaussianBlur.Apply(Context);
-
-	FilterTransform.SetInputTexture(DownScaledTexture4x);
-	FilterTransform.SetOutputTexture(DownScaledTexture8x);
-	FilterTransform.Apply(Context);
-
-	FilterGaussianBlur.SetInputTexture(DownScaledTexture8x);
-	FilterGaussianBlur.Apply(Context);
-
-	FilterTransform.SetInputTexture(DownScaledTexture8x);
-	FilterTransform.SetOutputTexture(DownScaledTexture4x);
-	FilterTransform.Apply(Context);
-
-	FilterGaussianBlur.SetInputTexture(DownScaledTexture4x);
-	FilterGaussianBlur.Apply(Context);
-
-	FilterTransform.SetInputTexture(DownScaledTexture4x);
-	FilterTransform.SetOutputTexture(BrightTexture);
-	FilterTransform.Apply(Context);
-
-	FilterGaussianBlur.SetInputTexture(BrightTexture);
-	FilterGaussianBlur.Apply(Context);
-
-	//for (ZEUInt I = 0; I < 3; I++)
-		//FilterGaussianBlur.Apply(Context);
-
-	return BrightTexture;
+	return DownScaledTextures.GetFirstItem();
 }
 
 void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture* BloomTexture)
@@ -369,10 +361,8 @@ bool ZERNStageHDR::DeinitializeInternal()
 	ToneMappingRenderStateData.Release();
 
 	ConstantBuffer.Release();
-
-	DownScaledTexture4x.Release();
-	DownScaledTexture8x.Release();
-	BrightTexture.Release();
+	
+	DownScaledTextures.Clear();
 	LuminanceTextures.Clear();
 	CurrentAdaptedLuminance.Release();
 	PreviousAdaptedLuminance.Release();
@@ -587,6 +577,8 @@ void ZERNStageHDR::CleanUp(ZEGRContext* Context)
 ZERNStageHDR::ZERNStageHDR()
 {
 	DirtyFlags.RaiseAll();
+
+	DownScaledTextures.SetCount(4);
 
 	BlurTextureSize = ZERN_HBTS_HALF;
 

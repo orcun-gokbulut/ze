@@ -305,6 +305,8 @@ bool ZERNFilterGaussianBlur::UpdateConstantBuffers()
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZERN_FDF_CONSTANT_BUFFER);
+
+	return true;
 }
 
 void ZERNFilterGaussianBlur::SetUseComputeShader(bool UseComputeShader)

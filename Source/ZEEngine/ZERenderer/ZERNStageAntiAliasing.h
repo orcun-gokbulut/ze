@@ -66,12 +66,14 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRShader>				NeighborhoodBlendingPixelShader;
 		ZEHolder<ZEGRShader>				ScreenCoverPositionTexcoordVertexShader;
 		ZEHolder<ZEGRShader>				GenerateVelocityBufferPixelShader;
+		ZEHolder<ZEGRShader>				ReprojectionNeighborhoodBlendingPixelShader;
 		ZEHolder<ZEGRShader>				ReprojectPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>		EdgeDetectionPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		BlendingWeightCalculationPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		NeighborhoodBlendingPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		GenerateVelocityBufferRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		ReprojectionNeighborhoodBlendingRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		ReprojectRenderStateData;
 
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;

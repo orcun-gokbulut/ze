@@ -52,7 +52,6 @@ cbuffer ZERNSMAA_Constant_Buffer	: register(ZERN_SHADER_CONSTANT_STAGE)
 #define		SMAA_RT_METRICS float4(ZERNSMAA_InvOutputSize, ZERNSMAA_OutputSize)
 #define		SMAA_HLSL_4
 #define		SMAA_PRESET_ULTRA
-#define		SMAA_REPROJECTION 1
 
 #include "SMAA.hlsl"
 
@@ -131,7 +130,11 @@ float4 ZERNSMAA_NeighborhoodBlending_PixelShader(
 	float2 Texcoord : TEXCOORD0,
 	float4 Offset : TEXCOORD1) : SV_TARGET
 {
-	return SMAANeighborhoodBlendingPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_BlendTexture, ZERNSMAA_VelocityTexture);
+	return SMAANeighborhoodBlendingPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_BlendTexture 
+	#if SMAA_REPROJECTION
+	, ZERNSMAA_VelocityTexture
+	#endif
+	);
 }
 
 float2 ZERNSMAA_GenerateVelocityBuffer_PixelShader(float4 PositionViewport : SV_POSITION) : SV_TARGET0
@@ -150,7 +153,11 @@ float2 ZERNSMAA_GenerateVelocityBuffer_PixelShader(float4 PositionViewport : SV_
 
 float4 ZERNSMAA_Reprojection_PixelShader(float4 Position : SV_POSITION) : SV_TARGET0
 {
-	return SMAAResolvePS(Position.xy * ZERNSMAA_InvOutputSize, ZERNSMAA_CurrColorTexture, ZERNSMAA_PrevColorTexture, ZERNSMAA_VelocityTexture);
+	return SMAAResolvePS(Position.xy * ZERNSMAA_InvOutputSize, ZERNSMAA_CurrColorTexture, ZERNSMAA_PrevColorTexture
+	#if SMAA_REPROJECTION
+	, ZERNSMAA_VelocityTexture
+	#endif
+	);
 }
 
 #endif

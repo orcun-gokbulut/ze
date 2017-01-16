@@ -98,6 +98,12 @@ bool ZERNStageAntiAliasing::UpdateShaders()
 	Options.EntryPoint = "ZERNSMAA_GenerateVelocityBuffer_PixelShader";
 	GenerateVelocityBufferPixelShader = ZEGRShader::Compile(Options);
 
+	Options.Definitions.Add(ZEGRShaderDefinition("SMAA_REPROJECTION", "1"));
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSMAA_NeighborhoodBlending_PixelShader";
+	ReprojectionNeighborhoodBlendingPixelShader = ZEGRShader::Compile(Options);
+
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSMAA_Reprojection_PixelShader";
 	ReprojectPixelShader = ZEGRShader::Compile(Options);
@@ -157,6 +163,12 @@ bool ZERNStageAntiAliasing::UpdateRenderStates()
 	GenerateVelocityBufferRenderStateData = RenderState.Compile();
 	zeCheckError(GenerateVelocityBufferRenderStateData == NULL, false, "Cannot set render state.");
 
+	RenderState.SetDepthStencilState(DisableStencilState);
+	RenderState.SetShader(ZEGR_ST_VERTEX, NeighborhoodBlendingVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, ReprojectionNeighborhoodBlendingPixelShader);
+	ReprojectionNeighborhoodBlendingRenderStateData= RenderState.Compile();
+	zeCheckError(ReprojectionNeighborhoodBlendingRenderStateData == NULL, false, "Cannot set render state.");
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverPositionTexcoordVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, ReprojectPixelShader);
 	ReprojectRenderStateData= RenderState.Compile();
@@ -185,7 +197,7 @@ bool ZERNStageAntiAliasing::UpdateTextures()
 	ColorTextures[0] = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	ColorTextures[1] = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
-	VelocityBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	//VelocityBuffer = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
 
 	DirtyFlags.UnraiseFlags(ZERN_AADF_TEXTURE);
 
@@ -266,15 +278,30 @@ void ZERNStageAntiAliasing::DoBlendingWeightCalculation(ZEGRContext* Context)
 
 void ZERNStageAntiAliasing::DoNeighborhoodBlending(ZEGRContext* Context)
 {
-	ZESize CurrIndex = (ZECore::GetInstance()->GetFrameId() + 1) % 2;
+	if (TemporalEnabled)
+	{
+		ZESize CurrIndex = (ZECore::GetInstance()->GetFrameId() + 1) % 2;
 
-	const ZEGRRenderTarget* RenderTarget = TemporalEnabled ? ColorTextures[CurrIndex]->GetRenderTarget() : OutputTexture->GetRenderTarget();
+		const ZEGRRenderTarget* RenderTarget = ColorTextures[CurrIndex]->GetRenderTarget();
 
-	Context->SetRenderState(NeighborhoodBlendingPassRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 9, BlendTexture);
+		Context->SetRenderState(ReprojectionNeighborhoodBlendingRenderStateData);
+		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->SetTexture(ZEGR_ST_PIXEL, 9, BlendTexture);
 
-	Context->Draw(3, 0);
+		Context->Draw(3, 0);
+
+		DoReprojection(Context);
+	}
+	else
+	{
+		const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
+
+		Context->SetRenderState(NeighborhoodBlendingPassRenderStateData);
+		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->SetTexture(ZEGR_ST_PIXEL, 9, BlendTexture);
+
+		Context->Draw(3, 0);
+	}
 }
 
 void ZERNStageAntiAliasing::GenerateVelocityBuffer(ZEGRContext* Context)
@@ -337,11 +364,15 @@ bool ZERNStageAntiAliasing::DeinitializeInternal()
 	NeighborhoodBlendingPixelShader.Release();
 
 	ScreenCoverPositionTexcoordVertexShader.Release();
+	GenerateVelocityBufferPixelShader.Release();
+	ReprojectionNeighborhoodBlendingPixelShader.Release();
 	ReprojectPixelShader.Release();
 
 	EdgeDetectionPassRenderStateData.Release();
 	BlendingWeightCalculationPassRenderStateData.Release();
 	NeighborhoodBlendingPassRenderStateData.Release();
+	GenerateVelocityBufferRenderStateData.Release();
+	ReprojectionNeighborhoodBlendingRenderStateData.Release();
 	ReprojectRenderStateData.Release();
 
 	ConstantBuffer.Release();
@@ -433,8 +464,8 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 3, Textures);
 	Context->SetViewports(1, &Viewport);
 	
-	if (TemporalEnabled)
-		GenerateVelocityBuffer(Context);
+	//if (TemporalEnabled)
+		//GenerateVelocityBuffer(Context);
 
 	Context->SetTexture(ZEGR_ST_PIXEL, 12, VelocityBuffer);
 	
@@ -442,9 +473,6 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	DoEdgeDetection(Context);
 	DoBlendingWeightCalculation(Context);
 	DoNeighborhoodBlending(Context);
-
-	if (TemporalEnabled)
-		DoReprojection(Context);
 
 	return true;
 }

@@ -90,10 +90,19 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>			BlendRenderStatePerSample;
 		ZEHolder<ZEGRComputeRenderStateData>	TiledDeferredComputeRenderState;
 
+		ZEHolder<ZEGRShader>					ProjectiveLightVertexShader;
+		ZEHolder<ZEGRShader>					ProjectiveLightPixelShader;
+		ZEHolder<ZEGRShader>					ProjectiveLightPixelShaderPerSample;
+
+		ZEHolder<ZEGRRenderStateData>			ProjectiveLightRenderState;
+		ZEHolder<ZEGRRenderStateData>			ProjectiveLightRenderStatePerSample;
+
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
 		ZEHolder<ZEGRBuffer>					PointLightStructuredBuffer;
 		ZEHolder<ZEGRBuffer>					ProjectiveLightStructuredBuffer;
 		ZEHolder<ZEGRBuffer>					DeferredLightVertexBuffer;
+
+		ZEHolder<ZEGRBuffer>					ProjectiveLightConstantBuffer;
 
 		ZEHolder<ZEGRTexture>					RandomVectorsTexture;
 		ZEHolder<ZEGRTexture>					TiledDeferredOutputTexture;
@@ -183,7 +192,7 @@ class ZERNStageLighting : public ZERNStage
 		ZESmartArray<ProjectiveLightStruct>		ProjectiveLights;
 
 		const ZEGRTexture*						DirectionalLightShadowMap;
-		const ZEGRTexture*						ProjectiveLightTexture;
+		ZESmartArray<const ZEGRTexture*>		ProjectiveLightTextures;
 
 		void									CreateRandomVectors();
 		void									CreateLightGeometries();
