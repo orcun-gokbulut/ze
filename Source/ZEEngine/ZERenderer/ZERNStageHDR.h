@@ -90,9 +90,7 @@ class ZERNStageHDR : public ZERNStage
 
 		ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
-		ZEHolder<ZEGRTexture>				BrightTexture;
-		ZEHolder<ZEGRTexture>				DownScaledTexture4x;
-		ZEHolder<ZEGRTexture>				DownScaledTexture8x;
+		ZEArray<ZEHolder<ZEGRTexture>>		DownScaledTextures;
 		ZEArray<ZEHolder<ZEGRTexture>>		LuminanceTextures;
 		ZEHolder<ZEGRTexture>				CurrentAdaptedLuminance;
 		ZEHolder<ZEGRTexture>				PreviousAdaptedLuminance;
@@ -117,7 +115,7 @@ class ZERNStageHDR : public ZERNStage
 			float							LuminanceMin;
 			float							LuminanceMax;
 			float							Reserved1;
-			float							Reserved2;
+			float							wwReserved2;
 		} Constants;
 
 		virtual bool						InitializeInternal();

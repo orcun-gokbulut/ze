@@ -657,7 +657,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (Daylight)
 	{
-		CloudAmbient = SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
+		CloudAmbient = SunIntensity * (3.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
 	}
 	else if (Twilight)
 	{
@@ -665,7 +665,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 		SunIntensity = ZEMath::Lerp(0.2f, 5.0f, Weight);
 		StarBrightness = ZEMath::Lerp(0.1f, 0.0f, Weight);
-		CloudAmbient = SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
+		CloudAmbient = SunIntensity * (3.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith));
 		ZEVector3::Lerp(CloudAmbient, ZEVector3::One * 0.005f, CloudAmbient, Weight);
 	}
 	else
@@ -700,14 +700,14 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	}
 
 	ZEVector3 SceneAmbientColor = ZEVector3(0.01f);
-	ZEVector3::Lerp(SceneAmbientColor, SunIntensity * (2.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith)), CloudAmbient, 1.0f - Clearness);
+	ZEVector3::Lerp(SceneAmbientColor, SunIntensity * (3.0f * TerrestrialSunAmbientColor + TerrestrialSunColor * ZEMath::Max(0.0f, CosSunZenith)), CloudAmbient, 1.0f - Clearness);
 	GetScene()->SetAmbientColor(SceneAmbientColor);
 	GetScene()->SetAmbientFactor(0.2f);
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 100.0f);
+	Sun->SetColor(TerrestrialSunColor * 1000.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);
@@ -761,7 +761,7 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 		ZELightDirectional* SunLight = GetSunLight();
 		ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
-		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 5.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 5.0f;
+		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 3.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 3.0f;
 
 		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * SunIntensity;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;

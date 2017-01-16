@@ -126,7 +126,21 @@ bool ZERNStageLighting::UpdateShaders()
 	ScreenCoverVertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(ScreenCoverVertexShader == NULL, false, "Cannot set vertex shader.");
 
+	Options.EntryPoint = "ZERNDeferredShading_ProjectiveLight_VertexShader";
+	ProjectiveLightVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(ProjectiveLightVertexShader == NULL, false, "Cannot set vertex shader.");
 
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNDeferredShading_ProjectiveLight_PixelShader";
+	ProjectiveLightPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ProjectiveLightPixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNDeferredShading_ProjectiveLight_PixelShader_PerSample";
+	ProjectiveLightPixelShaderPerSample = ZEGRShader::Compile(Options);
+	zeCheckError(ProjectiveLightPixelShaderPerSample == NULL, false, "Cannot set pixel shader.");
+
+	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNDeferredShading_VertexShader_LightingStage";
 
 	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_RENDER_DIRECTIONAL_LIGHT"));
@@ -241,6 +255,17 @@ bool ZERNStageLighting::UpdateRenderState()
 	GraphicsRenderState.SetRasterizerState(RasterizerStateCullFront);
 	GraphicsRenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ProjectiveLightVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, ProjectiveLightPixelShader);
+
+	ProjectiveLightRenderState = GraphicsRenderState.Compile();
+	zeCheckError(ProjectiveLightRenderState == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, ProjectiveLightPixelShaderPerSample);
+
+	ProjectiveLightRenderStatePerSample = GraphicsRenderState.Compile();
+	zeCheckError(ProjectiveLightRenderStatePerSample == NULL, false, "Cannot set render state.");
+
 	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredDirectionalLightVertexShader);
 	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredDirectionalLightPixelShader);
 
@@ -330,6 +355,9 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
 
+	PointLights.Clear();
+	ProjectiveLights.Clear();
+
 	ze_for_each(Command, GetCommands())
 	{
 		ZELight* Light = static_cast<ZELight*>(Command->Entity);
@@ -404,7 +432,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 
 				ProjectiveLights.AddByRef(DestLight);
 
-				ProjectiveLightTexture = ProjectiveLight->GetProjectionTexture();
+				ProjectiveLightTextures.Add(ProjectiveLight->GetProjectionTexture());
 			}
 			break;
 
@@ -460,9 +488,6 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		ProjectiveLightStructuredBuffer->Unmap();
 	}
 
-	PointLights.Clear();
-	ProjectiveLights.Clear();
-
 	return true;
 }
 
@@ -491,6 +516,8 @@ bool ZERNStageLighting::InitializeInternal()
 	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	PointLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(PointLightStruct), sizeof(PointLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
 	ProjectiveLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(ProjectiveLightStruct), sizeof(ProjectiveLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
+
+	ProjectiveLightConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ProjectiveLightStruct), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -521,10 +548,17 @@ bool ZERNStageLighting::DeinitializeInternal()
 	EdgeDetectionRenderState.Release();
 	TiledDeferredComputeRenderState.Release();
 
+	ProjectiveLightPixelShader.Release();
+	ProjectiveLightPixelShaderPerSample.Release();
+	ProjectiveLightRenderState.Release();
+	ProjectiveLightRenderStatePerSample.Release();
+
 	ConstantBuffer.Release();
 	PointLightStructuredBuffer.Release();
 	ProjectiveLightStructuredBuffer.Release();
 	DeferredLightVertexBuffer.Release();
+
+	ProjectiveLightConstantBuffer.Release();
 
 	RandomVectorsTexture.Release();
 	TiledDeferredOutputTexture.Release();
@@ -552,8 +586,19 @@ void ZERNStageLighting::DrawLights(ZEGRContext* Context, bool PerSample)
 
 	if (Constants.ProjectiveLightCount > 0)
 	{
-		Context->SetRenderState(PerSample ? DeferredProjectiveLightRenderStatePerSample : DeferredProjectiveLightRenderState);
-		Context->DrawInstanced(18, 4542, Constants.ProjectiveLightCount, 0);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, 9, ProjectiveLightConstantBuffer);
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ProjectiveLightConstantBuffer);
+		Context->SetRenderState(PerSample ? ProjectiveLightRenderStatePerSample : ProjectiveLightRenderState);
+		
+		ze_for_each(ProjectiveLight, ProjectiveLights)
+		{
+			ProjectiveLightConstantBuffer->SetData(&ProjectiveLight.GetItem());
+			Context->SetTexture(ZEGR_ST_PIXEL, 10, ProjectiveLightTextures[ProjectiveLight.GetIndex()]);
+			Context->Draw(18, 4542);
+		}
+
+		//Context->SetRenderState(PerSample ? DeferredProjectiveLightRenderStatePerSample : DeferredProjectiveLightRenderState);
+		//Context->DrawInstanced(18, 4542, Constants.ProjectiveLightCount, 0);
 	}
 
 	if (Constants.DirectionalLightCount > 0)
@@ -638,8 +683,8 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	const ZEGRTexture* GBuffers[] = {GBufferEmissive, GBufferDiffuse, GBufferNormal, DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, GBuffers);
 
-	const ZEGRTexture* InputTextures[] = {ProjectiveLightTexture, DirectionalLightShadowMap, ProjectiveShadowMaps, RandomVectorsTexture};
-	Context->SetTextures(ZEGR_ST_PIXEL, 10, 4, InputTextures);
+	const ZEGRTexture* InputTextures[] = {DirectionalLightShadowMap, ProjectiveShadowMaps, RandomVectorsTexture};
+	Context->SetTextures(ZEGR_ST_PIXEL, 11, 3, InputTextures);
 
 	ZERNStage* StageGBuffer = GetRenderer()->GetStage(ZERN_STAGE_GBUFFER);
 	if (StageGBuffer == NULL || !StageGBuffer->GetEnabled() || StageGBuffer->GetCommands().GetCount() == 0)
@@ -694,6 +739,8 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 
 void ZERNStageLighting::CleanUp(ZEGRContext* Context)
 {
+	ProjectiveLightTextures.Clear();
+
 	ZERNStage::CleanUp(Context);
 }
 
@@ -710,7 +757,6 @@ ZERNStageLighting::ZERNStageLighting()
 	memset(&Constants, 0, sizeof(Constants));
 
 	DirectionalLightShadowMap = NULL;
-	ProjectiveLightTexture = NULL;
 
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBufferEmissive), "GBuffer1", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBufferDiffuse), "GBuffer2", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);

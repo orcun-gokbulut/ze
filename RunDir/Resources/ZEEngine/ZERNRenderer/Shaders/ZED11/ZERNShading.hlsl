@@ -131,6 +131,11 @@ cbuffer	ZERNShading_Constants																	: register(b8)
 	float3										ZERNShading_Reserved;
 };
 
+cbuffer ZERNShading_ProjectiveLight_Constants													: register(b9)
+{
+	ZERNShading_ProjectiveLight					ZERNShading_ProjectiveLightConstant;
+};
+
 Texture2D<float4>								ZERNShading_ProjectionTexture					: register(t10);
 Texture2DArray<float>							ZERNShading_CascadeShadowMaps					: register(t11);
 Texture2DArray<float>							ZERNShading_ProjectiveShadowMaps				: register(t12);
