@@ -281,7 +281,7 @@ bool ZERayCastReport::CheckDistance(float Distance) const
 
 bool ZERayCastReport::CheckDone() const
 {
-	return (!Parameters->Components.GetFlags(ZE_RCRE_MULTI_COLLISIONS) && Collision.Type != ZE_RCCT_NONE && Collision.Type != ZE_RCM_FIRST);
+	return (!Parameters->Components.GetFlags(ZE_RCRE_MULTI_COLLISIONS) && Collision.Type != ZE_RCCT_NONE && Parameters->Match == ZE_RCM_FIRST);
 }
 
 
