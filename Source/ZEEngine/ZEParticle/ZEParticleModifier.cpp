@@ -189,13 +189,13 @@ void ZEParticlePhysicsModifier::Tick(float ElapsedTime)
 			case ZE_PAS_NEW:
 				if (IsRadialMovement)
 				{
-					Particles[I].Velocity = ((Particles[I].Position - EmitterWorldPosition).Normalize()) * ZERandom::GetFloatRange(MinRadialSpeed, MaxRadialSpeed);
+					Particles[I].InitialVelocity = ((Particles[I].Position - EmitterWorldPosition).Normalize()) * ZERandom::GetFloatRange(MinRadialSpeed, MaxRadialSpeed);
 				
 					if (EmitterType == ZE_PET_TORUS)
 					{
-						Particles[I].Velocity.x -= ZEMath::Abs(EmitterUp.x) * Particles[I].Velocity.x;
-						Particles[I].Velocity.y -= ZEMath::Abs(EmitterUp.y) * Particles[I].Velocity.y;
-						Particles[I].Velocity.z -= ZEMath::Abs(EmitterUp.z) * Particles[I].Velocity.z;
+						Particles[I].InitialVelocity.x -= ZEMath::Abs(EmitterUp.x) * Particles[I].InitialVelocity.x;
+						Particles[I].InitialVelocity.y -= ZEMath::Abs(EmitterUp.y) * Particles[I].InitialVelocity.y;
+						Particles[I].InitialVelocity.z -= ZEMath::Abs(EmitterUp.z) * Particles[I].InitialVelocity.z;
 					}
 				}
 				else

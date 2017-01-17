@@ -90,6 +90,9 @@ ZEEntityResult ZEParticleEffect::UnloadInternal()
 
 ZEParticleEffect::ZEParticleEffect()
 {
+	EffectState = ZE_PES_STOPPED;
+	AutoStart = false;
+
 	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
 }
 
@@ -127,6 +130,9 @@ void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 
 void ZEParticleEffect::SetAutoStart(bool Enabled)
 {
+	if (AutoStart == Enabled)
+		return;
+
 	AutoStart = Enabled;
 	
 	if (IsLoaded())
