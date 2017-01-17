@@ -235,7 +235,7 @@ void ZERNRenderer::RenderStages()
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;
-
+	Parameters.Type = (GetStage(ZERN_STAGE_SHADOW_MAP_GENERATION) != NULL) ? ZERN_RT_SHADOW : ZERN_RT_COLOR;
 	UpdateConstantBuffers();
 
 	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
@@ -513,13 +513,30 @@ void ZERNRenderer::BindStages()
 					{
 						if (NextStageInputResource->Name == OutputResource->Name)
 						{
-							if (NextStageInputResource->Usage == ZERN_SRUT_READ)
+							if (NextStageInputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
 							{
 								Stage->CreateOutput(OutputResource->Name);
 								Valid = true;
-							}
 
-							break;
+								break;
+							}
+						}
+					}
+
+					if (!Valid)
+					{
+						ze_for_each(NextStageOutputResource, NextStage->OutputResources)
+						{
+							if (NextStageOutputResource->Name == OutputResource->Name)
+							{
+								if (NextStageOutputResource->Usage == ZERN_SRUT_READ_WRITE && NextStageOutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
+								{
+									Stage->CreateOutput(OutputResource->Name);
+									Valid = true;
+									
+									break;
+								}
+							}
 						}
 					}
 

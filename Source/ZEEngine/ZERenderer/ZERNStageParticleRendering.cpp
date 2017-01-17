@@ -71,7 +71,7 @@ void ZERNStageParticleRendering::CreateOutput(const ZEString& Name)
 
 	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_SPDF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_SPDF_OUTPUT) || AccumulationTexture == GetRenderer()->GetOutputTexture())
 		{
 			AccumulationTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SPDF_OUTPUT);

@@ -134,8 +134,8 @@ bool ZEATMoon::CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutV
 	float MoonPositionScreenX = (MoonDirectionView.x * View.ProjectionTransform.M11 + MoonDirectionView.z * View.ProjectionTransform.M13) / MoonDirectionView.z;
 	float MoonPositionScreenY = (MoonDirectionView.y * View.ProjectionTransform.M22 + MoonDirectionView.z * View.ProjectionTransform.M23) / MoonDirectionView.z;
 
-	if (MoonPositionScreenX >= -1.0f && MoonPositionScreenX <= 1.0f &&
-		MoonPositionScreenY >= -1.0f && MoonPositionScreenY <= 1.0f &&
+	if (//MoonPositionScreenX >= -1.0f && MoonPositionScreenX <= 1.0f &&
+		//MoonPositionScreenY >= -1.0f && MoonPositionScreenY <= 1.0f &&
 		ZEVector3::DotProduct(View.N, Direction) > 0.0f)
 	{
 		OutVector.x = MoonPositionScreenX;

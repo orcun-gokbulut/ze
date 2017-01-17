@@ -53,7 +53,8 @@
 ZEGRVertexLayout ZEInteriorVertex::VertexLayout;
 ZEGRVertexLayout* ZEInteriorVertex::GetVertexLayout()
 {
-
+	static ZELock Lock;
+	Lock.Lock();
 	if (VertexLayout.GetElementCount() == 0)
 	{
 		ZEGRVertexElement ElementArray[] = 
@@ -67,6 +68,7 @@ ZEGRVertexLayout* ZEInteriorVertex::GetVertexLayout()
 
 		VertexLayout.SetElements(ElementArray, 5);
 	}
+	Lock.Unlock();
 
 	return &VertexLayout;
 }

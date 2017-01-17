@@ -335,7 +335,7 @@ float4 ZERNHDR_ToneMapping_PixelShader(float4 PositionViewport : SV_Position, fl
 
 	float Luminance = ZERNHDR_Calculate_Luminance(PixelColor);
 	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
-	ResultColor = ZERNHDR_ToneMap(PixelColor, Luminance, ScaledLuminance);
+	ResultColor += ZERNHDR_ToneMap(PixelColor, Luminance, ScaledLuminance);
 	
 	if (ZERNHDR_BloomEnabled)
 		ResultColor += ZERNHDR_BloomFactor * ZERNHDR_BloomTexture.Sample(ZERNSampler_LinearBorderZero, TexCoord);

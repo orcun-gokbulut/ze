@@ -62,7 +62,6 @@ struct ZEInteriorTransformConstants
 {
 	ZEMatrix4x4	WorldTransform;
 	ZEMatrix4x4	WorldTransformInverseTranspose;
-	ZEMatrix4x4	PreSkinTransform;
 	ZEVector4	ClippingPlane0;
 	ZEVector4	ClippingPlane1;
 	ZEVector4	ClippingPlane2;
@@ -278,6 +277,64 @@ void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 }
 
 template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
+static void VerifyVertexNormals(const ZEVertexTypeV1& InputVertex, const ZEVertexTypeV2& OutputVertex, ZESize Index)
+{
+	// Regenerated Normal
+	ZEVector3 RegeneratedNormal;
+	RegeneratedNormal.x = (float)OutputVertex.Normal.M[0] / (float)0x7FFF;
+	RegeneratedNormal.y = (float)OutputVertex.Normal.M[1] / (float)0x7FFF;
+	float NormalSign = (2.0f * (OutputVertex.Normal.M[0] & 0x0001) - 1.0f);
+	RegeneratedNormal.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedNormal.x * RegeneratedNormal.x - RegeneratedNormal.y * RegeneratedNormal.y)) * NormalSign;
+	RegeneratedNormal.NormalizeSelf();	
+	if (!RegeneratedNormal.IsValid())
+		zeWarning("Validation check failed. Regenerated normal is not valid. Index: %u.", Index);
+
+	float ErrorNormal = (RegeneratedNormal - InputVertex.Normal).Abs().Max();
+	if (ErrorNormal >= 0.02f)
+		zeWarning("Validation check failed. Regenerated normal is not equals to original normal. Index: %u, Error: %f.", Index, ErrorNormal);
+
+	// Regenerated Tangent
+	ZEVector3 RegeneratedTangent;
+	RegeneratedTangent.x = (float)OutputVertex.Tangent.M[0] / (float)0x7FFF;
+	RegeneratedTangent.y = (float)OutputVertex.Tangent.M[1] / (float)0x7FFF;
+	float TangentSign = (2.0f * (OutputVertex.Tangent.M[0] & 0x0001) - 1.0f);
+	RegeneratedTangent.z = ZEMath::Sqrt(ZEMath::Saturate(1.0f - RegeneratedTangent.x * RegeneratedTangent.x - RegeneratedTangent.y * RegeneratedTangent.y)) * TangentSign;
+	RegeneratedTangent.NormalizeSelf();
+	if (!RegeneratedTangent.IsValid())
+		zeWarning("Validation check failed. Regenerated tangent is not valid. Index: %u.", Index);
+
+	float ErrorTangent = (RegeneratedTangent - InputVertex.Tangent).Abs().Max();
+	if (ErrorTangent >= 0.02f)
+		zeWarning("Validation check failed. Regenerated tangent is not equals to original tangent. Index: %u, Error: %f.", Index, ErrorTangent);
+
+
+	// Calculated Binormal
+	float BinormalDirection = (2.0f * (OutputVertex.Tangent.M[1] & 0x0001) - 1.0f);
+	ZEVector3 CalculatedBinormal;
+	ZEVector3::CrossProduct(CalculatedBinormal, InputVertex.Tangent, InputVertex.Normal);
+	CalculatedBinormal *= BinormalDirection;
+	CalculatedBinormal.NormalizeSelf();
+	if (!CalculatedBinormal.IsValid())
+		zeWarning("Validation check failed. Calculated binormal is not valid. Index: %u.", Index);
+
+	float ErrorCalculatedBinormal = (InputVertex.Binormal - CalculatedBinormal).Abs().Sum();
+	if (ErrorCalculatedBinormal >= 0.2f)
+		zeWarning("Validation check failed. Calculated binormal is not equals to original binormal. Index: %u, Error: %f.", Index, ErrorCalculatedBinormal);
+
+
+	// Regenerated Binormal
+	ZEVector3 RegeneratedBinormal;
+	ZEVector3::CrossProduct(RegeneratedBinormal, RegeneratedTangent, RegeneratedNormal);
+	RegeneratedBinormal = RegeneratedBinormal.Normalize() * BinormalDirection;
+	if (!RegeneratedBinormal.IsValid())
+		zeWarning("Validation check failed. Regenerated binormal is not valid. Index: %u.", Index);
+
+	float ErrorBinormal = (RegeneratedBinormal - CalculatedBinormal).Abs().Max();
+	if (ErrorBinormal >= 0.05f)
+		zeWarning("Validation check failed. Regenerated binormal is not equals to calculated binormal. Index: %u, Error: %f.", Index, ErrorNormal);
+}
+
+template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
 static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex)
 {
 	const ZEVector3& Normal = InputVertex.Normal;
@@ -301,6 +358,9 @@ static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexType
 	ZEVector3 CalculatedBinormal;
 	ZEVector3::CrossProduct(CalculatedBinormal, Tangent, Normal);
 	CalculatedBinormal.NormalizeSelf();
+	if (!CalculatedBinormal.IsValid())
+		zeError("Calculated normal is not valid.");
+
 	if (ZEVector3::DotProduct(CalculatedBinormal, Binormal) < 0.0f) // Mirrored
 	{
 		CalculatedBinormal *= -1.0f;
@@ -310,6 +370,8 @@ static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexType
 	{
 		OutputVertex.Tangent.M[1] |= 0x0001;
 	}
+
+	return;
 }
 
 bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
@@ -329,7 +391,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	Processed.SetCount(PolygonCount);
 	Processed.Fill(false);
 
-	ZEArray<ZEMDVertex> Vertices;
+	ZEArray<ZEInteriorVertex> Vertices;
 	Vertices.SetCount(PolygonCount * 3);
 
 	ZESize CurrentVertexIndex = 0;
@@ -347,19 +409,34 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 					continue;
 
 				Vertices[CurrentVertexIndex].Position = Resource->Polygons[I].Vertices[0].Position;
-				Vertices[CurrentVertexIndex].Reserved0 = 1.0;
-				Vertices[CurrentVertexIndex].Texcoords = Resource->Polygons[I].Vertices[0].Texcoord;
-				ConvertVertexNormals(Resource->Polygons[I].Vertices[0], Vertices[CurrentVertexIndex]);
+				Vertices[CurrentVertexIndex].Normal = Resource->Polygons[I].Vertices[0].Normal;
+				Vertices[CurrentVertexIndex].Tangent = Resource->Polygons[I].Vertices[0].Tangent;
+				Vertices[CurrentVertexIndex].Binormal = Resource->Polygons[I].Vertices[0].Binormal;
+				Vertices[CurrentVertexIndex].Texcoord = Resource->Polygons[I].Vertices[0].Texcoord;
+				//Vertices[CurrentVertexIndex].Reserved0 = 1.0f;
+				//Vertices[CurrentVertexIndex].Texcoords = Resource->Polygons[I].Vertices[0].Texcoord;
+				//ConvertVertexNormals(Resource->Polygons[I].Vertices[0], Vertices[CurrentVertexIndex]);
+				//VerifyVertexNormals(Resource->Polygons[I].Vertices[0], Vertices[CurrentVertexIndex], I);
 
 				Vertices[CurrentVertexIndex + 1].Position = Resource->Polygons[I].Vertices[1].Position;
-				Vertices[CurrentVertexIndex + 1].Reserved0 = 1.0;
-				Vertices[CurrentVertexIndex + 1].Texcoords = Resource->Polygons[I].Vertices[1].Texcoord;
-				ConvertVertexNormals(Resource->Polygons[I].Vertices[1], Vertices[CurrentVertexIndex + 1]);
+				Vertices[CurrentVertexIndex + 1].Normal = Resource->Polygons[I].Vertices[1].Normal;
+				Vertices[CurrentVertexIndex + 1].Tangent = Resource->Polygons[I].Vertices[1].Tangent;
+				Vertices[CurrentVertexIndex + 1].Binormal = Resource->Polygons[I].Vertices[1].Binormal;
+				Vertices[CurrentVertexIndex + 1].Texcoord = Resource->Polygons[I].Vertices[1].Texcoord;
+				//Vertices[CurrentVertexIndex + 1].Reserved0 = 1.0f;
+				//Vertices[CurrentVertexIndex + 1].Texcoords = Resource->Polygons[I].Vertices[1].Texcoord;
+				//ConvertVertexNormals(Resource->Polygons[I].Vertices[1], Vertices[CurrentVertexIndex + 1]);
+				//VerifyVertexNormals(Resource->Polygons[I].Vertices[1], Vertices[CurrentVertexIndex + 1], I);
 
 				Vertices[CurrentVertexIndex + 2].Position = Resource->Polygons[I].Vertices[2].Position;
-				Vertices[CurrentVertexIndex + 2].Reserved0 = 1.0;
-				Vertices[CurrentVertexIndex + 2].Texcoords = Resource->Polygons[I].Vertices[2].Texcoord;
-				ConvertVertexNormals(Resource->Polygons[I].Vertices[2], Vertices[CurrentVertexIndex + 2]);
+				Vertices[CurrentVertexIndex + 2].Normal = Resource->Polygons[I].Vertices[2].Normal;
+				Vertices[CurrentVertexIndex + 2].Tangent = Resource->Polygons[I].Vertices[2].Tangent;
+				Vertices[CurrentVertexIndex + 2].Binormal = Resource->Polygons[I].Vertices[2].Binormal;
+				Vertices[CurrentVertexIndex + 2].Texcoord = Resource->Polygons[I].Vertices[2].Texcoord;
+				//Vertices[CurrentVertexIndex + 2].Reserved0 = 1.0f;
+				//Vertices[CurrentVertexIndex + 2].Texcoords = Resource->Polygons[I].Vertices[2].Texcoord;
+				//ConvertVertexNormals(Resource->Polygons[I].Vertices[2], Vertices[CurrentVertexIndex + 2]);
+				//VerifyVertexNormals(Resource->Polygons[I].Vertices[2], Vertices[CurrentVertexIndex + 2], I);
 
 				CurrentVertexIndex += 3;
 				Processed[I] = true;
@@ -374,12 +451,12 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		}
 	}
 
-	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEMDVertex), sizeof(ZEMDVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray());
+	VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEInteriorVertex), sizeof(ZEInteriorVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray());
 
 	ZESize DrawCount = Draws.GetCount();
 	for (ZESize I = 0; I < DrawCount; I++)
 	{
-		Draws[I].RenderCommand.Entity = NULL;
+		Draws[I].RenderCommand.Entity = GetOwner();
 		Draws[I].RenderCommand.Order = 0;
 		Draws[I].RenderCommand.Priority = 0;
 		Draws[I].RenderCommand.ExtraParameters = &Draws[I];

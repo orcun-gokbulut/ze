@@ -761,7 +761,7 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 		ZELightDirectional* SunLight = GetSunLight();
 		ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
-		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 3.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 3.0f;
+		float SunIntensity = (CosSunZenith <= 0.0f) ? ZEMath::Lerp(0.2f, 2.0f, ZEMath::Max(0.0f, CosSunZenith + 0.31f) / 0.31f) : 2.0f;
 
 		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * SunIntensity;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;

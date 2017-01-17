@@ -75,8 +75,12 @@ class ZERNStandardMaterial : public ZERNMaterial
 	friend class ZERSTemplates;
 	private:
 		ZEUInt											StageMask;
-		ZEFlags											DirtyFlags;
+		mutable ZEFlags									DirtyFlags;
 		
+		ZEHolder<ZEGRShader>							StageGBuffer_Forward_Interior_VertexShader;
+		ZEHolder<ZEGRShader>							StageShadowmapGeneration_Interior_VertexShader;
+		ZEHolder<ZEGRShader>							StageRenderDepth_Interior_VertexShader;
+
 		ZEHolder<ZEGRShader>							StageGBuffer_Forward_VertexShader;
 		ZEHolder<ZEGRShader>							StageGBuffer_Forward_PixelShader;
 		ZEHolder<ZEGRRenderStateData>					StageGBuffer_Forward_RenderState;
@@ -115,6 +119,8 @@ class ZERNStandardMaterial : public ZERNMaterial
 		ZEHolder<const ZEGRTexture>						DetailBaseMap;
 		ZEHolder<const ZEGRTexture>						DetailNormalMap;
 		
+		mutable bool									UseInteriorVertexLayout;
+
 		mutable struct
 		{
 			ZEVector3									AmbientColor;
