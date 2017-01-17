@@ -174,7 +174,7 @@ float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_In
 			discard;
 		
 		float DepthNormalized = saturate(DistanceDepth / ZERNParticleMaterial_DistanceMax);
-		Alpha = pow(DepthNormalized, ZERNParticleMaterial_ContrastPower);
+		Alpha *= pow(DepthNormalized, ZERNParticleMaterial_ContrastPower);
 	}
 	
 	return float4(AmbientColor + EmissiveColor + DiffuseColor, Alpha);

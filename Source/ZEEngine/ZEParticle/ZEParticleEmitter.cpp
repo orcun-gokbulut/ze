@@ -739,11 +739,14 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	}
 	InstanceBuffer->Unmap();
 
-	const ZEGRBuffer* ConstantBuffers[] = {ConstantBuffer, InstanceBuffer};
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 2, ConstantBuffers);
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthTexture);
+	if (RenderedParticleCount > 0)
+	{
+		const ZEGRBuffer* ConstantBuffers[] = {ConstantBuffer, InstanceBuffer};
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 2, ConstantBuffers);
+		Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthTexture);
 
-	Context->DrawInstanced(4, 0, RenderedParticleCount, 0);
+		Context->DrawInstanced(4, 0, RenderedParticleCount, 0);
+	}
 
 	Material->CleanupMaterial(Context, Stage);
 }

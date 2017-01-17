@@ -328,6 +328,7 @@ void ZERNParticleMaterial::SetDiffuseMapFileName(const ZEString& FileName)
 	{
 		ZEGRTextureOptions Options;
 		Options.Type = ZEGR_TT_2D;
+		Options.sRGB = true;
 
 		UnregisterExternalResource(DiffuseMap);
 		DiffuseMap = ZEGRTexture::LoadResourceShared(DiffuseMapFileName, Options);
@@ -368,6 +369,7 @@ void ZERNParticleMaterial::SetEmissiveMapFileName(const ZEString& FileName)
 	{
 		ZEGRTextureOptions Options;
 		Options.Type = ZEGR_TT_2D;
+		Options.sRGB = true;
 
 		UnregisterExternalResource(EmissiveMap);
 		EmissiveMap = ZEGRTexture::LoadResourceShared(EmissiveMapFileName, Options);
@@ -448,6 +450,7 @@ void ZERNParticleMaterial::SetOpacityMapFileName(const ZEString& FileName)
 	{
 		ZEGRTextureOptions Options;
 		Options.Type = ZEGR_TT_2D;
+		Options.sRGB = true;
 
 		UnregisterExternalResource(OpacityMap);
 		OpacityMap = ZEGRTexture::LoadResourceShared(OpacityMapFileName, Options);
