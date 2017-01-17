@@ -318,7 +318,7 @@ void ZERNStageHDR::CreateOutput(const ZEString& Name)
 {
 	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_SHDF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_SHDF_OUTPUT) || OutputColorTexture == GetRenderer()->GetOutputTexture())
 		{
 			OutputColorTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, InputColorTexture->GetWidth(), InputColorTexture->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_SHDF_OUTPUT);

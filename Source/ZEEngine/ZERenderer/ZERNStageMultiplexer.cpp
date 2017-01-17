@@ -181,9 +181,9 @@ void ZERNStageMultiplexer::CreateOutput(const ZEString& Name)
 	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
-	if (Name == "Color")
+	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_SMDF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_SMDF_OUTPUT) || OutputTexture == GetRenderer()->GetOutputTexture())
 		{
 			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 			DirtyFlags.UnraiseFlags(ZERN_SMDF_OUTPUT);
@@ -301,7 +301,7 @@ ZERNStageMultiplexer::ZERNStageMultiplexer()
 
 	OutputRenderTarget = NULL;
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "Color", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }
 
 ZERNStageMultiplexer::~ZERNStageMultiplexer()

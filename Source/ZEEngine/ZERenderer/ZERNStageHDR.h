@@ -115,7 +115,7 @@ class ZERNStageHDR : public ZERNStage
 			float							LuminanceMin;
 			float							LuminanceMax;
 			float							Reserved1;
-			float							wwReserved2;
+			float							Reserved2;
 		} Constants;
 
 		virtual bool						InitializeInternal();

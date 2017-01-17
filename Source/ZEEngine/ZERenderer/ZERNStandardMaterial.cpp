@@ -58,6 +58,8 @@
 #include "ZERNStageRenderDepth.h"
 #include "ZEResource/ZERSTemplates.h"
 #include "ZEModel/ZEMDVertex.h"
+#include "ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInteriorResource.h"
 
 #define ZERN_FMDF_CONSTANT_BUFFER		1
 #define ZERN_FMDF_RENDER_STATE			2
@@ -161,10 +163,22 @@ bool ZERNStandardMaterial::UpdateShaders()
 
 	UpdateGBufferForwardVertexShaderDefinitions(Options);
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
-	StageGBuffer_Forward_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageGBuffer_Forward_VertexShader == NULL, false, "Cannot set vertex shader.");
+	if (UseInteriorVertexLayout)
+	{
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
+		StageGBuffer_Forward_Interior_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageGBuffer_Forward_Interior_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
+	else
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_MODEL"));
+
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_VertexShader";
+		StageGBuffer_Forward_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageGBuffer_Forward_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
 
 	if (!SkinningEnabled)
 	{
@@ -179,17 +193,41 @@ bool ZERNStandardMaterial::UpdateShaders()
 	Options.Definitions.Clear();
 	UpdateShadowMapGenerationVertexShaderDefinitions(Options);
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
-	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
+	if (UseInteriorVertexLayout)
+	{
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageShadowmapGeneration_Interior_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageShadowmapGeneration_Interior_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
+	else
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_MODEL"));
+
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
 
 	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEPTH_PREPASS"));
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
-	StageRenderDepth_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageRenderDepth_VertexShader == NULL, false, "Cannot set vertex shader.");
+	if (UseInteriorVertexLayout)
+	{
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageRenderDepth_Interior_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageRenderDepth_Interior_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
+	else
+	{
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_MODEL"));
+
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
+		StageRenderDepth_VertexShader = ZEGRShader::Compile(Options);
+		zeCheckError(StageRenderDepth_VertexShader == NULL, false, "Cannot set vertex shader.");
+	}
 
 	Options.Definitions.Remove(Options.Definitions.GetCount() - 1);
 
@@ -275,6 +313,8 @@ bool ZERNStandardMaterial::UpdateRenderState()
 
 	if (SkinningEnabled)
 		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
+	else if (UseInteriorVertexLayout)
+		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
@@ -283,7 +323,11 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : RasterizerState.GetFillMode());
 	RenderState.SetRasterizerState(RasterizerState);
 	
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_VertexShader);
+	if (UseInteriorVertexLayout)
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_Interior_VertexShader);
+	else
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_VertexShader);
+
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_Forward_PixelShader);
 
 	if (TransparencyEnabled && TransparencyMode == ZERN_TM_ADDITIVE)
@@ -314,11 +358,18 @@ bool ZERNStandardMaterial::UpdateRenderState()
 
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
+
+	if (UseInteriorVertexLayout)
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_Interior_VertexShader);
+	else
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
+
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
 
 	if (SkinningEnabled)
 		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
+	else if (UseInteriorVertexLayout)
+		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
@@ -337,8 +388,15 @@ bool ZERNStandardMaterial::UpdateRenderState()
 		StageShadowmapGeneration_Instancing_RenderState = RenderState.Compile();
 		zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
 	}
+	
+	if (UseInteriorVertexLayout)
+		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_VertexShader);
+	if (UseInteriorVertexLayout)
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_Interior_VertexShader);
+	else
+		RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_VertexShader);
+
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageRenderDepth_PixelShader);
 
 	StageRenderDepth_RenderState = RenderState.Compile();
@@ -385,7 +443,7 @@ bool ZERNStandardMaterial::UpdateConstantBuffer()
 	Constants.ReflectionColor = (ReflectionEnabled ? 1.0f : 0.0f) * ReflectionFactor * ReflectionColor;
 	Constants.RefractionColor = (RefractionEnabled ? 1.0f : 0.0f) * RefractionFactor * RefractionColor;
 
-	Constants.AlphaCullLimit = 0.1f;
+	//Constants.AlphaCullLimit = 0.1f;
 
 	ConstantBuffer->SetData(&Constants);
 
@@ -459,6 +517,10 @@ ZETaskResult ZERNStandardMaterial::UnloadInternal()
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
 
+	StageGBuffer_Forward_Interior_VertexShader.Release();
+	StageShadowmapGeneration_Interior_VertexShader.Release();
+	StageRenderDepth_Interior_VertexShader.Release();
+
 	StageGBuffer_Forward_VertexShader.Release();
 	StageGBuffer_Forward_PixelShader.Release();
 	StageGBuffer_Forward_RenderState.Release();
@@ -486,6 +548,8 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 {
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
+
+	UseInteriorVertexLayout = false;
 
 	ShadowCaster = true;
 	TwoSided = false;
@@ -1927,6 +1991,14 @@ bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 	if (GetTransparencyEnabled())
 		Command.Order = -Command.Order;
 
+	if (Command.Entity->GetClass() == ZEInterior::Class())
+	{
+		if (!UseInteriorVertexLayout)
+		{
+			UseInteriorVertexLayout = true;
+			DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
+		}
+	}
 	return true;
 }
 

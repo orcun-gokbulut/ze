@@ -58,9 +58,9 @@ void ZERNStage2D::CreateOutput(const ZEString& Name)
 	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
 	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 	
-	if (Name == "Color")
+	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_2DDF_OUTPUT))
+		if (DirtyFlags.GetFlags(ZERN_2DDF_OUTPUT) || OutputTexture == GetRenderer()->GetOutputTexture())
 		{
 			OutputTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
 			DirtyFlags.UnraiseFlags(ZERN_2DDF_OUTPUT);

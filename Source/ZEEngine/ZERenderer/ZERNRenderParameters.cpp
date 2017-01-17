@@ -73,6 +73,7 @@ ZERNRenderParameters::ZERNRenderParameters()
 	ElapsedTime = 0.0f;
 	Time = 0.0f;
 	Context = NULL;
+	Type = ZERN_RT_COLOR;
 	View = NULL;
 	Renderer = NULL;
 	Stage = NULL;

@@ -134,8 +134,8 @@ bool ZEATSun::CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVec
 	float SunPositionScreenX = (SunDirectionView.x * View.ProjectionTransform.M11 + SunDirectionView.z * View.ProjectionTransform.M13) / SunDirectionView.z;
 	float SunPositionScreenY = (SunDirectionView.y * View.ProjectionTransform.M22 + SunDirectionView.z * View.ProjectionTransform.M23) / SunDirectionView.z;
 
-	if (SunPositionScreenX >= -1.0f && SunPositionScreenX <= 1.0f &&
-		SunPositionScreenY >= -1.0f && SunPositionScreenY <= 1.0f &&
+	if (//SunPositionScreenX >= -1.0f && SunPositionScreenX <= 1.0f &&
+		//SunPositionScreenY >= -1.0f && SunPositionScreenY <= 1.0f &&
 		ZEVector3::DotProduct(View.N, Direction) > 0.0f)
 	{
 		OutVector.x = SunPositionScreenX;
