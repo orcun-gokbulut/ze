@@ -59,6 +59,15 @@ void ZEGRShader::Deinitialize()
 	SetSize(0);
 }
 
+void ZEGRShader::PreDestroy()
+{
+	ShaderCache.LockWrite();
+	{
+		ShaderCache.Remove(&ShaderCacheLink);
+	}
+	ShaderCache.UnlockWrite();
+}
+
 ZEGRShader::ZEGRShader() : ShaderCacheLink(this)
 {
 	ShaderType = ZEGR_ST_NONE;
@@ -70,8 +79,6 @@ ZEGRShader::ZEGRShader() : ShaderCacheLink(this)
 ZEGRShader::~ZEGRShader()
 {
 	Unregister();
-
-	ShaderCache.Remove(&ShaderCacheLink);
 }
 
 ZEGRResourceType ZEGRShader::GetResourceType() const
