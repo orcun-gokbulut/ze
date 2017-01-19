@@ -39,28 +39,13 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
-
-cbuffer ZERNFog_Constants	: register(b9)
-{
-	float	ZERNFog_Density;
-	float	ZERNFog_StartDistance;
-	float2	ZERNFog_Reserved0;
-	
-	float3	ZERNFog_Color;
-	float	ZERNFog_Reserved1;
-};
+#include "ZERNShading.hlsl"
 
 float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
 	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy));
-	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	
-	float Distance = distance(ZERNView_Position, PositionWorld);
-	
-	float Value = max(0.0f, Distance - ZERNFog_StartDistance) * ZERNFog_Density;
-	float FogFactor = exp(-Value * Value);
-
-	return float4(ZERNFog_Color, FogFactor);
+	return ZERNShading_CalculateFogColor(PositionView);
 }
 
 #endif

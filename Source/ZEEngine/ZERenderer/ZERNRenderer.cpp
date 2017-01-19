@@ -504,44 +504,52 @@ void ZERNRenderer::BindStages()
 
 			if (!Valid && OutputResource->CreationFlags.GetFlags(ZERN_SRCF_CREATE_OWN))
 			{
-				for (auto NextStage = Stages.GetIterator(Stage->Link.GetNext()); NextStage.IsValid(); ++NextStage)
+				if (OutputResource->CreationFlags.GetFlags(ZERN_SRCF_REQUIRED))
 				{
-					if (!NextStage->GetEnabled())
-						continue;
-
-					ze_for_each(NextStageInputResource, NextStage->InputResources)
+					Stage->CreateOutput(OutputResource->Name);
+					Valid = true;
+				}
+				else
+				{
+					for (auto NextStage = Stages.GetIterator(Stage->Link.GetNext()); NextStage.IsValid(); ++NextStage)
 					{
-						if (NextStageInputResource->Name == OutputResource->Name)
-						{
-							if (NextStageInputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
-							{
-								Stage->CreateOutput(OutputResource->Name);
-								Valid = true;
+						if (!NextStage->GetEnabled())
+							continue;
 
-								break;
-							}
-						}
-					}
-
-					if (!Valid)
-					{
-						ze_for_each(NextStageOutputResource, NextStage->OutputResources)
+						ze_for_each(NextStageInputResource, NextStage->InputResources)
 						{
-							if (NextStageOutputResource->Name == OutputResource->Name)
+							if (NextStageInputResource->Name == OutputResource->Name)
 							{
-								if (NextStageOutputResource->Usage == ZERN_SRUT_READ_WRITE && NextStageOutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
+								if (NextStageInputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
 								{
 									Stage->CreateOutput(OutputResource->Name);
 									Valid = true;
-									
+
 									break;
 								}
 							}
 						}
-					}
 
-					if (Valid)
-						break;
+						if (!Valid)
+						{
+							ze_for_each(NextStageOutputResource, NextStage->OutputResources)
+							{
+								if (NextStageOutputResource->Name == OutputResource->Name)
+								{
+									if (NextStageOutputResource->Usage == ZERN_SRUT_READ_WRITE && NextStageOutputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
+									{
+										Stage->CreateOutput(OutputResource->Name);
+										Valid = true;
+										
+										break;
+									}
+								}
+							}
+						}
+
+						if (Valid)
+							break;
+					}
 				}
 			}
 

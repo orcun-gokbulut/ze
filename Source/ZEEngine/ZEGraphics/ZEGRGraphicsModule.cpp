@@ -46,6 +46,8 @@ using namespace DirectX;
 
 ZEUInt ZEGRGraphicsModule::SAMPLE_COUNT = 4;
 
+static bool IsComInitialized = false;
+
 void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
 {
 	zeLog("%s", Message);
@@ -102,21 +104,20 @@ ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()
 bool ZEGRGraphicsModule::InitializeInternal()
 {
 	HRESULT HR = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	if (FAILED(HR))
+	if (HR != RPC_E_CHANGED_MODE)
 	{
-		zeError("CoInitializeEx failed. Result: 0x%X", HR);
-		return false;
-	}
+		IsComInitialized = true;
 
-	bool IsWic2 = false;
-	IWICImagingFactory* WICFactory = GetWICFactory(IsWic2);
-	if (WICFactory == NULL)
-	{
-		zeError("WIC Factory creation failed.");
-		return false;
-	}
+		bool IsWic2 = false;
+		IWICImagingFactory* WICFactory = GetWICFactory(IsWic2);
+		if (WICFactory == NULL)
+		{
+			zeError("WIC Factory creation failed.");
+			return false;
+		}
 
-	SetWICFactory(WICFactory);
+		SetWICFactory(WICFactory);
+	}
 
 	return ZEModule::InitializeInternal();
 }
@@ -126,7 +127,8 @@ bool ZEGRGraphicsModule::DeinitializeInternal()
 	extern ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
 	InstanceVertexBuffer.Release();
 	
-	CoUninitialize();
+	if (IsComInitialized)
+		CoUninitialize();
 
 	return ZEModule::DeinitializeInternal();
 }

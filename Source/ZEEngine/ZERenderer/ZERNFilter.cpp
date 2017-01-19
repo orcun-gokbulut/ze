@@ -38,6 +38,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
+#include "ZEGraphics/ZEGRFormat.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRTexture.h"
@@ -72,6 +73,8 @@ bool ZERNFilter::InitializeInternal()
 
 bool ZERNFilter::DeinitializeInternal()
 {
+	TempTextures.Clear();
+
 	DirtyFlags.RaiseAll();
 
 	ScreenCoverVertexShader.Release();
@@ -123,6 +126,23 @@ bool ZERNFilter::Update()
 		return false;
 
 	return true;
+}
+
+const ZEGRTexture* ZERNFilter::GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+{
+	ze_for_each(TempTexture, TempTextures)
+	{
+		ZEGRTexture* Texture = TempTexture->GetPointer();
+		if (Texture->GetWidth() != Width || Texture->GetHeight() != Height || Texture->GetFormat() != Format)
+			continue;
+
+		return Texture;
+	}
+
+	ZEHolder<ZEGRTexture> NewTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, Format);
+	TempTextures.Add(NewTexture);
+
+	return NewTexture;
 }
 
 void ZERNFilter::SetInputTexture(const ZEGRTexture* InputTexture)
@@ -210,7 +230,6 @@ bool ZERNFilterGaussianBlur::DeinitializeInternal()
 	BlurVerticalComputeRenderStateData.Release();
 
 	ConstantBuffer.Release();
-	TempTexture.Release();
 
 	return ZERNFilter::DeinitializeInternal();
 }
@@ -356,12 +375,9 @@ void ZERNFilterGaussianBlur::Apply(ZEGRContext* Context)
 	if (!Update())
 		return;
 
-	ZEUInt Width = InputTexture->GetWidth();
-	ZEUInt Height = InputTexture->GetHeight();
-
-	if (TempTexture == NULL || 
-		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
-		TempTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
+	const ZEGRTexture* TempTexture = GetTempTexture(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetFormat());
+	if (TempTexture == NULL)
+		return;
 
 	if (!UseComputeShader)
 	{
@@ -384,6 +400,8 @@ void ZERNFilterGaussianBlur::Apply(ZEGRContext* Context)
 	else
 	{
 		const ZEUInt GroupDimX = 320;
+		ZEUInt Width = InputTexture->GetWidth();
+		ZEUInt Height = InputTexture->GetHeight();
 
 		Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 9, ConstantBuffer);
 

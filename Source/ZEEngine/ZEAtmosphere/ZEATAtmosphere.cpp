@@ -532,7 +532,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 	Fog = ZEATFog::CreateInstance();
 	Fog->SetDensity(0.0f);
 	Fog->SetStartDistance(0.0f);
-	Fog->SetColor(ZEVector3(0.5f));
+	Fog->SetColor(ZEVector3(1.0f));
 	AddComponent(Fog);
 
 	Cloud = ZEATCloud::CreateInstance();

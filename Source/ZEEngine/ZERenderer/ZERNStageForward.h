@@ -61,6 +61,7 @@ class ZERNStageForward : public ZERNStage
 
 		ZEHolder<const ZEGRTexture>				DepthTexture;
 		ZEHolder<const ZEGRTexture>				AccumulationTexture;
+		ZEHolder<const ZEGRBuffer>				FogConstantBuffer;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();

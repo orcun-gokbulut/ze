@@ -54,11 +54,15 @@ class ZEGRBuffer;
 class ZEGRRenderStateData;
 class ZEGRComputeRenderStateData;
 class ZEGRRenderTarget;
+enum ZEGRFormat;
 
 class ZERNFilter : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStagePostProcess;
+	private:
+		ZEArray<ZEHolder<ZEGRTexture>>			TempTextures;
+
 	protected:
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
@@ -80,6 +84,8 @@ class ZERNFilter : public ZEObject, public ZEInitializable
 		virtual bool							UpdateConstantBuffers();
 
 		bool									Update();
+
+		const ZEGRTexture*						GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
 	public:
 		virtual void							SetInputTexture(const ZEGRTexture* InputTexture);
@@ -112,7 +118,6 @@ class ZERNFilterGaussianBlur : public ZERNFilter
 		ZEHolder<ZEGRComputeRenderStateData>	BlurVerticalComputeRenderStateData;
 
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;
-		ZEHolder<ZEGRTexture>					TempTexture;
 
 		bool									UseComputeShader;
 
