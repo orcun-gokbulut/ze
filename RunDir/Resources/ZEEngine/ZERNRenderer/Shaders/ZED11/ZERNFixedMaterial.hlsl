@@ -512,7 +512,12 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		//for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
 		//	ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
 		
-		Output.Color = float4(ResultColor + Surface.Ambient + Surface.Emissive, Surface.Opacity);
+		ResultColor += Surface.Ambient + Surface.Emissive;
+		
+		float4 FogColor = ZERNShading_CalculateFogColor(Surface.PositionView);
+		ResultColor = lerp(ResultColor, FogColor.rgb, FogColor.a);
+		
+		Output.Color = float4(ResultColor, Surface.Opacity);
 	#endif
 	
 	return Output;

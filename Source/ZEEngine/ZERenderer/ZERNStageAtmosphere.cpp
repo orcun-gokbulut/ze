@@ -35,15 +35,17 @@
 
 #include "ZERNStageAtmosphere.h"
 
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 
-#define ZERN_SADF_OUTPUT	1
+#define ZERN_SADF_OUTPUT_TEXTURE	1
+#define ZERN_SADF_CONSTANT_BUFFER	2
 
 bool ZERNStageAtmosphere::InitializeInternal()
 {
@@ -59,6 +61,7 @@ bool ZERNStageAtmosphere::DeinitializeInternal()
 
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
+	FogConstantBuffer = NULL;
 
 	return ZERNStage::DeinitializeInternal();
 }
@@ -70,10 +73,19 @@ void ZERNStageAtmosphere::CreateOutput(const ZEString& Name)
 
 	if (Name == "ColorTexture")
 	{
-		if (DirtyFlags.GetFlags(ZERN_SADF_OUTPUT) || AccumulationTexture == GetRenderer()->GetOutputTexture())
+		if (DirtyFlags.GetFlags(ZERN_SADF_OUTPUT_TEXTURE) || AccumulationTexture == GetRenderer()->GetOutputTexture())
 		{
 			AccumulationTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT).GetPointer();
-			DirtyFlags.UnraiseFlags(ZERN_SADF_OUTPUT);
+			DirtyFlags.UnraiseFlags(ZERN_SADF_OUTPUT_TEXTURE);
+		}
+	}
+	else if (Name == "FogConstantBuffer")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SADF_CONSTANT_BUFFER))
+		{
+			FogConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(FogConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+			FogConstantBuffer->SetData(&FogConstants);
+			DirtyFlags.UnraiseFlags(ZERN_SADF_CONSTANT_BUFFER);
 		}
 	}
 }
@@ -91,7 +103,7 @@ const ZEString& ZERNStageAtmosphere::GetName() const
 
 void ZERNStageAtmosphere::Resized(ZEUInt Width, ZEUInt Height)
 {
-	DirtyFlags.RaiseFlags(ZERN_SADF_OUTPUT);
+	DirtyFlags.RaiseFlags(ZERN_SADF_OUTPUT_TEXTURE);
 }
 
 bool ZERNStageAtmosphere::Setup(ZEGRContext* Context)
@@ -114,6 +126,7 @@ bool ZERNStageAtmosphere::Setup(ZEGRContext* Context)
 			return false;
 	}
 
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 10, FogConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthBufferReadonly);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
@@ -129,9 +142,14 @@ ZERNStageAtmosphere::ZERNStageAtmosphere()
 {
 	DirtyFlags.RaiseAll();
 
+	FogConstants.Density = 0.0f;
+	FogConstants.StartDistance = 0.0f;
+	FogConstants.Color = ZEVector3(1.0f);
+
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&FogConstantBuffer), "FogConstantBuffer", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
 }
 
 ZERNStageAtmosphere::~ZERNStageAtmosphere()

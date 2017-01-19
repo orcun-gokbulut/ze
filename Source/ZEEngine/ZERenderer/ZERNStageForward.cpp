@@ -79,6 +79,7 @@ bool ZERNStageForward::DeinitializeInternal()
 
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
+	FogConstantBuffer = NULL;
 
 	return ZERNStage::DeinitializeInternal();
 }
@@ -214,6 +215,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 		//Context->Dispatch(TileCountX, TileCountY, 1);
 
 		//Context->SetBuffer(ZEGR_ST_PIXEL, 16, TileLightStructuredBuffer);
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 10, FogConstantBuffer);
 		Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	}
 	else if (GetId() == ZERN_STAGE_FORWARD_POST_HDR)
@@ -236,6 +238,7 @@ ZERNStageForward::ZERNStageForward()
 	DirtyFlags.RaiseAll();
 
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&FogConstantBuffer), "FogConstantBuffer", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }

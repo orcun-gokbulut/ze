@@ -84,11 +84,17 @@ bool ZEATFog::UpdateRenderStates()
 	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
+	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
+	DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
+	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
+
+	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
+
 	ZEGRBlendState BlendStateAlphaBlend;
 	BlendStateAlphaBlend.SetBlendEnable(true);
 	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlend = BlendStateAlphaBlend.GetRenderTarget(0);
-	BlendRenderTargetAlphaBlend.SetSource(ZEGR_BO_INV_SRC_ALPHA);
-	BlendRenderTargetAlphaBlend.SetDestination(ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAlphaBlend.SetSource(ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAlphaBlend.SetDestination(ZEGR_BO_INV_SRC_ALPHA);
 	BlendRenderTargetAlphaBlend.SetOperation(ZEGR_BE_ADD);
 	BlendRenderTargetAlphaBlend.SetBlendEnable(true);
 	BlendStateAlphaBlend.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlend);
@@ -111,8 +117,11 @@ bool ZEATFog::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZEAT_FDF_CONSTANT_BUFFERS))
 		return true;
 
-	Constants.Density = ZEMath::Power(Density, 8.0f);
-	ConstantBuffer->SetData(&Constants);
+	if (ConstantBuffer != NULL)
+	{
+		Constants.Density = ZEMath::Power(Density, 8.0f);
+		ConstantBuffer->SetData(&Constants);
+	}
 
 	DirtyFlags.UnraiseFlags(ZEAT_FDF_CONSTANT_BUFFERS);
 
@@ -137,9 +146,6 @@ ZEEntityResult ZEATFog::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
-
 	if (!Update())
 		return ZE_ER_FAILED_CLEANUP;
 
@@ -151,7 +157,8 @@ ZEEntityResult ZEATFog::UnloadInternal()
 	ScreenCoverVertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
-	ConstantBuffer.Release();
+
+	ConstantBuffer = NULL;
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
@@ -165,7 +172,9 @@ ZEATFog::ZEATFog()
 	Command.Priority = 5;
 	Command.StageMask = ZERN_STAGE_ATMOSPHERE;
 
-	Constants.Density = 0.5f;
+	ConstantBuffer = NULL;
+
+	Constants.Density = 0.0f;
 	Constants.StartDistance = 0.0f;
 	Constants.Color = ZEVector3(0.5f);
 
@@ -234,18 +243,17 @@ bool ZEATFog::PreRender(const ZERNPreRenderParameters* Parameters)
 
 void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	if (!Update())
-		return;
-
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = static_cast<const ZEGRTexture*>(Stage->GetOutput("ColorTexture"))->GetRenderTarget();
+	ConstantBuffer = const_cast<ZEGRBuffer*>(static_cast<const ZEGRBuffer*>(Stage->GetOutput("FogConstantBuffer")));
+	if (ConstantBuffer == NULL)
+		return;
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
+	if (!Update())
+		return;
+
 	Context->SetRenderState(RenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	
 	Context->Draw(3, 0);
 }
 

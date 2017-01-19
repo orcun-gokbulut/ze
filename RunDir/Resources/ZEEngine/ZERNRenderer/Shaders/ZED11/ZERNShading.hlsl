@@ -136,6 +136,16 @@ cbuffer ZERNShading_ProjectiveLight_Constants													: register(b9)
 	ZERNShading_ProjectiveLight					ZERNShading_ProjectiveLightConstant;
 };
 
+cbuffer ZERNFog_Constants																		: register(b10)
+{
+	float										ZERNShading_FogDensity;
+	float										ZERNShading_FogStartDistance;
+	float2										ZERNShading_FogReserved0;
+	
+	float3										ZERNShading_FogColor;
+	float										ZERNShading_FogReserved1;
+};
+
 Texture2D<float4>								ZERNShading_ProjectionTexture					: register(t10);
 Texture2DArray<float>							ZERNShading_CascadeShadowMaps					: register(t11);
 Texture2DArray<float>							ZERNShading_ProjectiveShadowMaps				: register(t12);
@@ -164,6 +174,15 @@ static const float2 ZERNShading_PoissonDiskSamples[] =
 	float2(-0.8184632f, 0.431774f),
 	float2(0.8985078f, 0.4366908f)
 };
+
+float4 ZERNShading_CalculateFogColor(float3 PositionView)
+{
+	float Distance = length(PositionView);
+	float Value = max(0.0f, Distance - ZERNShading_FogStartDistance) * ZERNShading_FogDensity;
+	float FogFactor = exp(-Value * Value);
+
+	return float4(ZERNShading_FogColor, max(1.0f - FogFactor, 0.0f));
+}
 
 float ZERNShading_CalculateVisibility(uint SampleCount, float SampleLength, Texture2DArray<float> ShadowMap, uint ShadowMapIndex, float2 ShadowMapDimensions, float3 TexCoordDepth)
 {		

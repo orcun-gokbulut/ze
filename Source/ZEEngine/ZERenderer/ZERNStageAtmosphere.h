@@ -37,7 +37,10 @@
 
 #include "ZERNStage.h"
 
+#include "ZEMath/ZEVector.h"
+
 class ZEGRTexture;
+class ZEGRBuffer;
 
 class ZERNStageAtmosphere : public ZERNStage
 {
@@ -47,6 +50,18 @@ class ZERNStageAtmosphere : public ZERNStage
 
 		ZEHolder<const ZEGRTexture>		AccumulationTexture;
 		ZEHolder<const ZEGRTexture>		DepthTexture;
+
+		ZEHolder<ZEGRBuffer>			FogConstantBuffer;
+
+		struct 
+		{
+			float						Density;
+			float						StartDistance;
+			ZEVector2					Reserved0;
+
+			ZEVector3					Color;
+			float						Reserved1;
+		} FogConstants;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
