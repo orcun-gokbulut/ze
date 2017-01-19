@@ -268,7 +268,7 @@ bool ZERNStageAO::UpdateTextures()
 	if (UseDeinterleavedTexturing)
 		ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R32_FLOAT);
 	else
-		ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+		ResolvedDepthTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL);
 
 	DeinterleavedDepthtexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
 	DeinterleavedAmbientOcclusionTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
@@ -631,6 +631,8 @@ bool ZERNStageAO::Setup(ZEGRContext* Context)
 
 	if (!UseDeinterleavedTexturing)
 	{
+		Context->ClearDepthStencilBuffer(ResolvedDepthTexture->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
+
 		ReadonlyDepthStencilBuffer = ResolvedDepthTexture->GetDepthStencilBuffer(true);
 
 		ResolveAndClampDepth(Context);

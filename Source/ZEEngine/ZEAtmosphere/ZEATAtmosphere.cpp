@@ -647,7 +647,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	float CloudOpacity = (Cloud->GetCloudCoverage() / 4.0f) * 0.9f + Cloud->GetCloudDensity() * 0.1f;
 
-	float Clearness = ZEMath::Saturate(1.0f - ZEMath::Power(CloudOpacity + Fog->GetDensity(), 0.25f));
+	float Clearness = ZEMath::Saturate(1.0f - ZEMath::Power(CloudOpacity + Fog->GetDensity(), 0.36f));
 	Clearness = ZEMath::Clamp(Clearness, 0.0f, 1.0f);
 
 	float SunIntensity = (GetSunLight() != NULL) ? GetSunLight()->GetIntensity() : 5.0f;

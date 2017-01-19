@@ -418,7 +418,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	
 	float AmbientWeight = dot(normalize(ZERNTransformations_ViewToWorld(float4(Normal, 0.0f))), float3(0.0f, 1.0f, 0.0f)) * 0.5f + 0.5f;
 	
-	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? lerp((float3)0.5f * dot(ZERNScene_AmbientColor, (float3)0.33f), ZERNScene_AmbientColor, AmbientWeight) : ZERNFixedMaterial_AmbientColor);
+	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? lerp((float3)0.2f * dot(ZERNScene_AmbientColor, (float3)0.33f), ZERNScene_AmbientColor, AmbientWeight) : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
 	float3 SpecularColor = ZERNFixedMaterial_SpecularColor;
 	float3 EmissiveColor = ZERNFixedMaterial_EmissiveColor;
