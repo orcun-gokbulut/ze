@@ -57,6 +57,8 @@ class ZEGRShader : public ZEGRResource
 		virtual bool						Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
 		virtual void						Deinitialize();
 
+		virtual void						PreDestroy() override;
+
 											ZEGRShader();
 		virtual								~ZEGRShader();
 
