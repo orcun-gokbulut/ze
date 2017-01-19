@@ -104,8 +104,9 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 	{
 		if (Entry->Hash == Hash)
 		{
+			ZEHolder<ZEGRShader> Temp = Entry.GetPointer();
 			ShaderCache.UnlockRead();
-			return Entry.GetPointer();
+			return Temp;
 		}
 	}
 	ShaderCache.UnlockRead();

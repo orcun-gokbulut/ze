@@ -40,52 +40,49 @@
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectManager.h"
 
-ZEAABBox ZEDEntityWrapper::CalculateBoundingBox(ZEEntity* Entity) const
+ZEAABBox ZEDEntityWrapper::CalculateBoundingBox(ZEEntity* Entity, bool& BoundingBoxAvailable) const
 {
 	if (Entity == NULL)
-		return ZEAABBox();
+		return ZEAABBox::Zero;
+	
+	ZEAABBox CurrentBoundingBox;
 
-	ZEAABBox CurrentBoundingBox = Entity->GetBoundingBox();
-
-	ZEArray<ZEEntity*> Components = Entity->GetComponents();
-
-	for (ZESize I = 0; I < Components.GetCount(); I++)
+	bool BoundingBoxVisible = Entity->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper3D.BoundingBoxVisible", "true");
+	if (BoundingBoxVisible)
 	{
-		ZEAABBox ComponentBoundingBox = CalculateBoundingBox(Components[I]);
-
-		for (ZEInt N = 0; N < 8; N++)
-		{
-			ZEVector3 Point = ComponentBoundingBox.GetVertex(N);
-			if (Point.x < CurrentBoundingBox.Min.x) CurrentBoundingBox.Min.x = Point.x;
-			if (Point.y < CurrentBoundingBox.Min.y) CurrentBoundingBox.Min.y = Point.y;
-			if (Point.z < CurrentBoundingBox.Min.z) CurrentBoundingBox.Min.z = Point.z;
-
-			if (Point.x > CurrentBoundingBox.Max.x) CurrentBoundingBox.Max.x = Point.x;
-			if (Point.y > CurrentBoundingBox.Max.y) CurrentBoundingBox.Max.y = Point.y;
-			if (Point.z > CurrentBoundingBox.Max.z) CurrentBoundingBox.Max.z = Point.z;
-		}
+		BoundingBoxAvailable = true;
+		CurrentBoundingBox = Entity->GetBoundingBox();
 	}
 
-	ZEArray<ZEEntity*> ChildEntities = Entity->GetChildEntities();
-
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
+	Components.LockRead();
 	{
-		const ZEAABBox& ChildEntityBoundingBox = CalculateBoundingBox(ChildEntities[I]);
-
-		for (ZEInt N = 0; N < 8; N++)
+		for (ZESize I = 0; I < Components.GetCount(); I++)
 		{
-			ZEVector3 Point = ChildEntityBoundingBox.GetVertex(N);
-			if (Point.x < CurrentBoundingBox.Min.x) CurrentBoundingBox.Min.x = Point.x;
-			if (Point.y < CurrentBoundingBox.Min.y) CurrentBoundingBox.Min.y = Point.y;
-			if (Point.z < CurrentBoundingBox.Min.z) CurrentBoundingBox.Min.z = Point.z;
+			bool ComponentBoundingBoxAvailable = false;
+			ZEAABBox ComponentBoundingBox;
+			ZEAABBox::Transform(ComponentBoundingBox, CalculateBoundingBox(Components[I], ComponentBoundingBoxAvailable), Components[I]->GetTransform());
 
-			if (Point.x > CurrentBoundingBox.Max.x) CurrentBoundingBox.Max.x = Point.x;
-			if (Point.y > CurrentBoundingBox.Max.y) CurrentBoundingBox.Max.y = Point.y;
-			if (Point.z > CurrentBoundingBox.Max.z) CurrentBoundingBox.Max.z = Point.z;
+			if (!ComponentBoundingBoxAvailable)
+				continue;
+
+			if (BoundingBoxAvailable)
+			{
+				ZEAABBox::Combine(CurrentBoundingBox, CurrentBoundingBox, ComponentBoundingBox);
+			}
+			else
+			{
+				CurrentBoundingBox = ComponentBoundingBox;
+				BoundingBoxAvailable = true;
+			}
 		}
 	}
+	Components.UnlockRead();
 
-	return CurrentBoundingBox;
+	if (BoundingBoxAvailable)
+		return CurrentBoundingBox;
+	else
+		return ZEAABBox::Zero;
 }
 
 bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
@@ -200,9 +197,10 @@ bool ZEDEntityWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 ZEAABBox ZEDEntityWrapper::GetBoundingBox() const
 {
 	if (GetEntity() == NULL)
-		return ZEAABBox();
+		return ZEAABBox::Zero;
 
-	return CalculateBoundingBox(GetEntity());
+	bool BoundingBoxAvailable = false;
+	return CalculateBoundingBox(GetEntity(), BoundingBoxAvailable);
 }
 
 ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform() const
