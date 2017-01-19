@@ -62,8 +62,9 @@
 #define MAX_LIGHT				512
 #define TILE_DIMENSION			16
 
-#define ZERN_SLDF_SHADERS		1
-#define ZERN_SLDF_RENDER_STATE	2
+#define ZERN_SLDF_SHADERS						1
+#define ZERN_SLDF_RENDER_STATE					2
+#define ZERN_SLDF_EDGEDETECTION_CONSTANT_BUFFER	4
 
 void ZERNStageLighting::CreateRandomVectors()
 {
@@ -518,6 +519,7 @@ bool ZERNStageLighting::InitializeInternal()
 	ProjectiveLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, MAX_LIGHT * sizeof(ProjectiveLightStruct), sizeof(ProjectiveLightStruct), ZEGR_RU_DYNAMIC, ZEGR_RBF_SHADER_RESOURCE);
 
 	ProjectiveLightConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ProjectiveLightStruct), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	EdgeDetectionConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(EdgeDetectionConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	return Update();
 }
@@ -559,6 +561,7 @@ bool ZERNStageLighting::DeinitializeInternal()
 	DeferredLightVertexBuffer.Release();
 
 	ProjectiveLightConstantBuffer.Release();
+	EdgeDetectionConstantBuffer.Release();
 
 	RandomVectorsTexture.Release();
 	TiledDeferredOutputTexture.Release();
@@ -649,6 +652,36 @@ bool ZERNStageLighting::GetUseTiledDeferred() const
 	return UseTiledDeferred;
 }
 
+void ZERNStageLighting::SetMSAADepthThreshold(float MSAADepthThreshold)
+{
+	if (EdgeDetectionConstants.DepthThreshold == MSAADepthThreshold)
+		return;
+
+	EdgeDetectionConstants.DepthThreshold = MSAADepthThreshold;
+
+	DirtyFlags.RaiseFlags(ZERN_SLDF_EDGEDETECTION_CONSTANT_BUFFER);
+}
+
+float ZERNStageLighting::GetMSAADepthThreshold() const
+{
+	return EdgeDetectionConstants.DepthThreshold;
+}
+
+void ZERNStageLighting::SetMSAANormalThreshold(float MSAANormalThreshold)
+{
+	if (EdgeDetectionConstants.NormalThreshold == MSAANormalThreshold)
+		return;
+
+	EdgeDetectionConstants.NormalThreshold = MSAANormalThreshold;
+
+	DirtyFlags.RaiseFlags(ZERN_SLDF_EDGEDETECTION_CONSTANT_BUFFER);
+}
+
+float ZERNStageLighting::GetMSAANormalThreshold() const
+{
+	return EdgeDetectionConstants.NormalThreshold;
+}
+
 void ZERNStageLighting::Resized(ZEUInt Width, ZEUInt Height)
 {
 	if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
@@ -713,6 +746,12 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 
 	if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
 	{
+		if (DirtyFlags.GetFlags(ZERN_SLDF_EDGEDETECTION_CONSTANT_BUFFER))
+		{
+			EdgeDetectionConstantBuffer->SetData(&EdgeDetectionConstants);
+			DirtyFlags.UnraiseFlags(ZERN_SLDF_EDGEDETECTION_CONSTANT_BUFFER);
+		}
+
 		Context->SetRenderState(EdgeDetectionRenderState);
 		Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer(true));
 		Context->SetStencilRef(1);
@@ -755,6 +794,9 @@ ZERNStageLighting::ZERNStageLighting()
 	UseTiledDeferred = false;
 
 	memset(&Constants, 0, sizeof(Constants));
+
+	EdgeDetectionConstants.DepthThreshold = 1.0f;
+	EdgeDetectionConstants.NormalThreshold = 0.9f;
 
 	DirectionalLightShadowMap = NULL;
 

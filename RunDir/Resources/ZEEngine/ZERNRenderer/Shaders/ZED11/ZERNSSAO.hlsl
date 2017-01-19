@@ -140,7 +140,7 @@ float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, flo
 {
 	#ifdef DEINTERLEAVED
 		float DepthView = ZERNSSAO_DeinterleavedDepth[int3(PositionViewport.xy, ZERNSSAO_DepthArrayIndex)];
-		if (DepthView > 100.0f)
+		if (DepthView > ZERNSSAO_DistanceThreshold)
 			return float2(1.0f, DepthView);
 	
 		float3 PositionView = ZERNTransformations_TexelToView2(TexCoord, DepthView);

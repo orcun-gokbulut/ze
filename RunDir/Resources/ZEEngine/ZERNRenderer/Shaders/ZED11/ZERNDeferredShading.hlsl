@@ -61,6 +61,13 @@ struct ZERNDeferredShading_PixelShader_Input
 	uint	InstanceID			: SV_InstanceID;
 };
 
+cbuffer ZERNDeferredShading_EdgeDetection_Constants	: register(b10)
+{
+	float	ZERNDeferredShading_EdgeDetection_DepthThreshold;
+	float	ZERNDeferredShading_EdgeDetection_NormalThreshold;
+	float2	ZERNDeferredShading_EdgeDetection_Reserved;
+};
+
 Texture2D<float3>	TiledDeferredOutputTexture	: register(t5);
 
 ZERNShading_Surface ZERNDeferredShading_GetSurfaceDataFromGBuffers(float2 PositionViewport, uint SampleIndex = 0)
@@ -176,7 +183,9 @@ void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport 
 		Surfaces[S].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, S));
 		Surfaces[S].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, S);
 	
-		EdgePixel = EdgePixel || (abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > 20.0f) || (dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < 0.9f);
+		EdgePixel = EdgePixel || 
+		(abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > ZERNDeferredShading_EdgeDetection_DepthThreshold) || 
+		(dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < ZERNDeferredShading_EdgeDetection_NormalThreshold);
 	}
 	
 	if (!EdgePixel)

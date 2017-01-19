@@ -50,7 +50,7 @@ class ZEGRComputeRenderStateData;
 class ZERNStageForward : public ZERNStage
 {
 	ZE_OBJECT
-	private:
+	protected:
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
 
@@ -61,7 +61,6 @@ class ZERNStageForward : public ZERNStage
 
 		ZEHolder<const ZEGRTexture>				DepthTexture;
 		ZEHolder<const ZEGRTexture>				AccumulationTexture;
-		ZEHolder<const ZEGRBuffer>				FogConstantBuffer;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
@@ -91,9 +90,18 @@ class ZERNStageForward : public ZERNStage
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	ZE_OBJECT
+	private:
+		ZEHolder<const ZEGRBuffer>				FogConstantBuffer;
+
+		virtual bool							DeinitializeInternal();
+
 	public:
 		virtual ZEInt							GetId() const;
 		virtual const ZEString&					GetName() const;
+
+		virtual bool							Setup(ZEGRContext* Context);
+
+												ZERNStageForwardTransparent();
 
 		static ZEGRRenderState					GetRenderState();
 };
@@ -104,4 +112,6 @@ class ZERNStageForwardPostHDR : public ZERNStageForward
 	public:
 		virtual ZEInt							GetId() const;
 		virtual const ZEString&					GetName() const;
+
+		virtual bool							Setup(ZEGRContext* Context);
 };

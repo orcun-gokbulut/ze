@@ -103,6 +103,7 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRBuffer>					DeferredLightVertexBuffer;
 
 		ZEHolder<ZEGRBuffer>					ProjectiveLightConstantBuffer;
+		ZEHolder<ZEGRBuffer>					EdgeDetectionConstantBuffer;
 
 		ZEHolder<ZEGRTexture>					RandomVectorsTexture;
 		ZEHolder<ZEGRTexture>					TiledDeferredOutputTexture;
@@ -188,6 +189,13 @@ class ZERNStageLighting : public ZERNStage
 			ZEVector3							Reserved;
 		} Constants;
 
+		struct
+		{
+			float								DepthThreshold;
+			float								NormalThreshold;
+			ZEVector2							Reserved;
+		} EdgeDetectionConstants;
+
 		ZESmartArray<PointLightStruct>			PointLights;
 		ZESmartArray<ProjectiveLightStruct>		ProjectiveLights;
 
@@ -217,6 +225,12 @@ class ZERNStageLighting : public ZERNStage
 
 		void									SetUseTiledDeferred(bool UseTiledDeferred);
 		bool									GetUseTiledDeferred() const;
+
+		void									SetMSAADepthThreshold(float MSAADepthThreshold);
+		float									GetMSAADepthThreshold() const;
+
+		void									SetMSAANormalThreshold(float MSAANormalThreshold);
+		float									GetMSAANormalThreshold() const;
 
 		virtual void							Resized(ZEUInt Width, ZEUInt Height);
 
