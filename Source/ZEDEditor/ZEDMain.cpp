@@ -42,11 +42,13 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include "ZEFile/ZEPathManager.h"
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
 	Q_INIT_RESOURCE(ZEDCommon);
 
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
 	if (!Core->Initialize())
 		return EXIT_FAILURE;

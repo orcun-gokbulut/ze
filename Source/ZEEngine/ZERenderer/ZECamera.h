@@ -68,7 +68,6 @@ class ZECamera : public ZEEntity
 		ZECameraFOVAxis					FOVAxis;
 		bool							AutoFOV;
 		bool							AutoAspectRatio;
-		float							AspectRatio;
 
 		ZEViewFrustum					ViewFrustum;
 
