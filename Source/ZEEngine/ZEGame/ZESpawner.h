@@ -98,5 +98,6 @@ class ZESpawner : public ZEEntity
 		static ZESpawner*				CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZESpawner.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false);
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, true)
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false);

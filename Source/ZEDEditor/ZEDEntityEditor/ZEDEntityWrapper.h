@@ -44,7 +44,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper3D
 	ZE_OBJECT
 	private:
 		bool								AlterRaycast(ZERayCastCollision& Collision);
-		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity) const;
+		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity, bool& BoundingBoxAvailable) const;
 
 	protected:
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
