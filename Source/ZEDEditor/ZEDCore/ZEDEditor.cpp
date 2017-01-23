@@ -112,7 +112,7 @@ void ZEDEditor::RegisterCommands()
 	SaveAsCommand.SetText("SaveAs");
 	SaveAsCommand.SetCategory("File");
 	SaveAsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL | ZED_VKM_SHIFT, ZED_VKK_S));
-	SaveAsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Save.png");
+	SaveAsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/SaveAs.png");
 	SaveAsCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveAsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveAsCommand);
 

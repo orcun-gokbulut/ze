@@ -83,7 +83,7 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 	if (!ZEClass::IsDerivedFrom(ZEScene::Class(), Object->GetClass()))
 		return;
 
-	ZEDObjectWrapper::SetObject(Object);
+	ZEDObjectWrapper3D::SetObject(Object);
 }
 
 ZEString ZEDSceneWrapper::GetName() const
