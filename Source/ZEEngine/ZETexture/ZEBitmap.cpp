@@ -37,10 +37,49 @@
 #include "ZEError.h"
 #include "ZETypes.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 
 #include <FreeImage.h>
 #include <memory.h>
+
+
+// FreeImageIO
+//////////////////////////////////////////////////////////////////////////////////////
+
+static unsigned DLL_CALLCONV FreeImageFile_Write_2D(void *buffer, unsigned size, unsigned count, fi_handle handle)
+{
+	return (ZEUInt)static_cast<ZEFile*>(handle)->Write(buffer, size, count);;
+}
+
+static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
+{
+	return (ZEUInt)static_cast<ZEFile*>(handle)->Read(buffer, size, count);
+}
+
+static ZEInt DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, ZEInt origin)
+{
+	ZESeekFrom OriginNorm;
+	switch(origin)
+	{
+	case SEEK_SET:
+		OriginNorm = ZE_SF_BEGINING;
+		break;
+	case SEEK_CUR:
+		OriginNorm = ZE_SF_CURRENT;
+		break;
+	case SEEK_END:
+		OriginNorm = ZE_SF_END;
+		break;
+	}
+
+	return ((ZEFile*)handle)->Seek(offset, OriginNorm);
+}
+
+static long DLL_CALLCONV FreeImageFile_Tell_2D(fi_handle handle) 
+{
+	return (long)static_cast<ZEFile*>(handle)->Tell();
+}
 
 
 // ZEPixelARGB
@@ -591,24 +630,33 @@ bool ZEBitmap::Create(ZESize Width, ZESize Height, ZEBitmapPixelFormat Format)
 
 bool ZEBitmap::Load(const ZEString& FileName)
 {
-	ZERealPath RealPath = ZEPathInfo(FileName).GetRealPath();
-	if ((RealPath.Access & ZE_PA_READ) == 0)
+	FreeImage_Initialise();
+
+	ZEFile File;
+	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		zeError("Cannot load ZEBitmap from file. Read access denied. File Name: \"%s\".", FileName.ToCString());
+		zeError("Cannot load bitmap. Cannot open file. FileName: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
-	FREE_IMAGE_FORMAT FIFormat = FreeImage_GetFileType(RealPath.Path, 0);
-	if (FIFormat == FIF_UNKNOWN)
-		FIFormat = FreeImage_GetFIFFromFilename(RealPath.Path);
+	FreeImageIO Callbacks;
+	Callbacks.write_proc = &FreeImageFile_Write_2D;
+	Callbacks.read_proc = &FreeImageFile_Read_2D;
+	Callbacks.seek_proc = &FreeImageFile_Seek_2D;
+	Callbacks.tell_proc = &FreeImageFile_Tell_2D;
 
-	FIBITMAP* FIBitmap = FreeImage_Load(FIFormat, RealPath.Path, 0);
+	FREE_IMAGE_FORMAT FIFormat = FreeImage_GetFileTypeFromHandle(&Callbacks, &File);
+	if (FIFormat == FIF_UNKNOWN)
+		FIFormat = FreeImage_GetFIFFromFilename(FileName);
+
+	FIBITMAP* FIBitmap = FreeImage_LoadFromHandle(FIFormat, &Callbacks, &File);
 	if (FIBitmap == NULL)
 	{
 		zeError("Cannot load ZEBitmap from file. Internal error. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
 
+	File.Close();
 
 	ZEUInt Width = FreeImage_GetWidth(FIBitmap);
 	ZEUInt Height = FreeImage_GetHeight(FIBitmap);
@@ -662,6 +710,8 @@ bool ZEBitmap::Load(const ZEString& FileName)
 	}
 
 	FreeImage_Unload(FIBitmap);
+
+	FreeImage_DeInitialise();
 
 	return true;
 }
