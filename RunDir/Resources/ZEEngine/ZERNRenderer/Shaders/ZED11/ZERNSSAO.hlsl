@@ -136,6 +136,14 @@ float2 ZERNSSAO_ApplyCrossBilateralBlur(float2 TexCoord, float2 TexelOffset)
 	return float2(TotalAO / TotalWeight, CenterDepth);
 }
 
+void ZERNSSAO_SSAO_VertexShader_Main(in uint VertexIndex : SV_VertexId, out float4 Position : SV_Position, out float2 Texcoords : TEXCOORD0)
+{
+	Position = ZERNScreenCover_GetPosition(VertexIndex);
+	Texcoords = ZERNScreenCover_GetTexcoords(Position);
+	
+	Position.z = ZERNTransformations_ViewToProjectionZ(ZERNSSAO_DistanceThreshold);
+}
+
 float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	#ifdef DEINTERLEAVED
@@ -170,18 +178,19 @@ float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, flo
 			float2 SamplePositionViewport = ZERNTransformations_ViewToViewport(SamplePositionView, ZERNSSAO_WidthHeight);
 			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNSSAO_DepthTexture[SamplePositionViewport]);
 		#endif
-	
+		
 		float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);
 		
 		float3 VectorToOccluder = OccluderPositionView - NormalBiasedPositionView;
 		float DistanceToOccluder = length(VectorToOccluder);
+		
 		float Angle = max(0.0f, dot(NormalView, (VectorToOccluder / DistanceToOccluder)));
-		TotalOcclusion += Angle * saturate((ZERNSSAO_OcclusionRadius - DistanceToOccluder) / ZERNSSAO_OcclusionRadius);
+		TotalOcclusion += Angle * exp(-DistanceToOccluder);
 	}
 	
 	TotalOcclusion /= ZERNSSAO_SampleCount;
 	
-	return float2(pow(abs(1.0f - TotalOcclusion), ZERNSSAO_Intensity), PositionView.z);
+	return float2(pow(saturate(1.0f - TotalOcclusion), ZERNSSAO_Intensity), PositionView.z);
 }
 
 float2 ZERNSSAO_CrossBilateralBlurX_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
@@ -197,17 +206,12 @@ float3 ZERNSSAO_CrossBilateralBlurY_PixelShader(float4 PositionViewport : SV_Pos
 ResolveDepthOutput ZERNSSAO_ResolveDepth_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0)
 {
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy, 0);
-	[unroll]
-	for (uint S = 1; S < SAMPLE_COUNT; S++)
-		DepthHomogeneous = min(DepthHomogeneous, ZERNGBuffer_GetDepth(PositionViewport.xy, S));
-	
-	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
 	
 	ResolveDepthOutput Output;
 	#ifdef DEINTERLEAVED
-		Output.DepthView = DepthView;
+		Output.DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
 	#else
-		Output.DepthHomogeneous = DepthHomogeneous * (DepthView < ZERNSSAO_DistanceThreshold);
+		Output.DepthHomogeneous = DepthHomogeneous;
 	#endif
 	
 	return Output;

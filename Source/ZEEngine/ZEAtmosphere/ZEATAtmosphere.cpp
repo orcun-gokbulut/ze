@@ -647,13 +647,13 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	float CloudOpacity = (Cloud->GetCloudCoverage() / 4.0f) * 0.9f + Cloud->GetCloudDensity() * 0.1f;
 
-	float Clearness = ZEMath::Saturate(1.0f - ZEMath::Power(CloudOpacity + Fog->GetDensity(), 0.36f));
+	float Clearness = ZEMath::Exp(-ZEMath::Power(CloudOpacity + (4.0f * Fog->GetDensity()), 2.72f));
 	Clearness = ZEMath::Clamp(Clearness, 0.0f, 1.0f);
 
 	float SunIntensity = (GetSunLight() != NULL) ? GetSunLight()->GetIntensity() : 5.0f;
-	ZEVector3 CloudAmbient = ZEVector3(0.5f); 
+	ZEVector3 CloudAmbient = ZEVector3(0.5f);
 	float StarBrightness = 0.0f;
-	float FogBrightness = 2.0f;
+	float FogBrightness = 1.0f;
 
 	if (Daylight)
 	{

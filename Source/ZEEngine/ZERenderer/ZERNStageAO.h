@@ -68,6 +68,7 @@ class ZERNStageAO : public ZERNStage
 		ZEArray<ZEVector4>					RandomVectors;
 
 		ZEHolder<ZEGRShader>				ScreenCoverPositionTexCoordVertexShader;
+		ZEHolder<ZEGRShader>				SSAOVertexShader;
 
 		ZEHolder<ZEGRShader>				ResolveAndClampDepthPixelShader;
 		ZEHolder<ZEGRShader>				SSAOPixelShader;
@@ -146,12 +147,12 @@ class ZERNStageAO : public ZERNStage
 		bool								Update();
 
 		void								ResolveAndClampDepth(ZEGRContext* Context);
-		void								AmbientOcclusion(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								AmbientOcclusion(ZEGRContext* Context, const ZEGRTexture* InputDepthTexture);
 		void								ResolveAndLinearizeDepth(ZEGRContext* Context);
 		void								DeinterleaveDepth(ZEGRContext* Context);
 		void								DeinterleaveAmbientOcclusion(ZEGRContext* Context);
 		void								ReinterleaveAmbientOcclusion(ZEGRContext* Context);
-		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture* InputTexture, const ZEGRTexture* InputDepthTexture);
 
 		virtual void						CreateOutput(const ZEString& Name);
 

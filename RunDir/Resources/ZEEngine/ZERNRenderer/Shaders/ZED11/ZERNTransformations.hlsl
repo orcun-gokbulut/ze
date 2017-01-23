@@ -204,6 +204,11 @@ float4 ZERNTransformations_ViewToProjection(float3 VectorView)
 	return mul(ZERNView_ProjectionTransform, float4(VectorView, 1.0f));
 }
 
+float ZERNTransformations_ViewToProjectionZ(float DepthView)
+{
+	return mad(DepthView, ZERNView_ProjectionTransform[2][2], ZERNView_ProjectionTransform[2][3]) / DepthView;
+}
+
 float3 ZERNTransformations_ViewToWorld(float4 VectorView)
 {
 	return mul(ZERNView_InvViewTransform, VectorView).xyz;
