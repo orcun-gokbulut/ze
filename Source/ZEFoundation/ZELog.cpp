@@ -171,7 +171,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 
 	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "(S:%d, T:%d) [%s] %s: %s \r\n", CurrentSession->GetSessionID(), ZEThread::GetCurrentThreadId(), Module, ZELog::GetLogTypeString(Type), Buffer);
+		sprintf(DebugBuffer, "(S:%d, T:%d) [%s] %s: %s \r\n", CurrentSession != NULL ? CurrentSession->GetSessionID() : -1, ZEThread::GetCurrentThreadId(), Module, ZELog::GetLogTypeString(Type), Buffer);
 		OutputDebugString(DebugBuffer);
 	#endif
 }
