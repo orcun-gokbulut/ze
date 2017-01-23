@@ -39,6 +39,8 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScene.hlsl"
+#include "ZERNShading.hlsl"
+#include "ZERNRenderer.hlsl"
 
 #define ZE_PBT_AXIS_ORIENTED		0
 #define ZE_PBT_VELOCITY_ORIENTED	1
@@ -177,7 +179,12 @@ float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_In
 		Alpha *= pow(DepthNormalized, ZERNParticleMaterial_ContrastPower);
 	}
 	
-	return float4(AmbientColor + EmissiveColor + DiffuseColor, Alpha);
+	float3 ResultColor = AmbientColor + EmissiveColor + DiffuseColor;
+	
+	float4 FogColor = ZERNShading_CalculateFogColor(ZERNTransformations_ViewportToView2(Input.PositionViewport.xy, ZERNRenderer_OutputSize, Input.DepthView));
+	ResultColor = lerp(ResultColor, FogColor.rgb, FogColor.a);
+		
+	return float4(ResultColor, Alpha);
 }
 
 #endif

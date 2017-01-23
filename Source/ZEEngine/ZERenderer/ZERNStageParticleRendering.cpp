@@ -37,6 +37,7 @@
 
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
@@ -60,6 +61,7 @@ bool ZERNStageParticleRendering::DeinitializeInternal()
 
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
+	FogConstantBuffer = NULL;
 
 	return ZERNStage::DeinitializeInternal();
 }
@@ -108,6 +110,7 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 10, FogConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetViewports(1, &Viewport);
 
@@ -124,6 +127,7 @@ ZERNStageParticleRendering::ZERNStageParticleRendering()
 	DirtyFlags.RaiseAll();
 
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&FogConstantBuffer), "FogConstantBuffer", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
 }

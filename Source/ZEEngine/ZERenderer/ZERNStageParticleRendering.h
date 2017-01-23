@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRTexture;
+class ZEGRBuffer;
 
 class ZERNStageParticleRendering : public ZERNStage
 {
@@ -51,6 +52,7 @@ class ZERNStageParticleRendering : public ZERNStage
 
 		ZEHolder<const ZEGRTexture>		AccumulationTexture;
 		ZEHolder<const ZEGRTexture>		DepthTexture;
+		ZEHolder<const ZEGRBuffer>		FogConstantBuffer;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
