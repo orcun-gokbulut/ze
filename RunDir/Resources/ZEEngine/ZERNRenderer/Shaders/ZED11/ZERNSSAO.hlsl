@@ -170,13 +170,12 @@ float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, flo
 		float Flip = sign(dot(RandomOrientedSampleVector, NormalView));
 		
 		float3 SamplePositionView = PositionView + Flip * RandomOrientedSampleVector * ZERNSSAO_OcclusionRadius;
+		float2 SampleTexCoord = ZERNTransformations_ViewToTexelCorner(SamplePositionView);
 		
 		#ifdef DEINTERLEAVED
-			float2 SampleTexCoord = ZERNTransformations_ViewToTexelCorner(SamplePositionView);
 			float OccluderDepthView = ZERNSSAO_DeinterleavedDepth.SampleLevel(ZERNSampler_PointClamp, float3(SampleTexCoord, ZERNSSAO_DepthArrayIndex), 0.0f);
 		#else
-			float2 SamplePositionViewport = ZERNTransformations_ViewToViewport(SamplePositionView, ZERNSSAO_WidthHeight);
-			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNSSAO_DepthTexture[SamplePositionViewport]);
+			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNSSAO_DepthTexture.SampleLevel(ZERNSampler_PointClamp, SampleTexCoord, 0.0f));
 		#endif
 		
 		float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);

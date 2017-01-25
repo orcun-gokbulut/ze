@@ -279,8 +279,12 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	}
 	else
 	{
+		GetMesh()->UpdateConstantBuffer();
+
 		if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
 		{
+			GetModel()->UpdateConstantBufferBoneTransforms();
+
 			ZEGRBuffer* ConstantBuffers[] = {GetMesh()->ConstantBuffer, GetModel()->ConstantBufferBoneTransforms};
 			Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
 		}
@@ -291,6 +295,9 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 
 		if (DirtyConstants)
 		{
+			if (ConstantBuffer == NULL)
+				ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+
 			ConstantBuffer->SetData(&Constants);
 			DirtyConstants = false;
 		}
@@ -317,7 +324,7 @@ ZEModelDraw::ZEModelDraw()
 	RenderCommand.InstanceTag = &InstanceTag;
 	DirtyConstants = true;
 
-	ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	//ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	Constants.Color = ZEVector3::One;
 	Constants.Opacity = 1.0f;
