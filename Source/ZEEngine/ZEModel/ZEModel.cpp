@@ -255,8 +255,6 @@ ZEEntityResult ZEModel::LoadInternal()
 	DirtyConstantBufferSkin = true;
 	DirtyBoundingBox = true;
 
-	//ConstantBufferBoneTransforms = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, 150 * sizeof(ZEMatrix4x4), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-
 	return ZE_ER_DONE;
 }
 

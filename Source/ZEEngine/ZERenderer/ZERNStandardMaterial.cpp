@@ -506,9 +506,6 @@ ZETaskResult ZERNStandardMaterial::LoadInternal()
 	if (!UpdateRenderState())
 		return ZE_TR_FAILED;
 
-	//if (!UpdateConstantBuffer())
-	//	return ZE_TR_FAILED;
-
 	return ZE_TR_DONE;
 }
 

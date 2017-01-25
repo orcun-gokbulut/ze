@@ -324,8 +324,6 @@ ZEModelDraw::ZEModelDraw()
 	RenderCommand.InstanceTag = &InstanceTag;
 	DirtyConstants = true;
 
-	//ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-
 	Constants.Color = ZEVector3::One;
 	Constants.Opacity = 1.0f;
 	Constants.LODTransition = ZEGR_FALSE;
