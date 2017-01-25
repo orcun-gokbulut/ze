@@ -234,7 +234,6 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 	SetScale(Resource->GetScale());
 	SetVisible(Resource->GetVisible());
 	SetBoundingBox(Resource->GetBoundingBox());
-	//ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZEModelMeshConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 
 	ze_for_each(ResourceLOD, Resource->GetLODs())
 	{
@@ -839,8 +838,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		LODTransitionDirection = -1.0f;
 	}
 
-	bool DirtyConstants = false;
-
 	if (LODTransitionPlaying)
 	{
 		LODTransitionElapsedTime += Parameters->ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
@@ -863,8 +860,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 					continue;
 
 				Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-
-				DirtyConstants |= (Draw->RenderCommand.InstanceTag == NULL);
 			}
 
 			ze_for_each(Draw, NextLOD->GetDraws())
@@ -878,8 +873,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 					continue;
 
 				Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-
-				DirtyConstants |= (Draw->RenderCommand.InstanceTag == NULL);
 			}
 		}
 		else
@@ -907,8 +900,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				continue;
 
 			Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-
-			DirtyConstants |= (Draw->RenderCommand.InstanceTag == NULL);
 		}
 	}
 
