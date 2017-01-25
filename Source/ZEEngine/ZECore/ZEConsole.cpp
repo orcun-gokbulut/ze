@@ -524,7 +524,6 @@ void ZEConsole::Output(const char* Format, ...)
 	ConsoleLock.Unlock();
 }
 
-
 void ZEConsole::OutputRaw(const char* String)
 {
 	ConsoleLock.Lock();
