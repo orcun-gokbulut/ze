@@ -124,6 +124,12 @@ void ZERNRenderer::CreatePredefinedSamplers()
 
 void ZERNRenderer::UpdateConstantBuffers()
 {
+	if (ViewConstantBuffer == NULL)
+		ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	
+	if (RendererConstantBuffer == NULL)
+		RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	
 	ZERNViewConstantBuffer* Buffer;
 	if (!ViewConstantBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&Buffer)))
 		return;
@@ -236,6 +242,7 @@ void ZERNRenderer::RenderStages()
 	Parameters.View = &View;
 	Parameters.Renderer = this;
 	Parameters.Type = (GetStage(ZERN_STAGE_SHADOW_MAP_GENERATION) != NULL) ? ZERN_RT_SHADOW : ZERN_RT_COLOR;
+
 	UpdateConstantBuffers();
 
 	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
@@ -309,8 +316,8 @@ bool ZERNRenderer::InitializeInternal()
 		}
 	}
 
-	ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-	RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	//ViewConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(ZERNViewConstantBuffer), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	//RendererConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(RendererConstants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
 	if (::InstanceVertexBuffer == NULL)
 		this->InstanceVertexBuffer = ::InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 8192, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 	else

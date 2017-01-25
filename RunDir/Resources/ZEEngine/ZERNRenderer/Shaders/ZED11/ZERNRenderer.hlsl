@@ -49,7 +49,7 @@ cbuffer ZERNRenderer_Constants	: register(ZERN_SHADER_CONSTANT_RENDERER)
 	uint		ZERNRenderer_Reserved0;
 	float2		ZERNRenderer_OutputSize;
 	float2		ZERNRenderer_InvOutputSize;
-	float4x4	ZERNRenderer_ScreenTransform;
+	float3x3	ZERNRenderer_ScreenTransform;
 };
 
 #endif

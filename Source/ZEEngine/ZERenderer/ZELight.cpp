@@ -143,7 +143,7 @@ ZELight::ZELight()
 
 ZELight::~ZELight()
 {
-
+	Unload();
 }
 
 void ZELight::SetCastsShadow(bool NewValue)
