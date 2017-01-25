@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleConfineModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEParticleModifier.h"
+#include "ZEParticleConfineModifier.h"
 
 #include "ZEParticleEmitter.h"
+#include "ZEParticleEffect.h"
 
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+void ZEParticleConfineModifier::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
-	return Emitter;
+	this->BoundingBox = BoundingBox;
 }
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
+const ZEAABBox ZEParticleConfineModifier::GetBoundingBox() const
 {
-	if (Emitter == NULL)
-		return NULL;
-
-	return Emitter->GetEffect();
+	return BoundingBox;
 }
 
-void ZEParticleModifier::SetName(const ZEString& Name)
+void ZEParticleConfineModifier::Tick(float ElapsedTime)
 {
-	this->Name = Name;
+	ZEArray<ZEParticle>& Particles = GetPool();
+	ZESize ParticleCount = Particles.GetCount();
+
+	ZEVector3 Displacement = GetBoundingBox().Max - GetBoundingBox().Min;
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		if (Particles[I].State != ZE_PAS_ALIVE)
+			continue;
+
+		if (!GetEmitter()->GetLocalSpace())
+			Particles[I].Position = GetEffect()->GetInvWorldTransform() * Particles[I].Position;
+
+		if (Particles[I].Position.x < BoundingBox.Min.x)
+			Particles[I].Position.x += Displacement.x;
+		else if (Particles[I].Position.x > BoundingBox.Max.x)
+			Particles[I].Position.x -= Displacement.x;
+
+		if (Particles[I].Position.y < BoundingBox.Min.y)
+			Particles[I].Position.y += Displacement.y;
+		else if (Particles[I].Position.y > BoundingBox.Max.y)
+			Particles[I].Position.y -= Displacement.y;
+
+		if (Particles[I].Position.z < BoundingBox.Min.z)
+			Particles[I].Position.z += Displacement.z;
+		else if (Particles[I].Position.z > BoundingBox.Max.z)
+			Particles[I].Position.z -= Displacement.z;
+
+		if (!GetEmitter()->GetLocalSpace())
+			Particles[I].Position = GetEffect()->GetWorldTransform() * Particles[I].Position;
+	}
 }
 
-const ZEString& ZEParticleModifier::GetName() const
+
+ZEParticleConfineModifier::ZEParticleConfineModifier()
 {
-	return Name;
+	BoundingBox = ZEAABBox::Maximum;
 }
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
+ZEParticleConfineModifier::~ZEParticleConfineModifier()
 {
 
 }

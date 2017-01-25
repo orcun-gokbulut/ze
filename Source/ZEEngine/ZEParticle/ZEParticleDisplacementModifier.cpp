@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleDisplacementModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEParticleModifier.h"
+#include "ZEParticleDisplacementModifier.h"
 
-#include "ZEParticleEmitter.h"
-
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+void ZEParticleDisplacementModifier::SetDisplacement(ZEVector3 NewDisplacement)
 {
-	return Emitter;
+	Displacement = NewDisplacement;
 }
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
+ZEVector3 ZEParticleDisplacementModifier::GetDisplacement()
 {
-	if (Emitter == NULL)
-		return NULL;
-
-	return Emitter->GetEffect();
+	return Displacement;
 }
 
-void ZEParticleModifier::SetName(const ZEString& Name)
+void ZEParticleDisplacementModifier::Tick(float ElapsedTime)
 {
-	this->Name = Name;
+	ZEArray<ZEParticle>& Particles = GetPool();
+	ZESize ParticleCount = Particles.GetCount();
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		ZEVector3 RandomedDisplacement;
+		RandomedDisplacement.x = ZERandom::GetFloatRange(Displacement.x * 0.9f, Displacement.x * 1.1f);
+		RandomedDisplacement.y = ZERandom::GetFloatRange(Displacement.y * 0.9f, Displacement.y * 1.1f);
+		RandomedDisplacement.z = ZERandom::GetFloatRange(Displacement.z * 0.9f, Displacement.z * 1.1f);
+		Particles[I].Position += RandomedDisplacement * ElapsedTime;
+	}
 }
 
-const ZEString& ZEParticleModifier::GetName() const
+ZEParticleDisplacementModifier::ZEParticleDisplacementModifier()
 {
-	return Name;
+	Displacement = ZEVector3::Zero;
 }
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
+ZEParticleDisplacementModifier::~ZEParticleDisplacementModifier()
 {
 
 }

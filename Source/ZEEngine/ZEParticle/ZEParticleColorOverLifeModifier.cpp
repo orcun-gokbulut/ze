@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleColorOverLifeModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEParticleModifier.h"
+#include "ZEParticleColorOverLifeModifier.h"
 
-#include "ZEParticleEmitter.h"
 
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+void ZEParticleColorOverLifeModifier::SetToColor(const ZEVector4& ToColor)
 {
-	return Emitter;
+	this->ToColor = ToColor;
 }
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
+const ZEVector4& ZEParticleColorOverLifeModifier::GetToColor() const
 {
-	if (Emitter == NULL)
-		return NULL;
-
-	return Emitter->GetEffect();
+	return ToColor;
 }
 
-void ZEParticleModifier::SetName(const ZEString& Name)
+void ZEParticleColorOverLifeModifier::Tick(float ElapsedTime)
 {
-	this->Name = Name;
+	ZESize ParticleCount = GetPool().GetCount();
+	ZEArray<ZEParticle>& Particles =  GetPool();
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		ZEParticle* CurrentParticle = &Particles[I];
+
+		if (CurrentParticle->State == ZE_PAS_ALIVE)
+		{
+			float TotalLife_Life = CurrentParticle->Life / CurrentParticle->TotalLife;
+			float LerpFactor = 1.0f - TotalLife_Life;
+
+			CurrentParticle->Color.x = CurrentParticle->InitialColor.x + (ToColor.x - CurrentParticle->InitialColor.x) * LerpFactor;
+			CurrentParticle->Color.y = CurrentParticle->InitialColor.y + (ToColor.y - CurrentParticle->InitialColor.y) * LerpFactor;
+			CurrentParticle->Color.z = CurrentParticle->InitialColor.z + (ToColor.z - CurrentParticle->InitialColor.z) * LerpFactor;
+			CurrentParticle->Color.w = CurrentParticle->InitialColor.w + (ToColor.w - CurrentParticle->InitialColor.w) * LerpFactor;
+		}
+	}
 }
 
-const ZEString& ZEParticleModifier::GetName() const
+ZEParticleColorOverLifeModifier::ZEParticleColorOverLifeModifier()
 {
-	return Name;
+	ToColor = ZEVector4::One;
 }
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
+ZEParticleColorOverLifeModifier::~ZEParticleColorOverLifeModifier()
 {
 
 }

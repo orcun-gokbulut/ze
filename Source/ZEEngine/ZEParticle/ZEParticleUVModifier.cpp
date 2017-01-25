@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleUVModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,79 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEParticleModifier.h"
+#include "ZEParticleUVModifier.h"
 
-#include "ZEParticleEmitter.h"
-
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+void ZEParticleUVModifier::SetTextureSize(ZEVector2 TextureSize)
 {
-	return Emitter;
+	this->TextureSize = TextureSize;
 }
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
+const ZEVector2& ZEParticleUVModifier::GetTextureSize() const
 {
-	if (Emitter == NULL)
-		return NULL;
-
-	return Emitter->GetEffect();
+	return TextureSize;
 }
 
-void ZEParticleModifier::SetName(const ZEString& Name)
+void ZEParticleUVModifier::SetRowCount(ZEInt RowCount)
 {
-	this->Name = Name;
+	this->RowCount = RowCount;
 }
 
-const ZEString& ZEParticleModifier::GetName() const
+ZEInt ZEParticleUVModifier::GetRowCount() const
 {
-	return Name;
+	return RowCount;
 }
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
+void ZEParticleUVModifier::SetColumnCount(ZEInt ColumnCount)
 {
-	this->Enabled = Enabled;
+	this->ColumnCount = ColumnCount;
 }
 
-bool ZEParticleModifier::GetEnabled()
+ZEInt ZEParticleUVModifier::GetColumnCount() const
 {
-	return Enabled;
+	return ColumnCount;
 }
 
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
+void ZEParticleUVModifier::Tick(float ElapsedTime)
 {
+	if (!DoOnce)
+	{
+		UVFrameSize.x = 1.0f / (float)ColumnCount;
+		UVFrameSize.y = 1.0f / (float)RowCount;
+		DoOnce = true;
+	}
 
+	ZEArray<ZEParticle>& Particles = GetPool();
+	ZESize ParticleCount = Particles.GetCount();
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		switch (Particles[I].State)
+		{
+			case ZE_PAS_NEW:
+				Particles[I].MinTexCoord = ZEVector2::Zero;
+				Particles[I].MaxTexCoord = UVFrameSize;
+				break;
+
+			case ZE_PAS_ALIVE:
+				CurrentUVFrame = (Particles[I].TotalLife - Particles[I].Life) * (((float)RowCount * (float)ColumnCount) / Particles[I].TotalLife);
+				Particles[I].MinTexCoord.x = (CurrentUVFrame % ColumnCount) * UVFrameSize.x;
+				Particles[I].MinTexCoord.y = (CurrentUVFrame / ColumnCount) * UVFrameSize.y;
+				Particles[I].MaxTexCoord.x = ((CurrentUVFrame % ColumnCount) + 1) * UVFrameSize.x;
+				Particles[I].MaxTexCoord.y = ((CurrentUVFrame / ColumnCount) + 1) * UVFrameSize.y;
+				break;
+
+			case ZE_PAS_DEAD:
+				break;
+		}
+	}
 }
 
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
+ZEParticleUVModifier::ZEParticleUVModifier()
 {
-	return Emitter->ParticlePool;
+	DoOnce = false;
 }
 
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
+ZEParticleUVModifier::~ZEParticleUVModifier()
 {
 
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleUVModifier.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
 #include "ZEParticleModifier.h"
 
-#include "ZEParticleEmitter.h"
-
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+class ZEParticleUVModifier : public ZEParticleModifier
 {
-	return Emitter;
-}
+	ZE_OBJECT
+	private:
+		bool								DoOnce;
+		ZEVector2							UVFrameSize;
+		ZEInt								CurrentUVFrame;
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
-{
-	if (Emitter == NULL)
-		return NULL;
+		ZEVector2							TextureSize;
+		ZEInt								RowCount;
+		ZEInt								ColumnCount;
 
-	return Emitter->GetEffect();
-}
+	public:
+		void								SetTextureSize(ZEVector2 TextureSize);
+		const ZEVector2&					GetTextureSize() const;
 
-void ZEParticleModifier::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
+		void								SetRowCount(ZEInt RowCount);
+		ZEInt								GetRowCount() const;
 
-const ZEString& ZEParticleModifier::GetName() const
-{
-	return Name;
-}
+		void								SetColumnCount(ZEInt ColumnCount);
+		ZEInt								GetColumnCount() const;
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
+		virtual void						Tick(float ElapsedTime) override;
 
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
-{
-
-}
+											ZEParticleUVModifier();
+		virtual								~ZEParticleUVModifier() override;
+};

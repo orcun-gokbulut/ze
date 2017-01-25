@@ -37,12 +37,30 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEParticle.cpp							Sources)
 ze_add_source(ZEParticle.h								Sources Headers ZEMC)
-ze_add_source(ZEParticleModifier.cpp					Sources)
-ze_add_source(ZEParticleModifier.h						Sources Headers ZEMC)
+
 ze_add_source(ZEParticleEffect.cpp						Sources)
 ze_add_source(ZEParticleEffect.h						Sources Headers ZEMC)
 ze_add_source(ZEParticleEmitter.cpp						Sources)
 ze_add_source(ZEParticleEmitter.h						Sources Headers ZEMC)
+ze_add_source(ZEParticleModifier.cpp					Sources)
+ze_add_source(ZEParticleModifier.h						Sources Headers ZEMC)
+ze_add_source(ZEParticlePhysicsModifier.cpp				Sources)
+ze_add_source(ZEParticlePhysicsModifier.h				Sources Headers ZEMC)
+ze_add_source(ZEParticleRotationModifier.cpp			Sources)
+ze_add_source(ZEParticleRotationModifier.h				Sources Headers ZEMC)
+ze_add_source(ZEParticleUVModifier.cpp					Sources)
+ze_add_source(ZEParticleUVModifier.h					Sources Headers ZEMC)
+ze_add_source(ZEParticleGrowModifier.cpp				Sources)
+ze_add_source(ZEParticleGrowModifier.h					Sources Headers ZEMC)
+ze_add_source(ZEParticleDisplacementModifier.h			Sources)
+ze_add_source(ZEParticleDisplacementModifier.cpp		Sources Headers ZEMC)
+ze_add_source(ZEParticleVelocityOverLifeModifier.cpp	Sources)
+ze_add_source(ZEParticleVelocityOverLifeModifier.h		Sources Headers ZEMC)
+ze_add_source(ZEParticleColorOverLifeModifier.cpp		Sources)
+ze_add_source(ZEParticleColorOverLifeModifier.h			Sources Headers ZEMC)
+ze_add_source(ZEParticleRandomAccelerationModifier.cpp	Sources)
+ze_add_source(ZEParticleRandomAccelerationModifier.h	Sources Headers ZEMC)
+
 
 ze_add_library(TARGET ZEParticle 
 	ZEMC ${ZEMC}

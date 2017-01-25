@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticleGrowModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEParticleModifier.h"
+#include "ZEParticleGrowModifier.h"
 
-#include "ZEParticleEmitter.h"
 
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+void ZEParticleGrowModifier::SetGrowFactor(float Factor)
 {
-	return Emitter;
+	GrowFactor = Factor;
 }
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
+float ZEParticleGrowModifier::GetGrowFactor() const
 {
-	if (Emitter == NULL)
-		return NULL;
-
-	return Emitter->GetEffect();
+	return GrowFactor;
 }
 
-void ZEParticleModifier::SetName(const ZEString& Name)
+void ZEParticleGrowModifier::Tick(float ElapsedTime)
 {
-	this->Name = Name;
+	ZESize ParticleCount = GetPool().GetCount();
+	ZEArray<ZEParticle>& Particles =  GetPool();
+
+	float GrowAmount = GrowFactor * ElapsedTime;
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		Particles[I].Size2D += (Particles[I].Size2D * GrowAmount);
+	}
 }
 
-const ZEString& ZEParticleModifier::GetName() const
+ZEParticleGrowModifier::ZEParticleGrowModifier()
 {
-	return Name;
+	GrowFactor = 0.2f;
 }
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
+ZEParticleGrowModifier::~ZEParticleGrowModifier()
 {
 
 }

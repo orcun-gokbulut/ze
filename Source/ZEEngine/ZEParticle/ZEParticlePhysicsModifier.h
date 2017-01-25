@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleModifier.cpp
+ Zinek Engine - ZEParticlePhysicsModifier.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
 #include "ZEParticleModifier.h"
 
-#include "ZEParticleEmitter.h"
-
-ZEParticleEmitter* ZEParticleModifier::GetEmitter()
+class ZEParticlePhysicsModifier : public ZEParticleModifier
 {
-	return Emitter;
-}
+	ZE_OBJECT
+	private:
+		bool								IsRadialMovement;
+		float								MaxRadialSpeed;
+		float								MinRadialSpeed;
 
-ZEParticleEffect* ZEParticleModifier::GetEffect()
-{
-	if (Emitter == NULL)
-		return NULL;
+		ZEVector3							MinAcceleration;
+		ZEVector3							MaxAcceleration;
+		ZEVector3							MinVelocity;
+		ZEVector3							MaxVelocity;
 
-	return Emitter->GetEffect();
-}
+	public:
+		void								SetRadialMovement(bool Enabled);
+		void								SetRadialSpeed(float Max, float Min);
 
-void ZEParticleModifier::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
+		void								SetMinAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&					GetMinAcceleration() const;
+		void								SetMaxAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&					GetMaxAcceleration() const;
 
-const ZEString& ZEParticleModifier::GetName() const
-{
-	return Name;
-}
+		void								SetMinVelocity(const ZEVector3& Velocity);
+		const ZEVector3&					GetMinVelocity() const;
+		void								SetMaxVelocity(const ZEVector3& Velocity);
+		const ZEVector3&					GetMaxVelocity() const;
 
-void ZEParticleModifier::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
+		virtual void						Tick(float ElapsedTime) override;
 
-bool ZEParticleModifier::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
-{
-
-}
-
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
-{
-	return Emitter->ParticlePool;
-}
-
-ZEParticleModifier::ZEParticleModifier()
-{
-	Emitter = NULL;
-	Enabled = true;
-}
-
-ZEParticleModifier::~ZEParticleModifier()
-{
-
-}
+											ZEParticlePhysicsModifier();
+		virtual								~ZEParticlePhysicsModifier() override;
+};
