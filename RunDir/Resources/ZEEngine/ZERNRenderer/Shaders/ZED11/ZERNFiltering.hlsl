@@ -64,6 +64,8 @@ cbuffer ZERNFiltering_Noise_Constants								: register(b9)
 	float2			ZERNFiltering_Noise_Size;
 };
 
+SamplerState		ZERNFiltering_Sampler							: register(s0);
+
 Texture2D<float4>	ZERNFiltering_InputTexture						: register(t5);
 Texture2D<float4>	ZERNFiltering_NoiseTexture						: register(t6);
 
@@ -81,7 +83,7 @@ float4 ZERNFiltering_BlurVertical_PixelShader(float4 PositionViewport : SV_Posit
 
 float4 ZERNFiltering_Scale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
-	return ZERNFiltering_InputTexture.SampleLevel(ZERNSampler_LinearClamp, TexCoord, 0.0f);
+	return ZERNFiltering_InputTexture.SampleLevel(ZERNFiltering_Sampler, TexCoord, 0.0f);
 }
 
 void ZERNFiltering_EdgeDetection_PixelShader(float4 PositionViewport : SV_Position)

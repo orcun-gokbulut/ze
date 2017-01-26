@@ -47,6 +47,7 @@
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZERNStageDisplay.h"
+#include "ZEML/ZEMLReader.h"
 
 #define ZERN_SMDF_OUTPUT	1
 
@@ -291,6 +292,29 @@ bool ZERNStageMultiplexer::Setup(ZEGRContext* Context)
 void ZERNStageMultiplexer::CleanUp(ZEGRContext* Context)
 {
 	ZERNStage::CleanUp(Context);
+}
+
+bool ZERNStageMultiplexer::Unserialize(ZEMLReaderNode* StageNode)
+{
+	ZEMLReaderNode DisplaysNode = StageNode->GetNode("Properties").GetNode("Displays");
+	ZESize DisplayCount = DisplaysNode.GetNodeCount("Object");
+
+	ze_for_each(Display, Displays)
+	{
+		Display->Deinitialize();
+		Displays.Remove(&Display.GetPointer()->Link);
+		delete Display.GetPointer();
+	}
+
+	for (ZESize I = 0; I < DisplayCount; I++)
+	{
+		ZEMLReaderNode DisplayNode = DisplaysNode.GetNode("Object", I);
+		ZERNStageDisplay* Display = ZERNStageDisplay::CreateInstance();
+		Display->GetClass()->Unserialize(Display, DisplayNode);
+		AddInput(Display);
+	}
+
+	return true;
 }
 
 ZERNStageMultiplexer::ZERNStageMultiplexer()

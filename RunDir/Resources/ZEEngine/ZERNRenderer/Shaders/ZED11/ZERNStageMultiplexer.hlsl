@@ -46,21 +46,12 @@ cbuffer	ZERNStageMultiplexer_Constants					: register(ZERN_SHADER_CONSTANT_STAGE
 {
 	float3x3		ZERNStageMultiplexer_Transform;
 	float2			ZERNStageMultiplexer_InputSize;
-	float2			ZERNStageMultiplexer_Reserved0;
+	float2			ZERNStageMultiplexer_CropOffset;
 }
 
 float4 ZERNStageMultiplexer_PixelShader(float4 PositionViewport : SV_Position, float2 Texcoord : TEXCOORD0) : SV_Target0
 {
-	float2 TexcoordTransformed = mul(ZERNStageMultiplexer_Transform, float3(Texcoord, 1.0f)).xy;
-	
-	if (any(TexcoordTransformed < float2(0.0f, 0.0f)) ||
-		any(TexcoordTransformed > ZERNStageMultiplexer_InputSize))
-	{
-		discard;
-		return 0.0f;
-	}
-	
-	return ZERNStageMultiplexer_Texture.SampleLevel(ZERNStageMultiplexer_Sampler, TexcoordTransformed, 0.0f);
+	return ZERNStageMultiplexer_Texture[floor(PositionViewport.xy) + ZERNStageMultiplexer_CropOffset];
 }
 
 #endif

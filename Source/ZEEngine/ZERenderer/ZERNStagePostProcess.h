@@ -53,7 +53,7 @@ class ZERNStagePostProcess : public ZERNStage
 		ZEHolder<const ZEGRTexture>			OutputTexture;
 
 		ZEList2<ZERNFilter>					Filters;
-		ZEArray<ZEHolder<ZEGRTexture>>		TempTextures;
+
 
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();

@@ -38,43 +38,27 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer\ZEHolder.h"
-#include "ZEGraphics\ZEGRFormat.h"
+
+class ZEGRTexture;
 
 class ZERNStageOutputTexture : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		bool								Dirty;
-
-		//ZEHolder<ZEGRTexture2D>				Texture;
-		//const ZEGRRenderTarget*				RenderTarget;
-		//
-		//ZERNStageBuffer						TargetBuffer;
-		ZEUInt								Width;
-		ZEUInt								Height;
-		ZEGRFormat							Format;
-
-		bool								Update();
+		ZEHolder<const ZEGRTexture>			OutputTexture;
+		ZEString							OutputName;
 
 											ZERNStageOutputTexture();
-		
+
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		//void								SetTargetBuffer(ZERNStageBuffer Buffer);
-		//ZERNStageBuffer						GetTargetBuffer() const;
+		void								SetOutputName(const ZEString& Name);
+		const ZEString&						GetOutputName() const;
+		
+		void								SetOutputTexture(const ZEGRTexture* Texture);
+		const ZEGRTexture*					GetOutputTexture() const;
 
-		void								SetWidth(ZEUInt Width);
-		ZEUInt								GetWidth() const;
-
-		void								SetHeight(ZEUInt Height);
-		ZEUInt								GetHeight() const;
-
-		void								SetFormat(ZEGRFormat Format);
-		ZEGRFormat							GetFormat() const;
-
-		virtual bool						Setup(ZEGRContext* Context);
-
-		//virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
+		static ZERNStageOutputTexture*		CreateInstance();
 };

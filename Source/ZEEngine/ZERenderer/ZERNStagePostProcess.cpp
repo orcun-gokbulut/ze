@@ -108,7 +108,7 @@ ZEArray<ZERNFilter*> ZERNStagePostProcess::GetFilters(ZEClass* Class) const
 
 	ze_for_each(Filter, Filters)
 	{
-		if (ZEClass::IsDerivedFrom(Class, Filter->GetClass()))
+		if (Filter->GetClass() == Class)
 			Output.Add(Filter.GetPointer());
 	}
 
@@ -147,13 +147,6 @@ void ZERNStagePostProcess::RemoveFilter(ZERNFilter* Filter)
 
 void ZERNStagePostProcess::Resized(ZEUInt Width, ZEUInt Height)
 {
-	if (Filters.GetCount() > 0)
-	{
-		TempTextures.SetCount(Filters.GetCount() - 1);
-		ze_for_each(Texture, TempTextures)
-			Texture.GetItem() = ZEGRTexture::CreateResource(ZEGR_TT_2D, Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
-	}
-
 	DirtyFlags.RaiseFlags(ZERN_SPDF_OUTPUT);
 }
 
@@ -165,33 +158,20 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (Filters.GetCount() == 0)
 		return false;
 
-	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
 
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)OutputTexture->GetWidth(), (float)OutputTexture->GetHeight()));
-
-	if (Filters.GetCount() == 1)
+	for (ZEUInt I = 0; I < Filters.GetCount(); I++)
 	{
-		Filters[0]->SetInputTexture(InputTexture);
-		Filters[0]->SetOutputTexture(OutputTexture);
-		Filters[0]->Apply(Context);
-	}
-	else
-	{
-		for (ZEUInt I = 0; I < (Filters.GetCount() - 1); I++)
-		{
-			if (I > 0)
-				Filters[I]->SetInputTexture(TempTextures[I - 1]);
-			else
-				Filters[I]->SetInputTexture(InputTexture);
+		if (I == 0)
+			Filters[I]->SetInputTexture(InputTexture);
+		else
+			Filters[I]->SetInputTexture(Filters[I - 1]->GetOutputTexture());
 
-			Filters[I]->SetOutputTexture(TempTextures[I]);
+		if (I == (Filters.GetCount() - 1))
+			Filters[I]->SetOutputTexture(OutputTexture);
+		else
+			Filters[I]->SetOutputTexture(NULL);
+
 			Filters[I]->Apply(Context);
-		}
-
-		Filters[(Filters.GetCount() - 1)]->SetInputTexture(TempTextures.GetLastItem());
-		Filters[(Filters.GetCount() - 1)]->SetOutputTexture(OutputTexture);
-		Filters[(Filters.GetCount() - 1)]->Apply(Context);
 	}
 
 	return true;

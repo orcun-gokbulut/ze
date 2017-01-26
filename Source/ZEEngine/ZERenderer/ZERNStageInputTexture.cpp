@@ -36,6 +36,7 @@
 #include "ZERNStageInputTexture.h"
 
 #include "ZERNStageID.h"
+#include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture.h"
 
@@ -59,11 +60,11 @@ void ZERNStageInputTexture::SetInputName(const ZEString& Name)
 	if (InputName == Name)
 		return;
 
-	RemoveOutputResource(InputName);
+	RemoveInputResource(InputName);
 
 	InputName = Name;
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&InputTexture), InputName, ZERN_SRUT_READ, ZERN_SRCF_CREATE_OWN);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&InputTexture), InputName, ZERN_SRUT_NONE, ZERN_SRCF_GET_FROM_PREV);
 }
 
 const ZEString& ZERNStageInputTexture::GetInputName() const
@@ -73,7 +74,13 @@ const ZEString& ZERNStageInputTexture::GetInputName() const
 
 void ZERNStageInputTexture::SetInputTexture(const ZEGRTexture* Texture)
 {
+	if (InputTexture == Texture)
+		return;
+
 	InputTexture = Texture;
+	
+	if (GetRenderer() != NULL)
+		GetRenderer()->MarkDirtyPipeline();
 }
 
 const ZEGRTexture* ZERNStageInputTexture::GetInputTexture() const

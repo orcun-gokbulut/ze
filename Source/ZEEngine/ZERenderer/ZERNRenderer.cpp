@@ -450,6 +450,9 @@ void ZERNRenderer::BindStages()
 
 		ze_for_each(InputResource, Stage->InputResources)
 		{
+			if (InputResource->Usage == ZERN_SRUT_NONE)
+				continue;
+
 			*InputResource->Resource = NULL;
 
 			if (InputResource->CreationFlags.GetFlags(ZERN_SRCF_GET_FROM_PREV))
@@ -465,6 +468,18 @@ void ZERNRenderer::BindStages()
 						{
 							*InputResource->Resource = *PrevStageOutputResource->Resource;
 							break;
+						}
+					}
+
+					if ((*InputResource->Resource) == NULL)
+					{
+						ze_for_each(PrevStageInputResource, PrevStage->InputResources)
+						{
+							if (PrevStageInputResource->Name == InputResource->Name)
+							{
+								*InputResource->Resource = *PrevStageInputResource->Resource;
+								break;
+							}
 						}
 					}
 

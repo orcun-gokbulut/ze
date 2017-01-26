@@ -48,6 +48,7 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERNStage.h"
+#include "ZEGraphics/ZEGRSampler.h"
 
 #define	ZERN_FDF_SHADERS			1
 #define ZERN_FDF_RENDER_STATE		2
@@ -128,12 +129,12 @@ bool ZERNFilter::Update()
 	return true;
 }
 
-const ZEGRTexture* ZERNFilter::GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+ZEHolder<const ZEGRTexture> ZERNFilter::GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	ze_for_each(TempTexture, TempTextures)
 	{
 		ZEGRTexture* Texture = TempTexture->GetPointer();
-		if (Texture->GetWidth() != Width || Texture->GetHeight() != Height || Texture->GetFormat() != Format)
+		if (Texture->GetReferenceCount() > 1 || Texture->GetWidth() != Width || Texture->GetHeight() != Height || Texture->GetFormat() != Format)
 			continue;
 
 		return Texture;
@@ -328,6 +329,11 @@ bool ZERNFilterGaussianBlur::UpdateConstantBuffers()
 	return true;
 }
 
+const ZEGRTexture* ZERNFilterGaussianBlur::GetOutputTexture() const
+{
+	return (OutputTexture != NULL) ? OutputTexture : InputTexture;
+}
+
 void ZERNFilterGaussianBlur::SetUseComputeShader(bool UseComputeShader)
 {
 	this->UseComputeShader = UseComputeShader;
@@ -375,9 +381,7 @@ void ZERNFilterGaussianBlur::Apply(ZEGRContext* Context)
 	if (!Update())
 		return;
 
-	const ZEGRTexture* TempTexture = GetTempTexture(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetFormat());
-	if (TempTexture == NULL)
-		return;
+	ZEHolder<const ZEGRTexture> TempTexture = GetTempTexture(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetFormat());
 
 	if (!UseComputeShader)
 	{
@@ -489,12 +493,46 @@ bool ZERNFilterImageTransform::UpdateRenderStates()
 	return true;
 }
 
+void ZERNFilterImageTransform::SetOutputWidth(ZEUInt Width)
+{
+	OutputWidth = Width;
+}
+
+ZEUInt ZERNFilterImageTransform::GetOutputWidth() const
+{
+	return OutputWidth;
+}
+
+void ZERNFilterImageTransform::SetOutputHeight(ZEUInt Height)
+{
+	OutputHeight = Height;
+}
+
+ZEUInt ZERNFilterImageTransform::GetOutputHeight() const
+{
+	return OutputHeight;
+}
+
+void ZERNFilterImageTransform::SetSampler(const ZEGRSampler* Sampler)
+{
+	this->Sampler = Sampler;
+}
+
+const ZEGRSampler* ZERNFilterImageTransform::GetSampler() const
+{
+	return Sampler;
+}
+
 void ZERNFilterImageTransform::Apply(ZEGRContext* Context)
 {
 	ZERNFilter::Apply(Context);
 
 	if (!Update())
 		return;
+
+	ZEHolder<const ZEGRTexture> TempOutputTexture;
+	if (OutputTexture == NULL)
+		OutputTexture = TempOutputTexture = GetTempTexture(OutputWidth, OutputHeight, InputTexture->GetFormat());
 
 	Viewport.SetWidth((float)OutputTexture->GetWidth());
 	Viewport.SetHeight((float)OutputTexture->GetHeight());
@@ -503,6 +541,7 @@ void ZERNFilterImageTransform::Apply(ZEGRContext* Context)
 
 	Context->SetRenderState(ScaleGraphicsRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
@@ -510,7 +549,9 @@ void ZERNFilterImageTransform::Apply(ZEGRContext* Context)
 
 ZERNFilterImageTransform::ZERNFilterImageTransform()
 {
-
+	Sampler = ZEGRSampler::GetDefaultSampler();
+	OutputWidth = 0;
+	OutputHeight = 0;
 }
 
 bool ZERNFilterEdgeDetection::InitializeInternal()
@@ -705,6 +746,10 @@ void ZERNFilterColorTransform::Apply(ZEGRContext* Context)
 	if (!Update())
 		return;
 
+	ZEHolder<const ZEGRTexture> TempOutputTexture;
+	if (OutputTexture == NULL)
+		OutputTexture = TempOutputTexture = GetTempTexture(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetFormat());
+
 	Viewport.SetWidth((float)OutputTexture->GetWidth());
 	Viewport.SetHeight((float)OutputTexture->GetHeight());
 
@@ -876,6 +921,10 @@ void ZERNFilterNoise::Apply(ZEGRContext* Context)
 	//Context->SetRWTexture(0, NoiseTexture);
 	//Context->SetComputeRenderState(GenerateNoiseComputeRenderStateData);
 	//Context->Dispatch(32, 32, 1);
+
+	ZEHolder<const ZEGRTexture> TempOutputTexture;
+	if (OutputTexture == NULL)
+		OutputTexture = TempOutputTexture = GetTempTexture(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetFormat());
 
 	Viewport.SetWidth((float)OutputTexture->GetWidth());
 	Viewport.SetHeight((float)OutputTexture->GetHeight());
