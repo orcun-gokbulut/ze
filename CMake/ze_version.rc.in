@@ -20,7 +20,7 @@ BEGIN
 			VALUE "FileDescription", "@PARAMETER_DESCRIPTION@"
 			VALUE "FileVersion", "@ZEBUILD_VERSION@"
 			VALUE "InternalName", "@PARAMETER_TARGET@"
-			VALUE "LegalCopyright", "Copyright (C) 2008-2015, Zinek Code House. All rights reserved."
+			VALUE "LegalCopyright", "Copyright (C) 2008-2017, Zinek Code House. All rights reserved."
 			VALUE "OriginalFilename", "@PARAMETER_TARGET@.@PARAMETER_EXTENSION@"
 			VALUE "ProductName", "Zinek Engine"
 			VALUE "ProductVersion", "@ZEBUILD_VERSION_MAJOR@.@ZEBUILD_VERSION_MINOR@"
