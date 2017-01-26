@@ -96,6 +96,8 @@ class ZERNStageMultiplexer : public ZERNStage
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);
 
+		virtual bool						Unserialize(ZEMLReaderNode* StageNode);
+
 											ZERNStageMultiplexer();
 		virtual								~ZERNStageMultiplexer();
 };

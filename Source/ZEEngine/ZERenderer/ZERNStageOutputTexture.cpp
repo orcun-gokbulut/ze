@@ -35,119 +35,60 @@
 
 #include "ZERNStageOutputTexture.h"
 
-#include "ZERNRenderer.h"
 #include "ZERNStageID.h"
+#include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
-
-bool ZERNStageOutputTexture::Update()
-{
-	if (!Dirty)
-		return true;
-
-	//Texture = ZEGRTexture2D::CreateResource(Width, Height, 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-	//if (Texture == NULL)
-	//	return false;
-	//
-	//RenderTarget = Texture->GetRenderTarget();
-	//if (RenderTarget == NULL)
-	//	return false;
-	
-	Dirty = false;
-
-	return true;
-}
 
 ZERNStageOutputTexture::ZERNStageOutputTexture()
 {
-	//TargetBuffer = ZERN_SO_COLOR;
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_TF_NONE;
 }
 
 ZEInt ZERNStageOutputTexture::GetId() const
 {
-	return ZERN_STAGE_TEXTURE_OUTPUT;
+	return ZERN_STAGE_OUTPUT;
 }
 
 const ZEString& ZERNStageOutputTexture::GetName() const
 {
-	static const ZEString Name = "TextureOutput";
+	static const ZEString Name = "OutputTexture";
 	return Name;
 }
 
-//const ZEGRRenderTarget* ZERNStageOutputTexture::GetProvidedInput(ZERNStageBuffer Buffer) const
-//{
-//	if (Buffer == GetTargetBuffer())
-//		return RenderTarget;
-//	else
-//		return ZERNStage::GetProvidedInput(Buffer);
-//}
-
-void ZERNStageOutputTexture::SetWidth(ZEUInt Width)
+void ZERNStageOutputTexture::SetOutputName(const ZEString& Name)
 {
-	if (this->Width == Width)
+	if (OutputName == Name)
 		return;
 
-	this->Width = Width;
+	RemoveOutputResource(OutputName);
 
-	Dirty = true;
+	OutputName = Name;
+
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&OutputTexture), OutputName, ZERN_SRUT_READ_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN);
 }
 
-ZEUInt ZERNStageOutputTexture::GetWidth() const
+const ZEString& ZERNStageOutputTexture::GetOutputName() const
 {
-	return Width;
+	return OutputName;
 }
 
-void ZERNStageOutputTexture::SetHeight(ZEUInt Height)
+void ZERNStageOutputTexture::SetOutputTexture(const ZEGRTexture* Texture)
 {
-	if (this->Height == Height)
+	if (OutputTexture == Texture)
 		return;
 
-	this->Height = Height;
+	OutputTexture = Texture;
 
-	Dirty = true;
+	if (GetRenderer() != NULL)
+		GetRenderer()->MarkDirtyPipeline();
 }
 
-ZEUInt ZERNStageOutputTexture::GetHeight() const
+const ZEGRTexture* ZERNStageOutputTexture::GetOutputTexture() const
 {
-	return Height;
+	return OutputTexture;
 }
 
-//void ZERNStageOutputTexture::SetTargetBuffer(ZERNStageBuffer Buffer)
-//{
-//	TargetBuffer = Buffer;
-//}
-//
-//ZERNStageBuffer ZERNStageOutputTexture::GetTargetBuffer() const
-//{
-//	return TargetBuffer;
-//}
-
-void ZERNStageOutputTexture::SetFormat(ZEGRFormat Format)
+ZERNStageOutputTexture* ZERNStageOutputTexture::CreateInstance()
 {
-	if (this->Format == Format)
-		return;
-
-	this->Format = Format;
-
-	Dirty = true;
-}
-
-ZEGRFormat ZERNStageOutputTexture::GetFormat() const
-{
-	return Format;
-}
-
-bool ZERNStageOutputTexture::Setup(ZEGRContext* Context)
-{
-	if (!ZERNStage::Setup(Context))
-		return false;
-
-	if (!Update())
-		return false;
-
-	return true;
+	return new ZERNStageOutputTexture();
 }

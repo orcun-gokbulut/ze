@@ -48,6 +48,7 @@
 #include "ZERNFilterCommon.h"
 
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRContext;
 class ZEGRTexture;
 class ZEGRBuffer;
@@ -85,14 +86,14 @@ class ZERNFilter : public ZEObject, public ZEInitializable
 
 		bool									Update();
 
-		const ZEGRTexture*						GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		ZEHolder<const ZEGRTexture>				GetTempTexture(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
 	public:
 		virtual void							SetInputTexture(const ZEGRTexture* InputTexture);
-		const ZEGRTexture*						GetInputTexture() const;
+		virtual const ZEGRTexture*				GetInputTexture() const;
 
 		virtual void							SetOutputTexture(const ZEGRTexture* OutputTexture);
-		const ZEGRTexture*						GetOutputTexture() const;
+		virtual const ZEGRTexture*				GetOutputTexture() const;
 
 		virtual void							Apply(ZEGRContext* Context);
 
@@ -136,6 +137,8 @@ class ZERNFilterGaussianBlur : public ZERNFilter
 		virtual bool							UpdateConstantBuffers() override;
 
 	public:
+		virtual const ZEGRTexture*				GetOutputTexture() const override;
+
 		void									SetUseComputeShader(bool UseComputeShader);
 		bool									GetUseComputeShader() const;
 
@@ -158,6 +161,10 @@ class ZERNFilterImageTransform : public ZERNFilter
 
 		ZEHolder<ZEGRRenderStateData>			ScaleGraphicsRenderStateData;
 
+		ZEHolder<const ZEGRSampler>				Sampler;
+		ZEUInt									OutputWidth;
+		ZEUInt									OutputHeight;
+
 		virtual bool							InitializeInternal() override;
 		virtual bool							DeinitializeInternal() override;
 
@@ -165,6 +172,15 @@ class ZERNFilterImageTransform : public ZERNFilter
 		virtual bool							UpdateRenderStates() override;
 
 	public:
+		void									SetOutputWidth(ZEUInt Width);
+		ZEUInt									GetOutputWidth() const;
+
+		void									SetOutputHeight(ZEUInt Height);
+		ZEUInt									GetOutputHeight() const;
+
+		void									SetSampler(const ZEGRSampler* Sampler);
+		const ZEGRSampler*						GetSampler() const;
+
 		virtual void							Apply(ZEGRContext* Context) override;
 
 												ZERNFilterImageTransform();

@@ -55,6 +55,7 @@ class ZERNCommand;
 
 ZE_ENUM(ZERNStageResourceUsageType)
 {
+	ZERN_SRUT_NONE			= 0,
 	ZERN_SRUT_READ			= 1,
 	ZERN_SRUT_WRITE			= 2,
 	ZERN_SRUT_READ_WRITE	= 3
@@ -62,6 +63,7 @@ ZE_ENUM(ZERNStageResourceUsageType)
 
 ZE_ENUM(ZERNStageResourceCreationFlag)
 {
+	ZERN_SRCF_NONE			= 0,
 	ZERN_SRCF_GET_FROM_PREV	= 1,
 	ZERN_SRCF_GET_OUTPUT	= 2,
 	ZERN_SRCF_CREATE_OWN	= 4,
@@ -121,6 +123,9 @@ class ZERNStage : public ZEObject, public ZEInitializable
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);
+
+		virtual bool						Serialize(ZEMLWriterNode* StageNode);
+		virtual bool						Unserialize(ZEMLReaderNode* StageNode);
 
 											ZERNStage();
 

@@ -96,7 +96,7 @@ class ZERNStageDisplay : public ZEObject, public ZEInitializable
 			ZEVector4							Transform1;
 			ZEVector4							Transform2;
 			ZEVector2							InputSize;
-			ZEVector2							Reserved0;
+			ZEVector2							CropOffset;
 		} Constants;							
 												
 		ZEHolder<ZEGRBuffer>					ConstantBuffer;

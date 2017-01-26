@@ -156,6 +156,7 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	Constants.Transform1 = ZEVector4(Matrix.M[1][0], Matrix.M[1][1], Matrix.M[1][2], 0.0f);
 	Constants.Transform2 = ZEVector4(Matrix.M[2][0], Matrix.M[2][1], Matrix.M[2][2], 0.0f);
 	Constants.InputSize = InputSizeMod * PixelScale;
+	Constants.CropOffset = InputOffset;
 
 	ConstantBuffer->SetData(&Constants);
 

@@ -183,6 +183,16 @@ void ZERNStage::CleanUp(ZEGRContext* Context)
 	Context->EndEvent();
 }
 
+bool ZERNStage::Serialize(ZEMLWriterNode* StageNode)
+{
+	return true;
+}
+
+bool ZERNStage::Unserialize(ZEMLReaderNode* StageNode)
+{
+	return true;
+}
+
 ZERNStage::ZERNStage() : Link(this)
 {
 	Renderer = NULL;
