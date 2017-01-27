@@ -222,7 +222,7 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 		for (uint S = 0; S < SAMPLE_COUNT; S++)
 		{
 			float3 SampleColor = ZERNHDR_InputTexture.Load(SamplePosition, S);
-			Luminance[I] += log(ZERNHDR_Calculate_Luminance(SampleColor));
+			Luminance[I] += any(isinf(SampleColor)) ? 0.0f : log(ZERNHDR_Calculate_Luminance(SampleColor));
 		}
 		
 		Luminance[I] /= SAMPLE_COUNT; 
@@ -237,7 +237,7 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 	for (uint J = 0; J < 4; J++)
 	{
 		float3 Color = float3(ColorReds[J], ColorGreens[J], ColorBlues[J]);	
-		Luminance += log(ZERNHDR_Calculate_Luminance(Color));
+		Luminance += any(isinf(Color)) ? 0.0f : log(ZERNHDR_Calculate_Luminance(Color));
 	}
 	
 	return Luminance / 4.0f;
@@ -291,7 +291,7 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 PositionViewport : SV_Positio
 			ScaledLuminance = exp2(ScaledLuminance);
 			float3 ScaledColor = (SampleColor / Luminance * ScaledLuminance);
 			
-			ResultColors[I] += ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * rcp(ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
+			ResultColors[I] += any(isinf(ScaledColor) || isnan(ScaledColor)) ? 0.0f : (ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * rcp(ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel)));
 		}
 		ResultColors[I] /= SAMPLE_COUNT;
 	}
@@ -311,7 +311,7 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 PositionViewport : SV_Positio
 		ScaledLuminance -= ZERNHDR_BloomThreshold;
 		ScaledLuminance = exp2(ScaledLuminance);
 		float3 ScaledColor = (Color / Luminance * ScaledLuminance);
-		ResultColor += ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * rcp(ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
+		ResultColor += any(isinf(ScaledColor) || isnan(ScaledColor)) ? 0.0f : (ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * rcp(ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel)));
 	}
 	
 	return ResultColor / 4.0f;

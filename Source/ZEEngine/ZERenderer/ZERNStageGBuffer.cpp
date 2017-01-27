@@ -179,10 +179,10 @@ ZERNStageGBuffer::ZERNStageGBuffer()
 {
 	DirtyFlags.RaiseAll();
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer0), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBuffer1", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBuffer2", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBuffer3", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer0), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer1), "GBuffer1", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer2), "GBuffer2", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&GBuffer3), "GBuffer3", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthStencilBuffer), "DepthTexture", ZERN_SRUT_READ_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN);
 }
 
