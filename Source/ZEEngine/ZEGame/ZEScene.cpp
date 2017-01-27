@@ -162,8 +162,7 @@ bool ZEScene::InitializeInternal()
 
 bool ZEScene::DeinitializeInternal()
 {
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Deinitialize();
+	DeinitializeEntities();
 
 	if (PhysicalWorld != NULL)
 		PhysicalWorld->Deinitialize();

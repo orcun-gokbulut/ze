@@ -157,6 +157,7 @@ static void GetWin32Style(ZEGRWindow* Window, DWORD& Win32StyleExt, DWORD& Win32
 	Win32Style = 0;
 	Win32StyleExt = 0;
 
+	Win32Style |= !Window->GetTitleBar() && !Window->GetFullScreen() ? WS_POPUP : 0;
 	Win32Style |= Window->GetTitleBar() ? WS_OVERLAPPED | WS_CAPTION : 0;
 	Win32Style |= Window->GetTitleBar() && Window->GetIconVisible() && Window->GetCloseButton() ? WS_SYSMENU : 0;
 	Win32Style |= Window->GetTitleBar() && Window->GetMinimizeButton() ? WS_MINIMIZEBOX : 0;
@@ -694,7 +695,7 @@ bool ZEGRWindow::InitializeInternal()
 	::SetWindowLongPtr((HWND)Handle, GWL_STYLE, Win32Style);
 	::SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, Win32StyleExt);
 
-	int ShowState = Maximized ? SW_SHOWMAXIMIZED : (Minimized ? SW_SHOWMINIMIZED : SW_SHOW);
+	int ShowState = !Visible ? SW_HIDE : (Maximized ? SW_SHOWMAXIMIZED : (Minimized ? SW_SHOWMINIMIZED : SW_SHOW));
 	::SetWindowPos((HWND)Handle, AlwaysOnTop ? HWND_TOPMOST : HWND_TOP, WindowPosX, WindowPosY, WindowWidth, WindowHeight, SWP_FRAMECHANGED | SWP_NOACTIVATE);
 
 	::EnableWindow((HWND)Handle, Enabled);
