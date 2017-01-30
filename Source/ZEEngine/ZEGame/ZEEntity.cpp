@@ -168,60 +168,69 @@ void ZEEntity::UpdateRenderabilityState(bool Forced)
 void ZEEntity::ParentVisibleChanged()
 {
 	EntityLock.LockNested();
-
-	bool NewState = GetVisible();
-	if (GetParent() != NULL)
-		NewState &= GetParent()->VisibleFlattened;
-
-	if (VisibleFlattened == NewState)
 	{
-		EntityLock.Unlock();
-		return;
+		bool NewState = GetVisible();
+		if (GetParent() != NULL)
+			NewState &= GetParent()->VisibleFlattened;
+
+		if (VisibleFlattened == NewState)
+		{
+			EntityLock.Unlock();
+			return;
+		}
+
+		VisibleFlattened = NewState;
+		UpdateRenderabilityState();
+
+		Components.LockRead();
+		{
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->ParentVisibleChanged();
+		}
+		Components.UnlockRead();
+
+		ChildEntities.LockRead();
+		{
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->ParentVisibleChanged();
+		}
+		ChildEntities.UnlockRead();
+
 	}
-
-	VisibleFlattened = NewState;
-	UpdateRenderabilityState();
-
-	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->ParentVisibleChanged();
-	Components.UnlockRead();
-
-	ChildEntities.LockRead();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->ParentVisibleChanged();
-	ChildEntities.UnlockRead();
-
 	EntityLock.Unlock();
 }
 
 void ZEEntity::ParentEnabledChanged()
 {
 	EntityLock.LockNested();
-
-	bool NewState = GetEnabled();
-	if (GetParent() != NULL)
-		NewState &= GetParent()->EnabledFlattened;
-
-	if (EnabledFlattened == NewState)
 	{
-		EntityLock.Unlock();
-		return;
+		bool NewState = GetEnabled();
+		if (GetParent() != NULL)
+			NewState &= GetParent()->EnabledFlattened;
+
+		if (EnabledFlattened == NewState)
+		{
+			EntityLock.Unlock();
+			return;
+		}
+
+		EnabledFlattened = NewState;
+		UpdateTickabilityState();
+
+		Components.LockRead();
+		{
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->ParentEnabledChanged();
+		}
+		Components.UnlockRead();
+
+		ChildEntities.LockRead();
+		{
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->ParentEnabledChanged();
+		}
+		ChildEntities.UnlockRead();
 	}
-
-	EnabledFlattened = NewState;
-	UpdateTickabilityState();
-
-	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->ParentEnabledChanged();
-	Components.UnlockRead();
-
-	ChildEntities.LockRead();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->ParentEnabledChanged();
-	ChildEntities.UnlockRead();
-
 	EntityLock.Unlock();
 }
 
@@ -238,8 +247,10 @@ void ZEEntity::LocalTransformChanged()
 		ZE_EDF_WORLD_BOUNDING_BOX);
 
 	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->ParentTransformChanged();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+			Components[I]->ParentTransformChanged();
+	}
 	Components.UnlockRead();
 
 	ChildEntities.LockRead();
@@ -255,13 +266,17 @@ void ZEEntity::ParentTransformChanged()
 		ZE_EDF_WORLD_BOUNDING_BOX);
 
 	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->ParentTransformChanged();
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+			Components[I]->ParentTransformChanged();
+	}
 	Components.UnlockRead();
 
 	ChildEntities.LockRead();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->ParentTransformChanged();
+	{
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			ChildEntities[I]->ParentTransformChanged();
+	}
 	ChildEntities.UnlockRead();
 
 	EntityLock.LockNested();
@@ -282,20 +297,22 @@ void ZEEntity::BoundingBoxChanged()
 	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 
 	EntityLock.LockNested();
-	if (GetStatic() && 
-		GetScene() != NULL &&
-		IsLoaded() && 
-		GetEntityFlags().GetFlags(ZE_EF_CULLABLE))
 	{
-		GetScene()->UpdateOctree(this);
+		if (GetStatic() && 
+			GetScene() != NULL &&
+			IsLoaded() && 
+			GetEntityFlags().GetFlags(ZE_EF_CULLABLE))
+		{
+			GetScene()->UpdateOctree(this);
+		}
 	}
-
 	EntityLock.Unlock();
 }
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
 {
 	zeCheckError(Entity == NULL, false, "Cannot add component entity. Component Entity is NULL.");
+	zeCheckError(Entity->IsDestroyed(), false, "Cannot add child entity. Component Entity is destroyed. (DANGEROUS!!!)");
 	zeCheckError(Entity->Parent != NULL, false, 
 		"Can not add component entity. Component entity belongs to another Entity. Parent Entity Name: \"%s\", Component Entity Name: \"%s\".", 
 		GetName().ToCString(), Entity->GetName().ToCString());
@@ -316,7 +333,9 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 	Entity->SetScene(this->Scene);
 
 	Components.LockWrite();
-	Components.Add(Entity);
+	{
+		Components.Add(Entity);
+	}
 	Components.UnlockWrite();
 
 	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
@@ -342,10 +361,12 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 void ZEEntity::ClearComponents()
 {
 	Components.LockWrite();
-	while(Components.GetCount() != 0)
 	{
-		ZEEntity* Component = Components.GetFirstItem();
-		Component->Destroy();
+		while(Components.GetCount() != 0)
+		{
+			ZEEntity* Component = Components.GetFirstItem();
+			Component->Destroy();
+		}
 	}
 	Components.UnlockWrite();
 }
@@ -353,6 +374,7 @@ void ZEEntity::ClearComponents()
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
 	zeCheckError(Entity == NULL, false, "Cannot add child entity. Child Entity is NULL.");
+	zeCheckError(Entity->IsDestroyed(), false, "Cannot add child entity. Entity is destroyed. (DANGEROUS!!!)");
 	zeCheckError(Entity->Parent != NULL, false, 
 		"Can not add child entity. Child entity belongs to another Entity. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
 		GetName().ToCString(), Entity->GetName().ToCString());
@@ -398,10 +420,12 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 void ZEEntity::ClearChildEntities()
 {
 	ChildEntities.LockWrite();
-	while(ChildEntities.GetCount() != 0)
 	{
-		ZEEntity* ChildEntity = ChildEntities.GetFirstItem();
-		ChildEntity->Destroy();
+		while (ChildEntities.GetCount() != 0)
+		{
+			ZEEntity* ChildEntity = ChildEntities.GetFirstItem();
+			ChildEntity->Destroy();
+		}
 	}
 	ChildEntities.UnlockWrite();
 }
@@ -423,51 +447,58 @@ bool ZEEntity::CheckChildEntity(ZEEntity* Parent)
 
 void ZEEntity::SetParent(ZEEntity* Parent)
 {
-	EntityLock.Lock();
-	this->Parent = Parent;
-	ParentTransformChanged();
-	ParentEnabledChanged();
-	ParentVisibleChanged();
+	EntityLock.LockNested();
+	{
+		this->Parent = Parent;
+		ParentTransformChanged();
+		ParentEnabledChanged();
+		ParentVisibleChanged();
+	}
 	EntityLock.Unlock();
 }
 
 void ZEEntity::SetScene(ZEScene* NewScene)
 {
-	EntityLock.Lock();
-
-	if (Scene == NewScene)
+	EntityLock.LockNested();
 	{
-		EntityLock.Unlock();
-		return;
+		if (Scene == NewScene)
+		{
+			EntityLock.Unlock();
+			return;
+		}
+
+		if (Scene != NULL)
+		{
+			if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE) || GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM))
+				Scene->RemoveFromTickList(this);
+
+			if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) || GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM))
+				Scene->RemoveFromRenderList(this);
+		}
+
+		Scene = NewScene;
+
+		if (Scene != NULL)
+		{
+			UpdateTickabilityState();
+			UpdateRenderabilityState();
+		}
+
+		Components.LockRead();
+		{
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->SetScene(Scene);
+		}
+		Components.UnlockRead();
+
+		ChildEntities.LockRead();
+		{
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->SetScene(Scene);
+		}
+		ChildEntities.UnlockRead();
+
 	}
-
-	if (Scene != NULL)
-	{
-		if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE) || GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM))
-			Scene->RemoveFromTickList(this);
-
-		if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) || GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM))
-			Scene->RemoveFromRenderList(this);
-	}
-
-	Scene = NewScene;
-
-	if (Scene != NULL)
-	{
-		UpdateTickabilityState();
-		UpdateRenderabilityState();
-	}
-
-	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->SetScene(Scene);
-	Components.UnlockRead();
-
-	ChildEntities.LockRead();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->SetScene(Scene);
-	ChildEntities.UnlockRead();
-
 	EntityLock.Unlock();
 }
 
@@ -489,6 +520,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
 		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));*/
 
+	// Persistent States
 	if (State == ZE_ES_NONE)
 	{
 		ReloadFlag = false;
@@ -500,38 +532,28 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		{
 			State = ZE_ES_DESTROYING;
 
-			#ifdef ZE_DEBUG_ENABLE
-			DestroyInternalChainCheck = false;
-			#endif
-
-			DestroyInternal();
+			ClearChildEntities();
+			ClearComponents();
 			
-			zeDebugCheck(!DestroyInternalChainCheck, "DestroyInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
-
-			Components.LockWrite();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Destroy();
-			Components.Clear();
-			Components.UnlockWrite();
-
-			ChildEntities.LockWrite();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Destroy();
-			ChildEntities.Clear();
-			ChildEntities.UnlockWrite();
+			delete this;
+			return ZE_TR_DONE;
 		}
 		else if (TargetState >= ZE_ES_LOADED)
 		{
 			State = ZE_ES_LOADING;
 
 			Components.LockRead();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Load();
+			{
+				for (ZESize I = 0; I < Components.GetCount(); I++)
+					Components[I]->Load();
+			}
 			Components.UnlockRead();
 
 			ChildEntities.LockRead();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Load();
+			{
+				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+					ChildEntities[I]->Load();
+			}
 			ChildEntities.UnlockRead();
 
 			return ZE_TR_COOPERATING;
@@ -550,13 +572,17 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			State = ZE_ES_UNLOADING;
 
 			Components.LockRead();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Unload();
+			{
+				for (ZESize I = 0; I < Components.GetCount(); I++)
+					Components[I]->Unload();
+			}
 			Components.UnlockRead();
 
 			ChildEntities.LockRead();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Unload();
+			{
+				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+					ChildEntities[I]->Unload();
+			}
 			ChildEntities.UnlockRead();
 		}
 		else if (TargetState == ZE_ES_INITIALIZED)
@@ -564,13 +590,17 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			State = ZE_ES_INITIALIZING;
 
 			Components.LockRead();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Initialize();
+			{
+				for (ZESize I = 0; I < Components.GetCount(); I++)
+					Components[I]->Initialize();
+			}
 			Components.UnlockRead();
 
 			ChildEntities.LockRead();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Initialize();
+			{
+				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+					ChildEntities[I]->Initialize();
+			}
 			ChildEntities.UnlockRead();
 		}
 	}
@@ -583,33 +613,25 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			State = ZE_ES_DEINITIALIZING;
 
 			Components.LockRead();
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Deinitialize();
+			{
+				for (ZESize I = 0; I < Components.GetCount(); I++)
+					Components[I]->Deinitialize();
+			}
 			Components.UnlockRead();
 
 			ChildEntities.LockRead();
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Deinitialize();
+			{
+				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+					ChildEntities[I]->Deinitialize();
+			}
 			ChildEntities.UnlockRead();
 		}
 	}
 	
+	// Transition States
 	if (State == ZE_ES_DESTROYING)
 	{
-		Components.LockRead();
-		ZESize DependencyCount = Components.GetCount();
-		Components.UnlockRead();
-
-		ChildEntities.LockRead();
-		DependencyCount = ChildEntities.GetCount();
-		ChildEntities.UnlockRead();
-
-		if (DependencyCount != 0)
-			return ZE_TR_COOPERATING;
-
-		State = ZE_ES_DESTROYED;
-		delete this;
-		return ZE_TR_DONE;
+		return ZE_TR_COOPERATING;
 	}
 	else if (State == ZE_ES_LOADING)
 	{
@@ -762,8 +784,10 @@ void ZEEntity::SetLocalLoadingPercentage(ZEUInt Percentage)
 	if (Percentage > 100)
 		Percentage = 100;
 	
-	EntityLock.Lock();
-	LocalLoadingPercentage = Percentage;
+	EntityLock.LockNested();
+	{
+		LocalLoadingPercentage = Percentage;
+	}
 	EntityLock.Unlock();
 }
 
@@ -774,7 +798,7 @@ ZEUInt ZEEntity::GetLocalLoadingPercentage()
 
 ZEEntityResult ZEEntity::DestroyInternal()
 {
-	zeDebugCheck(TargetState != ZE_ES_DESTROYED, "DestroyInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+	zeDebugCheck(TargetState != ZE_ES_DESTROYING, "DestroyInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
 		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
@@ -783,7 +807,6 @@ ZEEntityResult ZEEntity::DestroyInternal()
 
 	return ZE_ER_DONE;
 }
-
 
 ZEEntityResult ZEEntity::LoadInternal()
 {
@@ -879,27 +902,9 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 
 ZEEntity::~ZEEntity()
 {
-	Unload();
-
-	while(State >= ZE_ES_NONE);
-
-	if (Parent != NULL)
-	{
-		if (Parent->GetComponents().Exists(this))
-			Parent->RemoveComponent(this);
-		else if (Parent->GetChildEntities().Exists(this))
-			Parent->RemoveChildEntity(this);
-	}
-	else if (Scene != NULL)
-	{
-		Scene->RemoveEntity(this);
-	}
-
-	while(Components.GetCount() != 0)
-		Components.GetFirstItem()->Destroy();
-
-	while(ChildEntities.GetCount() != 0)
-		ChildEntities.GetFirstItem()->Destroy();
+	zeDebugCheck(Components.GetCount() != 0, "Destroy problem. Components exists.");
+	zeDebugCheck(ChildEntities.GetCount() != 0, "Destroy problem. Child Entities.");
+	zeDebugCheck(Parent != NULL, "Destroy problem. Parent is not NULL.");
 }
 
 ZEEntity* ZEEntity::GetParent() const
@@ -1428,20 +1433,24 @@ ZEEntityLoadingScore ZEEntity::GetLoadingScore()
 	}
 
 	Components.LockRead();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
 	{
-		ZEEntityLoadingScore ComponentScore = Components[I]->GetLoadingScore();
-		TotalScore.Count += ComponentScore.Count;
-		TotalScore.Score += ComponentScore.Score;
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			ZEEntityLoadingScore ComponentScore = Components[I]->GetLoadingScore();
+			TotalScore.Count += ComponentScore.Count;
+			TotalScore.Score += ComponentScore.Score;
+		}
 	}
 	Components.UnlockRead();
 
 	ChildEntities.LockRead();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 	{
-		ZEEntityLoadingScore ChildEntityScore = ChildEntities[I]->GetLoadingScore();
-		TotalScore.Count += ChildEntityScore.Count;
-		TotalScore.Score += ChildEntityScore.Score;
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			ZEEntityLoadingScore ChildEntityScore = ChildEntities[I]->GetLoadingScore();
+			TotalScore.Count += ChildEntityScore.Count;
+			TotalScore.Score += ChildEntityScore.Score;
+		}
 	}
 	ChildEntities.UnlockRead();
 
@@ -1571,27 +1580,27 @@ void ZEEntity::Reload()
 
 void ZEEntity::Destroy()
 {
-	TargetState = ZE_ES_DESTROYED;
+	TargetState = ZE_ES_DESTROYING;
 
 	DestroyInternal();
 
-	if (GetParent() != NULL)
+	EntityLock.Lock();
 	{
-		ZEEntity* Parent = GetParent();
-		Parent->Components.LockWriteNested();
-		if (Parent->Components.Exists(this))
-			Parent->RemoveComponent(this);
-		Parent->Components.UnlockWrite();
+		if (Parent != NULL)
+		{
+			if (Parent->Components.Exists(this))
+				Parent->RemoveComponent(this);
+			else if (Parent->ChildEntities.Exists(this))
+				Parent->RemoveChildEntity(this);
+		}
+		else if (GetScene() != NULL)
+		{
+			GetScene()->RemoveEntity(this);
+		}
+	}
+	EntityLock.Unlock();
 
-		Parent->ChildEntities.LockWriteNested();
-		if (Parent->ChildEntities.Exists(this))
-			Parent->RemoveChildEntity(this);
-		Parent->ChildEntities.UnlockWrite();
-	}
-	else if (GetScene() != NULL)
-	{
-		GetScene()->RemoveEntity(this);
-	}
+	TargetState = ZE_ES_DESTROYED;
 
 	UpdateState();
 }
@@ -1677,20 +1686,22 @@ bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 	PropertiesNode.CloseNode();
 
 	ChildEntities.LockRead();
-	if (ChildEntities.GetCount() != 0)
 	{
-		ZEMLWriterNode SubEntitiesNode, EntityNode;
-		Serializer->OpenNode("ChildEntities", SubEntitiesNode);
-
-		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		if (ChildEntities.GetCount() != 0)
 		{
-			SubEntitiesNode.OpenNode("Entity", EntityNode);
-			EntityNode.WriteString("Class", ChildEntities[I]->GetClass()->GetName());
-			ChildEntities[I]->Serialize(&EntityNode);
-			EntityNode.CloseNode();
-		}
+			ZEMLWriterNode SubEntitiesNode, EntityNode;
+			Serializer->OpenNode("ChildEntities", SubEntitiesNode);
 
-		SubEntitiesNode.CloseNode();
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			{
+				SubEntitiesNode.OpenNode("Entity", EntityNode);
+				EntityNode.WriteString("Class", ChildEntities[I]->GetClass()->GetName());
+				ChildEntities[I]->Serialize(&EntityNode);
+				EntityNode.CloseNode();
+			}
+
+			SubEntitiesNode.CloseNode();
+		}
 	}
 	ChildEntities.UnlockRead();
 	

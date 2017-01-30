@@ -130,10 +130,10 @@ class ZEEntity : public ZEObject
 
 		volatile ZEEntityState					State;
 		volatile ZEEntityState					TargetState;
-		bool									ReloadFlag;
-		bool									ReinitializeFlag;
+		volatile bool							ReloadFlag;
+		volatile bool							ReinitializeFlag;
 		bool									SerialOperation;
-		ZEUInt									LocalLoadingPercentage;
+		volatile ZEUInt							LocalLoadingPercentage;
 		ZETask									UpdateStateTask;
 
 		ZEString								Name;
