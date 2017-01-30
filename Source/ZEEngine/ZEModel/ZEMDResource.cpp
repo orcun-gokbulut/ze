@@ -423,6 +423,7 @@ void ZEMDResource::RemoveBone(ZEMDResourceBone* Bone)
 	zeCheckError(Bone == NULL, ZE_VOID, "Cannot add bone. Bone is NULL.");
 	zeCheckError(Bone->Resource != this, ZE_VOID, "Cannot remove bone. Bone does not belong to this resource.");
 
+	Bone->Resource = NULL;
 	Bones.Remove(&Bone->Link);
 }
 
