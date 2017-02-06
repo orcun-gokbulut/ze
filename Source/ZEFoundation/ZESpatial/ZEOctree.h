@@ -36,16 +36,20 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZETriangle.h"
+#include "ZEThread/ZELockRW.h"
 #include "ZEOctreeIterator.h"
 
 #define ZE_OO_OUTSIDE	-2
 #define ZE_OO_MULTIPLE	-1
 
-template<typename ZEItemType>
+#define ZE_OCTREE_TEMPLATE template<typename ZEItemType, typename ZELockType>
+#define ZE_OCTREE_SPEC ZEItemType, ZELockType
+
+template<typename ZEItemType, typename ZELockType = ZELockRW>
 class ZEOctree
 {
 	private:
@@ -58,16 +62,19 @@ class ZEOctree
 		ZEAABBox								BoundingBox;
 		ZESize									TotalNodeCount;
 		ZESize									TotalItemCount;
+		ZELockRW								Lock;
 
 		void									UpdateNodeCount(ZESSize Delta);
 		void									UpdateItemCount(ZESSize Delta);
 
 		void									Expand();
 		void									Shrink();
+
 		void									CreateChildNode(ZEInt Octant);
+		void									RemoveChildNode(ZEOctree* Octree);
 
 	public:
-		typedef ZEOctreeIterator<ZEItemType>	Iterator;
+		typedef ZEOctreeIterator<ZE_OCTREE_SPEC> Iterator;
 
 		ZEOctree*								GetParent();
 		const ZEOctree*							GetParent() const;
@@ -98,8 +105,8 @@ class ZEOctree
 		const ZEArray<ZEItemType>&				GetItems();
 		const ZEArray<const ZEItemType>&		GetItems() const;
 
-		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEVector3& Point);
-		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
+		ZEOctree*								AddItem(const ZEItemType& Item, const ZEVector3& Point);
+		ZEOctree*								AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
 
 		void									RemoveItem(ZESize Index);
 		bool									RemoveItem(const ZEItemType& Item);
@@ -110,40 +117,50 @@ class ZEOctree
 
 		void									Clear();
 
-		ZEOctreeIterator<ZEItemType>			Traverse(const ZEViewVolume* Volume);
+		ZEOctreeIterator<ZE_OCTREE_SPEC>		Traverse(const ZEViewVolume* Volume);
+
+		void									LockRead() const;
+		void									UnlockRead() const;
+
+		void									LockWrite();
+		void									LockWriteNested();
+		void									UnlockWrite();
 
 												ZEOctree();
 												~ZEOctree();
 };
 
-
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::UpdateNodeCount(ZESSize Delta)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::UpdateNodeCount(ZESSize Delta)
 {
-	ZEOctree<ZEItemType>* Current = this;
-	while(Current != NULL)
+	Lock.LockWriteNested();
 	{
-		Current->TotalNodeCount += Delta;
-		Current = Current->Parent;
+		TotalNodeCount += Delta;
+
+		if (Parent != NULL)
+			Parent->UpdateNodeCount(Delta);
 	}
+	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::UpdateItemCount(ZESSize Delta)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::UpdateItemCount(ZESSize Delta)
 {
-	ZEOctree<ZEItemType>* Current = this;
-	while(Current != NULL)
+	Lock.LockWriteNested();
 	{
-		Current->TotalItemCount += Delta;
-		Current = Current->Parent;
+		TotalItemCount += Delta;
+
+		if (Parent != NULL)
+			Parent->UpdateItemCount(Delta);
 	}
+	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEVector3& Point) const
+ZE_OCTREE_TEMPLATE
+ZEInt ZEOctree<ZE_OCTREE_SPEC>::FindOctant(const ZEVector3& Point) const
 {
 	if (Point.x < BoundingBox.Min.x || Point.x > BoundingBox.Max.x)
 		return ZE_OO_OUTSIDE;
@@ -158,8 +175,8 @@ ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEVector3& Point) const
 	return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
 }
 
-template<typename ZEItemType>
-ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEAABBox& BoundingBox) const
+ZE_OCTREE_TEMPLATE
+ZEInt ZEOctree<ZE_OCTREE_SPEC>::FindOctant(const ZEAABBox& BoundingBox) const
 {
 	ZEInt MinOctantIndex = FindOctant(BoundingBox.Min);
 	if (MinOctantIndex == ZE_OO_OUTSIDE)
@@ -175,8 +192,8 @@ ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEAABBox& BoundingBox) const
 		return ZE_OO_MULTIPLE;
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::Expand()
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::Expand()
 {
 	zeDebugCheck(Parent != NULL, "Uplifiting non root octree.");
 
@@ -200,7 +217,7 @@ void ZEOctree<ZEItemType>::Expand()
 			continue;
 
 		// Remove Old Child
-		ZEOctree<ZEItemType>* Temp = Nodes[I];
+		ZEOctree<ZE_OCTREE_SPEC>* Temp = Nodes[I];
 		Nodes[I] = NULL;
 		
 		// Generate New Child
@@ -209,9 +226,13 @@ void ZEOctree<ZEItemType>::Expand()
 		Nodes[I]->MaxDepth = MaxDepth;
 
 		// Add Old Child to New Child
-		Temp->Parent = Nodes[I];
-		Temp->ParentOctant = (~I) & 0x07;
-		Nodes[I]->Nodes[Temp->ParentOctant] = Temp;
+		Temp->LockWriteNested();
+		{
+			Temp->Parent = Nodes[I];
+			Temp->ParentOctant = (~I) & 0x07;
+			Nodes[I]->Nodes[Temp->ParentOctant] = Temp;
+		}
+		Temp->UnlockWrite();
 		Nodes[I]->TotalNodeCount = 1;
 	}
 
@@ -220,33 +241,29 @@ void ZEOctree<ZEItemType>::Expand()
 	MaxDepth = MaxDepth + 1;
 }
 
-
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::Shrink()
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::Shrink()
 {
-	if (Items.GetCount() != 0)
-		return;
-
-	for (ZEInt I = 0; I < 8; I++)
+	Lock.LockWriteNested();
 	{
-		if (Nodes[I] != NULL)
+		if (Depth == 0 || TotalItemCount != 0 || TotalNodeCount != 0)
+		{
+			Lock.UnlockWrite();
 			return;
-	}
+		}
 
-	if (Parent != NULL)
-	{
-		ZEOctree<ZEItemType>* ParentPointer = Parent;
+		ZEOctree<ZE_OCTREE_SPEC>* ParentPointer = Parent;
 
-		ParentPointer->Nodes[ParentOctant] = NULL;
+		if (Parent != NULL)
+			Parent->RemoveChildNode(this);
+
+		Lock.UnlockWrite();
 		delete this;
-
-		ParentPointer->UpdateNodeCount(-1);
-		ParentPointer->Shrink();
 	}
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::CreateChildNode(ZEInt Octant)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::CreateChildNode(ZEInt Octant)
 {
 	ZEVector3 Center = BoundingBox.GetCenter();
 
@@ -295,394 +312,546 @@ void ZEOctree<ZEItemType>::CreateChildNode(ZEInt Octant)
 	UpdateNodeCount(1);
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetParent()
+
+ZE_OCTREE_TEMPLATE
+	void ZEOctree<ZE_OCTREE_SPEC>::RemoveChildNode(ZEOctree<ZE_OCTREE_SPEC>* Octree)
+{
+	Lock.LockWriteNested();
+	Octree->LockWriteNested();
+	{
+		zeDebugCheck(Octree->Parent != this, "Octree is not child of this octree.");
+
+		Nodes[Octree->ParentOctant] = NULL;
+		Octree->Parent = NULL;
+		UpdateItemCount(-(ZESSize)Octree->TotalItemCount);
+		UpdateNodeCount(-(ZESSize)Octree->TotalNodeCount);
+	}
+	Octree->UnlockWrite();
+	Lock.UnlockWrite();
+
+	Shrink();
+}
+
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetParent()
 {
 	return Parent;
 }
 
-template<typename ZEItemType>
-const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetParent() const
+ZE_OCTREE_TEMPLATE
+const ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetParent() const
 {
 	return Parent;
 }
 
-template<typename ZEItemType>
-ZEUInt ZEOctree<ZEItemType>::GetDepth() const
+ZE_OCTREE_TEMPLATE
+ZEUInt ZEOctree<ZE_OCTREE_SPEC>::GetDepth() const
 {
 	return Depth;
 }
 
-template<typename ZEItemType>
-	ZEUInt ZEOctree<ZEItemType>::GetParentOctant() const
+ZE_OCTREE_TEMPLATE
+	ZEUInt ZEOctree<ZE_OCTREE_SPEC>::GetParentOctant() const
 {
 	return ParentOctant;
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::SetBoundingBox(const ZEAABBox& BoundingBox)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	zeCheckError(Parent != NULL || TotalItemCount != 0 || TotalNodeCount != NULL, ZE_VOID, "You can only change bounding box of an empty root octree.");
 	this->BoundingBox = BoundingBox;
 }
 
-template<typename ZEItemType>
-const ZEAABBox& ZEOctree<ZEItemType>::GetBoundingBox()  const
+ZE_OCTREE_TEMPLATE
+const ZEAABBox& ZEOctree<ZE_OCTREE_SPEC>::GetBoundingBox()  const
 {
 	return BoundingBox;
 }
 
-template<typename ZEItemType>
-ZESize ZEOctree<ZEItemType>::GetTotalNodeCount() const
+ZE_OCTREE_TEMPLATE
+ZESize ZEOctree<ZE_OCTREE_SPEC>::GetTotalNodeCount() const
 {
 	return TotalNodeCount;
 }
 
-template<typename ZEItemType>
-ZESize ZEOctree<ZEItemType>::GetTotalItemCount() const
+ZE_OCTREE_TEMPLATE
+ZESize ZEOctree<ZE_OCTREE_SPEC>::GetTotalItemCount() const
 {
 	return TotalItemCount;
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(ZESize OctantIndex)
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(ZESize OctantIndex)
 {
 	zeDebugCheck(OctantIndex >= 8, "Index out of bounds.");
 	return Nodes[OctantIndex];
 }
 
-template<typename ZEItemType>
-const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(ZESize OctantIndex) const 
+ZE_OCTREE_TEMPLATE
+const ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(ZESize OctantIndex) const 
 {
 	zeDebugCheck(OctantIndex >= 8, "Index out of bounds.");
 	return Nodes[OctantIndex];
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEVector3& Point)
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(const ZEVector3& Point)
 {
-	if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
-		return NULL;
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
+	Lock.LockRead();
+	{
+		if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
+		{
+			Result = NULL;
+		}
+		else
+		{
+			ZEInt OctantIndex = FindOctant(Point);
+			if (Nodes[OctantIndex] != NULL)
+				Result = Nodes[OctantIndex]->GetNode(Point);
+			else
+				Result = this;
+		}
+	}
+	Lock.UnlockRead();
 
+	return Result;
+}
+
+ZE_OCTREE_TEMPLATE
+const ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(const ZEVector3& Point) const
+{
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
 	ZEInt OctantIndex = FindOctant(Point);
-	if (Nodes[OctantIndex] != NULL)
-		return Nodes[OctantIndex]->GetNode(Point);
-	else
-		return this;
-}
-
-template<typename ZEItemType>
-const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEVector3& Point) const
-{
-	ZEInt OctantIndex = FindOctant(Point);
-	if (OctantIndex == ZE_OO_OUTSIDE)
+	Lock.LockRead();
 	{
-		return NULL;
-	}
-	else
-	{
-		if (Nodes[OctantIndex] != NULL)
-			return Nodes[OctantIndex]->GetNode(Point);
+		if (OctantIndex == ZE_OO_OUTSIDE)
+		{
+			Result = NULL;
+		}
 		else
-			return this;
+		{
+			if (Nodes[OctantIndex] != NULL)
+				Result = Nodes[OctantIndex]->GetNode(Point);
+			else
+				Result = this;
+		}
 	}
+	Lock.UnlockRead();
+
+	return Result;
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEAABBox& SearchVolume)
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(const ZEAABBox& SearchVolume)
 {
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
 	ZEInt OctantIndex = FindOctant(SearchVolume);
-	if (OctantIndex == ZE_OO_OUTSIDE)
+	Lock.LockRead();
 	{
-		return NULL;
+		if (OctantIndex == ZE_OO_OUTSIDE)
+		{
+			Result = NULL;
+		}
+		else if (OctantIndex == ZE_OO_MULTIPLE)
+		{
+			Result = this;
+		}
+		else 
+		{
+			if (Nodes[OctantIndex] != NULL)
+				Result = Nodes[OctantIndex]->GetNode(SearchVolume);
+			else
+				Result = this;
+		}
 	}
-	else if (OctantIndex == ZE_OO_MULTIPLE)
-	{
-		return this;
-	}
-	else 
-	{
-		if (Nodes[OctantIndex] != NULL)
-			return Nodes[OctantIndex]->GetNode(SearchVolume);
-		else
-			return this;
-	}
+	Lock.UnlockRead();
+
+	return Result;
 }
 
-template<typename ZEItemType>
-const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEAABBox& SearchVolume) const
+ZE_OCTREE_TEMPLATE
+const ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::GetNode(const ZEAABBox& SearchVolume) const
 {
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
 	ZEInt OctantIndex = FindOctant(SearchVolume);
-	if (OctantIndex == ZE_OO_OUTSIDE)
+	Lock.LockRead();
 	{
-		return NULL;
+		if (OctantIndex == ZE_OO_OUTSIDE)
+		{
+			Result = NULL;
+		}
+		else if (OctantIndex == ZE_OO_MULTIPLE)
+		{
+			Result = this;
+		}
+		else 
+		{
+			if (Nodes[OctantIndex] != NULL)
+				Result = Nodes[OctantIndex]->GetNode(SearchVolume);
+			else
+				Result = this;
+		}
 	}
-	else if (OctantIndex == ZE_OO_MULTIPLE)
-	{
-		return this;
-	}
-	else 
-	{
-		if (Nodes[OctantIndex] != NULL)
-			return Nodes[OctantIndex]->GetNode(SearchVolume);
-		else
-			return this;
-	}
+	Lock.UnlockRead();
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::SetMaxDepth(ZEUInt Depth)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::SetMaxDepth(ZEUInt Depth)
 {
 	MaxDepth = Depth;
 }
 
-template<typename ZEItemType>
-ZEUInt ZEOctree<ZEItemType>::GetMaxDepth()  const
+ZE_OCTREE_TEMPLATE
+ZEUInt ZEOctree<ZE_OCTREE_SPEC>::GetMaxDepth()  const
 {
 	return MaxDepth;
 }
 
-template<typename ZEItemType>
-const ZEArray<ZEItemType>& ZEOctree<ZEItemType>::GetItems() 
+ZE_OCTREE_TEMPLATE
+const ZEArray<ZEItemType>& ZEOctree<ZE_OCTREE_SPEC>::GetItems() 
 {
 	return Items;
 }
 
-template<typename ZEItemType>
-const ZEArray<const ZEItemType>& ZEOctree<ZEItemType>::GetItems() const
+ZE_OCTREE_TEMPLATE
+const ZEArray<const ZEItemType>& ZEOctree<ZE_OCTREE_SPEC>::GetItems() const
 {
 	return reinterpret_cast<const ZEArray<const ZEItemType>&>(Items);
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEVector3& Point)
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::AddItem(const ZEItemType& Item, const ZEVector3& Point)
 {
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
 	ZEInt ItemOctant = FindOctant(Point);
-	if (ItemOctant == ZE_OO_MULTIPLE)
+	Lock.LockWriteNested();
 	{
-		Items.Add(Item);
-		UpdateItemCount(1);
-		return this;
-	}
-	else if (ItemOctant == ZE_OO_OUTSIDE)
-	{
-		if (Parent == NULL)
-		{
-			Expand();
-			return AddItem(Item, Point);
-		}
-		else
-		{
-			return Parent->AddItem(Item, Point);
-		}
-	}
-	else
-	{
-		if (MaxDepth == 0)
+		if (ItemOctant == ZE_OO_MULTIPLE)
 		{
 			Items.Add(Item);
 			UpdateItemCount(1);
-			return this;
+			Result = this;
+		}
+		else if (ItemOctant == ZE_OO_OUTSIDE)
+		{
+			if (Parent == NULL)
+			{
+				Expand();
+				Result = AddItem(Item, Point);
+			}
+			else
+			{
+				Result = Parent->AddItem(Item, Point);
+			}
 		}
 		else
 		{
-			CreateChildNode(ItemOctant);
-			return Nodes[ItemOctant]->AddItem(Item, Point);
+			if (MaxDepth == 0)
+			{
+				Items.Add(Item);
+				UpdateItemCount(1);
+				Result = this;
+			}
+			else
+			{
+				CreateChildNode(ItemOctant);
+				Result = Nodes[ItemOctant]->AddItem(Item, Point);
+			}
 		}
 	}
+	Lock.UnlockWrite();
+
+	return Result;
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>* ZEOctree<ZE_OCTREE_SPEC>::AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
 {
+	ZEOctree<ZE_OCTREE_SPEC>* Result;
 	ZEInt ItemOctant = FindOctant(Volume);
-	if (ItemOctant == ZE_OO_MULTIPLE)
+	Lock.LockWriteNested();
 	{
-		Items.Add(Item);
-		zeDebugCheck(!ZEAABBox::IntersectionTest(GetBoundingBox(), Volume), "Aha");
-
-		UpdateItemCount(1);
-		return this;
-	}
-	else if (ItemOctant == ZE_OO_OUTSIDE)
-	{
-		if (Parent == NULL)
-		{
-			Expand();
-			return AddItem(Item, Volume);
-		}
-		else
-		{
-			return Parent->AddItem(Item, Volume);
-		}
-	}
-	else
-	{
-		if (MaxDepth == 0)
+		if (ItemOctant == ZE_OO_MULTIPLE)
 		{
 			Items.Add(Item);
 			zeDebugCheck(!ZEAABBox::IntersectionTest(GetBoundingBox(), Volume), "Aha");
+
 			UpdateItemCount(1);
-			return this;
+			Result = this;
+		}
+		else if (ItemOctant == ZE_OO_OUTSIDE)
+		{
+			if (Parent == NULL)
+			{
+				Expand();
+				Result = AddItem(Item, Volume);
+			}
+			else
+			{
+				Result = Parent->AddItem(Item, Volume);
+			}
 		}
 		else
 		{
-			CreateChildNode(ItemOctant);
-			return Nodes[ItemOctant]->AddItem(Item, Volume);
+			if (MaxDepth == 0)
+			{
+				Items.Add(Item);
+				zeDebugCheck(!ZEAABBox::IntersectionTest(GetBoundingBox(), Volume), "Aha");
+				UpdateItemCount(1);
+				Result = this;
+			}
+			else
+			{
+				CreateChildNode(ItemOctant);
+				Result = Nodes[ItemOctant]->AddItem(Item, Volume);
+			}
 		}
 	}
+	Lock.UnlockWrite();
+
+	return Result;
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::RemoveItem(ZESize Index)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::RemoveItem(ZESize Index)
 {
-	Items.Remove(Index);
-	UpdateItemCount(-1);	
-	Shrink();
-}
-
-template<typename ZEItemType>
-bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item)
-{
-	ZESSize Index = Items.FindIndex(Item);
-	if (Index != -1)
+	Lock.LockWriteNested();
 	{
 		Items.Remove(Index);
-		UpdateItemCount(-1);
+		UpdateItemCount(-1);	
 		Shrink();
-		return true;
 	}
-	else
-	{
-		for (ZESize I = 0; I < 8; I++)
-		{
-			if (Nodes[I] == NULL)
-				continue;
-
-			if (Nodes[I]->RemoveItem(Item))
-				return true;
-		}
-
-		return false;
-	}
+	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEVector3& Point)
+ZE_OCTREE_TEMPLATE
+bool ZEOctree<ZE_OCTREE_SPEC>::RemoveItem(const ZEItemType& Item)
 {
-	ZEInt ItemOctant = FindOctant(Point);
-	if (ItemOctant == ZE_OO_OUTSIDE)
-	{
-		return false;
-	}
-	else if (ItemOctant == ZE_OO_MULTIPLE)
-	{
-		ZEInt Index = Items.FindIndex(Item);
-		if (Index != -1)
-		{
-			Items.Remove(Index);
-			UpdateItemCount(-1);
-			Shrink();
-			return true;
-		}
-	}
-	else
-	{
-		if (Nodes[ItemOctant] != NULL)
-			return Nodes[ItemOctant]->RemoveItem(Item, Point);
-		
-		return false;
-	}
-}
-
-template<typename ZEItemType>
-bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume)
-{
-	ZEInt ItemOctant = FindOctant(Volume);
-	if (ItemOctant == ZE_OO_OUTSIDE)
-	{
-		return false;
-	}
-	else if (ItemOctant == ZE_OO_MULTIPLE)
+	Lock.LockWriteNested();
 	{
 		ZESSize Index = Items.FindIndex(Item);
 		if (Index != -1)
 		{
 			Items.Remove(Index);
 			UpdateItemCount(-1);
+			Lock.UnlockWrite();
+
 			Shrink();
+
 			return true;
 		}
+		else
+		{
+			for (ZESize I = 0; I < 8; I++)
+			{
+				if (Nodes[I] == NULL)
+					continue;
 
-		return false;
+				if (Nodes[I]->RemoveItem(Item))
+				{
+					Lock.UnlockWrite();
+					return true;
+				}
+			}
+		}
 	}
-	else
-	{
-		if (Nodes[ItemOctant] != NULL)
-			return Nodes[ItemOctant]->RemoveItem(Item, Volume);
+	Lock.UnlockWrite();
 
-		return false;
-	}
+	return false;
 }
 
-template<typename ZEItemType>
-bool ZEOctree<ZEItemType>::Check() const
+ZE_OCTREE_TEMPLATE
+bool ZEOctree<ZE_OCTREE_SPEC>::RemoveItem(const ZEItemType& Item, const ZEVector3& Point)
 {
-	// Check Counts
-	ZESize ItemCount = 0;
-	ZESize NodeCount = 0;
-
-	for (int I = 0; I < 8; I++)
+	Lock.LockWriteNested();
 	{
-		if (Nodes[I] == NULL)
-			continue;
-
-		if (!Nodes[I]->Check())
+		ZEInt ItemOctant = FindOctant(Point);
+		if (ItemOctant == ZE_OO_OUTSIDE)
+		{
+			Lock.UnlockWrite();
 			return false;
+		}
+		else if (ItemOctant == ZE_OO_MULTIPLE)
+		{
+			ZEInt Index = Items.FindIndex(Item);
+			if (Index != -1)
+			{
+				Items.Remove(Index);
+				UpdateItemCount(-1);
+				Shrink();
 
-		NodeCount++;
+				Lock.UnlockWrite();
+				return true;
+			}
+		}
+		else
+		{
+			if (Nodes[ItemOctant] != NULL)
+			{
+				bool Result = Nodes[ItemOctant]->RemoveItem(Item, Point);
 
-		ItemCount += Nodes[I]->GetTotalItemCount();
-		NodeCount += Nodes[I]->GetTotalNodeCount();
+				Lock.UnlockWrite();
+				return Result;
+			}
+
+			Lock. UnlockWrite();
+			return false;
+		}
 	}
+	Lock.UnlockWrite();
+}
 
-	ItemCount += Items.GetCount();
+ZE_OCTREE_TEMPLATE
+bool ZEOctree<ZE_OCTREE_SPEC>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume)
+{
+	Lock.LockWriteNested();
+	{
+		ZEInt ItemOctant = FindOctant(Volume);
+		if (ItemOctant == ZE_OO_OUTSIDE)
+		{
+			Lock.UnlockWrite();
+			return false;
+		}
+		else if (ItemOctant == ZE_OO_MULTIPLE)
+		{
+			ZESSize Index = Items.FindIndex(Item);
+			if (Index != -1)
+			{
+				Items.Remove(Index);
+				UpdateItemCount(-1);
+				Shrink();
 
-	if (TotalNodeCount != NodeCount)
-		return false;
+				Lock.UnlockWrite();
+				return true;
+			}
 
-	if (TotalItemCount != ItemCount)
-		return false;
+			Lock.UnlockWrite();
+			return false;
+		}
+		else
+		{
+			if (Nodes[ItemOctant] != NULL)
+			{
+				bool Result = Nodes[ItemOctant]->RemoveItem(Item, Volume);
+
+				Lock.UnlockWrite();
+				return Result;
+			}
+
+			Lock.UnlockWrite();
+			return false;
+		}
+	}
+	Lock.UnlockWrite();
+}
+
+ZE_OCTREE_TEMPLATE
+bool ZEOctree<ZE_OCTREE_SPEC>::Check() const
+{
+	Lock.LockRead();
+	{
+		// Check Counts
+		ZESize ItemCount = 0;
+		ZESize NodeCount = 0;
+
+		for (int I = 0; I < 8; I++)
+		{
+			if (Nodes[I] == NULL)
+				continue;
+
+			if (!Nodes[I]->Check())
+			{
+				Lock.UnlockRead();
+				return false;
+			}
+
+			NodeCount++;
+
+			ItemCount += Nodes[I]->GetTotalItemCount();
+			NodeCount += Nodes[I]->GetTotalNodeCount();
+		}
+
+		ItemCount += Items.GetCount();
+
+		if (TotalNodeCount != NodeCount)
+		{
+			Lock.UnlockRead();
+			return false;
+		}
+
+		if (TotalItemCount != ItemCount)
+		{
+			Lock.UnlockRead();
+			return false;
+		}
+	}
+	Lock.UnlockRead();
 
 	return true;
 }
 
-template<typename ZEItemType>
-void ZEOctree<ZEItemType>::Clear()
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::Clear()
 {
-	UpdateNodeCount(-(ZESSize)TotalNodeCount);
-	UpdateItemCount(-(ZESSize)TotalItemCount);
-
-	Items.Clear();
-	for (ZEInt I = 0; I < 8; I++)
+	Lock.LockWriteNested();
 	{
-		if (Nodes[I] != NULL)
+		UpdateNodeCount(-(ZESSize)TotalNodeCount);
+		UpdateItemCount(-(ZESSize)TotalItemCount);
+
+		Items.Clear();
+		for (ZEInt I = 0; I < 8; I++)
 		{
-			Nodes[I]->Parent = NULL;
-			delete Nodes[I];
-			Nodes[I] = NULL;
+			if (Nodes[I] != NULL)
+			{
+				Nodes[I]->Parent = NULL;
+				delete Nodes[I];
+				Nodes[I] = NULL;
+			}
 		}
 	}
+	Lock.UnlockWrite();
 }
 
-template<typename ZEItemType>
-ZEOctreeIterator<ZEItemType> ZEOctree<ZEItemType>::Traverse(const ZEViewVolume* Volume)
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::LockRead() const
 {
-	return ZEOctreeIterator<ZEItemType>(this, Volume);
+	Lock.LockRead();
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>::ZEOctree()
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::UnlockRead() const
+{
+	Lock.UnlockRead();
+}
+
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::LockWrite()
+{
+	Lock.LockWrite();
+}
+
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::LockWriteNested()
+{
+	Lock.LockWriteNested();
+}
+
+ZE_OCTREE_TEMPLATE
+void ZEOctree<ZE_OCTREE_SPEC>::UnlockWrite()
+{
+	Lock.UnlockWrite();
+}
+
+ZE_OCTREE_TEMPLATE
+ZEOctreeIterator<ZE_OCTREE_SPEC> ZEOctree<ZE_OCTREE_SPEC>::Traverse(const ZEViewVolume* Volume)
+{
+	return ZEOctreeIterator<ZE_OCTREE_SPEC>(this, Volume);
+}
+
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>::ZEOctree()
 {
 	Parent = NULL;
 	for (ZEInt I = 0; I < 8; I++)
@@ -697,8 +866,8 @@ ZEOctree<ZEItemType>::ZEOctree()
 	BoundingBox.Min =  2.0f * ZEVector3::One;
 }
 
-template<typename ZEItemType>
-ZEOctree<ZEItemType>::~ZEOctree()
+ZE_OCTREE_TEMPLATE
+ZEOctree<ZE_OCTREE_SPEC>::~ZEOctree()
 {
 	Clear();
 }

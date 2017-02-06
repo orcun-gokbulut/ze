@@ -48,7 +48,7 @@ class ZELock
 	friend class ZELockRW;
 	private:
 		volatile ZEInt32		CurrentNumber;
-		volatile ZEInt32		NextNumber;
+		volatile ZEInt32		QueueNumber;
 		volatile ZEUInt32		OwnerThreadId;
 		volatile ZEInt32		NestingCount;
 

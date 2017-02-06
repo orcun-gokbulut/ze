@@ -223,7 +223,7 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 			Entity->GetEntityFlags().GetFlags(ZE_EF_STATIC_SUPPORT) && 
 			Entity->GetStatic())
 		{
-			Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+			UpdateOctree(Entity);
 		}
 		else
 		{
@@ -237,14 +237,14 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 {
 	RenderList.LockWrite();
 	{
-		if (Entity->RenderListLink.GetInUse())
-		{
-			RenderList.Remove(&Entity->RenderListLink);
-			Entity->RenderListOctree = NULL;
-		}
-		else if (Entity->RenderListOctree != NULL)
+		if (Entity->RenderListOctree != NULL)
 		{
 			Entity->RenderListOctree->RemoveItem(Entity);
+			Entity->RenderListOctree = NULL;
+		}
+		else if (Entity->RenderListLink.GetInUse())
+		{
+			RenderList.Remove(&Entity->RenderListLink);
 			Entity->RenderListOctree = NULL;
 		}
 	}
@@ -260,12 +260,22 @@ void ZEScene::UpdateOctree(ZEEntity* Entity)
 	if (!SpatialDatabase)
 		return;
 
-	RenderList.LockWrite();
+	RenderList.LockWriteNested();
 	{
 		if (Entity->RenderListOctree != NULL)
+		{
+			if (ZEAABBox::InsideTest(Entity->RenderListOctree->GetBoundingBox(), Entity->GetWorldBoundingBox()))
+			{
+				RenderList.UnlockWrite();
+				return;
+			}
+
 			Entity->RenderListOctree->RemoveItem(Entity);
+			Entity->RenderListOctree = NULL;
+		}
 
 		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		zeDebugCheck(Entity->RenderListOctree == NULL, "Octree node is null.");
 	}
 	RenderList.UnlockWrite();
 }

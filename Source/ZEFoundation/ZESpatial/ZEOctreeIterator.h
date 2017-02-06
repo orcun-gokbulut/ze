@@ -38,64 +38,67 @@
 
 #include "ZETypes.h"
 
-template<typename ZEItemType> class ZEOctree;
+#define ZE_OCTREE_ITER_TEMPLATE template<typename ZEItemType, typename ZELockType>
+#define ZE_OCTREE_ITER_SPEC ZEItemType, ZELockType
+
+ZE_OCTREE_ITER_TEMPLATE class ZEOctree;
 class ZEViewVolume;
 
-template<typename ZEItemType>
+ZE_OCTREE_ITER_TEMPLATE
 class ZEOctreeIterator : public ZEIterator<ZEItemType>
 {
 	protected:
-		ZEOctree<ZEItemType>*					Octree;
-		ZEInt									Octant;
-		const ZEViewVolume*						Volume;
+		ZEOctree<ZE_OCTREE_ITER_SPEC>*		Octree;
+		ZEInt								Octant;
+		const ZEViewVolume*					Volume;
 
 	public:
-		bool									IsValid() const;
+		bool								IsValid() const;
 
-		ZEOctree<ZEItemType>&					GetItem() const;
-		ZEOctree<ZEItemType>*					GetPointer() const;
+		ZEOctree<ZE_OCTREE_ITER_SPEC>&		GetItem() const;
+		ZEOctree<ZE_OCTREE_ITER_SPEC>*		GetPointer() const;
 
-		void									Next();
+		void								Next();
 
-		ZEOctreeIterator<ZEItemType>&			operator++();
+		ZEOctreeIterator&					operator++();
 
-		bool									operator==(const ZEOctreeIterator& Iterator) const;
+		bool								operator==(const ZEOctreeIterator& Iterator) const;
 
-		ZEOctree<ZEItemType>&					operator*() const;
-		ZEOctree<ZEItemType>*					operator->() const;	
+		ZEOctree<ZE_OCTREE_ITER_SPEC>&		operator*() const;
+		ZEOctree<ZE_OCTREE_ITER_SPEC>*		operator->() const;	
 
-												ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, const ZEViewVolume* Volume);
+											ZEOctreeIterator(ZEOctree<ZE_OCTREE_ITER_SPEC>* Octree, const ZEViewVolume* Volume);
 
 };
 
 // ZEOctreeIterator
 /////////////////////////////////////////////////////////////////////////////
 
-template<typename ZEItemType>
-inline bool ZEOctreeIterator<ZEItemType>::IsValid() const
+ZE_OCTREE_ITER_TEMPLATE
+inline bool ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::IsValid() const
 {
 	return Octree != NULL;
 }
 
-template<typename ZEItemType>
-inline ZEOctree<ZEItemType>& ZEOctreeIterator<ZEItemType>::GetItem() const
+ZE_OCTREE_ITER_TEMPLATE
+inline ZEOctree<ZE_OCTREE_ITER_SPEC>& ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::GetItem() const
 {
 	return *Octree;
 }
 
-template<typename ZEItemType>
-inline ZEOctree<ZEItemType>* ZEOctreeIterator<ZEItemType>::GetPointer() const
+ZE_OCTREE_ITER_TEMPLATE
+inline ZEOctree<ZE_OCTREE_ITER_SPEC>* ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::GetPointer() const
 {
 	return Octree;
 }
 
 
-template<typename ZEItemType>
-void ZEOctreeIterator<ZEItemType>::Next()
+ZE_OCTREE_ITER_TEMPLATE
+void ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::Next()
 {	
 	while (Octant <= 7)
 	{
-		ZEOctree<ZEItemType>* ChildOctree = Octree->GetNode(Octant);
+		ZEOctree<ZE_OCTREE_ITER_SPEC>* ChildOctree = Octree->GetNode(Octant);
 		if (ChildOctree == NULL || ChildOctree->GetTotalItemCount() == 0 || !Volume->IntersectionTest(ChildOctree->GetBoundingBox()))
 		{
 			Octant++;
@@ -120,33 +123,33 @@ void ZEOctreeIterator<ZEItemType>::Next()
 	return Next();
 }
 
-template<typename ZEItemType>
-inline ZEOctreeIterator<ZEItemType>& ZEOctreeIterator<ZEItemType>::operator++()
+ZE_OCTREE_ITER_TEMPLATE
+inline ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>& ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::operator++()
 {
 	Next();
 	return *this;
 }
 
-template<typename ZEItemType>
-inline bool ZEOctreeIterator<ZEItemType>::operator==(const ZEOctreeIterator& Iterator) const
+ZE_OCTREE_ITER_TEMPLATE
+inline bool ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::operator==(const ZEOctreeIterator& Iterator) const
 {
 	return (Iterator.Octree == Octree && Iterator.Octant = Octant);
 }
 
-template<typename ZEItemType>
-inline ZEOctree<ZEItemType>& ZEOctreeIterator<ZEItemType>::operator*() const
+ZE_OCTREE_ITER_TEMPLATE
+inline ZEOctree<ZE_OCTREE_ITER_SPEC>& ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::operator*() const
 {
 	return GetItem();
 }
 
-template<typename ZEItemType>
-inline ZEOctree<ZEItemType>* ZEOctreeIterator<ZEItemType>::operator->() const
+ZE_OCTREE_ITER_TEMPLATE
+inline ZEOctree<ZE_OCTREE_ITER_SPEC>* ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::operator->() const
 {
 	return &GetItem();
 }
 
-template<typename ZEItemType>
-ZEOctreeIterator<ZEItemType>::ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, const ZEViewVolume* Volume)
+ZE_OCTREE_ITER_TEMPLATE
+ZEOctreeIterator<ZE_OCTREE_ITER_SPEC>::ZEOctreeIterator(ZEOctree<ZE_OCTREE_ITER_SPEC>* Octree, const ZEViewVolume* Volume)
 {
 	this->Octree = Octree;
 	this->Octant = 0;

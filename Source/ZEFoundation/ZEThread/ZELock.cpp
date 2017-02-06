@@ -65,14 +65,14 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 
 bool ZELock::IsLocked() const
 {
-    return (CurrentNumber != NextNumber + 1);
+    return (CurrentNumber != QueueNumber + 1);
 }
 
 ZEUInt32 ZELock::Queue()
 {
 	zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
 
-	return AtomicIncrement(&NextNumber);
+	return AtomicIncrement(&QueueNumber);
 }
 
 bool ZELock::Check(ZEUInt32 Number) const
@@ -87,7 +87,7 @@ void ZELock::Wait(ZEUInt32 Number) const
 
 void ZELock::Release(ZEUInt32 Number)
 {
-	zeDebugCheck(CurrentNumber == NextNumber + 1, "Lock cannot be release because it is not locked.");
+	zeDebugCheck(CurrentNumber == QueueNumber + 1, "Lock cannot be release because it is not locked.");
 	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acquired yet by given number.");
 	zeDebugCheck(OwnerThreadId != 0 && OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
 	
@@ -182,18 +182,18 @@ ZELock::ZELock()
 	__itt_sync_create(this, "ZELock", "", 0);
 	#endif
 
-	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&NextNumber, 4), "ZELock memory alignmnet is not correct.");
+	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&QueueNumber, 4), "ZELock memory alignmnet is not correct.");
 	zeDebugCheck(!ZE_CHECK_ALIGNMENT(&CurrentNumber, 4), "ZELock memory alignmnet is not correct.");
 
 	CurrentNumber = 1;
-	NextNumber = 0;
+	QueueNumber = 0;
 	NestingCount = 0;
 	OwnerThreadId = 0;
 }
 
 ZELock::~ZELock()
 {
-    zeDebugCheck(CurrentNumber != NextNumber + 1, "Destroying lock while it is still locked.");
+    zeDebugCheck(CurrentNumber != QueueNumber + 1, "Destroying lock while it is still locked.");
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_destroy(this);
 	#endif
