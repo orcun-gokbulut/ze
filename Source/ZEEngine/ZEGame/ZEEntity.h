@@ -65,7 +65,7 @@ class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
-template<typename ZEItemType>
+template<typename ZEItemType, typename ZELockType = ZELockRW>
 class ZEOctree;
 
 typedef ZEFlags ZEEntityFlags;
@@ -188,6 +188,7 @@ class ZEEntity : public ZEObject
 
 		void									UpdateRenderabilityState(bool Forced = false);
 		void									UpdateTickabilityState();
+		void									UpdateOctree();
 
 		void									ParentVisibleChanged();
 		void									ParentEnabledChanged();
@@ -198,11 +199,13 @@ class ZEEntity : public ZEObject
 		void									SetSerialOperation(bool SerialOperation);
 		bool									GetSerialOperation() const;
 
-		virtual ZEEntityResult					DestroyInternal();
 		virtual ZEEntityResult					LoadInternal();
 		virtual ZEEntityResult					UnloadInternal();
 		virtual ZEEntityResult					InitializeInternal();
 		virtual ZEEntityResult					DeinitializeInternal();
+
+		virtual void							PreDestroyInternal();
+		virtual void							PostDestroyInternal();
 
 		ZEEntity*								GetComponent(ZEClass* Class, bool Recursive = false);
 		ZEEntity*								GetComponent(const ZEString& Name, bool Recursive = false);

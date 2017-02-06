@@ -91,7 +91,7 @@ void ZERSResource::Destroy() const
 	Resource->TargetState = ZERS_RS_DESTROYED;
 	Resource->PreDestroy();
 	ReferenceCountLock.Unlock();
-	Resource->UpdateStateTask.Run();
+	Resource->UpdateState();
 }
 
 void ZERSResource::UpdateMemoryConsumption()
@@ -128,15 +128,21 @@ void ZERSResource::UpdateMemoryConsumption()
 
 bool ZERSResource::UpdateStateSerial()
 {
-	StateLock.Lock();
-
 	ZETaskResult Result = ZE_TR_COOPERATING;
-	while (Result == ZE_TR_COOPERATING)
-		Result = UpdateStateFunction(NULL, 0);
 
+	StateLock.Lock();
+	{
+		while (Result == ZE_TR_COOPERATING)
+			Result = UpdateStateFunction(NULL, 0);
+	}
 	StateLock.Unlock();
 
 	return (Result == ZE_TR_DONE);
+}
+
+void ZERSResource::UpdateState()
+{
+	UpdateStateTask.Run();
 }
 
 ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters)
@@ -452,10 +458,8 @@ ZERSResource::~ZERSResource()
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
 
-	zeDebugCheck(ManagerSharedLink.GetInUse(), "Resource is shared.");
-	zeDebugCheck(Manager != NULL || ManagerLink.GetInUse(), "Resource is not registered.");
-
-	ZERSResourceManager::GetInstance()->UnregisterResource(this);
+	zeDebugCheck(ManagerSharedLink.GetInUse(), "Resource is not unshared.");
+	zeDebugCheck(Manager != NULL || ManagerLink.GetInUse(), "Resource is not unregistered. (Check class destructor)");
 
 	State = ZERS_RS_DESTROYED;
 }
@@ -649,7 +653,7 @@ void ZERSResource::Load()
 	ResourceLock.Unlock();
 
 	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-	UpdateStateTask.Run();
+	UpdateState();
 }
 
 void ZERSResource::Unload()
@@ -664,7 +668,7 @@ void ZERSResource::Unload()
 
 	zeLog("Unloading resource. Resource Class: \"%s\", File Name: \"%s\".", GetClass()->GetName(), this->FileName.ToCString());
 	TargetState = ZERS_RS_STAGED;
-	UpdateStateTask.Run();
+	UpdateState();
 }
 
 void ZERSResource::Reload()
@@ -678,7 +682,7 @@ void ZERSResource::Reload()
 	if (TargetState <= ZERS_RS_LOADED)
 		TargetState = ZERS_RS_LOADED;
 
-	UpdateStateTask.Run();
+	UpdateState();
 }
 
 bool ZERSResource::LoadSerial()
@@ -725,7 +729,7 @@ bool ZERSResource::ReloadSerial()
 	if (TargetState <= ZERS_RS_LOADED)
 		TargetState = ZERS_RS_LOADED;
 
-	UpdateStateTask.Run();
+	UpdateState();
 
 	return true;
 }

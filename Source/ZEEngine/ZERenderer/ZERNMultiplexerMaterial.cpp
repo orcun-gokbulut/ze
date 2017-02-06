@@ -95,7 +95,7 @@ ZERNMultiplexerMaterial::ZERNMultiplexerMaterial()
 
 ZERNMultiplexerMaterial::~ZERNMultiplexerMaterial()
 {
-
+	Unregister();
 }
 
 ZEUInt ZERNMultiplexerMaterial::GetStageMask() const 

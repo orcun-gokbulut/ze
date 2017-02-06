@@ -140,6 +140,20 @@ ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlan
 		return ZE_HS_INTERSECTS;
 }
 
+bool ZEAABBox::InsideTest(const ZEAABBox& Cover, const ZEAABBox& Tested)
+{
+	if (Cover.Min.x > Tested.Min.x || Tested.Max.x > Cover.Max.x)
+		return false;
+
+	if (Cover.Min.y > Tested.Min.y || Tested.Min.y > Cover.Max.y)
+		return false;
+
+	if (Cover.Min.z > Tested.Min.z || Tested.Min.z > Cover.Max.z)
+		return false;
+
+	return true;
+}
+
 void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
 {
 	float a = (BoundingBox.Max - BoundingBox.Min).Length();

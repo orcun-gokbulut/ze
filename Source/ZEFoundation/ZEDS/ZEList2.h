@@ -104,6 +104,7 @@ class ZEList2
 		void								UnlockRead() const;
 
 		void								LockWrite();
+		void								LockWriteNested();
 		void								UnlockWrite();
 
 		const ZEList2<const ZEItemType>&	ToInspector() const;
@@ -656,6 +657,12 @@ ZE_LIST_TEMPLATE
 void ZEList2<ZE_LIST_SPECIALIZATION>::LockWrite()
 {
 	Lock.LockWrite();
+}
+
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::LockWriteNested()
+{
+	Lock.LockWriteNested();
 }
 
 ZE_LIST_TEMPLATE
