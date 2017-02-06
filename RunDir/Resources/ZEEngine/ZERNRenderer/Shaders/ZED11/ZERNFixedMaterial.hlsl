@@ -249,13 +249,13 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput
 	float4 Position			: SV_Position;
 	float2 Texcoord         : TEXCOORD0;
 	
-	#ifdef ZERN_FM_CLIPPING_PLANES
-		float4 ClipDistance	: SV_ClipDistance;
-	#endif
-	
 	#if defined ZERN_FM_INSTANCING && defined ZERN_FM_DEPTH_PREPASS
 		nointerpolation float	DrawOpacity			: TEXCOORD1;
 		nointerpolation bool	DrawLODTransition	: TEXCOORD2;
+	#endif
+	
+	#ifdef ZERN_FM_CLIPPING_PLANES
+		float4 ClipDistance	: SV_ClipDistance;
 	#endif
 };
 
@@ -279,7 +279,7 @@ ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSIn
 		float3 Tangent;
 		float3 Binormal;
 		DecodeTangentBinormal(Input.TangentEncoded, Normal, Tangent, Binormal);
-	
+		
 		#ifdef ZERN_FM_SKIN_TRANSFORM
 			float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
 			Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
@@ -381,7 +381,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	float3 Binormal = normalize(Input.Binormal);
 	#ifdef ZERN_FM_NORMAL_MAP
 		float3 NormalSample = ZERNFixedMaterial_NormalMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).xyz * 2.0f - 1.0f;
-		NormalSample.z = sqrt(saturate(1.0f - dot(NormalSample.xy, NormalSample.xy)));
+		NormalSample.z = sqrt(saturate(1.0f - dot(NormalSample.xy, NormalSample.xy)));	
 		Normal = normalize(NormalSample.x * Tangent + NormalSample.y * Binormal + NormalSample.z * Normal);
 	#endif
 

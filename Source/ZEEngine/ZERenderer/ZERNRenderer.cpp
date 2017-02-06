@@ -608,17 +608,27 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (Command->InstanceTag != NULL)
 	{
 		bool Found = false;
-		ze_for_each(CurrentCommand, CommandListInstanced)
+		ZELink<ZERNCommand>* Temp = CommandListInstanced.GetFirst();
+		while (Temp != NULL)
 		{
+			ZERNCommand* CurrentCommand = Temp->GetItem();
+
 			if (CurrentCommand->InstanceTag == NULL ||
 				CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
 				CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
 				!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
 			{
+				Temp = Temp->GetNext();
 				continue;
 			}
 
-			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());			
+			if (Temp != CommandListInstanced.GetFirst())
+			{
+				CommandListInstanced.Remove(Temp);
+				CommandListInstanced.AddBegin(Temp);
+			}
+
+			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());
 			Found = true;
 			break;
 		}

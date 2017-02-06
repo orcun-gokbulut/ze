@@ -44,11 +44,28 @@
 
 #define ZE_GEDF_LOCAL_TRANSFORM 0x0004
 
+void ZESectorManager::ActivateSector(ZESector* Sector)
+{
+	zeDebugCheck(Sector->GetScene() != NULL, "Sector is already activated.");
+
+	zeDebugLog("ZESectorManager updated. Sector added to scene. Sector: \"%s\"", Sector->GetName().ToCString());
+
+	Scene->AddEntity(Sector);
+	ActiveSectors.Add(Sector);
+}
+
+void ZESectorManager::DeactivateSector(ZESector* Sector)
+{
+	zeDebugCheck(Sector->GetScene() != Scene, "Sector is not added to the scene.");
+
+	Scene->RemoveEntity(Sector);
+	ActiveSectors.RemoveValue(Sector);
+}
+
 void ZESectorManager::AddToCache(ZESector* Sector)
 {
-	if (Sector == NULL)
-		return;
-
+	zeDebugCheck(Sector == NULL, "Sector is NULL.");
+	
 	if (SectorCache.Exists(Sector))
 		return;
 
@@ -60,25 +77,44 @@ void ZESectorManager::AddToCache(ZESector* Sector)
 
 void ZESectorManager::RemoveFromCache(ZESector* Sector)
 {
-	if (Sector == NULL)
-		return;
-
-	if (Sector->GetScene() != NULL && Sector->GetScene() != Scene)
-		return;
-
-	if (!SectorCache.Exists(Sector))
-		return;
+	zeDebugCheck(Sector == NULL, "Sector is NULL.");
 
 	zeDebugLog("ZESectorManager Cache updated. Sector removed. Sector: \"%s\"", Sector->GetName().ToCString());
-	zeDebugLog("ZESectorManager updated. Sector removed from Scene. Sector: \"%s\"", Sector->GetName().ToCString());
-
-	SectorCache.RemoveValue(Sector);
-
-	if (Sector->GetScene() != NULL)
-		Scene->RemoveEntity(Sector);
 
 	Sector->Unload();
+	SectorCache.RemoveValue(Sector);
 }
+
+void ZESectorManager::FollowLinks(ZEArray<ZESector*>& ActivateList, ZEArray<ZESector*>& CacheList, ZESector* Sector, ZESSize ActivateDepth, ZESSize CacheDepth)
+{
+	if (CacheDepth == 0)
+		return;
+
+	CacheDepth--;
+	ActivateDepth--;
+
+	ze_for_each(Link, Sector->GetSectorLinks())
+	{
+		ZESector* LinkedSector = GetSector(Link->Id);
+		if (LinkedSector == NULL)
+			continue;
+
+		if (ActivateDepth > 0)
+		{
+			if (ActivateDepth > Link->Depth)
+				ActivateDepth = Link->Depth;
+
+			if (!ActivateList.Exists(LinkedSector))
+				ActivateList.Add(LinkedSector);
+		}
+		
+		if (!CacheList.Exists(LinkedSector))
+			CacheList.Add(LinkedSector);
+
+		FollowLinks(ActivateList, CacheList, LinkedSector, ActivateDepth, CacheDepth);
+	}
+}
+
 
 void ZESectorManager::UpdateTransformation(ZEGeographicEntity* Entity, bool Forced)
 {
@@ -117,6 +153,8 @@ void ZESectorManager::UpdateTransformations()
 	{
 		OriginSector = ResultSector;
 
+		UpdateActiveSectors();
+
 		ze_for_each(Sector, Sectors)
 			UpdateTransformation(Sector.GetPointer(), true);
 
@@ -138,55 +176,42 @@ void ZESectorManager::UpdateTransformations()
 
 void ZESectorManager::UpdateActiveSectors()
 {
-	ZESector* CurrentSelectedSector = NULL;
+	ZEArray<ZESector*> ActivateList;
+	ZEArray<ZESector*> CacheList;
+	FollowLinks(ActivateList, CacheList, OriginSector, 3, 5);
 
-	ze_for_each(Selector, Selectors)
+
+	// Update Active Sectors
+	for (ZESSize I = 0; I < ActiveSectors.GetCount(); I++)
 	{
-		CurrentSelectedSector = GetSector(Selector->GetGeographicPosition(), true);
-
-		if (CurrentSelectedSector == NULL)
-			continue;
-
-		ze_for_each(Sector, Sectors)
+		if (!ActivateList.Exists(ActiveSectors[I]))
 		{
-			ZESector* CurrentSector = static_cast<ZESector*>(Sector.GetPointer());
-			bool NormalResult = CurrentSelectedSector->CheckLink(CurrentSector);
-			bool CacheResult = CurrentSelectedSector->CheckLinkInternal(CurrentSector, CacheDepth, false);
-
-			if (CacheResult)
-			{
-				AddToCache(CurrentSector);
-			}
-			else
-			{
-				RemoveFromCache(CurrentSector);
-			}
-
-			if (NormalResult)
-			{
-				if (CurrentSector->GetScene() == NULL)
-				{
-					zeDebugLog("ZESectorManager updated. Sector added to scene. Sector: \"%s\"", Sector->GetName().ToCString());
-					Scene->AddEntity(CurrentSector);
-					UpdateTransformation(CurrentSector, true);
-				}
-
-				if (!CurrentSector->GetVisible())
-				{
-					CurrentSector->SetVisible(true);
-					zeDebugLog("ZESectorManager updated. Sector set as visible. Sector: \"%s\"", Sector->GetName().ToCString());
-					UpdateTransformation(CurrentSector, true);
-				}
-			}
-			else
-			{
-				if (CurrentSector->GetVisible())
-				{
-					CurrentSector->SetVisible(false);
-					zeDebugLog("ZESectorManager updated. Sector set as invisible. Sector: \"%s\"", Sector->GetName().ToCString());
-				}
-			}
+			DeactivateSector(ActiveSectors[I]);
+			I--;
 		}
+	}
+
+	for (ZESize I = 0; I < ActivateList.GetCount(); I++)
+	{
+		if (!ActiveSectors.Exists(ActivateList[I]))
+			ActivateSector(ActivateList[I]);
+	}
+
+
+	// Update Cache
+	for (ZESSize I = 0; I < SectorCache.GetCount(); I++)
+	{
+		if (!CacheList.Exists(SectorCache[I]))
+		{
+			RemoveFromCache(SectorCache[I]);
+			I--;
+		}
+	}
+	
+	for (ZESize I = 0; I < CacheList.GetCount(); I++)
+	{
+		if (!SectorCache.Exists(CacheList[I]))
+			AddToCache(CacheList[I]);
 	}
 }
 
@@ -406,8 +431,6 @@ void ZESectorManager::ClearGeographicEntities()
 void ZESectorManager::Process(float Time)
 {
 	UpdateTransformations();
-
-	UpdateActiveSectors();
 }
 
 bool ZESectorManager::Serialize(const ZEString& FileName)

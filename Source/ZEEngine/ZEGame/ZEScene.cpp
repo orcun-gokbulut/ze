@@ -564,9 +564,8 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 	Entities.UnlockWrite();
 	
 	Entity->SetScene(this);
-	Entity->Load();
 
-	if(Entity->GetName().GetLength() == 0)
+	if(Entity->GetName().IsEmpty())
 		Entity->SetName(Entity->GetClass()->GetName() + ZEString::FromUInt32(LastEntityId));
 
 	if (EntityState == ZE_ES_INITIALIZED)
@@ -581,8 +580,10 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 	zeCheckError(Entity->GetScene() != this, ZE_VOID, "Entity does not belong to this scene.");
 	zeCheckError(Entity->GetParent() != NULL, ZE_VOID, "Entity is not a root entity.");
 
-	Entity->Deinitialize();
 	Entity->SetScene(NULL);
+
+	if (EntityState == ZE_ES_INITIALIZED)
+		Entity->Deinitialize();
 
 	Entities.LockWriteNested();
 	{

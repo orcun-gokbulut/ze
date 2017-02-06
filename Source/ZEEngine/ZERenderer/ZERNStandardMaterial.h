@@ -76,10 +76,6 @@ class ZERNStandardMaterial : public ZERNMaterial
 	private:
 		ZEUInt											StageMask;
 		mutable ZEFlags									DirtyFlags;
-		
-		ZEHolder<ZEGRShader>							StageGBuffer_Forward_Interior_VertexShader;
-		ZEHolder<ZEGRShader>							StageShadowmapGeneration_Interior_VertexShader;
-		ZEHolder<ZEGRShader>							StageRenderDepth_Interior_VertexShader;
 
 		ZEHolder<ZEGRShader>							StageGBuffer_Forward_VertexShader;
 		ZEHolder<ZEGRShader>							StageGBuffer_Forward_PixelShader;
