@@ -49,16 +49,22 @@ class ZESectorManager : public ZEObject
 	protected:
 		ZEScene*							Scene;
 		ZESector* 							OriginSector;
-		ZEArray<ZESector*>					SectorCache;
 		ZEUInt32							CacheDepth;
 
 		ZEList2<ZEGeographicEntity>			Sectors;
+		ZEArray<ZESector*>					SectorCache;
+		ZEArray<ZESector*>					ActiveSectors;
+
 		ZEList2<ZEGeographicEntity>			Selectors;
 		ZEList2<ZEGeographicEntity>			GeographicEntities;
+
+		void								ActivateSector(ZESector* Sector);
+		void								DeactivateSector(ZESector* Sector);
 
 		void								AddToCache(ZESector* Sector);
 		void								RemoveFromCache(ZESector* Sector);
 
+		void								FollowLinks(ZEArray<ZESector*>& ActivateList, ZEArray<ZESector*>& CacheList, ZESector* Sector, ZESSize ActivateDepth, ZESSize CacheDepth);
 		void								UpdateTransformation(ZEGeographicEntity* Entity, bool Forced = false);
 		void								UpdateTransformations();
 		void								UpdateActiveSectors();
