@@ -69,4 +69,5 @@
 	ClassName::ClassName(const ClassName&) {new (this) ClassName();} \
 	ClassName& ClassName::operator=(const ClassName&) {return *this;}
 
+#define ZE_ALIGN(Bytes) __declspec(align(4))
 #define ZE_CHECK_ALIGNMENT(Pointer, Alignment) (((ZESize)(const void*)(Pointer)) % (Alignment) == 0)

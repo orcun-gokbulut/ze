@@ -686,7 +686,6 @@ void ZEArray<ZE_ARRAY_SPECIALIZATION>::Enqueue(ZEItemType Value)
 ZE_ARRAY_TEMPLATE
 ZEItemType ZEArray<ZE_ARRAY_SPECIALIZATION>::Dequeue()
 {
-	ZEItemType Temp;
 	Lock.LockWriteNested();
 	//{
 		zeDebugCheck(Count == 0, "There is no item in the queue.");
