@@ -52,10 +52,10 @@
 
 ZE_COPY_NO_ACTION_IMP(ZELock)
 
-static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
+static inline ZEUInt32 AtomicIncrement(volatile ZEUInt32* NextNumber)
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
-		return _InterlockedIncrement((long*)NextNumber);
+		return _InterlockedIncrement((volatile long*)NextNumber);
     #endif
 
     #ifdef ZE_PLATFORM_COMPILER_GCC
@@ -118,7 +118,7 @@ void ZELock::Lock()
 	__itt_sync_prepare(this);
 	#endif
 
-	ZEInt32 MyNumber = Queue();
+	ZEUInt32 MyNumber = Queue();
 	Wait(MyNumber);
 
 	NestingCount++;

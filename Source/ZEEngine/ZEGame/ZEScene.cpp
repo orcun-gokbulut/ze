@@ -705,9 +705,9 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 		ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
 		{
 			OctreeVisitedNodeCount++;
-			OctreeProcessedEntity += Node->GetItems().GetCount();
 			for (ZESize I = 0; I < Node->GetItems().GetCount(); I++)
-			{		
+			{	
+				OctreeProcessedEntity++;
 				ZEEntity* Entity = Node->GetItems()[I];
 				if (PreRenderEntity(Entity, Parameters))
 					RenderedEntity++;
@@ -719,6 +719,7 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 		OctreeCulledEntity = RenderListOctree.GetTotalItemCount() - OctreeProcessedEntity;
 		OctreeCullRatio = (float)OctreeCulledEntity / (float)RenderListOctree.GetTotalItemCount();
 		OctreePerformanceRatio = 1.0f - (float)(OctreeProcessedEntity + OctreeVisitedNodeCount) / (float)RenderListOctree.GetTotalItemCount();
+		zeDebugCheck(!RenderListOctree.Check(), "Octree integrity check failed.");
 
 		ze_for_each(Entity, RenderList)
 		{
@@ -900,13 +901,14 @@ ZEScene::ZEScene()
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.1f;
-	SpatialDatabase = false;
+	SpatialDatabase = true;
 	EntityState = ZE_ES_NONE;
 
 	Constants.AmbientColor = ZEVector3::Zero;
 
-	RenderListOctree.SetBoundingBox(ZEAABBox(-32000.0f * ZEVector3::One, 32000.0f * ZEVector3::One));
-	RenderListOctree.SetMaxDepth(8);
+	RenderListOctree.SetBoundingBox(ZEAABBox(-10.0f * ZEVector3::One, 10.0f * ZEVector3::One));
+	RenderListOctree.SetMinDepth(-10);
+	RenderListOctree.SetMaxDepth(2);
 }
 
 ZEScene::~ZEScene()

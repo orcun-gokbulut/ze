@@ -53,6 +53,7 @@
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZESpatial/ZEOctree.h"
 #include "ZEThread/ZETask.h"
 #include "ZERayCast.h"
 #include "ZEVolumeCast.h"

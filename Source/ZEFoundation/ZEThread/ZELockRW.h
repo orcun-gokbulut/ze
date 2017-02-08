@@ -61,15 +61,15 @@ class ZELockRW
 
 class ZELockRWDummy
 {
-	#ifdef ZE_DEBUG_ENABLE
-		ZELock					DebugLock;
-		ZEUInt32				ThreadID;
-	#endif
+	private:
+		#ifdef ZE_DEBUG_ENABLE
+			ZELock				DebugLock;
+			ZEUInt32			ThreadID;
+		#endif
 
 		void					CheckLockMultipleThreadAccess();
 		void					CheckUnlockMultipleThreadAccess();
 
-	
 	public:
 		void					LockRead();
 		void					UnlockRead();

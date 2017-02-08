@@ -42,13 +42,14 @@
 #define ZE_CRITICAL_SECTION_BEGIN(Name)	static ZELock Name##CriticalSection; Name##CriticalSection.Lock();
 #define ZE_CRITICAL_SECTION_END(Name) Name##CriticalSection.Unlock();
 
+ZE_ALIGN(4) 
 class ZELock
 {
 	ZE_COPY_NO_ACTION(ZELock)
 	friend class ZELockRW;
 	private:
-		volatile ZEInt32		CurrentNumber;
-		volatile ZEInt32		QueueNumber;
+		volatile ZEUInt32		CurrentNumber;
+		volatile ZEUInt32		QueueNumber;
 		volatile ZEUInt32		OwnerThreadId;
 		volatile ZEInt32		NestingCount;
 
