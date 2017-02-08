@@ -56,6 +56,7 @@
 #include "ZEThread/ZETask.h"
 #include "ZERayCast.h"
 #include "ZEVolumeCast.h"
+#include "ZESpatial/ZEOctree.h"
 
 class ZEScene;
 class ZEDObjectWrapper;
@@ -65,8 +66,6 @@ class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
-template<typename ZEItemType, typename ZELockType = ZELockRW>
-class ZEOctree;
 
 typedef ZEFlags ZEEntityFlags;
 ZE_ENUM(ZEEntityFlag)
