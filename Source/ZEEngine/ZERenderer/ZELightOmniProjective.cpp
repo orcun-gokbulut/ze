@@ -77,8 +77,6 @@ ZEEntityResult ZELightOmniProjective::UnloadInternal()
 ZELightOmniProjective::ZELightOmniProjective()
 {
 	ProjectionTexture = NULL;
-	Command.Entity = this;
-	Command.Priority = 1;
 }
 
 ZELightOmniProjective::~ZELightOmniProjective()
@@ -120,11 +118,6 @@ const ZEGRTexture* ZELightOmniProjective::GetProjectionTexture()
 void ZELightOmniProjective::SetProjectionTexture(const ZEGRTexture* Texture)
 {
 	ProjectionTexture = Texture;
-}
-
-ZEGRTexture* ZELightOmniProjective::GetShadowMap(ZESize	Index) const
-{
-	return NULL;
 }
 
 const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index) const

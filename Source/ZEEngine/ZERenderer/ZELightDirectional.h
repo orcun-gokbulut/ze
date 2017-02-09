@@ -44,27 +44,36 @@
 class ZEGRTexture;
 class ZEGRBuffer;
 
+struct ZERNCascade
+{
+	ZEMatrix4x4								ViewTransform;
+	ZEMatrix4x4								ProjectionTransform;
+	ZEViewOBBox								ViewVolume;
+	ZEVector4								Borders;
+	ZEUInt									SampleCount;
+	float									SampleLength;
+	float									DepthBias;
+	float									NormalBias;
+
+											ZERNCascade();
+};
+
+class ZERNCommandDirectionalLight : public ZERNCommand
+{
+	ZE_OBJECT
+	public:
+		ZEQuaternion						RotationWorld;
+		ZEVector3							Color;
+		ZEBool32							CastShadow;
+		ZEArray<ZERNCascade>				Cascades;
+};
+
 class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
 	private:
-		struct ZECascade
-		{
-			ZEMatrix4x4						ViewTransform;
-			ZEMatrix4x4						ProjectionTransform;
-			ZEViewOBBox						ViewVolume;
-			ZEVector4						Borders;
-			ZEUInt							SampleCount;
-			float							SampleLength;
-			float							DepthBias;
-			float							NormalBias;
-
-											ZECascade();
-		};
-
-		ZEHolder<ZEGRTexture>				CascadeShadowMaps;
-
-		ZEArray<ZECascade>					Cascades;
+		ZERNCommandDirectionalLight			Command;
+		ZEArray<ZERNCascade>				Cascades;
 
 		float								CascadeDistanceFactor;
 
@@ -72,8 +81,7 @@ class ZELightDirectional : public ZELight
 		ZEVector3							TerrestrialColor;
 		float								TerrestrialIntensity;
 
-		void								UpdateCascadeTransforms(const ZERNView& View);
-		void								UpdateCascadeShadowMaps();
+		void								UpdateCascadeTransforms(const ZERNView& View, ZEUInt ShadowMapSize);
 
 		virtual ZEEntityResult				LoadInternal();
 		virtual ZEEntityResult				UnloadInternal();
@@ -84,8 +92,6 @@ class ZELightDirectional : public ZELight
 	public:
 		virtual ZELightType					GetLightType() const;
 		virtual ZESize						GetViewCount() const;
-
-		const ZEArray<ZECascade>&			GetCascades() const;
 
 		void								SetCascadeCount(ZEUInt CascadeCount);
 		ZEUInt								GetCascadeCount() const;
@@ -108,12 +114,11 @@ class ZELightDirectional : public ZELight
 		void								SetTerrestrialIntensity(float TerrestrialIntensity);
 		float								GetTerrestrialIntensity() const;
 
-		virtual ZEGRTexture*				GetShadowMap(ZESize Index = 0) const;
 		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&			GetViewTransform(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0) const;
 
-		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 
 		static ZELightDirectional*			CreateInstance();
 }

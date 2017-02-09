@@ -44,7 +44,7 @@ groupshared uint					TileMinDepth;
 groupshared uint					TileMaxDepth;
 
 groupshared uint					TileLightCount;
-groupshared uint					TileLightIndices[MAX_LIGHT];
+groupshared uint					TileLightIndices[MAX_TILED_LIGHT];
 
 #ifdef MSAA_ENABLED
 	groupshared	uint				PerSamplePixels[TILE_SIZE];
@@ -144,26 +144,26 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	#ifdef ZERN_TILED_FORWARD
 		uint TilePointLightCount = TileLightCount;
 	
-		for (uint ProjectiveLightIndex = GroupIndex; ProjectiveLightIndex < ZERNShading_ProjectiveLightCount; ProjectiveLightIndex += TILE_SIZE)
+		for (uint SpotLightIndex = GroupIndex; SpotLightIndex < ZERNShading_SpotLightCount; SpotLightIndex += TILE_SIZE)
 		{
 			bool InsideFrustum = true;
-			ZERNShading_ProjectiveLight ProjectiveLight = ZERNShading_ProjectiveLights[ProjectiveLightIndex];
+			ZERNShading_SpotLight SpotLight = ZERNShading_SpotLights[SpotLightIndex];
 			
 			for (uint I = 0; I < 6; I++)
-				InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(ProjectiveLight.CullPositionView, 1.0f)) >= -ProjectiveLight.CullRange);
+				InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(SpotLight.CullPositionView, 1.0f)) >= -SpotLight.CullRange);
 			
 			if (InsideFrustum)
 			{
 				uint Index;
 				InterlockedAdd(TileLightCount, 1, Index);
-				TileLightIndices[Index] = ProjectiveLightIndex;
+				TileLightIndices[Index] = SpotLightIndex;
 			}
 		}
 		
 		GroupMemoryBarrierWithGroupSync();
 		
 		uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
-		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
 		uint TileTotalLightCount = TileLightCount;
 			
 		for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)

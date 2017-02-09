@@ -94,32 +94,17 @@ float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID, u
 		
 		if (ZERNShading_AddTiledDeferredOutput)
 			ResultColor += TiledDeferredOutputTexture[PixelCoord];
-	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
-		ResultColor = ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[InstanceID], Surface);
+	#elif defined ZERN_RENDER_SPOT_LIGHT
+		ResultColor = ZERNShading_SpotShading(ZERNShading_SpotLights[InstanceID], Surface);
+	#elif defined ZERN_RENDER_SPOT_LIGHT_SHADOW
+		ResultColor = ZERNShading_SpotShading(ZERNShading_SpotLightsShadowConstant[InstanceID], InstanceID, Surface);
 	#elif defined ZERN_RENDER_POINT_LIGHT
 		ResultColor = ZERNShading_PointShading(ZERNShading_PointLights[InstanceID], Surface);
+	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
+		ResultColor = ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLightConstant, Surface);
 	#endif
 	
 	return ResultColor;
-}
-
-float4 ZERNDeferredShading_ProjectiveLight_VertexShader(ZERNDeferredShading_VertexShader_Input Input) : SV_Position
-{
-	float4 PositionWorld = mul(ZERNShading_ProjectiveLightConstant.WorldMatrix, float4(Input.Position, 1.0f));
-	
-	return ZERNTransformations_WorldToProjection(PositionWorld);
-}
-
-float3 ZERNDeferredShading_ProjectiveLight_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
-{
-	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(PositionViewport.xy);
-	return ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLightConstant, Surface);
-}
-
-float3 ZERNDeferredShading_ProjectiveLight_PixelShader_PerSample(float4 PositionViewport : SV_Position, uint SampleIndex : SV_SampleIndex) : SV_Target0
-{
-	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(PositionViewport.xy, SampleIndex);
-	return ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLightConstant, Surface);
 }
 
 ZERNDeferredShading_VertexShader_Output ZERNDeferredShading_VertexShader_LightingStage(ZERNDeferredShading_VertexShader_Input Input, uint InstanceID : SV_InstanceID)
@@ -128,11 +113,17 @@ ZERNDeferredShading_VertexShader_Output ZERNDeferredShading_VertexShader_Lightin
 	
 	#if defined ZERN_RENDER_DIRECTIONAL_LIGHT
 		Output.Position = float4(Input.Position, 1.0f);
-	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
-		float4 PositionWorld = mul(ZERNShading_ProjectiveLights[InstanceID].WorldMatrix, float4(Input.Position, 1.0f));
+	#elif defined ZERN_RENDER_SPOT_LIGHT
+		float4 PositionWorld = mul(ZERNShading_SpotLights[InstanceID].WorldMatrix, float4(Input.Position, 1.0f));
+		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
+	#elif defined ZERN_RENDER_SPOT_LIGHT_SHADOW
+		float4 PositionWorld = mul(ZERNShading_SpotLightsShadowConstant[InstanceID].SpotLight.WorldMatrix, float4(Input.Position, 1.0f));
 		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	#elif defined ZERN_RENDER_POINT_LIGHT
 		float4 PositionWorld = mul(ZERNShading_PointLights[InstanceID].WorldMatrix, float4(Input.Position, 1.0f));
+		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
+	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
+		float4 PositionWorld = mul(ZERNShading_ProjectiveLightConstant.WorldMatrix, float4(Input.Position, 1.0f));
 		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	#endif
 	

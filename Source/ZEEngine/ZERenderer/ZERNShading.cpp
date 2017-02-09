@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELightPoint.h
+ Zinek Engine - ZERNShading.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZELight.h"
-
-#include "ZEMath/ZEBSphere.h"
-
-class ZERNCommandPointLight : public ZERNCommand
-{
-	ZE_OBJECT
-	public:
-		ZEVector3					PositionWorld;
-		float						Range;
-		ZEVector3					Color;
-		float						FalloffExponent;
-};
-
-class ZELightPoint : public ZELight
-{
-	ZE_OBJECT
-	private:
-		mutable ZEViewSphere			ViewVolume;
-		ZERNCommandPointLight			Command;
-
-		float							FalloffExponent;
-
-										ZELightPoint();
-		virtual							~ZELightPoint();
-
-	public:
-		virtual ZELightType				GetLightType() const;
-		virtual ZESize					GetViewCount() const;
-
-		void							SetFalloffExponent(float Exponent);
-		float							GetFalloffExponent() const;
-
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const;
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;
-
-		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
-
-		static ZELightPoint*			CreateInstance();
-};
+#include "ZERNShading.h"

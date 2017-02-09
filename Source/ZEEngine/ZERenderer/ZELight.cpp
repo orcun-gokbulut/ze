@@ -59,18 +59,13 @@ ZEEntityResult ZELight::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
-	ShadowRenderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
-	ShadowRenderer.Initialize();
-
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZELight::UnloadInternal()
 {
-	ShadowRenderer.Deinitialize();
-	
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+
 	return ZE_ER_DONE;
 }
 
@@ -124,8 +119,7 @@ ZELight::ZELight()
 	DirtyFlags.RaiseAll();
 
 	CastsShadows = false;
-	ShadowResolution = ZE_LSR_MEDIUM;
-	ShadowSampleCount = ZE_LSC_MEDIUM;
+	ShadowSampleCount = ZERN_LSC_MEDIUM;
 	ShadowSampleLength = 1.0f;
 	ShadowDepthBias = 0.005f;
 	ShadowNormalBias = 0.1f;
@@ -181,27 +175,12 @@ float ZELight::GetIntensity() const
 	return Intensity;
 }
 
-void ZELight::SetShadowResolution(ZELightShadowResolution ShadowResolution)
-{
-	if(this->ShadowResolution == ShadowResolution)
-		return;
-
-	this->ShadowResolution = ShadowResolution;
-
-	DirtyFlags.RaiseFlags(ZE_LDF_SHADOW_MAP);
-}
-
-ZELightShadowResolution ZELight::GetShadowResolution() const
-{
-	return ShadowResolution;
-}
-
-void ZELight::SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
+void ZELight::SetShadowSampleCount(ZERNLightShadowSampleCount ShadowSampleCount)
 {
 	this->ShadowSampleCount = ShadowSampleCount;
 }
 
-ZELightShadowSampleCount ZELight::GetShadowSampleCount() const
+ZERNLightShadowSampleCount ZELight::GetShadowSampleCount() const
 {
 	return ShadowSampleCount;
 }
@@ -309,43 +288,40 @@ bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
-	if (CastsShadows)
-		Command.StageMask |= ZERN_STAGE_SHADOWING;
-
-	Parameters->Renderer->AddCommand(&Command);
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
 
 	return true;
 }
 
-ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)
+ZEUInt ZELight::ConvertShadowResolution(ZERNLightShadowResolution ShadowResolution)
 {
 	switch (ShadowResolution)
 	{
 		default:
-		case ZE_LSR_LOW:
+		case ZERN_LSR_LOW:
 			return 256;
-		case ZE_LSR_MEDIUM:
+		case ZERN_LSR_MEDIUM:
 			return 512;
-		case ZE_LSR_HIGH:
+		case ZERN_LSR_HIGH:
 			return 1024;
-		case ZE_LSR_VERY_HIGH:
+		case ZERN_LSR_VERY_HIGH:
 			return 2048;
 	}
 }
 
-ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
+ZEUInt ZELight::ConvertShadowSampleCount(ZERNLightShadowSampleCount ShadowSampleCount)
 {
 	switch (ShadowSampleCount)
 	{
 		default:
-		case ZE_LSC_LOW:
+		case ZERN_LSC_LOW:
 			return 4;
-		case ZE_LSC_MEDIUM:
+		case ZERN_LSC_MEDIUM:
 			return 8;
-		case ZE_LSC_HIGH:
+		case ZERN_LSC_HIGH:
 			return 16;
-		case ZE_LSC_VERY_HIGH:
+		case ZERN_LSC_VERY_HIGH:
 			return 16;
 	}
 }

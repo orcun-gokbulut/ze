@@ -47,6 +47,7 @@ ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
 
 class ZERNCommand;
 class ZERNInstanceTag;
+class ZEScene;
 
 typedef ZEDelegate<void (const ZERNRenderParameters*, const ZERNCommand*)> ZERNCommandCallback;
 
@@ -56,26 +57,27 @@ class ZERNCommand : public ZEObject
 	//ZE_DISALLOW_COPY(ZERNCommand);
 	friend class ZERNRenderer;
 	private:
-		ZELink<ZERNCommand>				Links[ZERN_MAX_COMMAND_LINK];
-		ZEList2<ZERNCommand>			InstancesPrevious;
+		ZELink<ZERNCommand>		Links[ZERN_MAX_COMMAND_LINK];
+		ZEList2<ZERNCommand>	InstancesPrevious;
 
-		void							PushInstances();
-		void							PopInstances();
-		ZELink<ZERNCommand>*			GetFreeLink();
+		void					PushInstances();
+		void					PopInstances();
+		ZELink<ZERNCommand>*	GetFreeLink();
 
 	public:
-		ZERNCommandCallback				Callback;
-		ZEEntity*						Entity;
+		ZERNCommandCallback		Callback;
+		ZEEntity*				Entity;
+		ZEScene*				Scene;
 
-		ZEInt							Priority;
-		float							Order;
-		ZEInt							SceneIndex;
-		ZEUInt							StageMask;
-		void*							ExtraParameters;
-		ZEList2<ZERNCommand>			Instances;
-		const ZERNInstanceTag*			InstanceTag;
+		ZEInt					Priority;
+		float					Order;
+		ZEInt					SceneIndex;
+		ZEUInt					StageMask;
+		void*					ExtraParameters;
+		ZEList2<ZERNCommand>	Instances;
+		const ZERNInstanceTag*	InstanceTag;
+		
+		virtual void			Execute(const ZERNRenderParameters* Parameters);
 
-		virtual void					Execute(const ZERNRenderParameters* Parameters);
-
-										ZERNCommand();
+								ZERNCommand();
 };

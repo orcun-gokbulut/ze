@@ -49,6 +49,7 @@
 #include "ZERNRenderParameters.h"
 #include "ZERNStage.h"
 #include "ZECamera.h"
+#include "ZERNStageShadowing.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -56,15 +57,16 @@
 #define ZE_LDF_VIEW_VOLUME				8
 #define ZE_LDF_CONSTANT_BUFFER			16
 
-ZELightDirectional::ZECascade::ZECascade()
+ZERNCascade::ZERNCascade()
 {
+	Borders = ZEVector4::Zero;
 	SampleCount = 16;
 	SampleLength = 1.0f;
-	DepthBias = 0.0005f;
-	NormalBias = 0.1f;
+	DepthBias = 0.001f;
+	NormalBias = 0.003f;
 }
 
-void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
+void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View, ZEUInt ShadowMapSize)
 {
 	float VerticalTopFovTangent = ZEAngle::Tan(View.VerticalFOVTop);
 	float VerticalBottomFovTangent = ZEAngle::Tan(View.VerticalFOVBottom);
@@ -76,7 +78,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 	ZEUInt CascadeCount = Cascades.GetCount();
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeCount; CascadeIndex++)
 	{
-		ZECascade& Cascade = Cascades[CascadeIndex];
+		ZERNCascade& Cascade = Cascades[CascadeIndex];
 
 		float CascadeNumberDividedByCount = (float)(CascadeIndex + 1) / CascadeCount;
 		Cascade.Borders.z = (CascadeIndex == 0) ? View.NearZ : Cascades[CascadeIndex - 1].Borders.w;
@@ -116,7 +118,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 		}
 
 		float Diameter = ZEVector3::Length(CascadeFrustumVerticesWorld[0] - CascadeFrustumVerticesWorld[6]);
-		float UnitPerShadowTexel = Diameter / CascadeShadowMaps->GetWidth();
+		float UnitPerShadowTexel = Diameter / (float)ShadowMapSize;
 
 		//Offset cascade frustum aabb in light space to enclose the circle
 		ZEVector3 Offset = (ZEVector3(Diameter) - (CascadeFrustumAABBLight.Max - CascadeFrustumAABBLight.Min)) * 0.5f;
@@ -172,17 +174,6 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 	}
 }
 
-void ZELightDirectional::UpdateCascadeShadowMaps()
-{
-	if (!DirtyFlags.GetFlags(ZE_LDF_SHADOW_MAP))
-		return;
-
-	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
-	CascadeShadowMaps = ZEGRTexture::CreateResource(ZEGR_TT_2D, Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, Cascades.GetCount());
-
-	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
-}
-
 ZEEntityResult ZELightDirectional::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZELight);
@@ -191,7 +182,6 @@ ZEEntityResult ZELightDirectional::LoadInternal()
 
 ZEEntityResult ZELightDirectional::UnloadInternal()
 {
-	CascadeShadowMaps.Release();
 	Cascades.Clear();
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
@@ -305,19 +295,6 @@ ZESize ZELightDirectional::GetViewCount() const
 	return 1;
 }
 
-const ZEArray<ZELightDirectional::ZECascade>& ZELightDirectional::GetCascades() const
-{
-	return Cascades;
-}
-
-ZEGRTexture* ZELightDirectional::GetShadowMap(ZESize Index) const
-{
-	if (Index >= Cascades.GetCount())
-		zeError("Index is out of range");
-
-	return CascadeShadowMaps;
-}
-
 const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index) const
 {
 	return Cascades[Index].ViewVolume;
@@ -339,55 +316,28 @@ const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index) cons
 	return Cascades[Index].ProjectionTransform;
 }
 
-void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+bool ZELightDirectional::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
-		return;
-
-	// Do not update shadow map for second channel
-	// Reuse the generated one for the first channel
-	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS))
-		return;
-
-	UpdateCascadeShadowMaps();
-	UpdateCascadeTransforms(*Parameters->View);
-
-	ZEGRContext* Context = Parameters->Context;
-
-	ZERNView View = ShadowRenderer.GetView();
-	View.Position = Parameters->View->Position;
-	View.Rotation = GetWorldRotation();
-	View.Direction = GetWorldFront();
-	View.U = GetWorldRight();
-	View.V = GetWorldUp();
-	View.N = GetWorldFront();
-	View.Entity = this;
-
-	ShadowRenderer.SetContext(Parameters->Context);
-
-	ZEUInt CascadeCount = Cascades.GetCount();
-	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeCount; CascadeIndex++)
+	if (!ZELight::PreRender(Parameters))
+		return false;
+	
+	if (GetCastsShadow())
 	{
-		View.ViewVolume = &Cascades[CascadeIndex].ViewVolume;
-		View.ViewProjectionTransform = Cascades[CascadeIndex].ProjectionTransform * Cascades[CascadeIndex].ViewTransform;
-		ShadowRenderer.SetView(View);
-
-		ZERNPreRenderParameters ShadowParameters;
-		ShadowParameters.Renderer = &ShadowRenderer;
-		ShadowParameters.View = &View;
-		ShadowParameters.Type = ZERN_RT_SHADOW;
-		
-		Parameters->Renderer->BeginNestedRenderer();
-		GetScene()->PreRender(&ShadowParameters);
-
-		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
-		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
-		Context->SetRenderTargets(0, NULL, DepthBuffer);
-		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
-
-		ShadowRenderer.Render();
-		Parameters->Renderer->EndNestedRenderer();
+		ZERNStageShadowing* StageShadowing = static_cast<ZERNStageShadowing*>(Parameters->Renderer->GetStage(ZERN_STAGE_SHADOWING));
+		if (StageShadowing != NULL && StageShadowing->GetEnabled())
+			UpdateCascadeTransforms(*Parameters->View, ZELight::ConvertShadowResolution(StageShadowing->GetDirectionalShadowMapsResolution()));
 	}
+
+	Command.Scene = GetScene();
+	Command.RotationWorld = GetWorldRotation();
+	Command.Color = GetIsTerrestrial() ? (GetTerrestrialColor() * GetTerrestrialIntensity()) : (GetColor() * GetIntensity());
+	Command.CastShadow = GetCastsShadow();
+	Command.Cascades = Cascades;
+	Command.StageMask = ZERN_STAGE_LIGHTING | (GetCastsShadow() ? ZERN_STAGE_SHADOWING : 0);
+
+	Parameters->Renderer->AddCommand(&Command);
+
+	return true;
 }
 
 ZELightDirectional* ZELightDirectional::CreateInstance()

@@ -50,23 +50,24 @@ ZE_ENUM_TYPED(ZELightType, ZEUInt8)
 	ZE_LT_POINT				= 1,
 	ZE_LT_DIRECTIONAL		= 2,
 	ZE_LT_PROJECTIVE		= 3,
-	ZE_LT_OMNIPROJECTIVE	= 4
+	ZE_LT_OMNIPROJECTIVE	= 4,
+	ZE_LT_SPOT				= 5
 };
 
-ZE_ENUM_TYPED(ZELightShadowResolution, ZEUInt8)
+ZE_ENUM_TYPED(ZERNLightShadowResolution, ZEUInt8)
 {
-	ZE_LSR_LOW				= 0,
-	ZE_LSR_MEDIUM			= 1,
-	ZE_LSR_HIGH				= 2,
-	ZE_LSR_VERY_HIGH		= 3
+		ZERN_LSR_LOW		= 0,
+		ZERN_LSR_MEDIUM		= 1,
+		ZERN_LSR_HIGH		= 2,
+		ZERN_LSR_VERY_HIGH	= 3
 };
 
-ZE_ENUM_TYPED(ZELightShadowSampleCount, ZEUInt8)
+ZE_ENUM_TYPED(ZERNLightShadowSampleCount, ZEUInt8)
 {
-	ZE_LSC_LOW				= 0,
-	ZE_LSC_MEDIUM			= 1,
-	ZE_LSC_HIGH				= 2,
-	ZE_LSC_VERY_HIGH		= 3
+		ZERN_LSC_LOW		= 0,
+		ZERN_LSC_MEDIUM		= 1,
+		ZERN_LSC_HIGH		= 2,
+		ZERN_LSC_VERY_HIGH	= 3
 };
 
 class ZEGRTexture;
@@ -81,9 +82,8 @@ class ZELight : public ZEEntity
 		mutable ZEFlags					DirtyFlags;
 
 		bool							CastsShadows;
-
-		ZELightShadowResolution			ShadowResolution;
-		ZELightShadowSampleCount		ShadowSampleCount;
+		
+		ZERNLightShadowSampleCount		ShadowSampleCount;
 		float							ShadowSampleLength;
 		float							ShadowDepthBias;
 		float							ShadowNormalBias;
@@ -96,9 +96,6 @@ class ZELight : public ZEEntity
 
 		mutable ZEMatrix4x4				ViewTransform;
 		mutable ZEMatrix4x4				ProjectionTransform;
-
-		ZERNRenderer					ShadowRenderer;
-		ZERNCommand						Command;
 
 		virtual ZEEntityResult			LoadInternal();
 		virtual ZEEntityResult			UnloadInternal();
@@ -125,11 +122,9 @@ class ZELight : public ZEEntity
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
 
-		void							SetShadowResolution(ZELightShadowResolution ShadowResolution);
-		ZELightShadowResolution			GetShadowResolution() const;
 
-		void							SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
-		ZELightShadowSampleCount		GetShadowSampleCount() const;
+		void							SetShadowSampleCount(ZERNLightShadowSampleCount ShadowSampleCount);
+		ZERNLightShadowSampleCount		GetShadowSampleCount() const;
 
 		void							SetShadowSampleLength(float ShadowSampleLength);
 		float							GetShadowSampleLength() const;
@@ -149,15 +144,14 @@ class ZELight : public ZEEntity
 
 		virtual const ZEAABBox&			GetBoundingBox() const;
 
-		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 		
 		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 
-		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
-		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
+		static ZEUInt					ConvertShadowResolution(ZERNLightShadowResolution ShadowResolution);
+		static ZEUInt					ConvertShadowSampleCount(ZERNLightShadowSampleCount ShadowSampleCount);
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZERNLight.png")
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)

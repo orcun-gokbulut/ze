@@ -201,8 +201,7 @@ ZEATSun::ZEATSun()
 	SunLight->SetCascadeNormalBias(1, 0.1f);
 	SunLight->SetCascadeNormalBias(2, 0.2f);
 	SunLight->SetCascadeNormalBias(3, 0.4f);
-	SunLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
-	SunLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
+	SunLight->SetShadowSampleCount(ZERN_LSC_VERY_HIGH);
 	SunLight->SetIntensity(5.0f);
 	SunLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	SunLight->SetIsTerrestrial(true);

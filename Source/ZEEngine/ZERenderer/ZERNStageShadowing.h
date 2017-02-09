@@ -38,13 +38,16 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZERNRenderer.h"
 #include "ZELight.h"
 
 class ZEGRTexture;
+class ZERNCommandDirectionalLight;
+class ZERNCommandSpotLightShadow;
+class ZERNCommandProjectiveLight;
 
 class ZERNStageShadowing : public ZERNStage
 {
-	friend class ZELightProjective;
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
@@ -52,19 +55,27 @@ class ZERNStageShadowing : public ZERNStage
 
 		ZEUInt							CascadeCount;
 		ZEUInt							DirectionalShadowMapCount;
+		ZEUInt							SpotShadowMapCount;
 		ZEUInt							ProjectiveShadowMapCount;
 
 		ZEUInt							DirectionalShadowMapIndex;
+		ZEUInt							SpotShadowMapIndex;
 		ZEUInt							ProjectiveShadowMapIndex;
 
-		ZELightShadowResolution			DirectionalShadowMapsResolution;
-		ZELightShadowResolution			ProjectiveShadowMapsResolution;
+		ZERNLightShadowResolution		DirectionalShadowMapsResolution;
+		ZERNLightShadowResolution		SpotShadowMapsResolution;
+		ZERNLightShadowResolution		ProjectiveShadowMapsResolution;
 
 		ZEHolder<ZEGRTexture>			DirectionalShadowMaps;
+		ZEHolder<ZEGRTexture>			SpotShadowMaps;
 		ZEHolder<ZEGRTexture>			ProjectiveShadowMaps;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
+
+		void							GenerateDirectionalShadowMaps(ZEGRContext* Context, const ZERNCommandDirectionalLight& DirectionalLight);
+		void							GenerateSpotShadowMaps(ZEGRContext* Context, const ZERNCommandSpotLightShadow& SpotLight);
+		void							GenerateProjectiveShadowMaps(ZEGRContext* Context, const ZERNCommandProjectiveLight& ProjectiveLight);
 
 		virtual void					CreateOutput(const ZEString& Name);
 
@@ -72,23 +83,30 @@ class ZERNStageShadowing : public ZERNStage
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
 
-		void							SetCascadeShadowMapsResolution(ZELightShadowResolution ShadowResolution);
-		ZELightShadowResolution			GetCascadeShadowMapsResolution() const;
-
-		void							SetProjectiveShadowMapsResolution(ZELightShadowResolution ShadowResolution);
-		ZELightShadowResolution			GetProjectiveShadowMapsResolution() const;
-
-		void							SetCascadeCount(ZEUInt CascadeCount);
+		void							SetCascadeCount(ZEUInt Count);
 		ZEUInt							GetCascadeCount() const;
 
-		void							SetDirectionalShadowMapCount(ZEUInt DirectionalShadowMapCount);
+		void							SetDirectionalShadowMapCount(ZEUInt Count);
 		ZEUInt							GetDirectionalShadowMapCount() const;
 
-		void							SetProjectiveShadowMapCount(ZEUInt ProjectiveShadowMapCount);
+		void							SetSpotShadowMapCount(ZEUInt Count);
+		ZEUInt							GetSpotShadowMapCount() const;
+
+		void							SetProjectiveShadowMapCount(ZEUInt Count);
 		ZEUInt							GetProjectiveShadowMapCount() const;
 
+		void							SetDirectionalShadowMapsResolution(ZERNLightShadowResolution Resolution);
+		ZERNLightShadowResolution		GetDirectionalShadowMapsResolution() const;
+
+		void							SetSpotShadowMapsResolution(ZERNLightShadowResolution Resolution);
+		ZERNLightShadowResolution		GetSpotShadowMapsResolution() const;
+
+		void							SetProjectiveShadowMapsResolution(ZERNLightShadowResolution Resolution);
+		ZERNLightShadowResolution		GetProjectiveShadowMapsResolution() const;
+
 		virtual bool					Setup(ZEGRContext* Context);
-										
+		virtual void					CleanUp(ZEGRContext* Context);
+
 										ZERNStageShadowing();
 		virtual							~ZERNStageShadowing();
 };

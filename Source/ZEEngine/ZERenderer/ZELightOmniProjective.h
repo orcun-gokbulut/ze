@@ -40,7 +40,6 @@
 #include "ZEMath/ZEBSphere.h"
 
 class ZEGRTexture;
-class ZETextureCubeResource;
 
 class ZELightOmniProjective : public ZELight
 {
@@ -67,8 +66,7 @@ class ZELightOmniProjective : public ZELight
 
 		void							SetProjectionTexture(const ZEGRTexture* Texture);
 		const ZEGRTexture*				GetProjectionTexture();
-		
-		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
+
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;

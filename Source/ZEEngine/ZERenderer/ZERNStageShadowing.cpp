@@ -35,18 +35,36 @@
 
 #include "ZERNStageShadowing.h"
 
-#include "ZERNStageID.h"
 #include "ZEDS/ZEString.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEFrustum.h"
+#include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZERNStageID.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNShaderSlots.h"
+#include "ZERNStageShadowmapGeneration.h"
+#include "ZELightSpot.h"
+#include "ZELightDirectional.h"
+#include "ZELightProjective.h"
+#include "ZERNShading.h"
 
 #define ZERN_SSDF_OUTPUT0		1
 #define ZERN_SSDF_OUTPUT1		2
-#define ZERN_SSDF_OUTPUT_ALL	(ZERN_SSDF_OUTPUT0 | ZERN_SSDF_OUTPUT1)
+#define ZERN_SSDF_OUTPUT2		4
+#define ZERN_SSDF_OUTPUT_ALL	(ZERN_SSDF_OUTPUT0 | ZERN_SSDF_OUTPUT1 | ZERN_SSDF_OUTPUT2)
 
 bool ZERNStageShadowing::InitializeInternal()
 {
 	if (!ZERNStage::InitializeInternal())
 		return false;
+
+	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
+	ShadowRenderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
+	ShadowRenderer.Initialize();
 
 	return true;
 }
@@ -54,21 +72,107 @@ bool ZERNStageShadowing::InitializeInternal()
 bool ZERNStageShadowing::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
+	ShadowRenderer.Deinitialize();
 
 	DirectionalShadowMaps.Release();
+	SpotShadowMaps.Release();
 	ProjectiveShadowMaps.Release();
 
-	CascadeCount = 4;
-	DirectionalShadowMapCount = 1;
-	ProjectiveShadowMapCount = 4;
-
-	DirectionalShadowMapIndex = 0;
-	ProjectiveShadowMapIndex = 0;
-
-	DirectionalShadowMapsResolution = ZE_LSR_HIGH;
-	ProjectiveShadowMapsResolution = ZE_LSR_MEDIUM;
-
 	return ZERNStage::DeinitializeInternal();
+}
+
+void ZERNStageShadowing::GenerateDirectionalShadowMaps(ZEGRContext* Context, const ZERNCommandDirectionalLight& DirectionalLight)
+{
+	if ((DirectionalShadowMapIndex + DirectionalLight.Cascades.GetCount()) > (DirectionalShadowMapCount * CascadeCount))
+		return;
+
+	ZERNView View;
+	View.Position = GetRenderer()->GetView().Position;
+
+	ze_for_each(Cascade, DirectionalLight.Cascades)
+	{
+		View.ViewVolume = &Cascade->ViewVolume;
+		View.ViewProjectionTransform = Cascade->ProjectionTransform * Cascade->ViewTransform;
+		ShadowRenderer.SetView(View);
+
+		ZERNPreRenderParameters PreRenderParameters;
+		PreRenderParameters.Renderer = &ShadowRenderer;
+		PreRenderParameters.View = &View;
+		PreRenderParameters.Type = ZERN_RT_SHADOW;
+
+		GetRenderer()->BeginNestedRenderer();
+		DirectionalLight.Scene->PreRender(&PreRenderParameters);
+
+		const ZEGRDepthStencilBuffer* DepthBuffer = DirectionalShadowMaps->GetDepthStencilBuffer(false, DirectionalShadowMapIndex + Cascade.GetIndex());
+		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+		Context->SetRenderTargets(0, NULL, DepthBuffer);
+		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+
+		ShadowRenderer.Render();
+		GetRenderer()->EndNestedRenderer();
+	}
+
+	DirectionalShadowMapIndex += DirectionalLight.Cascades.GetCount();
+}
+
+void ZERNStageShadowing::GenerateSpotShadowMaps(ZEGRContext* Context, const ZERNCommandSpotLightShadow& SpotLight)
+{
+	if (SpotShadowMapIndex >= SpotShadowMapCount)
+		return;
+
+	ZERNView View;
+	View.Position = GetRenderer()->GetView().Position;
+	View.ViewVolume = &SpotLight.ViewFrustum;
+	View.ViewProjectionTransform = SpotLight.ViewProjectionTransform;
+	ShadowRenderer.SetView(View);
+
+	ZERNPreRenderParameters PreRenderParameters;
+	PreRenderParameters.Renderer = &ShadowRenderer;
+	PreRenderParameters.View = &View;
+	PreRenderParameters.Type = ZERN_RT_SHADOW;
+
+	GetRenderer()->BeginNestedRenderer();
+	SpotLight.Scene->PreRender(&PreRenderParameters);
+
+	const ZEGRDepthStencilBuffer* DepthBuffer = SpotShadowMaps->GetDepthStencilBuffer(false, SpotShadowMapIndex);
+	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+	Context->SetRenderTargets(0, NULL, DepthBuffer);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+
+	ShadowRenderer.Render();
+	GetRenderer()->EndNestedRenderer();
+
+	SpotShadowMapIndex++;
+}
+
+void ZERNStageShadowing::GenerateProjectiveShadowMaps(ZEGRContext* Context, const ZERNCommandProjectiveLight& ProjectiveLight)
+{
+	if (ProjectiveShadowMapIndex >= ProjectiveShadowMapCount)
+		return;
+
+	ZERNView View;
+	View.Position = GetRenderer()->GetView().Position;
+	View.ViewVolume = &ProjectiveLight.ViewFrustum;
+	View.ViewProjectionTransform = ProjectiveLight.ViewProjectionTransform;
+	ShadowRenderer.SetView(View);
+
+	ZERNPreRenderParameters PreRenderParameters;
+	PreRenderParameters.Renderer = &ShadowRenderer;
+	PreRenderParameters.View = &View;
+	PreRenderParameters.Type = ZERN_RT_SHADOW;
+
+	GetRenderer()->BeginNestedRenderer();
+	ProjectiveLight.Scene->PreRender(&PreRenderParameters);
+
+	const ZEGRDepthStencilBuffer* DepthBuffer = ProjectiveShadowMaps->GetDepthStencilBuffer(false, ProjectiveShadowMapIndex);
+	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+	Context->SetRenderTargets(0, NULL, DepthBuffer);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+
+	ShadowRenderer.Render();
+	GetRenderer()->EndNestedRenderer();
+
+	ProjectiveShadowMapIndex++;
 }
 
 void ZERNStageShadowing::CreateOutput(const ZEString& Name)
@@ -83,14 +187,24 @@ void ZERNStageShadowing::CreateOutput(const ZEString& Name)
 			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT0);
 		}
 	}
-	else if (Name == "ProjectiveShadowMaps")
+	else if (Name == "SpotShadowMaps")
 	{
 		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT1))
+		{
+			ZEUInt ShadowMapRes = ZELight::ConvertShadowResolution(SpotShadowMapsResolution);
+			ZEUInt ArrayCount = SpotShadowMapCount;
+			SpotShadowMaps = ZEGRTexture::CreateResource(ZEGR_TT_2D, ShadowMapRes, ShadowMapRes, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, ArrayCount);
+			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT1);
+		}
+	}
+	else if (Name == "ProjectiveShadowMaps")
+	{
+		if (DirtyFlags.GetFlags(ZERN_SSDF_OUTPUT2))
 		{
 			ZEUInt ShadowMapRes = ZELight::ConvertShadowResolution(ProjectiveShadowMapsResolution);
 			ZEUInt ArrayCount = ProjectiveShadowMapCount;
 			ProjectiveShadowMaps = ZEGRTexture::CreateResource(ZEGR_TT_2D, ShadowMapRes, ShadowMapRes, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, ArrayCount);
-			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT1);
+			DirtyFlags.UnraiseFlags(ZERN_SSDF_OUTPUT2);
 		}
 	}
 }
@@ -106,42 +220,12 @@ const ZEString& ZERNStageShadowing::GetName() const
 	return Name;
 }
 
-void ZERNStageShadowing::SetCascadeShadowMapsResolution(ZELightShadowResolution ShadowResolution)
+void ZERNStageShadowing::SetCascadeCount(ZEUInt Count)
 {
-	if (DirectionalShadowMapsResolution == ShadowResolution)
+	if (CascadeCount == Count)
 		return;
-
-	DirectionalShadowMapsResolution = ShadowResolution;
-
-	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
-}
-
-ZELightShadowResolution ZERNStageShadowing::GetCascadeShadowMapsResolution() const
-{
-	return DirectionalShadowMapsResolution;
-}
-
-void ZERNStageShadowing::SetProjectiveShadowMapsResolution(ZELightShadowResolution ShadowResolution)
-{
-	if (ProjectiveShadowMapsResolution == ShadowResolution)
-		return;
-
-	ProjectiveShadowMapsResolution = ShadowResolution;
-
-	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT1);
-}
-
-ZELightShadowResolution ZERNStageShadowing::GetProjectiveShadowMapsResolution() const
-{
-	return ProjectiveShadowMapsResolution;
-}
-
-void ZERNStageShadowing::SetCascadeCount(ZEUInt CascadeCount)
-{
-	if (this->CascadeCount == CascadeCount)
-		return;
-
-	this->CascadeCount = CascadeCount;
+	
+	CascadeCount = ZEMath::Min(Count, (ZEUInt)MAX_CASCADE);
 
 	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
 }
@@ -151,12 +235,12 @@ ZEUInt ZERNStageShadowing::GetCascadeCount() const
 	return CascadeCount;
 }
 
-void ZERNStageShadowing::SetDirectionalShadowMapCount(ZEUInt DirectionalShadowMapCount)
+void ZERNStageShadowing::SetDirectionalShadowMapCount(ZEUInt Count)
 {
-	if (this->DirectionalShadowMapCount == DirectionalShadowMapCount)
+	if (this->DirectionalShadowMapCount == Count)
 		return;
 
-	this->DirectionalShadowMapCount = DirectionalShadowMapCount;
+	this->DirectionalShadowMapCount = ZEMath::Min(Count, (ZEUInt)MAX_DIRECTIONAL_LIGHT_SHADOW);
 
 	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
 }
@@ -166,19 +250,79 @@ ZEUInt ZERNStageShadowing::GetDirectionalShadowMapCount() const
 	return DirectionalShadowMapCount;
 }
 
-void ZERNStageShadowing::SetProjectiveShadowMapCount(ZEUInt ProjectiveShadowMapCount)
+void ZERNStageShadowing::SetSpotShadowMapCount(ZEUInt Count)
 {
-	if (this->ProjectiveShadowMapCount == ProjectiveShadowMapCount)
+	if (this->SpotShadowMapCount == Count)
 		return;
 
-	this->ProjectiveShadowMapCount = ProjectiveShadowMapCount;
+	this->SpotShadowMapCount = ZEMath::Min(Count, (ZEUInt)MAX_SPOT_LIGHT_SHADOW);
 
 	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT1);
+}
+
+ZEUInt ZERNStageShadowing::GetSpotShadowMapCount() const
+{
+	return SpotShadowMapCount;
+}
+
+void ZERNStageShadowing::SetProjectiveShadowMapCount(ZEUInt Count)
+{
+	if (ProjectiveShadowMapCount == Count)
+		return;
+
+	ProjectiveShadowMapCount = ZEMath::Min(Count, (ZEUInt)MAX_PROJECTIVE_LIGHT_SHADOW);
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT2);
 }
 
 ZEUInt ZERNStageShadowing::GetProjectiveShadowMapCount() const
 {
 	return ProjectiveShadowMapCount;
+}
+
+void ZERNStageShadowing::SetDirectionalShadowMapsResolution(ZERNLightShadowResolution Resolution)
+{
+	if (DirectionalShadowMapsResolution == Resolution)
+		return;
+
+	DirectionalShadowMapsResolution = Resolution;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT0);
+}
+
+ZERNLightShadowResolution ZERNStageShadowing::GetDirectionalShadowMapsResolution() const
+{
+	return DirectionalShadowMapsResolution;
+}
+
+void ZERNStageShadowing::SetSpotShadowMapsResolution(ZERNLightShadowResolution Resolution)
+{
+	if (SpotShadowMapsResolution == Resolution)
+		return;
+
+	SpotShadowMapsResolution = Resolution;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT1);
+}
+
+ZERNLightShadowResolution ZERNStageShadowing::GetSpotShadowMapsResolution() const
+{
+	return SpotShadowMapsResolution;
+}
+
+void ZERNStageShadowing::SetProjectiveShadowMapsResolution(ZERNLightShadowResolution Resolution)
+{
+	if (ProjectiveShadowMapsResolution == Resolution)
+		return;
+
+	ProjectiveShadowMapsResolution = Resolution;
+
+	DirtyFlags.RaiseFlags(ZERN_SSDF_OUTPUT2);
+}
+
+ZERNLightShadowResolution ZERNStageShadowing::GetProjectiveShadowMapsResolution() const
+{
+	return ProjectiveShadowMapsResolution;
 }
 
 bool ZERNStageShadowing::Setup(ZEGRContext* Context)
@@ -189,83 +333,53 @@ bool ZERNStageShadowing::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
+	ze_for_each(Command, GetCommands())
+	{
+		if (Command->Scene == NULL)
+			continue;
+		
+		Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, Command->Scene->GetConstantBuffer());
+
+		if (Command->GetClass() == ZERNCommandDirectionalLight::Class())
+			GenerateDirectionalShadowMaps(Context, static_cast<const ZERNCommandDirectionalLight&>(Command.GetItem()));
+		else if (Command->GetClass() == ZERNCommandSpotLightShadow::Class())
+			GenerateSpotShadowMaps(Context, static_cast<const ZERNCommandSpotLightShadow&>(Command.GetItem()));
+		else if (Command->GetClass() == ZERNCommandProjectiveLight::Class())
+			GenerateProjectiveShadowMaps(Context, static_cast<const ZERNCommandProjectiveLight&>(Command.GetItem()));
+	}
+
+
+	return false;
+}
+
+void ZERNStageShadowing::CleanUp(ZEGRContext* Context)
+{
 	DirectionalShadowMapIndex = 0;
+	SpotShadowMapIndex = 0;
 	ProjectiveShadowMapIndex = 0;
 
-	//ShadowRenderer.SetContext(Context);
-	//
-	//ze_for_each(Command, GetCommands())
-	//{
-	//	if (Command->Entity == NULL)
-	//		continue;
-	//
-	//	if (ZEClass::IsDerivedFrom(ZELight::Class(), Command->Entity->GetClass()))
-	//	{
-	//		zeWarning("Non-light entity had been added to stage shadowing");
-	//		continue;
-	//	}
-	//
-	//	ZELight* Light = static_cast<ZELight*>(Command->Entity);
-	//	ZERNView View = ShadowRenderer.GetView();
-	//	View.Position = RenderParameters->View->Position;
-	//	View.Rotation = Light->GetWorldRotation();
-	//	View.Direction = Light->GetWorldFront();
-	//	View.U = Light->GetWorldRight();
-	//	View.V = Light->GetWorldUp();
-	//	View.N = Light->GetWorldFront();
-	//
-	//	switch (Light->GetLightType())
-	//	{
-	//		case ZE_LT_DIRECTIONAL:
-	//			{
-	//				for (ZEUInt I = 0; I < CascadeCount; I++)
-	//				{
-	//
-	//				}
-	//			}
-	//			break;
-	//		case ZE_LT_PROJECTIVE:
-	//			{
-	//
-	//			}
-	//			break;
-	//		default:
-	//			break;
-	//	}
-	//
-	//	ZERNPreRenderParameters PreRenderParameters;
-	//	PreRenderParameters.Renderer = &ShadowRenderer;
-	//	PreRenderParameters.View = &View;
-	//	PreRenderParameters.Type = ZERN_PRT_SHADOW;
-	//
-	//	RenderParameters->Scene->PreRender(&Parameters);
-	//
-	//	const ZEGRDepthStencilBuffer* DepthBuffer = DirectionalShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
-	//	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
-	//	Context->SetRenderTargets(0, NULL, DepthBuffer);
-	//	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
-	//
-	//	ShadowRenderer.Render();
-	//}
-
-	return true;
+	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageShadowing::ZERNStageShadowing()
 {
 	DirtyFlags.RaiseAll();
-
-	CascadeCount = 4;
-	DirectionalShadowMapCount = 1;
-	ProjectiveShadowMapCount = 4;
 	
+	SetCascadeCount(4);
+	SetDirectionalShadowMapCount(1);
+	SetSpotShadowMapCount(4);
+	SetProjectiveShadowMapCount(4);
+
 	DirectionalShadowMapIndex = 0;
+	SpotShadowMapIndex = 0;
 	ProjectiveShadowMapIndex = 0;
 
-	DirectionalShadowMapsResolution = ZE_LSR_HIGH;
-	ProjectiveShadowMapsResolution = ZE_LSR_MEDIUM;
+	DirectionalShadowMapsResolution = ZERN_LSR_HIGH;
+	SpotShadowMapsResolution = ZERN_LSR_MEDIUM;
+	ProjectiveShadowMapsResolution = ZERN_LSR_MEDIUM;
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DirectionalShadowMaps), "DirectionalShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&SpotShadowMaps), "SpotShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
 }
 
