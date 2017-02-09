@@ -122,7 +122,7 @@ class ZERNStageAO : public ZERNStage
 			ZEUInt							KernelRadius;
 			float							BlurSharpness;
 			float							DistanceThreshold;
-			float							Reserved0;
+			float							FalloffExponent;
 		} Constants;
 
 		struct
@@ -174,6 +174,9 @@ class ZERNStageAO : public ZERNStage
 
 		void								SetDistanceThreshold(float DistanceThreshold);
 		float								GetDistanceThreshold() const;
+
+		void								SetFalloffExponent(float FalloffExponent);
+		float								GetFalloffExponent() const;
 
 		void								SetDeinterleavedTexturing(bool UseDeinterleavedTexturing);
 		bool								GetDeinterleavedTexturing() const;

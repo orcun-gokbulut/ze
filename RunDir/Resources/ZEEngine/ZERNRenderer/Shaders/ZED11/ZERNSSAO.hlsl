@@ -77,7 +77,7 @@ cbuffer ZERNSSAO_Constants								: register(b8)
 	uint				ZERNSSAO_KernelRadius;
 	float				ZERNSSAO_BlurSharpness;
 	float				ZERNSSAO_DistanceThreshold;
-	float				ZERNSSAO_Reserved0;
+	float				ZERNSSAO_FalloffExponent;
 };
 
 cbuffer ZERNSSAO_DeinterleavedConstants					: register(b9)
@@ -184,7 +184,7 @@ float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, flo
 		float DistanceToOccluder = length(VectorToOccluder);
 		
 		float Angle = max(0.0f, dot(NormalView, (VectorToOccluder / DistanceToOccluder)));
-		TotalOcclusion += Angle * exp(-DistanceToOccluder);
+		TotalOcclusion += Angle * exp(-ZERNSSAO_FalloffExponent * DistanceToOccluder);
 	}
 	
 	TotalOcclusion /= ZERNSSAO_SampleCount;

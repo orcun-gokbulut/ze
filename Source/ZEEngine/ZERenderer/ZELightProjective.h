@@ -43,6 +43,25 @@
 
 class ZEGRTexture;
 
+class ZERNCommandProjectiveLight : public ZERNCommand
+{
+	ZE_OBJECT
+	public:
+		ZEVector3						PositionWorld;
+		ZEQuaternion					RotationWorld;
+		float							Range;
+		ZEVector3						Color;
+		float							FalloffExponent;
+		ZEHolder<const ZEGRTexture>		ProjectionTexture;
+		ZEMatrix4x4						ViewProjectionTransform;
+		ZEBool32						CastShadow;
+		ZEViewFrustum					ViewFrustum;
+		ZERNLightShadowSampleCount		ShadowSampleCount;
+		float							ShadowSampleLength;
+		float							ShadowDepthBias;
+		float							ShadowNormalBias;
+};
+
 class ZELightProjective : public ZELight
 {
 	ZE_OBJECT
@@ -52,10 +71,10 @@ class ZELightProjective : public ZELight
 		mutable ZEViewFrustum			ViewVolume;
 		ZEHolder<const ZEGRTexture>		ProjectionTexture;
 		ZEHolder<ZEGRTexture>			ShadowMap;
-		ZEUInt							ShadowMapIndex;
 		ZEString						ProjectionTextureFileName;
+		ZERNCommandProjectiveLight		Command;
+		float							FalloffExponent;
 
-		void							UpdateShadowMap();
 		void							LoadProjectionTexture();
 
 		virtual ZEEntityResult			LoadInternal();
@@ -73,23 +92,22 @@ class ZELightProjective : public ZELight
 
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
-
-		void							SetShadowMapIndex(ZEUInt ShadowMapIndex);
-		ZEUInt							GetShadowMapIndex() const;
-
+		
 		void							SetProjectionTextureFile(const ZEString& Filename);
 		const ZEString&					GetProjectionTextureFile() const;
 
 		void							SetProjectionTexture(const ZEGRTexture* Texture);
 		const ZEGRTexture*				GetProjectionTexture() const;
 
-		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		void							SetFalloffExponent(float Exponent);
+		float							GetFalloffExponent() const;
 
-		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;
 
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
+		
 		static ZELightProjective*		CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightProjective.png");

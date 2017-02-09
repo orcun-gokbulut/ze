@@ -707,7 +707,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 1000.0f);
+	Sun->SetColor(TerrestrialSunColor * 500.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);

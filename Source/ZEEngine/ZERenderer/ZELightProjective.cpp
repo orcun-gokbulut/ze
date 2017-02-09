@@ -55,17 +55,6 @@
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 
-void ZELightProjective::UpdateShadowMap()
-{
-	if (!DirtyFlags.GetFlags(ZE_LDF_SHADOW_MAP))
-		return;
-
-	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
-	ShadowMap = ZEGRTexture::CreateResource(ZEGR_TT_2D, Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL);
-
-	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
-}
-
 void ZELightProjective::LoadProjectionTexture()
 {
 	if (ProjectionTextureFileName.IsEmpty())
@@ -104,6 +93,7 @@ ZELightProjective::ZELightProjective()
 	AspectRatio = 1.0f;
 	Command.Entity = this;
 	Command.Priority = 1;
+	FalloffExponent = 2.0f;
 }
 
 ZELightProjective::~ZELightProjective()
@@ -151,16 +141,6 @@ float ZELightProjective::GetAspectRatio() const
 	return AspectRatio;
 }
 
-void ZELightProjective::SetShadowMapIndex(ZEUInt ShadowMapIndex)
-{
-	this->ShadowMapIndex = ShadowMapIndex;
-}
-
-ZEUInt ZELightProjective::GetShadowMapIndex() const
-{
-	return ShadowMapIndex;
-}
-
 void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
 	if (FileName.IsEmpty() || ProjectionTextureFileName == FileName)
@@ -191,9 +171,14 @@ const ZEGRTexture* ZELightProjective::GetProjectionTexture() const
 	return ProjectionTexture;
 }
 
-ZEGRTexture* ZELightProjective::GetShadowMap(ZESize Index) const
+void ZELightProjective::SetFalloffExponent(float Exponent)
 {
-	return ShadowMap;
+	FalloffExponent = Exponent;
+}
+
+float ZELightProjective::GetFalloffExponent() const
+{
+	return FalloffExponent;
 }
 
 const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index) const
@@ -229,56 +214,82 @@ const ZEMatrix4x4& ZELightProjective::GetProjectionTransform(ZESize Index) const
 	return ProjectionTransform;
 }
 
-void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+bool ZELightProjective::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
-		return;
+	if (!ZELight::PreRender(Parameters))
+		return false;
 
-	// Do not update shadow map for second channel
-	// Reuse the generated one for the first channel
-	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS)) 
-		return;
-
-	if (GetScene() == NULL)
-		return;
-
-	UpdateShadowMap();
-
-	ZERNView View = ShadowRenderer.GetView();
-	View.Position = Parameters->View->Position;
-	View.Rotation = GetWorldRotation();
-	View.Direction = GetWorldFront();
-	View.U = GetWorldRight();
-	View.V = GetWorldUp();
-	View.N = GetWorldFront();
-	View.VerticalFOV = FOV;
-	View.HorizontalFOV = FOV;
-	View.AspectRatio = AspectRatio;
-	View.NearZ = 0.1f;
-	View.FarZ = GetRange();
-	View.ViewVolume = &GetViewVolume();
-	View.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
-
-	ZERNPreRenderParameters PreRenderParameters;
-	PreRenderParameters.Renderer = &ShadowRenderer;
-	PreRenderParameters.View = &View;
-	PreRenderParameters.Type = ZERN_RT_SHADOW;
-
-	ZEGRContext* Context = Parameters->Context;
-	ShadowRenderer.SetContext(Context);
-	ShadowRenderer.SetView(View);
-	GetScene()->PreRender(&PreRenderParameters);
-
-	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
-	this->ShadowMapIndex = const_cast<ZERNStageShadowing*>(StageShadowing)->ProjectiveShadowMapCount++;
-	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, this->ShadowMapIndex);
-
-	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
-	Context->SetRenderTargets(0, NULL, DepthBuffer);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+	Command.Scene = GetScene();
+	Command.PositionWorld = GetWorldPosition();
+	Command.RotationWorld = GetWorldRotation();
+	Command.Range = GetRange();
+	Command.Color = GetColor() * GetIntensity();
+	Command.FalloffExponent = GetFalloffExponent();
+	Command.ProjectionTexture = GetProjectionTexture();
+	Command.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
+	Command.CastShadow = GetCastsShadow();
+	Command.ViewFrustum = static_cast<const ZEViewFrustum&>(GetViewVolume());
+	Command.ShadowSampleCount = GetShadowSampleCount();
+	Command.ShadowSampleLength = GetShadowSampleLength();
+	Command.ShadowDepthBias = GetShadowDepthBias();
+	Command.ShadowNormalBias = GetShadowNormalBias();
+	Command.StageMask = ZERN_STAGE_LIGHTING | (GetCastsShadow() ? ZERN_STAGE_SHADOWING : 0);
 	
-	ShadowRenderer.Render();
+	Parameters->Renderer->AddCommand(&Command);
+
+	return true;
 }
+
+//void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+//{
+//	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
+//		return;
+//
+//	// Do not update shadow map for second channel
+//	// Reuse the generated one for the first channel
+//	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS)) 
+//		return;
+//
+//	if (GetScene() == NULL)
+//		return;
+//
+//	UpdateShadowMap();
+//
+//	ZERNView View = ShadowRenderer.GetView();
+//	View.Position = Parameters->View->Position;
+//	View.Rotation = GetWorldRotation();
+//	View.Direction = GetWorldFront();
+//	View.U = GetWorldRight();
+//	View.V = GetWorldUp();
+//	View.N = GetWorldFront();
+//	View.VerticalFOV = FOV;
+//	View.HorizontalFOV = FOV;
+//	View.AspectRatio = AspectRatio;
+//	View.NearZ = 0.1f;
+//	View.FarZ = GetRange();
+//	View.ViewVolume = &GetViewVolume();
+//	View.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
+//
+//	ZERNPreRenderParameters PreRenderParameters;
+//	PreRenderParameters.Renderer = &ShadowRenderer;
+//	PreRenderParameters.View = &View;
+//	PreRenderParameters.Type = ZERN_RT_SHADOW;
+//
+//	ZEGRContext* Context = Parameters->Context;
+//	ShadowRenderer.SetContext(Context);
+//	ShadowRenderer.SetView(View);
+//	GetScene()->PreRender(&PreRenderParameters);
+//
+//	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
+//	this->ShadowMapIndex = const_cast<ZERNStageShadowing*>(StageShadowing)->ProjectiveShadowMapCount++;
+//	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, this->ShadowMapIndex);
+//
+//	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+//	Context->SetRenderTargets(0, NULL, DepthBuffer);
+//	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
+//	
+//	ShadowRenderer.Render();
+//}
 
 ZELightProjective* ZELightProjective::CreateInstance()
 {

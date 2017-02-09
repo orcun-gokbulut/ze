@@ -594,6 +594,21 @@ float ZERNStageAO::GetDistanceThreshold() const
 	return Constants.DistanceThreshold;
 }
 
+void ZERNStageAO::SetFalloffExponent(float FalloffExponent)
+{
+	if (Constants.FalloffExponent == FalloffExponent)
+		return;
+
+	Constants.FalloffExponent = FalloffExponent;
+
+	DirtyFlags.RaiseFlags(ZERN_AODF_CONSTANT_BUFFER);
+}
+
+float ZERNStageAO::GetFalloffExponent() const
+{
+	return Constants.FalloffExponent;
+}
+
 void ZERNStageAO::SetDeinterleavedTexturing(bool UseDeinterleavedTexturing)
 {
 	if (this->UseDeinterleavedTexturing == UseDeinterleavedTexturing)
@@ -685,9 +700,10 @@ ZERNStageAO::ZERNStageAO()
 	Constants.WidthHeight = ZEVector2::Zero;
 	Constants.InvWidthHeight = ZEVector2::Zero;
 
-	Constants.KernelRadius = 6;
+	Constants.KernelRadius = 3;
 	Constants.BlurSharpness = 8.0f;
 	Constants.DistanceThreshold = 100.0f;
+	Constants.FalloffExponent = 4.0f;
 
 	memset(&DeinterleavedConstants, 0, sizeof(DeinterleavedConstants));
 

@@ -108,7 +108,7 @@ ZEArray<ZERNFilter*> ZERNStagePostProcess::GetFilters(ZEClass* Class) const
 
 	ze_for_each(Filter, Filters)
 	{
-		if (Filter->GetClass() == Class)
+		if (ZEClass::IsDerivedFrom(Class, Filter->GetClass()))
 			Output.Add(Filter.GetPointer());
 	}
 

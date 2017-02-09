@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELightPoint.h
+ Zinek Engine - ZELightSpot.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,33 +37,57 @@
 
 #include "ZELight.h"
 
-#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEFrustum.h"
 
-class ZERNCommandPointLight : public ZERNCommand
+class ZERNCommandSpotLight : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
-		ZEVector3					PositionWorld;
-		float						Range;
-		ZEVector3					Color;
-		float						FalloffExponent;
+		ZEVector3						PositionWorld;
+		ZEQuaternion					RotationWorld;
+		float							Range;
+		ZEVector3						Color;
+		float							FalloffExponent;
+		float							InnerConeAngle;
+		float							OuterConeAngle;
 };
 
-class ZELightPoint : public ZELight
+class ZERNCommandSpotLightShadow : public ZERNCommandSpotLight
+{
+	ZE_OBJECT
+	public:
+		ZEViewFrustum					ViewFrustum;
+		ZEMatrix4x4						ViewProjectionTransform;
+		ZERNLightShadowSampleCount		ShadowSampleCount;
+		float							ShadowSampleLength;
+		float							ShadowDepthBias;
+		float							ShadowNormalBias;
+};
+
+class ZELightSpot : public ZELight
 {
 	ZE_OBJECT
 	private:
-		mutable ZEViewSphere			ViewVolume;
-		ZERNCommandPointLight			Command;
+		mutable ZEViewFrustum			ViewVolume;
+		ZERNCommandSpotLight			Command;
+		ZERNCommandSpotLightShadow		CommandShadow;
 
+		float							InnerConeAngle;
+		float							OuterConeAngle;
 		float							FalloffExponent;
 
-										ZELightPoint();
-		virtual							~ZELightPoint();
-
+										ZELightSpot();
+		virtual							~ZELightSpot();
+	
 	public:
 		virtual ZELightType				GetLightType() const;
 		virtual ZESize					GetViewCount() const;
+
+		void							SetInnerConeAngle(float Angle);
+		float							GetInnerConeAngle() const;
+
+		void							SetOuterConeAngle(float Angle);
+		float							GetOuterConeAngle() const;
 
 		void							SetFalloffExponent(float Exponent);
 		float							GetFalloffExponent() const;
@@ -74,5 +98,5 @@ class ZELightPoint : public ZELight
 
 		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 
-		static ZELightPoint*			CreateInstance();
+		static ZELightSpot*				CreateInstance();
 };

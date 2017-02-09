@@ -50,6 +50,8 @@ ZELightPoint::ZELightPoint()
 {
 	Command.Entity = this;
 	Command.Priority = 2;
+
+	FalloffExponent = 2.0f;
 }
 
 ZELightPoint::~ZELightPoint()
@@ -67,9 +69,14 @@ ZESize ZELightPoint::GetViewCount() const
 	return 1;
 }
 
-ZEGRTexture* ZELightPoint::GetShadowMap(ZESize Index) const
+void ZELightPoint::SetFalloffExponent(float Exponent)
 {
-	return NULL;
+	FalloffExponent = Exponent;
+}
+
+float ZELightPoint::GetFalloffExponent() const
+{
+	return FalloffExponent;
 }
 
 const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index) const
@@ -92,6 +99,23 @@ const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index) const
 const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index) const
 {
 	return ProjectionTransform;
+}
+
+bool ZELightPoint::PreRender(const ZERNPreRenderParameters* Parameters)
+{
+	if (!ZELight::PreRender(Parameters))
+		return false;
+
+	Command.Scene = GetScene();
+	Command.PositionWorld = GetWorldPosition();
+	Command.Range = GetRange();
+	Command.Color = GetColor() * GetIntensity();
+	Command.FalloffExponent = GetFalloffExponent();
+	Command.StageMask = ZERN_STAGE_LIGHTING;
+
+	Parameters->Renderer->AddCommand(&Command);
+
+	return true;
 }
 
 ZELightPoint* ZELightPoint::CreateInstance()

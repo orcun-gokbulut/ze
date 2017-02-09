@@ -287,7 +287,7 @@ ZEVector3 ZEFrustum::GetVertex(ZEFrustumVertex Vertex) const
 			return GetEdge(ZE_FE_RIGHT_TOP).GetStartPoint();
 
 		case ZE_FV_RIGHT_TOP_FAR:
-			return GetEdge(ZE_FE_RIGHT_BOTTOM).GetEndPoint();
+			return GetEdge(ZE_FE_RIGHT_TOP).GetEndPoint();
 
 		default:
 			zeDebugCheck(true, "Wrong frustum vertex");
