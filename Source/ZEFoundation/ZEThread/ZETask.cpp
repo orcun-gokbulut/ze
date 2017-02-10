@@ -83,12 +83,12 @@ void* ZETask::GetParameter() const
 	return Parameter;
 }
 
-void ZETask::SetPool(ZEInt PoolId)
+void ZETask::SetPoolId(ZEInt PoolId)
 {
 	PoolId = PoolId;
 }
 
-ZEInt ZETask::GetPool() const
+ZEInt ZETask::GetPoolId() const
 {
 	return PoolId;
 }
@@ -98,11 +98,15 @@ void ZETask::Run()
 	if (Function.IsNull())
 		return;
 
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool == NULL)
+	ZETaskManager::GetInstance()->RunTask(this);
+}
+
+void ZETask::RunInstanced()
+{
+	if (Function.IsNull())
 		return;
 
-	Pool->RunTask(this);
+	ZETaskManager::GetInstance()->RunTaskInstanced(this, true);
 }
 
 void ZETask::Wait()
@@ -115,15 +119,17 @@ void ZETask::Wait()
 
 ZETask::ZETask() : Link(this)
 {
+	Manager = NULL;
 	Status = ZE_TS2_NONE;
 	Priority = 0;
 	PoolId = ZE_TPI_DEFAULT;
 	Parameter = NULL;
+	InstancingState = ZE_TIS_NONE;
+	LastInstanceIndex = 0;
+	RunningInstanceCount = 0;
 }
 
 ZETask::~ZETask()
 {
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool != NULL)
-		Pool->TaskDestroyed(this);
+	ZETaskManager::GetInstance()->RemoveTask(this);
 }

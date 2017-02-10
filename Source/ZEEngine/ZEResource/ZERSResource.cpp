@@ -133,7 +133,7 @@ bool ZERSResource::UpdateStateSerial()
 	StateLock.Lock();
 	{
 		while (Result == ZE_TR_COOPERATING)
-			Result = UpdateStateFunction(NULL, 0);
+			Result = UpdateStateFunction(NULL, 0, NULL);
 	}
 	StateLock.Unlock();
 
@@ -145,7 +145,7 @@ void ZERSResource::UpdateState()
 	UpdateStateTask.Run();
 }
 
-ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters)
+ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, ZESize InstanceIndex, void* Parameters)
 {
 	if (State == ZERS_RS_NONE)
 	{
@@ -449,7 +449,7 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	LoadInternalDone = false;
 	UnloadInternalDone = false;
 	ReloadFlag = false;
-	UpdateStateTask.SetPool(ZE_TPI_IO);
+	UpdateStateTask.SetPoolId(ZE_TPI_IO);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
 }
 

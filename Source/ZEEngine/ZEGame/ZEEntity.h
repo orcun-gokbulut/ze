@@ -178,7 +178,7 @@ class ZEEntity : public ZEObject
 		void 									GetChildEntitiesInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const;
 		void									GetChildEntitiesInternal(const ZEString& Name, ZEArray<ZEEntity*>& Output) const;
 
-		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
+		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, ZESize InstanceIndex, void* Parameters);
 		void									UpdateStateSerial();
 		void									UpdateState();
 

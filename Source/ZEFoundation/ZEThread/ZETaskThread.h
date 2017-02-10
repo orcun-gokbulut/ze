@@ -42,8 +42,7 @@ class ZETask;
 
 class ZETaskThread : public ZEThread
 {
-	friend class ZETask;
-	friend class ZETaskPool;
+	friend class ZETaskManager;
 	private:
 		ZETask*					Task;
 		ZEUInt					InstanceIndex;
