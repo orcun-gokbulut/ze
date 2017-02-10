@@ -178,8 +178,14 @@ void ZESectorManager::UpdateActiveSectors()
 {
 	ZEArray<ZESector*> ActivateList;
 	ZEArray<ZESector*> CacheList;
-	FollowLinks(ActivateList, CacheList, OriginSector, 3, 5);
 
+	if (!ActivateList.Exists(OriginSector))
+		ActivateList.Add(OriginSector);
+
+	if (!CacheList.Exists(OriginSector))
+		CacheList.Add(OriginSector);
+
+	FollowLinks(ActivateList, CacheList, OriginSector, 3, CacheDepth);
 
 	// Update Active Sectors
 	for (ZESSize I = 0; I < ActiveSectors.GetCount(); I++)
