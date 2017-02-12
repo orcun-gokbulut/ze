@@ -99,6 +99,28 @@ bool ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* P
 	return true;
 }
 
+ZETaskResult ZEScene::PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize InstanceIndex, void* Parameters)
+{
+	struct ZETaskParameters
+	{
+		ZEList2IteratorAtomic<ZEEntity, ZELockRW>* Iterator;
+		const ZERNPreRenderParameters* Parameters;
+	};
+	ZETaskParameters* TaskParameters = static_cast<ZETaskParameters*>(Parameters);
+	
+	while (true)
+	{
+		ZEEntity* Entity = TaskParameters->Iterator->NextItem();
+	 
+		if (Entity == NULL)
+			return ZE_TR_STOP_INSTANCING;
+	
+		PreRenderEntity(Entity, TaskParameters->Parameters);
+	}
+
+	return ZE_TR_DONE;
+}
+
 void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	if (Entity->GetState() < ZE_ES_LOADED)
@@ -700,6 +722,8 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	RenderList.LockRead();
 	{
+		ZEList2<ZEEntity> PreRenderList;
+
 		TotalRenderableEntity = RenderListOctree.GetTotalItemCount() + RenderList.GetCount();
 
 		ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
@@ -708,6 +732,7 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 			for (ZESize I = 0; I < Node->GetItems().GetCount(); I++)
 			{	
 				OctreeProcessedEntity++;
+
 				ZEEntity* Entity = Node->GetItems()[I];
 				if (PreRenderEntity(Entity, Parameters))
 					RenderedEntity++;
@@ -721,13 +746,27 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 		OctreePerformanceRatio = 1.0f - (float)(OctreeProcessedEntity + OctreeVisitedNodeCount) / (float)RenderListOctree.GetTotalItemCount();
 		zeDebugCheck(!RenderListOctree.Check(), "Octree integrity check failed.");
 
-		ze_for_each(Entity, RenderList)
+		ZETask PreRenderTask;
+		PreRenderTask.SetFunction(ZETaskFunction::Create<ZEScene, &ZEScene::PreRenderEntityTaskFunction>(this));
+		struct ZETaskParameters
+		{
+			ZEList2IteratorAtomic<ZEEntity, ZELockRW>* Iterator;
+			const ZERNPreRenderParameters* Parameters;
+		} TaskParameters;
+
+		TaskParameters.Iterator = &RenderList.GetIteratorAtomic();
+		TaskParameters.Parameters = Parameters;
+		PreRenderTask.SetParameter(&TaskParameters);
+		PreRenderTask.SetPoolId(ZE_TPI_REAL_TIME);
+		/*ze_for_each(Entity, RenderList)
 		{
 			if (PreRenderEntity(Entity.GetPointer(), Parameters))
 				RenderedEntity++;
 			else
 				ViewTestCulledEntity++;
-		}
+		}*/
+		PreRenderTask.RunInstanced();
+
 		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)RenderList.GetCount();
 
 		RenderRatio = (float)RenderedEntity / (float)TotalRenderableEntity;
@@ -901,7 +940,7 @@ ZEScene::ZEScene()
 	Enabled = true;
 	AmbientColor = ZEVector3::One;
 	AmbientFactor = 0.1f;
-	SpatialDatabase = true;
+	SpatialDatabase = false;
 	EntityState = ZE_ES_NONE;
 
 	Constants.AmbientColor = ZEVector3::Zero;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETask.h
+ Zinek Engine - ZEIteratorAtomic.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,90 +35,22 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEList2.h"
-#include "ZEDS\ZEDelegate.h"
-
-enum  ZETaskPoolId
+template<typename ZEItemType>
+class ZEIteratorAtomic
 {
-	ZE_TPI_REAL_TIME,
-	ZE_TPI_CONCURENT,
-	ZE_TPI_IO,
-	ZE_TPI_DEFAULT = ZE_TPI_CONCURENT
-};
-
-enum ZETaskStatus
-{
-	ZE_TS2_FAILED		= -1,
-	ZE_TS2_NONE			= 0,
-	ZE_TS2_WAITING		= 1,
-	ZE_TS2_RUNNING		= 2,
-	ZE_TS2_DONE			= 3
-};
-
-enum ZETaskInstancingState
-{
-	ZE_TIS_NONE,
-	ZE_TIS_INSTANCING,
-	ZE_TIS_STOPPED
-};
-
-enum ZETaskResult
-{
-	ZE_TR_FAILED			= -1,
-	ZE_TR_COOPERATING		= 0,
-	ZE_TR_DONE				= 1,
-	ZE_TR_STOP_INSTANCING	= 2
-};
-
-class ZETask;
-class ZETaskThread;
-class ZETaskPool;
-
-typedef ZEDelegate<ZETaskResult (ZETaskThread* TaskThread, ZESize InstanceIndex, void* Parameter)> ZETaskFunction;
-
-class ZETask
-{
-	friend class ZETaskManager;
-	private:
-		ZETaskManager*					Manager;
-		ZEString						Name;
-		volatile ZETaskStatus			Status;
-		ZEInt							PoolId;
-		ZETaskPool*						Pool;
-		ZEInt							Priority;
-		ZELink<ZETask>					Link;
-
-		volatile ZETaskInstancingState	InstancingState;
-		volatile ZESize					RunningInstanceCount;
-		volatile ZESize					LastInstanceIndex;
-
-		ZETaskFunction					Function;
-		void*							Parameter;	
-		
 	public:
-		ZETaskStatus					GetStatus() const;
+		bool						IsValid() const;
 
-		void							SetName(const ZEString& Name);
-		const ZEString					GetName() const;
+		ZEIteratorAtomic&			Prev();
+		ZEIteratorAtomic&			Next();
+};
 
-		void							SetPriority(ZEInt Priority);
-		ZEInt							GetPriority() const;
+template<typename ZEItemType>
+class ZEIteratorAtomicConst
+{
+	public:
+		bool						IsValid() const;
 
-		void							SetFunction(const ZETaskFunction& Function);
-		const ZETaskFunction&			GetFunction() const;
-
-		void							SetParameter(void* Parameter);
-		void*							GetParameter() const;
-
-		void							SetPoolId(ZEInt PoolId);
-		ZEInt							GetPoolId() const;
-
-		void							Run();
-		void							RunInstanced();
-		void							Wait();
-
-										ZETask();
-										~ZETask();
+		ZEIteratorAtomicConst&		Prev();
+		ZEIteratorAtomicConst&		Next();
 };

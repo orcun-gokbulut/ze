@@ -43,6 +43,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEThread/ZETask.h"
 
 #include "ZERayCast.h"
 
@@ -56,8 +57,8 @@ ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
 ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 
 class ZEPhysicalWorld;
-class ZERNRenderer;
 class ZEGRBuffer;
+class ZERNRenderer;
 class ZERNPreRenderParameters;
 enum ZEEntityState;
 
@@ -101,6 +102,8 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
 		bool									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
+		ZETaskResult							PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize InstanceIndex, void* Parameters);
+
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		ZEEntity*								GetEntityInternal(ZEEntity* ParentEntity, const ZEString& Name);

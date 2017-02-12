@@ -193,7 +193,7 @@ void ZETaskManager::Scheduler(ZEThread* Thread, void* ExtraParameter)
 			}
 			else
 			{
-				if (Task->Status != ZE_TS2_RUNNING)
+				if (Task->Status == ZE_TS2_WAITING)
 				{
 					Task->Pool->QueuedTasks.Remove(&Task->Link);
 					Task->Pool->InstancingTasks.AddEnd(&Task->Link);
@@ -202,14 +202,14 @@ void ZETaskManager::Scheduler(ZEThread* Thread, void* ExtraParameter)
 			}
 
 			Task->Status = ZE_TS2_RUNNING;
+
+			Task->LastInstanceIndex++;
 		}
 		SchedulerLock.Unlock();
 
 		ZETaskResult Result = ZE_TR_DONE;
 		if (!Task->Function.IsNull())
-			Result = Task->Function(static_cast<ZETaskThread*>(Thread), Task->LastInstanceIndex, Task->GetParameter());
-		
-		Task->LastInstanceIndex++;
+			Result = Task->Function(static_cast<ZETaskThread*>(Thread), Task->LastInstanceIndex - 1, Task->GetParameter());
 
 		if (TaskThread->TaskDestroyed)
 			continue;
@@ -258,7 +258,8 @@ void ZETaskManager::Scheduler(ZEThread* Thread, void* ExtraParameter)
 				if (Task->RunningInstanceCount == 0 && Task->InstancingState == ZE_TIS_STOPPED)
 				{
 					Task->InstancingState = ZE_TIS_NONE;
-					Task->Status = ZE_TS2_DONE;
+					if (Task->Status == ZE_TS2_RUNNING)
+						Task->Status = ZE_TS2_DONE;
 				}
 			}
 		}
@@ -268,12 +269,6 @@ void ZETaskManager::Scheduler(ZEThread* Thread, void* ExtraParameter)
 
 void ZETaskManager::SchedulerJoined(ZETask* Task)
 {
-	SchedulerLock.Lock();
-	{
-		Task->Pool->InstancingTasks.AddEnd(&Task->Link);
-	}
-	SchedulerLock.Unlock();
-
 	while (true)
 	{
 		SchedulerLock.Lock();
@@ -336,7 +331,9 @@ void ZETaskManager::SchedulerJoined(ZETask* Task)
 			Task->RunningInstanceCount--;
 			if (Task->RunningInstanceCount == 0 && Task->InstancingState == ZE_TIS_STOPPED)
 			{
-				Task->Status = ZE_TS2_DONE;
+				if (Task->Status == ZE_TS2_RUNNING)
+					Task->Status = ZE_TS2_DONE;
+
 				Task->InstancingState = ZE_TIS_NONE;
 				SchedulerLock.Unlock();
 
@@ -494,10 +491,11 @@ void ZETaskManager::RunTaskInstanced(ZETask* Task, bool UseCurrentThread)
 		if (Task->Pool == NULL)
 			zeCriticalError("Cannot run task. Task does not have a pool. Task Name: \"%s\".", Task->GetName().ToCString());
 
-		Task->Status = ZE_TS2_WAITING;
+		Task->Status = ZE_TS2_RUNNING;
 		Task->InstancingState = ZE_TIS_INSTANCING;
 		Task->LastInstanceIndex = 0;
 		Task->RunningInstanceCount = 0;
+		Task->Pool->InstancingTasks.AddEnd(&Task->Link);
 	}
 	SchedulerLock.Unlock();
 

@@ -123,6 +123,7 @@ ZETask::ZETask() : Link(this)
 	Status = ZE_TS2_NONE;
 	Priority = 0;
 	PoolId = ZE_TPI_DEFAULT;
+	Pool = NULL;
 	Parameter = NULL;
 	InstancingState = ZE_TIS_NONE;
 	LastInstanceIndex = 0;
