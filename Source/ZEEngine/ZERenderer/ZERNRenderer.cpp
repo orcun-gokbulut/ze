@@ -604,42 +604,46 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (!IsInitialized())
 		return;
 
-	Command->SceneIndex = CurrentSceneIndex;
-	if (Command->InstanceTag != NULL)
+	CommandList.LockWrite();
 	{
-		bool Found = false;
-		ZELink<ZERNCommand>* Temp = CommandListInstanced.GetFirst();
-		while (Temp != NULL)
+		Command->SceneIndex = CurrentSceneIndex;
+		if (Command->InstanceTag != NULL)
 		{
-			ZERNCommand* CurrentCommand = Temp->GetItem();
-
-			if (CurrentCommand->InstanceTag == NULL ||
-				CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
-				CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
-				!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+			bool Found = false;
+			ZELink<ZERNCommand>* Temp = CommandListInstanced.GetFirst();
+			while (Temp != NULL)
 			{
-				Temp = Temp->GetNext();
-				continue;
+				ZERNCommand* CurrentCommand = Temp->GetItem();
+
+				if (CurrentCommand->InstanceTag == NULL ||
+					CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
+					CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
+					!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+				{
+					Temp = Temp->GetNext();
+					continue;
+				}
+
+				if (Temp != CommandListInstanced.GetFirst())
+				{
+					CommandListInstanced.Remove(Temp);
+					CommandListInstanced.AddBegin(Temp);
+				}
+
+				CurrentCommand->Instances.AddEnd(Command->GetFreeLink());
+				Found = true;
+				break;
 			}
 
-			if (Temp != CommandListInstanced.GetFirst())
-			{
-				CommandListInstanced.Remove(Temp);
-				CommandListInstanced.AddBegin(Temp);
-			}
-
-			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());
-			Found = true;
-			break;
+			if (!Found)
+				CommandListInstanced.AddEnd(Command->GetFreeLink());
 		}
-
-		if (!Found)
-			CommandListInstanced.AddEnd(Command->GetFreeLink());
+		else
+		{
+			CommandList.AddEnd(Command->GetFreeLink());
+		}
 	}
-	else
-	{
-		CommandList.AddEnd(Command->GetFreeLink());
-	}
+	CommandList.UnlockWrite();
 }
 
 void ZERNRenderer::CleanCommands()
