@@ -74,7 +74,7 @@ enum ZERayCastMatch
 	ZE_RCM_FURTHEST
 };
 
-enum ZEMDVertexIndexType;
+enum ZEMDVertexIndexType : ZEUInt8;
 class ZERayCastCollision;
 
 typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;

@@ -38,6 +38,7 @@
 #include "ZEMeta/ZEObject.h"
 
 #include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNInstanceTag.h"
@@ -51,14 +52,35 @@ class ZEGRBuffer;
 
 ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
 
-class ZEMDInstanceTag : public ZERNInstanceTag
+class ZERNCommandDraw : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
+		ZEHolder<ZEGRBuffer>	VertexBuffer;
+		ZEHolder<ZEGRBuffer>	IndexBuffer;
+		ZEHolder<ZERNMaterial>	Material;
+
+		ZEVector3				Position;
+		ZEQuaternion			Rotation;
+		ZEVector3				Scale;
+
+		ZEVector4				Color;
+		bool					LODTransition;
+		bool					Instanced;
+		bool					DirtyTransform;
+};
+
+class ZEMDInstanceTag : public ZERNInstanceTag
+{
+	ZE_OBJECT
+	friend class ZEModelDraw;
+	private:
 		ZEModelDraw*								Draw;
+		bool										Dirty;
 
-		void										Update();
+		bool										Update();
 
+	public:
 		virtual bool								Check(const ZERNInstanceTag* Other) const;
 };
 
@@ -67,17 +89,18 @@ class ZEModelDraw : public ZEObject
 	ZE_OBJECT
 	friend class ZEModelMesh;
 	friend class ZEModelMeshLOD;
-	friend class ZEMDInstanceTag;
 	private:
 		const ZEMDResourceDraw*						Resource;
 		ZEModelMeshLOD*								LOD;
-		ZEUInt32									Offset;
-		ZEUInt32									Count;
+		ZEUInt32									VertexOffset;
+		ZEUInt32									VertexCount;
+		ZEUInt32									IndexOffset;
+		ZEUInt32									IndexCount;
 		ZEHolder<const ZERNMaterial>				Material;
 		mutable ZERNCommand							RenderCommand;
-		ZEMDInstanceTag								InstanceTag;
+		mutable ZEMDInstanceTag						InstanceTag;
 		bool										DirtyConstants;
-
+		
 		ZEHolder<ZEGRBuffer>						ConstantBuffer;
 
 		struct
@@ -88,6 +111,11 @@ class ZEModelDraw : public ZEObject
 			ZEVector3								Reserved;
 			ZEBool32								LODTransition;
 		} Constants;
+
+		bool										Load(const ZEMDResourceDraw* Resource);
+		bool										Unload();
+
+		const ZEMDInstanceTag*						GetInstanceTag() const;
 
 		void										SetLOD(ZEModelMeshLOD* LOD);
 
@@ -101,11 +129,17 @@ class ZEModelDraw : public ZEObject
 		ZEModelMeshLOD*								GetLOD();
 		const ZEModelMeshLOD*						GetLOD() const;
 
-		void										SetOffset(ZEUInt32 Offset);
-		ZEUInt32									GetOffset() const;
+		void										SetVertexOffset(ZEUInt32 Offset);
+		ZEUInt32									GetVertexOffset() const;
 
-		void										SetCount(ZEUInt32 Count);
-		ZEUInt32									GetCount() const;
+		void										SetVertexCount(ZEUInt32 Count);
+		ZEUInt32									GetVertexCount() const;
+
+		void										SetIndexOffset(ZEUInt32 Offset);
+		ZEUInt32									GetIndexOffset() const;
+
+		void										SetIndexCount(ZEUInt32 Count);
+		ZEUInt32									GetIndexCount() const;
 
 		void										SetColor(const ZEVector3& Color);
 		const ZEVector3&							GetColor() const;
@@ -116,11 +150,12 @@ class ZEModelDraw : public ZEObject
 		void										SetLODTransition(bool LODTransition);
 		bool										GetLODTransition() const;
 
-		void										SetMaterial(ZEHolder<const ZERNMaterial> Material);
-		ZEHolder<const ZERNMaterial>				GetMaterial() const;
+		void										SetMaterial(const ZERNMaterial* Material);
+		const ZERNMaterial*							GetMaterial() const;
 		void										ResetMaterial();
 
 		void										Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 													ZEModelDraw();
+		virtual										~ZEModelDraw();
 };

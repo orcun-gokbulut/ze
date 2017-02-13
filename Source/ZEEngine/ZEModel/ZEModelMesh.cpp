@@ -178,7 +178,6 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 {
 	DirtyFlags.RaiseAll();
 
-	Resource = NULL;
 	Model = NULL;
 	Parent = NULL;
 	Visible = true;
@@ -209,6 +208,8 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 	AnimationType = ZE_MAT_NOANIMATION;
 	CustomDrawOrderEnabled = false;
 	CustomDrawOrder = 0;
+
+	Resource = NULL;
 }
 
 ZEModelMesh::~ZEModelMesh()
@@ -223,10 +224,9 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 {
 	if (Resource == NULL)
 		return true;
-
-	DirtyFlags.RaiseAll();
-
 	AnimationType = ZE_MAT_PREDEFINED;
+	
+	this->Resource = Resource;
 	
 	SetName(Resource->GetName());
 	SetPosition(Resource->GetPosition());
@@ -242,8 +242,6 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 		NewLOD->Load(ResourceLOD.GetPointer());
 	}
 
-	this->Resource = Resource;
-
 	return true;
 }
 
@@ -251,13 +249,12 @@ bool ZEModelMesh::Unload()
 {
 	DirtyFlags.RaiseAll();
 
-	ConstantBuffer.Release();
+	Resource = NULL;
 
+	ConstantBuffer.Release();
+	
 	while (LODs.GetFirst() != NULL)
-	{
-		ZEModelMeshLOD* LOD = LODs.GetFirst()->GetItem();
-		LOD->Destroy();
-	}
+		LODs.GetFirst()->GetItem()->Destroy();
 
 	return true;
 }
@@ -658,21 +655,6 @@ const ZEVector3 ZEModelMesh::GetWorldScale() const
 	}
 }
 
-void ZEModelMesh::SetMeshResource(const ZEMDResourceMesh* MeshResource)
-{
-	if (Resource == MeshResource)
-		return;
-
-	Resource = MeshResource;
-
-	Load(Resource);
-}
-
-const ZEMDResourceMesh* ZEModelMesh::GetMeshResource() const
-{
-	return Resource;
-}
-
 void ZEModelMesh::SetAnimationType(ZEModelAnimationType AnimationType)
 {
 	this-> AnimationType = AnimationType;
@@ -854,7 +836,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				Draw->RenderCommand.Entity = GetModel();
 				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 				Draw->RenderCommand.Order = DrawOrder;
-				Draw->RenderCommand.InstanceTag = (PrevLOD->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
+				Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 					continue;
@@ -867,7 +849,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				Draw->RenderCommand.Entity = GetModel();
 				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 				Draw->RenderCommand.Order = DrawOrder;
-				Draw->RenderCommand.InstanceTag = (NextLOD->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
+				Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 					continue;
@@ -894,7 +876,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			Draw->RenderCommand.Entity = GetModel();
 			Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 			Draw->RenderCommand.Order = DrawOrder;
-			Draw->RenderCommand.InstanceTag = (CurrentLOD->GetVertexType() == ZEMD_VT_NORMAL ? &Draw->InstanceTag : NULL);
+			Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 				continue;
@@ -920,7 +902,11 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 
 	if (Resource == NULL)
 		return;
-	
+
+	const ZEMDResource* ResourceModel = Resource->GetResource();
+	if (ResourceModel == NULL)
+		return;
+
 	const ZEMDResourceLOD* ResourceLOD = Resource->GetLODs()[0];
 	if (ResourceLOD == NULL)
 		return;
@@ -938,23 +924,23 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 		ZESize IndexCount = 0;
 		if (ResourceLOD->GetIndexType() == ZEMD_VIT_16BIT)
 		{
-			IndexBuffer = ResourceLOD->GetIndices().GetConstCArray();
-			IndexCount = ResourceLOD->GetIndices().GetCount();
+			IndexBuffer = &ResourceModel->GetIndices()[ResourceLOD->GetIndexOffset()];
+			IndexCount = ResourceLOD->GetIndexCount();
 		}
 		else
 		{
-			IndexBuffer = ResourceLOD->GetIndices32().GetConstCArray();
-			IndexCount = ResourceLOD->GetIndices32().GetCount();
+			IndexBuffer = &ResourceModel->GetIndices32()[ResourceLOD->GetIndexOffset()];
+			IndexCount = ResourceLOD->GetIndexCount();
 		}
 
 		if (ResourceLOD->GetVertexType() == ZEMD_VT_NORMAL)
 		{
-			VertexBuffer = ResourceLOD->GetVertices().GetConstCArray();
+			VertexBuffer = &ResourceModel->GetVertices()[ResourceLOD->GetVertexOffset()];
 			VertexStride = sizeof(ZEMDVertex);
 		}
 		else
 		{
-			VertexBuffer = ResourceLOD->GetVerticesSkin().GetConstCArray();
+			VertexBuffer = &ResourceModel->GetVerticesSkin()[ResourceLOD->GetVertexOffset()];
 			VertexStride = sizeof(ZEMDVertexSkin);
 		}
 		Helper.RayCastMeshIndexed(VertexBuffer, VertexStride, IndexBuffer, IndexCount, ResourceLOD->GetIndexType());

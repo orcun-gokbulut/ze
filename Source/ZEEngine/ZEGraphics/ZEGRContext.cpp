@@ -95,15 +95,7 @@ bool ZEGRContext::CheckIndexBuffer(const ZEGRBuffer* Buffer)
 			IndexBuffer = Buffer;
 		}
 	}
-	else
-	{
-		if (IndexBuffer != NULL)
-		{
-			Dirty = true;
-			IndexBuffer = NULL;
-		}
-	}
-
+	
 	return Dirty;
 }
 

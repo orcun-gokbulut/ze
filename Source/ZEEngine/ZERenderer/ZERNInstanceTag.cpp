@@ -41,7 +41,7 @@ ZESize ZERNInstanceTag::GenerateHash(const void* Data, ZESize Size)
 	ZESize Hash = 0x14650FB0739D0383UL;
 	for (ZESize I = 0; I < Size; I++)
 	{
-		Hash ^= ((ZEUInt32*)Data)[I];
+		Hash ^= ((ZESize*)Data)[I];
 		Hash = 0x84222325cbf29ce4UL * Hash;
 	}
 

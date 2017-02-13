@@ -48,9 +48,6 @@
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
-ZE_META_FORWARD_DECLARE(ZEGRBuffer, "ZERenderer/ZEGRBuffer.h");
-
 class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
@@ -67,16 +64,14 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		float									EndDistance;
 
 		ZEMDVertexType							VertexType;
-		ZEArray<ZEMDVertex>						Vertices;
-		ZEArray<ZEMDVertexSkin>					VerticesSkin;
-		ZEArray<ZEMDResourceDraw>				Draws;
-		
-		ZEMDVertexIndexType						IndexType;
-		ZEArray<ZEUInt16>						Indices;
-		ZEArray<ZEUInt32>						Indices32;
+		ZESize									VertexOffset;
+		ZESize									VertexCount;
 
-		ZEHolder<const ZEGRBuffer>				VertexBuffer;
-		ZEHolder<const ZEGRBuffer>				IndexBuffer;
+		ZEMDVertexIndexType						IndexType;
+		ZESize									IndexOffset;
+		ZESize									IndexCount;
+
+		ZEArray<ZEMDResourceDraw>				Draws;
 		
 												ZEMDResourceLOD();
 		virtual									~ZEMDResourceLOD();
@@ -100,32 +95,24 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		void									SetVertexType(ZEMDVertexType VertexType);
 		ZEMDVertexType							GetVertexType() const;
 
+		void									SetVertexOffset(ZESize Offset);
+		ZESize									GetVertexOffset() const;
+
+		void									SetVertexCount(ZESize Count);
+		ZESize									GetVertexCount() const;
+
 		void									SetIndexType(ZEMDVertexIndexType IndexType);
 		ZEMDVertexIndexType						GetIndexType() const;
 
-		void									SetVertices(const ZEArray<ZEMDVertex>& Vertices);
-		const ZEArray<ZEMDVertex>&				GetVertices() const;
+		void									SetIndexOffset(ZESize Offset);
+		ZESize									GetIndexOffset() const;
 
-		void									SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin);
-		const ZEArray<ZEMDVertexSkin>&			GetVerticesSkin() const;
-	
-		void									SetIndices(const ZEArray<ZEUInt16>& Indices);
-		const ZEArray<ZEUInt16>&				GetIndices() const;
-
-		void									SetIndices32(const ZEArray<ZEUInt32>& Indices);
-		const ZEArray<ZEUInt32>&				GetIndices32() const;
-
-		void									SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer);
-		ZEHolder<const ZEGRBuffer>				GetVertexBuffer() const;
-
-		void									SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer);
-		ZEHolder<const ZEGRBuffer>				GetIndexBuffer() const;
+		void									SetIndexCount(ZESize Count);
+		ZESize									GetIndexCount() const;
 
 		const ZEArray<ZEMDResourceDraw>&		GetDraws() const;
 		void									AddDraw(const ZEMDResourceDraw& Draw);
 		void									RemoveDraw(ZESize Index);
-
-		void									GenerateBuffers();
 
 		bool									Unserialize(const ZEMLReaderNode& LODNode);
 		bool									Serialize(ZEMLWriterNode& LODNode) const;

@@ -206,6 +206,12 @@ ZEEntityResult ZEModel::LoadInternal()
 		return ZE_ER_WAIT;
 	}
 
+	SetVertexBuffer(Resource->GetVertexBuffer(ZEMD_VT_NORMAL), ZEMD_VT_NORMAL);
+	SetVertexBuffer(Resource->GetVertexBuffer(ZEMD_VT_SKINNED), ZEMD_VT_SKINNED);
+
+	SetIndexBuffer(Resource->GetIndexBuffer(ZEMD_VIT_16BIT), ZEMD_VIT_16BIT);
+	SetIndexBuffer(Resource->GetIndexBuffer(ZEMD_VIT_32BIT), ZEMD_VIT_32BIT);
+
 	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled();
 	const_cast<ZEModel*>(this)->SetBoundingBox(Resource->GetUserDefinedBoundingBox());
 
@@ -252,9 +258,6 @@ ZEEntityResult ZEModel::LoadInternal()
 	ze_for_each(AnimationTrack, AnimationTracks)
 		AnimationTrack->BindAnimation();
 
-	DirtyConstantBufferSkin = true;
-	DirtyBoundingBox = true;
-
 	return ZE_ER_DONE;
 }
 
@@ -293,6 +296,15 @@ ZEEntityResult ZEModel::UnloadInternal()
 	}
 
 	ConstantBufferBoneTransforms.Release();
+
+	for (ZEUInt8 I = 0; I < ZEMD_VT_COUNT; I++)
+		VertexBuffers[I].Release();
+
+	for (ZEUInt8 J = 0; J < ZEMD_VIT_COUNT; J++)
+		IndexBuffers[J].Release();
+
+	DirtyConstantBufferSkin = true;
+	DirtyBoundingBox = true;
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
@@ -605,6 +617,34 @@ void ZEModel::SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateM
 ZEModelAnimationUpdateMode ZEModel::GetAnimationUpdateMode()
 {
 	return AnimationUpdateMode;
+}
+
+void ZEModel::SetVertexBuffer(const ZEGRBuffer* VertexBuffer, ZEMDVertexType VertexType)
+{
+	zeDebugCheck(VertexType >= ZEMD_VT_COUNT, "Unknown vertex type");
+
+	VertexBuffers[VertexType] = VertexBuffer;
+}
+
+const ZEGRBuffer* ZEModel::GetVertexBuffer(ZEMDVertexType VertexType) const
+{
+	zeDebugCheck(VertexType >= ZEMD_VT_COUNT, "Unknown vertex type");
+
+	return VertexBuffers[VertexType];
+}
+
+void ZEModel::SetIndexBuffer(const ZEGRBuffer* IndexBuffer, ZEMDVertexIndexType IndexType)
+{
+	zeDebugCheck(IndexType >= ZEMD_VIT_COUNT, "Unknown index type");
+
+	IndexBuffers[IndexType] = IndexBuffer;
+}
+
+const ZEGRBuffer* ZEModel::GetIndexBuffer(ZEMDVertexIndexType IndexType) const
+{
+	zeDebugCheck(IndexType >= ZEMD_VIT_COUNT, "Unknown index type");
+
+	return IndexBuffers[IndexType];
 }
 
 bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)

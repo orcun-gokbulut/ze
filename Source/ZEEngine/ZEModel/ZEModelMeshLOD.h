@@ -44,7 +44,6 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZEResource/ZERSHolder.h"
 
 class ZEModel;
 class ZEModelMesh;
@@ -70,16 +69,20 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		float										EndDistance;
 
 		ZEMDVertexType								VertexType;
-		ZEHolder<const ZEGRBuffer>					VertexBuffer;
-
+		ZESize										VertexOffset;
+		ZESize										VertexCount;
+		
 		ZEMDVertexIndexType							IndexType;
-		ZEHolder<const ZEGRBuffer>					IndexBuffer;
+		ZESize										IndexOffset;
+		ZESize										IndexCount;
 
 		ZEArray<ZEModelDraw>						Draws;
+		
+		const ZEMDResourceLOD*						Resource;
 
 		bool										Load(const ZEMDResourceLOD* Resource);
 		bool										Unload();
-				
+
 													ZEModelMeshLOD();
 		virtual										~ZEModelMeshLOD();
 
@@ -94,28 +97,29 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		void										AddDraw(const ZEModelDraw& Draw);
 		void										RemoveDraw(ZESize Index);
 
-		void										SetVertexType(ZEMDVertexType Type);
-		ZEMDVertexType								GetVertexType() const;
-
-		void										SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer);
-		ZEHolder<const ZEGRBuffer>					GetVertexBuffer() const;
-
-		void										SetIndexType(ZEMDVertexIndexType Type);
-		ZEMDVertexIndexType							GetIndexType() const;
-
-		void										SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer);
-		ZEHolder<const ZEGRBuffer>					GetIndexBuffer() const;
-
 		void										SetStartDistance(float Distance);
 		float										GetStartDistance() const;
 
 		void										SetEndDistance(float Distance);
 		float										GetEndDistance() const;
 
-		void										SetResource(ZERSHolder<const ZEMDResourceLOD> Resource);
-		ZERSHolder<const ZEMDResourceLOD>			GetResource();
+		void										SetVertexType(ZEMDVertexType Type);
+		ZEMDVertexType								GetVertexType() const;
 
-		void										Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		void										SetVertexOffset(ZESize Offset);
+		ZESize										GetVertexOffset() const;
 
+		void										SetVertexCount(ZESize Count);
+		ZESize										GetVertexCount() const;
+
+		void										SetIndexType(ZEMDVertexIndexType Type);
+		ZEMDVertexIndexType							GetIndexType() const;
+
+		void										SetIndexOffset(ZESize Offset);
+		ZESize										GetIndexOffset() const;
+
+		void										SetIndexCount(ZESize Count);
+		ZESize										GetIndexCount() const;
+		
 		static ZEModelMeshLOD*						CreateInstance();
 };

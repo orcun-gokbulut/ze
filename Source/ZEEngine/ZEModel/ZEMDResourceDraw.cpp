@@ -43,24 +43,44 @@
 #include "ZEMDResourceLOD.h"
 #include "ZERenderer/ZERNMaterial.h"
 
-void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
+void ZEMDResourceDraw::SetVertexOffset(ZESize Offset)
 {
-	this->Offset = PoligonOffset;
+	VertexOffset = Offset;
 }
 
-ZESize ZEMDResourceDraw::GetOffset() const 
+ZESize ZEMDResourceDraw::GetVertexOffset() const 
 {
-	return Offset;
+	return VertexOffset;
 }
 
-void ZEMDResourceDraw::SetCount(ZESize PoligonCount)
+void ZEMDResourceDraw::SetVertexCount(ZESize Count)
 {
-	this->Count = PoligonCount;
+	VertexCount = Count;
 }
 
-ZESize ZEMDResourceDraw::GetCount() const 
+ZESize ZEMDResourceDraw::GetVertexCount() const 
 {
-	return Count;
+	return VertexCount;
+}
+
+void ZEMDResourceDraw::SetIndexOffset(ZESize Offset)
+{
+	IndexOffset = Offset;
+}
+
+ZESize ZEMDResourceDraw::GetIndexOffset() const
+{
+	return IndexOffset;
+}
+
+void ZEMDResourceDraw::SetIndexCount(ZESize Count)
+{
+	IndexCount = Count;
+}
+
+ZESize ZEMDResourceDraw::GetIndexCount() const
+{
+	return IndexCount;
 }
 
 void ZEMDResourceDraw::SetMaterialFileName(const ZEString& FileName)
@@ -104,8 +124,18 @@ bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)
 	zeCheckError(!DrawNode.IsValid(), false, "Invalid Draw node.");
 	zeCheckError(DrawNode.GetName() != "Draw", false, "Invalid Draw node name.");
 
-	SetOffset(DrawNode.ReadUInt32("Offset", 0));
-	SetCount(DrawNode.ReadUInt32("Count", 0));
+	if (LOD->GetIndexType() == NULL)
+	{
+		SetVertexOffset(LOD->GetVertexOffset() + DrawNode.ReadUInt32("Offset", 0));
+		SetVertexCount(DrawNode.ReadUInt32("Count", 0));
+	}
+	else
+	{
+		SetVertexOffset(LOD->GetVertexOffset());
+		SetIndexOffset(LOD->GetIndexOffset() + DrawNode.ReadUInt32("Offset", 0));
+		SetIndexCount(DrawNode.ReadUInt32("Count", 0));
+	}
+
 	SetMaterialFileName(ZEPathInfo::CombineRelativePath(DrawNode.GetFile()->GetPath(), DrawNode.ReadString("MaterialFilePath")));
 
 	return true;
@@ -119,6 +149,8 @@ bool ZEMDResourceDraw::Serialize(ZEMLWriterNode& DrawNode) const
 ZEMDResourceDraw::ZEMDResourceDraw()
 {
 	LOD = NULL;
-	Offset = 0;
-	Count = 0;
+	VertexOffset = 0;
+	VertexCount = 0;
+	IndexOffset = 0;
+	IndexCount = 0;
 }

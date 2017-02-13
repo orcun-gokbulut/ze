@@ -46,29 +46,28 @@
 
 bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 {
-	Unload();
-
 	if (Resource == NULL)
-		return true;
+		return false;
+
+	this->Resource = Resource;
 
 	SetStartDistance(Resource->GetStartDistance());
 	SetEndDistance(Resource->GetEndDistance());
 	SetVertexType(Resource->GetVertexType());
-	SetVertexBuffer(Resource->GetVertexBuffer());
+	SetVertexOffset(Resource->GetVertexOffset());
+	SetVertexCount(Resource->GetVertexCount());
 	SetIndexType(Resource->GetIndexType());
-	SetIndexBuffer(Resource->GetIndexBuffer());
-	
+	SetIndexOffset(Resource->GetIndexOffset());
+	SetIndexCount(Resource->GetIndexCount());
+
 	ZESize DrawCount = Resource->GetDraws().GetCount();
 	Draws.SetCount(DrawCount);
 
 	for (ZESize I = 0; I < DrawCount; I++)
 	{
-		const ZEMDResourceDraw* ResourceDraw = &Resource->GetDraws()[I];
-		Draws[I].SetMaterial(ResourceDraw->GetMaterial());
-		Draws[I].SetOffset(ResourceDraw->GetOffset());
-		Draws[I].SetCount(ResourceDraw->GetCount());
-		Draws[I].SetLOD(this);
-		Draws[I].Resource = ResourceDraw;
+		Draws[I].LOD = this;
+		if (!Draws[I].Load(&Resource->GetDraws()[I]))
+			return false;
 	}
 
 	return true;
@@ -76,14 +75,11 @@ bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 
 bool ZEModelMeshLOD::Unload()
 {
-	SetStartDistance(0);
-	SetEndDistance(0);
-	SetVertexBuffer(NULL);
-	SetIndexBuffer(NULL);
+	Resource = NULL;
+	Draws.Clear();
 
 	return true;
 }
-
 
 ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 {
@@ -91,7 +87,13 @@ ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 	StartDistance = 0;
 	EndDistance = 0;
 	VertexType = ZEMD_VT_NORMAL;
+	VertexOffset = 0;
+	VertexCount = 0;
 	IndexType = ZEMD_VIT_NONE;
+	IndexOffset = 0;
+	IndexCount = 0;
+
+	Resource = NULL;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()
@@ -117,7 +119,6 @@ const ZEModel* ZEModelMeshLOD::GetModel() const
 	else
 		return NULL;
 }
-
 
 ZEModelMesh* ZEModelMeshLOD::GetMesh()
 {
@@ -145,47 +146,6 @@ void ZEModelMeshLOD::RemoveDraw(ZESize Index)
 	Draws.Remove(Index);
 }
 
-
-void ZEModelMeshLOD::SetVertexType(ZEMDVertexType Type)
-{
-	VertexType = Type;
-}
-
-ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
-{
-	return VertexType;
-}
-
-void ZEModelMeshLOD::SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer)
-{
-	this->VertexBuffer = VertexBuffer;
-}
-
-ZEHolder<const ZEGRBuffer> ZEModelMeshLOD::GetVertexBuffer() const
-{
-	return VertexBuffer;
-}
-
-void ZEModelMeshLOD::SetIndexType(ZEMDVertexIndexType Type)
-{
-	IndexType = Type;
-}
-
-ZEMDVertexIndexType ZEModelMeshLOD::GetIndexType() const
-{
-	return IndexType;
-}
-
-void ZEModelMeshLOD::SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer)
-{
-	this->IndexBuffer = IndexBuffer;
-}
-
-ZEHolder<const ZEGRBuffer> ZEModelMeshLOD::GetIndexBuffer() const
-{
-	return IndexBuffer;
-}
-
 void ZEModelMeshLOD::SetStartDistance(float Distance)
 {
 	StartDistance = Distance;
@@ -204,6 +164,64 @@ void ZEModelMeshLOD::SetEndDistance(float Distance)
 float ZEModelMeshLOD::GetEndDistance() const 
 {
 	return EndDistance;
+}
+
+void ZEModelMeshLOD::SetVertexType(ZEMDVertexType Type)
+{
+	VertexType = Type;
+}
+
+ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
+{
+	return VertexType;
+}
+void ZEModelMeshLOD::SetVertexOffset(ZESize Offset)
+{
+	VertexOffset = Offset;
+}
+
+ZESize ZEModelMeshLOD::GetVertexOffset() const 
+{
+	return VertexOffset;
+}
+
+void ZEModelMeshLOD::SetVertexCount(ZESize Count)
+{
+	VertexCount = Count;
+}
+
+ZESize ZEModelMeshLOD::GetVertexCount() const 
+{
+	return VertexCount;
+}
+void ZEModelMeshLOD::SetIndexType(ZEMDVertexIndexType Type)
+{
+	IndexType = Type;
+}
+
+ZEMDVertexIndexType ZEModelMeshLOD::GetIndexType() const
+{
+	return IndexType;
+}
+
+void ZEModelMeshLOD::SetIndexOffset(ZESize Offset)
+{
+	IndexOffset = Offset;
+}
+
+ZESize ZEModelMeshLOD::GetIndexOffset() const
+{
+	return IndexOffset;
+}
+
+void ZEModelMeshLOD::SetIndexCount(ZESize Count)
+{
+	IndexCount = Count;
+}
+
+ZESize ZEModelMeshLOD::GetIndexCount() const
+{
+	return IndexCount;
 }
 
 ZEModelMeshLOD* ZEModelMeshLOD::CreateInstance()

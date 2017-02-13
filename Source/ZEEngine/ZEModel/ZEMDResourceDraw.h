@@ -51,17 +51,25 @@ class ZEMDResourceDraw : public ZEObject
 	friend class ZEMDResourceLOD;
 	private:
 		ZEMDResourceLOD*				LOD;
-		ZESize							Offset;
-		ZESize							Count;
+		ZESize							VertexOffset;
+		ZESize							VertexCount;
+		ZESize							IndexOffset;
+		ZESize							IndexCount;
 		ZEHolder<const ZERNMaterial>	Material;
 		ZEString						MaterialFileName;
 
 	public:
-		void							SetOffset(ZESize Offset);
-		ZESize							GetOffset() const;
+		void							SetVertexOffset(ZESize Offset);
+		ZESize							GetVertexOffset() const;
 
-		void							SetCount(ZESize Count);
-		ZESize							GetCount() const;
+		void							SetVertexCount(ZESize Count);
+		ZESize							GetVertexCount() const;
+
+		void							SetIndexOffset(ZESize Offset);
+		ZESize							GetIndexOffset() const;
+
+		void							SetIndexCount(ZESize Count);
+		ZESize							GetIndexCount() const;
 
 		void							SetMaterialFileName(const ZEString& Name);
 		const ZEString&					GetMaterialFileName();
