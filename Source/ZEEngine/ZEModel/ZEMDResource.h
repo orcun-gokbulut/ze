@@ -41,11 +41,13 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEResource/ZERSHolder.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEMDVertex.h"
 
 ZE_META_FORWARD_DECLARE(ZEMDResourceMesh, "ZEMDResourceMesh.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceBone, "ZEMDResourceBone.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceAnimation, "ZEMDResourceAnimation.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceHelper, "ZEMDResourceHelper.h");
+ZE_META_FORWARD_DECLARE(ZEGRBuffer, "ZERenderer/ZEGRBuffer.h");
 
 class ZEMDResource : public ZERSResource
 {
@@ -60,6 +62,15 @@ class ZEMDResource : public ZERSResource
 		ZEList2<ZEMDResourceBone>						Bones;
 		ZEList2<ZEMDResourceHelper>						Helpers;
 		ZEList2<ZEMDResourceAnimation>					Animations;
+
+		ZEArray<ZEMDVertex>								Vertices;
+		ZEArray<ZEMDVertexSkin>							VerticesSkin;
+
+		ZEArray<ZEUInt16>								Indices;
+		ZEArray<ZEUInt32>								Indices32;
+
+		ZEHolder<const ZEGRBuffer>						VertexBuffers[ZEMD_VT_COUNT];
+		ZEHolder<const ZEGRBuffer>						IndexBuffers[ZEMD_VIT_COUNT];
 
 		bool											BoundingBoxIsUserDefined;
 		ZEAABBox										UserDefinedBoundingBox;
@@ -106,6 +117,24 @@ class ZEMDResource : public ZERSResource
 		const ZEMDResourceHelper*						GetHelper(const ZEString& Name) const;	
 		void											AddHelper(ZEMDResourceHelper* Helper);
 		void											RemoveHelper(ZEMDResourceHelper* Helper);
+		
+		void											SetVertices(const ZEArray<ZEMDVertex>& Vertices);
+		const ZEArray<ZEMDVertex>&						GetVertices() const;
+		
+		void											SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin);
+		const ZEArray<ZEMDVertexSkin>&					GetVerticesSkin() const;
+		
+		void											SetIndices(const ZEArray<ZEUInt16>& Indices);
+		const ZEArray<ZEUInt16>&						GetIndices() const;
+		
+		void											SetIndices32(const ZEArray<ZEUInt32>& Indices);
+		const ZEArray<ZEUInt32>&						GetIndices32() const;
+
+		void											SetVertexBuffer(const ZEGRBuffer* VertexBuffer, ZEMDVertexType VertexType);
+		const ZEGRBuffer*								GetVertexBuffer(ZEMDVertexType VertexType) const;
+
+		void											SetIndexBuffer(const ZEGRBuffer* IndexBuffer, ZEMDVertexIndexType IndexType);
+		const ZEGRBuffer*								GetIndexBuffer(ZEMDVertexIndexType IndexType) const;
 
 		static ZEMDResource*							CreateInstance();
 		static ZERSHolder<ZEMDResource>					CreateResource();

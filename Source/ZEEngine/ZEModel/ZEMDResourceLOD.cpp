@@ -49,7 +49,11 @@ ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 	StartDistance = 0;
 	EndDistance = 1000000;
 	VertexType = ZEMD_VT_NORMAL;
+	VertexOffset = 0;
+	VertexCount = 0;
 	IndexType = ZEMD_VIT_NONE;
+	IndexOffset = 0;
+	IndexCount = 0;
 }
 
 ZEMDResourceLOD::~ZEMDResourceLOD()
@@ -124,6 +128,26 @@ ZEMDVertexType ZEMDResourceLOD::GetVertexType() const
 	return VertexType;
 }
 
+void ZEMDResourceLOD::SetVertexOffset(ZESize Offset)
+{
+	VertexOffset = Offset;
+}
+
+ZESize ZEMDResourceLOD::GetVertexOffset() const 
+{
+	return VertexOffset;
+}
+
+void ZEMDResourceLOD::SetVertexCount(ZESize Count)
+{
+	VertexCount = Count;
+}
+
+ZESize ZEMDResourceLOD::GetVertexCount() const 
+{
+	return VertexCount;
+}
+
 void ZEMDResourceLOD::SetIndexType(ZEMDVertexIndexType IndexType)
 {
 	this->IndexType = IndexType;
@@ -134,68 +158,24 @@ ZEMDVertexIndexType ZEMDResourceLOD::GetIndexType() const
 	return IndexType;
 }
 
-void ZEMDResourceLOD::SetVertices(const ZEArray<ZEMDVertex>& Vertices)
+void ZEMDResourceLOD::SetIndexOffset(ZESize Offset)
 {
-	this->Vertices = Vertices;
-	this->VerticesSkin.Clear();
+	IndexOffset = Offset;
 }
 
-const ZEArray<ZEMDVertex>& ZEMDResourceLOD::GetVertices() const
+ZESize ZEMDResourceLOD::GetIndexOffset() const
 {
-	return Vertices;
+	return IndexOffset;
 }
 
-void ZEMDResourceLOD::SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin)
+void ZEMDResourceLOD::SetIndexCount(ZESize Count)
 {
-	this->VerticesSkin = VerticesSkin;
-	this->Vertices.Clear();
+	IndexCount = Count;
 }
 
-const ZEArray<ZEMDVertexSkin>& ZEMDResourceLOD::GetVerticesSkin() const
+ZESize ZEMDResourceLOD::GetIndexCount() const
 {
-	return VerticesSkin;
-}
-
-void ZEMDResourceLOD::SetIndices(const ZEArray<ZEUInt16>& Indices)
-{
-	this->Indices = Indices;
-	this->Indices32.Clear();
-}
-
-const ZEArray<ZEUInt16>& ZEMDResourceLOD::GetIndices() const
-{
-	return Indices;
-}
-
-void ZEMDResourceLOD::SetIndices32(const ZEArray<ZEUInt32>& Indices)
-{
-	this->Indices32 = Indices;
-	this->Indices.Clear();
-}
-
-const ZEArray<ZEUInt32>& ZEMDResourceLOD::GetIndices32() const
-{
-	return Indices32;
-}
-
-void ZEMDResourceLOD::SetVertexBuffer(ZEHolder<const ZEGRBuffer> VertexBuffer)
-{
-	this->VertexBuffer = VertexBuffer;
-}
-
-ZEHolder<const ZEGRBuffer> ZEMDResourceLOD::GetVertexBuffer() const
-{
-	return VertexBuffer;
-}
-
-void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<const ZEGRBuffer> IndexBuffer)
-{
-	this->IndexBuffer = IndexBuffer;
-}
-
-ZEHolder<const ZEGRBuffer> ZEMDResourceLOD::GetIndexBuffer() const
-{
-	return IndexBuffer;
+	return IndexCount;
 }
 
 const ZEArray<ZEMDResourceDraw>& ZEMDResourceLOD::GetDraws() const
@@ -211,22 +191,7 @@ void ZEMDResourceLOD::AddDraw(const ZEMDResourceDraw& Draw)
 
 void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 {
-	Draws[Index].LOD = NULL;
 	Draws.Remove(Index);
-}
-
-void ZEMDResourceLOD::GenerateBuffers()
-{
-	if (GetIndexType() == ZEMD_VIT_16BIT)
-		IndexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices.GetCount() * sizeof(ZEUInt16), sizeof(ZEUInt16), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R16_UINT, Indices.GetConstCArray()).GetPointer();
-	else if (GetIndexType() == ZEMD_VIT_32BIT)
-		IndexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices32.GetCount() * sizeof(ZEUInt32), sizeof(ZEUInt32), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R32_UINT, Indices32.GetConstCArray()).GetPointer();
-
-	if (GetVertexType() == ZEMD_VT_NORMAL)
-		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEMDVertex), sizeof(ZEMDVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetCArray()).GetPointer();
-	else if (GetVertexType() == ZEMD_VT_SKINNED)
-		VertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin), sizeof(ZEMDVertexSkin), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, VerticesSkin.GetCArray()).GetPointer();
-
 }
 
 bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
@@ -234,44 +199,49 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	zeCheckError(!LODNode.IsValid(), false, "Invalid LOD node.");
 	zeCheckError(LODNode.GetName() != "LOD", false, "Invalid LOD node name.");
 
-	Vertices.Clear();
-	VerticesSkin.Clear();
-	Indices.Clear();
-	Indices32.Clear();
-
-	IndexBuffer = NULL;
-	VertexBuffer = NULL;
+	ZEArray<ZEMDVertex>& Vertices = GetResource()->Vertices;
+	ZEArray<ZEMDVertexSkin>& VerticesSkin = GetResource()->VerticesSkin;
+	ZEArray<ZEUInt16>& Indices = GetResource()->Indices;
+	ZEArray<ZEUInt32>& Indices32 = GetResource()->Indices32;
 
 	SetLevel(LODNode.ReadInt32("Level", LODNode.ReadInt32("LODLevel", 0)));
 	SetStartDistance(LODNode.ReadFloat("StartDistance", (float)LODNode.ReadInt32("LODStartDistance", GetLevel() * 30)));
 	SetEndDistance(LODNode.ReadFloat("EndDistance", (float)LODNode.ReadInt32("LODEndDistance", 100000)));
 	SetVertexType((ZEMDVertexType)LODNode.ReadUInt8("VertexType", ZEMD_VT_NORMAL));
-	SetIndexType((ZEMDVertexIndexType)LODNode.ReadUInt8("IndexType", ZEMD_VIT_NONE));
+	SetIndexType((ZEMDVertexIndexType)(LODNode.ReadUInt8("IndexType", ZEMD_VIT_NONE) / 16));
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 	{
-		Vertices.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertex));
-		if (!LODNode.ReadDataItems("Vertices", Vertices.GetCArray(), sizeof(ZEMDVertex), Vertices.GetCount()))
+		VertexOffset = Vertices.GetCount();
+		VertexCount = LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertex);
+		Vertices.Resize(VertexOffset + VertexCount);
+		if (!LODNode.ReadDataItems("Vertices", Vertices.GetCArray() + VertexOffset, sizeof(ZEMDVertex), VertexCount))
 			return false;
 
 	}
 	else if (GetVertexType() == ZEMD_VT_SKINNED)
 	{
-		VerticesSkin.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexSkin));
-		if (!LODNode.ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkin), VerticesSkin.GetCount()))
+		VertexOffset = VerticesSkin.GetCount();
+		VertexCount = LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexSkin);
+		VerticesSkin.Resize(VertexOffset + VertexCount);
+		if (!LODNode.ReadDataItems("Vertices", VerticesSkin.GetCArray() + VertexOffset, sizeof(ZEMDVertexSkin), VertexCount))
 			return false;
 	}
 
 	if (GetIndexType() == ZEMD_VIT_16BIT)
 	{
-		Indices.SetCount(LODNode.ReadDataSize("Indices") / sizeof(ZEUInt16));
-		if (!LODNode.ReadDataItems("Indices", Indices.GetCArray(), sizeof(ZEUInt16), Indices.GetCount()))
+		IndexOffset = Indices.GetCount();
+		IndexCount = LODNode.ReadDataSize("Indices") / sizeof(ZEUInt16);
+		Indices.Resize(IndexOffset + IndexCount);
+		if (!LODNode.ReadDataItems("Indices", Indices.GetCArray() + IndexOffset, sizeof(ZEUInt16), IndexCount))
 			return false;
 	}
 	else if (GetIndexType() == ZEMD_VIT_32BIT)
 	{
-		Indices32.SetCount(LODNode.ReadDataSize("Indices") / sizeof(ZEUInt32));
-		if (!LODNode.ReadDataItems("Indices", Indices32.GetCArray(), sizeof(ZEUInt32), Indices32.GetCount()))
+		IndexOffset = Indices32.GetCount();
+		IndexCount = LODNode.ReadDataSize("Indices") / sizeof(ZEUInt32);
+		Indices32.Resize(IndexOffset + IndexCount);
+		if (!LODNode.ReadDataItems("Indices", Indices32.GetCArray() + IndexOffset, sizeof(ZEUInt32), IndexCount))
 			return false;
 	}
 
@@ -279,19 +249,14 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	if (DrawsNode.IsValid())
 	{
 		ZESize DrawsNodeCount = LODNode.GetNodeCount("Draws");
+		Draws.SetCount(DrawsNodeCount);
 		for (ZESize I = 0; I < DrawsNodeCount; I++)
 		{
-			ZEMLReaderNode DrawNode = DrawsNode.GetNode("Draw", I);
-			
-			ZEMDResourceDraw Draw;
-			if (!Draw.Unserialize(DrawNode))
+			Draws[I].LOD = this;
+			if (!Draws[I].Unserialize(DrawsNode.GetNode("Draw", I)))
 				return false;
-			
-			AddDraw(Draw);
 		}
 	}
-
-	GenerateBuffers();
 
 	return true;
 }

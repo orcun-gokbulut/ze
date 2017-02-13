@@ -244,6 +244,7 @@ bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 			return false;
 		
 		ZEMDResourceLOD* LOD = ZEMDResourceLOD::CreateInstance();
+		AddLOD(LOD);
 		if (!LOD->Unserialize(LODNode))
 		{
 			LOD->Destroy();
@@ -254,19 +255,17 @@ bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 		{
 			if (LOD->GetVertexType() == ZEMD_VT_SKINNED)
 			{
-				Geometry.SetCount(LOD->GetVerticesSkin().GetCount());
+				Geometry.SetCount(LOD->GetVertexCount());
 				for (ZESize N = 0; N < Geometry.GetCount(); N++)
-					Geometry[N] = LOD->GetVerticesSkin()[N].Position;
+					Geometry[N] = LOD->GetResource()->GetVerticesSkin()[LOD->GetVertexOffset() + N].Position;
 			}
 			else
 			{
-				Geometry.SetCount(LOD->GetVertices().GetCount());
+				Geometry.SetCount(LOD->GetVertexCount());
 				for (ZESize N = 0; N < Geometry.GetCount(); N++)
-					Geometry[N] = LOD->GetVertices()[N].Position;
+					Geometry[N] = LOD->GetResource()->GetVertices()[LOD->GetVertexOffset() + N].Position;
 			}
 		}
-
-		AddLOD(LOD);
 	}
 
 	return true;

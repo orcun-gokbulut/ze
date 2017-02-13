@@ -87,6 +87,9 @@ class ZEModel : public ZEEntity
 		bool									DirtyConstantBufferSkin;
 		ZEHolder<ZEGRBuffer>					ConstantBufferBoneTransforms;
 
+		ZEHolder<const ZEGRBuffer>				VertexBuffers[ZEMD_VT_COUNT];
+		ZEHolder<const ZEGRBuffer>				IndexBuffers[ZEMD_VIT_COUNT];
+
 		mutable bool							DirtyBoundingBox;
 		bool									BoundingBoxIsUserDefined;
 
@@ -149,6 +152,12 @@ class ZEModel : public ZEEntity
 
 		void									SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
 		ZEModelAnimationUpdateMode				GetAnimationUpdateMode();
+
+		void									SetVertexBuffer(const ZEGRBuffer* VertexBuffer, ZEMDVertexType VertexType);
+		const ZEGRBuffer*						GetVertexBuffer(ZEMDVertexType VertexType) const;
+		
+		void									SetIndexBuffer(const ZEGRBuffer* IndexBuffer, ZEMDVertexIndexType IndexType);
+		const ZEGRBuffer*						GetIndexBuffer(ZEMDVertexIndexType IndexType) const;
 
 		void									Tick(float ElapsedTime);
 

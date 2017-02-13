@@ -171,9 +171,6 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		void									SetWorldScale(const ZEVector3& WorldScale);
 		const ZEVector3							GetWorldScale() const;
 
-		void									SetMeshResource(const ZEMDResourceMesh* MeshResource);	
-		const ZEMDResourceMesh*					GetMeshResource() const;
-
 		void									SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType					GetAnimationType();
 

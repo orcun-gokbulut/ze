@@ -49,52 +49,7 @@
 #include "ZERenderer/ZERNStandardMaterial.h"
 #include "ZEResource/ZERSTemplates.h"
 #include "ZEMDResourceDraw.h"
-
-static void CalculateBoundingBox(ZEMDResourceMesh* Mesh)
-{
-	if (Mesh == NULL)
-		return;
-
-	ZEAABBox BoundingBox;
-	BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
-	BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-
-	ze_for_each(CurrentLOD, Mesh->GetLODs())
-	{
-		if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
-		{
-			const ZEArray<ZEMDVertexSkin>& Vertices = CurrentLOD->GetVerticesSkin();
-			for (ZESize N = 0; N < Vertices.GetCount(); N++)
-			{
-				const ZEVector3& Position = Vertices[N].Position;
-
-				if (Position.x < BoundingBox.Min.x) BoundingBox.Min.x = Position.x;
-				if (Position.y < BoundingBox.Min.y) BoundingBox.Min.y = Position.y;
-				if (Position.z < BoundingBox.Min.z) BoundingBox.Min.z = Position.z;
-				if (Position.x > BoundingBox.Max.x) BoundingBox.Max.x = Position.x;
-				if (Position.y > BoundingBox.Max.y) BoundingBox.Max.y = Position.y;
-				if (Position.z > BoundingBox.Max.z) BoundingBox.Max.z = Position.z;
-			}
-		}
-		else
-		{
-			const ZEArray<ZEMDVertex>& Vertices = CurrentLOD->GetVertices();
-			for (ZESize N = 0; N < Vertices.GetCount(); N++)
-			{
-				const ZEVector3& Position = Vertices[N].Position;
-
-				if (Position.x < BoundingBox.Min.x) BoundingBox.Min.x = Position.x;
-				if (Position.y < BoundingBox.Min.y) BoundingBox.Min.y = Position.y;
-				if (Position.z < BoundingBox.Min.z) BoundingBox.Min.z = Position.z;
-				if (Position.x > BoundingBox.Max.x) BoundingBox.Max.x = Position.x;
-				if (Position.y > BoundingBox.Max.y) BoundingBox.Max.y = Position.y;
-				if (Position.z > BoundingBox.Max.z) BoundingBox.Max.z = Position.z;
-			}
-		}
-	}
-
-	Mesh->SetBoundingBox(BoundingBox);
-}
+#include "ZEGraphics/ZEGRBuffer.h"
 
 bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 {
@@ -109,13 +64,13 @@ bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 			return false;
 
 		ZEMDResourceMesh* Mesh = ZEMDResourceMesh::CreateInstance();
+		AddMesh(Mesh);
 		if (!Mesh->Unserialize(MeshNode))
 		{
 			Mesh->Destroy();
 			return false;
 		}
 
-		AddMesh(Mesh);
 		SetLocalLoadProgress(I, SubNodeCount, 10, 50);
 	}
 
@@ -269,6 +224,18 @@ ZETaskResult ZEMDResource::LoadInternal()
 
 	SetLocalLoadProgress(100);
 
+	if (Vertices.GetCount() > 0)
+		VertexBuffers[ZEMD_VT_NORMAL] = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, Vertices.GetCount() * sizeof(ZEMDVertex), sizeof(ZEMDVertex), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, Vertices.GetConstCArray());
+
+	if (VerticesSkin.GetCount() > 0)
+		VertexBuffers[ZEMD_VT_SKINNED] = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin), sizeof(ZEMDVertexSkin), ZEGR_RU_IMMUTABLE, ZEGR_RBF_VERTEX_BUFFER, ZEGR_TF_NONE, VerticesSkin.GetConstCArray());
+
+	if (Indices.GetCount() > 0)
+		IndexBuffers[ZEMD_VIT_16BIT] = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices.GetCount() * sizeof(ZEUInt16), sizeof(ZEUInt16), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R16_UINT, Indices.GetConstCArray());
+
+	if (Indices32.GetCount() > 0)
+		IndexBuffers[ZEMD_VIT_32BIT] = ZEGRBuffer::CreateResource(ZEGR_BT_INDEX_BUFFER, Indices32.GetCount() * sizeof(ZEUInt32), sizeof(ZEUInt32), ZEGR_RU_IMMUTABLE, ZEGR_RBF_INDEX_BUFFER, ZEGR_TF_R32_UINT, Indices32.GetConstCArray());
+
 	return ZE_TR_DONE;
 }
 
@@ -301,6 +268,17 @@ ZETaskResult ZEMDResource::UnloadInternal()
 		RemoveHelper(Helper);
 		delete Helper;
 	}
+
+	Vertices.Clear();
+	VerticesSkin.Clear();
+	Indices.Clear();
+	Indices32.Clear();
+	
+	for (ZEUInt8 I = 0; I < ZEMD_VT_COUNT; I++)
+		VertexBuffers[I].Release();
+
+	for (ZEUInt8 J = 0; J < ZEMD_VIT_COUNT; J++)
+		IndexBuffers[J].Release();
 
 	return ZE_TR_DONE;
 }
@@ -509,6 +487,74 @@ void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 
 	Helper->Resource = NULL;
 	Helpers.Remove(&Helper->Link);
+}
+
+void ZEMDResource::SetVertices(const ZEArray<ZEMDVertex>& Vertices)
+{
+	this->Vertices = Vertices;
+}
+
+const ZEArray<ZEMDVertex>& ZEMDResource::GetVertices() const
+{
+	return Vertices;
+}
+
+void ZEMDResource::SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin)
+{
+	this->VerticesSkin = VerticesSkin;
+}
+
+const ZEArray<ZEMDVertexSkin>& ZEMDResource::GetVerticesSkin() const
+{
+	return VerticesSkin;
+}
+
+void ZEMDResource::SetIndices(const ZEArray<ZEUInt16>& Indices)
+{
+	this->Indices = Indices;
+}
+
+const ZEArray<ZEUInt16>& ZEMDResource::GetIndices() const
+{
+	return Indices;
+}
+
+void ZEMDResource::SetIndices32(const ZEArray<ZEUInt32>& Indices)
+{
+	this->Indices32 = Indices;
+}
+
+const ZEArray<ZEUInt32>& ZEMDResource::GetIndices32() const
+{
+	return Indices32;
+}
+
+void ZEMDResource::SetVertexBuffer(const ZEGRBuffer* VertexBuffer, ZEMDVertexType VertexType)
+{
+	zeDebugCheck(VertexType >= ZEMD_VT_COUNT, "Unknown vertex type");
+
+	VertexBuffers[VertexType] = VertexBuffer;
+}
+
+const ZEGRBuffer* ZEMDResource::GetVertexBuffer(ZEMDVertexType VertexType) const
+{
+	zeDebugCheck(VertexType >= ZEMD_VT_COUNT, "Unknown vertex type");
+
+	return VertexBuffers[VertexType];
+}
+
+void ZEMDResource::SetIndexBuffer(const ZEGRBuffer* IndexBuffer, ZEMDVertexIndexType IndexType)
+{
+	zeDebugCheck(IndexType >= ZEMD_VIT_COUNT, "Unknown index type");
+
+	IndexBuffers[IndexType] = IndexBuffer;
+}
+
+const ZEGRBuffer* ZEMDResource::GetIndexBuffer(ZEMDVertexIndexType IndexType) const
+{
+	zeDebugCheck(IndexType >= ZEMD_VIT_COUNT, "Unknown index type");
+
+	return IndexBuffers[IndexType];
 }
 
 ZEMDResource* ZEMDResource::CreateInstance()

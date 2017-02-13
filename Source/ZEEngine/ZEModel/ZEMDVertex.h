@@ -44,17 +44,19 @@
 
 class ZEGRVertexLayout;
 
-enum ZEMDVertexType
+enum ZEMDVertexType					: ZEUInt8
 {
 	ZEMD_VT_NORMAL		= 0,
-	ZEMD_VT_SKINNED		= 1
+	ZEMD_VT_SKINNED		= 1,
+	ZEMD_VT_COUNT		= 2
 };
 
-enum ZEMDVertexIndexType
+enum ZEMDVertexIndexType			: ZEUInt8
 {
 	ZEMD_VIT_NONE		= 0,
-	ZEMD_VIT_16BIT		= 16,
-	ZEMD_VIT_32BIT		= 32
+	ZEMD_VIT_16BIT		= 1,
+	ZEMD_VIT_32BIT		= 2,
+	ZEMD_VIT_COUNT		= 3
 };
 
 ZEPackStruct(
