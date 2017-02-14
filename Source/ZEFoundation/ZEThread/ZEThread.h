@@ -103,6 +103,7 @@ class ZEThread
 
 		void						Destroy();
 
+		static ZEUInt				GetCoreCount();
 		static ZEThread*			GetCurrentThread();
 		static ZEUInt32				GetCurrentThreadId();
 };

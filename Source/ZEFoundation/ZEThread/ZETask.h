@@ -39,7 +39,6 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEList2.h"
 #include "ZEDS\ZEDelegate.h"
-#include "ZEThread.h"
 
 enum  ZETaskPoolId
 {
@@ -58,30 +57,43 @@ enum ZETaskStatus
 	ZE_TS2_DONE			= 3
 };
 
+enum ZETaskInstancingState
+{
+	ZE_TIS_NONE,
+	ZE_TIS_INSTANCING,
+	ZE_TIS_STOPPED
+};
+
 enum ZETaskResult
 {
-	ZE_TR_FAILED		= -1,
-	ZE_TR_COOPERATING	= 0,
-	ZE_TR_DONE			= 1
+	ZE_TR_FAILED			= -1,
+	ZE_TR_COOPERATING		= 0,
+	ZE_TR_DONE				= 1,
+	ZE_TR_STOP_INSTANCING	= 2
 };
 
 class ZETask;
 class ZETaskThread;
 class ZETaskPool;
 
-typedef ZEDelegate<ZETaskResult (ZETaskThread* TaskThread, void* Parameter)> ZETaskFunction;
+typedef ZEDelegate<ZETaskResult (ZETaskThread* TaskThread, ZESize InstanceIndex, void* Parameter)> ZETaskFunction;
 
 class ZETask
 {
-	friend class Manager;
-	friend class ZETaskPool;
+	friend class ZETaskManager;
 	private:
+		ZETaskManager*					Manager;
 		ZEString						Name;
-		ZETaskStatus					Status;
+		volatile ZETaskStatus			Status;
 		ZEInt							PoolId;
+		ZETaskPool*						Pool;
 		ZEInt							Priority;
 		ZELink<ZETask>					Link;
-	
+
+		volatile ZETaskInstancingState	InstancingState;
+		volatile ZESize					RunningInstanceCount;
+		volatile ZESize					LastInstanceIndex;
+
 		ZETaskFunction					Function;
 		void*							Parameter;	
 		
@@ -100,10 +112,11 @@ class ZETask
 		void							SetParameter(void* Parameter);
 		void*							GetParameter() const;
 
-		void							SetPool(ZEInt PoolId);
-		ZEInt							GetPool() const;
+		void							SetPoolId(ZEInt PoolId);
+		ZEInt							GetPoolId() const;
 
 		void							Run();
+		void							RunInstanced();
 		void							Wait();
 
 										ZETask();

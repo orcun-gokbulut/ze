@@ -42,40 +42,45 @@ class ZETask;
 class ZEThread;
 class ZETaskThread;
 
+enum ZETaskSchedulePolicy
+{
+	ZE_TSP_ALWAYS_FIRST,
+	ZE_TSP_ROUND_ROBIN
+};
+
 class ZETaskPool
 {
-	friend class ZETask;
+	friend class ZETaskManager;
 	private:
+		ZETaskManager*					Manager;
 		ZEInt							Id;
 		ZEString						Name;
-		ZEList2<ZETaskThread>			SuspendedThreads;
-		ZEList2<ZETaskThread>			FiringThreads;
-		ZEList2<ZETaskThread>			ActiveThreads;
-		ZEList2<ZETask>					Tasks;
-		ZESize							ThreadCount;
-		ZELock							SchedulerLock;
-
-		// Thread Management
-		ZETaskThread*					RequestThread();
-		void							ReleaseThread(ZETaskThread* Thread);
-
-		// Task Management
-		void							Schedule(ZEThread* Thread, void* ExtraParameter);
-		void							QueueTask(ZETask* Task);
-		void							RunTask(ZETask* Task);
-		void							TaskDestroyed(ZETask* Task);
+		ZEInt							Priority;
+		ZEUInt							ReservedThreadCount;
+		ZEUInt							RemainingReservedThreadCount;
+		ZETaskSchedulePolicy			SchedulingPolicy;
+		
+		ZEList2<ZETask>					QueuedTasks;
+		ZEList2<ZETask>					RunningTasks;
+		ZEList2<ZETask>					InstancingTasks;
 
 	public:
+		ZETaskManager*					GetManager() const;
+
 		void							SetId(ZEInt Id);
-		ZEInt							GetId();
+		ZEInt							GetId() const;
 
 		void							SetName(const ZEString& Name);
-		const ZEString&					GetName();
+		const ZEString&					GetName() const;
 
-		void							SetThreadCount(ZEUInt Count);
-		ZEUInt							GetThreadCount();
+		void							SetSchedulingPolicy(ZETaskSchedulePolicy Policy);
+		ZETaskSchedulePolicy			GetSchedulingPolicy() const;
 
-		const ZEList2<ZETask>&			GetTasks();
+		void							SetReservedThreadCount(ZESize Count);
+		ZEUInt							GetReservedThreadCount() const;
+
+		const ZEList2<ZETask>&			GetRunningTasks() const;
+		const ZEList2<ZETask>&			GetWaitingTasks() const;
 
 										ZETaskPool();
 										~ZETaskPool();

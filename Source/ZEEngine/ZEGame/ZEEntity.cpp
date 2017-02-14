@@ -525,7 +525,7 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox, bool NoEvent)
 		BoundingBoxChanged();
 }
 
-ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters)
+ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, ZESize InstanceIndex, void* Parameters)
 {
 	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetClass()->GetName(), 
@@ -761,7 +761,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 
 void ZEEntity::UpdateStateSerial()
 {
-	while (UpdateStateTaskFunction(NULL, 0) == ZE_TR_COOPERATING);
+	while (UpdateStateTaskFunction(NULL, 0, NULL) == ZE_TR_COOPERATING);
 }
 
 void ZEEntity::UpdateState()

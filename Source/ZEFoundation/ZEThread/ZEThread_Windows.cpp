@@ -210,6 +210,13 @@ ZEThread::~ZEThread()
 	Terminate();
 }
 
+ZEUInt ZEThread::GetCoreCount()
+{
+	SYSTEM_INFO SystemInfo;
+	GetSystemInfo(&SystemInfo);
+	return SystemInfo.dwNumberOfProcessors;
+}
+
 ZEUInt32 ZEThread::GetCurrentThreadId()
 {
 	return ::GetCurrentThreadId();

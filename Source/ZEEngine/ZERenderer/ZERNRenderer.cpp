@@ -608,33 +608,47 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (Command->InstanceTag != NULL)
 	{
 		bool Found = false;
-		ZELink<ZERNCommand>* Temp = CommandListInstanced.GetFirst();
-		while (Temp != NULL)
+		ZELink<ZERNCommand>* InstancedCommand;
+		CommandListInstanced.LockRead();
 		{
-			ZERNCommand* CurrentCommand = Temp->GetItem();
-
-			if (CurrentCommand->InstanceTag == NULL ||
-				CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
-				CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
-				!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+			InstancedCommand = CommandListInstanced.GetFirst();
+			while (InstancedCommand != NULL)
 			{
-				Temp = Temp->GetNext();
-				continue;
-			}
+				ZERNCommand* CurrentCommand = InstancedCommand->GetItem();
 
-			if (Temp != CommandListInstanced.GetFirst())
-			{
-				CommandListInstanced.Remove(Temp);
-				CommandListInstanced.AddBegin(Temp);
-			}
+				if (CurrentCommand->InstanceTag == NULL ||
+					CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
+					CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
+					!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+				{
+					InstancedCommand = InstancedCommand->GetNext();
+					continue;
+				}
 
-			CurrentCommand->Instances.AddEnd(Command->GetFreeLink());
-			Found = true;
-			break;
+				Found = true;
+				break;
+			}
 		}
+		CommandListInstanced.UnlockRead();
 
-		if (!Found)
+		if (Found)
+		{
+			if (InstancedCommand != CommandListInstanced.GetFirst())
+			{
+				CommandListInstanced.LockWrite();
+				{
+					CommandListInstanced.Remove(InstancedCommand);
+					CommandListInstanced.AddBegin(InstancedCommand);
+				}
+				CommandListInstanced.UnlockWrite();
+			}
+
+			InstancedCommand->GetItem()->Instances.AddEnd(Command->GetFreeLink());
+		}
+		else
+		{
 			CommandListInstanced.AddEnd(Command->GetFreeLink());
+		}
 	}
 	else
 	{
