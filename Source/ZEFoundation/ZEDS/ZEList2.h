@@ -39,6 +39,7 @@
 #include "ZEError.h"
 #include "ZELink.h"
 #include "ZEList2Iterator.h"
+#include "ZEList2IteratorAtomic.h"
 #include "ZEThread/ZELockRW.h"
 
 #define ZE_LIST_TEMPLATE template<typename ZEItemType, typename ZELockType>
@@ -60,6 +61,13 @@ class ZEList2
 		ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>	GetIterator(const ZELink<ZEItemType>* Item) const;
 		ZEList2Iterator<ZE_LIST_SPECIALIZATION>			GetIteratorEnd();
 		ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>	GetIteratorEnd() const;
+
+		ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>		GetIteratorAtomic();
+		ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>		GetIteratorAtomic(ZELink<ZEItemType>* Item);
+		ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>	GetIteratorAtomic() const;
+		ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>	GetIteratorAtomic(const ZELink<ZEItemType>* Item) const;
+		ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>		GetIteratorEndAtomic();
+		ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>	GetIteratorEndAtomic() const;
 
 		ZESize								GetCount() const;
 
@@ -88,6 +96,15 @@ class ZEList2
 		void								InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink);
 		
 		void								Remove(ZELink<ZEItemType>* Link);
+
+		void								Push(ZELink<ZEItemType>* Link);
+		ZELink<ZEItemType>*					Pop();
+		ZEItemType*							PopItem();
+
+		void								Enqueue(ZELink<ZEItemType>* Link);
+		ZELink<ZEItemType>*					Dequeue();
+		ZEItemType*							DequeueItem();
+
 		void								Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
 
 		template<typename ZELockTypeOther>
@@ -159,6 +176,42 @@ ZE_LIST_TEMPLATE
 ZEList2IteratorConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorEnd() const
 {
 	return ZEList2IteratorConst<ZE_LIST_SPECIALIZATION>(GetLast());
+}
+
+ZE_LIST_TEMPLATE
+ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorAtomic()
+{
+	return ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>(GetFirst());
+}
+
+ZE_LIST_TEMPLATE
+	ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorAtomic(ZELink<ZEItemType>* Item)
+{
+	return ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>(Item);
+}
+
+ZE_LIST_TEMPLATE
+	ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorAtomic() const
+{
+	return ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>(GetFirst());
+}
+
+ZE_LIST_TEMPLATE
+	ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorAtomic(const ZELink<ZEItemType>* Item) const
+{
+	return ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>(Item);
+}
+
+ZE_LIST_TEMPLATE
+	ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorEndAtomic()
+{
+	return ZEList2IteratorAtomic<ZE_LIST_SPECIALIZATION>(GetLast());
+}
+
+ZE_LIST_TEMPLATE
+	ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION> ZEList2<ZE_LIST_SPECIALIZATION>::GetIteratorEndAtomic() const
+{
+	return ZEList2IteratorAtomicConst<ZE_LIST_SPECIALIZATION>(GetLast());
 }
 
 ZE_LIST_TEMPLATE
@@ -497,6 +550,67 @@ void ZEList2<ZE_LIST_SPECIALIZATION>::Remove(ZELink<ZEItemType>* Link)
 	Count--;
 
 	Lock.UnlockWrite();
+}
+
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::Push(ZELink<ZEItemType>* Link)
+{
+	AddBegin(Link);
+}
+
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::Pop()
+{
+	ZELink<ZEItemType>* Output;
+	
+	Lock.LockWrite();
+	{
+		Output = GetFirst();
+		if (Output != NULL)
+			Remove(Output);
+	}
+	Lock.UnlockWrite();
+
+	return Output;
+}
+
+ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZE_LIST_SPECIALIZATION>::PopItem()
+{
+	ZEItemType* Item;
+
+	Lock.LockWriteNested();
+	{
+		ZELink<ZEItemType>* Link = GetFirst();
+		if (Link == NULL)
+		{
+			Lock.UnlockWrite();
+			return NULL;
+		}
+		Remove(Link);
+		Item = Link->Item;
+	}
+	Lock.UnlockWrite();
+
+	return Item;
+}
+
+ZE_LIST_TEMPLATE
+void ZEList2<ZE_LIST_SPECIALIZATION>::Enqueue(ZELink<ZEItemType>* Link)
+{
+	AddEnd(Link);
+}
+
+ZE_LIST_TEMPLATE
+ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::Dequeue()
+{
+	return Pop();
+}
+
+ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZE_LIST_SPECIALIZATION>::DequeueItem()
+{
+	return PopItem();
 }
 
 ZE_LIST_TEMPLATE

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETaskPool.cpp
+ Zinek Engine - ZEIteratorAtomic.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETaskPool.h"
+#include "ZEIteratorAtomic.h"
 
-#include "ZETask.h"
-#include "ZETaskThread.h"
-#include "ZEError.h"
-#include "ZEDS/ZEFormat.h"
-
-void ZETaskPool::SetId(ZEInt Id)
-{
-	this->Id = Id;
-}
-
-ZEInt ZETaskPool::GetId() const
-{
-	return Id;
-}
-
-void ZETaskPool::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString& ZETaskPool::GetName() const
-{
-	return Name;
-}
-
-void ZETaskPool::SetSchedulingPolicy(ZETaskSchedulePolicy Policy)
-{
-	SchedulingPolicy = Policy;
-}
-
-ZETaskSchedulePolicy ZETaskPool::GetSchedulingPolicy() const
-{
-	return SchedulingPolicy;
-}
-
-void ZETaskPool::SetReservedThreadCount(ZESize Count)
-{
-	ReservedThreadCount = Count;
-}
-
-ZEUInt ZETaskPool::GetReservedThreadCount() const
-{
-	return ReservedThreadCount;
-}
-
-ZETaskPool::ZETaskPool()
-{
-	Manager = NULL;
-	Id = 0;
-	Priority = 0;
-	ReservedThreadCount = 0;
-	RemainingReservedThreadCount = 0;
-	SchedulingPolicy = ZE_TSP_ROUND_ROBIN;
-}
-
-ZETaskPool::~ZETaskPool()
-{
-
-}
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

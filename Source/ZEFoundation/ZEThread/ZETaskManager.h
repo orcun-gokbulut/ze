@@ -36,35 +36,55 @@
 #pragma once
 
 #include "ZEDS/ZEArray.h"
-#include "ZETaskPool.h"
-#include "ZEPointer/ZEPointer.h"
+#include "ZEDS/ZEList2.h"
 
-class ZETask;
 class ZEThread;
+class ZETask;
+class ZETaskPool;
+class ZETaskThread;
 
 class ZETaskManager
 {
+	friend ZETask;
 	private:
-		ZEArray<ZETaskPool*>			Pools;
+		ZEArray<ZETaskPool*>			TaskPools;
 
-		ZETaskPool						DefaultPool;
-		ZETaskPool						RealTimePool;
-		ZETaskPool						IOPool;
-		ZETaskPool						ConcurrentPool;
+		// ThreadPool
+		ZEList2<ZETaskThread>			SuspendedThreads;
+		ZEList2<ZETaskThread>			FiringThreads;
+		ZEList2<ZETaskThread>			ActiveThreads;
+		ZESize							ThreadCount;
+
+		ZELock							SchedulerLock;
+		ZESize							LastScheduledPoolIndex;
+
+		// Thread Management
+		ZETaskThread*					RequestThread();
+		void							ReleaseThread(ZETaskThread* Thread);
+
+		// Task Management
+		ZETask*							RequestTask(ZESize& QueuedTaskCount);
+		void							Scheduler(ZEThread* Thread, void* ExtraParameter);
+		void							SchedulerJoined(ZETask* Task);
+		void							RemoveTask(ZETask* Task);
+
+		void							TerminateTasks();
 
 										ZETaskManager();
 										~ZETaskManager();
 
 	public:
-		static ZETaskPool*				GetRealTimePool();
-		static ZETaskPool*				GetIOPool();
-		static ZETaskPool*				GetConcurrentPool();
-		static ZEUInt					GetThreadCount();
-
-		const ZEArray<ZETaskPool*>&		GetPools();
 		ZETaskPool*						GetPool(ZEInt PoolId);
+		const ZEArray<ZETaskPool*>&		GetPools() const;
 		void							RegisterPool(ZETaskPool* Pool);
-		void							UnregisterPool(ZEInt PoolId);
+		void							UnregisterPool(ZETaskPool* Pool);
+
+		void							SetThreadCount(ZESize Size);
+		ZESize							GetThreadCount() const;
+
+		void							RunTask(ZETask* Task);
+		void							RunTaskInstanced(ZETask* Task, bool UseCurrentThread);
+		void							RunTaskSerial(ZETask* Task);
 
 		static ZETaskManager*			GetInstance();
 };

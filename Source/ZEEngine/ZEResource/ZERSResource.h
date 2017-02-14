@@ -104,7 +104,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		virtual void							Release() const;
 		virtual void							Destroy() const;
 
-		ZETaskResult							UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters);
+		ZETaskResult							UpdateStateFunction(ZETaskThread* TaskThread, ZESize InstanceIndex, void* Parameters);
 		void									UpdateMemoryConsumption();
 
 		bool									UpdateStateSerial();
