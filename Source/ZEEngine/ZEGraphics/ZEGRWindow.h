@@ -93,7 +93,7 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool							CursorLockedState;
 
 		bool							FullScreen;
-		bool							VSynchEnabled;
+		bool							VSyncEnabled;
 
 		bool							Focused;
 		bool							Minimized;
@@ -145,8 +145,8 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void							SetFullScreen(bool FullScreen);
 		bool							GetFullScreen() const;
 
-		void							SetVSynchEnabled(bool Enabled);
-		bool							GetVSynchEnabled() const;
+		void							SetVSyncEnabled(bool Enabled);
+		bool							GetVSyncEnabled() const;
 
 		void							SetVisible(bool Visible);
 		bool							GetVisible() const;
