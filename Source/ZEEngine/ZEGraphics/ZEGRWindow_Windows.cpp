@@ -359,9 +359,9 @@ void ZEGRWindow::SetFullScreen(bool FullScreen)
 		OnWindowed();
 }
 
-void ZEGRWindow::SetVSynchEnabled(bool VSynchEnable)
+void ZEGRWindow::SetVSyncEnabled(bool VSyncEnable)
 {
-	this->VSynchEnabled = VSynchEnable;
+	this->VSyncEnabled = VSyncEnable;
 }
 
 void ZEGRWindow::SetVisible(bool Visible)

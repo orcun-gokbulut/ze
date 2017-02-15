@@ -188,6 +188,6 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 void ZED11Output::Present()
 {
 	LockContext();
-	SwapChain->Present(0, 0);
+	SwapChain->Present(GetWindow()->GetVSyncEnabled() ? 1 : 0, 0);
 	UnlockContext();
 }

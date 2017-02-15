@@ -342,9 +342,9 @@ bool ZEGRWindow::GetManageInputAcquisition() const
 	return ManageInputAcquisition;
 }
 
-bool ZEGRWindow::GetVSynchEnabled() const
+bool ZEGRWindow::GetVSyncEnabled() const
 {
-	return VSynchEnabled;
+	return VSyncEnabled;
 }
 
 ZEGROutput* ZEGRWindow::GetOutput() const
@@ -414,7 +414,7 @@ ZEGRWindow::ZEGRWindow()
 	CursorLockedState = false;
 
 	FullScreen = false;
-	VSynchEnabled = false;
+	VSyncEnabled = false;
 
 	Focused = false;
 	Minimized = false;
