@@ -41,7 +41,7 @@
 
 struct ZEEventConnection 
 {
-	ZEEventBase*					Event;
+	ZEMTEventBase*					Event;
 	ZESize							Count;
 };
 
@@ -80,7 +80,7 @@ void ZEObject::CloneEventConnections(ZEObject* Other)
 	}
 }
 
-void ZEObject::AddEventConnection(ZEEventBase* Event)
+void ZEObject::AddEventConnection(ZEMTEventBase* Event)
 {
 	zeDebugCheck(Event == NULL, "Cannot add event connection. Event is NULL.");
 	
@@ -108,7 +108,7 @@ void ZEObject::AddEventConnection(ZEEventBase* Event)
 	EventConnectionsCasted.UnlockWrite();
 }
 
-void ZEObject::RemoveEventConnection(ZEEventBase* Event)
+void ZEObject::RemoveEventConnection(ZEMTEventBase* Event)
 {
 	zeDebugCheck(Event == NULL, "Cannot remove event connection. Event is NULL.");
 		

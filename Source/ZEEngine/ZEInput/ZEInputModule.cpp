@@ -36,7 +36,7 @@
 #include "ZEInputModule.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 
 #include "ZECore/ZECore.h"
 #include "ZEInputDevice.h"
@@ -102,7 +102,7 @@ bool ZEInputModule::InitializeInternal()
 	zeLog("Initializing Input.");
 
 	zeLog("Loading Input Device modules.");
-	ZEArray<ZEClass*> DeviceModuleClasses = ZEProvider::GetInstance()->GetClasses(ZEInputDeviceModule::Class(), true);
+	ZEArray<ZEClass*> DeviceModuleClasses = ZEMTProvider::GetInstance()->GetClasses(ZEInputDeviceModule::Class(), true);
 
 	for (ZESize I = 0; I < DeviceModuleClasses.GetCount(); I++)
 	{

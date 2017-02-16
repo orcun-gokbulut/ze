@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
 
 enum ZEModelAnimationBlendMode
 {

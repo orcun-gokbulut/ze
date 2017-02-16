@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethodSignatureGenerator.h
+ Zinek Engine - ZEMTRegistar.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEMTRegistar.h"
 
-#include "ZEMethodSignature.h"
-#include "ZEPropertySignatureGenerator.h"
-
-template<typename TSignature>
-class ZEMethodSignatureGenerator;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEMeta/ZEMethodSignatureGeneratorImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

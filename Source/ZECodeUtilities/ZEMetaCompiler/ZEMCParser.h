@@ -104,10 +104,10 @@ class ZEMCParser
 		bool							IsEvent();
 
 		// Processors
-		ZEMCMetaOperatorType			GetOperatorType(OverloadedOperatorKind OperatorKind);
+		ZEMCOperatorType				GetOperatorType(OverloadedOperatorKind OperatorKind);
 		void							ProcessDeclaration(Decl* BaseDeclaration);
+		bool							ProcessCommands(Decl* Declaration);
 		void							ProcessEnumerator(EnumDecl* EnumDeclaration);
-		bool							ProcessForwardDeclaration(CXXRecordDecl* ClassDeclaration);
 		void							ProcessClass(CXXRecordDecl* ClassDeclaration);
 		void							ProcessClassAttributes(ZEMCClass* ClassData, CXXRecordDecl* ClassDeclaration);
 

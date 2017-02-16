@@ -80,11 +80,86 @@ void ZEMCParser::RaiseCriticalError(SourceLocation& Location, const char* ErrorT
 
 void ZEMCParser::ProcessDeclaration(Decl* BaseDeclaration)
 {
-	if(isa<EnumDecl>(BaseDeclaration) && BaseDeclaration)
-		ProcessEnumerator(dyn_cast<EnumDecl>(BaseDeclaration));
+	if (BaseDeclaration == NULL)
+		return;
 
-	if (isa<CXXRecordDecl>(BaseDeclaration) && BaseDeclaration)
+	if (ProcessCommands(BaseDeclaration))
+		return;
+
+	if(isa<EnumDecl>(BaseDeclaration))
+	{
+		ProcessEnumerator(dyn_cast<EnumDecl>(BaseDeclaration));
+		return;
+	}
+
+	if (isa<CXXRecordDecl>(BaseDeclaration))
+	{
 		ProcessClass(dyn_cast<CXXRecordDecl>(BaseDeclaration));
+		return;
+	}
+}
+
+bool ZEMCParser::ProcessCommands(Decl* Declaration)
+{
+	ZEMCAttribute AttributeData;
+	for (RecordDecl::attr_iterator CurrentAttr = Declaration->attr_begin(), LastAttr = Declaration->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
+	{
+
+		if (!AnnotateAttr::classof(*CurrentAttr))
+			continue;
+
+		ParseAttribute(AttributeData, static_cast<AnnotateAttr*>(*CurrentAttr));
+
+		if (AttributeData.Name == "ZEMC.ForwardDeclare")
+		{
+			bool Found = false;
+			for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
+			{
+				if (Context->ForwardDeclarations[I]->Name == AttributeData.Values[0])
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (Found)
+				continue;
+
+			ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
+			if (isa<EnumDecl>(Declaration))
+				ForwardDeclaredClass->Type = ZEMC_DT_ENUMERATOR;
+			else if (isa<CXXRecordDecl>(Declaration))
+				ForwardDeclaredClass->Type = ZEMC_DT_CLASS;
+
+			ForwardDeclaredClass->Name = AttributeData.Values[0].ToCString();
+			Context->ForwardDeclarations.Add(ForwardDeclaredClass);
+
+			return true;
+		}
+		else if (AttributeData.Name == "ZEMC.Include")
+		{
+			bool Found = false;
+			for (ZESize I = 0; I < Context->Includes.GetCount(); I++)
+			{
+				if (Context->Includes[I]->HeaderFileName == AttributeData.Values[0])
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (Found)
+				continue;
+
+			ZEMCInclude* Include = new ZEMCInclude();
+			Include->HeaderFileName = AttributeData.Values[0].ToCString();
+			Context->Includes.Add(Include);
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)

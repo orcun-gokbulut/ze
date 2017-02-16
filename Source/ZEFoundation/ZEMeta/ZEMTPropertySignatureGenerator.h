@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPropertySignatureGenerator.h
+ Zinek Engine - ZEMTPropertySignatureGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,219 +37,219 @@
 
 #include "ZETypes.h"
 #include "ZEClass.h"
-#include "ZEPropertySignature.h"
+#include "ZEMTPropertySignature.h"
 
 #include <type_traits>
-#include "ZEProvider.h"
+#include "ZEMTProvider.h"
 
 template <typename T>
-class ZEPropertySignatureGenerator;
+class ZEMTPropertySignatureGenerator;
 
 template <typename T>
-class ZEPropertySignatureGenerator<const T>
+class ZEMTPropertySignatureGenerator<const T>
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
+			ZEMTPropertySignature Type = ZEMTPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_VALUE;
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEPropertySignatureGenerator<T *>
+class ZEMTPropertySignatureGenerator<T *>
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
+			ZEMTPropertySignature Type = ZEMTPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_POINTER;
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEPropertySignatureGenerator<const T *>
+class ZEMTPropertySignatureGenerator<const T *>
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
+			ZEMTPropertySignature Type = ZEMTPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_POINTER;
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEPropertySignatureGenerator<T &>
+class ZEMTPropertySignatureGenerator<T &>
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
+			ZEMTPropertySignature Type = ZEMTPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_REFERENCE;
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEPropertySignatureGenerator<const T &>
+class ZEMTPropertySignatureGenerator<const T &>
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type = ZEPropertySignatureGenerator<T>::GetType();
+			ZEMTPropertySignature Type = ZEMTPropertySignatureGenerator<T>::GetType();
 			Type.CanonicalType = ZE_CT_CONST_REFERENCE;
 			return Type;
 		}
 };
 
 template <>
-class ZEPropertySignatureGenerator<void>
+class ZEMTPropertySignatureGenerator<void>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEUInt8>
+class ZEMTPropertySignatureGenerator<ZEUInt8>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEUInt16>
+class ZEMTPropertySignatureGenerator<ZEUInt16>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEUInt32>
+class ZEMTPropertySignatureGenerator<ZEUInt32>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEUInt64>
+class ZEMTPropertySignatureGenerator<ZEUInt64>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEInt8>
+class ZEMTPropertySignatureGenerator<ZEInt8>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEInt16>
+class ZEMTPropertySignatureGenerator<ZEInt16>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEInt32>
+class ZEMTPropertySignatureGenerator<ZEInt32>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEInt64>
+class ZEMTPropertySignatureGenerator<ZEInt64>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<float>
+class ZEMTPropertySignatureGenerator<float>
 {
 	public:
-		static ZEPropertySignature GetType();
-};
-
-
-template <>
-class ZEPropertySignatureGenerator<double>
-{
-	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 
 template <>
-class ZEPropertySignatureGenerator<bool>
+class ZEMTPropertySignatureGenerator<double>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
+};
+
+
+template <>
+class ZEMTPropertySignatureGenerator<bool>
+{
+	public:
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEVector2>
+class ZEMTPropertySignatureGenerator<ZEVector2>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEVector3>
+class ZEMTPropertySignatureGenerator<ZEVector3>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEVector4>
+class ZEMTPropertySignatureGenerator<ZEVector4>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEQuaternion>
+class ZEMTPropertySignatureGenerator<ZEQuaternion>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEMatrix3x3>
+class ZEMTPropertySignatureGenerator<ZEMatrix3x3>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEMatrix4x4>
+class ZEMTPropertySignatureGenerator<ZEMatrix4x4>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 template <>
-class ZEPropertySignatureGenerator<ZEString>
+class ZEMTPropertySignatureGenerator<ZEString>
 {
 	public:
-		static ZEPropertySignature GetType();
+		static ZEMTPropertySignature GetType();
 };
 
 
 template <typename T>
-class ZEPropertySignatureGenerator
+class ZEMTPropertySignatureGenerator
 {
 	public:
-		static ZEPropertySignature GetType()
+		static ZEMTPropertySignature GetType()
 		{
-			ZEPropertySignature Type;
+			ZEMTPropertySignature Type;
 			
-			Type.BaseClass = ZEProvider::GetInstance()->GetClass(typeid(T).name());
+			Type.BaseClass = ZEMTProvider::GetInstance()->GetClass(typeid(T).name());
 			if (Type.BaseClass == NULL)
 				Type.Type = ZE_VRT_UNDEFINED;
 

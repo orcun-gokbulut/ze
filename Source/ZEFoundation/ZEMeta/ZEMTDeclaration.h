@@ -37,7 +37,7 @@
 
 #include "ZETypes.h"
 
-struct ZEAttribute;
+struct ZEMTAttribute;
 class ZEGUID;
 
 enum ZEMTDeclarationType
@@ -56,10 +56,10 @@ class ZEMTDeclaration
 
 		virtual const char*					GetName() const = 0;
 		virtual const ZEGUID&				GetGUID() const = 0;
-		virtual const ZEAttribute*			GetAttributes() const = 0;
+		virtual const ZEMTAttribute*			GetAttributes() const = 0;
 		virtual ZESize						GetAttributeCount() const = 0;
 
-		const ZEAttribute*					GetAttribute(const char* Name) const;
+		const ZEMTAttribute*					GetAttribute(const char* Name) const;
 		const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;
 
 		bool								CheckAttribute(const char* Name) const;

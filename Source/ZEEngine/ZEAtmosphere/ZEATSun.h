@@ -106,7 +106,7 @@ class ZEATSun : public ZEEntity
 
 		static ZEATSun*					CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false)
-ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
+ZEMT_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false)
+ZEMT_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color");

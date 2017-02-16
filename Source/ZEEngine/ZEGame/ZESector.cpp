@@ -41,7 +41,7 @@
 #include "ZEFile\ZEPathManager.h"
 #include "ZEDS\ZEFormat.h"
 #include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEProvider.h"
+#include "ZEMeta\ZEMTProvider.h"
 
 void ZESector::SetManager(ZESectorManager* Manager)
 {
@@ -106,7 +106,7 @@ ZEEntityResult ZESector::LoadInternal()
 	{
 		ZEMLReaderNode ChildEntityNode = SubEntitiesNode.GetNode("Entity", I);
 
-		ZEClass* NewChildEntityClass = ZEProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
+		ZEClass* NewChildEntityClass = ZEMTProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
 		zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
 			GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
 
@@ -377,18 +377,18 @@ bool ZESector::Serialize(ZEMLWriterNode* Serializer)
 	BoundingBoxNode.WriteVector3("Min", GetBoundingBox().Min);
 	BoundingBoxNode.CloseNode();
 
-	const ZEProperty* Properties = GetClass()->GetProperties();
+	const ZEMTProperty* Properties = GetClass()->GetProperties();
 
 	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 	{
-		const ZEProperty* Current = &Properties[I];
-		if (Current->Type.ContainerType != ZE_CT_NONE)
+		const ZEMTProperty* Current = &Properties[I];
+		if (Current->Type.ContainerType != ZEMT_CT_NONE)
 			continue;
 
-		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+		if (Current->Type.TypeQualifier != ZEMT_TQ_VALUE)
 			continue;
 
-		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+		if (Current->Type.Type == ZEMT_TT_OBJECT || Current->Type.Type == ZEMT_TT_OBJECT_PTR)
 			continue;
 
 		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)

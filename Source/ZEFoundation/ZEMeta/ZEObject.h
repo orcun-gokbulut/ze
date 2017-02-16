@@ -37,7 +37,8 @@
 
 #include "ZEClass.h"
 
-#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE(ZEMC.ForwardDeclaration, #ClassName, IncludeFile) ClassName;
+#define ZEMT_INCLUDE(IncludeFile) ZEMT_ATTRIBUTE_GLOBAL(ZEMC.Include, IncludeFile)
+#define ZEMT_FORWARD_DECLARE(ClassName) class ZEMT_ATTRIBUTE(ZEMC.ForwardDeclare, #ClassName) ClassName
 
 #define ZE_OBJECT \
 	public: \
@@ -45,7 +46,7 @@
 		static ZEClass*				Class(); \
 	private:
 		
-#define ZE_META_OBJECT_IMPLEMENTATION(ClassName) \
+#define ZEMT_OBJECT_IMPLEMENTATION(ClassName) \
 	ZEClass* ClassName::GetClass() const \
 	{ \
 		return ClassName::Class(); \
@@ -62,7 +63,7 @@
 		return ClassName::Class(); \
 	}
 
-class ZEEventBase;
+class ZEMTEventBase;
 
 class ZEObject
 {
@@ -71,8 +72,8 @@ class ZEObject
 		void*						EventConnections;
 	
 		void						CloneEventConnections(ZEObject* Other);
-		void						AddEventConnection(ZEEventBase* Event);
-		void						RemoveEventConnection(ZEEventBase* Event);
+		void						AddEventConnection(ZEMTEventBase* Event);
+		void						RemoveEventConnection(ZEMTEventBase* Event);
 
 	public:
 		virtual	ZEClass*			GetClass() const;
@@ -84,9 +85,9 @@ class ZEObject
 									ZEObject(const ZEObject& Object);
 									~ZEObject();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEObject.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
-ZE_META_ATTRIBUTE_MEMBER(*, ZEMC.Export, true)
-ZE_META_ATTRIBUTE_MEMBER(~*, ZEMC.Accessor, true)
-ZE_META_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)
-ZE_META_ATTRIBUTE_MEMBER(@*, ZEDEditor.PropertyEditor.Display, true);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEObject.png")
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
+ZEMT_ATTRIBUTE_MEMBER(*, ZEMC.Export, true)
+ZEMT_ATTRIBUTE_MEMBER(~*, ZEMC.Accessor, true)
+ZEMT_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)
+ZEMT_ATTRIBUTE_MEMBER(@*, ZEDEditor.PropertyEditor.Display, true);

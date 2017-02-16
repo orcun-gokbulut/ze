@@ -194,53 +194,8 @@ bool ZEMCParser::CheckTargetDeclaration(Decl* Declaration)
 	return (CurrentFileID == MainFileId);
 }
 
-bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
-{
-	if (Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
-	{
-		ZEMCAttribute AttributeData;
-		for (CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-		{
-			if (!AnnotateAttr::classof(*CurrentAttr))
-				continue;
-
-			ParseAttribute(AttributeData, static_cast<AnnotateAttr*>(*CurrentAttr));
-
-			if (AttributeData.Name == "ZEMC.ForwardDeclaration")
-			{
-				bool Found = false;
-				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
-				{
-					if (Context->ForwardDeclarations[I]->ClassName == AttributeData.Values[0])
-					{
-						Found = true;
-						break;
-					}
-				}
-
-				if (!Found)
-				{
-					ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
-
-					ForwardDeclaredClass->ClassName = AttributeData.Values[0].ToCString();
-					ForwardDeclaredClass->HeaderName = AttributeData.Values[1].ToCString();
-
-					Context->ForwardDeclarations.Add(ForwardDeclaredClass);
-
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
 void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 {
-	if (ProcessForwardDeclaration(Class))
-		return;
-
 	if (!Class->isCompleteDefinition())
 		return;
 

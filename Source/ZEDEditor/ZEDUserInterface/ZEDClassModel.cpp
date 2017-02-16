@@ -37,7 +37,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEMeta/ZEClass.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEDCore/ZEDObjectEvent.h"
@@ -77,7 +77,7 @@ bool ZEDClassModel::Filter(ZEClass* Class) const
 
 bool ZEDClassModel::FilterForward(ZEClass* Class) const
 {
-	const ZEArray<ZEClass*>& Classes = ZEProvider::GetInstance()->GetClasses();
+	const ZEArray<ZEClass*>& Classes = ZEMTProvider::GetInstance()->GetClasses();
 	for (ZESize I = 0; I < Classes.GetCount(); I++)
 	{
 		if (Classes[I]->GetParentClass() != Class)
@@ -261,7 +261,7 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 			return QModelIndex();
 
 		ZESize Index = 0;
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
@@ -286,7 +286,7 @@ QModelIndex ZEDClassModel::index(int Row, int Column, const QModelIndex& Parent)
 	}
 	else if (Mode == ZED_CMM_LIST)
 	{
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			if (Row >= Classes.GetCount())
@@ -334,7 +334,7 @@ QModelIndex ZEDClassModel::parent(const QModelIndex& Child) const
 
 		int Index = 0;
 		ZEClass* GrandParentClass = ParentClass->GetParentClass();
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
@@ -374,7 +374,7 @@ bool ZEDClassModel::hasChildren(const QModelIndex& Parent) const
 		if (ParentClass == NULL)
 			return false;
 
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
@@ -416,7 +416,7 @@ int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 			return 0;
 
 		int Count = 0;
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			for (ZESize I = 0; I < Classes.GetCount(); I++)
@@ -440,7 +440,7 @@ int ZEDClassModel::rowCount(const QModelIndex& Parent) const
 			return 0;
 
 		int Count = 0;
-		const ZEArray<ZEClass*> Classes = ZEProvider::GetInstance()->GetClasses();
+		const ZEArray<ZEClass*> Classes = ZEMTProvider::GetInstance()->GetClasses();
 		Classes.LockRead();
 		{
 			for (ZESize I = 0; I < Classes.GetCount(); I++)

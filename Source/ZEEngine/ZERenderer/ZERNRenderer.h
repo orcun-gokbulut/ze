@@ -45,8 +45,8 @@
 #include "ZERNStageID.h"
 #include "ZEModel/ZEMDVertex.h"
 
-ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
-ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
+ZEMT_FORWARD_DECLARE(ZEScene);
+ZEMT_FORWARD_DECLARE(ZERNStage);
 
 class ZERNCommand;
 class ZEGRContext;

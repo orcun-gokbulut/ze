@@ -36,7 +36,7 @@
 #include "ZEMTDeclaration.h"
 
 #include "ZEGUID.h"
-#include "ZEAttribute.h"
+#include "ZEMTAttribute.h"
 
 #include <string.h>
 
@@ -46,10 +46,10 @@ const ZEGUID& ZEMTDeclaration::GetGUID() const
 	return ZEGUID::Zero;
 }
 
-const ZEAttribute* ZEMTDeclaration::GetAttribute(const char* Name) const
+const ZEMTAttribute* ZEMTDeclaration::GetAttribute(const char* Name) const
 {
 	ZESize AttributeCount = GetAttributeCount();
-	const ZEAttribute* Attributes = GetAttributes();
+	const ZEMTAttribute* Attributes = GetAttributes();
 
 	for (ZESize I = 0; I < AttributeCount; I++)
 	{
@@ -62,7 +62,7 @@ const ZEAttribute* ZEMTDeclaration::GetAttribute(const char* Name) const
 
 const char* ZEMTDeclaration::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue) const
 {
-	const ZEAttribute* Attribute = GetAttribute(Name);
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
 	if (Attribute == NULL)
 		return DefaultValue;
 
@@ -74,7 +74,7 @@ const char* ZEMTDeclaration::GetAttributeValue(const char* Name, ZESize Index, c
 
 bool ZEMTDeclaration::CheckAttribute(const char* Name) const
 {
-	const ZEAttribute* Attribute = GetAttribute(Name);
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
 	if (Attribute != NULL)
 		return true;
 
@@ -83,7 +83,7 @@ bool ZEMTDeclaration::CheckAttribute(const char* Name) const
 
 bool ZEMTDeclaration::CheckAttributeHasValue(const char* Name, const char* Value) const
 {
-	const ZEAttribute* Attribute = GetAttribute(Name);
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
 	if (Attribute == NULL)
 		return false;
 

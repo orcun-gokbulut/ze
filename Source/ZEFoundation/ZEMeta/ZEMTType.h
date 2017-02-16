@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProperty.h
+ Zinek Engine - ZEMTType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,43 +35,75 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEType.h"
-
-class ZEClass;
-struct ZEAttribute;
-struct ZEEnum;
-
-enum ZEPropertyAccess
+enum ZEMTTypeType
 {
-	ZEMT_PA_NONE		= 0,
-	ZEMT_PA_READ		= 1,
-	ZEMT_PA_WRITE		= 2,
-	ZEMT_PA_READ_WRITE	= 3
+	ZEMT_TT_UNDEFINED				= 0,
+	ZEMT_TT_VOID					= 1,
+	ZEMT_TT_INTEGER_8				= 2,
+	ZEMT_TT_INTEGER_16				= 3,
+	ZEMT_TT_INTEGER_32				= 4,
+	ZEMT_TT_INTEGER_64				= 5,
+	ZEMT_TT_UNSIGNED_INTEGER_8		= 6,
+	ZEMT_TT_UNSIGNED_INTEGER_16		= 7,
+	ZEMT_TT_UNSIGNED_INTEGER_32		= 8,
+	ZEMT_TT_UNSIGNED_INTEGER_64		= 9,
+	ZEMT_TT_FLOAT					= 10,
+	ZEMT_TT_DOUBLE					= 11,
+	ZEMT_TT_BOOLEAN					= 12,
+	ZEMT_TT_STRING					= 13,
+	ZEMT_TT_QUATERNION				= 14,
+	ZEMT_TT_VECTOR2					= 15,
+	ZEMT_TT_VECTOR2D				= 16,
+	ZEMT_TT_VECTOR3					= 17,
+	ZEMT_TT_VECTOR3D				= 18,
+	ZEMT_TT_VECTOR4					= 19,
+	ZEMT_TT_VECTOR4D				= 20,
+	ZEMT_TT_MATRIX3X3				= 21,
+	ZEMT_TT_MATRIX3X3D				= 22,
+	ZEMT_TT_MATRIX4X4				= 23,
+	ZEMT_TT_MATRIX4X4D				= 24,
+	ZEMT_TT_OBJECT					= 25,
+	ZEMT_TT_OBJECT_PTR				= 26,
+	ZEMT_TT_ENUMERATOR				= 27,
+	ZEMT_TT_CLASS					= 28
 };
 
-struct ZEProperty
+enum ZEMTTypeQualifier
 {
-	ZESize								ID;
-	ZEClass*							MemberOf;
+	ZEMT_TQ_VALUE,
+	ZEMT_TQ_CONST_VALUE,
+	ZEMT_TQ_REFERENCE,
+	ZEMT_TQ_CONST_REFERENCE
+};
 
-	const char*							Name;
-	ZEUInt32							Hash;
-	void*								OffsetOrAddress;
-	ZEType								Type;
+enum ZEMTContainerType
+{
+	ZEMT_CT_NONE,
+	ZEMT_CT_ARRAY,
+	ZEMT_CT_LIST,
+	ZEMT_CT_CONTAINER
+};
 
-	ZEPropertyAccess					Access;
+class ZEClass;
+class ZEMTEnumerator;
 
-	bool								IsGenerated;
-	bool								IsContainer;
-	bool								IsStatic;
+class ZEMTType
+{
+	public:
+		ZEMTTypeType			Type;
+		ZEMTTypeQualifier		TypeQualifier;
+		ZEMTContainerType		ContainerType;
 
-	ZEAttribute*						Attributes;
-	ZESize								AttributeCount;
+		ZEClass*				Class;
+		ZEMTEnumerator*			Enumerator;
 
-	const ZEAttribute*					GetAttribute(const char* Name) const;
-	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;
+		bool					operator==(const ZEMTType& Other) const;
+		bool					operator!=(const ZEMTType& Other) const;
 
-	bool								CheckAttribute(const char* Name) const;
-	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;
+		static bool				Equal(const ZEMTType& A, const ZEMTType& B);
+
+								ZEMTType();
+								ZEMTType(ZEMTTypeType Type, ZEMTTypeQualifier TypeQualifier, 
+									ZEMTContainerType ContainerType, 
+									ZEClass* Class, ZEMTEnumerator* Enumerator);
 };

@@ -42,18 +42,18 @@ void ZEMCGenerator::GenerateEnumeratorMacros(ZEMCEnumerator* CurrentEnumerator)
 	WriteToFile("// %s\n", CurrentEnumerator->Name.ToCString());
 	WriteToFile("////////////////////////////////////////////////////////////////////////////////////////\n\n");
 
-	WriteToFile("ZE_META_ENUMERATOR_IMPLEMENTATION(%s);\n", CurrentEnumerator->Name.ToCString());
-	WriteToFile("ZE_META_ENUMERATOR_DECLARATION(%s);\n\n", CurrentEnumerator->Name.ToCString());
+	WriteToFile("ZEMT_ENUMERATOR_IMPLEMENTATION(%s);\n", CurrentEnumerator->Name.ToCString());
+	WriteToFile("ZEMT_ENUMERATOR_DECLARATION(%s);\n\n", CurrentEnumerator->Name.ToCString());
 }
 
 void ZEMCGenerator::GenerateEnumeratorGetItems(ZEMCEnumerator* CurrentEnumerator)
 {
-	WriteToFile("const ZEEnumeratorItem* %sEnumerator::GetItems() const\n"
+	WriteToFile("const ZEMTEnumeratorItem* %sEnumerator::GetItems() const\n"
 		"{\n", CurrentEnumerator->Name.ToCString());
 
 	if (CurrentEnumerator->Items.GetCount() != 0)
 	{
-		WriteToFile("\tstatic ZEEnumeratorItem Items[%d] =\n"
+		WriteToFile("\tstatic ZEMTEnumeratorItem Items[%d] =\n"
 			"\t{\n", 
 			CurrentEnumerator->Items.GetCount());
 

@@ -45,9 +45,9 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
-ZE_META_FORWARD_DECLARE(ZEModelMesh,"ZEModelMesh.h")
-ZE_META_FORWARD_DECLARE(ZEModelBone,"ZEModelBone.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
+ZEMT_FORWARD_DECLARE(ZEModelMesh);
+ZEMT_FORWARD_DECLARE(ZEModelBone);
 
 enum ZEModelHelperParentType
 {

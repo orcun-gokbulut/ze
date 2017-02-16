@@ -95,7 +95,7 @@ const ZEGUID& ZEClass::GetGUID() const
 	return ZEGUID::Zero;
 }
 
-const ZEAttribute* ZEClass::GetAttributes() const
+const ZEMTAttribute* ZEClass::GetAttributes() const
 {
 	return NULL;
 }
@@ -110,37 +110,37 @@ ZEClass* ZEClass::GetParentClass()
 	return NULL;
 }
 
-ZEClassFlags ZEClass::GetFlags()
+ZEMTClassFlags ZEClass::GetFlags()
 {
-	return ZE_CF_CREATE_INSTANCE | ZE_CF_DESTROY | ZE_CF_ASSIGN | ZE_CF_CLONE | ZE_CF_CONSTRUCT | ZE_CF_DECONSTRUCT;
+	return ZEMT_CF_CREATE_INSTANCE | ZEMT_CF_DESTROY | ZEMT_CF_ASSIGN | ZEMT_CF_CLONE | ZEMT_CF_CONSTRUCT | ZEMT_CF_DECONSTRUCT;
 }
 
 bool ZEClass::IsAbstract()
 {
-	return (GetFlags() & ZE_CF_ABSTRACT) != 0;
+	return (GetFlags() & ZEMT_CF_ABSTRACT) != 0;
 }
 
 bool ZEClass::IsFundamental()
 {
-	return (GetFlags() & ZE_CF_FUNDAMENTAL) != 0;
+	return (GetFlags() & ZEMT_CF_FUNDAMENTAL) != 0;
 }
 
 bool ZEClass::IsDynamic()
 {
-	return (GetFlags() & ZE_CF_SCRIPT) != 0;
+	return (GetFlags() & ZEMT_CF_SCRIPT) != 0;
 }
 
 bool ZEClass::IsValueObject()
 {
-	return (GetFlags() & ZE_CF_VALUE_OBJECT) != 0;
+	return (GetFlags() & ZEMT_CF_VALUE_OBJECT) != 0;
 }
 
 bool ZEClass::IsCloneable()
 {
-	return (GetFlags() & ZE_CF_CLONE) != 0;
+	return (GetFlags() & ZEMT_CF_CLONE) != 0;
 }
 
-const ZEProperty* ZEClass::GetProperties()
+const ZEMTProperty* ZEClass::GetProperties()
 {
 	return NULL;
 }
@@ -150,7 +150,7 @@ ZESize ZEClass::GetPropertyCount()
 	return 0;
 }
 
-const ZEProperty* ZEClass::GetPropertyDescription(ZESize PropertyId)
+const ZEMTProperty* ZEClass::GetPropertyDescription(ZESize PropertyId)
 {
 	if (PropertyId >= GetPropertyCount())
 		return NULL;
@@ -158,7 +158,7 @@ const ZEProperty* ZEClass::GetPropertyDescription(ZESize PropertyId)
 	return &GetProperties()[PropertyId];
 }
 
-const ZEProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName)
+const ZEMTProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName)
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == (ZESize)-1)
@@ -167,7 +167,7 @@ const ZEProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName)
 	return &GetProperties()[PropertyId];
 }
 
-const ZEMethod* ZEClass::GetMethods()
+const ZEMTMethod* ZEClass::GetMethods()
 {
 	return NULL;
 }
@@ -459,11 +459,11 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 {
 	for (ZESize I = 0; I < GetPropertyCount(); I++)
 	{
-		const ZEProperty* Property = GetProperties() + I;
+		const ZEMTProperty* Property = GetProperties() + I;
 		if (Property->Access != ZEMT_PA_READ_WRITE)
 			continue;
 
-		const ZEProperty* PropertyDescription = GetPropertyDescription(I);
+		const ZEMTProperty* PropertyDescription = GetPropertyDescription(I);
 		if (PropertyDescription == NULL)
 			continue;
 
@@ -474,7 +474,7 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 		if (PropertyDescription->Type.Enumerator != NULL)
 		{
 			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
+			const ZEMTEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
 
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{
@@ -527,7 +527,7 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 		if (Element->ElementType != ZEML_ET_PROPERTY)
 			continue;
 
-		const ZEProperty* PropertyDescription = GetPropertyDescription(Element->Name);
+		const ZEMTProperty* PropertyDescription = GetPropertyDescription(Element->Name);
 		if (PropertyDescription == NULL)
 		{
 			zeWarning("Property not found. Class Name: \"%s\", Property Name: \"%s\", ZEML Path: \"%s\".", 
@@ -541,7 +541,7 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.Enumerator != NULL)
 		{
 			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
+			const ZEMTEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
 
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{

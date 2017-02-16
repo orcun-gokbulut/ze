@@ -37,7 +37,7 @@
 
 #include "ZEDPropertyEditorItemString.h"
 
-#include "ZEMeta/ZEProperty.h"
+#include "ZEMeta/ZEMTProperty.h"
 #include "ZEDPropertyEditor.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 
@@ -56,8 +56,8 @@ bool ZEDPropertyEditorItemString::InitializeInternal()
 		return false;
 	}
 
-	const ZEProperty* Property = GetProperty();
-	if (Property->Type.Type != ZE_TT_STRING)
+	const ZEMTProperty* Property = GetProperty();
+	if (Property->Type.Type != ZEMT_TT_STRING)
 	{
 		setText(1, "Type Error");
 		return false;

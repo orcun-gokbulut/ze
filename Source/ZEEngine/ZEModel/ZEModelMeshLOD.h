@@ -52,7 +52,7 @@ class ZERNMaterial;
 class ZERNRenderer;
 class ZERNRenderParameters;
 
-ZE_META_FORWARD_DECLARE(ZEMDResourceLOD, "ZEMDResourceLOD.h")
+ZEMT_FORWARD_DECLARE(ZEMDResourceLOD);
 
 class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 {

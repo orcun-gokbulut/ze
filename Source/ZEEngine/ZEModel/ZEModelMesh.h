@@ -53,7 +53,7 @@ class ZEGRBuffer;
 class ZERayCastParameters;
 class ZERayCastReport;
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
 
 class ZEModelMesh : public ZEObject, public ZEDestroyable
 {

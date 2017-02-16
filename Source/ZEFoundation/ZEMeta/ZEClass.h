@@ -34,32 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CLASS_H__
-#define __ZE_CLASS_H__
 
 #include "ZEMTDeclaration.h"
 
-#include "ZEAttribute.h"
-#include "ZEProperty.h"
-#include "ZEMethod.h"
-#include "ZEEnumerator.h"
+#include "ZEMTAttribute.h"
+#include "ZEMTProperty.h"
+#include "ZEMTMethod.h"
 #include "ZETypes.h"
 #include "ZEGUID.h"
-#include "ZEDS\ZEFlags.h"
+#include "ZEEnumerator.h"
+#include "ZEDS/ZEFlags.h"
 
-#define ZE_META_CLASS_DEFINITION(ClassName) \
+#define ZEMT_CLASS_DEFINITION(ClassName) \
 	class ClassName##Class : public ZEClass \
 	{ \
 		public: \
 			virtual const char*				GetName() const; \
 			virtual const ZEGUID&			GetGUID() const; \
-			virtual const ZEAttribute*		GetAttributes() const; \
+			virtual const ZEMTAttribute*	GetAttributes() const; \
 			virtual ZESize					GetAttributeCount() const; \
 			virtual ZEClass*				GetParentClass(); \
-			virtual ZEClassFlags			GetFlags(); \
-			virtual const ZEProperty*		GetProperties(); \
+			virtual ZEMTClassFlags			GetFlags(); \
+			virtual const ZEMTProperty*		GetProperties(); \
 			virtual ZESize					GetPropertyCount(); \
-			virtual const ZEMethod*			GetMethods(); \
+			virtual const ZEMTMethod*		GetMethods(); \
 			virtual ZESize					GetMethodCount(); \
 			virtual ZESize					GetPropertyId(const ZEString& PropertyName); \
 			virtual ZESize					GetMethodId(const ZEString& MethodName, ZESize OverloadIndex = 0); \
@@ -93,19 +91,19 @@ class ZEScriptObject;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-typedef ZEUInt ZEClassFlags;
-#define ZE_CF_NONE						0
-#define ZE_CF_FUNDAMENTAL				1
-#define ZE_CF_ABSTRACT					2
-#define ZE_CF_SCRIPT					4 
-#define ZE_CF_CREATE_INSTANCE			8 
-#define ZE_CF_DESTROY					16
-#define ZE_CF_ASSIGN					32
-#define ZE_CF_CLONE						64
-#define ZE_CF_CONSTRUCT					128
-#define ZE_CF_DECONSTRUCT				256
+typedef ZEUInt ZEMTClassFlags;
+#define ZEMT_CF_NONE					0
+#define ZEMT_CF_FUNDAMENTAL				1
+#define ZEMT_CF_ABSTRACT				2
+#define ZEMT_CF_SCRIPT					4 
+#define ZEMT_CF_CREATE_INSTANCE			8 
+#define ZEMT_CF_DESTROY					16
+#define ZEMT_CF_ASSIGN					32
+#define ZEMT_CF_CLONE					64
+#define ZEMT_CF_CONSTRUCT				128
+#define ZEMT_CF_DECONSTRUCT				256
 
-#define ZE_CF_VALUE_OBJECT				(ZE_CF_CONSTRUCT | ZE_CF_DECONSTRUCT)
+#define ZEMT_CF_VALUE_OBJECT				(ZEMT_CF_CONSTRUCT | ZEMT_CF_DECONSTRUCT)
 
 struct ZEClassSortedData
 {
@@ -123,24 +121,24 @@ class ZEClass : public ZEMTDeclaration
 		virtual ZEMTDeclarationType		GetDeclarationType() const;
 		virtual const char*				GetName() const;
 		virtual const ZEGUID&			GetGUID() const;
-		virtual const ZEAttribute*		GetAttributes() const;
+		virtual const ZEMTAttribute*	GetAttributes() const;
 		virtual ZESize					GetAttributeCount() const;
 
 		virtual ZEClass*				GetParentClass();
 
-		virtual ZEClassFlags			GetFlags();
+		virtual ZEMTClassFlags			GetFlags();
 		bool							IsAbstract();
 		bool							IsFundamental();
 		bool							IsDynamic();
 		bool							IsValueObject();
 		bool							IsCloneable();
 
-		virtual const ZEProperty*		GetProperties();
+		virtual const ZEMTProperty*		GetProperties();
 		virtual ZESize					GetPropertyCount();
-		const ZEProperty*				GetPropertyDescription(ZESize PropertyId);
-		const ZEProperty*				GetPropertyDescription(const ZEString& PropertyName);
+		const ZEMTProperty*				GetPropertyDescription(ZESize PropertyId);
+		const ZEMTProperty*				GetPropertyDescription(const ZEString& PropertyName);
 
-		virtual const ZEMethod*			GetMethods();
+		virtual const ZEMTMethod*		GetMethods();
 		virtual ZESize					GetMethodCount();
 
 		virtual ZESize					GetPropertyId(const ZEString& PropertyName);
@@ -268,5 +266,3 @@ ZECastedObjectType* ZEClass::Cast(ZEObject* Object)
 	
 	return NULL;
 }
-
-#endif

@@ -39,9 +39,9 @@
 
 #include "ZEUIControl.h"
 
-ZE_META_FORWARD_DECLARE(ZEUIRenderer, "ZEUIRenderer.h")
-ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
-ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
+ZEMT_FORWARD_DECLARE(ZEUIRenderer);
+ZEMT_FORWARD_DECLARE(ZEUIRectangle);
+ZEMT_FORWARD_DECLARE(ZEUIMaterial);
 
 class ZEUIHorizontalSliderControl : public ZEUIControl
 {

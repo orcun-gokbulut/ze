@@ -293,8 +293,8 @@ class ZEEndian
 			#endif
 		}
 
-		template<typename ZEType>
-		static ZE_INLINE ZEType Uni(ZEType Value, ZEEndianness Endianness)
+		template<typename ZEMTType>
+		static ZE_INLINE ZEMTType Uni(ZEMTType Value, ZEEndianness Endianness)
 		{
 			if (Endianness == ZE_ET_BIG)
 				return ZEEndian::Big(Value);
@@ -303,19 +303,19 @@ class ZEEndian
 		}
 };
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZEBigEndian
 {
 	private:
-		ZEType Value;
+		ZEMTType Value;
 
 	public:
-		operator ZEType()
+		operator ZEMTType()
 		{
 			return ZEEndian::Big(Value);
 		}
 
-		ZEBigEndian(const ZEType& Value)
+		ZEBigEndian(const ZEMTType& Value)
 		{
 			this->Value = ZEEndian::Big(Value);
 		}
@@ -326,19 +326,19 @@ class ZEBigEndian
 		}
 };
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZELittleEndian
 {
 	private:
-		ZEType Value;
+		ZEMTType Value;
 
 	public:
-		operator ZEType()
+		operator ZEMTType()
 		{
 			return ZEEndian::Little(Value);
 		}
 
-		ZELittleEndian(const ZEType& Value)
+		ZELittleEndian(const ZEMTType& Value)
 		{
 			this->Value = ZEEndian::Little(Value);
 		}

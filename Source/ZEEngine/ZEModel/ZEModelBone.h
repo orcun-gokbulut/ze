@@ -46,8 +46,8 @@
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
-ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
+ZEMT_FORWARD_DECLARE(ZEAABBox);
 
 class ZEModelBone : public ZEObject, public ZEDestroyable
 {

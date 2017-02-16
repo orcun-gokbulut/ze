@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_VARIANT_H__
-#define __ZE_VARIANT_H__
 
 #pragma warning(push)
 #pragma warning(disable:4482)
@@ -45,8 +43,8 @@
 #include "ZEArray.h"
 #include "ZEList.h"
 #include "ZEValue.h"
-#include "ZEMeta/ZEType.h"
-#include "ZEMeta/ZETypeGenerator.h"
+#include "ZEMeta/ZEMTType.h"
+#include "ZEMeta/ZEMTTypeGenerator.h"
 
 class ZEVector2;
 class ZEVector2d;
@@ -87,8 +85,8 @@ class ZEVariant
 		void*							(*Cloner)(const void*);
 		void							(*Deleter)(void*);
 
-		ZEType							ValueType;
-		void							SetType(const ZEType& NewType);
+		ZEMTType							ValueType;
+		void							SetType(const ZEMTType& NewType);
 
 		template<typename ZETypeInstance>
 		static void*					ClonerTemplate(const void* Instance);
@@ -97,13 +95,13 @@ class ZEVariant
 
 		template<typename ZEReturnType>
 		ZEReturnType					ConvertValue() const;
-		template <typename ZEReturnType, ZETypeType Type>
+		template <typename ZEReturnType, ZEMTTypeType Type>
 		ZEReturnType&					ConvertRef() const;
-		template <typename ZEReturnType, ZETypeType Type>
+		template <typename ZEReturnType, ZEMTTypeType Type>
 		const ZEReturnType&				ConvertConstRef() const;
 
 	public:
-		const ZEType&					GetType() const;
+		const ZEMTType&					GetType() const;
 
 		// Setters
 		////////////////////////////////////////////////
@@ -415,18 +413,18 @@ void ZEVariant::DeleterTemplate(void* Instance)
 template<typename ZEItemType>
 void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZE_TT_UNDEFINED)
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+	if (Type.Type == ZEMT_TT_UNDEFINED)
 		return;
 
-	if (Type.ContainerType == ZE_CT_NONE)
+	if (Type.ContainerType == ZEMT_CT_NONE)
 		zeCriticalError("Array to arrays are not supported.");
 
-	if (Type.TypeQualifier != ZE_TQ_VALUE)
+	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
 		zeCriticalError("Only value or object pointer type arrays supported.");
 
-	Type.TypeQualifier = ZE_TQ_VALUE;
-	Type.ContainerType = ZE_CT_ARRAY;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
 
 	SetType(Type);
 	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
@@ -437,18 +435,18 @@ void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 template<typename ZEItemType>
 void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZE_TT_UNDEFINED)
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+	if (Type.Type == ZEMT_TT_UNDEFINED)
 		return;
 
-	if (Type.ContainerType == ZE_CT_NONE)
+	if (Type.ContainerType == ZEMT_CT_NONE)
 		zeCriticalError("Array to arrays are not supported.");
 
-	if (Type.TypeQualifier != ZE_TQ_VALUE)
+	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
 		zeCriticalError("Only value or object pointer type arrays supported.");
 
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
-	Type.ContainerType = ZE_CT_ARRAY;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
 
 	SetType(Type);
 	Value.Pointer = &Array;
@@ -457,19 +455,19 @@ void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 template<typename ZEItemType>
 void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 	
-	if (Type.Type == ZE_TT_UNDEFINED)
+	if (Type.Type == ZEMT_TT_UNDEFINED)
 		return;
 	
-	if (Type.ContainerType == ZE_CT_NONE)
+	if (Type.ContainerType == ZEMT_CT_NONE)
 		zeCriticalError("Array to arrays are not supported.");
 
-	if (Type.TypeQualifier != ZE_TQ_VALUE)
+	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
 		zeCriticalError("Only value or object pointer type arrays supported.");
 
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
-	Type.ContainerType = ZE_CT_ARRAY;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
 	
 	SetType(Type);
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
@@ -478,9 +476,9 @@ void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 template<typename ZEObjectType>
 void ZEVariant::SetObject(const ZEObjectType& Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
 
@@ -496,9 +494,9 @@ void ZEVariant::SetObject(const ZEObjectType& Object)
 template<typename ZEObjectType>
 void ZEVariant::SetObjectRef(ZEObjectType& Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
 
@@ -508,9 +506,9 @@ void ZEVariant::SetObjectRef(ZEObjectType& Object)
 template<typename ZEObjectType>
 void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
 
@@ -520,7 +518,7 @@ void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 template<typename ZEItemType>
 const ZEArray<ZEItemType>& ZEVariant::GetArray() const
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 	if (ValueType.Type != ZE_TT_ARRAY || ValueType.SubType != Type.SubType)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
@@ -530,13 +528,13 @@ const ZEArray<ZEItemType>& ZEVariant::GetArray() const
 template<typename ZEItemType>
 ZEArray<ZEItemType>& ZEVariant::GetArrayRef() const
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.SubTypeQualifier == ZE_TQ_REFERENCE)
+	if (ValueType.SubTypeQualifier == ZEMT_TQ_REFERENCE)
 		return *(ZEReturnType*)Value.Pointer;
-	else if (ValueType.SubTypeQualifier == ZE_TQ_CONST_REFERENCE)
+	else if (ValueType.SubTypeQualifier == ZEMT_TQ_CONST_REFERENCE)
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
 
 	return *(ZEArray<ZEItemType>*)Value.Pointer;
@@ -545,7 +543,7 @@ ZEArray<ZEItemType>& ZEVariant::GetArrayRef() const
 template<typename ZEItemType>
 const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 {
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 
 	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
@@ -556,7 +554,7 @@ const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 template<typename ZEObjectType>
 const ZEObjectType& ZEVariant::GetObject() const
 {
-	if (ValueType.Type != ZE_TT_OBJECT)
+	if (ValueType.Type != ZEMT_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
 	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
@@ -568,13 +566,13 @@ const ZEObjectType& ZEVariant::GetObject() const
 template<typename ZEObjectType>
 ZEObjectType& ZEVariant::GetObjectRef() const
 {
-	if (ValueType.Type != ZE_TT_OBJECT)
+	if (ValueType.Type != ZEMT_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
 	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
 		zeCriticalError("Value of the variant is not inherited from Object Type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
 		zeCriticalError("Value of the variant is const reference.");
 
 	return *(ZEObjectType*)Value.Pointer;
@@ -583,7 +581,7 @@ ZEObjectType& ZEVariant::GetObjectRef() const
 template<typename ZEObjectType>
 const ZEObjectType& ZEVariant::GetObjectConstRef() const
 {
-	if (ValueType.Type != ZE_TT_OBJECT)
+	if (ValueType.Type != ZEMT_TT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
 	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
@@ -618,4 +616,3 @@ ZEVariant::ZEVariant(const ZEArray<ZEArrayType>& Value)
 }
 
 #pragma warning(pop)
-#endif

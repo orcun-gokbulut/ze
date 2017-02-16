@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAttribute.cpp
+ Zinek Engine - ZEMTMethod.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,88 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAttribute.h"
+#pragma once
 
-#include "ZECommon.h"
-ZE_SUPPRESS_LNK4221
+#include "ZETypes.h"
+#include "ZEMTType.h"
+
+class ZEClass;
+struct ZEMTAttribute;
+
+enum ZEMTOperatorType
+{
+	ZEMT_OT_NONE,
+	ZEMT_OT_ADDITION,
+	ZEMT_OT_ADDITION_ASSIGNMENT,
+	ZEMT_OT_SUBTRACTION,
+	ZEMT_OT_SUBSTRACTION_ASSIGNMENT,
+	ZEMT_OT_MULTIPLICATION,
+	ZEMT_OT_MULTIPLICATION_ASSIGNMENT,
+	ZEMT_OT_DIVISION,
+	ZEMT_OT_DIVISION_ASSIGNMENT,
+	ZEMT_OT_MODULO,
+	ZEMT_OT_MODULO_ASSIGNMENT,
+	ZEMT_OT_INCREMENT,
+	ZEMT_OT_DECREMENT,
+
+	ZEMT_OT_LOGICAL_NOT,
+	ZEMT_OT_LOGICAL_AND,
+	ZEMT_OT_LOGICAL_OR,
+
+	ZEMT_OT_BITWISE_AND,
+	ZEMT_OT_BITWISE_AND_ASSIGNMENT,
+	ZEMT_OT_BITWISE_OR,
+	ZEMT_OT_BITWISE_OR_ASSIGNMENT,
+	ZEMT_OT_BITWISE_XOR,
+	ZEMT_OT_BITWISE_XOR_ASSIGNMENT,
+	ZEMT_OT_LEFT_SHIFT,
+	ZEMT_OT_LEFT_SHIFT_ASSIGNMENT,
+	ZEMT_OT_RIGHT_SHIFT,
+	ZEMT_OT_RIGHT_SHIFT_ASSIGNMENT,
+	ZEMT_OT_ASSIGNMENT,
+	ZEMT_OT_EQUAL,
+	ZEMT_OT_NOT_EQUAL,
+	ZEMT_OT_LESS,
+	ZEMT_OT_LESS_EQUAL,
+	ZEMT_OT_GREATER,
+	ZEMT_OT_GREATER_AND_EQUAL,
+
+	ZEMT_OT_FUNCTION_CALL,
+	ZEMT_OT_ARRAY_SUBSCRIPT
+};
+
+struct ZEMTMethodParameter
+{
+	const char*							Name;
+	ZEMTType							Type;
+};
+
+struct ZEMTMethod
+{
+	ZESize								Id;
+	const char*							Name;
+	ZEUInt32							Hash;
+
+	ZEClass*							MemberOf;
+	void*								MethodPtr;
+
+	bool								IsConst;
+	bool								IsEvent;
+	bool								IsVirtual;
+	bool								IsStatic;
+	bool								IsOperator;
+
+	ZEMTOperatorType					OperatorType;
+	ZEMTType							ReturnType;
+	ZEMTMethodParameter*				Parameters;
+	ZESize								ParameterCount;
+
+	ZEMTAttribute*						Attributes;
+	ZESize								AttributeCount;
+
+	const ZEMTAttribute*				GetAttribute(const char* Name) const;
+	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;
+
+	bool								CheckAttribute(const char* Name) const;
+	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;
+};

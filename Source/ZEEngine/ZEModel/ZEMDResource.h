@@ -43,11 +43,11 @@
 #include "ZEGraphics/ZEGRVertexLayout.h"
 #include "ZEMDVertex.h"
 
-ZE_META_FORWARD_DECLARE(ZEMDResourceMesh, "ZEMDResourceMesh.h");
-ZE_META_FORWARD_DECLARE(ZEMDResourceBone, "ZEMDResourceBone.h");
-ZE_META_FORWARD_DECLARE(ZEMDResourceAnimation, "ZEMDResourceAnimation.h");
-ZE_META_FORWARD_DECLARE(ZEMDResourceHelper, "ZEMDResourceHelper.h");
-ZE_META_FORWARD_DECLARE(ZEGRBuffer, "ZERenderer/ZEGRBuffer.h");
+ZEMT_FORWARD_DECLARE(ZEMDResourceMesh);
+ZEMT_FORWARD_DECLARE(ZEMDResourceBone);
+ZEMT_FORWARD_DECLARE(ZEMDResourceAnimation);
+ZEMT_FORWARD_DECLARE(ZEMDResourceHelper);
+ZEMT_FORWARD_DECLARE(ZEGRBuffer);
 
 class ZEMDResource : public ZERSResource
 {

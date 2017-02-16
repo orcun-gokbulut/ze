@@ -42,7 +42,7 @@
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZERenderer/ZERNView.h"
@@ -529,8 +529,8 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, ZESize Inst
 {
 	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetClass()->GetName(), 
-		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
-		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));*/
+		ZEEntityState_Enumerator()->ToText(State, "Unknown"), 
+		ZEEntityState_Enumerator()->ToText(TargetState, "Unknown"));*/
 
 	// Persistent States
 	if (State == ZE_ES_NONE)
@@ -813,7 +813,7 @@ ZEUInt ZEEntity::GetLocalLoadingPercentage()
 ZEEntityResult ZEEntity::LoadInternal()
 {
 	zeDebugCheck(GetState() != ZE_ES_LOADING, "LoadInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
-		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+		ZEEntityState_Enumerator()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
 	LoadInternalChainCheck = true;
@@ -825,7 +825,7 @@ ZEEntityResult ZEEntity::LoadInternal()
 ZEEntityResult ZEEntity::UnloadInternal()
 {
 	zeDebugCheck(GetState() != ZE_ES_UNLOADING  && GetState() != ZE_ES_LOADING, "UnloadInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
-		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+		ZEEntityState_Enumerator()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
 	UnloadInternalChainCheck = true;
@@ -837,7 +837,7 @@ ZEEntityResult ZEEntity::UnloadInternal()
 ZEEntityResult ZEEntity::InitializeInternal()
 {
 	zeDebugCheck(GetState() != ZE_ES_INITIALIZING, "InitializeInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
-		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+		ZEEntityState_Enumerator()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
 	InitializeInternalChainCheck = true;
@@ -849,7 +849,7 @@ ZEEntityResult ZEEntity::InitializeInternal()
 ZEEntityResult ZEEntity::DeinitializeInternal()
 {
 	zeDebugCheck(GetState() != ZE_ES_INITIALIZING && GetState() != ZE_ES_DEINITIALIZING, "DeinitializeInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
-		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+		ZEEntityState_Enumerator()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
 	DeinitializeInternalChainCheck = true;
@@ -1666,17 +1666,17 @@ bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 	ZEMLWriterNode PropertiesNode; 
 	Serializer->OpenNode("Properties", PropertiesNode);
 	
-	const ZEProperty* Properties = GetClass()->GetProperties();
+	const ZEMTProperty* Properties = GetClass()->GetProperties();
 	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 	{
-		const ZEProperty* Current = &Properties[I];
-		if (Current->Type.ContainerType != ZE_CT_NONE)
+		const ZEMTProperty* Current = &Properties[I];
+		if (Current->Type.ContainerType != ZEMT_CT_NONE)
 			continue;
 
-		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+		if (Current->Type.TypeQualifier != ZEMT_TQ_VALUE)
 			continue;
 
-		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+		if (Current->Type.Type == ZEMT_TT_OBJECT || Current->Type.Type == ZEMT_TT_OBJECT_PTR)
 			continue;
 
 		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
@@ -1755,7 +1755,7 @@ bool ZEEntity::Unserialize(ZEMLReaderNode* Unserializer)
 		{
 			ZEMLReaderNode SubEntityNode = SubEntitiesNode.GetNode("Entity", I);
 
-			NewSubEntityClass = ZEProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
+			NewSubEntityClass = ZEMTProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
 			if (NewSubEntityClass == NULL)
 			{
 				zeError("Unserialization failed. Child Entity class is not registered. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());

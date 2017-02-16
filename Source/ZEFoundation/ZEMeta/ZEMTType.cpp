@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPropertySignature.h
+ Zinek Engine - ZEMTType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEMTType.h"
 
-#include "ZEDS/ZEValue.h"
-
-enum ZECanonicalType
+bool ZEMTType::operator==(const ZEMTType& Other) const
 {
-	ZE_CT_VALUE,
-	ZE_CT_CONST_VALUE,
-	ZE_CT_REFERENCE,
-	ZE_CT_CONST_REFERENCE,
-	ZE_CT_POINTER,
-	ZE_CT_CONST_POINTER
-};
+	return Equal(*this, Other);
+}
 
-class ZEClass;
-class ZEPropertySignature
+bool ZEMTType::operator!=(const ZEMTType& Other) const
 {
-	public:
-		ZEValueType					Type;
-		ZEClass*					BaseClass;
-		ZECanonicalType				CanonicalType;
+	return !Equal(*this, Other);
+}
 
-		bool						operator==(const ZEPropertySignature& Other);
-		bool						operator!=(const ZEPropertySignature& Other);
+bool ZEMTType::Equal(const ZEMTType& A, const ZEMTType& B)
+{
+	if (A.Type != B.Type || 
+		A.TypeQualifier != B.TypeQualifier || 
+		A.ContainerType != B.ContainerType)
+	{
+		return false;
+	}
 
-		ZEString					ToString() const;
+	if ((A.Type == ZEMT_TT_OBJECT || A.Type == ZEMT_TT_OBJECT_PTR) && A.Class != B.Class)
+	{
+		return false;
+	}
+	else if (A.Type == ZEMT_TT_ENUMERATOR && A.Enumerator != B.Enumerator)
+	{
+		return false;
+	}
 
-									ZEPropertySignature();
+	return true;
+}
 
-		static bool					Compare(const ZEPropertySignature& A, const ZEPropertySignature& B);
-};
+ZEMTType::ZEMTType()
+{
+	Type = ZEMT_TT_UNDEFINED;
+	TypeQualifier = ZEMT_TQ_VALUE;
+	ContainerType = ZEMT_CT_NONE;
+	Class = 0;
+	Enumerator = 0;
+}
+
+ZEMTType::ZEMTType(ZEMTTypeType Type, ZEMTTypeQualifier TypeQualifier, ZEMTContainerType ContainerType, ZEClass* Class, ZEMTEnumerator* Enumerator)
+{
+	this->Type = Type;
+	this->TypeQualifier = TypeQualifier;
+	this->ContainerType = ContainerType;
+	this->Enumerator = Enumerator;
+	this->Class = Class;
+}

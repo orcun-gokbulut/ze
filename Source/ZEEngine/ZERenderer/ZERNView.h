@@ -51,7 +51,7 @@
 class ZEEntity;
 class ZEViewVolume;
 
-ZE_META_FORWARD_DECLARE(ZEGRViewport, "ZEGRViewport.h");
+ZEMT_FORWARD_DECLARE(ZEGRViewport);
 
 ZE_ENUM(ZERNViewType)
 {

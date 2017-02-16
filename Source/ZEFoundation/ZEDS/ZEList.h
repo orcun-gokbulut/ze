@@ -43,9 +43,9 @@
 
 class ZEListItem
 {
-	template<typename ZEType> friend class ZEList;
-	template<typename ZEType> friend class ZEListIterator;
-	template<typename ZEType> friend class ZEListIteratorConst;
+	template<typename ZEMTType> friend class ZEList;
+	template<typename ZEMTType> friend class ZEListIterator;
+	template<typename ZEMTType> friend class ZEListIteratorConst;
 	private:
 		ZEListItem* NextItem;
 		ZEListItem* PrevItem;
@@ -58,7 +58,7 @@ class ZEListItem
 		}
 };
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZEList
 {
 	private:
@@ -75,16 +75,16 @@ class ZEList
 		}
 
 	public:
-		typedef ZEListIterator<ZEType> Iterator;
+		typedef ZEListIterator<ZEMTType> Iterator;
 		Iterator GetIterator()
 		{
 			return Iterator(this);
 		}
 
-		typedef ZEListIterator<ZEType> ConstIterator;
+		typedef ZEListIterator<ZEMTType> ConstIterator;
 		Iterator GetConstIterator() const
 		{
-			return Iterator(const_cast<ZEList<ZEType>*>(this));
+			return Iterator(const_cast<ZEList<ZEMTType>*>(this));
 		}
 
 		inline ZESize GetCount() const
@@ -92,7 +92,7 @@ class ZEList
 			return Count;
 		}
 
-		inline ZEType* Append(ZEType* Item)
+		inline ZEMTType* Append(ZEMTType* Item)
 		{
 			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
 			zeDebugCheck(Exists(Item), "Item is already added to list.");
@@ -113,7 +113,7 @@ class ZEList
 			return Item;
 		}
 
-		inline ZEType* Insert(ZEType* Item)
+		inline ZEMTType* Insert(ZEMTType* Item)
 		{
 			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
 			zeDebugCheck(Exists(Item), "Item is already added to list.");
@@ -135,7 +135,7 @@ class ZEList
 			return Item;
 		}
 
-		inline ZEType* Insert(ZESize Index, ZEType* Item)
+		inline ZEMTType* Insert(ZESize Index, ZEMTType* Item)
 		{
 			zeDebugCheck(Index > Count, "Index out of range.");
 			zeDebugCheck(Item->PrevItem != NULL || Item->NextItem != NULL, "Item is eighter already associated with another list or corrupt.");
@@ -147,8 +147,8 @@ class ZEList
 				return Append(Item);
 			else
 			{
-				ZEType* OldItem = GetItem(Index);
-				ZEType* PreviousItem = (ZEType*)OldItem->PrevItem;
+				ZEMTType* OldItem = GetItem(Index);
+				ZEMTType* PreviousItem = (ZEMTType*)OldItem->PrevItem;
 				Item->PrevItem = OldItem->PrevItem;
 				Item->NextItem = OldItem;
 				OldItem->PrevItem = Item;
@@ -158,7 +158,7 @@ class ZEList
 			}
 		}
 
-		inline void Remove(ZEType* Item)
+		inline void Remove(ZEMTType* Item)
 		{
 			zeDebugCheck(!Exists(Item), "Item is not in the list.");
 
@@ -172,7 +172,7 @@ class ZEList
 
 			else
 			{
-				ZEType* Previous = (ZEType*)Item->PrevItem;
+				ZEMTType* Previous = (ZEMTType*)Item->PrevItem;
 				Previous->NextItem = Item->NextItem;
 			}
 			
@@ -186,7 +186,7 @@ class ZEList
 
 			else
 			{
-				ZEType* Next = (ZEType*)Item->NextItem;
+				ZEMTType* Next = (ZEMTType*)Item->NextItem;
 				Next->PrevItem = Item->PrevItem;
 			}
 				
@@ -198,16 +198,16 @@ class ZEList
 
 		inline void RemoveAt(ZESize Index)
 		{
-			ZEType* Item = GetItem(Index);
+			ZEMTType* Item = GetItem(Index);
 			Remove(Item);
 		}
 
 		inline void RemoveAll()
 		{
-			ZEType* Cursor = (ZEType*)FirstItem;
+			ZEMTType* Cursor = (ZEMTType*)FirstItem;
 			while(Cursor != NULL)
 			{
-				ZEType* Temp = (ZEType*)Cursor->NextItem;
+				ZEMTType* Temp = (ZEMTType*)Cursor->NextItem;
 				Cursor->PrevItem = NULL;
 				Cursor->NextItem = NULL;
 				Cursor = Temp;
@@ -215,109 +215,109 @@ class ZEList
   			Count = 0;
 		}
 
-		inline const ZEType* GetItem(ZESize Index) const
+		inline const ZEMTType* GetItem(ZESize Index) const
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 			
-			const ZEType* Cursor = (ZEType*)FirstItem;
+			const ZEMTType* Cursor = (ZEMTType*)FirstItem;
 			while(Index-- != 0)
-				Cursor = (ZEType*)Cursor->NextItem;
+				Cursor = (ZEMTType*)Cursor->NextItem;
 			
 			return Cursor;
 		}
 
-		inline ZEType* GetItem(ZESize Index)
+		inline ZEMTType* GetItem(ZESize Index)
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 
-			ZEType* Cursor = (ZEType*)FirstItem;
+			ZEMTType* Cursor = (ZEMTType*)FirstItem;
 			while(Index-- != 0)
-				Cursor = (ZEType*)Cursor->NextItem;
+				Cursor = (ZEMTType*)Cursor->NextItem;
 
 			return Cursor;
 		}
 
-		inline ZEType* GetFirstItem()
+		inline ZEMTType* GetFirstItem()
 		{
-			return (ZEType*)FirstItem;
+			return (ZEMTType*)FirstItem;
 		}
 
-		inline const ZEType* GetFirstItem() const
+		inline const ZEMTType* GetFirstItem() const
 		{
-			return (const ZEType*)FirstItem;
+			return (const ZEMTType*)FirstItem;
 		}
 
-		inline ZEType* GetLastItem()
+		inline ZEMTType* GetLastItem()
 		{
-			return (ZEType*)LastItem;
+			return (ZEMTType*)LastItem;
 		}
 
-		inline const ZEType* GetLastItem() const
+		inline const ZEMTType* GetLastItem() const
 		{
-			return (const ZEType*)LastItem;
+			return (const ZEMTType*)LastItem;
 		}
 
-		inline ZEType* operator[](ZESize Index)
+		inline ZEMTType* operator[](ZESize Index)
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return GetItem(Index);
 		}
 
-		inline const ZEType* operator[](ZESize Index) const
+		inline const ZEMTType* operator[](ZESize Index) const
 		{
 			zeDebugCheck(Index >= Count, "Index is out of range.");
 			return GetItem(Index);
 		}
 
-		inline void Enqueue(ZEType* Value)
+		inline void Enqueue(ZEMTType* Value)
 		{
 			Append(Value);
 		}
 
-		inline ZEType* Dequeue()
+		inline ZEMTType* Dequeue()
 		{
-			ZEType* Item = (ZEType*)FirstItem;
-			Remove((ZEType*)FirstItem);
+			ZEMTType* Item = (ZEMTType*)FirstItem;
+			Remove((ZEMTType*)FirstItem);
 
 			return Item;
 		}
 
-		inline void Push(ZEType* Value)
+		inline void Push(ZEMTType* Value)
 		{
 			Append(Value);
 		}
 
-		inline ZEType* Pop()
+		inline ZEMTType* Pop()
 		{
-			ZEType* Item = (ZEType*)LastItem;
-			Remove((ZEType*)LastItem);
+			ZEMTType* Item = (ZEMTType*)LastItem;
+			Remove((ZEMTType*)LastItem);
 
 			return Item;
 		}
 
-		inline bool Exists(ZEType* Item) const
+		inline bool Exists(ZEMTType* Item) const
 		{
-			ZEType* Cursor = (ZEType*)FirstItem;
+			ZEMTType* Cursor = (ZEMTType*)FirstItem;
 			while(Cursor != NULL)
 			{
 				if (Cursor == Item)
 					return true;
-				Cursor = (ZEType*)Cursor->NextItem;
+				Cursor = (ZEMTType*)Cursor->NextItem;
 			}
 			return false;
 		}
 
-		inline ZESSize FindIndex(ZEType* Item, ZESize StartIndex = 0) const
+		inline ZESSize FindIndex(ZEMTType* Item, ZESize StartIndex = 0) const
 		{
 			ZESize Index = StartIndex;
-			ZEType* Cursor = (ZEType*)GetItem(Index);
+			ZEMTType* Cursor = (ZEMTType*)GetItem(Index);
 			while(Cursor != NULL)
 			{
 				if (Cursor == Item)
 					return Index;
 
 				Index++;
-				Cursor = (ZEType*)Cursor->NextItem;
+				Cursor = (ZEMTType*)Cursor->NextItem;
 			}
 
 			return -1;

@@ -39,8 +39,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
-ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+ZEMT_FORWARD_DECLARE(ZEInterior);
+ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
 
 struct ZEInteriorResourceHelper;
 

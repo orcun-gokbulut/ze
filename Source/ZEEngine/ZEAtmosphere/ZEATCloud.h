@@ -125,6 +125,6 @@ class ZEATCloud : public ZEEntity
 
 		static ZEATCloud*						CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NameplateVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.NameplateVisible, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);

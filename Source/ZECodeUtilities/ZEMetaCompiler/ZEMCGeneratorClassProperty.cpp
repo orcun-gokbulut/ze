@@ -115,7 +115,7 @@ void ZEMCGenerator::GenerateClassGetProperties_Attributes(ZEMCClass* CurrentClas
 			}
 
 			WriteToFile(
-				"\tstatic ZEAttribute Property%dAttributes[%d] =\n"
+				"\tstatic ZEMTAttribute Property%dAttributes[%d] =\n"
 				"\t{\n", 
 				I, CurrentProperty->Attributes.GetCount());
 
@@ -146,7 +146,7 @@ void ZEMCGenerator::GenerateClassGetProperties_Attributes(ZEMCClass* CurrentClas
 void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"\tstatic ZEProperty Properties[%d] =\n\t"
+		"\tstatic ZEMTProperty Properties[%d] =\n\t"
 		"{\n", CurrentClass->Properties.GetCount());
 
 	for (ZESize I = 0; I < CurrentClass->Properties.GetCount(); I++)
@@ -227,7 +227,7 @@ void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClas
 void ZEMCGenerator::GenerateClassGetProperties(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"const ZEProperty* %sClass::GetProperties()\n"
+		"const ZEMTProperty* %sClass::GetProperties()\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 

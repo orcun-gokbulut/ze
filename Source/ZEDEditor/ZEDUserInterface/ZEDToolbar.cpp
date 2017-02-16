@@ -76,7 +76,7 @@ void ZEDToolbar::Toolbar_topLevelChanged(bool Changed)
 	Order = Toolbar->pos().x();
 	Row = Toolbar->pos().y();
 
-	zeLog("%s, L: %s", GetName().ToCString(), ZEDToolbarLocation_Declaration()->ToText(Location, "Unknown").ToCString());
+	zeLog("%s, L: %s", GetName().ToCString(), ZEDToolbarLocation_Enumerator()->ToText(Location, "Unknown").ToCString());
 }
 
 void ZEDToolbar::Setup()

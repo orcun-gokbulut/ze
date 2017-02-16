@@ -126,7 +126,7 @@ class ZEPhysicalCloth : public ZEObject, public ZEInitializable, public ZEDestro
 		virtual void							AttachVertex(ZEUInt VertexId, const ZEPhysicalShape* Shape, const ZEVector3& LocalPosition) = 0;
 		virtual void							DetachVertex(const ZEUInt VertexId) = 0;
 
-		ZE_META_ATTRIBUTE(ZEMC.Export, false)
+		ZEMT_ATTRIBUTE(ZEMC.Export, false)
 		virtual const ZEClothVertexAttachment*	GetVertexAttachment(ZEUInt VertexId) const = 0;
 
 		virtual bool							TearVertex(const ZEUInt VertexId, const ZEVector3& Normal) = 0;

@@ -63,6 +63,6 @@ class ZEListener: public ZEEntity
 
 		static ZEListener*		CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZESound.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZESound.png")
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.EntityWrapper3D.BoundingBoxVisible, false);

@@ -187,7 +187,7 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 		UpdatedOptions.OptimizationLevel = 0;
 	#endif
 
-	zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Declaration()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
+	zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Enumerator()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
 
 	ZEArray<ZEBYTE> OutputShaderBinary;
 	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
