@@ -39,80 +39,80 @@
 #include "llvm\Support\raw_ostream.h"
 #include "ZEDS\ZEFormat.h"
 
-ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
+ZEMCOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
 	switch(OperatorKind)
 	{
 		case OO_Plus:
-			return ZEMC_MOT_ADDITION;
+			return ZEMC_OT_ADDITION;
 		case OO_PlusEqual:
-			return ZEMC_MOT_ADDITION_ASSIGNMENT;
+			return ZEMC_OT_ADDITION_ASSIGNMENT;
 		case OO_PlusPlus:
-			return ZEMC_MOT_INCREMENT;
+			return ZEMC_OT_INCREMENT;
 		case OO_Minus:
-			return ZEMC_MOT_SUBTRACTION;
+			return ZEMC_OT_SUBTRACTION;
 		case OO_MinusEqual:
-			return ZEMC_MOT_SUBSTRACTION_ASSIGNMENT;
+			return ZEMC_OT_SUBSTRACTION_ASSIGNMENT;
 		case OO_MinusMinus:
-			return ZEMC_MOT_DECREMENT;
+			return ZEMC_OT_DECREMENT;
 		case OO_Star:
-			return ZEMC_MOT_MULTIPLICATION;
+			return ZEMC_OT_MULTIPLICATION;
 		case OO_StarEqual:
-			return ZEMC_MOT_MULTIPLICATION_ASSIGNMENT;
+			return ZEMC_OT_MULTIPLICATION_ASSIGNMENT;
 		case OO_Slash:
-			return ZEMC_MOT_DIVISION;
+			return ZEMC_OT_DIVISION;
 		case OO_SlashEqual:
-			return ZEMC_MOT_DIVISION_ASSIGNMENT;
+			return ZEMC_OT_DIVISION_ASSIGNMENT;
 		case OO_Percent:
-			return ZEMC_MOT_MODULO;
+			return ZEMC_OT_MODULO;
 		case OO_PercentEqual:
-			return ZEMC_MOT_MODULO_ASSIGNMENT;
+			return ZEMC_OT_MODULO_ASSIGNMENT;
 		case OO_Amp:
-			return ZEMC_MOT_BITWISE_AND;
+			return ZEMC_OT_BITWISE_AND;
 		case OO_AmpEqual:
-			return ZEMC_MOT_BITWISE_AND_ASSIGNMENT;
+			return ZEMC_OT_BITWISE_AND_ASSIGNMENT;
 		case OO_AmpAmp:
-			return ZEMC_MOT_LOGICAL_AND;
+			return ZEMC_OT_LOGICAL_AND;
 		case OO_Pipe:
-			return ZEMC_MOT_BITWISE_OR;
+			return ZEMC_OT_BITWISE_OR;
 		case OO_PipeEqual:
-			return ZEMC_MOT_BITWISE_OR_ASSIGNMENT;
+			return ZEMC_OT_BITWISE_OR_ASSIGNMENT;
 		case OO_PipePipe:
-			return ZEMC_MOT_LOGICAL_OR;
+			return ZEMC_OT_LOGICAL_OR;
 		case OO_Caret:
-			return ZEMC_MOT_BITWISE_XOR;
+			return ZEMC_OT_BITWISE_XOR;
 		case OO_CaretEqual:
-			return ZEMC_MOT_BITWISE_XOR_ASSIGNMENT;
+			return ZEMC_OT_BITWISE_XOR_ASSIGNMENT;
 		case OO_Equal:
-			return ZEMC_MOT_ASSIGNMENT;
+			return ZEMC_OT_ASSIGNMENT;
 		case OO_EqualEqual:
-			return ZEMC_MOT_EQUAL;
+			return ZEMC_OT_EQUAL;
 		case OO_ExclaimEqual:
-			return ZEMC_MOT_NOT_EQUAL;
+			return ZEMC_OT_NOT_EQUAL;
 		case OO_Less:
-			return ZEMC_MOT_LESS;
+			return ZEMC_OT_LESS;
 		case OO_LessEqual:
-			return ZEMC_MOT_LESS_EQUAL;
+			return ZEMC_OT_LESS_EQUAL;
 		case OO_LessLess:
-			return ZEMC_MOT_LEFT_SHIFT;
+			return ZEMC_OT_LEFT_SHIFT;
 		case OO_LessLessEqual:
-			return ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT;
+			return ZEMC_OT_LEFT_SHIFT_ASSIGNMENT;
 		case OO_Greater:
-			return ZEMC_MOT_GREATER;
+			return ZEMC_OT_GREATER;
 		case OO_GreaterEqual:
-			return ZEMC_MOT_GREATER_AND_EQUAL;
+			return ZEMC_OT_GREATER_AND_EQUAL;
 		case OO_GreaterGreater:
-			return ZEMC_MOT_RIGHT_SHIFT;
+			return ZEMC_OT_RIGHT_SHIFT;
 		case OO_GreaterGreaterEqual:
-			return ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT;
+			return ZEMC_OT_RIGHT_SHIFT_ASSIGNMENT;
 		case OO_Exclaim:
-			return ZEMC_MOT_LOGICAL_NOT;
+			return ZEMC_OT_LOGICAL_NOT;
 		case OO_Call:
-			return ZEMC_MOT_FUNCTION_CALL;
+			return ZEMC_OT_FUNCTION_CALL;
 		case OO_Subscript:
-			return ZEMC_MOT_ARRAY_SUBSCRIPT;
+			return ZEMC_OT_ARRAY_SUBSCRIPT;
 		default:
-			return ZEMC_MOT_NONE;
+			return ZEMC_OT_NONE;
 	}
 }
 
@@ -287,7 +287,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (MethodDecl->isCopyAssignmentOperator())
 	{
 		MethodData->IsOperator = true;
-		MethodData->OperatorType = ZEMC_MOT_ASSIGNMENT;
+		MethodData->OperatorType = ZEMC_OT_ASSIGNMENT;
 		
 		if (MethodData->ReturnValue.TypeQualifier == ZEMC_TQ_VALUE)
 			MethodData->ReturnValue.TypeQualifier = ZEMC_TQ_REFERENCE;

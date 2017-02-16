@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZEMC_GENERATOR_H__
-#define __ZEMC_GENERATOR_H__
 
 #include "ZEMCOptions.h"
 #include "ZEMCContext.h"
@@ -53,8 +51,8 @@ class ZEMCGenerator
 		void					CloseFile();
 		
 		// Utilities
-		const char*				ConvertOperatorTypeToName(ZEMCMetaOperatorType OperatorType);
-		const char*				ConvertOperatorTypeToString(ZEMCMetaOperatorType OperatorType);
+		const char*				ConvertOperatorTypeToName(ZEMCOperatorType OperatorType);
+		const char*				ConvertOperatorTypeToString(ZEMCOperatorType OperatorType);
 
 		const char*				ConvertTypeQualifierToEnum(ZEMCTypeQualifier TypeQualifier);
 		const char*				ConvertContainerTypeToEnum(ZEMCContainerType ContainerType);
@@ -67,6 +65,8 @@ class ZEMCGenerator
 		ZEString				GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEMCClass* CurrentClass);
 
 		// File
+		void					GenerateIncludes();
+		void					GenerateForwardDeclaration();
 		void					GenerateHeading();
 		void					GenerateEnding();
 		
@@ -88,7 +88,6 @@ class ZEMCGenerator
 		// Class
 		void					GenerateClassMacros(ZEMCClass* CurrentClass);
 		void					GenerateClass(ZEMCClass* CurrentClass);
-		void					GenerateClassForwardDeclarations(ZEMCClass* CurrentClass);
 		void					GenerateClassGetParentClass(ZEMCClass* CurrentClass);
 		void					GenerateClassGetFlags(ZEMCClass* CurrentClass);
 
@@ -145,8 +144,5 @@ class ZEMCGenerator
 		void					SetMetaContext(ZEMCContext* context);
 		void					SetOptions(ZEMCOptions* options);
 
-		bool					GenerateOld();
 		bool					Generate();
 };
-
-#endif

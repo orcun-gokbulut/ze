@@ -60,7 +60,7 @@ void ZEMCGenerator::GenerateDeclarationGetGUID(ZEMCDeclaration* Declaration)
 void ZEMCGenerator::GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaration)
 {
 	WriteToFile(
-		"const ZEAttribute* %s::GetAttributes() const\n"
+		"const ZEMTAttribute* %s::GetAttributes() const\n"
 		"{\n", 
 		Declaration->MetaName.ToCString());
 
@@ -93,7 +93,7 @@ void ZEMCGenerator::GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaratio
 		if(Declaration->Attributes.GetCount() > 0)
 		{
 			WriteToFile(
-				"\tstatic ZEAttribute Attributes[%d] =\n"
+				"\tstatic ZEMTAttribute Attributes[%d] =\n"
 				"\t{\n", Declaration->Attributes.GetCount());
 		}
 

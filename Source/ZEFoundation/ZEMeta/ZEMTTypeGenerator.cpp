@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETypeGenerator.cpp
+ Zinek Engine - ZEMTTypeGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,183 +33,183 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypeGenerator.h"
+#include "ZEMTTypeGenerator.h"
 
 #ifndef NULL
 #define NULL 0
 #endif
 
-ZEType ZETypeGenerator<void>::GetType()
+ZEMTType ZEMTTypeGenerator<void>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VOID;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VOID;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEUInt8>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEUInt8>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_UNSIGNED_INTEGER_8;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_UNSIGNED_INTEGER_8;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEUInt16>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEUInt16>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_UNSIGNED_INTEGER_16;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_UNSIGNED_INTEGER_16;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEUInt32>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEUInt32>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_UNSIGNED_INTEGER_32;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_UNSIGNED_INTEGER_32;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEUInt64>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEUInt64>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_UNSIGNED_INTEGER_64;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_UNSIGNED_INTEGER_64;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEInt8>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEInt8>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEInt16>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEInt16>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEInt32>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEInt32>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEInt64>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEInt64>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
 	return Type;
 }
 
-ZEType ZETypeGenerator<float>::GetType()
+ZEMTType ZEMTTypeGenerator<float>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_FLOAT;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_FLOAT;
 	return Type;
 }
 
-ZEType ZETypeGenerator<double>::GetType()
+ZEMTType ZEMTTypeGenerator<double>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_DOUBLE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_DOUBLE;
 	return Type;
 }
 
-ZEType ZETypeGenerator<bool>::GetType()
+ZEMTType ZEMTTypeGenerator<bool>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_BOOLEAN;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_BOOLEAN;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector2>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector2>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector2d>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector2d>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2D;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector3>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector3>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector3d>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector3d>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3D;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector4>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector4>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector4d>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEVector4d>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4D;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEQuaternion>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEQuaternion>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_QUATERNION;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_QUATERNION;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEMatrix3x3>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEMatrix3x3>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEMatrix3x3d>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEMatrix3x3d>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3D;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEMatrix4x4>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEMatrix4x4>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEMatrix4x4d>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEMatrix4x4d>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4D;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEString>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEString>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_STRING;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_STRING;
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEClass*>::GetType()
+ZEMTType ZEMTTypeGenerator<ZEClass*>::GetType()
 {
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_CLASS;
 	return Type;
 }

@@ -137,4 +137,4 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 
 		virtual void								UpdateLocal() override;
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, "");
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, "");

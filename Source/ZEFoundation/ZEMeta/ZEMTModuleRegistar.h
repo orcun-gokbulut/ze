@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethodSignature.cpp
+ Zinek Engine - ZEMTModuleRegistar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMethodSignature.h"
+#pragma once
 
-bool ZEMethodSignature::operator==(const ZEMethodSignature& Other)
+#include "ZETypes.h"
+
+class ZEMTRegistar;
+
+class ZEMTModuleRegister
 {
-	return Compare(*this, Other);
-}
+	public:
+		virtual ZEMTRegistar**		GetRegisters() = 0;
+		virtual ZESize				GetRegisterCount() = 0;
 
-bool ZEMethodSignature::operator!=(const ZEMethodSignature& Other)
-{
-	return !Compare(*this, Other);
-}
-
-ZEString ZEMethodSignature::ToString() const
-{
-	ZEString String = ReturnType.ToString();
-	
-	String += " (";
-	for (ZESize I = 0; I < Parameters.GetCount(); I++)
-	{
-		String += Parameters[I].ToString();
-		
-		if (I + 1 != Parameters.GetCount())
-			String += ",";
-	}
-	String += ")";
-
-	return String;
-}
-
-bool ZEMethodSignature::Compare(const ZEMethodSignature& A, const ZEMethodSignature& B)
-{
-	if (A.Parameters.GetCount() != B.Parameters.GetCount())
-		return false;
-
-	if (!ZEPropertySignature::Compare(A.ReturnType, B.ReturnType))
-		return false;
-
-	for (ZESize I = 0; I < A.Parameters.GetCount(); I++)
-		if (!ZEPropertySignature::Compare(A.Parameters[I], B.Parameters[I]))
-			return false;
-
-	return true;
-}
+};

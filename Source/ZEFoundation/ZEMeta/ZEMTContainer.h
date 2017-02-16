@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethodSignatureGenerator.cpp
+ Zinek Engine - ZEMTContainer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMethodSignatureGenerator.h"
+#pragma once
+#ifndef __ZE_CONTAINER_H__
+#define __ZE_CONTAINER_H__
 
-#include "ZECommon.h"
-ZE_SUPPRESS_LNK4221
+#include "ZETypes.h"
+
+class ZEClass;
+class ZEObject;
+
+class ZEMTContainerBase
+{
+	public:
+		virtual ZEClass*			GetClass() const = 0;
+		virtual bool				GetAllowDerived() const = 0;
+
+		virtual ZESize				GetCount() const = 0;
+		virtual bool				Insert(ZESize Index, ZEObject* Item);
+		virtual bool				Remove(ZESize Index);
+		virtual bool				SetItem(ZESize Index, ZEObject* Item);
+		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const = 0;
+};
+
+template<typename ZEMTType, bool AllowDerived = true>
+class ZEMTContainer : public ZEMTContainerBase
+{
+	public:
+		virtual ZEClass*			GetClass() const;
+		virtual bool				GetAllowDerived() const;
+
+		virtual ZESize				GetCount() const;
+		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const;
+};
+
+
+template<typename ZEMTType, bool AllowDerived>
+ZEClass* ZEMTContainer<ZEMTType, AllowDerived>::GetClass() const
+{
+	return ZEMTType::Class();
+}
+
+template<typename ZEMTType, bool AllowDerived>
+bool ZEMTContainer<ZEMTType, AllowDerived>::GetAllowDerived() const
+{
+	return AllowDerived;
+}
+
+template<typename ZEMTType, bool AllowDerived>
+ZESize ZEMTContainer<ZEMTType, AllowDerived>::GetCount() const
+{
+	return 0;
+}
+
+template<typename ZEMTType, bool AllowDerived>
+bool ZEMTContainer<ZEMTType, AllowDerived>::GetItem(ZESize Index, ZEObject*& Item) const
+{
+	return false;
+}
+
+#endif

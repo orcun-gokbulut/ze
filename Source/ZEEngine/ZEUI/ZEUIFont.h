@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
 
-ZE_META_FORWARD_DECLARE(ZEGRTexture, "ZEGraphics/ZEGRTexture.h");
+ZEMT_FORWARD_DECLARE(ZEGRTexture);
 
 ZE_ENUM(ZEUIFontType)
 {

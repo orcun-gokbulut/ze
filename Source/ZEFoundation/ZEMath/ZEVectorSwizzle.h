@@ -36,15 +36,15 @@
 #pragma once
 
 #include <ZETypes.h>
-#include "ZEMeta/ZEAttribute.h"
+#include "ZEMeta/ZEMTAttribute.h"
 
-#define ZE_VECTOR_SWIZZLE_DEFINITION_2(ZEVectorType, a, b) ZE_META_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b() const;
+#define ZE_VECTOR_SWIZZLE_DEFINITION_2(ZEVectorType, a, b) ZEMT_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b() const;
 #define ZE_VECTOR_SWIZZLE_IMPLEMENTATION_2(ZEVectorType, ClassName, a, b)  ZEVectorType ClassName::a##b() const {return ZEVectorType(a, b);}
 
-#define ZE_VECTOR_SWIZZLE_DEFINITION_3(ZEVectorType, a, b, c) ZE_META_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b##c() const;
+#define ZE_VECTOR_SWIZZLE_DEFINITION_3(ZEVectorType, a, b, c) ZEMT_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b##c() const;
 #define ZE_VECTOR_SWIZZLE_IMPLEMENTATION_3(ZEVectorType, ClassName, a, b, c)  ZEVectorType ClassName::a##b##c() const {return ZEVectorType(a, b, c);}
 
-#define ZE_VECTOR_SWIZZLE_DEFINITION_4(ZEVectorType, a, b, c, d) ZE_META_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b##c##d() const;
+#define ZE_VECTOR_SWIZZLE_DEFINITION_4(ZEVectorType, a, b, c, d) ZEMT_ATTRIBUTE(ZEMC.Export, false) ZEVectorType a##b##c##d() const;
 #define ZE_VECTOR_SWIZZLE_IMPLEMENTATION_4(ZEVectorType, ClassName, a, b, c, d) ZEVectorType ClassName::a##b##c##d() const {return ZEVectorType(a, b, c, d);}
 
 #define ZE_VECTOR_SWIZZLE_2D_DEFINITION(ZEVectorType) \

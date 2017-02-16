@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETypeGenerator.h
+ Zinek Engine - ZEMTTypeGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,11 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TYPE_GENERATOR_H__
-#define __ZE_TYPE_GENERATOR_H__
 
 #include "ZETypes.h"
-#include "ZEType.h"
+#include "ZEMTType.h"
 
 class ZEVector2;
 class ZEVector2d;
@@ -62,15 +60,15 @@ template<class T, class B> struct Derived_from
 };
 
 template <typename T>
-class ZETypeGenerator;
+class ZEMTTypeGenerator;
 
 template <typename T>
-class ZETypeGenerator<const T>
+class ZEMTTypeGenerator<const T>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			ZEType Type = ZE_TT_UNDEFINED;
+			ZEMTType Type = ZEMT_TT_UNDEFINED;
 			Type.Class = 0;
 			Type.TypeQualifier = ZE_TT_VALUE;
 			return Type;
@@ -78,258 +76,256 @@ class ZETypeGenerator<const T>
 };
 
 template <typename T>
-class ZETypeGenerator<T *>
+class ZEMTTypeGenerator<T *>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			ZEType Type = ZETypeGenerator<T>::GetType();
+			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
 			
-			if (Type.Type == ZE_TT_OBJECT)
+			if (Type.Type == ZEMT_TT_OBJECT)
 			{
-				Type.Type = ZE_TT_OBJECT_PTR;
+				Type.Type = ZEMT_TT_OBJECT_PTR;
 			}
-			else if (Type.Type == ZE_TT_CLASS)
+			else if (Type.Type == ZEMT_TT_CLASS)
 			{
 				return Type;
 			}
 
-			return ZEType();
+			return ZEMTType();
 		}
 };
 
 template <typename T>
-class ZETypeGenerator<const T *>
+class ZEMTTypeGenerator<const T *>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			return ZEType();
+			return ZEMTType();
 		}
 };
 
 template <typename T>
-class ZETypeGenerator<T &>
+class ZEMTTypeGenerator<T &>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			ZEType Type = ZETypeGenerator<T>::GetType();
+			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
 			Type.Class = 0;
-			Type.TypeQualifier = ZE_TQ_REFERENCE;
+			Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 			return Type;
 		}
 };
 
 template <typename T>
-class ZETypeGenerator<const T &>
+class ZEMTTypeGenerator<const T &>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			ZEType Type = ZETypeGenerator<T>::GetType();
+			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
 			Type.Class = NULL;
-			Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+			Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 			return Type;
 		}
 };
 
 template <>
-class ZETypeGenerator<void>
+class ZEMTTypeGenerator<void>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEUInt8>
+class ZEMTTypeGenerator<ZEUInt8>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEUInt16>
+class ZEMTTypeGenerator<ZEUInt16>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEUInt32>
+class ZEMTTypeGenerator<ZEUInt32>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEUInt64>
+class ZEMTTypeGenerator<ZEUInt64>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEInt8>
+class ZEMTTypeGenerator<ZEInt8>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEInt16>
+class ZEMTTypeGenerator<ZEInt16>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEInt32>
+class ZEMTTypeGenerator<ZEInt32>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEInt64>
+class ZEMTTypeGenerator<ZEInt64>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<float>
+class ZEMTTypeGenerator<float>
 {
 	public:
-		static ZEType GetType();
-};
-
-
-template <>
-class ZETypeGenerator<double>
-{
-	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 
 template <>
-class ZETypeGenerator<bool>
+class ZEMTTypeGenerator<double>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
+};
+
+
+template <>
+class ZEMTTypeGenerator<bool>
+{
+	public:
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector2>
+class ZEMTTypeGenerator<ZEVector2>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector2d>
+class ZEMTTypeGenerator<ZEVector2d>
 {
 public:
-	static ZEType GetType();
+	static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector3>
+class ZEMTTypeGenerator<ZEVector3>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector3d>
+class ZEMTTypeGenerator<ZEVector3d>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector4>
+class ZEMTTypeGenerator<ZEVector4>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEVector4d>
+class ZEMTTypeGenerator<ZEVector4d>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEQuaternion>
+class ZEMTTypeGenerator<ZEQuaternion>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEMatrix3x3>
+class ZEMTTypeGenerator<ZEMatrix3x3>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEMatrix3x3d>
+class ZEMTTypeGenerator<ZEMatrix3x3d>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEMatrix4x4>
+class ZEMTTypeGenerator<ZEMatrix4x4>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEMatrix4x4d>
+class ZEMTTypeGenerator<ZEMatrix4x4d>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEString>
+class ZEMTTypeGenerator<ZEString>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEObject>
+class ZEMTTypeGenerator<ZEObject>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <>
-class ZETypeGenerator<ZEClass*>
+class ZEMTTypeGenerator<ZEClass*>
 {
 	public:
-		static ZEType GetType();
+		static ZEMTType GetType();
 };
 
 template <typename T>
-class ZETypeGenerator : Derived_from<T, ZEObject>
+class ZEMTTypeGenerator : Derived_from<T, ZEObject>
 {
 	public:
-		static ZEType GetType()
+		static ZEMTType GetType()
 		{
-			ZEType Type;
-			Type.Type = ZE_TT_OBJECT;
-			Type.TypeQualifier = ZE_TQ_VALUE;
+			ZEMTType Type;
+			Type.Type = ZEMT_TT_OBJECT;
+			Type.TypeQualifier = ZEMT_TQ_VALUE;
 			Type.Class = T::Class();
 			return Type;
 		}
 };
-
-#endif

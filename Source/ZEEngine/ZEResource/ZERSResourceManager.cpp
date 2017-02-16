@@ -344,13 +344,13 @@ ZESize ZERSResourceManager::GetSharedResourceCount()
 
 ZESize ZERSResourceManager::GetMemoryUsage(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Enumerator()->ToText(Pool).ToCString());
 	return MemoryUsage[Pool];
 }
 
 ZESize ZERSResourceManager::GetMemoryUsageShared(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Enumerator()->ToText(Pool).ToCString());
 	return MemoryUsageShared[Pool];
 }
 
@@ -575,7 +575,7 @@ ZEString ZERSResourceManager::ListResources(const ZEString& Filter)
 				"RefCount: {3}",
 				Resource->GetIndex(),
 				Resource->GetClass()->GetName(),
-				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				ZERSResourceState_Enumerator()->ToText(Resource->GetState()),
 				Resource->GetReferenceCount());
 
 			if (!Resource->GetGUID().Equals(ZEGUID::Zero))
@@ -627,7 +627,7 @@ ZEString ZERSResourceManager::ShowResource(ZESize Index)
 				Resource->GetGUID().ToString(),
 				Resource->GetFileName(),
 				Resource->GetFileNameHash(),
-				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				ZERSResourceState_Enumerator()->ToText(Resource->GetState()),
 				Resource->IsShared(),
 				Resource->GetReferenceCount(),
 				Resource->GetMemoryUsage(ZERS_MP_CPU),

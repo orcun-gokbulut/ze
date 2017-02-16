@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethod.cpp
+ Zinek Engine - ZEMTContainer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMethod.h"
+#include "ZEMTContainer.h"
 
-#include "ZEAttribute.h"
-#include <string.h>
-
-const ZEAttribute* ZEMethod::GetAttribute(const char* Name) const
+bool ZEMTContainerBase::Insert(ZESize Index, ZEObject* Item)
 {
-	for (ZESize I = 0; I < AttributeCount; I++)
-	{
-		if (strcmp(Attributes[I].Name, Name) == 0)
-			return &Attributes[I];
-	}
-
-	return NULL;
-}
-
-const char* ZEMethod::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue) const
-{
-	const ZEAttribute* Attribute = GetAttribute(Name);
-	if (Attribute == NULL)
-		return DefaultValue;
-
-	if (Attribute->ValueCount < Index)
-		return DefaultValue;
-
-	return Attribute->Values[Index];
-}
-
-bool ZEMethod::CheckAttribute(const char* Name) const
-{
-	const ZEAttribute* Attribute = GetAttribute(Name);
-	if (Attribute != NULL)
-		return true;
-
 	return false;
 }
 
-bool ZEMethod::CheckAttributeHasValue(const char* Name, const char* Value) const
+bool ZEMTContainerBase::Remove(ZESize Index)
 {
-	const ZEAttribute* Attribute = GetAttribute(Name);
-	if (Attribute == NULL)
-		return false;
+	return false;
+}
 
-	for (ZESize I = 0; I < Attribute->ValueCount; I++)
-	{
-		if (strcmp(Attribute->Values[I], Value) != 0)
-			return true;
-	}
-
+bool ZEMTContainerBase::SetItem(ZESize Index, ZEObject* Item)
+{
 	return false;
 }

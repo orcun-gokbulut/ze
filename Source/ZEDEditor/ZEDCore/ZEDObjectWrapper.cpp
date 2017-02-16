@@ -424,7 +424,7 @@ ZEDObjectWrapper* ZEDObjectWrapper::Clone()
 	if (CloneObject == NULL)
 		return NULL;
 
-	const ZEProperty* Properties = CloneObject->GetClass()->GetProperties();
+	const ZEMTProperty* Properties = CloneObject->GetClass()->GetProperties();
 	ZESize PropertyCount = CloneObject->GetClass()->GetPropertyCount();
 	for (ZESize I = 0; I < PropertyCount; I++)
 	{

@@ -37,81 +37,81 @@
 #include "ZEMCContext.h"
 #include "ZEDS\ZEFormat.h"
 
-const char* ZEMCGenerator::ConvertOperatorTypeToString(ZEMCMetaOperatorType OperatorType)
+const char* ZEMCGenerator::ConvertOperatorTypeToString(ZEMCOperatorType OperatorType)
 {
 	switch (OperatorType)
 	{
-		case ZEMC_MOT_ADDITION:
-			return "ZE_MOT_ADDITION";
-		case ZEMC_MOT_ADDITION_ASSIGNMENT:
-			return "ZE_MOT_ADDITION_ASSIGNMENT";
-		case ZEMC_MOT_SUBTRACTION:
-			return "ZE_MOT_SUBTRACTION";
-		case ZEMC_MOT_SUBSTRACTION_ASSIGNMENT:
-			return "ZE_MOT_SUBSTRACTION_ASSIGNMENT";
-		case ZEMC_MOT_MULTIPLICATION:
-			return "ZE_MOT_MULTIPLICATION";
-		case ZEMC_MOT_MULTIPLICATION_ASSIGNMENT:
-			return "ZE_MOT_MULTIPLICATION_ASSIGNMENT";
-		case ZEMC_MOT_DIVISION:
-			return "ZE_MOT_DIVISION";
-		case ZEMC_MOT_DIVISION_ASSIGNMENT:
-			return "ZE_MOT_DIVISION_ASSIGNMENT";
-		case ZEMC_MOT_MODULO:
-			return "ZE_MOT_MODULO";
-		case ZEMC_MOT_MODULO_ASSIGNMENT:
-			return "ZE_MOT_MODULO_ASSIGNMENT";
-		case ZEMC_MOT_INCREMENT:
-			return "ZE_MOT_INCREMENT";
-		case ZEMC_MOT_DECREMENT:
-			return "ZE_MOT_DECREMENT";
-		case ZEMC_MOT_LOGICAL_NOT:
-			return "ZE_MOT_LOGICAL_NOT";
-		case ZEMC_MOT_LOGICAL_AND:
-			return "ZE_MOT_LOGICAL_AND";
-		case ZEMC_MOT_LOGICAL_OR:
-			return "ZE_MOT_LOGICAL_OR";
-		case ZEMC_MOT_BITWISE_AND:
-			return "ZE_MOT_BITWISE_AND";
-		case ZEMC_MOT_BITWISE_AND_ASSIGNMENT:
-			return "ZE_MOT_BITWISE_AND_ASSIGNMENT";
-		case ZEMC_MOT_BITWISE_OR:
-			return "ZE_MOT_BITWISE_OR";
-		case ZEMC_MOT_BITWISE_OR_ASSIGNMENT:
-			return "ZE_MOT_BITWISE_OR_ASSIGNMENT";
-		case ZEMC_MOT_BITWISE_XOR:
-			return "ZE_MOT_BITWISE_XOR";
-		case ZEMC_MOT_BITWISE_XOR_ASSIGNMENT:
-			return "ZE_MOT_BITWISE_XOR_ASSIGNMENT";
-		case ZEMC_MOT_LEFT_SHIFT:
-			return "ZE_MOT_LEFT_SHIFT";
-		case ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT:
-			return "ZE_MOT_LEFT_SHIFT_ASSIGNMENT";
-		case ZEMC_MOT_RIGHT_SHIFT:
-			return "ZE_MOT_RIGHT_SHIFT";
-		case ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT:
-			return "ZE_MOT_RIGHT_SHIFT_ASSIGNMENT";
-		case ZEMC_MOT_ASSIGNMENT:
-			return "ZE_MOT_ASSIGNMENT";
-		case ZEMC_MOT_EQUAL:
-			return "ZE_MOT_EQUAL";
-		case ZEMC_MOT_NOT_EQUAL:
-			return "ZE_MOT_NOT_EQUAL";
-		case ZEMC_MOT_LESS:
-			return "ZE_MOT_LESS";
-		case ZEMC_MOT_LESS_EQUAL:
-			return "ZE_MOT_LESS_EQUAL";
-		case ZEMC_MOT_GREATER:
-			return "ZE_MOT_GREATER";
-		case ZEMC_MOT_GREATER_AND_EQUAL:
-			return "ZE_MOT_GREATER_AND_EQUAL";
-		case ZEMC_MOT_FUNCTION_CALL:
-			return "ZE_MOT_FUNCTION_CALL";
-		case ZEMC_MOT_ARRAY_SUBSCRIPT:
-			return "ZE_MOT_ARRAY_SUBSCRIPT";
+		case ZEMC_OT_ADDITION:
+			return "ZEMT_OT_ADDITION";
+		case ZEMC_OT_ADDITION_ASSIGNMENT:
+			return "ZEMT_OT_ADDITION_ASSIGNMENT";
+		case ZEMC_OT_SUBTRACTION:
+			return "ZEMT_OT_SUBTRACTION";
+		case ZEMC_OT_SUBSTRACTION_ASSIGNMENT:
+			return "ZEMT_OT_SUBSTRACTION_ASSIGNMENT";
+		case ZEMC_OT_MULTIPLICATION:
+			return "ZEMT_OT_MULTIPLICATION";
+		case ZEMC_OT_MULTIPLICATION_ASSIGNMENT:
+			return "ZEMT_OT_MULTIPLICATION_ASSIGNMENT";
+		case ZEMC_OT_DIVISION:
+			return "ZEMT_OT_DIVISION";
+		case ZEMC_OT_DIVISION_ASSIGNMENT:
+			return "ZEMT_OT_DIVISION_ASSIGNMENT";
+		case ZEMC_OT_MODULO:
+			return "ZEMT_OT_MODULO";
+		case ZEMC_OT_MODULO_ASSIGNMENT:
+			return "ZEMT_OT_MODULO_ASSIGNMENT";
+		case ZEMC_OT_INCREMENT:
+			return "ZEMT_OT_INCREMENT";
+		case ZEMC_OT_DECREMENT:
+			return "ZEMT_OT_DECREMENT";
+		case ZEMC_OT_LOGICAL_NOT:
+			return "ZEMT_OT_LOGICAL_NOT";
+		case ZEMC_OT_LOGICAL_AND:
+			return "ZEMT_OT_LOGICAL_AND";
+		case ZEMC_OT_LOGICAL_OR:
+			return "ZEMT_OT_LOGICAL_OR";
+		case ZEMC_OT_BITWISE_AND:
+			return "ZEMT_OT_BITWISE_AND";
+		case ZEMC_OT_BITWISE_AND_ASSIGNMENT:
+			return "ZEMT_OT_BITWISE_AND_ASSIGNMENT";
+		case ZEMC_OT_BITWISE_OR:
+			return "ZEMT_OT_BITWISE_OR";
+		case ZEMC_OT_BITWISE_OR_ASSIGNMENT:
+			return "ZEMT_OT_BITWISE_OR_ASSIGNMENT";
+		case ZEMC_OT_BITWISE_XOR:
+			return "ZEMT_OT_BITWISE_XOR";
+		case ZEMC_OT_BITWISE_XOR_ASSIGNMENT:
+			return "ZEMT_OT_BITWISE_XOR_ASSIGNMENT";
+		case ZEMC_OT_LEFT_SHIFT:
+			return "ZEMT_OT_LEFT_SHIFT";
+		case ZEMC_OT_LEFT_SHIFT_ASSIGNMENT:
+			return "ZEMT_OT_LEFT_SHIFT_ASSIGNMENT";
+		case ZEMC_OT_RIGHT_SHIFT:
+			return "ZEMT_OT_RIGHT_SHIFT";
+		case ZEMC_OT_RIGHT_SHIFT_ASSIGNMENT:
+			return "ZEMT_OT_RIGHT_SHIFT_ASSIGNMENT";
+		case ZEMC_OT_ASSIGNMENT:
+			return "ZEMT_OT_ASSIGNMENT";
+		case ZEMC_OT_EQUAL:
+			return "ZEMT_OT_EQUAL";
+		case ZEMC_OT_NOT_EQUAL:
+			return "ZEMT_OT_NOT_EQUAL";
+		case ZEMC_OT_LESS:
+			return "ZEMT_OT_LESS";
+		case ZEMC_OT_LESS_EQUAL:
+			return "ZEMT_OT_LESS_EQUAL";
+		case ZEMC_OT_GREATER:
+			return "ZEMT_OT_GREATER";
+		case ZEMC_OT_GREATER_AND_EQUAL:
+			return "ZEMT_OT_GREATER_AND_EQUAL";
+		case ZEMC_OT_FUNCTION_CALL:
+			return "ZEMT_OT_FUNCTION_CALL";
+		case ZEMC_OT_ARRAY_SUBSCRIPT:
+			return "ZEMT_OT_ARRAY_SUBSCRIPT";
 	}
 
-	return "ZE_MOT_NONE";
+	return "ZEMT_OT_NONE";
 }
 
 void ZEMCGenerator::GenerateClassMethods(ZEMCClass* CurrentClass)
@@ -192,7 +192,7 @@ void ZEMCGenerator::GenerateClassGetMethods_Attributes(ZEMCClass* CurrentClass)
 
 		// Attributes
 		WriteToFile(
-			"\tstatic ZEAttribute Method%dAttributes[%d] =\n"
+			"\tstatic ZEMTAttribute Method%dAttributes[%d] =\n"
 			"\t{\n", I, CurrentMethod->Attributes.GetCount());
 
 		for (ZESize J = 0; J < CurrentMethod->Attributes.GetCount(); J++)
@@ -228,7 +228,7 @@ void ZEMCGenerator::GenerateClassGetMethods_Parameters(ZEMCClass* CurrentClass)
 			continue;
 
 		WriteToFile(
-			"\tstatic ZEMethodParameter Method%dParameters[%d] =\n"
+			"\tstatic ZEMTMethodParameter Method%dParameters[%d] =\n"
 			"\t{\n", I, CurrentMethod->Parameters.GetCount());
 
 		for (ZESize J = 0; J < CurrentMethod->Parameters.GetCount(); J++)
@@ -256,7 +256,7 @@ ZEString ZEMCGenerator::GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEM
 void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"\tstatic ZEMethod Methods[%d] =\n\t"
+		"\tstatic ZEMTMethod Methods[%d] =\n\t"
 		"{\n", CurrentClass->Methods.GetCount());
 
 	for (ZESize I = 0; I < CurrentClass->Methods.GetCount(); I++)
@@ -312,7 +312,7 @@ void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetMethods(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"const ZEMethod* %sClass::GetMethods()\n"
+		"const ZEMTMethod* %sClass::GetMethods()\n"
 		"{\n", CurrentClass->Name.ToCString());
 
 	if (CurrentClass->Methods.GetCount() == 0)
@@ -502,6 +502,16 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 			else
 				WriteToFile("CastedObject->%s(", CurrentMethod->Name.ToCString());
 
+			ZEMCType& ReturnType = CurrentMethod->ReturnValue;
+			if (ReturnType.BaseType == ZEMC_BT_OBJECT_PTR && ReturnType.Class->IsForwardDeclared)
+			{
+				WriteToFile("(");
+				if (ReturnType.TypeQualifier == ZEMC_TQ_CONST_VALUE || ReturnType.TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
+					WriteToFile("const");
+				
+				WriteToFile("ZEObject*)");
+			}
+
 			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
 			{
 				ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[N];
@@ -513,6 +523,16 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_REFERENCE;
 				else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
+
+				ZEMCType& ParameterType = CurrentParameter->Type;
+				if (ParameterType.BaseType == ZEMC_BT_OBJECT_PTR && ParameterType.Class->IsForwardDeclared)
+				{
+					WriteToFile("(");
+					if (ParameterType.TypeQualifier == ZEMC_TQ_CONST_VALUE || ParameterType.TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
+						WriteToFile("const");
+
+					WriteToFile("ZEObject*)");
+				}
 
 				ZEString VariantCast;
 				ZEString VariantPostfix = GenerateVariantPostfix(ModifiedParameterType, VariantCast);

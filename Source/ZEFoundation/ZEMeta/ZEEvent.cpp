@@ -35,17 +35,17 @@
 
 #include "ZEEvent.h"
 
-void ZEEventBase::SetSuppressed(bool Suppressed)
+void ZEMTEventBase::SetSuppressed(bool Suppressed)
 {
 	this->Suppressed = Suppressed;
 }
 
-bool ZEEventBase::GetSuppressed() const
+bool ZEMTEventBase::GetSuppressed() const
 {
 	return Suppressed;
 }
 
-ZEEventBase::ZEEventBase()
+ZEMTEventBase::ZEMTEventBase()
 {
 	Suppressed = false;
 }

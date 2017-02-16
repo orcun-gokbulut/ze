@@ -38,13 +38,13 @@
 #define __ZE_BUILT_IN_OBJECT_H__
 
 #include "ZETypes.h"
-#include "ZEAttribute.h"
+#include "ZEMTAttribute.h"
 
 class ZEClass;
 
 #define ZE_FUNDAMENTAL \
 	public: \
-		static ZEClass* Class() ZE_META_ATTRIBUTE(ZEMeta.Fundamental); \
+		static ZEClass* Class() ZEMT_ATTRIBUTE(ZEMeta.Fundamental); \
 	private:
 
 #define ZE_META_FUNDAMENTAL_IMPLEMENTATION(ClassName) \

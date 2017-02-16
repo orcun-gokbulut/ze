@@ -50,7 +50,7 @@ class ZEModelDraw;
 class ZEMDResourceDraw;
 class ZEGRBuffer;
 
-ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
+ZEMT_FORWARD_DECLARE(ZERNMaterial);
 
 class ZERNCommandDraw : public ZERNCommand
 {

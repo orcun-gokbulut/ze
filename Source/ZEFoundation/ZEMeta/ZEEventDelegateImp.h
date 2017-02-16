@@ -53,7 +53,7 @@ ZE_TEMPLATE_KEYWORD
 class ZEEventDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)> : public ZEEventDelegateBase
 {
 	private:
-		ZEMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
+		ZEMTMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
 		void (*Wrapper)(ZEObject* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS);
 
 		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)>
@@ -63,7 +63,7 @@ class ZEEventDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)> : public ZEEventDelegateB
 		static void WrapperImpConst(ZEObject* Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENT_DEFINITIONS);
 
 	public:
-		virtual const ZEMethodSignature& GetSignature() const;
+		virtual const ZEMTMethodSignature& GetSignature() const;
 
 		void Call(ZE_ARGUMENT_DEFINITIONS) const;
 
@@ -107,7 +107,7 @@ void ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::WrapperImpConst(ZEObject* Obje
 }
 
 ZE_TEMPLATE_KEYWORD
-const ZEMethodSignature& ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() const
+const ZEMTMethodSignature& ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() const
 {
 	return SignatureGenerator.GetSignature();
 }

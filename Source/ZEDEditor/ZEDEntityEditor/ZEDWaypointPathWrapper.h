@@ -48,4 +48,4 @@ class ZEDWaypointPathWrapper : public ZEDEntityWrapper
 	public:
 		static ZEDWaypointPathWrapper*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEWaypointPath);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEWaypointPath);

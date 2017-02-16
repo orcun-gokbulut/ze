@@ -38,7 +38,7 @@
 #include "ZEDPropertyEditorItemNumeric.h"
 
 #include "ZEDS/ZEVariant.h"
-#include "ZEMeta/ZEProperty.h"
+#include "ZEMeta/ZEMTProperty.h"
 #include "ZEDPropertyEditor.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 
@@ -54,18 +54,18 @@ bool ZEDPropertyEditorItemNumeric::InitializeInternal()
 		return false;
 	}
 
-	const ZEProperty* Property = GetProperty();
+	const ZEMTProperty* Property = GetProperty();
 
-	if (Property->Type.Type != ZE_TT_INTEGER_8&&
-		Property->Type.Type != ZE_TT_INTEGER_16	&&
-		Property->Type.Type != ZE_TT_INTEGER_32	&&
-		Property->Type.Type != ZE_TT_INTEGER_64	&&
-		Property->Type.Type != ZE_TT_UNSIGNED_INTEGER_8	&&
-		Property->Type.Type != ZE_TT_UNSIGNED_INTEGER_16 &&
-		Property->Type.Type != ZE_TT_UNSIGNED_INTEGER_32 &&
-		Property->Type.Type != ZE_TT_UNSIGNED_INTEGER_64 &&
-		Property->Type.Type != ZE_TT_FLOAT &&
-		Property->Type.Type != ZE_TT_DOUBLE)
+	if (Property->Type.Type != ZEMT_TT_INTEGER_8&&
+		Property->Type.Type != ZEMT_TT_INTEGER_16	&&
+		Property->Type.Type != ZEMT_TT_INTEGER_32	&&
+		Property->Type.Type != ZEMT_TT_INTEGER_64	&&
+		Property->Type.Type != ZEMT_TT_UNSIGNED_INTEGER_8	&&
+		Property->Type.Type != ZEMT_TT_UNSIGNED_INTEGER_16 &&
+		Property->Type.Type != ZEMT_TT_UNSIGNED_INTEGER_32 &&
+		Property->Type.Type != ZEMT_TT_UNSIGNED_INTEGER_64 &&
+		Property->Type.Type != ZEMT_TT_FLOAT &&
+		Property->Type.Type != ZEMT_TT_DOUBLE)
 	{
 		setText(1, "Type Error");
 		return false;
@@ -101,7 +101,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 	switch(GetProperty()->Type.Type)
 	{
 		default:
-		case ZE_TT_INTEGER_8:
+		case ZEMT_TT_INTEGER_8:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toInt(&Result);
@@ -112,7 +112,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_INTEGER_16:
+		case ZEMT_TT_INTEGER_16:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toInt(&Result);
@@ -123,7 +123,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_INTEGER_32:
+		case ZEMT_TT_INTEGER_32:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toInt(&Result);
@@ -134,7 +134,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_INTEGER_64:
+		case ZEMT_TT_INTEGER_64:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toInt(&Result);
@@ -145,7 +145,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_UNSIGNED_INTEGER_8:
+		case ZEMT_TT_UNSIGNED_INTEGER_8:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toUInt(&Result);
@@ -156,7 +156,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_UNSIGNED_INTEGER_16:
+		case ZEMT_TT_UNSIGNED_INTEGER_16:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toUInt(&Result);
@@ -167,7 +167,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_UNSIGNED_INTEGER_32:
+		case ZEMT_TT_UNSIGNED_INTEGER_32:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toUInt(&Result);
@@ -178,7 +178,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_UNSIGNED_INTEGER_64:
+		case ZEMT_TT_UNSIGNED_INTEGER_64:
 		{
 			bool Result = false;
 			ZEInt Integer = Text.toUInt(&Result);
@@ -189,7 +189,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_FLOAT:
+		case ZEMT_TT_FLOAT:
 		{
 			bool Result = false;
 			float Float = Text.toFloat(&Result);
@@ -200,7 +200,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 			break;
 		}
 
-		case ZE_TT_DOUBLE:
+		case ZEMT_TT_DOUBLE:
 		{
 			bool Result = false;
 			double Double = Text.toDouble(&Result);
@@ -291,43 +291,43 @@ void ZEDPropertyEditorItemNumeric::Update()
 	{
 		switch (GetProperty()->Type.Type)
 		{
-			case ZE_TT_INTEGER_8:
+			case ZEMT_TT_INTEGER_8:
 				TextEdit->setText(QString::number(Value.GetInt8()));
 				break;
 
-			case ZE_TT_INTEGER_16:
+			case ZEMT_TT_INTEGER_16:
 				TextEdit->setText(QString::number(Value.GetInt16()));
 				break;
 
-			case ZE_TT_INTEGER_32:
+			case ZEMT_TT_INTEGER_32:
 				TextEdit->setText(QString::number(Value.GetInt32()));
 				break;
 
-			case ZE_TT_INTEGER_64:
+			case ZEMT_TT_INTEGER_64:
 				TextEdit->setText(QString::number(Value.GetInt64()));
 				break;
 
-			case ZE_TT_UNSIGNED_INTEGER_8:
+			case ZEMT_TT_UNSIGNED_INTEGER_8:
 				TextEdit->setText(QString::number(Value.GetUInt8()));
 				break;
 
-			case ZE_TT_UNSIGNED_INTEGER_16:
+			case ZEMT_TT_UNSIGNED_INTEGER_16:
 				TextEdit->setText(QString::number(Value.GetUInt16()));
 				break;
 
-			case ZE_TT_UNSIGNED_INTEGER_32:
+			case ZEMT_TT_UNSIGNED_INTEGER_32:
 				TextEdit->setText(QString::number(Value.GetUInt32()));
 				break;
 
-			case ZE_TT_UNSIGNED_INTEGER_64:
+			case ZEMT_TT_UNSIGNED_INTEGER_64:
 				TextEdit->setText(QString::number(Value.GetUInt64()));
 				break;
 
-			case ZE_TT_FLOAT:
+			case ZEMT_TT_FLOAT:
 				TextEdit->setText(QString::number(Value.GetFloat(), 'f', 3));
 				break;
 
-			case ZE_TT_DOUBLE:
+			case ZEMT_TT_DOUBLE:
 				TextEdit->setText(QString::number(Value.GetDouble(), 'f', 3));
 				break;
 

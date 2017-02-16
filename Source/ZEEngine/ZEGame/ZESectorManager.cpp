@@ -40,7 +40,7 @@
 #include "ZEScene.h"
 #include "ZEML\ZEMLWriter.h"
 #include "ZEML\ZEMLReader.h"
-#include "ZEMeta\ZEProvider.h"
+#include "ZEMeta\ZEMTProvider.h"
 
 #define ZE_GEDF_LOCAL_TRANSFORM 0x0004
 
@@ -567,7 +567,7 @@ bool ZESectorManager::Unserialize(const ZEString& FileName)
 		zeCheckError(!SelectorNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
 
 
-		ZEClass* SelectorClass = ZEProvider::GetInstance()->GetClass(SelectorNode.ReadString("Class"));
+		ZEClass* SelectorClass = ZEMTProvider::GetInstance()->GetClass(SelectorNode.ReadString("Class"));
 		if (SelectorClass == NULL)
 		{
 			zeWarning("Problem in loading ZESectorManager. Selector class is not registered. Class Name: \"%s\".", SelectorNode.ReadString("Class").ToCString());
@@ -589,7 +589,7 @@ bool ZESectorManager::Unserialize(const ZEString& FileName)
 		ZEMLReaderNode SectorNode = SectorsNode.GetNode("Sector", I);
 		zeCheckError(!SectorNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
 
-		ZEClass* SectorClass = ZEProvider::GetInstance()->GetClass(SectorNode.ReadString("Class"));
+		ZEClass* SectorClass = ZEMTProvider::GetInstance()->GetClass(SectorNode.ReadString("Class"));
 
 		if (SectorClass == NULL)
 		{
@@ -612,7 +612,7 @@ bool ZESectorManager::Unserialize(const ZEString& FileName)
 		ZEMLReaderNode GeographicEntityNode = GeographicEntitiesNode.GetNode("GeographicEntity", I);
 		zeCheckError(!GeographicEntityNode.IsValid(), false, "Loading ZESectorManager failed. Corrupted ZESectorManager file. File Name: \"%s\".", FileName.ToCString());
 
-		ZEClass* GeographicEntityClass = ZEProvider::GetInstance()->GetClass(GeographicEntityNode.ReadString("Class"));
+		ZEClass* GeographicEntityClass = ZEMTProvider::GetInstance()->GetClass(GeographicEntityNode.ReadString("Class"));
 
 		if (GeographicEntityClass == NULL)
 		{

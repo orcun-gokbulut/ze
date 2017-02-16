@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPropertySignatureGenerator.cpp
+ Zinek Engine - ZEMTPropertySignatureGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,173 +33,173 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPropertySignatureGenerator.h"
+#include "ZEMTPropertySignatureGenerator.h"
 
-ZEPropertySignature ZEPropertySignatureGenerator<void>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<void>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_NULL;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEUInt8>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEUInt8>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_UNSIGNED_INTEGER_8;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEUInt16>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEUInt16>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_UNSIGNED_INTEGER_16;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEUInt32>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEUInt32>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_UNSIGNED_INTEGER_32;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEUInt64>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEUInt64>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_UNSIGNED_INTEGER_64;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEInt8>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEInt8>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_INTEGER_8;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEInt16>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEInt16>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_INTEGER_16;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEInt32>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEInt32>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_INTEGER_32;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEInt64>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEInt64>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_INTEGER_64;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<float>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<float>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_FLOAT;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<double>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<double>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_DOUBLE;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<bool>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<bool>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_BOOLEAN;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEVector2>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEVector2>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_VECTOR2;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEVector3>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEVector3>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_VECTOR3;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEVector4>:: GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEVector4>:: GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_VECTOR4;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEQuaternion>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEQuaternion>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_QUATERNION;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEMatrix3x3>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEMatrix3x3>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_MATRIX3X3;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEMatrix4x4>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEMatrix4x4>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_MATRIX4X4;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;
 	return Type;
 }
 
-ZEPropertySignature ZEPropertySignatureGenerator<ZEString>::GetType()
+ZEMTPropertySignature ZEMTPropertySignatureGenerator<ZEString>::GetType()
 {
-	ZEPropertySignature Type;
+	ZEMTPropertySignature Type;
 	Type.Type = ZE_VRT_STRING;
 	Type.BaseClass = NULL;
 	Type.CanonicalType = ZE_CT_VALUE;

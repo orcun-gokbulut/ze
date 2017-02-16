@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEType.cpp
+ Zinek Engine - ZEMTProvider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEType.h"
+#pragma once
 
-bool ZEType::operator==(const ZEType& Other) const
+#include "ZEDS/ZEArray.h"
+#undef RegisterClass
+
+class ZEClass;
+class ZEObject;
+class ZEMTEnumerator;
+class ZEMLReaderNode;
+
+class ZEMTProvider
 {
-	return Equal(*this, Other);
-}
+	private:
+		ZEArray<ZEClass*>				Classes;
+		ZEArray<ZEMTEnumerator*>		Enumerators;
 
-bool ZEType::operator!=(const ZEType& Other) const
-{
-	return !Equal(*this, Other);
-}
+	public:
+		const ZEArray<ZEClass*>&		GetClasses();
+		ZEArray<ZEClass*>				GetClasses(ZEClass* ParentClass, bool ExcludeParentClass = false);
+		ZEClass*						GetClass(const char* ClassName);
+		bool							RegisterClass(ZEClass* Class);
+		void							UnregisterClass(ZEClass* Class);
 
-bool ZEType::Equal(const ZEType& A, const ZEType& B)
-{
-	if (A.Type != B.Type || 
-		A.TypeQualifier != B.TypeQualifier || 
-		A.ContainerType != B.ContainerType)
-	{
-		return false;
-	}
+		const ZEArray<ZEMTEnumerator*>&	GetEnumerators();
+		ZEMTEnumerator*					GetEnumerator(const char* EnumeratorName);
+		bool							RegisterEnumerator(ZEMTEnumerator* Enumerator);
+		void							UnregisterEnumerator(ZEMTEnumerator* Enumerator);
 
-	if ((A.Type == ZE_TT_OBJECT || A.Type == ZE_TT_OBJECT_PTR) && A.Class != B.Class)
-	{
-		return false;
-	}
-	else if (A.Type == ZE_TT_ENUMERATOR && A.Enumerator != B.Enumerator)
-	{
-		return false;
-	}
+		ZEObject*						CreateInstance(const char* ClassName);
+		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName);
+		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& Node);
 
-	return true;
-}
-
-ZEType::ZEType()
-{
-	Type = ZE_TT_UNDEFINED;
-	TypeQualifier = ZE_TQ_VALUE;
-	ContainerType = ZE_CT_NONE;
-	Class = 0;
-	Enumerator = 0;
-}
-
-ZEType::ZEType(ZETypeType Type, ZETypeQualifier TypeQualifier, ZEContainerType ContainerType, ZEClass* Class, ZEEnumerator* Enumerator)
-{
-	this->Type = Type;
-	this->TypeQualifier = TypeQualifier;
-	this->ContainerType = ContainerType;
-	this->Enumerator = Enumerator;
-	this->Class = Class;
-}
+		static ZEMTProvider*			GetInstance();
+};

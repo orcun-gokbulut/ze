@@ -37,7 +37,7 @@
 
 #include "ZEDPropertyEditorItemEnumurator.h"
 
-#include "ZEMeta/ZEProperty.h"
+#include "ZEMeta/ZEMTProperty.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDPropertyEditor.h"
 
@@ -54,8 +54,8 @@ bool ZEDPropertyEditorItemEnumurator::InitializeInternal()
 		return false;
 	}
 
-	const ZEProperty* Property = GetProperty();
-	if (Property->Type.Type != ZE_TT_ENUMERATOR)
+	const ZEMTProperty* Property = GetProperty();
+	if (Property->Type.Type != ZEMT_TT_ENUMERATOR)
 	{
 		setText(1, "Type Error");
 		return false;
@@ -72,7 +72,7 @@ bool ZEDPropertyEditorItemEnumurator::InitializeInternal()
 	{
 		ComboBox->lineEdit()->setReadOnly(true);
 		ZESize EnumuratorCount = Property->Type.Enumerator->GetItemCount();
-		const ZEEnumeratorItem* Enumurators = Property->Type.Enumerator->GetItems();
+		const ZEMTEnumeratorItem* Enumurators = Property->Type.Enumerator->GetItems();
 		for (ZESize I = 0; I < EnumuratorCount; I++)
 			ComboBox->addItem(Enumurators[I].Name, Enumurators[I].Value);
 	}
@@ -149,7 +149,7 @@ void ZEDPropertyEditorItemEnumurator::Update()
 	{
 		bool Found = false;
 		ZESize EnumuratorCount = GetProperty()->Type.Enumerator->GetItemCount();
-		const ZEEnumeratorItem* Enumurators = GetProperty()->Type.Enumerator->GetItems();
+		const ZEMTEnumeratorItem* Enumurators = GetProperty()->Type.Enumerator->GetItems();
 		for (ZESize I = 0; I < EnumuratorCount; I++)
 		{
 			if (Value.GetEnum() == Enumurators[I].Value)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethodSignatureGeneratorImp.h
+ Zinek Engine - ZEMTMethodSignatureGeneratorImp.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -46,16 +46,16 @@
 #define ZE_ARGUMENT_DEFINITIONS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_DEFINITION_MACRO, 0)
 #define ZE_ARGUMENT_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) Arg##Index
 #define ZE_ARGUMENTS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_MACRO, 0)
-#define ZE_SIGNATURE_GENERATOR_MACRO(Index, Parameter) Signature.Parameters[Index] = ZEPropertySignatureGenerator<TArg##Index>::GetType();
+#define ZE_SIGNATURE_GENERATOR_MACRO(Index, Parameter) Signature.Parameters[Index] = ZEMTPropertySignatureGenerator<TArg##Index>::GetType();
 
 template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
-class ZEMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)>
+class ZEMTMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 {
 	private:
-		mutable ZEMethodSignature			Signature;
+		mutable ZEMTMethodSignature			Signature;
 
 	public:
-		const ZEMethodSignature&			GetSignature() const;
+		const ZEMTMethodSignature&			GetSignature() const;
 };
 
 
@@ -63,11 +63,11 @@ class ZEMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 //////////////////////////////////////////////////////////////////////////////////////
 
 template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
-const ZEMethodSignature& ZEMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)>::GetSignature() const
+const ZEMTMethodSignature& ZEMTMethodSignatureGenerator<TReturn (ZE_TEMPLATE_ARGUMENTS)>::GetSignature() const
 {
 	if (Signature.ReturnType.Type == ZE_VRT_UNDEFINED)
 	{
-		Signature.ReturnType = ZEPropertySignatureGenerator<TReturn>::GetType();
+		Signature.ReturnType = ZEMTPropertySignatureGenerator<TReturn>::GetType();
 
 		Signature.Parameters.SetCount(ZE_MACRO_INCLUDE_INDEX);
 		ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_SIGNATURE_GENERATOR_MACRO, 0);

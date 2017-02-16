@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleRegistar.h
+ Zinek Engine - ZEMTAttribute.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,19 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MODULE_REGISTAR_H__
-#define __ZE_MODULE_REGISTAR_H__
 
 #include "ZETypes.h"
+#include "ZEMacro/ZEMacro.h"
 
-class ZERegistar;
-
-class ZEMetaModuleRegister
-{
-	public:
-		virtual ZERegistar**		GetRegisters() = 0;
-		virtual ZESize				GetRegisterCount() = 0;
-
-};
-
+#ifdef ZE_META_COMPILER
+	#define ZEMT_ATTRIBUTE(Args...) ZEMT_ATTRIBUTE_2(Args)
+	#define ZEMT_ATTRIBUTE_2(Args...) __attribute__((annotate(#Args)))
+	#define ZEMT_ATTRIBUTE_GLOBAL(Args...) namespace { class ZEMT_ATTRIBUTE(Args) ZE_MACRO_CONCAT(Dummy, __LINE__); }
+#else
+	#define ZEMT_ATTRIBUTE(...)
+	#define ZEMT_ATTRIBUTE_GLOBAL(...)
 #endif
+
+
+#define ZEMT_ATTRIBUTE_MEMBER(MemberName, AttributeName, ...)		ZEMT_ATTRIBUTE(#MemberName, #AttributeName, __VA_ARGS__)
+#define ZEMT_ATTRIBUTE_PROPERTY(PropertyName, AttributeName, ...)	ZEMT_ATTRIBUTE("@"#PropertyName, #AttributeName, __VA_ARGS__)
+#define ZEMT_ATTRIBUTE_METHOD(MethodName, AttributeName, ...)		ZEMT_ATTRIBUTE("~"#MethodName, #AttributeName, __VA_ARGS__)
+
+struct ZEMTAttribute
+{
+	const char*		Name;
+	const char**	Values;
+	ZESize			ValueCount;
+};

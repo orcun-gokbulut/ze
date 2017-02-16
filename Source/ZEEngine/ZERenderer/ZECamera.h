@@ -146,6 +146,6 @@ class ZECamera : public ZEEntity
 
 		static ZECamera*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZECamera.png")
-ZE_META_ATTRIBUTE_PROPERTY(HorizontalFOV, ZEMeta.Serialization, false)
-ZE_META_ATTRIBUTE_PROPERTY(VerticalFOV, ZEMeta.Serialization, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZECamera.png")
+ZEMT_ATTRIBUTE_PROPERTY(HorizontalFOV, ZEMeta.Serialization, false)
+ZEMT_ATTRIBUTE_PROPERTY(VerticalFOV, ZEMeta.Serialization, false);

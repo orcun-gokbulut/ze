@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAttribute.h
+ Zinek Engine - ZEMTProperty.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,22 +36,42 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEMacro/ZEMacro.h"
+#include "ZEMTType.h"
 
-#ifdef ZE_META_COMPILER
-	#define ZE_META_ATTRIBUTE(Args...) ZE_META_ATTRIBUTE_2(Args)
-	#define ZE_META_ATTRIBUTE_2(Args...)__attribute__((annotate(#Args)))
-#else
-	#define ZE_META_ATTRIBUTE(...)
-#endif
+class ZEClass;
+struct ZEMTAttribute;
+struct ZEEnum;
 
-#define ZE_META_ATTRIBUTE_MEMBER(MemberName, AttributeName, ...)					ZE_META_ATTRIBUTE(#MemberName, #AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_PROPERTY(PropertyName, AttributeName, ...)				ZE_META_ATTRIBUTE("@"#PropertyName, #AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_METHOD(MethodName, AttributeName, ...)					ZE_META_ATTRIBUTE("~"#MethodName, #AttributeName, __VA_ARGS__)
-
-struct ZEAttribute
+enum ZEPropertyAccess
 {
-	const char*		Name;
-	const char**	Values;
-	ZESize			ValueCount;
+	ZEMT_PA_NONE		= 0,
+	ZEMT_PA_READ		= 1,
+	ZEMT_PA_WRITE		= 2,
+	ZEMT_PA_READ_WRITE	= 3
+};
+
+struct ZEMTProperty
+{
+	ZESize								ID;
+	ZEClass*							MemberOf;
+
+	const char*							Name;
+	ZEUInt32							Hash;
+	void*								OffsetOrAddress;
+	ZEMTType								Type;
+
+	ZEPropertyAccess					Access;
+
+	bool								IsGenerated;
+	bool								IsContainer;
+	bool								IsStatic;
+
+	ZEMTAttribute*						Attributes;
+	ZESize								AttributeCount;
+
+	const ZEMTAttribute*					GetAttribute(const char* Name) const;
+	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;
+
+	bool								CheckAttribute(const char* Name) const;
+	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;
 };

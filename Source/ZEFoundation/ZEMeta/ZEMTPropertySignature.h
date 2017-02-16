@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMethodSignature.h
+ Zinek Engine - ZEMTPropertySignature.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,19 +35,32 @@
 
 #pragma once
 
-#include "ZEPropertySignature.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEValue.h"
 
-class ZEMethodSignature
+enum ZECanonicalType
+{
+	ZE_CT_VALUE,
+	ZE_CT_CONST_VALUE,
+	ZE_CT_REFERENCE,
+	ZE_CT_CONST_REFERENCE,
+	ZE_CT_POINTER,
+	ZE_CT_CONST_POINTER
+};
+
+class ZEClass;
+class ZEMTPropertySignature
 {
 	public:
-		ZEPropertySignature				ReturnType;
-		ZEArray<ZEPropertySignature>	Parameters;
+		ZEValueType					Type;
+		ZEClass*					BaseClass;
+		ZECanonicalType				CanonicalType;
 
-		bool							operator==(const ZEMethodSignature& Other);
-		bool							operator!=(const ZEMethodSignature& Other);
+		bool						operator==(const ZEMTPropertySignature& Other);
+		bool						operator!=(const ZEMTPropertySignature& Other);
 
-		ZEString						ToString() const;
+		ZEString					ToString() const;
 
-		static bool						Compare(const ZEMethodSignature& A, const ZEMethodSignature& B);
+									ZEMTPropertySignature();
+
+		static bool					Compare(const ZEMTPropertySignature& A, const ZEMTPropertySignature& B);
 };

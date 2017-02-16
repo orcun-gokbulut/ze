@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleRegistar.cpp
+ Zinek Engine - ZEMTProperty.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModuleRegistar.h"
+#include "ZEMTProperty.h"
 
-#include "ZECommon.h"
-ZE_SUPPRESS_LNK4221
+#include "ZEMTAttribute.h"
+#include <string.h>
+
+const ZEMTAttribute* ZEMTProperty::GetAttribute(const char* Name) const
+{
+	if (Name == NULL)
+		return NULL;
+
+	for (ZESize I = 0; I < AttributeCount; I++)
+	{
+		if (strcmp(Attributes[I].Name, Name) == 0)
+			return &Attributes[I];
+	}
+
+	return NULL;
+}
+
+const char* ZEMTProperty::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue) const
+{
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
+	if (Attribute == NULL)
+		return DefaultValue;
+
+	if (Attribute->ValueCount < Index)
+		return DefaultValue;
+
+	return Attribute->Values[Index];
+}
+
+bool ZEMTProperty::CheckAttribute(const char* Name) const
+{
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
+	if (Attribute != NULL)
+		return true;
+
+	return false;
+}
+
+bool ZEMTProperty::CheckAttributeHasValue(const char* Name, const char* Value) const
+{
+	if (Value == NULL)
+		return false;
+
+	const ZEMTAttribute* Attribute = GetAttribute(Name);
+	if (Attribute == NULL)
+		return false;
+
+	for (ZESize I = 0; I < Attribute->ValueCount; I++)
+	{
+		if (strcmp(Attribute->Values[I], Value) == 0)
+			return true;
+	}
+
+	return false;
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPropertySignature.cpp
+ Zinek Engine - ZEMTPropertySignature.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,21 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPropertySignature.h"
+#include "ZEMTPropertySignature.h"
 #include "ZEClass.h"
 
 
-bool ZEPropertySignature::operator==(const ZEPropertySignature& Other)
+bool ZEMTPropertySignature::operator==(const ZEMTPropertySignature& Other)
 {
 	return Compare(*this, Other);
 }
 
-bool ZEPropertySignature::operator!=(const ZEPropertySignature& Other)
+bool ZEMTPropertySignature::operator!=(const ZEMTPropertySignature& Other)
 {
 	return !Compare(*this, Other);
 }
 
-ZEString ZEPropertySignature::ToString() const
+ZEString ZEMTPropertySignature::ToString() const
 {
 	ZEString TypeString;
 	switch(Type)
@@ -160,14 +160,14 @@ ZEString ZEPropertySignature::ToString() const
 		return TypeString;
 }
 
-ZEPropertySignature::ZEPropertySignature()
+ZEMTPropertySignature::ZEMTPropertySignature()
 {
 	Type = ZE_VRT_UNDEFINED;
 	BaseClass = NULL;
 	CanonicalType = ZE_CT_VALUE;
 }
 
-bool ZEPropertySignature::Compare(const ZEPropertySignature& A, const ZEPropertySignature& B)
+bool ZEMTPropertySignature::Compare(const ZEMTPropertySignature& A, const ZEMTPropertySignature& B)
 {
 	if (A.CanonicalType != B.CanonicalType)
 		return false;

@@ -80,7 +80,7 @@ ZEMCType::~ZEMCType()
 
 ZEMCForwardDeclaration::ZEMCForwardDeclaration()
 {
-
+	Type = ZEMC_DT_NONE;
 }
 
 ZEMCForwardDeclaration::~ZEMCForwardDeclaration()
@@ -239,6 +239,7 @@ ZEMCProperty::ZEMCProperty()
 	Setter = NULL;
 	Adder = NULL;
 	Remover = NULL;
+	Counter = NULL;
 }
 
 ZEMCProperty::~ZEMCProperty()
@@ -268,7 +269,7 @@ ZEMCMethod::ZEMCMethod()
 	IsConstructor = false;
 
 	IsOperator = false;
-	OperatorType = ZEMC_MOT_NONE;
+	OperatorType = ZEMC_OT_NONE;
 }
 
 ZEMCMethod::~ZEMCMethod()
@@ -320,6 +321,10 @@ ZEMCContext::~ZEMCContext()
 	for (ZESize I = 0; I < ForwardDeclarations.GetCount(); I++)
 		delete ForwardDeclarations[I];
 	ForwardDeclarations.Clear();
+
+	for (ZESize I = 0; I < Includes.GetCount(); I++)
+		delete Includes[I];
+	Includes.Clear();
 
 	TargetClasses.Clear();
 	TargetEnumerators.Clear();

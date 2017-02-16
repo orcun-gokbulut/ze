@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 
-struct ZEProperty;
+struct ZEMTProperty;
 class ZEDObjectWrapper;
 
 struct ZEDPropertyOperationItem
@@ -56,7 +56,7 @@ class ZEDPropertyOperation : public ZEDOperation
 	private:
 		ZEArray<ZEDPropertyOperationItem>		Items;
 		ZEDObjectWrapper*						Wrappers;
-		const ZEProperty*						Property;
+		const ZEMTProperty*						Property;
 
 		virtual bool							Apply();
 		virtual bool							Revert();
@@ -64,6 +64,6 @@ class ZEDPropertyOperation : public ZEDOperation
 												ZEDPropertyOperation();
 
 	public:
-		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEVariant& Value);
-		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
+		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEMTProperty* Property, const ZEVariant& Value);
+		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values);
 };

@@ -110,5 +110,5 @@ class ZELightProjective : public ZELight
 		
 		static ZELightProjective*		CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightProjective.png");
-ZE_META_ATTRIBUTE_PROPERTY(ProjectionTextureFile, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightProjective.png");
+ZEMT_ATTRIBUTE_PROPERTY(ProjectionTextureFile, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");

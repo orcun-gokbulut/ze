@@ -105,6 +105,53 @@ bool ZEMCGenerator::Generate()
 	return true;
 }
 
+void ZEMCGenerator::GenerateIncludes()
+{
+	if (Context->Includes.GetCount() != 0)
+	{
+		WriteToFile(
+			"\n// Include(s)\n"
+			"////////////////////////////////////////////////////////////////////////////////////////\n\n");
+	}
+
+	for (ZESize I = 0; I < Context->Includes.GetCount(); I++)
+		WriteToFile("#include \"%s\"\n", Context->Includes[I]->HeaderFileName.ToCString());
+	
+	if (Context->Includes.GetCount() != 0)
+		WriteToFile("\n");
+}
+
+void ZEMCGenerator::GenerateForwardDeclaration()
+{
+	if (Context->ForwardDeclarations.GetCount() != 0)
+	{
+		WriteToFile(
+			"\n// Forward Declaration(s)\n"
+			"////////////////////////////////////////////////////////////////////////////////////////\n\n");
+	}
+
+	for(ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
+	{
+		switch (Context->ForwardDeclarations[I]->Type)
+		{
+			case ZEMC_DT_CLASS:
+				WriteToFile("ZEClass* %s_Class();\n", Context->ForwardDeclarations[I]->Name.ToCString());
+				break;
+
+			case ZEMC_DT_ENUMERATOR:
+				WriteToFile("ZEClass* %s_Enumerator();\n", Context->ForwardDeclarations[I]->Name.ToCString());
+				break;
+
+			case ZEMC_DT_FLAGS:
+			default:
+				continue;
+		}
+	}
+	
+	if (Context->Includes.GetCount() != 0)
+		WriteToFile("\n");
+}
+
 void ZEMCGenerator::GenerateHeading()
 {
 	ZEString VersionString = ZEVersion::GetZinekVersion().GetLongString();
@@ -130,7 +177,12 @@ void ZEMCGenerator::GenerateHeading()
 	WriteToFile("#include \"ZEMeta/ZEClass.h\"\n");
 	WriteToFile("#include \"ZEMeta/ZEMTFundamental.h\"\n");
 	WriteToFile("\n");
+
 	WriteToFile("#include <stddef.h>\n");
+	WriteToFile("\n");
+
+	GenerateIncludes();
+	GenerateForwardDeclaration();
 }
 
 void ZEMCGenerator::GenerateEnding()
@@ -144,91 +196,91 @@ const char* ZEMCGenerator::ConvertBaseTypeToEnum(ZEMCBaseType BaseType)
 	{
 		default:
 		case ZEMC_BT_UNDEFINED:
-			return "ZE_TT_UNDEFINED";
+			return "ZEMT_TT_UNDEFINED";
 
 		case ZEMC_BT_VOID:
-			return "ZE_TT_VOID";
+			return "ZEMT_TT_VOID";
 
 		case ZEMC_BT_INTEGER_8:
-			return "ZE_TT_INTEGER_8";
+			return "ZEMT_TT_INTEGER_8";
 
 		case ZEMC_BT_INTEGER_16:
-			return "ZE_TT_INTEGER_16";
+			return "ZEMT_TT_INTEGER_16";
 
 		case ZEMC_BT_INTEGER_32:
-			return "ZE_TT_INTEGER_32";
+			return "ZEMT_TT_INTEGER_32";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_8:
-			return "ZE_TT_UNSIGNED_INTEGER_8";
+			return "ZEMT_TT_UNSIGNED_INTEGER_8";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_16:
-			return "ZE_TT_UNSIGNED_INTEGER_16";
+			return "ZEMT_TT_UNSIGNED_INTEGER_16";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_32:
-			return "ZE_TT_UNSIGNED_INTEGER_32";
+			return "ZEMT_TT_UNSIGNED_INTEGER_32";
 
 		case ZEMC_BT_INTEGER_64:
-			return "ZE_TT_INTEGER_64";
+			return "ZEMT_TT_INTEGER_64";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_64:
-			return "ZE_TT_UNSIGNED_INTEGER_64";
+			return "ZEMT_TT_UNSIGNED_INTEGER_64";
 
 		case ZEMC_BT_FLOAT:
-			return "ZE_TT_FLOAT";
+			return "ZEMT_TT_FLOAT";
 
 		case ZEMC_BT_DOUBLE:
-			return "ZE_TT_DOUBLE";
+			return "ZEMT_TT_DOUBLE";
 
 		case ZEMC_BT_BOOLEAN:
-			return "ZE_TT_BOOLEAN";
+			return "ZEMT_TT_BOOLEAN";
 
 		case ZEMC_BT_STRING:
-			return "ZE_TT_STRING";
+			return "ZEMT_TT_STRING";
 
 		case ZEMC_BT_QUATERNION:
-			return "ZE_TT_QUATERNION";
+			return "ZEMT_TT_QUATERNION";
 
 		case ZEMC_BT_VECTOR2:
-			return "ZE_TT_VECTOR2";
+			return "ZEMT_TT_VECTOR2";
 
 		case ZEMC_BT_VECTOR2D:
-			return "ZE_TT_VECTOR2D";
+			return "ZEMT_TT_VECTOR2D";
 
 		case ZEMC_BT_VECTOR3:
-			return "ZE_TT_VECTOR3";
+			return "ZEMT_TT_VECTOR3";
 
 		case ZEMC_BT_VECTOR3D:
-			return "ZE_TT_VECTOR3D";
+			return "ZEMT_TT_VECTOR3D";
 
 		case ZEMC_BT_VECTOR4:
-			return "ZE_TT_VECTOR4";
+			return "ZEMT_TT_VECTOR4";
 
 		case ZEMC_BT_VECTOR4D:
-			return "ZE_TT_VECTOR4D";
+			return "ZEMT_TT_VECTOR4D";
 
 		case ZEMC_BT_MATRIX3X3:
-			return "ZE_TT_MATRIX3X3";
+			return "ZEMT_TT_MATRIX3X3";
 
 		case ZEMC_BT_MATRIX3X3D:
-			return "ZE_TT_MATRIX3X3D";
+			return "ZEMT_TT_MATRIX3X3D";
 
 		case ZEMC_BT_MATRIX4X4:
-			return "ZE_TT_MATRIX4X4";
+			return "ZEMT_TT_MATRIX4X4";
 
 		case ZEMC_BT_MATRIX4X4D:
-			return "ZE_TT_MATRIX4X4D";
+			return "ZEMT_TT_MATRIX4X4D";
 
 		case ZEMC_BT_CLASS:
-			return "ZE_TT_CLASS";
+			return "ZEMT_TT_CLASS";
 
 		case ZEMC_BT_OBJECT:
-			return "ZE_TT_OBJECT";
+			return "ZEMT_TT_OBJECT";
 
 		case ZEMC_BT_OBJECT_PTR:
-			return "ZE_TT_OBJECT_PTR";
+			return "ZEMT_TT_OBJECT_PTR";
 
 		case ZEMC_BT_ENUMERATOR:
-			return "ZE_TT_ENUMERATOR";
+			return "ZEMT_TT_ENUMERATOR";
 	}
 }
 
@@ -238,13 +290,13 @@ const char* ZEMCGenerator::ConvertContainerTypeToEnum(ZEMCContainerType Containe
 	{
 		default:
 		case ZEMC_CT_NONE:
-			return "ZE_CT_NONE";
+			return "ZEMT_CT_NONE";
 		case ZEMC_CT_ARRAY:
-			return "ZE_CT_ARRAY";
+			return "ZEMT_CT_ARRAY";
 		case ZEMC_CT_LIST:
-			return "ZE_CT_LIST";
+			return "ZEMT_CT_LIST";
 		case ZEMC_CT_CONTAINER:
-			return "ZE_CT_CONTAINER";
+			return "ZEMT_CT_CONTAINER";
 	}
 }
 
@@ -254,16 +306,16 @@ const char* ZEMCGenerator::ConvertTypeQualifierToEnum(ZEMCTypeQualifier TypeQual
 	{
 		default:
 		case ZEMC_TQ_VALUE:
-			return "ZE_TQ_VALUE";
+			return "ZEMT_TQ_VALUE";
 
 		case ZEMC_TQ_CONST_VALUE:
-			return "ZE_TQ_CONST_VALUE";
+			return "ZEMT_TQ_CONST_VALUE";
 
 		case ZEMC_TQ_REFERENCE:
-			return "ZE_TQ_REFERENCE";
+			return "ZEMT_TQ_REFERENCE";
 
 		case ZEMC_TQ_CONST_REFERENCE:
-			return "ZE_TQ_CONST_REFERENCE";
+			return "ZEMT_TQ_CONST_REFERENCE";
 	}
 }
 
@@ -540,10 +592,12 @@ ZEString ZEMCGenerator::GenerateTypeSignature(const ZEMCType& Type)
 
 ZEString ZEMCGenerator::GenerateTypeConstructor(const ZEMCType& Type)
 {
-	return ZEFormat::Format("ZEType({0}, {1}, {2}, {3}, {4})",
+	return ZEFormat::Format("ZEMTType({0}, {1}, {2}, {3}, {4})",
 		ConvertBaseTypeToEnum(Type.BaseType), 
 		ConvertTypeQualifierToEnum(Type.TypeQualifier),
 		ConvertContainerTypeToEnum(Type.ContainerType),
-		Type.BaseType == ZEMC_BT_OBJECT || Type.BaseType == ZEMC_BT_OBJECT_PTR ? ZEFormat::Format("{0}::Class()", Type.Class->Name) : "NULL",
-		Type.BaseType == ZEMC_BT_ENUMERATOR ? ZEFormat::Format("{0}_Declaration()", Type.Enumurator->Name) : "NULL");
+		Type.BaseType == ZEMC_BT_OBJECT || Type.BaseType == ZEMC_BT_OBJECT_PTR ? 
+			(Type.Class->IsForwardDeclared ? ZEFormat::Format("{0}_Class()", Type.Class->Name) : ZEFormat::Format("{0}::Class()", Type.Class->Name))  : 
+			"NULL",
+		Type.BaseType == ZEMC_BT_ENUMERATOR ? ZEFormat::Format("{0}_Enumerator()", Type.Enumurator->Name) : "NULL");
 }

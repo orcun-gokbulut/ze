@@ -39,7 +39,7 @@
 #include "ZEUIRectangle.h"
 #include "ZECore/ZETimer.h"
 
-ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZEGraphics/ZEMaterial.h")
+ZEMT_FORWARD_DECLARE(ZERNMaterial);
 
 class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {

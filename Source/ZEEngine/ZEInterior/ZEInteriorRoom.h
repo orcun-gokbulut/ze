@@ -43,8 +43,8 @@
 #include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
-ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
+ZEMT_FORWARD_DECLARE(ZEInterior);
+ZEMT_FORWARD_DECLARE(ZEInteriorDoor);
 
 struct ZEInteriorResourceRoom;
 class ZEPhysicalMesh;

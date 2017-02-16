@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEContainer.h
+ Zinek Engine - ZEMTMethodSignature.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,61 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CONTAINER_H__
-#define __ZE_CONTAINER_H__
 
-#include "ZETypes.h"
+#include "ZEMTPropertySignature.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEClass;
-class ZEObject;
-
-class ZEContainerBase
+class ZEMTMethodSignature
 {
 	public:
-		virtual ZEClass*			GetClass() const = 0;
-		virtual bool				GetAllowDerived() const = 0;
+		ZEMTPropertySignature				ReturnType;
+		ZEArray<ZEMTPropertySignature>	Parameters;
 
-		virtual ZESize				GetCount() const = 0;
-		virtual bool				Insert(ZESize Index, ZEObject* Item);
-		virtual bool				Remove(ZESize Index);
-		virtual bool				SetItem(ZESize Index, ZEObject* Item);
-		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const = 0;
+		bool							operator==(const ZEMTMethodSignature& Other);
+		bool							operator!=(const ZEMTMethodSignature& Other);
+
+		ZEString						ToString() const;
+
+		static bool						Compare(const ZEMTMethodSignature& A, const ZEMTMethodSignature& B);
 };
-
-template<typename ZEType, bool AllowDerived = true>
-class ZEContainer : public ZEContainerBase
-{
-	public:
-		virtual ZEClass*			GetClass() const;
-		virtual bool				GetAllowDerived() const;
-
-		virtual ZESize				GetCount() const;
-		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const;
-};
-
-
-template<typename ZEType, bool AllowDerived>
-ZEClass* ZEContainer<ZEType, AllowDerived>::GetClass() const
-{
-	return ZEType::Class();
-}
-
-template<typename ZEType, bool AllowDerived>
-bool ZEContainer<ZEType, AllowDerived>::GetAllowDerived() const
-{
-	return AllowDerived;
-}
-
-template<typename ZEType, bool AllowDerived>
-ZESize ZEContainer<ZEType, AllowDerived>::GetCount() const
-{
-	return 0;
-}
-
-template<typename ZEType, bool AllowDerived>
-bool ZEContainer<ZEType, AllowDerived>::GetItem(ZESize Index, ZEObject*& Item) const
-{
-	return false;
-}
-
-#endif

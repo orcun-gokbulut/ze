@@ -67,4 +67,4 @@ class ZEDEntityEditor : public ZEDEditor
 	public:
 		static ZEDEntityEditor*				CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");
+ZEMT_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");

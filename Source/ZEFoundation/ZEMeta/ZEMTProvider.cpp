@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.cpp
+ Zinek Engine - ZEMTProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEProvider.h"
+#include "ZEMTProvider.h"
 
 #include "ZEClass.h"
 #include "ZEEnumerator.h"
@@ -41,12 +41,12 @@
 #include "ZEObject.h"
 
 
-const ZEArray<ZEClass*>& ZEProvider::GetClasses()
+const ZEArray<ZEClass*>& ZEMTProvider::GetClasses()
 {
 	return Classes;
 }
 
-ZEArray<ZEClass*> ZEProvider::GetClasses(ZEClass* ParentClass, bool ExcludeParentClass)
+ZEArray<ZEClass*> ZEMTProvider::GetClasses(ZEClass* ParentClass, bool ExcludeParentClass)
 {
 	ZEArray<ZEClass*> DerivedClasses;
 	for (ZESize I = 0; I < Classes.GetCount(); I++)
@@ -61,7 +61,7 @@ ZEArray<ZEClass*> ZEProvider::GetClasses(ZEClass* ParentClass, bool ExcludeParen
 	return DerivedClasses;
 }
 
-ZEClass* ZEProvider::GetClass(const char* ClassName)
+ZEClass* ZEMTProvider::GetClass(const char* ClassName)
 {
 	for(ZESize I = 0; I < Classes.GetCount(); I++)
 	{
@@ -72,7 +72,7 @@ ZEClass* ZEProvider::GetClass(const char* ClassName)
 	return NULL;
 }
 
-bool ZEProvider::RegisterClass(ZEClass* Class)
+bool ZEMTProvider::RegisterClass(ZEClass* Class)
 {
 	if (Class == NULL)
 		return false;
@@ -87,17 +87,17 @@ bool ZEProvider::RegisterClass(ZEClass* Class)
 	return true;
 }
 
-void ZEProvider::UnregisterClass(ZEClass* Class)
+void ZEMTProvider::UnregisterClass(ZEClass* Class)
 {
 	Classes.RemoveValue(Class);
 }
 
-const ZEArray<ZEEnumerator*>& ZEProvider::GetEnumerators()
+const ZEArray<ZEMTEnumerator*>& ZEMTProvider::GetEnumerators()
 {
 	return Enumerators;
 }
 
-ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
+ZEMTEnumerator* ZEMTProvider::GetEnumerator(const char* EnumeratorName)
 {
 	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
 	{
@@ -108,7 +108,7 @@ ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
 	return NULL;
 }
 
-bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
+bool ZEMTProvider::RegisterEnumerator(ZEMTEnumerator* Enumerator)
 {
 	if (Enumerator == NULL)
 		return false;
@@ -121,12 +121,12 @@ bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
 	return true;
 }
 
-void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)
+void ZEMTProvider::UnregisterEnumerator(ZEMTEnumerator* Enumerator)
 {
 	Enumerators.RemoveValue(Enumerator);
 }
 
-ZEObject* ZEProvider::CreateInstance(const char* ClassName)
+ZEObject* ZEMTProvider::CreateInstance(const char* ClassName)
 {
 	ZEClass* Class = GetClass(ClassName);
 	if (Class == NULL)
@@ -138,7 +138,7 @@ ZEObject* ZEProvider::CreateInstance(const char* ClassName)
 	return Class->CreateInstance();
 }
 
-ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName)
+ZEObject* ZEMTProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName)
 {
 	ZEClass* Class = GetClass(ClassName);
 	if (Class == NULL)
@@ -158,7 +158,7 @@ ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* Clas
 	return Class->CreateInstance();
 }
 
-ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& ObjectNode)
+ZEObject* ZEMTProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& ObjectNode)
 {
 	ZEObject* Object = CreateDerivedInstance(BaseClass, ObjectNode.ReadString("Class"));
 	if (Object == NULL)
@@ -173,8 +173,8 @@ ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& 
 	return Object;
 }
 
-ZEProvider* ZEProvider::GetInstance()
+ZEMTProvider* ZEMTProvider::GetInstance()
 {
-	static ZEProvider Provider;
+	static ZEMTProvider Provider;
 	return &Provider;
 }

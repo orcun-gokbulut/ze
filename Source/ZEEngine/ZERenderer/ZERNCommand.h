@@ -42,8 +42,8 @@
 
 #define ZERN_MAX_COMMAND_LINK 8
 
-ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
-ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
+ZEMT_FORWARD_DECLARE(ZEEntity);
+ZEMT_FORWARD_DECLARE(ZERNRenderParameters);
 
 class ZERNCommand;
 class ZERNInstanceTag;

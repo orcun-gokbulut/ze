@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProvider.h
+ Zinek Engine - ZEMTMethodSignature.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEMTMethodSignature.h"
 
-#include "ZEDS/ZEArray.h"
-#undef RegisterClass
-
-class ZEClass;
-class ZEObject;
-class ZEEnumerator;
-class ZEMLReaderNode;
-
-class ZEProvider
+bool ZEMTMethodSignature::operator==(const ZEMTMethodSignature& Other)
 {
-	private:
-		ZEArray<ZEClass*>				Classes;
-		ZEArray<ZEEnumerator*>			Enumerators;
+	return Compare(*this, Other);
+}
 
-	public:
-		const ZEArray<ZEClass*>&		GetClasses();
-		ZEArray<ZEClass*>				GetClasses(ZEClass* ParentClass, bool ExcludeParentClass = false);
-		ZEClass*						GetClass(const char* ClassName);
-		bool							RegisterClass(ZEClass* Class);
-		void							UnregisterClass(ZEClass* Class);
+bool ZEMTMethodSignature::operator!=(const ZEMTMethodSignature& Other)
+{
+	return !Compare(*this, Other);
+}
 
-		const ZEArray<ZEEnumerator*>&	GetEnumerators();
-		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
-		bool							RegisterEnumerator(ZEEnumerator* Enumerator);
-		void							UnregisterEnumerator(ZEEnumerator* Enumerator);
+ZEString ZEMTMethodSignature::ToString() const
+{
+	ZEString String = ReturnType.ToString();
+	
+	String += " (";
+	for (ZESize I = 0; I < Parameters.GetCount(); I++)
+	{
+		String += Parameters[I].ToString();
+		
+		if (I + 1 != Parameters.GetCount())
+			String += ",";
+	}
+	String += ")";
 
-		ZEObject*						CreateInstance(const char* ClassName);
-		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName);
-		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& Node);
+	return String;
+}
 
-		static ZEProvider*				GetInstance();
-};
+bool ZEMTMethodSignature::Compare(const ZEMTMethodSignature& A, const ZEMTMethodSignature& B)
+{
+	if (A.Parameters.GetCount() != B.Parameters.GetCount())
+		return false;
+
+	if (!ZEMTPropertySignature::Compare(A.ReturnType, B.ReturnType))
+		return false;
+
+	for (ZESize I = 0; I < A.Parameters.GetCount(); I++)
+		if (!ZEMTPropertySignature::Compare(A.Parameters[I], B.Parameters[I]))
+			return false;
+
+	return true;
+}

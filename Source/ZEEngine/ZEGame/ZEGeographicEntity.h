@@ -74,4 +74,4 @@ class ZEGeographicEntity : public ZEEntity
 
 		static ZEGeographicEntity*			CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEGeographicEntity.png");

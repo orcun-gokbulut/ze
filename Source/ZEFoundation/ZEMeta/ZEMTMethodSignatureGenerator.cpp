@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEContainer.cpp
+ Zinek Engine - ZEMTMethodSignatureGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEContainer.h"
+#include "ZEMTMethodSignatureGenerator.h"
 
-bool ZEContainerBase::Insert(ZESize Index, ZEObject* Item)
-{
-	return false;
-}
-
-bool ZEContainerBase::Remove(ZESize Index)
-{
-	return false;
-}
-
-bool ZEContainerBase::SetItem(ZESize Index, ZEObject* Item)
-{
-	return false;
-}
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

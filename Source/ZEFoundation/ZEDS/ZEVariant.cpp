@@ -51,7 +51,7 @@
 #include "ZEMath/ZEMatrixd.h"
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEMeta/ZEType.h"
+#include "ZEMeta/ZEMTType.h"
 
 #pragma warning(push)
 #pragma warning(disable:4482 4996 4244 4800)
@@ -59,29 +59,29 @@
 template<typename ZEReturnType>
 inline ZEReturnType ZEVariant::ConvertValue() const
 {
-	if (ValueType.TypeQualifier ==  ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier ==  ZEMT_TQ_VALUE)
 	{
 		switch(ValueType.Type)
 		{
 			default:
-			case ZE_TT_UNDEFINED:
-			case ZE_TT_VOID:
+			case ZEMT_TT_UNDEFINED:
+			case ZEMT_TT_VOID:
 				return (ZEReturnType)0;
-			case ZE_TT_INTEGER_8:
-			case ZE_TT_INTEGER_16:
-			case ZE_TT_INTEGER_32:
-			case ZE_TT_UNSIGNED_INTEGER_8:
-			case ZE_TT_UNSIGNED_INTEGER_16:
-			case ZE_TT_UNSIGNED_INTEGER_32:
+			case ZEMT_TT_INTEGER_8:
+			case ZEMT_TT_INTEGER_16:
+			case ZEMT_TT_INTEGER_32:
+			case ZEMT_TT_UNSIGNED_INTEGER_8:
+			case ZEMT_TT_UNSIGNED_INTEGER_16:
+			case ZEMT_TT_UNSIGNED_INTEGER_32:
 				return (ZEReturnType)Value.Int32;
-			case ZE_TT_INTEGER_64:
-			case ZE_TT_UNSIGNED_INTEGER_64:
+			case ZEMT_TT_INTEGER_64:
+			case ZEMT_TT_UNSIGNED_INTEGER_64:
 				return (ZEReturnType)Value.Int64;
-			case ZE_TT_FLOAT:
+			case ZEMT_TT_FLOAT:
 				return Value.Float;
-			case ZE_TT_DOUBLE:
+			case ZEMT_TT_DOUBLE:
 				return Value.Double;
-			case ZE_TT_BOOLEAN:
+			case ZEMT_TT_BOOLEAN:
 				return (ZEReturnType)Value.Boolean;
 		}
 	}
@@ -89,27 +89,27 @@ inline ZEReturnType ZEVariant::ConvertValue() const
 	{
 		switch(ValueType.Type)
 		{
-			case ZE_TT_INTEGER_8:
+			case ZEMT_TT_INTEGER_8:
 				return (ZEReturnType)*(const ZEInt8*)Value.Pointer;
-			case ZE_TT_INTEGER_16:
+			case ZEMT_TT_INTEGER_16:
 				return (ZEReturnType)*(const ZEInt16*)Value.Pointer;
-			case ZE_TT_INTEGER_32:
+			case ZEMT_TT_INTEGER_32:
 				return (ZEReturnType)*(const ZEInt32*)Value.Pointer;
-			case ZE_TT_INTEGER_64:
+			case ZEMT_TT_INTEGER_64:
 				return (ZEReturnType)*(const ZEInt64*)Value.Pointer;
-			case ZE_TT_UNSIGNED_INTEGER_8:
+			case ZEMT_TT_UNSIGNED_INTEGER_8:
 				return (ZEReturnType)*(const ZEUInt8*)Value.Pointer;
-			case ZE_TT_UNSIGNED_INTEGER_16:
+			case ZEMT_TT_UNSIGNED_INTEGER_16:
 				return (ZEReturnType)*(const ZEUInt16*)Value.Pointer;
-			case ZE_TT_UNSIGNED_INTEGER_32:
+			case ZEMT_TT_UNSIGNED_INTEGER_32:
 				return (ZEReturnType)*(const ZEUInt32*)Value.Pointer;
-			case ZE_TT_UNSIGNED_INTEGER_64:
+			case ZEMT_TT_UNSIGNED_INTEGER_64:
 				return (ZEReturnType)*(const ZEInt64*)Value.Pointer;
-			case ZE_TT_FLOAT:
+			case ZEMT_TT_FLOAT:
 				return (ZEReturnType)*(const float*)Value.Pointer;
-			case ZE_TT_DOUBLE:
+			case ZEMT_TT_DOUBLE:
 				return (ZEReturnType)*(const double*)Value.Pointer;
-			case ZE_TT_BOOLEAN:
+			case ZEMT_TT_BOOLEAN:
 				return (ZEReturnType)*(const bool*)Value.Pointer;
 			default:
 				zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
@@ -118,50 +118,50 @@ inline ZEReturnType ZEVariant::ConvertValue() const
 	return 0;
 }
 
-template <typename ZEReturnType, ZETypeType Type>
+template <typename ZEReturnType, ZEMTTypeType Type>
 inline ZEReturnType& ZEVariant::ConvertRef() const
 {
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to reference.");
-	else if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
+	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
 
 	return *(ZEReturnType*)Value.Pointer;
 }
 
-template <typename ZEReturnType, ZETypeType Type>
+template <typename ZEReturnType, ZEMTTypeType Type>
 inline const ZEReturnType& ZEVariant::ConvertConstRef() const
 {
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return *(const ZEReturnType*)Value.Pointer;
 }
 
-void ZEVariant::SetType(const ZEType& NewType)
+void ZEVariant::SetType(const ZEMTType& NewType)
 {
 	if (ValueType == NewType)
 		return;
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE && Value.Pointer != NULL)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE && Value.Pointer != NULL)
 	{
-		if (ValueType.Type == ZE_TT_OBJECT)
+		if (ValueType.Type == ZEMT_TT_OBJECT)
 			Deleter(Value.Pointer);
-		else if (ValueType.Type == ZE_TT_STRING)
+		else if (ValueType.Type == ZEMT_TT_STRING)
 			Value.String.Clear();
-		else if (ValueType.Type == ZE_TT_MATRIX3X3)
+		else if (ValueType.Type == ZEMT_TT_MATRIX3X3)
 			delete (ZEMatrix3x3*)Value.Pointer;
-		else if (ValueType.Type == ZE_TT_MATRIX3X3D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX3X3D)
 			delete (ZEMatrix3x3d*)Value.Pointer;
-		else if (ValueType.Type == ZE_TT_MATRIX4X4)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4)
 			delete (ZEMatrix4x4*)Value.Pointer;
-		else if (ValueType.Type == ZE_TT_MATRIX4X4D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4D)
 			delete (ZEMatrix4x4d*)Value.Pointer;
 
 		Value.Pointer = NULL;
@@ -171,46 +171,46 @@ void ZEVariant::SetType(const ZEType& NewType)
 	Deleter = NULL;
 	ValueType = NewType;
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE && Value.Pointer == NULL)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE && Value.Pointer == NULL)
 	{
-		if (ValueType.Type == ZE_TT_MATRIX3X3)
+		if (ValueType.Type == ZEMT_TT_MATRIX3X3)
 			Value.Pointer = new ZEMatrix3x3();
-		else if (ValueType.Type == ZE_TT_MATRIX3X3D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX3X3D)
 			Value.Pointer =  new ZEMatrix3x3d();
-		else if (ValueType.Type == ZE_TT_MATRIX4X4)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4)
 			Value.Pointer =  new ZEMatrix4x4();
-		else if (ValueType.Type == ZE_TT_MATRIX4X4D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4D)
 			Value.Pointer = new ZEMatrix4x4d();
 	}
 }
 
-const ZEType& ZEVariant::GetType() const
+const ZEMTType& ZEVariant::GetType() const
 {
 	return ValueType;
 }
 
 void ZEVariant::SetUndefined()
 {
-	ValueType = ZEType();
+	ValueType = ZEMTType();
 }
 
 void ZEVariant::SetVariant(const ZEVariant& Variant)
 {
 	SetType(Variant.ValueType);
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 	{
-		if (ValueType.Type == ZE_TT_OBJECT)
+		if (ValueType.Type == ZEMT_TT_OBJECT)
 			Value.Pointer = Variant.Cloner(Variant.Value.Pointer);
-		else if (ValueType.Type == ZE_TT_MATRIX3X3)
+		else if (ValueType.Type == ZEMT_TT_MATRIX3X3)
 			Value.Pointer = new ZEMatrix3x3(*(const ZEMatrix3x3*)Variant.Value.Pointer);
-		else if (ValueType.Type == ZE_TT_MATRIX3X3D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX3X3D)
 			Value.Pointer = new ZEMatrix3x3d(*(const ZEMatrix3x3d*)Variant.Value.Pointer);
-		else if (ValueType.Type == ZE_TT_MATRIX4X4)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4)
 			Value.Pointer = new ZEMatrix4x4(*(const ZEMatrix4x4*)Variant.Value.Pointer);
-		else if (ValueType.Type == ZE_TT_MATRIX4X4D)
+		else if (ValueType.Type == ZEMT_TT_MATRIX4X4D)
 			Value.Pointer = new ZEMatrix4x4d(*(const ZEMatrix4x4d*)Variant.Value.Pointer);
-		else if (ValueType.Type == ZE_TT_STRING)
+		else if (ValueType.Type == ZEMT_TT_STRING)
 			Value.String = Variant.Value.String;
 		else
 			Value.Int64 = Variant.Value.Int64;
@@ -227,8 +227,8 @@ void ZEVariant::SetReference(const ZEReference& Reference)
 
 void ZEVariant::SetInt8(ZEInt8 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -236,9 +236,9 @@ void ZEVariant::SetInt8(ZEInt8 Value)
 
 void ZEVariant::SetInt8Ref(ZEInt8& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -246,9 +246,9 @@ void ZEVariant::SetInt8Ref(ZEInt8& Reference)
 
 void ZEVariant::SetInt8ConstRef(const ZEInt8& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEInt8*>(&Reference);
@@ -256,8 +256,8 @@ void ZEVariant::SetInt8ConstRef(const ZEInt8& Reference)
 
 void ZEVariant::SetInt16(ZEInt16 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -265,9 +265,9 @@ void ZEVariant::SetInt16(ZEInt16 Value)
 
 void ZEVariant::SetInt16Ref(ZEInt16& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -275,9 +275,9 @@ void ZEVariant::SetInt16Ref(ZEInt16& Reference)
 
 void ZEVariant::SetInt16ConstRef(const ZEInt16& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEInt16*>(&Reference);
@@ -285,8 +285,8 @@ void ZEVariant::SetInt16ConstRef(const ZEInt16& Reference)
 
 void ZEVariant::SetInt32(ZEInt32 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -294,9 +294,9 @@ void ZEVariant::SetInt32(ZEInt32 Value)
 
 void ZEVariant::SetInt32Ref(ZEInt32& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -304,9 +304,9 @@ void ZEVariant::SetInt32Ref(ZEInt32& Reference)
 
 void ZEVariant::SetInt32ConstRef(const ZEInt32& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEInt32*>(&Reference);
@@ -314,8 +314,8 @@ void ZEVariant::SetInt32ConstRef(const ZEInt32& Reference)
 
 void ZEVariant::SetInt64(ZEInt64 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
 	SetType(Type);
 
 	this->Value.Int64 = Value;
@@ -323,9 +323,9 @@ void ZEVariant::SetInt64(ZEInt64 Value)
 
 void ZEVariant::SetInt64Ref(ZEInt64& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -333,9 +333,9 @@ void ZEVariant::SetInt64Ref(ZEInt64& Reference)
 
 void ZEVariant::SetInt64ConstRef(const ZEInt64& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEInt64*>(&Reference);
@@ -343,8 +343,8 @@ void ZEVariant::SetInt64ConstRef(const ZEInt64& Reference)
 
 void ZEVariant::SetUInt8(ZEUInt8 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -352,9 +352,9 @@ void ZEVariant::SetUInt8(ZEUInt8 Value)
 
 void ZEVariant::SetUInt8Ref(ZEUInt8& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -362,9 +362,9 @@ void ZEVariant::SetUInt8Ref(ZEUInt8& Reference)
 
 void ZEVariant::SetUInt8ConstRef(const ZEUInt8& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_8;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEUInt8*>(&Reference);
@@ -372,8 +372,8 @@ void ZEVariant::SetUInt8ConstRef(const ZEUInt8& Reference)
 
 void ZEVariant::SetUInt16(ZEUInt16 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -381,9 +381,9 @@ void ZEVariant::SetUInt16(ZEUInt16 Value)
 
 void ZEVariant::SetUInt16Ref(ZEUInt16& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -391,9 +391,9 @@ void ZEVariant::SetUInt16Ref(ZEUInt16& Reference)
 
 void ZEVariant::SetUInt16ConstRef(const ZEUInt16& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_16;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEUInt16*>(&Reference);
@@ -401,8 +401,8 @@ void ZEVariant::SetUInt16ConstRef(const ZEUInt16& Reference)
 
 void ZEVariant::SetUInt32(ZEUInt32 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -410,9 +410,9 @@ void ZEVariant::SetUInt32(ZEUInt32 Value)
 
 void ZEVariant::SetUInt32Ref(ZEUInt32& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -420,9 +420,9 @@ void ZEVariant::SetUInt32Ref(ZEUInt32& Reference)
 
 void ZEVariant::SetUInt32ConstRef(const ZEUInt32& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEUInt32*>(&Reference);
@@ -430,8 +430,8 @@ void ZEVariant::SetUInt32ConstRef(const ZEUInt32& Reference)
 
 void ZEVariant::SetUInt64(ZEUInt64 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
 	SetType(Type);
 
 	this->Value.Int64 = Value;
@@ -439,9 +439,9 @@ void ZEVariant::SetUInt64(ZEUInt64 Value)
 
 void ZEVariant::SetUInt64Ref(ZEUInt64& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Reference;
@@ -449,9 +449,9 @@ void ZEVariant::SetUInt64Ref(ZEUInt64& Reference)
 
 void ZEVariant::SetUInt64ConstRef(const ZEUInt64& Reference)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_64;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEUInt64*>(&Reference);
@@ -459,9 +459,9 @@ void ZEVariant::SetUInt64ConstRef(const ZEUInt64& Reference)
 
 void ZEVariant::SetFloat(float Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_FLOAT;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_FLOAT;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Float = Value;
@@ -469,9 +469,9 @@ void ZEVariant::SetFloat(float Value)
 
 void ZEVariant::SetFloatRef(float& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_FLOAT;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_FLOAT;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -479,9 +479,9 @@ void ZEVariant::SetFloatRef(float& Value)
 
 void ZEVariant::SetFloatConstRef(const float& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_FLOAT;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_FLOAT;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<float*>(&Value);
@@ -489,9 +489,9 @@ void ZEVariant::SetFloatConstRef(const float& Value)
 
 void ZEVariant::SetDouble(double Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_DOUBLE;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_DOUBLE;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Double = Value;
@@ -499,9 +499,9 @@ void ZEVariant::SetDouble(double Value)
 
 void ZEVariant::SetDoubleRef(double& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_DOUBLE;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_DOUBLE;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -509,9 +509,9 @@ void ZEVariant::SetDoubleRef(double& Value)
 
 void ZEVariant::SetDoubleConstRef(const double& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_DOUBLE;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_DOUBLE;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<double*>(&Value);
@@ -519,9 +519,9 @@ void ZEVariant::SetDoubleConstRef(const double& Value)
 
 void ZEVariant::SetBool(bool Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_BOOLEAN;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_BOOLEAN;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	SetType(Type);
 
 	this->Value.Boolean = Value;
@@ -529,9 +529,9 @@ void ZEVariant::SetBool(bool Value)
 
 void ZEVariant::SetBoolRef(bool& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_BOOLEAN;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_BOOLEAN;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -539,9 +539,9 @@ void ZEVariant::SetBoolRef(bool& Value)
 
 void ZEVariant::SetBoolConstRef(const bool& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_BOOLEAN;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_BOOLEAN;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<bool*>(&Value);
@@ -549,8 +549,8 @@ void ZEVariant::SetBoolConstRef(const bool& Value)
 
 void ZEVariant::SetEnum(ZEInt32 Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_INTEGER_32;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_INTEGER_32;
 	SetType(Type);
 
 	this->Value.Int32 = Value;
@@ -558,8 +558,8 @@ void ZEVariant::SetEnum(ZEInt32 Value)
 
 void ZEVariant::SetVector2(const ZEVector2& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2;
 	SetType(Type);
 
 	memcpy(this->Value.Vectors, &Value, sizeof(ZEVector2));
@@ -567,9 +567,9 @@ void ZEVariant::SetVector2(const ZEVector2& Value)
 
 void ZEVariant::SetVector2Ref(ZEVector2& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -577,9 +577,9 @@ void ZEVariant::SetVector2Ref(ZEVector2& Value)
 
 void ZEVariant::SetVector2ConstRef(const ZEVector2& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector2*>(&Value);
@@ -587,8 +587,8 @@ void ZEVariant::SetVector2ConstRef(const ZEVector2& Value)
 
 void ZEVariant::SetVector2d(const ZEVector2d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2D;
 	SetType(Type);
 
 	memcpy(this->Value.DoubleVectors, &Value, sizeof(ZEVector2d));
@@ -596,9 +596,9 @@ void ZEVariant::SetVector2d(const ZEVector2d& Value)
 
 void ZEVariant::SetVector2dRef(ZEVector2d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2D;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2D;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -606,9 +606,9 @@ void ZEVariant::SetVector2dRef(ZEVector2d& Value)
 
 void ZEVariant::SetVector2dConstRef(const ZEVector2d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR2D;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR2D;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector2d*>(&Value);
@@ -616,8 +616,8 @@ void ZEVariant::SetVector2dConstRef(const ZEVector2d& Value)
 
 void ZEVariant::SetVector3(const ZEVector3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3;
 	SetType(Type);
 
 	memcpy(this->Value.Vectors, &Value, sizeof(ZEVector3));
@@ -625,9 +625,9 @@ void ZEVariant::SetVector3(const ZEVector3& Value)
 
 void ZEVariant::SetVector3Ref(ZEVector3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -635,9 +635,9 @@ void ZEVariant::SetVector3Ref(ZEVector3& Value)
 
 void ZEVariant::SetVector3ConstRef(const ZEVector3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector3*>(&Value);
@@ -645,8 +645,8 @@ void ZEVariant::SetVector3ConstRef(const ZEVector3& Value)
 
 void ZEVariant::SetVector3d(const ZEVector3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3D;
 	SetType(Type);
 
 	memcpy(this->Value.DoubleVectors, &Value, sizeof(ZEVector3d));
@@ -654,9 +654,9 @@ void ZEVariant::SetVector3d(const ZEVector3d& Value)
 
 void ZEVariant::SetVector3dRef(ZEVector3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3D;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3D;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -664,9 +664,9 @@ void ZEVariant::SetVector3dRef(ZEVector3d& Value)
 
 void ZEVariant::SetVector3dConstRef(const ZEVector3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR3D;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR3D;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector3d*>(&Value);
@@ -674,8 +674,8 @@ void ZEVariant::SetVector3dConstRef(const ZEVector3d& Value)
 
 void ZEVariant::SetVector4(const ZEVector4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4;
 	SetType(Type);
 
 	memcpy(this->Value.Vectors, &Value, sizeof(ZEVector4));
@@ -683,9 +683,9 @@ void ZEVariant::SetVector4(const ZEVector4& Value)
 
 void ZEVariant::SetVector4Ref(ZEVector4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -693,9 +693,9 @@ void ZEVariant::SetVector4Ref(ZEVector4& Value)
 
 void ZEVariant::SetVector4ConstRef(const ZEVector4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector4*>(&Value);
@@ -703,8 +703,8 @@ void ZEVariant::SetVector4ConstRef(const ZEVector4& Value)
 
 void ZEVariant::SetVector4d(const ZEVector4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4D;
 	SetType(Type);
 
 	memcpy(this->Value.DoubleVectors, &Value, sizeof(ZEVector4d));
@@ -712,9 +712,9 @@ void ZEVariant::SetVector4d(const ZEVector4d& Value)
 
 void ZEVariant::SetVector4dRef(ZEVector4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4D;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4D;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -722,9 +722,9 @@ void ZEVariant::SetVector4dRef(ZEVector4d& Value)
 
 void ZEVariant::SetVector4dConstRef(const ZEVector4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_VECTOR4D;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_VECTOR4D;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector4d*>(&Value);
@@ -732,8 +732,8 @@ void ZEVariant::SetVector4dConstRef(const ZEVector4d& Value)
 
 void ZEVariant::SetQuaternion(const ZEQuaternion& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_QUATERNION;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_QUATERNION;
 	SetType(Type);
 
 	memcpy(this->Value.Vectors, &Value, sizeof(ZEQuaternion));
@@ -741,9 +741,9 @@ void ZEVariant::SetQuaternion(const ZEQuaternion& Value)
 
 void ZEVariant::SetQuaternionRef(ZEQuaternion& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_QUATERNION;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_QUATERNION;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -751,9 +751,9 @@ void ZEVariant::SetQuaternionRef(ZEQuaternion& Value)
 
 void ZEVariant::SetQuaternionConstRef(const ZEQuaternion& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_QUATERNION;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_QUATERNION;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEQuaternion*>(&Value);
@@ -761,8 +761,8 @@ void ZEVariant::SetQuaternionConstRef(const ZEQuaternion& Value)
 
 void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3;
 	SetType(Type);
 
 	*(ZEMatrix3x3*)this->Value.Pointer = Value;
@@ -770,9 +770,9 @@ void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Value)
 
 void ZEVariant::SetMatrix3x3Ref(ZEMatrix3x3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -780,9 +780,9 @@ void ZEVariant::SetMatrix3x3Ref(ZEMatrix3x3& Value)
 
 void ZEVariant::SetMatrix3x3ConstRef(const ZEMatrix3x3& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEMatrix3x3*>(&Value);
@@ -790,8 +790,8 @@ void ZEVariant::SetMatrix3x3ConstRef(const ZEMatrix3x3& Value)
 
 void ZEVariant::SetMatrix3x3d(const ZEMatrix3x3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3D;
 	SetType(Type);
 
 	*(ZEMatrix3x3d*)this->Value.Pointer = Value;
@@ -799,9 +799,9 @@ void ZEVariant::SetMatrix3x3d(const ZEMatrix3x3d& Value)
 
 void ZEVariant::SetMatrix3x3dRef(ZEMatrix3x3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3D;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3D;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -809,9 +809,9 @@ void ZEVariant::SetMatrix3x3dRef(ZEMatrix3x3d& Value)
 
 void ZEVariant::SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX3X3D;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX3X3D;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEMatrix3x3d*>(&Value);
@@ -819,8 +819,8 @@ void ZEVariant::SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value)
 
 void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4;
 	SetType(Type);
 
 	*(ZEMatrix4x4*)this->Value.Pointer = Value;
@@ -828,9 +828,9 @@ void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Value)
 
 void ZEVariant::SetMatrix4x4Ref(ZEMatrix4x4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -838,9 +838,9 @@ void ZEVariant::SetMatrix4x4Ref(ZEMatrix4x4& Value)
 
 void ZEVariant::SetMatrix4x4ConstRef(const ZEMatrix4x4& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEMatrix4x4*>(&Value);
@@ -848,8 +848,8 @@ void ZEVariant::SetMatrix4x4ConstRef(const ZEMatrix4x4& Value)
 
 void ZEVariant::SetMatrix4x4d(const ZEMatrix4x4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4D;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4D;
 	SetType(Type);
 
 	*(ZEMatrix4x4d*)this->Value.Pointer = Value;
@@ -857,9 +857,9 @@ void ZEVariant::SetMatrix4x4d(const ZEMatrix4x4d& Value)
 
 void ZEVariant::SetMatrix4x4dRef(ZEMatrix4x4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4D;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4D;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -867,9 +867,9 @@ void ZEVariant::SetMatrix4x4dRef(ZEMatrix4x4d& Value)
 
 void ZEVariant::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_MATRIX4X4D;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_MATRIX4X4D;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEMatrix4x4d*>(&Value);
@@ -877,8 +877,8 @@ void ZEVariant::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
 
 void ZEVariant::SetString(const char* Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_STRING;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_STRING;
 	SetType(Type);
 
 	this->Value.String = Value;
@@ -886,8 +886,8 @@ void ZEVariant::SetString(const char* Value)
 
 void ZEVariant::SetString(const ZEString& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_STRING;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_STRING;
 	SetType(Type);
 
 	this->Value.String = Value;
@@ -895,9 +895,9 @@ void ZEVariant::SetString(const ZEString& Value)
 
 void ZEVariant::SetStringRef(ZEString& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_STRING;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_STRING;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = &Value;
@@ -905,9 +905,9 @@ void ZEVariant::SetStringRef(ZEString& Value)
 
 void ZEVariant::SetStringConstRef(const ZEString& Value)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_STRING;
-	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_STRING;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEString*>(&Value);
@@ -915,9 +915,9 @@ void ZEVariant::SetStringConstRef(const ZEString& Value)
 
 void ZEVariant::SetObjectPtr(ZEObject* Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT_PTR;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	Type.Class = Object->GetClass();
 	SetType(Type);
 
@@ -926,9 +926,9 @@ void ZEVariant::SetObjectPtr(ZEObject* Object)
 
 void ZEVariant::SetObjectPtrRef(ZEObject*& Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT_PTR;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object->GetClass();
 	SetType(Type);
 
@@ -937,9 +937,9 @@ void ZEVariant::SetObjectPtrRef(ZEObject*& Object)
 
 void ZEVariant::SetObjectPtrConstRef(const ZEObject*& Object)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT_PTR;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object->GetClass();
 	SetType(Type);
 
@@ -948,9 +948,9 @@ void ZEVariant::SetObjectPtrConstRef(const ZEObject*& Object)
 
 void ZEVariant::SetClass(ZEClass* Class)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
-	Type.TypeQualifier = ZE_TQ_VALUE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_CLASS;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	SetType(Type);
 
 	Value.Pointer = Class;
@@ -958,9 +958,9 @@ void ZEVariant::SetClass(ZEClass* Class)
 
 void ZEVariant::SetClassRef(ZEClass*& Class)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_CLASS;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = &Class;
@@ -968,9 +968,9 @@ void ZEVariant::SetClassRef(ZEClass*& Class)
 
 void ZEVariant::SetClassConstRef(const ZEClass*& Class)
 {
-	ZEType Type;
-	Type.Type = ZE_TT_CLASS;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_CLASS;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
 	Value.Pointer = const_cast<ZEClass**>(&Class);
@@ -1083,7 +1083,7 @@ void ZEVariant::SetValue(const ZEValue& Value)
 
 bool ZEVariant::IsUndefined() const
 {
-	return (GetType().Type == ZE_TT_UNDEFINED);
+	return (GetType().Type == ZEMT_TT_UNDEFINED);
 }
 
 ZEInt8 ZEVariant::GetInt8() const
@@ -1093,12 +1093,12 @@ ZEInt8 ZEVariant::GetInt8() const
 
 ZEInt8& ZEVariant::GetInt8Ref() const
 {
-	return ConvertRef<ZEInt8, ZE_TT_INTEGER_8>();
+	return ConvertRef<ZEInt8, ZEMT_TT_INTEGER_8>();
 }
 
 const ZEInt8& ZEVariant::GetInt8ConstRef() const
 {
-	return ConvertConstRef<ZEInt8, ZE_TT_INTEGER_8>();
+	return ConvertConstRef<ZEInt8, ZEMT_TT_INTEGER_8>();
 }
 
 ZEInt16 ZEVariant::GetInt16() const
@@ -1108,12 +1108,12 @@ ZEInt16 ZEVariant::GetInt16() const
 
 ZEInt16& ZEVariant::GetInt16Ref() const
 {
-	return ConvertRef<ZEInt16, ZE_TT_INTEGER_16>();
+	return ConvertRef<ZEInt16, ZEMT_TT_INTEGER_16>();
 }
 
 const ZEInt16& ZEVariant::GetInt16ConstRef() const
 {
-	return ConvertConstRef<ZEInt16, ZE_TT_INTEGER_16>();
+	return ConvertConstRef<ZEInt16, ZEMT_TT_INTEGER_16>();
 }
 
 ZEInt32 ZEVariant::GetInt32() const
@@ -1123,12 +1123,12 @@ ZEInt32 ZEVariant::GetInt32() const
 
 ZEInt32& ZEVariant::GetInt32Ref() const
 {
-	return ConvertRef<ZEInt32, ZE_TT_INTEGER_32>();
+	return ConvertRef<ZEInt32, ZEMT_TT_INTEGER_32>();
 }
 
 const ZEInt32& ZEVariant::GetInt32ConstRef() const
 {
-	return ConvertConstRef<ZEInt32, ZE_TT_INTEGER_32>();
+	return ConvertConstRef<ZEInt32, ZEMT_TT_INTEGER_32>();
 }
 
 ZEInt64 ZEVariant::GetInt64() const
@@ -1138,12 +1138,12 @@ ZEInt64 ZEVariant::GetInt64() const
 
 ZEInt64& ZEVariant::GetInt64Ref() const
 {
-	return ConvertRef<ZEInt64, ZE_TT_INTEGER_64>();
+	return ConvertRef<ZEInt64, ZEMT_TT_INTEGER_64>();
 }
 
 const ZEInt64& ZEVariant::GetInt64ConstRef() const
 {
-	return ConvertConstRef<ZEInt64, ZE_TT_INTEGER_64>();
+	return ConvertConstRef<ZEInt64, ZEMT_TT_INTEGER_64>();
 }
 
 ZEUInt8 ZEVariant::GetUInt8() const
@@ -1153,12 +1153,12 @@ ZEUInt8 ZEVariant::GetUInt8() const
 
 ZEUInt8& ZEVariant::GetUInt8Ref() const
 {
-	return ConvertRef<ZEUInt8, ZE_TT_UNSIGNED_INTEGER_8>();
+	return ConvertRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
 }
 
 const ZEUInt8& ZEVariant::GetUInt8ConstRef() const
 {
-	return ConvertConstRef<ZEUInt8, ZE_TT_UNSIGNED_INTEGER_8>();
+	return ConvertConstRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
 }
 
 ZEUInt16 ZEVariant::GetUInt16() const
@@ -1168,12 +1168,12 @@ ZEUInt16 ZEVariant::GetUInt16() const
 
 ZEUInt16& ZEVariant::GetUInt16Ref() const
 {
-	return ConvertRef<ZEUInt16, ZE_TT_UNSIGNED_INTEGER_16>();
+	return ConvertRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
 }
 
 const ZEUInt16& ZEVariant::GetUInt16ConstRef() const
 {
-	return ConvertConstRef<ZEUInt16, ZE_TT_UNSIGNED_INTEGER_16>();
+	return ConvertConstRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
 }
 
 ZEUInt32 ZEVariant::GetUInt32() const
@@ -1183,12 +1183,12 @@ ZEUInt32 ZEVariant::GetUInt32() const
 
 ZEUInt32& ZEVariant::GetUInt32Ref() const
 {
-	return ConvertRef<ZEUInt32, ZE_TT_UNSIGNED_INTEGER_32>();
+	return ConvertRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
 }
 
 const ZEUInt32& ZEVariant::GetUInt32ConstRef() const
 {
-	return ConvertConstRef<ZEUInt32, ZE_TT_UNSIGNED_INTEGER_32>();
+	return ConvertConstRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
 }
 
 ZEUInt64 ZEVariant::GetUInt64() const
@@ -1198,12 +1198,12 @@ ZEUInt64 ZEVariant::GetUInt64() const
 
 ZEUInt64& ZEVariant::GetUInt64Ref() const
 {
-	return ConvertRef<ZEUInt64, ZE_TT_UNSIGNED_INTEGER_64>();
+	return ConvertRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
 }
 
 const ZEUInt64& ZEVariant::GetUInt64ConstRef() const
 {
-	return ConvertConstRef<ZEUInt64, ZE_TT_UNSIGNED_INTEGER_64>();
+	return ConvertConstRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
 }
 
 float ZEVariant::GetFloat() const
@@ -1213,12 +1213,12 @@ float ZEVariant::GetFloat() const
 
 float& ZEVariant::GetFloatRef() const
 {
-	return ConvertRef<float, ZE_TT_FLOAT>();
+	return ConvertRef<float, ZEMT_TT_FLOAT>();
 }
 
 const float& ZEVariant::GetFloatConstRef() const
 {
-	return ConvertConstRef<float, ZE_TT_FLOAT>();
+	return ConvertConstRef<float, ZEMT_TT_FLOAT>();
 }
 
 double ZEVariant::GetDouble() const
@@ -1228,12 +1228,12 @@ double ZEVariant::GetDouble() const
 
 double& ZEVariant::GetDoubleRef() const
 {
-	return ConvertRef<double, ZE_TT_DOUBLE>();
+	return ConvertRef<double, ZEMT_TT_DOUBLE>();
 }
 
 const double& ZEVariant::GetDoubleConstRef() const
 {
-	return ConvertConstRef<double, ZE_TT_DOUBLE>();
+	return ConvertConstRef<double, ZEMT_TT_DOUBLE>();
 }
 
 bool ZEVariant::GetBool() const
@@ -1243,12 +1243,12 @@ bool ZEVariant::GetBool() const
 
 bool& ZEVariant::GetBoolRef() const
 {
-	return ConvertRef<bool, ZE_TT_BOOLEAN>();
+	return ConvertRef<bool, ZEMT_TT_BOOLEAN>();
 }
 
 const bool& ZEVariant::GetBoolConstRef() const
 {
-	return ConvertConstRef<bool, ZE_TT_BOOLEAN>();
+	return ConvertConstRef<bool, ZEMT_TT_BOOLEAN>();
 }
 
 ZEInt32 ZEVariant::GetEnum() const
@@ -1258,10 +1258,10 @@ ZEInt32 ZEVariant::GetEnum() const
 
 const ZEVector2& ZEVariant::GetVector2() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR2)
+	if (ValueType.Type != ZEMT_TT_VECTOR2)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector2*)&Value.Vectors;
 	else
 		return *(ZEVector2*)&Value.Pointer;
@@ -1269,20 +1269,20 @@ const ZEVector2& ZEVariant::GetVector2() const
 
 ZEVector2& ZEVariant::GetVector2Ref() const
 {
-	return ConvertRef<ZEVector2, ZE_TT_VECTOR2>();
+	return ConvertRef<ZEVector2, ZEMT_TT_VECTOR2>();
 }
 
 const ZEVector2& ZEVariant::GetVector2ConstRef() const
 {
-	return ConvertConstRef<ZEVector2, ZE_TT_VECTOR2>();
+	return ConvertConstRef<ZEVector2, ZEMT_TT_VECTOR2>();
 }
 
 const ZEVector2d& ZEVariant::GetVector2d() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR2D)
+	if (ValueType.Type != ZEMT_TT_VECTOR2D)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector2d*)&Value.DoubleVectors;
 	else
 		return *(ZEVector2d*)&Value.Pointer;
@@ -1290,20 +1290,20 @@ const ZEVector2d& ZEVariant::GetVector2d() const
 
 ZEVector2d& ZEVariant::GetVector2dRef() const
 {
-	return ConvertRef<ZEVector2d, ZE_TT_VECTOR2D>();
+	return ConvertRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
 }
 
 const ZEVector2d& ZEVariant::GetVector2dConstRef() const
 {
-	return ConvertConstRef<ZEVector2d, ZE_TT_VECTOR2D>();
+	return ConvertConstRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
 }
 
 const ZEVector3& ZEVariant::GetVector3() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR3)
+	if (ValueType.Type != ZEMT_TT_VECTOR3)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector3*)&Value.Vectors;
 	else
 		return *(ZEVector3*)&Value.Pointer;
@@ -1311,20 +1311,20 @@ const ZEVector3& ZEVariant::GetVector3() const
 
 ZEVector3& ZEVariant::GetVector3Ref() const
 {
-	return ConvertRef<ZEVector3, ZE_TT_VECTOR3>();
+	return ConvertRef<ZEVector3, ZEMT_TT_VECTOR3>();
 }
 
 const ZEVector3& ZEVariant::GetVector3ConstRef() const
 {
-	return ConvertConstRef<ZEVector3, ZE_TT_VECTOR3>();
+	return ConvertConstRef<ZEVector3, ZEMT_TT_VECTOR3>();
 }
 
 const ZEVector3d& ZEVariant::GetVector3d() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR3D)
+	if (ValueType.Type != ZEMT_TT_VECTOR3D)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector3d*)&Value.DoubleVectors;
 	else
 		return *(ZEVector3d*)&Value.Pointer;
@@ -1332,20 +1332,20 @@ const ZEVector3d& ZEVariant::GetVector3d() const
 
 ZEVector3d& ZEVariant::GetVector3dRef() const
 {
-	return ConvertRef<ZEVector3d, ZE_TT_VECTOR3D>();
+	return ConvertRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
 }
 
 const ZEVector3d& ZEVariant::GetVector3dConstRef() const
 {
-	return ConvertConstRef<ZEVector3d, ZE_TT_VECTOR3D>();
+	return ConvertConstRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
 }
 
 const ZEVector4& ZEVariant::GetVector4() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR4)
+	if (ValueType.Type != ZEMT_TT_VECTOR4)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector4*)&Value.Vectors;
 	else
 		return *(ZEVector4*)&Value.Pointer;
@@ -1353,20 +1353,20 @@ const ZEVector4& ZEVariant::GetVector4() const
 
 ZEVector4& ZEVariant::GetVector4Ref() const
 {
-	return ConvertRef<ZEVector4, ZE_TT_VECTOR4>();
+	return ConvertRef<ZEVector4, ZEMT_TT_VECTOR4>();
 }
 
 const ZEVector4& ZEVariant::GetVector4ConstRef() const
 {
-	return ConvertConstRef<ZEVector4, ZE_TT_VECTOR4>();
+	return ConvertConstRef<ZEVector4, ZEMT_TT_VECTOR4>();
 }
 
 const ZEVector4d& ZEVariant::GetVector4d() const
 {
-	if (ValueType.Type != ZE_TT_VECTOR4D)
+	if (ValueType.Type != ZEMT_TT_VECTOR4D)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEVector4d*)&Value.DoubleVectors;
 	else
 		return *(ZEVector4d*)&Value.Pointer;
@@ -1374,20 +1374,20 @@ const ZEVector4d& ZEVariant::GetVector4d() const
 
 ZEVector4d& ZEVariant::GetVector4dRef() const
 {
-	return ConvertRef<ZEVector4d, ZE_TT_VECTOR4D>();
+	return ConvertRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
 }
 
 const ZEVector4d& ZEVariant::GetVector4dConstRef() const
 {
-	return ConvertConstRef<ZEVector4d, ZE_TT_VECTOR4D>();
+	return ConvertConstRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
 }
 
 const ZEQuaternion& ZEVariant::GetQuaternion() const
 {
-	if (ValueType.Type != ZE_TT_QUATERNION)
+	if (ValueType.Type != ZEMT_TT_QUATERNION)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return *(ZEQuaternion*)&Value.Vectors;
 	else
 		return *(ZEQuaternion*)&Value.Pointer;
@@ -1395,17 +1395,17 @@ const ZEQuaternion& ZEVariant::GetQuaternion() const
 
 ZEQuaternion& ZEVariant::GetQuaternionRef() const
 {
-	return ConvertRef<ZEQuaternion, ZE_TT_QUATERNION>();
+	return ConvertRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
 }
 
 const ZEQuaternion& ZEVariant::GetQuaternionConstRef() const
 {
-	return ConvertConstRef<ZEQuaternion, ZE_TT_QUATERNION>();
+	return ConvertConstRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
 }
 
 const ZEMatrix3x3& ZEVariant::GetMatrix3x3() const
 {
-	if (ValueType.Type != ZE_TT_MATRIX3X3)
+	if (ValueType.Type != ZEMT_TT_MATRIX3X3)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
 	return *(ZEMatrix3x3*)Value.Pointer;
@@ -1413,17 +1413,17 @@ const ZEMatrix3x3& ZEVariant::GetMatrix3x3() const
 
 ZEMatrix3x3& ZEVariant::GetMatrix3x3Ref() const
 {
-	return ConvertRef<ZEMatrix3x3, ZE_TT_MATRIX3X3>();
+	return ConvertRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
 }
 
 const ZEMatrix3x3& ZEVariant::GetMatrix3x3ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3, ZE_TT_MATRIX3X3>();
+	return ConvertConstRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
 }
 
 const ZEMatrix3x3d& ZEVariant::GetMatrix3x3d() const
 {
-	if (ValueType.Type != ZE_TT_MATRIX3X3D)
+	if (ValueType.Type != ZEMT_TT_MATRIX3X3D)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
 	return *(ZEMatrix3x3d*)Value.Pointer;
@@ -1431,17 +1431,17 @@ const ZEMatrix3x3d& ZEVariant::GetMatrix3x3d() const
 
 ZEMatrix3x3d& ZEVariant::GetMatrix3x3dRef() const
 {
-	return ConvertRef<ZEMatrix3x3d, ZE_TT_MATRIX3X3D>();
+	return ConvertRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
 }
 
 const ZEMatrix3x3d& ZEVariant::GetMatrix3x3dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3d, ZE_TT_MATRIX3X3D>();
+	return ConvertConstRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
 }
 
 const ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 {
-	if (ValueType.Type != ZE_TT_MATRIX4X4)
+	if (ValueType.Type != ZEMT_TT_MATRIX4X4)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
 	return *(ZEMatrix4x4*)Value.Pointer;
@@ -1449,17 +1449,17 @@ const ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 
 ZEMatrix4x4& ZEVariant::GetMatrix4x4Ref() const
 {
-	return ConvertRef<ZEMatrix4x4, ZE_TT_MATRIX4X4>();
+	return ConvertRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
 }
 
 const ZEMatrix4x4& ZEVariant::GetMatrix4x4ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4, ZE_TT_MATRIX4X4>();
+	return ConvertConstRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
 }
 
 const ZEMatrix4x4d& ZEVariant::GetMatrix4x4d() const
 {
-	if (ValueType.Type != ZE_TT_MATRIX4X4D)
+	if (ValueType.Type != ZEMT_TT_MATRIX4X4D)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
 	return *(ZEMatrix4x4d*)Value.Pointer;
@@ -1467,21 +1467,21 @@ const ZEMatrix4x4d& ZEVariant::GetMatrix4x4d() const
 
 ZEMatrix4x4d& ZEVariant::GetMatrix4x4dRef() const
 {
-	return ConvertRef<ZEMatrix4x4d, ZE_TT_MATRIX4X4D>();
+	return ConvertRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
 }
 
 const ZEMatrix4x4d& ZEVariant::GetMatrix4x4dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4d, ZE_TT_MATRIX4X4D>();
+	return ConvertConstRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
 }
 
 const ZEString& ZEVariant::GetString() const
 {
 	// No Conversion
-	if (ValueType.Type != ZE_TT_STRING)
+	if (ValueType.Type != ZEMT_TT_STRING)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return Value.String;
 	else
 		return *(ZEString*)Value.Pointer;
@@ -1489,20 +1489,20 @@ const ZEString& ZEVariant::GetString() const
 
 ZEString& ZEVariant::GetStringRef() const
 {
-	return ConvertRef<ZEString, ZE_TT_STRING>();
+	return ConvertRef<ZEString, ZEMT_TT_STRING>();
 }
 
 const ZEString& ZEVariant::GetStringConstRef() const
 {
-	return ConvertConstRef<ZEString, ZE_TT_STRING>();
+	return ConvertConstRef<ZEString, ZEMT_TT_STRING>();
 }
 
 ZEObject* ZEVariant::GetObjectPtr() const
 {
-	if (ValueType.Type != ZE_TT_OBJECT_PTR)
+	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return (ZEObject*)Value.Pointer;
 	else
 		return *(ZEObject**)Value.Pointer;
@@ -1510,15 +1510,15 @@ ZEObject* ZEVariant::GetObjectPtr() const
 
 ZEObject*& ZEVariant::GetObjectPtrRef() const
 {
-	return ConvertRef<ZEObject*, ZE_TT_OBJECT_PTR>();
+	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>();
 }
 
 ZEObject*const& ZEVariant::GetObjectPtrConstRef() const
 {
-	if (ValueType.Type != ZE_TT_OBJECT_PTR)
+	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return (ZEObject* const)Value.Pointer;
@@ -1526,10 +1526,10 @@ ZEObject*const& ZEVariant::GetObjectPtrConstRef() const
 
 ZEClass* ZEVariant::GetClass() const
 {
-	if (ValueType.Type != ZE_TT_CLASS)
+	if (ValueType.Type != ZEMT_TT_CLASS)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return (ZEClass*)Value.Pointer;
 	else
 		return *(ZEClass**)Value.Pointer;
@@ -1537,15 +1537,15 @@ ZEClass* ZEVariant::GetClass() const
 
 ZEClass*& ZEVariant::GetClassRef() const
 {
-	return ConvertRef<ZEClass*, ZE_TT_CLASS>();
+	return ConvertRef<ZEClass*, ZEMT_TT_CLASS>();
 }
 
 ZEClass* const& ZEVariant::GetClassConstRef() const
 {
-	if (ValueType.Type != ZE_TT_CLASS)
+	if (ValueType.Type != ZEMT_TT_CLASS)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return (ZEClass* const)Value.Pointer;
@@ -1557,82 +1557,82 @@ ZEValue ZEVariant::GetValue()
 	{
 		default:
 			zeCriticalError("Unknown variant type.");
-		case ZE_TT_OBJECT:	
-		case ZE_TT_UNDEFINED:
-		case ZE_TT_VOID:
-		case ZE_TT_CLASS:
+		case ZEMT_TT_OBJECT:	
+		case ZEMT_TT_UNDEFINED:
+		case ZEMT_TT_VOID:
+		case ZEMT_TT_CLASS:
 			return ZEValue();
 
-		case ZE_TT_INTEGER_8:
+		case ZEMT_TT_INTEGER_8:
 			return ZEValue(GetInt8());
 
-		case ZE_TT_INTEGER_16:
+		case ZEMT_TT_INTEGER_16:
 			return ZEValue(GetInt16());
 
-		case ZE_TT_INTEGER_32:
+		case ZEMT_TT_INTEGER_32:
 			return ZEValue(GetInt32());
 
-		case ZE_TT_INTEGER_64:
+		case ZEMT_TT_INTEGER_64:
 			return ZEValue(GetInt64());
 
-		case ZE_TT_UNSIGNED_INTEGER_8:
+		case ZEMT_TT_UNSIGNED_INTEGER_8:
 			return ZEValue(GetUInt8());
 
-		case ZE_TT_UNSIGNED_INTEGER_16:
+		case ZEMT_TT_UNSIGNED_INTEGER_16:
 			return ZEValue(GetUInt16());
 
-		case ZE_TT_UNSIGNED_INTEGER_32:
+		case ZEMT_TT_UNSIGNED_INTEGER_32:
 			return ZEValue(GetUInt32());
 
-		case ZE_TT_UNSIGNED_INTEGER_64:
+		case ZEMT_TT_UNSIGNED_INTEGER_64:
 			return ZEValue(GetUInt64());
 
-		case ZE_TT_FLOAT:
+		case ZEMT_TT_FLOAT:
 			return ZEValue(GetFloat());
 
-		case ZE_TT_DOUBLE:
+		case ZEMT_TT_DOUBLE:
 			return ZEValue(GetDouble());
 
-		case ZE_TT_BOOLEAN:
+		case ZEMT_TT_BOOLEAN:
 			return ZEValue(GetBool());
 
-		case ZE_TT_STRING:
+		case ZEMT_TT_STRING:
 			return ZEValue(GetString());
 
-		case ZE_TT_QUATERNION:
+		case ZEMT_TT_QUATERNION:
 			return ZEValue(GetQuaternion());
 
-		case ZE_TT_VECTOR2:
+		case ZEMT_TT_VECTOR2:
 			return ZEValue(GetVector2());
 
-		case ZE_TT_VECTOR2D:
+		case ZEMT_TT_VECTOR2D:
 			return ZEValue(GetVector2d());
 
-		case ZE_TT_VECTOR3:
+		case ZEMT_TT_VECTOR3:
 			return ZEValue(GetVector3());
 
-		case ZE_TT_VECTOR3D:
+		case ZEMT_TT_VECTOR3D:
 			return ZEValue(GetVector3d());
 
-		case ZE_TT_VECTOR4:
+		case ZEMT_TT_VECTOR4:
 			return ZEValue(GetVector4());
 
-		case ZE_TT_VECTOR4D:
+		case ZEMT_TT_VECTOR4D:
 			return ZEValue(GetVector4d());
 
-		case ZE_TT_MATRIX3X3:
+		case ZEMT_TT_MATRIX3X3:
 			return ZEValue(GetMatrix3x3());
 
-		case ZE_TT_MATRIX3X3D:
+		case ZEMT_TT_MATRIX3X3D:
 			return ZEValue(GetMatrix3x3d());
 
-		case ZE_TT_MATRIX4X4:
+		case ZEMT_TT_MATRIX4X4:
 			return ZEValue(GetMatrix4x4());
 
-		case ZE_TT_MATRIX4X4D:
+		case ZEMT_TT_MATRIX4X4D:
 			return ZEValue(GetMatrix4x4d());
 
-		case ZE_TT_ENUMERATOR:
+		case ZEMT_TT_ENUMERATOR:
 			return ZEValue(GetInt32());
 	}
 }
@@ -1814,7 +1814,7 @@ ZEVariant::ZEVariant(ZEClass* Class)
 
 ZEVariant::~ZEVariant()
 {
-	SetType(ZEType());
+	SetType(ZEMTType());
 }
 
 #pragma warning(pop)

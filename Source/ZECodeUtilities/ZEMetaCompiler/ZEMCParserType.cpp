@@ -46,14 +46,19 @@ ZEMCClass* ZEMCParser::FindClass(const char* ClassName)
 
 	for (int I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
 	{
-		if (Context->ForwardDeclarations[I]->ClassName == ClassName)
-		{
-			ZEMCClass* ForwardDeclaredClass = new ZEMCClass();
-			ForwardDeclaredClass->Name = ClassName;
-			ForwardDeclaredClass->IsForwardDeclared = true;
-			Context->Classes.Add(ForwardDeclaredClass);
-			return ForwardDeclaredClass;
-		}
+		ZEMCForwardDeclaration* ForwardDeclaration = Context->ForwardDeclarations[I];
+
+		if (Context->ForwardDeclarations[I]->Type != ZEMC_DT_CLASS)
+			continue;
+
+		if (Context->ForwardDeclarations[I]->Name != ClassName)
+			continue;
+
+		ZEMCClass* ForwardDeclaredClass = new ZEMCClass();
+		ForwardDeclaredClass->Name = ClassName;
+		ForwardDeclaredClass->IsForwardDeclared = true;
+		Context->Classes.Add(ForwardDeclaredClass);
+		return ForwardDeclaredClass;
 	}
 
 	return NULL;
@@ -180,20 +185,13 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		}
 		else
 		{
-			if (ClassDecl->getNameAsString() == "ZEClass")
-			{
-				Output.BaseType = ZEMC_BT_CLASS;
-			}
-			else
-			{
-				Output.BaseType = ZEMC_BT_OBJECT;
-				Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
-				if (Output.Class == NULL)
-					return false;
+			Output.BaseType = ZEMC_BT_OBJECT;
+			Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
+			if (Output.Class == NULL)
+				return false;
 
-				if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
-					return false;
-			}
+			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
+				return false;
 		}
 	}
 	else if (ClangType->isPointerType())
@@ -214,9 +212,6 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 				return false;
 
 			if (Output.Class->IsFundamental)
-				return false;
-
-			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
 				return false;
 		}
 	}

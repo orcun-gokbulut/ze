@@ -39,28 +39,28 @@
 
 #include "ZEList.h"
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZETree : public ZEListItem
 {
 	private:
-		ZEType* Parent;
-		ZEType* NextItem;
-		ZEType* PrevItem;
+		ZEMTType* Parent;
+		ZEMTType* NextItem;
+		ZEMTType* PrevItem;
 
-		ZEList<ZEType> SubTrees;
+		ZEList<ZEMTType> SubTrees;
 
 	public:	
-		ZEType  GetParent()
+		ZEMTType  GetParent()
 		{
 			return Parent;
 		}
 
-		const ZEList<ZEType>& GetSubTrees()
+		const ZEList<ZEMTType>& GetSubTrees()
 		{
 			return SubTrees;
 		}
 
-		bool AddSubTree(ZEType* SubTree)
+		bool AddSubTree(ZEMTType* SubTree)
 		{
 			if (SubTree->Parent != NULL || SubTree->Parent == this)
 				return false;
@@ -71,7 +71,7 @@ class ZETree : public ZEListItem
 			return true;
 		}
 
-		bool RemoveSubTree(ZEType* SubTree)
+		bool RemoveSubTree(ZEMTType* SubTree)
 		{
 			if (SubTree->Parent != this)
 				return;

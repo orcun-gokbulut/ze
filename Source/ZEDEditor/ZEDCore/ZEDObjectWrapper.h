@@ -133,4 +133,4 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		virtual ZEDObjectWrapper*					Clone();
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEObject);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEObject);

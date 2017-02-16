@@ -108,4 +108,4 @@ class ZEActor : public ZEEntity
 
 		virtual void				Tick(float ElapsedTime);
 };
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEActor.png");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEActor.png");

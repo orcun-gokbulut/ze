@@ -55,7 +55,7 @@
 #include "ZESound/ZESoundModule.h"
 #include "ZECrashHandler.h"
 
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -456,17 +456,17 @@ void ZECore::RegisterClasses()
 {
 	#undef RegisterClass
 
-	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration(); ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
-	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "../ZEMetaRegister.h"
 	#include "../../ZEModules/ZEMetaRegister.h"
-	#undef ZE_META_REGISTER_ENUM
-	#undef ZE_META_REGISTER_CLASS
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 }
 
 ZEModule* ZECore::FindModule(ZEClass* BaseClass, const char* Name)
 {
-	ZEClass* Class = ZEProvider::GetInstance()->GetClass(Name);
+	ZEClass* Class = ZEMTProvider::GetInstance()->GetClass(Name);
 	if (Class == NULL)
 	{
 		zeError("Cannot find required module. Module Name: \"%s\".", Name);

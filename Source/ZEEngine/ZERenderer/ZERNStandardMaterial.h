@@ -422,4 +422,4 @@ class ZERNStandardMaterial : public ZERNMaterial
 		static ZERSHolder<ZERNStandardMaterial>			LoadResource(const ZEString& FileName);
 		static ZERSHolder<const ZERNStandardMaterial>	LoadResourceShared(const ZEString& FileName);
 }
-ZE_META_ATTRIBUTE(ZEMC.Instancable, true);
+ZEMT_ATTRIBUTE(ZEMC.Instancable, true);

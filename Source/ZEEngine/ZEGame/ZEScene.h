@@ -47,20 +47,17 @@
 
 #include "ZERayCast.h"
 
-ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
-ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
-ZE_META_FORWARD_DECLARE(ZEFrameRenderer,	"ZEGraphics/ZEFrameRenderer.h")
-ZE_META_FORWARD_DECLARE(ZEShadowRenderer,	"ZEGraphics/ZEShadowRenderer.h")
-ZE_META_FORWARD_DECLARE(ZEListener,			"ZESound/ZEListener.h")
-ZE_META_FORWARD_DECLARE(ZEInterior,			"ZEInterior/ZEInterior.h")
-ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
-ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
+ZEMT_FORWARD_DECLARE(ZEEntity);
+ZEMT_FORWARD_DECLARE(ZECamera);
+ZEMT_FORWARD_DECLARE(ZEListener);
 
 class ZEPhysicalWorld;
 class ZEGRBuffer;
 class ZERNRenderer;
 class ZERNPreRenderParameters;
 enum ZEEntityState;
+
+ZEMT_INCLUDE("Test.h");
 
 class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
@@ -165,7 +162,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		static ZEScene*							CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEScene.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEScene.png")
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false);

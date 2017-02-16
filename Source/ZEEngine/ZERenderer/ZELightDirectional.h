@@ -122,6 +122,6 @@ class ZELightDirectional : public ZELight
 
 		static ZELightDirectional*			CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightDirectional.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZELightDirectional.png")
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false);
