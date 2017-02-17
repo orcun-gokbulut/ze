@@ -50,11 +50,11 @@
 ZEMT_FORWARD_DECLARE(ZEEntity);
 ZEMT_FORWARD_DECLARE(ZECamera);
 ZEMT_FORWARD_DECLARE(ZEListener);
+ZEMT_FORWARD_DECLARE(ZEPhysicalWorld);
+ZEMT_FORWARD_DECLARE(ZERNPreRenderParameters);
 
 class ZEPhysicalWorld;
 class ZEGRBuffer;
-class ZERNRenderer;
-class ZERNPreRenderParameters;
 enum ZEEntityState;
 
 ZEMT_INCLUDE("Test.h");

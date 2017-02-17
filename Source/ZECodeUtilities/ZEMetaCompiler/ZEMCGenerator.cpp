@@ -412,7 +412,7 @@ ZEString ZEMCGenerator::ConvertBaseTypeToName(const ZEMCType& Type)
 			return ZEFormat::Format("{0}*", Type.Class->Name);
 	}
 }
-ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& CastOutput)
+ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& CastOutput, ZEString& SetterExtraParams)
 {
 	ZEString Output;
 
@@ -431,6 +431,9 @@ ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& C
 		Output.Append("<");
 		Output.Append(ConvertBaseTypeToName(Type));
 		Output.Append(">");
+
+		if (Type.BaseType == ZEMC_BT_OBJECT_PTR && Type.Class->IsForwardDeclared)
+			SetterExtraParams = ZEFormat::Format(", {0}_Class()", Type.Class->Name);
 	}
 	else if (Type.BaseType == ZEMC_BT_OBJECT)
 	{

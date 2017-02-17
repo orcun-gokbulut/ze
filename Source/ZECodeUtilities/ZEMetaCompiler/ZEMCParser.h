@@ -52,6 +52,7 @@ enum ZEMCAccessorType
 	ZEMC_AT_GETTER,
 	ZEMC_AT_ADDER,
 	ZEMC_AT_REMOVER,
+	ZEMC_AT_COUNTER
 };
 
 struct ZEMCAccessor

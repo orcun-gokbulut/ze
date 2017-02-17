@@ -490,11 +490,21 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 			ZEMCMethod* CurrentMethod = CurrentClass->Methods[I];
 			WriteToFile("\t\tcase %d:\n", CurrentMethod->ID);
 			
+			ZEMCType& ReturnType = CurrentMethod->ReturnValue;
+
 			WriteToFile("\t\t\t");
-			if (CurrentMethod->ReturnValue.BaseType != ZEMC_BT_VOID)
-				WriteToFile("ReturnValue.Set%s(", GenerateVariantPostfix(CurrentMethod->ReturnValue, ZEString()).ToCString());
+			ZEString VariantSetterParam;
+			if (ReturnType.BaseType != ZEMC_BT_VOID)
+			{
+				ZEString VariantPostfix = GenerateVariantPostfix(ReturnType, ZEString(), VariantSetterParam);
+				
+				ZEString VariantCast;
+				if (ReturnType.ContainerType == ZEMC_CT_NONE && ReturnType.BaseType == ZEMC_BT_OBJECT_PTR && ReturnType.Class->IsForwardDeclared)
+					VariantCast = "(ZEObject*)";
 
-
+				WriteToFile("ReturnValue.Set%s(%s", VariantPostfix.ToCString(), VariantCast.ToCString());
+			}
+			
 			if (CurrentMethod->IsStatic)
 				WriteToFile("%s::%s(", CurrentClass->Name.ToCString(), CurrentMethod->Name.ToCString());
 			else if (CurrentMethod->IsConstructor)
@@ -502,40 +512,18 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 			else
 				WriteToFile("CastedObject->%s(", CurrentMethod->Name.ToCString());
 
-			ZEMCType& ReturnType = CurrentMethod->ReturnValue;
-			if (ReturnType.BaseType == ZEMC_BT_OBJECT_PTR && ReturnType.Class->IsForwardDeclared)
-			{
-				WriteToFile("(");
-				if (ReturnType.TypeQualifier == ZEMC_TQ_CONST_VALUE || ReturnType.TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
-					WriteToFile("const");
-				
-				WriteToFile("ZEObject*)");
-			}
-
 			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
 			{
 				ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[N];
-				if (CurrentParameter->Type.BaseType == ZEMC_BT_ENUMERATOR)
-					WriteToFile("(%s)", CurrentParameter->Type.Enumurator->Name.ToCString());
-
+	
 				ZEMCType ModifiedParameterType = CurrentParameter->Type;
 				if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_REFERENCE;
 				else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
 
-				ZEMCType& ParameterType = CurrentParameter->Type;
-				if (ParameterType.BaseType == ZEMC_BT_OBJECT_PTR && ParameterType.Class->IsForwardDeclared)
-				{
-					WriteToFile("(");
-					if (ParameterType.TypeQualifier == ZEMC_TQ_CONST_VALUE || ParameterType.TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
-						WriteToFile("const");
-
-					WriteToFile("ZEObject*)");
-				}
-
 				ZEString VariantCast;
-				ZEString VariantPostfix = GenerateVariantPostfix(ModifiedParameterType, VariantCast);
+				ZEString VariantPostfix = GenerateVariantPostfix(ModifiedParameterType, VariantCast, ZEString());
 				WriteToFile("%sParameters[%d]->Get%s()%s", 
 					VariantCast.ToCString(),
 					N, 
@@ -543,10 +531,10 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 					N + 1 >= CurrentMethod->Parameters.GetCount() ? "" : ", ");
 			}
 			
-			if (CurrentMethod->ReturnValue.BaseType != ZEMC_BT_VOID)
+			if (ReturnType.BaseType != ZEMC_BT_VOID)
 				WriteToFile(")");
 
-			WriteToFile(");\n");
+			WriteToFile("%s);\n", VariantSetterParam.ToCString());
 			WriteToFile("\t\t\treturn true;\n");
 		}
 

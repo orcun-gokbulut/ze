@@ -368,7 +368,7 @@ void ZEMCGenerator::GenerateClassSetProperty(ZEMCClass* CurrentClass)
 			}
 
 			ZEString VariantCast;
-			ZEString VariantPostfix = GenerateVariantPostfix(CurrentProperty->Type, VariantCast);
+			ZEString VariantPostfix = GenerateVariantPostfix(CurrentProperty->Type, VariantCast, ZEString());
 			WriteToFile("%sValue.Get%s()", VariantCast.ToCString(), VariantPostfix.ToCString());
 		
 			if (CurrentProperty->HasAccessors)
@@ -430,7 +430,15 @@ void ZEMCGenerator::GenerateClassGetProperty(ZEMCClass* CurrentClass)
 				continue;
 
 			WriteToFile("\t\tcase %d:\n", CurrentProperty->ID);
-			WriteToFile("\t\t\tValue.Set%s(", GenerateVariantPostfix(CurrentProperty->Type, ZEString()).ToCString());
+
+			ZEString VariantCast;
+			if (CurrentProperty->Type.ContainerType == ZEMC_CT_NONE && CurrentProperty->Type.BaseType == ZEMC_BT_OBJECT_PTR && CurrentProperty->Type.Class->IsForwardDeclared)
+				VariantCast = "(ZEObject*)";
+
+			ZEString VariantSetterParam;
+			ZEString VariantPostFix = GenerateVariantPostfix(CurrentProperty->Type, ZEString(), VariantSetterParam);
+
+			WriteToFile("\t\t\tValue.Set%s(%s", VariantPostFix.ToCString(), VariantCast.ToCString());
 
 			if (CurrentProperty->Type.Enumurator != NULL)
 				WriteToFile("(ZEInt32)");
@@ -463,7 +471,7 @@ void ZEMCGenerator::GenerateClassGetProperty(ZEMCClass* CurrentClass)
 						CurrentProperty->Name.ToCString());
 				}
 			}
-			WriteToFile(");\n");
+			WriteToFile("%s);\n", VariantSetterParam.ToCString());
 			WriteToFile("\t\t\treturn true;\n");
 		}
 
@@ -523,7 +531,7 @@ void ZEMCGenerator::GenerateClassSetPropertyItem(ZEMCClass* CurrentClass)
 			ContainerItemType.TypeQualifier = ZEMC_TQ_VALUE;
 
 			ZEString VariantCast;
-			ZEString VariantPostfix = GenerateVariantPostfix(ContainerItemType, VariantCast);
+			ZEString VariantPostfix = GenerateVariantPostfix(ContainerItemType, VariantCast, ZEString());
 			WriteToFile("%sValue.Get%s()", VariantCast.ToCString(), VariantPostfix.ToCString());
 
 			WriteToFile(
@@ -626,7 +634,7 @@ void ZEMCGenerator::GenerateClassAddItemToProperty(ZEMCClass* CurrentClass)
 			ContainerItemType.TypeQualifier = ZEMC_TQ_VALUE;
 
 			ZEString VariantCast;
-			ZEString VariantPostfix = GenerateVariantPostfix(ContainerItemType, VariantCast);
+			ZEString VariantPostfix = GenerateVariantPostfix(ContainerItemType, VariantCast, ZEString());
 			WriteToFile("%sValue.Get%s()", VariantCast.ToCString(), VariantPostfix.ToCString());
 
 			WriteToFile(

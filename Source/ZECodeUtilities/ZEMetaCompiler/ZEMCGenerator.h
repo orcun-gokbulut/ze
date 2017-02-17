@@ -59,7 +59,7 @@ class ZEMCGenerator
 		const char*				ConvertBaseTypeToEnum(ZEMCBaseType BaseType);
 		ZEString				ConvertBaseTypeToName(const ZEMCType& Type);
 
-		ZEString				GenerateVariantPostfix(const ZEMCType& baseType, ZEString& CastOutput);
+		ZEString				GenerateVariantPostfix(const ZEMCType& baseType, ZEString& CastOutput, ZEString& SetterExtraParams);
 		ZEString				GenerateTypeSignature(const ZEMCType& Type);
 		ZEString				GenerateTypeConstructor(const ZEMCType& Type);
 		ZEString				GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEMCClass* CurrentClass);
