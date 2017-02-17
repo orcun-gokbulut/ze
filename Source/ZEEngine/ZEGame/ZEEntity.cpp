@@ -1226,12 +1226,12 @@ ZEInt ZEEntity::GetEntityId() const
 	return EntityId;
 }
 
-void ZEEntity::SetName(ZEString NewName)
+void ZEEntity::SetName(const ZEString& NewName)
 {
 	Name = NewName;
 }
 
-ZEString ZEEntity::GetName() const
+const ZEString& ZEEntity::GetName() const
 {
 	return Name;
 }

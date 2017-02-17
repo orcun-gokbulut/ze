@@ -213,6 +213,14 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 
 			if (Output.Class->IsFundamental)
 				return false;
+
+			if (Output.ContainerType == ZEMC_CT_NONE && ClangType->getPointeeType().isConstQualified())
+			{
+				if (Output.TypeQualifier != ZEMC_TQ_VALUE)
+					return false;
+
+				Output.TypeQualifier = ZEMC_TQ_CONST_VALUE;
+			}
 		}
 	}
 	else if(ClangType->isEnumeralType())
@@ -221,7 +229,6 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		Output.Enumurator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
 		if (Output.Enumurator == NULL)
 			return false;
-
 	}
 	else
 	{
@@ -241,7 +248,7 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 	// Check Qualifier
 	if (TypePtr->isReferenceType())
 	{
-		if (TypePtr->getPointeeType()->isPointerType() || TypePtr->getPointeeType()->isReferenceType())
+		if (TypePtr->getPointeeType()->isReferenceType())
 			return false;
 
 		TempType.TypeQualifier = TypePtr->getPointeeType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
@@ -249,6 +256,7 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 	}
 	else
 	{
+		TypePtr->dump();
 		TempType.TypeQualifier = ClangType.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
 		BaseTypePtr = TypePtr;
 	}
@@ -259,21 +267,13 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 		if (TemplateType != NULL)
 		{
 			if (TemplateType->getNameAsString() == "ZEArray")
-			{
 				TempType.ContainerType = ZEMC_CT_ARRAY;
-			}
 			else if (TemplateType->getNameAsString() == "ZEList")
-			{
 				TempType.ContainerType = ZEMC_CT_LIST;
-			}
 			else if (TemplateType->getNameAsString() == "ZEContainer")
-			{
 				TempType.ContainerType = ZEMC_CT_CONTAINER;
-			}
 			else
-			{
 				return false;
-			}
 
 			if (TemplateType->getTemplateArgs().size() < 1)
 				return false;
@@ -284,6 +284,7 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 			if (Argument.isConstQualified())
 				return false;
 
+			// References are not allowed in containers
 			if(Argument.getTypePtr()->isReferenceType())
 				return false;
 

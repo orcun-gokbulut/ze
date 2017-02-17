@@ -233,7 +233,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 		return;
 
 	ZEMCType ReturnType;
-	if (!ProcessType(ReturnType, MethodDecl->getCallResultType()))
+	if (!ProcessType(ReturnType, MethodDecl->getReturnType()))
 		return;
 
 	ZEPointer<ZEMCMethod> MethodData = new ZEMCMethod();

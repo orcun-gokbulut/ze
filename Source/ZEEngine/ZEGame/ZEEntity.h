@@ -59,14 +59,14 @@
 #include "ZEVolumeCast.h"
 #include "ZESpatial/ZEOctree.h"
 
-class ZEScene;
 class ZEDObjectWrapper;
-class ZERNPreRenderParameters;
-class ZERNRenderParameters;
-class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
+ZEMT_FORWARD_DECLARE(ZEScene);
+ZEMT_FORWARD_DECLARE(ZERNPreRenderParameters);
+ZEMT_FORWARD_DECLARE(ZERNRenderParameters);
+ZEMT_FORWARD_DECLARE(ZERNCommand);
 
 typedef ZEFlags ZEEntityFlags;
 ZE_ENUM(ZEEntityFlag)
@@ -237,8 +237,8 @@ class ZEEntity : public ZEObject
 		void									SetEntityId(ZEInt EntityId);
 		ZEInt									GetEntityId() const;
 
-		void									SetName(ZEString NewName);
-		ZEString								GetName() const;
+		void									SetName(const ZEString& NewName);
+		const ZEString&							GetName() const;
 
 		virtual ZEEntityFlags					GetEntityFlags() const final;
 

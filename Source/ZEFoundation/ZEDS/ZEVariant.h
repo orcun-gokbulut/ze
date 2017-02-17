@@ -221,7 +221,11 @@ class ZEVariant
 		template<typename ZEItemType>
 		void							SetArrayRef(ZEArray<ZEItemType>& Array);
 		template<typename ZEItemType>
-		void							SetArrayRefConst(const ZEArray<ZEItemType>& Array);
+		void							SetArrayRef(ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
+		template<typename ZEItemType>
+		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array);
+		template<typename ZEItemType>
+		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
 
 		void							SetClass(ZEClass* Object);
 		void							SetClassRef(ZEClass*& Object);
@@ -453,7 +457,20 @@ void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 }
 
 template<typename ZEItemType>
-void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
+void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
+{
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
+	Type.Class = ObjectClass;
+
+	SetType(Type);
+	Value.Pointer = &Array;
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 	
@@ -469,6 +486,19 @@ void ZEVariant::SetArrayRefConst(const ZEArray<ZEItemType>& Array)
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	Type.ContainerType = ZEMT_CT_ARRAY;
 	
+	SetType(Type);
+	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
+{
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
+	Type.Class = ObjectClass;
+
 	SetType(Type);
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
 }
@@ -529,7 +559,7 @@ template<typename ZEItemType>
 ZEArray<ZEItemType>& ZEVariant::GetArrayRef() const
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (ValueType.Type = ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
+	if (ValueType.Type != ZE_TT_ARRAY || ValueType.SubTypeType != Type.Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
 	if (ValueType.SubTypeQualifier == ZEMT_TQ_REFERENCE)
