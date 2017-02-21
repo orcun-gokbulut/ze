@@ -35,38 +35,38 @@
 
 #pragma once
 
-enum ZEMTTypeType
+enum ZEMTBaseType
 {
-	ZEMT_TT_UNDEFINED				= 0,
-	ZEMT_TT_VOID					= 1,
-	ZEMT_TT_INTEGER_8				= 2,
-	ZEMT_TT_INTEGER_16				= 3,
-	ZEMT_TT_INTEGER_32				= 4,
-	ZEMT_TT_INTEGER_64				= 5,
-	ZEMT_TT_UNSIGNED_INTEGER_8		= 6,
-	ZEMT_TT_UNSIGNED_INTEGER_16		= 7,
-	ZEMT_TT_UNSIGNED_INTEGER_32		= 8,
-	ZEMT_TT_UNSIGNED_INTEGER_64		= 9,
-	ZEMT_TT_FLOAT					= 10,
-	ZEMT_TT_DOUBLE					= 11,
-	ZEMT_TT_BOOLEAN					= 12,
-	ZEMT_TT_STRING					= 13,
-	ZEMT_TT_QUATERNION				= 14,
-	ZEMT_TT_VECTOR2					= 15,
-	ZEMT_TT_VECTOR2D				= 16,
-	ZEMT_TT_VECTOR3					= 17,
-	ZEMT_TT_VECTOR3D				= 18,
-	ZEMT_TT_VECTOR4					= 19,
-	ZEMT_TT_VECTOR4D				= 20,
-	ZEMT_TT_MATRIX3X3				= 21,
-	ZEMT_TT_MATRIX3X3D				= 22,
-	ZEMT_TT_MATRIX4X4				= 23,
-	ZEMT_TT_MATRIX4X4D				= 24,
-	ZEMT_TT_OBJECT					= 25,
-	ZEMT_TT_OBJECT_PTR				= 26,
-	ZEMT_TT_CLASS					= 27,
-	ZEMT_TT_ENUMERATOR				= 28,
-	ZEMT_TT_FLAGS					= 29
+	ZEMT_BT_UNDEFINED				= 0,
+	ZEMT_BT_VOID					= 1,
+	ZEMT_BT_INTEGER_8				= 2,
+	ZEMT_BT_INTEGER_16				= 3,
+	ZEMT_BT_INTEGER_32				= 4,
+	ZEMT_BT_INTEGER_64				= 5,
+	ZEMT_BT_UNSIGNED_INTEGER_8		= 6,
+	ZEMT_BT_UNSIGNED_INTEGER_16		= 7,
+	ZEMT_BT_UNSIGNED_INTEGER_32		= 8,
+	ZEMT_BT_UNSIGNED_INTEGER_64		= 9,
+	ZEMT_BT_FLOAT					= 10,
+	ZEMT_BT_DOUBLE					= 11,
+	ZEMT_BT_BOOLEAN					= 12,
+	ZEMT_BT_STRING					= 13,
+	ZEMT_BT_QUATERNION				= 14,
+	ZEMT_BT_VECTOR2					= 15,
+	ZEMT_BT_VECTOR2D				= 16,
+	ZEMT_BT_VECTOR3					= 17,
+	ZEMT_BT_VECTOR3D				= 18,
+	ZEMT_BT_VECTOR4					= 19,
+	ZEMT_BT_VECTOR4D				= 20,
+	ZEMT_BT_MATRIX3X3				= 21,
+	ZEMT_BT_MATRIX3X3D				= 22,
+	ZEMT_BT_MATRIX4X4				= 23,
+	ZEMT_BT_MATRIX4X4D				= 24,
+	ZEMT_BT_OBJECT					= 25,
+	ZEMT_BT_OBJECT_PTR				= 26,
+	ZEMT_BT_CLASS					= 27,
+	ZEMT_BT_ENUMERATOR				= 28,
+	ZEMT_BT_FLAGS					= 29
 };
 
 enum ZEMTTypeQualifier
@@ -91,7 +91,7 @@ class ZEMTEnumerator;
 class ZEMTType
 {
 	public:
-		ZEMTTypeType			Type;
+		ZEMTBaseType			Type;
 		ZEMTTypeQualifier		TypeQualifier;
 		ZEMTContainerType		ContainerType;
 
@@ -104,7 +104,7 @@ class ZEMTType
 		static bool				Equal(const ZEMTType& A, const ZEMTType& B);
 
 								ZEMTType();
-								ZEMTType(ZEMTTypeType Type, ZEMTTypeQualifier TypeQualifier, 
+								ZEMTType(ZEMTBaseType Type, ZEMTTypeQualifier TypeQualifier, 
 									ZEMTContainerType ContainerType, 
 									ZEClass* Class, ZEMTEnumerator* Enumerator);
 };

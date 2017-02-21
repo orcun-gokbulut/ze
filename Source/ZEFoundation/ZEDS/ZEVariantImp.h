@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline ZEReturnType ZEVariant::ConvertValue(const void* ValuePointer) const
 {
 	if (ValueType.ContainerType != ZEMT_CT_NONE)
@@ -54,7 +54,7 @@ inline ZEReturnType ZEVariant::ConvertValue(const void* ValuePointer) const
 		zeCriticalError("Variant internal error. Unknown type qualifier.");
 }
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer) const
 {
 	if (ValueType.ContainerType != ZEMT_CT_NONE)
@@ -71,7 +71,7 @@ inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer)
 		zeCriticalError("Variant internal error. Unknown type qualifier.");
 }
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline ZEReturnType& ZEVariant::ConvertRef(const void* ValuePointer) const
 {
 	if (ValueType.ContainerType != ZEMT_CT_NONE)
@@ -92,7 +92,7 @@ inline ZEReturnType& ZEVariant::ConvertRef(const void* ValuePointer) const
 		zeCriticalError("Variant internal error. Unknown type qualifier.");
 }
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline ZEReturnType& ZEVariant::ConvertConstRef(const void* ValuePointer) const
 {
 	if (ValueType.ContainerType != ZEMT_CT_NONE)
@@ -125,7 +125,7 @@ template<typename ZEItemType>
 void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZEMT_TT_UNDEFINED)
+	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 
 	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
@@ -144,7 +144,7 @@ template<typename ZEItemType>
 void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.Type = ZEMT_BT_OBJECT_PTR;
 	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	Type.ContainerType = ZEMT_CT_ARRAY;
 	Type.Class = ObjectPtrClass;
@@ -159,7 +159,7 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZEMT_TT_UNDEFINED)
+	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 
 	if (Type.ContainerType == ZEMT_CT_NONE)
@@ -179,7 +179,7 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.Type = ZEMT_BT_OBJECT_PTR;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.ContainerType = ZEMT_CT_ARRAY;
 	Type.Class = ObjectClass;
@@ -193,7 +193,7 @@ void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
 	
-	if (Type.Type == ZEMT_TT_UNDEFINED)
+	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 	
 	if (Type.ContainerType == ZEMT_CT_NONE)
@@ -213,7 +213,7 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.Type = ZEMT_BT_OBJECT_PTR;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	Type.ContainerType = ZEMT_CT_ARRAY;
 	Type.Class = ObjectClass;
@@ -226,7 +226,7 @@ template<typename ZEObjectType>
 void ZEVariant::SetObject(const ZEObjectType& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT;
+	Type.Type = ZEMT_BT_OBJECT;
 	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
@@ -244,7 +244,7 @@ template<typename ZEObjectType>
 void ZEVariant::SetObjectRef(ZEObjectType& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT;
+	Type.Type = ZEMT_BT_OBJECT;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
@@ -256,7 +256,7 @@ template<typename ZEObjectType>
 void ZEVariant::SetObjectConstRef(const ZEObjectType& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT;
+	Type.Type = ZEMT_BT_OBJECT;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	Type.Class = Object.GetClass();
 	SetType(Type);
@@ -303,19 +303,19 @@ const ZEArray<ZEItemType>& ZEVariant::GetArrayConstRef() const
 template<typename ZEObjectType>
 const ZEObjectType& ZEVariant::GetObject() const
 {
-	return ConvertValue<ZEObjectType, ZEMT_TT_OBJECT>(Value.Pointer);
+	return ConvertValue<ZEObjectType, ZEMT_BT_OBJECT>(Value.Pointer);
 }
 
 template<typename ZEObjectType>
 ZEObjectType& ZEVariant::GetObjectRef() const
 {
-	return ConvertRef<ZEObjectType, ZEMT_TT_OBJECT>(Value.Pointer);
+	return ConvertRef<ZEObjectType, ZEMT_BT_OBJECT>(Value.Pointer);
 }
 
 template<typename ZEObjectType>
 const ZEObjectType& ZEVariant::GetObjectConstRef() const
 {
-	return ConvertConstRef<const ZEObjectType, ZEMT_TT_OBJECT>(Value.Pointer);
+	return ConvertConstRef<const ZEObjectType, ZEMT_BT_OBJECT>(Value.Pointer);
 }
 
 template<typename ZEObjectType>

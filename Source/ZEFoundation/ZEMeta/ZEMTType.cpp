@@ -54,11 +54,11 @@ bool ZEMTType::Equal(const ZEMTType& A, const ZEMTType& B)
 		return false;
 	}
 
-	if ((A.Type == ZEMT_TT_OBJECT || A.Type == ZEMT_TT_OBJECT_PTR) && A.Class != B.Class)
+	if ((A.Type == ZEMT_BT_OBJECT || A.Type == ZEMT_BT_OBJECT_PTR) && A.Class != B.Class)
 	{
 		return false;
 	}
-	else if (A.Type == ZEMT_TT_ENUMERATOR && A.Enumerator != B.Enumerator)
+	else if (A.Type == ZEMT_BT_ENUMERATOR && A.Enumerator != B.Enumerator)
 	{
 		return false;
 	}
@@ -68,14 +68,14 @@ bool ZEMTType::Equal(const ZEMTType& A, const ZEMTType& B)
 
 ZEMTType::ZEMTType()
 {
-	Type = ZEMT_TT_UNDEFINED;
+	Type = ZEMT_BT_UNDEFINED;
 	TypeQualifier = ZEMT_TQ_VALUE;
 	ContainerType = ZEMT_CT_NONE;
 	Class = 0;
 	Enumerator = 0;
 }
 
-ZEMTType::ZEMTType(ZEMTTypeType Type, ZEMTTypeQualifier TypeQualifier, ZEMTContainerType ContainerType, ZEClass* Class, ZEMTEnumerator* Enumerator)
+ZEMTType::ZEMTType(ZEMTBaseType Type, ZEMTTypeQualifier TypeQualifier, ZEMTContainerType ContainerType, ZEClass* Class, ZEMTEnumerator* Enumerator)
 {
 	this->Type = Type;
 	this->TypeQualifier = TypeQualifier;

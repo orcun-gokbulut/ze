@@ -1676,7 +1676,7 @@ bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 		if (Current->Type.TypeQualifier != ZEMT_TQ_VALUE)
 			continue;
 
-		if (Current->Type.Type == ZEMT_TT_OBJECT || Current->Type.Type == ZEMT_TT_OBJECT_PTR)
+		if (Current->Type.Type == ZEMT_BT_OBJECT || Current->Type.Type == ZEMT_BT_OBJECT_PTR)
 			continue;
 
 		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)

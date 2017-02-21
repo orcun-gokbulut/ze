@@ -41,7 +41,7 @@
 #pragma warning(push)
 #pragma warning(disable:4482 4996 4244)
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline ZEReturnType& ZEReference::ConvertRef() const
 {
 	if (ValueType.Type != Type)
@@ -53,7 +53,7 @@ inline ZEReturnType& ZEReference::ConvertRef() const
 	return *(ZEReturnType*)Value.Pointer;		
 }
 
-template <typename ZEReturnType, ZEMTTypeType Type>
+template <typename ZEReturnType, ZEMTBaseType Type>
 inline const ZEReturnType& ZEReference::ConvertConstRef() const
 {
 	if (ValueType.Type != Type)
@@ -81,7 +81,7 @@ void ZEReference::SetReference(const ZEReference& Reference)
 void ZEReference::SetInt8Ref(ZEInt8& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.Type = ZEMT_BT_INTEGER_8;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -91,7 +91,7 @@ void ZEReference::SetInt8Ref(ZEInt8& Reference)
 void ZEReference::SetInt8ConstRef(const ZEInt8& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.Type = ZEMT_BT_INTEGER_8;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -101,7 +101,7 @@ void ZEReference::SetInt8ConstRef(const ZEInt8& Reference)
 void ZEReference::SetInt16Ref(ZEInt16& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.Type = ZEMT_BT_INTEGER_16;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -111,7 +111,7 @@ void ZEReference::SetInt16Ref(ZEInt16& Reference)
 void ZEReference::SetInt16ConstRef(const ZEInt16& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.Type = ZEMT_BT_INTEGER_16;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -121,7 +121,7 @@ void ZEReference::SetInt16ConstRef(const ZEInt16& Reference)
 void ZEReference::SetInt32Ref(ZEInt32& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.Type = ZEMT_BT_INTEGER_32;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -131,7 +131,7 @@ void ZEReference::SetInt32Ref(ZEInt32& Reference)
 void ZEReference::SetInt32ConstRef(const ZEInt32& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.Type = ZEMT_BT_INTEGER_32;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -141,7 +141,7 @@ void ZEReference::SetInt32ConstRef(const ZEInt32& Reference)
 void ZEReference::SetInt64Ref(ZEInt64& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.Type = ZEMT_BT_INTEGER_64;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -151,7 +151,7 @@ void ZEReference::SetInt64Ref(ZEInt64& Reference)
 void ZEReference::SetInt64ConstRef(const ZEInt64& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.Type = ZEMT_BT_INTEGER_64;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -161,7 +161,7 @@ void ZEReference::SetInt64ConstRef(const ZEInt64& Reference)
 void ZEReference::SetUInt8Ref(ZEUInt8& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.Type = ZEMT_BT_INTEGER_8;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -171,7 +171,7 @@ void ZEReference::SetUInt8Ref(ZEUInt8& Reference)
 void ZEReference::SetUInt8ConstRef(const ZEUInt8& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_8;
+	Type.Type = ZEMT_BT_INTEGER_8;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -181,7 +181,7 @@ void ZEReference::SetUInt8ConstRef(const ZEUInt8& Reference)
 void ZEReference::SetUInt16Ref(ZEUInt16& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.Type = ZEMT_BT_INTEGER_16;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -191,7 +191,7 @@ void ZEReference::SetUInt16Ref(ZEUInt16& Reference)
 void ZEReference::SetUInt16ConstRef(const ZEUInt16& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_16;
+	Type.Type = ZEMT_BT_INTEGER_16;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -201,7 +201,7 @@ void ZEReference::SetUInt16ConstRef(const ZEUInt16& Reference)
 void ZEReference::SetUInt32Ref(ZEUInt32& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.Type = ZEMT_BT_INTEGER_32;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -211,7 +211,7 @@ void ZEReference::SetUInt32Ref(ZEUInt32& Reference)
 void ZEReference::SetUInt32ConstRef(const ZEUInt32& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.Type = ZEMT_BT_INTEGER_32;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -221,7 +221,7 @@ void ZEReference::SetUInt32ConstRef(const ZEUInt32& Reference)
 void ZEReference::SetUInt64Ref(ZEUInt64& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.Type = ZEMT_BT_INTEGER_64;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -231,7 +231,7 @@ void ZEReference::SetUInt64Ref(ZEUInt64& Reference)
 void ZEReference::SetUInt64ConstRef(const ZEUInt64& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_64;
+	Type.Type = ZEMT_BT_INTEGER_64;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -241,7 +241,7 @@ void ZEReference::SetUInt64ConstRef(const ZEUInt64& Reference)
 void ZEReference::SetFloatRef(float& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_FLOAT;
+	Type.Type = ZEMT_BT_FLOAT;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -251,7 +251,7 @@ void ZEReference::SetFloatRef(float& Value)
 void ZEReference::SetFloatConstRef(const float& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_FLOAT;
+	Type.Type = ZEMT_BT_FLOAT;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -261,7 +261,7 @@ void ZEReference::SetFloatConstRef(const float& Value)
 void ZEReference::SetDoubleRef(double& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_DOUBLE;
+	Type.Type = ZEMT_BT_DOUBLE;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -271,7 +271,7 @@ void ZEReference::SetDoubleRef(double& Value)
 void ZEReference::SetDoubleConstRef(const double& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_DOUBLE;
+	Type.Type = ZEMT_BT_DOUBLE;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -281,7 +281,7 @@ void ZEReference::SetDoubleConstRef(const double& Value)
 void ZEReference::SetBooleanRef(bool& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_BOOLEAN;
+	Type.Type = ZEMT_BT_BOOLEAN;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -291,7 +291,7 @@ void ZEReference::SetBooleanRef(bool& Value)
 void ZEReference::SetBoolConstRef(const bool& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_BOOLEAN;
+	Type.Type = ZEMT_BT_BOOLEAN;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -301,7 +301,7 @@ void ZEReference::SetBoolConstRef(const bool& Value)
 void ZEReference::SetVector2Ref(ZEVector2& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR2;
+	Type.Type = ZEMT_BT_VECTOR2;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -311,7 +311,7 @@ void ZEReference::SetVector2Ref(ZEVector2& Value)
 void ZEReference::SetVector2ConstRef(const ZEVector2& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR2;
+	Type.Type = ZEMT_BT_VECTOR2;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -321,7 +321,7 @@ void ZEReference::SetVector2ConstRef(const ZEVector2& Value)
 void ZEReference::SetVector2dRef(ZEVector2d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR2D;
+	Type.Type = ZEMT_BT_VECTOR2D;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -331,7 +331,7 @@ void ZEReference::SetVector2dRef(ZEVector2d& Value)
 void ZEReference::SetVector2dConstRef(const ZEVector2d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR2D;
+	Type.Type = ZEMT_BT_VECTOR2D;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -341,7 +341,7 @@ void ZEReference::SetVector2dConstRef(const ZEVector2d& Value)
 void ZEReference::SetVector3Ref(ZEVector3& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR3;
+	Type.Type = ZEMT_BT_VECTOR3;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -351,7 +351,7 @@ void ZEReference::SetVector3Ref(ZEVector3& Value)
 void ZEReference::SetVector3ConstRef(const ZEVector3& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR3;
+	Type.Type = ZEMT_BT_VECTOR3;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -361,7 +361,7 @@ void ZEReference::SetVector3ConstRef(const ZEVector3& Value)
 void ZEReference::SetVector3dRef(ZEVector3d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR3D;
+	Type.Type = ZEMT_BT_VECTOR3D;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -371,7 +371,7 @@ void ZEReference::SetVector3dRef(ZEVector3d& Value)
 void ZEReference::SetVector3dConstRef(const ZEVector3d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR3D;
+	Type.Type = ZEMT_BT_VECTOR3D;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -381,7 +381,7 @@ void ZEReference::SetVector3dConstRef(const ZEVector3d& Value)
 void ZEReference::SetVector4Ref(ZEVector4& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR4;
+	Type.Type = ZEMT_BT_VECTOR4;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -391,7 +391,7 @@ void ZEReference::SetVector4Ref(ZEVector4& Value)
 void ZEReference::SetVector4ConstRef(const ZEVector4& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR4;
+	Type.Type = ZEMT_BT_VECTOR4;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -401,7 +401,7 @@ void ZEReference::SetVector4ConstRef(const ZEVector4& Value)
 void ZEReference::SetVector4dRef(ZEVector4d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR4D;
+	Type.Type = ZEMT_BT_VECTOR4D;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -411,7 +411,7 @@ void ZEReference::SetVector4dRef(ZEVector4d& Value)
 void ZEReference::SetVector4dConstRef(const ZEVector4d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_VECTOR4D;
+	Type.Type = ZEMT_BT_VECTOR4D;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -421,7 +421,7 @@ void ZEReference::SetVector4dConstRef(const ZEVector4d& Value)
 void ZEReference::SetQuaternionRef(ZEQuaternion& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_QUATERNION;
+	Type.Type = ZEMT_BT_QUATERNION;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -431,7 +431,7 @@ void ZEReference::SetQuaternionRef(ZEQuaternion& Value)
 void ZEReference::SetQuaternionConstRef(const ZEQuaternion& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_QUATERNION;
+	Type.Type = ZEMT_BT_QUATERNION;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -441,7 +441,7 @@ void ZEReference::SetQuaternionConstRef(const ZEQuaternion& Value)
 void ZEReference::SetMatrix3x3Ref(ZEMatrix3x3& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX3X3;
+	Type.Type = ZEMT_BT_MATRIX3X3;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -451,7 +451,7 @@ void ZEReference::SetMatrix3x3Ref(ZEMatrix3x3& Value)
 void ZEReference::SetMatrix3x3ConstRef(const ZEMatrix3x3& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX3X3;
+	Type.Type = ZEMT_BT_MATRIX3X3;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -461,7 +461,7 @@ void ZEReference::SetMatrix3x3ConstRef(const ZEMatrix3x3& Value)
 void ZEReference::SetMatrix3x3dRef(ZEMatrix3x3d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX3X3D;
+	Type.Type = ZEMT_BT_MATRIX3X3D;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -471,7 +471,7 @@ void ZEReference::SetMatrix3x3dRef(ZEMatrix3x3d& Value)
 void ZEReference::SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX3X3D;
+	Type.Type = ZEMT_BT_MATRIX3X3D;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -481,7 +481,7 @@ void ZEReference::SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value)
 void ZEReference::SetMatrix4x4Ref(ZEMatrix4x4& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX4X4;
+	Type.Type = ZEMT_BT_MATRIX4X4;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -491,7 +491,7 @@ void ZEReference::SetMatrix4x4Ref(ZEMatrix4x4& Value)
 void ZEReference::SetMatrix4x4ConstRef(const ZEMatrix4x4& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX4X4;
+	Type.Type = ZEMT_BT_MATRIX4X4;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -501,7 +501,7 @@ void ZEReference::SetMatrix4x4ConstRef(const ZEMatrix4x4& Value)
 void ZEReference::SetMatrix4x4dRef(ZEMatrix4x4d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX4X4D;
+	Type.Type = ZEMT_BT_MATRIX4X4D;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -511,7 +511,7 @@ void ZEReference::SetMatrix4x4dRef(ZEMatrix4x4d& Value)
 void ZEReference::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_MATRIX4X4D;
+	Type.Type = ZEMT_BT_MATRIX4X4D;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -520,7 +520,7 @@ void ZEReference::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
 void ZEReference::SetStringRef(ZEString& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_STRING;
+	Type.Type = ZEMT_BT_STRING;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	SetType(Type);
 
@@ -530,7 +530,7 @@ void ZEReference::SetStringRef(ZEString& Value)
 void ZEReference::SetStringConstRef(const ZEString& Value)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_STRING;
+	Type.Type = ZEMT_BT_STRING;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -540,7 +540,7 @@ void ZEReference::SetStringConstRef(const ZEString& Value)
 void ZEReference::SetEnumRef(const ZEInt32& Reference)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_INTEGER_32;
+	Type.Type = ZEMT_BT_INTEGER_32;
 	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
 
@@ -550,7 +550,7 @@ void ZEReference::SetEnumRef(const ZEInt32& Reference)
 void ZEReference::SetObjectPtrRef(ZEObject*& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.Type = ZEMT_BT_OBJECT_PTR;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object->GetClass();
 	SetType(Type);
@@ -561,7 +561,7 @@ void ZEReference::SetObjectPtrRef(ZEObject*& Object)
 void ZEReference::SetObjectPtrConstRef(const ZEObject*& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.Type = ZEMT_BT_OBJECT_PTR;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = Object->GetClass();
 	SetType(Type);
@@ -572,7 +572,7 @@ void ZEReference::SetObjectPtrConstRef(const ZEObject*& Object)
 void ZEReference::SetClassRef(ZEClass*& Class)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_CLASS;
+	Type.Type = ZEMT_BT_CLASS;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = NULL;
 	SetType(Type);
@@ -583,7 +583,7 @@ void ZEReference::SetClassRef(ZEClass*& Class)
 void ZEReference::SetClassConstRef(const ZEClass*& Class)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_CLASS;
+	Type.Type = ZEMT_BT_CLASS;
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Type.Class = NULL;
 	SetType(Type);
@@ -594,242 +594,242 @@ void ZEReference::SetClassConstRef(const ZEClass*& Class)
 
 ZEInt8& ZEReference::GetInt8Ref() const
 {
-	return ConvertRef<ZEInt8, ZEMT_TT_INTEGER_8>();
+	return ConvertRef<ZEInt8, ZEMT_BT_INTEGER_8>();
 }
 
 const ZEInt8& ZEReference::GetInt8ConstRef() const
 {
-	return ConvertConstRef<ZEInt8, ZEMT_TT_INTEGER_8>();
+	return ConvertConstRef<ZEInt8, ZEMT_BT_INTEGER_8>();
 }
 
 ZEInt16& ZEReference::GetInt16Ref() const
 {
-	return ConvertRef<ZEInt16, ZEMT_TT_INTEGER_16>();
+	return ConvertRef<ZEInt16, ZEMT_BT_INTEGER_16>();
 }
 
 const ZEInt16& ZEReference::GetInt16ConstRef() const
 {
-	return ConvertConstRef<ZEInt16, ZEMT_TT_INTEGER_16>();
+	return ConvertConstRef<ZEInt16, ZEMT_BT_INTEGER_16>();
 }
 
 ZEInt32& ZEReference::GetInt32Ref() const
 {
-	return ConvertRef<ZEInt32, ZEMT_TT_INTEGER_32>();
+	return ConvertRef<ZEInt32, ZEMT_BT_INTEGER_32>();
 }
 
 const ZEInt32& ZEReference::GetInt32ConstRef() const
 {
-	return ConvertConstRef<ZEInt32, ZEMT_TT_INTEGER_32>();
+	return ConvertConstRef<ZEInt32, ZEMT_BT_INTEGER_32>();
 }
 
 ZEInt64& ZEReference::GetInt64Ref() const
 {
-	return ConvertRef<ZEInt64, ZEMT_TT_INTEGER_64>();
+	return ConvertRef<ZEInt64, ZEMT_BT_INTEGER_64>();
 }
 
 const ZEInt64& ZEReference::GetInt64ConstRef() const
 {
-	return ConvertConstRef<ZEInt64, ZEMT_TT_INTEGER_64>();
+	return ConvertConstRef<ZEInt64, ZEMT_BT_INTEGER_64>();
 }
 
 ZEUInt8& ZEReference::GetUInt8Ref() const
 {
-	return ConvertRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
+	return ConvertRef<ZEUInt8, ZEMT_BT_UNSIGNED_INTEGER_8>();
 }
 
 const ZEUInt8& ZEReference::GetUInt8ConstRef() const
 {
-	return ConvertConstRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
+	return ConvertConstRef<ZEUInt8, ZEMT_BT_UNSIGNED_INTEGER_8>();
 }
 
 ZEUInt16& ZEReference::GetUInt16Ref() const
 {
-	return ConvertRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
+	return ConvertRef<ZEUInt16, ZEMT_BT_UNSIGNED_INTEGER_16>();
 }
 
 const ZEUInt16& ZEReference::GetUInt16ConstRef() const
 {
-	return ConvertConstRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
+	return ConvertConstRef<ZEUInt16, ZEMT_BT_UNSIGNED_INTEGER_16>();
 }
 
 ZEUInt32& ZEReference::GetUInt32Ref() const
 {
-	return ConvertRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
+	return ConvertRef<ZEUInt32, ZEMT_BT_UNSIGNED_INTEGER_32>();
 }
 
 const ZEUInt32& ZEReference::GetUInt32ConstRef() const
 {
-	return ConvertConstRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
+	return ConvertConstRef<ZEUInt32, ZEMT_BT_UNSIGNED_INTEGER_32>();
 }
 
 ZEUInt64& ZEReference::GetUInt64Ref() const
 {
-	return ConvertRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
+	return ConvertRef<ZEUInt64, ZEMT_BT_UNSIGNED_INTEGER_64>();
 }
 
 const ZEUInt64& ZEReference::GetUInt64ConstRef() const
 {
-	return ConvertConstRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
+	return ConvertConstRef<ZEUInt64, ZEMT_BT_UNSIGNED_INTEGER_64>();
 }
 
 float& ZEReference::GetFloatRef() const
 {
-	return ConvertRef<float, ZEMT_TT_FLOAT>();
+	return ConvertRef<float, ZEMT_BT_FLOAT>();
 }
 
 const float& ZEReference::GetFloatConstRef() const
 {
-	return ConvertConstRef<float, ZEMT_TT_FLOAT>();
+	return ConvertConstRef<float, ZEMT_BT_FLOAT>();
 }
 
 double& ZEReference::GetDoubleRef() const
 {
-	return ConvertRef<double, ZEMT_TT_DOUBLE>();
+	return ConvertRef<double, ZEMT_BT_DOUBLE>();
 }
 
 const double& ZEReference::GetDoubleConstRef() const
 {
-	return ConvertConstRef<double, ZEMT_TT_DOUBLE>();
+	return ConvertConstRef<double, ZEMT_BT_DOUBLE>();
 }
 
 bool& ZEReference::GetBoolRef() const
 {
-	return ConvertRef<bool, ZEMT_TT_BOOLEAN>();
+	return ConvertRef<bool, ZEMT_BT_BOOLEAN>();
 }
 
 const bool& ZEReference::GetBoolConstRef() const
 {
-	return ConvertConstRef<bool, ZEMT_TT_BOOLEAN>();
+	return ConvertConstRef<bool, ZEMT_BT_BOOLEAN>();
 }
 
 ZEVector2& ZEReference::GetVector2Ref() const
 {
-	return ConvertRef<ZEVector2, ZEMT_TT_VECTOR2>();
+	return ConvertRef<ZEVector2, ZEMT_BT_VECTOR2>();
 }
 
 const ZEVector2& ZEReference::GetVector2ConstRef() const
 {
-	return ConvertConstRef<ZEVector2, ZEMT_TT_VECTOR2>();
+	return ConvertConstRef<ZEVector2, ZEMT_BT_VECTOR2>();
 }
 
 ZEVector2d& ZEReference::GetVector2dRef() const
 {
-	return ConvertRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
+	return ConvertRef<ZEVector2d, ZEMT_BT_VECTOR2D>();
 }
 
 const ZEVector2d& ZEReference::GetVector2dConstRef() const
 {
-	return ConvertConstRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
+	return ConvertConstRef<ZEVector2d, ZEMT_BT_VECTOR2D>();
 }
 
 ZEVector3& ZEReference::GetVector3Ref() const
 {
-	return ConvertRef<ZEVector3, ZEMT_TT_VECTOR3>();
+	return ConvertRef<ZEVector3, ZEMT_BT_VECTOR3>();
 }
 
 const ZEVector3& ZEReference::GetVector3ConstRef() const
 {
-	return ConvertConstRef<ZEVector3, ZEMT_TT_VECTOR3>();
+	return ConvertConstRef<ZEVector3, ZEMT_BT_VECTOR3>();
 }
 
 ZEVector3d& ZEReference::GetVector3dRef() const
 {
-	return ConvertRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
+	return ConvertRef<ZEVector3d, ZEMT_BT_VECTOR3D>();
 }
 
 const ZEVector3d& ZEReference::GetVector3dConstRef() const
 {
-	return ConvertConstRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
+	return ConvertConstRef<ZEVector3d, ZEMT_BT_VECTOR3D>();
 }
 
 ZEVector4& ZEReference::GetVector4Ref() const
 {
-	return ConvertRef<ZEVector4, ZEMT_TT_VECTOR4>();
+	return ConvertRef<ZEVector4, ZEMT_BT_VECTOR4>();
 }
 
 const ZEVector4& ZEReference::GetVector4ConstRef() const
 {
-	return ConvertConstRef<ZEVector4, ZEMT_TT_VECTOR4>();
+	return ConvertConstRef<ZEVector4, ZEMT_BT_VECTOR4>();
 }
 
 ZEVector4d& ZEReference::GetVector4dRef() const
 {
-	return ConvertRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
+	return ConvertRef<ZEVector4d, ZEMT_BT_VECTOR4D>();
 }
 
 const ZEVector4d& ZEReference::GetVector4dConstRef() const
 {
-	return ConvertConstRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
+	return ConvertConstRef<ZEVector4d, ZEMT_BT_VECTOR4D>();
 }
 
 ZEQuaternion& ZEReference::GetQuaternionRef() const
 {
-	return ConvertRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
+	return ConvertRef<ZEQuaternion, ZEMT_BT_QUATERNION>();
 }
 
 const ZEQuaternion& ZEReference::GetQuaternionConstRef() const
 {
-	return ConvertConstRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
+	return ConvertConstRef<ZEQuaternion, ZEMT_BT_QUATERNION>();
 }
 
 ZEMatrix3x3& ZEReference::GetMatrix3x3Ref() const
 {
-	return ConvertRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
+	return ConvertRef<ZEMatrix3x3, ZEMT_BT_MATRIX3X3>();
 }
 
 const ZEMatrix3x3& ZEReference::GetMatrix3x3ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
+	return ConvertConstRef<ZEMatrix3x3, ZEMT_BT_MATRIX3X3>();
 }
 
 ZEMatrix3x3d& ZEReference::GetMatrix3x3dRef() const
 {
-	return ConvertRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
+	return ConvertRef<ZEMatrix3x3d, ZEMT_BT_MATRIX3X3D>();
 }
 
 const ZEMatrix3x3d& ZEReference::GetMatrix3x3dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
+	return ConvertConstRef<ZEMatrix3x3d, ZEMT_BT_MATRIX3X3D>();
 }
 
 ZEMatrix4x4& ZEReference::GetMatrix4x4Ref() const
 {
-	return ConvertRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
+	return ConvertRef<ZEMatrix4x4, ZEMT_BT_MATRIX4X4>();
 }
 
 const ZEMatrix4x4& ZEReference::GetMatrix4x4ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
+	return ConvertConstRef<ZEMatrix4x4, ZEMT_BT_MATRIX4X4>();
 }
 
 ZEMatrix4x4d& ZEReference::GetMatrix4x4dRef() const
 {
-	return ConvertRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
+	return ConvertRef<ZEMatrix4x4d, ZEMT_BT_MATRIX4X4D>();
 }
 
 const ZEMatrix4x4d& ZEReference::GetMatrix4x4dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
+	return ConvertConstRef<ZEMatrix4x4d, ZEMT_BT_MATRIX4X4D>();
 }
 
 ZEString& ZEReference::GetStringRef() const
 {
-	return ConvertRef<ZEString, ZEMT_TT_STRING>();
+	return ConvertRef<ZEString, ZEMT_BT_STRING>();
 }
 
 const ZEString& ZEReference::GetStringConstRef() const
 {
-	return ConvertConstRef<ZEString, ZEMT_TT_STRING>();
+	return ConvertConstRef<ZEString, ZEMT_BT_STRING>();
 }
 
 ZEObject*& ZEReference::GetObjectPtrRef() const
 {
-	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>();
+	return ConvertRef<ZEObject*, ZEMT_BT_OBJECT_PTR>();
 }
 
 ZEObject*const& ZEReference::GetObjectPtrConstRef() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
+	if (ValueType.Type != ZEMT_BT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
 	return (ZEObject* const)Value.Pointer;
@@ -838,7 +838,7 @@ ZEObject*const& ZEReference::GetObjectPtrConstRef() const
 
 ZEClass*& ZEReference::GetClassRef() const
 {
-	if (ValueType.Type != ZEMT_TT_CLASS)
+	if (ValueType.Type != ZEMT_BT_CLASS)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
 	return *(ZEClass**)Value.Pointer;
@@ -1375,7 +1375,7 @@ ZEReference::operator ZEObject*const&()
 
 ZEReference::ZEReference()
 {
-	ValueType.Type = ZEMT_TT_UNDEFINED;
+	ValueType.Type = ZEMT_BT_UNDEFINED;
 	ValueType.TypeQualifier = ZEMT_TQ_REFERENCE;
 	Value.Pointer = NULL;
 }

@@ -68,7 +68,7 @@ class ZEMTTypeGenerator<const T>
 	public:
 		static ZEMTType GetType()
 		{
-			ZEMTType Type = ZEMT_TT_UNDEFINED;
+			ZEMTType Type = ZEMT_BT_UNDEFINED;
 			Type.Class = 0;
 			Type.TypeQualifier = ZE_TT_VALUE;
 			return Type;
@@ -83,11 +83,11 @@ class ZEMTTypeGenerator<T *>
 		{
 			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
 			
-			if (Type.Type == ZEMT_TT_OBJECT)
+			if (Type.Type == ZEMT_BT_OBJECT)
 			{
-				Type.Type = ZEMT_TT_OBJECT_PTR;
+				Type.Type = ZEMT_BT_OBJECT_PTR;
 			}
-			else if (Type.Type == ZEMT_TT_CLASS)
+			else if (Type.Type == ZEMT_BT_CLASS)
 			{
 				return Type;
 			}
@@ -323,7 +323,7 @@ class ZEMTTypeGenerator : Derived_from<T, ZEObject>
 		static ZEMTType GetType()
 		{
 			ZEMTType Type;
-			Type.Type = ZEMT_TT_OBJECT;
+			Type.Type = ZEMT_BT_OBJECT;
 			Type.TypeQualifier = ZEMT_TQ_VALUE;
 			Type.Class = T::Class();
 			return Type;

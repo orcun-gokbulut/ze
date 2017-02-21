@@ -55,7 +55,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 {
 	switch (GetProperty()->Type.Type)
 	{
-		case ZEMT_TT_VECTOR2:
+		case ZEMT_BT_VECTOR2:
 		{
 			ZEVector2 Temp = Variant.GetVector2();
 			Temp.M[MemberIndex] = MemberValue;
@@ -63,7 +63,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_VECTOR2D:
+		case ZEMT_BT_VECTOR2D:
 		{
 			ZEVector2d Temp = Variant.GetVector2d();
 			Temp.M[MemberIndex] = MemberValue;
@@ -71,7 +71,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_VECTOR3:
+		case ZEMT_BT_VECTOR3:
 		{
 			ZEVector3 Temp = Variant.GetVector3();
 			Temp.M[MemberIndex] = MemberValue;
@@ -79,7 +79,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_VECTOR3D:
+		case ZEMT_BT_VECTOR3D:
 		{
 			ZEVector3d Temp = Variant.GetVector3d();
 			Temp.M[MemberIndex] = MemberValue;
@@ -87,7 +87,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_VECTOR4:
+		case ZEMT_BT_VECTOR4:
 		{
 			ZEVector4 Temp = Variant.GetVector4();
 			Temp.M[MemberIndex] = MemberValue;
@@ -95,7 +95,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_VECTOR4D:
+		case ZEMT_BT_VECTOR4D:
 		{
 			ZEVector4d Temp = Variant.GetVector4d();
 			Temp.M[MemberIndex] = MemberValue;
@@ -103,7 +103,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_QUATERNION:
+		case ZEMT_BT_QUATERNION:
 		{
 			ZEQuaternion Temp = Variant.GetQuaternion();
 
@@ -125,7 +125,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_MATRIX3X3:
+		case ZEMT_BT_MATRIX3X3:
 		{
 			ZEMatrix3x3 Temp = Variant.GetMatrix3x3();
 			Temp.MA[MemberIndex] = MemberValue;
@@ -133,7 +133,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_MATRIX3X3D:
+		case ZEMT_BT_MATRIX3X3D:
 		{
 			ZEMatrix3x3d Temp = Variant.GetMatrix3x3d();
 			Temp.MA[MemberIndex] = MemberValue;
@@ -141,7 +141,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_MATRIX4X4:
+		case ZEMT_BT_MATRIX4X4:
 		{
 			ZEMatrix4x4 Temp = Variant.GetMatrix4x4();
 			Temp.MA[MemberIndex] = MemberValue;
@@ -149,7 +149,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 			break;
 		}
 
-		case ZEMT_TT_MATRIX4X4D:
+		case ZEMT_BT_MATRIX4X4D:
 		{
 			ZEMatrix4x4d Temp = Variant.GetMatrix4x4d();
 			Temp.MA[MemberIndex] = MemberValue;
@@ -163,25 +163,25 @@ double ZEDPropertyEditorItemVector::GetMemeberValue(const ZEVariant& Variant, ZE
 {
 	switch (GetProperty()->Type.Type)
 	{
-		case ZEMT_TT_VECTOR2:
+		case ZEMT_BT_VECTOR2:
 			return Variant.GetVector2().M[MemberIndex];
 
-		case ZEMT_TT_VECTOR2D:
+		case ZEMT_BT_VECTOR2D:
 			return Variant.GetVector2d().M[MemberIndex];
 
-		case ZEMT_TT_VECTOR3:
+		case ZEMT_BT_VECTOR3:
 			return Variant.GetVector3().M[MemberIndex];
 
-		case ZEMT_TT_VECTOR3D:
+		case ZEMT_BT_VECTOR3D:
 			return Variant.GetVector3d().M[MemberIndex];
 
-		case ZEMT_TT_VECTOR4:
+		case ZEMT_BT_VECTOR4:
 			return Variant.GetVector4().M[MemberIndex];
 
-		case ZEMT_TT_VECTOR4D:
+		case ZEMT_BT_VECTOR4D:
 			return Variant.GetVector4d().M[MemberIndex];
 
-		case ZEMT_TT_QUATERNION:
+		case ZEMT_BT_QUATERNION:
 			if (MemberIndex < 3)
 			{
 				// Euler [Rx, Ry, Rz]
@@ -196,16 +196,16 @@ double ZEDPropertyEditorItemVector::GetMemeberValue(const ZEVariant& Variant, ZE
 			}
 			break;
 
-		case ZEMT_TT_MATRIX3X3:
+		case ZEMT_BT_MATRIX3X3:
 			return  Variant.GetMatrix3x3().MA[MemberIndex];
 
-		case ZEMT_TT_MATRIX3X3D:
+		case ZEMT_BT_MATRIX3X3D:
 			return Variant.GetMatrix3x3d().MA[MemberIndex];
 
-		case ZEMT_TT_MATRIX4X4:
+		case ZEMT_BT_MATRIX4X4:
 			return Variant.GetMatrix4x4().MA[MemberIndex];
 
-		case ZEMT_TT_MATRIX4X4D:
+		case ZEMT_BT_MATRIX4X4D:
 			return Variant.GetMatrix4x4d().MA[MemberIndex];
 		
 		default:
@@ -235,8 +235,8 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 	const ZEMTProperty* Property = GetProperty();
 	switch (GetProperty()->Type.Type)
 	{
-		case ZEMT_TT_VECTOR2:
-		case ZEMT_TT_VECTOR2D:
+		case ZEMT_BT_VECTOR2:
+		case ZEMT_BT_VECTOR2D:
 			ShortLabels[0] = Labels[0] = "x"; 
 			ShortLabels[1] = Labels[1] = "y";
 			RowCount = 1;
@@ -244,8 +244,8 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			Detail = false;
 			break;
 
-		case ZEMT_TT_VECTOR3:
-		case ZEMT_TT_VECTOR3D:
+		case ZEMT_BT_VECTOR3:
+		case ZEMT_BT_VECTOR3D:
 			ShortLabels[0] = Labels[0] = "x"; 
 			ShortLabels[1] = Labels[1] = "y";
 			ShortLabels[2] = Labels[2] = "z";
@@ -254,8 +254,8 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			Detail = false;
 			break;
 
-		case ZEMT_TT_VECTOR4:
-		case ZEMT_TT_VECTOR4D:
+		case ZEMT_BT_VECTOR4:
+		case ZEMT_BT_VECTOR4D:
 			ShortLabels[0] = Labels[0] = "x"; 
 			ShortLabels[1] = Labels[1] = "y";
 			ShortLabels[2] = Labels[2] = "z";
@@ -265,7 +265,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			Detail = false;
 			break;
 
-		case ZEMT_TT_QUATERNION:
+		case ZEMT_BT_QUATERNION:
 			Labels[0] = "Euler.x (Pitch)"; 
 			Labels[1] = "Euler.y (Yaw)";
 			Labels[2] = "Euler.z (Roll)";
@@ -288,8 +288,8 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			break;
 
 
-		case ZEMT_TT_MATRIX3X3:
-		case ZEMT_TT_MATRIX3X3D:
+		case ZEMT_BT_MATRIX3X3:
+		case ZEMT_BT_MATRIX3X3D:
 			ShortLabels[0]  = Labels[0]  = "M11";
 			ShortLabels[1]  = Labels[1]  = "M21"; 
 			ShortLabels[2]  = Labels[2]  = "M31";
@@ -307,8 +307,8 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			Detail = true;
 			break;
 
-		case ZEMT_TT_MATRIX4X4:
-		case ZEMT_TT_MATRIX4X4D:
+		case ZEMT_BT_MATRIX4X4:
+		case ZEMT_BT_MATRIX4X4D:
 			ShortLabels[0]  = Labels[0]  = "M11";
 			ShortLabels[1]  = Labels[1]  = "M21"; 
 			ShortLabels[2]  = Labels[2]  = "M31";
@@ -345,10 +345,10 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 	const char* Type = Property->GetAttributeValue("ZEDEditor.PropertyEditor.Semantic");
 	if (strcmp(Type, "Color") == 0 && 
-		(Property->Type.Type == ZEMT_TT_VECTOR3 || Property->Type.Type == ZEMT_TT_VECTOR3D ||
-		Property->Type.Type == ZEMT_TT_VECTOR4 || Property->Type.Type == ZEMT_TT_VECTOR4D))
+		(Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D ||
+		Property->Type.Type == ZEMT_BT_VECTOR4 || Property->Type.Type == ZEMT_BT_VECTOR4D))
 	{
-		if (Property->Type.Type == ZEMT_TT_VECTOR3 || Property->Type.Type == ZEMT_TT_VECTOR3D)
+		if (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D)
 		{
 			Labels[0] = "Red";
 			Labels[1] = "Green";
@@ -358,7 +358,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			ShortLabels[1] = "g";
 			ShortLabels[2] = "b";
 		}
-		else if (Property->Type.Type == ZEMT_TT_VECTOR4 || Property->Type.Type == ZEMT_TT_VECTOR4D)
+		else if (Property->Type.Type == ZEMT_BT_VECTOR4 || Property->Type.Type == ZEMT_BT_VECTOR4D)
 		{
 			Labels[0] = "Red";
 			Labels[1] = "Green";
@@ -381,7 +381,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 		Detail = true;
 	}
-	else if (strcmp(Type, "EulerAngles") == 0 && (Property->Type.Type == ZEMT_TT_VECTOR3 || Property->Type.Type == ZEMT_TT_VECTOR3D))
+	else if (strcmp(Type, "EulerAngles") == 0 && (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D))
 	{
 		Labels[0] = "Euler.x (Pitch)";
 		Labels[1] = "Euler.y (Yaw)";
@@ -393,7 +393,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 		IsEulerAngles = true;
 	}
-	else if (strcmp(Type, "Attenuation") == 0 && (Property->Type.Type == ZEMT_TT_VECTOR3 || Property->Type.Type == ZEMT_TT_VECTOR3D))
+	else if (strcmp(Type, "Attenuation") == 0 && (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D))
 	{
 		Labels[0] = "Constant";
 		Labels[1] = "Linear";
@@ -520,7 +520,7 @@ void ZEDPropertyEditorItemVector::DetailButton_clicked()
 		CurrentColor.setGreenF(TextEdits[1]->text().toFloat());
 		CurrentColor.setBlueF(TextEdits[2]->text().toFloat());
 
-		if (GetProperty()->Type.Type == ZEMT_TT_VECTOR4 || GetProperty()->Type.Type ==  ZEMT_TT_VECTOR4D)
+		if (GetProperty()->Type.Type == ZEMT_BT_VECTOR4 || GetProperty()->Type.Type ==  ZEMT_BT_VECTOR4D)
 		{
 			CurrentColor.setAlphaF(TextEdits[3]->text().toFloat());
 			Dialog.setOptions(QColorDialog::ShowAlphaChannel);
@@ -534,19 +534,19 @@ void ZEDPropertyEditorItemVector::DetailButton_clicked()
 
 		switch (GetProperty()->Type.Type)
 		{
-			case ZEMT_TT_VECTOR3:
+			case ZEMT_BT_VECTOR3:
 				Changed(ZEVector3(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF()));
 				break;
 
-			case ZEMT_TT_VECTOR3D:
+			case ZEMT_BT_VECTOR3D:
 				Changed(ZEVector3d(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF()));
 				break;
 
-			case ZEMT_TT_VECTOR4:
+			case ZEMT_BT_VECTOR4:
 				Changed(ZEVector4(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF(), Dialog.selectedColor().alphaF()));
 				break;
 
-			case ZEMT_TT_VECTOR4D:
+			case ZEMT_BT_VECTOR4D:
 				Changed(ZEVector4d(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF(), Dialog.selectedColor().alphaF()));
 				break;
 		}
@@ -628,24 +628,24 @@ void ZEDPropertyEditorItemVector::Update()
 
 	switch(GetProperty()->Type.Type)
 	{
-		case ZEMT_TT_VECTOR2:
-		case ZEMT_TT_VECTOR2D:
+		case ZEMT_BT_VECTOR2:
+		case ZEMT_BT_VECTOR2D:
 			Label->setText(QString("<%1:%2, %3:%4>")
 				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
 				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3)));
 			break;
 
-		case ZEMT_TT_VECTOR3:
-		case ZEMT_TT_VECTOR3D:
-		case ZEMT_TT_QUATERNION:
+		case ZEMT_BT_VECTOR3:
+		case ZEMT_BT_VECTOR3D:
+		case ZEMT_BT_QUATERNION:
 			Label->setText(QString("<%1:%2, %3:%4, %5:%6>")
 				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
 				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3))
 				.arg(ShortLabels[2]).arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2], 'f', 3)));
 			break;
 
-		case ZEMT_TT_VECTOR4:
-		case ZEMT_TT_VECTOR4D:
+		case ZEMT_BT_VECTOR4:
+		case ZEMT_BT_VECTOR4D:
 			Label->setText(QString("<%1:%2, %3:%4, %5:%6, %7:%8>")
 				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
 				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3))
@@ -663,7 +663,7 @@ void ZEDPropertyEditorItemVector::Update()
 		if (VectorMembersMultiValue[0] ||
 			VectorMembersMultiValue[1] ||
 			VectorMembersMultiValue[2] ||
-			((GetProperty()->Type.Type == ZEMT_TT_VECTOR4 || GetProperty()->Type.Type == ZEMT_TT_VECTOR4D) && VectorMembersMultiValue[3]))
+			((GetProperty()->Type.Type == ZEMT_BT_VECTOR4 || GetProperty()->Type.Type == ZEMT_BT_VECTOR4D) && VectorMembersMultiValue[3]))
 		{
 			ColorBox->setStyleSheet(
 				"* { "

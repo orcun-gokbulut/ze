@@ -196,91 +196,91 @@ const char* ZEMCGenerator::ConvertBaseTypeToEnum(ZEMCBaseType BaseType)
 	{
 		default:
 		case ZEMC_BT_UNDEFINED:
-			return "ZEMT_TT_UNDEFINED";
+			return "ZEMT_BT_UNDEFINED";
 
 		case ZEMC_BT_VOID:
-			return "ZEMT_TT_VOID";
+			return "ZEMT_BT_VOID";
 
 		case ZEMC_BT_INTEGER_8:
-			return "ZEMT_TT_INTEGER_8";
+			return "ZEMT_BT_INTEGER_8";
 
 		case ZEMC_BT_INTEGER_16:
-			return "ZEMT_TT_INTEGER_16";
+			return "ZEMT_BT_INTEGER_16";
 
 		case ZEMC_BT_INTEGER_32:
-			return "ZEMT_TT_INTEGER_32";
+			return "ZEMT_BT_INTEGER_32";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_8:
-			return "ZEMT_TT_UNSIGNED_INTEGER_8";
+			return "ZEMT_BT_UNSIGNED_INTEGER_8";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_16:
-			return "ZEMT_TT_UNSIGNED_INTEGER_16";
+			return "ZEMT_BT_UNSIGNED_INTEGER_16";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_32:
-			return "ZEMT_TT_UNSIGNED_INTEGER_32";
+			return "ZEMT_BT_UNSIGNED_INTEGER_32";
 
 		case ZEMC_BT_INTEGER_64:
-			return "ZEMT_TT_INTEGER_64";
+			return "ZEMT_BT_INTEGER_64";
 
 		case ZEMC_BT_UNSIGNED_INTEGER_64:
-			return "ZEMT_TT_UNSIGNED_INTEGER_64";
+			return "ZEMT_BT_UNSIGNED_INTEGER_64";
 
 		case ZEMC_BT_FLOAT:
-			return "ZEMT_TT_FLOAT";
+			return "ZEMT_BT_FLOAT";
 
 		case ZEMC_BT_DOUBLE:
-			return "ZEMT_TT_DOUBLE";
+			return "ZEMT_BT_DOUBLE";
 
 		case ZEMC_BT_BOOLEAN:
-			return "ZEMT_TT_BOOLEAN";
+			return "ZEMT_BT_BOOLEAN";
 
 		case ZEMC_BT_STRING:
-			return "ZEMT_TT_STRING";
+			return "ZEMT_BT_STRING";
 
 		case ZEMC_BT_QUATERNION:
-			return "ZEMT_TT_QUATERNION";
+			return "ZEMT_BT_QUATERNION";
 
 		case ZEMC_BT_VECTOR2:
-			return "ZEMT_TT_VECTOR2";
+			return "ZEMT_BT_VECTOR2";
 
 		case ZEMC_BT_VECTOR2D:
-			return "ZEMT_TT_VECTOR2D";
+			return "ZEMT_BT_VECTOR2D";
 
 		case ZEMC_BT_VECTOR3:
-			return "ZEMT_TT_VECTOR3";
+			return "ZEMT_BT_VECTOR3";
 
 		case ZEMC_BT_VECTOR3D:
-			return "ZEMT_TT_VECTOR3D";
+			return "ZEMT_BT_VECTOR3D";
 
 		case ZEMC_BT_VECTOR4:
-			return "ZEMT_TT_VECTOR4";
+			return "ZEMT_BT_VECTOR4";
 
 		case ZEMC_BT_VECTOR4D:
-			return "ZEMT_TT_VECTOR4D";
+			return "ZEMT_BT_VECTOR4D";
 
 		case ZEMC_BT_MATRIX3X3:
-			return "ZEMT_TT_MATRIX3X3";
+			return "ZEMT_BT_MATRIX3X3";
 
 		case ZEMC_BT_MATRIX3X3D:
-			return "ZEMT_TT_MATRIX3X3D";
+			return "ZEMT_BT_MATRIX3X3D";
 
 		case ZEMC_BT_MATRIX4X4:
-			return "ZEMT_TT_MATRIX4X4";
+			return "ZEMT_BT_MATRIX4X4";
 
 		case ZEMC_BT_MATRIX4X4D:
-			return "ZEMT_TT_MATRIX4X4D";
+			return "ZEMT_BT_MATRIX4X4D";
 
 		case ZEMC_BT_CLASS:
-			return "ZEMT_TT_CLASS";
+			return "ZEMT_BT_CLASS";
 
 		case ZEMC_BT_OBJECT:
-			return "ZEMT_TT_OBJECT";
+			return "ZEMT_BT_OBJECT";
 
 		case ZEMC_BT_OBJECT_PTR:
-			return "ZEMT_TT_OBJECT_PTR";
+			return "ZEMT_BT_OBJECT_PTR";
 
 		case ZEMC_BT_ENUMERATOR:
-			return "ZEMT_TT_ENUMERATOR";
+			return "ZEMT_BT_ENUMERATOR";
 	}
 }
 

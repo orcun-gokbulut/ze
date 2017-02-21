@@ -73,9 +73,9 @@ class ZEReference
 			void*						Pointer;
 		} Value;
 
-		template <typename ZEReturnType, ZEMTTypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType&					ConvertRef() const;
-		template <typename ZEReturnType, ZEMTTypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		const ZEReturnType&				ConvertConstRef() const;
 
 		void							SetType(const ZEMTType& Type);
@@ -390,7 +390,7 @@ template<typename ZEItemType>
 void ZEReference::SetArrayRef(ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZEMT_TT_UNDEFINED)
+	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 
 	Type.SubType = Type.Type;
@@ -406,7 +406,7 @@ template<typename ZEItemType>
 void ZEReference::SetArrayConstRef(const ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZEMT_TT_UNDEFINED)
+	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 
 	Type.SubType = Type.Type;
@@ -422,7 +422,7 @@ template<typename ZEObjectType>
 void ZEReference::SetObjectRef(ZEObjectType& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT;
+	Type.Type = ZEMT_BT_OBJECT;
 	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
 	SetType(Type);
 
@@ -433,7 +433,7 @@ template<typename ZEObjectType>
 void ZEReference::SetObjectConstRef(const ZEObjectType& Object)
 {
 	ZEMTType Type;
-	Type.Type = ZEMT_TT_OBJECT;
+	Type.Type = ZEMT_BT_OBJECT;
 	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
 	SetType(Type);
 
@@ -466,7 +466,7 @@ const ZEArray<ZEItemType>& ZEReference::GetArrayConstRef() const
 template<typename ZEObjectType>
 ZEObjectType& ZEReference::GetObjectRef() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT)
+	if (ValueType.Type != ZEMT_BT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
 	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
@@ -481,7 +481,7 @@ ZEObjectType& ZEReference::GetObjectRef() const
 template<typename ZEObjectType>
 const ZEObjectType& ZEReference::GetObjectConstRef() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT)
+	if (ValueType.Type != ZEMT_BT_OBJECT)
 		zeCriticalError("Value of the variant is not object.");
 
 	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObjectType*)Value.Pointer)->GetClass()))
