@@ -55,7 +55,7 @@ bool ZEDPropertyEditorItemEnumurator::InitializeInternal()
 	}
 
 	const ZEMTProperty* Property = GetProperty();
-	if (Property->Type.Type != ZEMT_TT_ENUMERATOR)
+	if (Property->Type.Type != ZEMT_BT_ENUMERATOR)
 	{
 		setText(1, "Type Error");
 		return false;

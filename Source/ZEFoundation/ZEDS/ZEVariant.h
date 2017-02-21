@@ -95,13 +95,13 @@ class ZEVariant
 
 		template<typename ZEReturnType>
 		ZEReturnType					ConvertValuePrimitive() const;
-		template<typename ZEReturnType, ZEMTTypeType Type>
+		template<typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType					ConvertValue(const void* ValuePointer) const;
-		template<typename ZEReturnType, ZEMTTypeType Type>
+		template<typename ZEReturnType, ZEMTBaseType Type>
 		const ZEReturnType				ConvertConstValue(const void* ValuePointer) const;
-		template <typename ZEReturnType, ZEMTTypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType&					ConvertRef(const void* ValuePointer) const;
-		template <typename ZEReturnType, ZEMTTypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType&					ConvertConstRef(const void* ValuePointer) const;
 
 	public:

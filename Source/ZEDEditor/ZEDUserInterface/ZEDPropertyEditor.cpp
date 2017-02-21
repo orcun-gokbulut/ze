@@ -117,20 +117,20 @@ void ZEDPropertyEditor::Populate()
 
 		switch (Properties[I].Type.Type)
 		{
-			case ZEMT_TT_UNDEFINED:
-			case ZEMT_TT_VOID:
+			case ZEMT_BT_UNDEFINED:
+			case ZEMT_BT_VOID:
 				continue;
 
-			case ZEMT_TT_INTEGER_8:
-			case ZEMT_TT_INTEGER_16:
-			case ZEMT_TT_INTEGER_32:
-			case ZEMT_TT_INTEGER_64:
-			case ZEMT_TT_UNSIGNED_INTEGER_8:
-			case ZEMT_TT_UNSIGNED_INTEGER_16:
-			case ZEMT_TT_UNSIGNED_INTEGER_32:
-			case ZEMT_TT_UNSIGNED_INTEGER_64:
-			case ZEMT_TT_DOUBLE:
-			case ZEMT_TT_FLOAT:
+			case ZEMT_BT_INTEGER_8:
+			case ZEMT_BT_INTEGER_16:
+			case ZEMT_BT_INTEGER_32:
+			case ZEMT_BT_INTEGER_64:
+			case ZEMT_BT_UNSIGNED_INTEGER_8:
+			case ZEMT_BT_UNSIGNED_INTEGER_16:
+			case ZEMT_BT_UNSIGNED_INTEGER_32:
+			case ZEMT_BT_UNSIGNED_INTEGER_64:
+			case ZEMT_BT_DOUBLE:
+			case ZEMT_BT_FLOAT:
 			{
 				ZEDPropertyEditorItemNumeric* NumericItem = new ZEDPropertyEditorItemNumeric();
 				NumericItem->SetProperty(&Properties[I]);
@@ -140,7 +140,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZEMT_TT_BOOLEAN:
+			case ZEMT_BT_BOOLEAN:
 			{
 				ZEDPropertyEditorItemBoolean* BooleanItem = new ZEDPropertyEditorItemBoolean();
 				BooleanItem->SetProperty(&Properties[I]);
@@ -150,7 +150,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZEMT_TT_STRING:
+			case ZEMT_BT_STRING:
 			{
 				ZEDPropertyEditorItemString* StringItem = new ZEDPropertyEditorItemString();
 				StringItem->SetProperty(&Properties[I]);
@@ -160,7 +160,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZEMT_TT_ENUMERATOR:
+			case ZEMT_BT_ENUMERATOR:
 			{
 				ZEDPropertyEditorItemEnumurator* EnumuratorItem = new ZEDPropertyEditorItemEnumurator();
 				EnumuratorItem->SetProperty(&Properties[I]);
@@ -170,17 +170,17 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZEMT_TT_QUATERNION:
-			case ZEMT_TT_VECTOR2:
-			case ZEMT_TT_VECTOR2D:
-			case ZEMT_TT_VECTOR3:
-			case ZEMT_TT_VECTOR3D:
-			case ZEMT_TT_VECTOR4:
-			case ZEMT_TT_VECTOR4D:
-			case ZEMT_TT_MATRIX3X3:
-			case ZEMT_TT_MATRIX3X3D:
-			case ZEMT_TT_MATRIX4X4:
-			case ZEMT_TT_MATRIX4X4D:
+			case ZEMT_BT_QUATERNION:
+			case ZEMT_BT_VECTOR2:
+			case ZEMT_BT_VECTOR2D:
+			case ZEMT_BT_VECTOR3:
+			case ZEMT_BT_VECTOR3D:
+			case ZEMT_BT_VECTOR4:
+			case ZEMT_BT_VECTOR4D:
+			case ZEMT_BT_MATRIX3X3:
+			case ZEMT_BT_MATRIX3X3D:
+			case ZEMT_BT_MATRIX4X4:
+			case ZEMT_BT_MATRIX4X4D:
 			{
 				ZEDPropertyEditorItemVector* VectorItem = new ZEDPropertyEditorItemVector();
 				VectorItem->SetProperty(&Properties[I]);
@@ -190,11 +190,11 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZEMT_TT_OBJECT:
-			case ZEMT_TT_OBJECT_PTR:
+			case ZEMT_BT_OBJECT:
+			case ZEMT_BT_OBJECT_PTR:
 				continue;
 
-			case ZEMT_TT_CLASS:
+			case ZEMT_BT_CLASS:
 			{
 				QTreeWidgetItem* Item = new ZEDPropertyEditorItem();
 				Item->setText(0, Properties[I].Name);
