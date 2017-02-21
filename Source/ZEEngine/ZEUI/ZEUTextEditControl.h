@@ -46,7 +46,6 @@ ZEMT_FORWARD_DECLARE(ZEUIRectangle);
 class ZEUITextEditControl : public ZEUILabel
 {
 	ZE_OBJECT
-
 	private:
 		ZEUITextCursor						Cursor;
 		bool								IsTextDirty;

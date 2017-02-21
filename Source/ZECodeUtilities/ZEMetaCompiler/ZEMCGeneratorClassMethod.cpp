@@ -276,11 +276,54 @@ void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 		else
 			WriteToFile("%s&MethodWrapper%d, ", GenerateMethodPointerCast(CurrentMethod, CurrentClass).ToCString(), CurrentMethod->ID);
 
-		WriteToFile("%s, ",	CurrentMethod->IsConst ? "true" : "false");
-		WriteToFile("%s, ",	CurrentMethod->IsEvent ? "true" : "false");
-		WriteToFile("%s, ", CurrentMethod->IsVirtual ? "true" : "false");
-		WriteToFile("%s, ", CurrentMethod->IsStatic ? "true" : "false");
-		WriteToFile("%s, ", CurrentMethod->IsOperator ? "true" : "false");
+		bool HasFlag = false;
+		if (CurrentMethod->IsEvent)
+		{
+			WriteToFile("ZEMT_MF_EVENT");
+			HasFlag = true;
+		}
+
+		if (CurrentMethod->IsConst)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+
+			WriteToFile("ZEMT_MF_CONST");
+			HasFlag = true;
+		}
+
+		if (CurrentMethod->IsVirtual)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+
+			WriteToFile("ZEMT_MF_VIRTUAL");
+			HasFlag = true;
+		}
+
+		if (CurrentMethod->IsStatic)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+
+			WriteToFile("ZEMT_MF_STATIC");
+			HasFlag = true;
+		}
+
+		if (CurrentMethod->IsOperator)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+
+			WriteToFile("ZEMT_MF_OPERATOR");
+			HasFlag = true;
+		}
+
+		if (!HasFlag)
+			WriteToFile("ZEMT_MF_NONE");
+
+		WriteToFile(", ");
+
 		WriteToFile("%s, ", ConvertOperatorTypeToString(CurrentMethod->OperatorType));
 		WriteToFile("%s, ", GenerateTypeConstructor(CurrentMethod->ReturnValue).ToCString());
 

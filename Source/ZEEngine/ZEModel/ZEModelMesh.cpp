@@ -441,7 +441,7 @@ void ZEModelMesh::SetModelPosition(const ZEVector3& ModelPosition)
 	}
 }
 
-const ZEVector3 ZEModelMesh::GetModelPosition() const
+ZEVector3 ZEModelMesh::GetModelPosition() const
 {
 	if (Parent == NULL)
 	{
@@ -470,7 +470,7 @@ void ZEModelMesh::SetModelRotation(const ZEQuaternion& ModelRotation)
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetModelRotation() const
+ZEQuaternion ZEModelMesh::GetModelRotation() const
 {
 	if (Parent == NULL)
 	{
@@ -499,7 +499,7 @@ void ZEModelMesh::SetModelScale(const ZEVector3& ModelScale)
 	}		
 }
 
-const ZEVector3 ZEModelMesh::GetModelScale() const
+ZEVector3 ZEModelMesh::GetModelScale() const
 {
 	if (Parent == NULL)
 	{
@@ -536,7 +536,7 @@ void ZEModelMesh::SetWorldPosition(const ZEVector3& WorldPosition)
 	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldPosition() const
+ZEVector3 ZEModelMesh::GetWorldPosition() const
 {
 	if (Model == NULL)
 	{
@@ -584,7 +584,7 @@ void ZEModelMesh::SetWorldRotation(const ZEQuaternion& WorldRotation)
 	}
 }
 
-const ZEQuaternion ZEModelMesh::GetWorldRotation() const
+ZEQuaternion ZEModelMesh::GetWorldRotation() const
 {
 	if (Model == NULL)
 	{
@@ -632,7 +632,7 @@ void ZEModelMesh::SetWorldScale(const ZEVector3& WorldScale)
 	}
 }
 
-const ZEVector3 ZEModelMesh::GetWorldScale() const
+ZEVector3 ZEModelMesh::GetWorldScale() const
 {
 	if (Model == NULL)
 	{

@@ -64,8 +64,9 @@ enum ZEMTTypeType
 	ZEMT_TT_MATRIX4X4D				= 24,
 	ZEMT_TT_OBJECT					= 25,
 	ZEMT_TT_OBJECT_PTR				= 26,
-	ZEMT_TT_ENUMERATOR				= 27,
-	ZEMT_TT_CLASS					= 28
+	ZEMT_TT_CLASS					= 27,
+	ZEMT_TT_ENUMERATOR				= 28,
+	ZEMT_TT_FLAGS					= 29
 };
 
 enum ZEMTTypeQualifier

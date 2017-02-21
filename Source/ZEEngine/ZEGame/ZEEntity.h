@@ -264,19 +264,19 @@ class ZEEntity : public ZEObject
 		const ZEVector3&						GetPosition() const;
 
 		void									SetWorldPosition(const ZEVector3& NewPosition);
-		const ZEVector3							GetWorldPosition() const;
+		ZEVector3								GetWorldPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
 
 		void									SetWorldRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion						GetWorldRotation() const;
+		ZEQuaternion							GetWorldRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
 
 		void									SetWorldScale(const ZEVector3& NewScale);
-		const ZEVector3							GetWorldScale() const;
+		ZEVector3								GetWorldScale() const;
 
 		ZEVector3								GetFront() const;
 		ZEVector3								GetRight() const;

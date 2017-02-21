@@ -1266,7 +1266,7 @@ void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 	}
 }
 
-const ZEVector3 ZEEntity::GetWorldPosition() const
+ZEVector3 ZEEntity::GetWorldPosition() const
 {
 	if (Parent != NULL)
 	{
@@ -1304,7 +1304,7 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 	}
 }
 
-const ZEQuaternion ZEEntity::GetWorldRotation() const
+ZEQuaternion ZEEntity::GetWorldRotation() const
 {
 	if (Parent != NULL)
 	{
@@ -1342,7 +1342,7 @@ void ZEEntity::SetWorldScale(const ZEVector3& NewScale)
 	}
 }
 
-const ZEVector3 ZEEntity::GetWorldScale() const
+ZEVector3 ZEEntity::GetWorldScale() const
 {
 	if (Parent != NULL)
 	{

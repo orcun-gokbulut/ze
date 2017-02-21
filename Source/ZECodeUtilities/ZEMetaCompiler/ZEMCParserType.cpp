@@ -256,7 +256,6 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 	}
 	else
 	{
-		TypePtr->dump();
 		TempType.TypeQualifier = ClangType.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
 		BaseTypePtr = TypePtr;
 	}

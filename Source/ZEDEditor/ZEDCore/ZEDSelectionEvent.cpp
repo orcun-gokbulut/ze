@@ -43,6 +43,11 @@ void ZEDSelectionEvent::SetManager(ZEDSelectionManager* Manager)
 	this->Manager = Manager;
 }
 
+ZEDSelectionManager* ZEDSelectionEvent::GetManager() const
+{
+	return Manager;
+}
+
 void ZEDSelectionEvent::SetType(ZEDSelectionEventType Type)
 {
 	this->Type = Type;

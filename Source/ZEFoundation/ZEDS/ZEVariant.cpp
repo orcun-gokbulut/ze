@@ -124,7 +124,7 @@ inline ZEReturnType& ZEVariant::ConvertRef() const
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
 		zeCriticalError("Variant is a value. Can not convert value to reference.");
 	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
@@ -137,9 +137,6 @@ inline const ZEReturnType& ZEVariant::ConvertConstRef() const
 {
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		zeCriticalError("Variant is a value. Can not convert value to const reference.");
 
 	return *(const ZEReturnType*)Value.Pointer;
 }
@@ -924,6 +921,17 @@ void ZEVariant::SetObjectPtr(ZEObject* Object)
 	Value.Pointer = Object;
 }
 
+void ZEVariant::SetObjectPtrConst(const ZEObject* Object)
+{
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_CONST_VALUE;
+	Type.Class = Object->GetClass();
+	SetType(Type);
+
+	Value.Pointer = const_cast<ZEObject*>(Object);
+}
+
 void ZEVariant::SetObjectPtrRef(ZEObject*& Object)
 {
 	ZEMTType Type;
@@ -1502,26 +1510,49 @@ ZEObject* ZEVariant::GetObjectPtr() const
 	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
 
+	if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+		zeCriticalError("Variant type cast mismatch. Cannot cast const value to non-const value.");
+
 	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 		return (ZEObject*)Value.Pointer;
 	else
 		return *(ZEObject**)Value.Pointer;
 }
 
-ZEObject*& ZEVariant::GetObjectPtrRef() const
+const ZEObject* ZEVariant::GetObjectPtrConst() const
 {
-	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>();
+	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
+		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		return (const ZEObject*)Value.Pointer;
+	else
+		return *(const ZEObject**)Value.Pointer;
 }
 
-ZEObject*const& ZEVariant::GetObjectPtrConstRef() const
+ZEObject*& ZEVariant::GetObjectPtrRef() const
 {
 	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		zeCriticalError("Variant is a value. Can not convert value to const reference.");
+	if (ValueType.TypeQualifier != ZEMT_TQ_REFERENCE)
+		zeCriticalError("Variant type cast mismatch. Cannot cast reference type to non-reference type.");
 
-	return (ZEObject* const)Value.Pointer;
+	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>();
+}
+
+const ZEObject*& ZEVariant::GetObjectPtrConstRef() const
+{
+	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
+
+	if (ValueType.Type != ZEMT_TQ_REFERENCE && ValueType.Type != ZEMT_TQ_VALUE)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		zeCriticalError("Variant type mismatch. Can not convert value type to reference type.");
+
+	return *(const ZEObject**)Value.Pointer;
 }
 
 ZEClass* ZEVariant::GetClass() const

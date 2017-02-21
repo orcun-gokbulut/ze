@@ -73,18 +73,18 @@ class ZEInteriorHelper : public ZEObject
 
 		void								SetPosition(const ZEVector3& LocalPosition);
 		const ZEVector3&					GetPosition();
-		const ZEVector3						GetInteriorPosition();
-		const ZEVector3						GetWorldPosition();
+		ZEVector3							GetInteriorPosition();
+		ZEVector3							GetWorldPosition();
 
 		void								SetRotation(const ZEQuaternion& LocalRotation);
 		const ZEQuaternion&					GetRotation();
-		const ZEQuaternion					GetInteriorRotation();
-		const ZEQuaternion					GetWorldRotation();
+		ZEQuaternion						GetInteriorRotation();
+		ZEQuaternion						GetWorldRotation();
 
 		void								SetScale(const ZEVector3& LocalScale);
 		const ZEVector3&					GetScale();
-		const ZEVector3						GetInteriorScale();
-		const ZEVector3						GetWorldScale();
+		ZEVector3							GetInteriorScale();
+		ZEVector3							GetWorldScale();
 
 		ZEVector3							GetFront();
 		ZEVector3							GetRight();
