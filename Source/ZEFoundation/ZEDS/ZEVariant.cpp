@@ -57,16 +57,12 @@
 #pragma warning(disable:4482 4996 4244 4800)
 
 template<typename ZEReturnType>
-inline ZEReturnType ZEVariant::ConvertValue() const
+inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 {
-	if (ValueType.TypeQualifier ==  ZEMT_TQ_VALUE)
+	if (ValueType.TypeQualifier ==  ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
 	{
 		switch(ValueType.Type)
 		{
-			default:
-			case ZEMT_TT_UNDEFINED:
-			case ZEMT_TT_VOID:
-				return (ZEReturnType)0;
 			case ZEMT_TT_INTEGER_8:
 			case ZEMT_TT_INTEGER_16:
 			case ZEMT_TT_INTEGER_32:
@@ -83,6 +79,11 @@ inline ZEReturnType ZEVariant::ConvertValue() const
 				return Value.Double;
 			case ZEMT_TT_BOOLEAN:
 				return (ZEReturnType)Value.Boolean;
+
+			default:
+			case ZEMT_TT_UNDEFINED:
+			case ZEMT_TT_VOID:
+				zeCriticalError("Variant type mismatch. Cannot convert non-primitive value type to primitive value type.");
 		}
 	}
 	else
@@ -112,33 +113,11 @@ inline ZEReturnType ZEVariant::ConvertValue() const
 			case ZEMT_TT_BOOLEAN:
 				return (ZEReturnType)*(const bool*)Value.Pointer;
 			default:
-				zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
+				zeCriticalError("Variant type mismatch. Cannot convert non-primitive reference type to primitive value type.");
 		}
 	}
+
 	return 0;
-}
-
-template <typename ZEReturnType, ZEMTTypeType Type>
-inline ZEReturnType& ZEVariant::ConvertRef() const
-{
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variant is a value. Can not convert value to reference.");
-	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
-
-	return *(ZEReturnType*)Value.Pointer;
-}
-
-template <typename ZEReturnType, ZEMTTypeType Type>
-inline const ZEReturnType& ZEVariant::ConvertConstRef() const
-{
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	return *(const ZEReturnType*)Value.Pointer;
 }
 
 void ZEVariant::SetType(const ZEMTType& NewType)
@@ -872,15 +851,6 @@ void ZEVariant::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
 	this->Value.Pointer = const_cast<ZEMatrix4x4d*>(&Value);
 }
 
-void ZEVariant::SetString(const char* Value)
-{
-	ZEMTType Type;
-	Type.Type = ZEMT_TT_STRING;
-	SetType(Type);
-
-	this->Value.String = Value;
-}
-
 void ZEVariant::SetString(const ZEString& Value)
 {
 	ZEMTType Type;
@@ -1096,490 +1066,382 @@ bool ZEVariant::IsUndefined() const
 
 ZEInt8 ZEVariant::GetInt8() const
 {
-	return ConvertValue<ZEInt8>();
+	return ConvertValuePrimitive<ZEInt8>();
 }
 
 ZEInt8& ZEVariant::GetInt8Ref() const
 {
-	return ConvertRef<ZEInt8, ZEMT_TT_INTEGER_8>();
+	return ConvertRef<ZEInt8, ZEMT_TT_INTEGER_8>(&Value.Int32);
 }
 
 const ZEInt8& ZEVariant::GetInt8ConstRef() const
 {
-	return ConvertConstRef<ZEInt8, ZEMT_TT_INTEGER_8>();
+	return ConvertConstRef<const ZEInt8, ZEMT_TT_INTEGER_8>(&Value.Int32);
 }
 
 ZEInt16 ZEVariant::GetInt16() const
 {
-	return ConvertValue<ZEInt16>();
+	return ConvertValuePrimitive<ZEInt16>();
 }
 
 ZEInt16& ZEVariant::GetInt16Ref() const
 {
-	return ConvertRef<ZEInt16, ZEMT_TT_INTEGER_16>();
+	return ConvertRef<ZEInt16, ZEMT_TT_INTEGER_16>(&Value.Int32);
 }
 
 const ZEInt16& ZEVariant::GetInt16ConstRef() const
 {
-	return ConvertConstRef<ZEInt16, ZEMT_TT_INTEGER_16>();
+	return ConvertConstRef<const ZEInt16, ZEMT_TT_INTEGER_16>(&Value.Int32);
 }
 
 ZEInt32 ZEVariant::GetInt32() const
 {
-	return ConvertValue<ZEInt32>();
+	return ConvertValuePrimitive<ZEInt32>();
 }
 
 ZEInt32& ZEVariant::GetInt32Ref() const
 {
-	return ConvertRef<ZEInt32, ZEMT_TT_INTEGER_32>();
+	return ConvertRef<ZEInt32, ZEMT_TT_INTEGER_32>(&Value.Int32);
 }
 
 const ZEInt32& ZEVariant::GetInt32ConstRef() const
 {
-	return ConvertConstRef<ZEInt32, ZEMT_TT_INTEGER_32>();
+	return ConvertConstRef<const ZEInt32, ZEMT_TT_INTEGER_32>(&Value.Int32);
 }
 
 ZEInt64 ZEVariant::GetInt64() const
 {
-	return ConvertValue<ZEInt64>();
+	return ConvertValuePrimitive<ZEInt64>();
 }
 
 ZEInt64& ZEVariant::GetInt64Ref() const
 {
-	return ConvertRef<ZEInt64, ZEMT_TT_INTEGER_64>();
+	return ConvertRef<ZEInt64, ZEMT_TT_INTEGER_64>(&Value.Int64);
 }
 
 const ZEInt64& ZEVariant::GetInt64ConstRef() const
 {
-	return ConvertConstRef<ZEInt64, ZEMT_TT_INTEGER_64>();
+	return ConvertConstRef<const ZEInt64, ZEMT_TT_INTEGER_64>(&Value.Int64);
 }
 
 ZEUInt8 ZEVariant::GetUInt8() const
 {
-	return ConvertValue<ZEUInt8>();
+	return ConvertValuePrimitive<ZEUInt8>();
 }
 
 ZEUInt8& ZEVariant::GetUInt8Ref() const
 {
-	return ConvertRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
+	return ConvertRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>(&Value.Int32);
 }
 
 const ZEUInt8& ZEVariant::GetUInt8ConstRef() const
 {
-	return ConvertConstRef<ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>();
+	return ConvertConstRef<const ZEUInt8, ZEMT_TT_UNSIGNED_INTEGER_8>(&Value.Int32);
 }
 
 ZEUInt16 ZEVariant::GetUInt16() const
 {
-	return ConvertValue<ZEUInt16>();
+	return ConvertValuePrimitive<ZEUInt16>();
 }
 
 ZEUInt16& ZEVariant::GetUInt16Ref() const
 {
-	return ConvertRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
+	return ConvertRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>(&Value.Int32);
 }
 
 const ZEUInt16& ZEVariant::GetUInt16ConstRef() const
 {
-	return ConvertConstRef<ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>();
+	return ConvertConstRef<const ZEUInt16, ZEMT_TT_UNSIGNED_INTEGER_16>(&Value.Int32);
 }
 
 ZEUInt32 ZEVariant::GetUInt32() const
 {
-	return ConvertValue<ZEUInt32>();
+	return ConvertValuePrimitive<ZEUInt32>();
 }
 
 ZEUInt32& ZEVariant::GetUInt32Ref() const
 {
-	return ConvertRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
+	return ConvertRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>(&Value.Int32);
 }
 
 const ZEUInt32& ZEVariant::GetUInt32ConstRef() const
 {
-	return ConvertConstRef<ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>();
+	return ConvertConstRef<const ZEUInt32, ZEMT_TT_UNSIGNED_INTEGER_32>(&Value.Int32);
 }
 
 ZEUInt64 ZEVariant::GetUInt64() const
 {
-	return ConvertValue<ZEUInt64>();
+	return ConvertValuePrimitive<ZEUInt64>();
 }
 
 ZEUInt64& ZEVariant::GetUInt64Ref() const
 {
-	return ConvertRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
+	return ConvertRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>(&Value.Int64);
 }
 
 const ZEUInt64& ZEVariant::GetUInt64ConstRef() const
 {
-	return ConvertConstRef<ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>();
+	return ConvertConstRef<const ZEUInt64, ZEMT_TT_UNSIGNED_INTEGER_64>(&Value.Int64);
 }
 
 float ZEVariant::GetFloat() const
 {
-	return ConvertValue<float>();
+	return ConvertValuePrimitive<float>();
 }
 
 float& ZEVariant::GetFloatRef() const
 {
-	return ConvertRef<float, ZEMT_TT_FLOAT>();
+	return ConvertRef<float, ZEMT_TT_FLOAT>(&Value.Float);
 }
 
 const float& ZEVariant::GetFloatConstRef() const
 {
-	return ConvertConstRef<float, ZEMT_TT_FLOAT>();
+	return ConvertConstRef<const float, ZEMT_TT_FLOAT>(&Value.Float);
 }
 
 double ZEVariant::GetDouble() const
 {
-	return ConvertValue<double>();
+	return ConvertValuePrimitive<double>();
 }
 
 double& ZEVariant::GetDoubleRef() const
 {
-	return ConvertRef<double, ZEMT_TT_DOUBLE>();
+	return ConvertRef<double, ZEMT_TT_DOUBLE>(&Value.Double);
 }
 
 const double& ZEVariant::GetDoubleConstRef() const
 {
-	return ConvertConstRef<double, ZEMT_TT_DOUBLE>();
+	return ConvertConstRef<const double, ZEMT_TT_DOUBLE>(&Value.Double);
 }
 
 bool ZEVariant::GetBool() const
 {
-	return ConvertValue<bool>();
+	return ConvertValuePrimitive<bool>();
 }
 
 bool& ZEVariant::GetBoolRef() const
 {
-	return ConvertRef<bool, ZEMT_TT_BOOLEAN>();
+	return ConvertRef<bool, ZEMT_TT_BOOLEAN>(&Value.Boolean);
 }
 
 const bool& ZEVariant::GetBoolConstRef() const
 {
-	return ConvertConstRef<bool, ZEMT_TT_BOOLEAN>();
+	return ConvertConstRef<const bool, ZEMT_TT_BOOLEAN>(&Value.Boolean);
 }
 
 ZEInt32 ZEVariant::GetEnum() const
 {
-	return ConvertValue<ZEInt32>();
+	return ConvertValuePrimitive<ZEInt32>();
 }
 
 const ZEVector2& ZEVariant::GetVector2() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR2)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector2*)&Value.Vectors;
-	else
-		return *(ZEVector2*)&Value.Pointer;
+	return ConvertValue<ZEVector2, ZEMT_TT_VECTOR2>(&Value.Vectors);
 }
 
 ZEVector2& ZEVariant::GetVector2Ref() const
 {
-	return ConvertRef<ZEVector2, ZEMT_TT_VECTOR2>();
+	return ConvertRef<ZEVector2, ZEMT_TT_VECTOR2>(&Value.Vectors);
 }
 
 const ZEVector2& ZEVariant::GetVector2ConstRef() const
 {
-	return ConvertConstRef<ZEVector2, ZEMT_TT_VECTOR2>();
+	return ConvertConstRef<const ZEVector2, ZEMT_TT_VECTOR2>(&Value.Vectors);
 }
 
 const ZEVector2d& ZEVariant::GetVector2d() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR2D)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector2d*)&Value.DoubleVectors;
-	else
-		return *(ZEVector2d*)&Value.Pointer;
+	return ConvertValue<ZEVector2d, ZEMT_TT_VECTOR2D>(&Value.DoubleVectors);
 }
 
 ZEVector2d& ZEVariant::GetVector2dRef() const
 {
-	return ConvertRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
+	return ConvertRef<ZEVector2d, ZEMT_TT_VECTOR2D>(&Value.DoubleVectors);
 }
 
 const ZEVector2d& ZEVariant::GetVector2dConstRef() const
 {
-	return ConvertConstRef<ZEVector2d, ZEMT_TT_VECTOR2D>();
+	return ConvertConstRef<const ZEVector2d, ZEMT_TT_VECTOR2D>(&Value.DoubleVectors);
 }
 
 const ZEVector3& ZEVariant::GetVector3() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR3)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector3*)&Value.Vectors;
-	else
-		return *(ZEVector3*)&Value.Pointer;
+	return ConvertValue<ZEVector3, ZEMT_TT_VECTOR3>(&Value.Vectors);
 }
 
 ZEVector3& ZEVariant::GetVector3Ref() const
 {
-	return ConvertRef<ZEVector3, ZEMT_TT_VECTOR3>();
+	return ConvertRef<ZEVector3, ZEMT_TT_VECTOR3>(&Value.Vectors);
 }
 
 const ZEVector3& ZEVariant::GetVector3ConstRef() const
 {
-	return ConvertConstRef<ZEVector3, ZEMT_TT_VECTOR3>();
+	return ConvertConstRef<const ZEVector3, ZEMT_TT_VECTOR3>(&Value.Vectors);
 }
 
 const ZEVector3d& ZEVariant::GetVector3d() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR3D)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector3d*)&Value.DoubleVectors;
-	else
-		return *(ZEVector3d*)&Value.Pointer;
+	return ConvertValue<ZEVector3d, ZEMT_TT_VECTOR3D>(&Value.DoubleVectors);
 }
 
 ZEVector3d& ZEVariant::GetVector3dRef() const
 {
-	return ConvertRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
+	return ConvertRef<ZEVector3d, ZEMT_TT_VECTOR3D>(&Value.DoubleVectors);
 }
 
 const ZEVector3d& ZEVariant::GetVector3dConstRef() const
 {
-	return ConvertConstRef<ZEVector3d, ZEMT_TT_VECTOR3D>();
+	return ConvertConstRef<const ZEVector3d, ZEMT_TT_VECTOR3D>(&Value.DoubleVectors);
 }
 
 const ZEVector4& ZEVariant::GetVector4() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR4)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector4*)&Value.Vectors;
-	else
-		return *(ZEVector4*)&Value.Pointer;
+	return ConvertValue<ZEVector4, ZEMT_TT_VECTOR4>(&Value.Vectors);
 }
 
 ZEVector4& ZEVariant::GetVector4Ref() const
 {
-	return ConvertRef<ZEVector4, ZEMT_TT_VECTOR4>();
+	return ConvertRef<ZEVector4, ZEMT_TT_VECTOR4>(&Value.Vectors);
 }
 
 const ZEVector4& ZEVariant::GetVector4ConstRef() const
 {
-	return ConvertConstRef<ZEVector4, ZEMT_TT_VECTOR4>();
+	return ConvertConstRef<const ZEVector4, ZEMT_TT_VECTOR4>(&Value.Vectors);
 }
 
 const ZEVector4d& ZEVariant::GetVector4d() const
 {
-	if (ValueType.Type != ZEMT_TT_VECTOR4D)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEVector4d*)&Value.DoubleVectors;
-	else
-		return *(ZEVector4d*)&Value.Pointer;
+	return ConvertValue<ZEVector4d, ZEMT_TT_VECTOR4D>(&Value.DoubleVectors);
 }
 
 ZEVector4d& ZEVariant::GetVector4dRef() const
 {
-	return ConvertRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
+	return ConvertRef<ZEVector4d, ZEMT_TT_VECTOR4D>(&Value.DoubleVectors);
 }
 
 const ZEVector4d& ZEVariant::GetVector4dConstRef() const
 {
-	return ConvertConstRef<ZEVector4d, ZEMT_TT_VECTOR4D>();
+	return ConvertConstRef<const ZEVector4d, ZEMT_TT_VECTOR4D>(&Value.DoubleVectors);
 }
 
 const ZEQuaternion& ZEVariant::GetQuaternion() const
 {
-	if (ValueType.Type != ZEMT_TT_QUATERNION)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *(ZEQuaternion*)&Value.Vectors;
-	else
-		return *(ZEQuaternion*)&Value.Pointer;
+	return ConvertValue<ZEQuaternion, ZEMT_TT_QUATERNION>(&Value.Vectors);
 }
 
 ZEQuaternion& ZEVariant::GetQuaternionRef() const
 {
-	return ConvertRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
+	return ConvertRef<ZEQuaternion, ZEMT_TT_QUATERNION>(&Value.Vectors);
 }
 
 const ZEQuaternion& ZEVariant::GetQuaternionConstRef() const
 {
-	return ConvertConstRef<ZEQuaternion, ZEMT_TT_QUATERNION>();
+	return ConvertConstRef<const ZEQuaternion, ZEMT_TT_QUATERNION>(&Value.Vectors);
 }
 
 const ZEMatrix3x3& ZEVariant::GetMatrix3x3() const
 {
-	if (ValueType.Type != ZEMT_TT_MATRIX3X3)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	return *(ZEMatrix3x3*)Value.Pointer;
+	return ConvertValue<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>(Value.Pointer);
 }
 
 ZEMatrix3x3& ZEVariant::GetMatrix3x3Ref() const
 {
-	return ConvertRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
+	return ConvertRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>(Value.Pointer);
 }
 
 const ZEMatrix3x3& ZEVariant::GetMatrix3x3ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3, ZEMT_TT_MATRIX3X3>();
+	return ConvertConstRef<const ZEMatrix3x3, ZEMT_TT_MATRIX3X3>(Value.Pointer);
 }
 
 const ZEMatrix3x3d& ZEVariant::GetMatrix3x3d() const
 {
-	if (ValueType.Type != ZEMT_TT_MATRIX3X3D)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	return *(ZEMatrix3x3d*)Value.Pointer;
+	return ConvertValue<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>(Value.Pointer);
 }
 
 ZEMatrix3x3d& ZEVariant::GetMatrix3x3dRef() const
 {
-	return ConvertRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
+	return ConvertRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>(Value.Pointer);
 }
 
 const ZEMatrix3x3d& ZEVariant::GetMatrix3x3dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>();
+	return ConvertConstRef<const ZEMatrix3x3d, ZEMT_TT_MATRIX3X3D>(Value.Pointer);
 }
 
 const ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 {
-	if (ValueType.Type != ZEMT_TT_MATRIX4X4)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	return *(ZEMatrix4x4*)Value.Pointer;
+	return ConvertValue<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>(Value.Pointer);
 }
 
 ZEMatrix4x4& ZEVariant::GetMatrix4x4Ref() const
 {
-	return ConvertRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
+	return ConvertRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>(Value.Pointer);
 }
 
 const ZEMatrix4x4& ZEVariant::GetMatrix4x4ConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4, ZEMT_TT_MATRIX4X4>();
+	return ConvertConstRef<const ZEMatrix4x4, ZEMT_TT_MATRIX4X4>(Value.Pointer);
 }
 
 const ZEMatrix4x4d& ZEVariant::GetMatrix4x4d() const
 {
-	if (ValueType.Type != ZEMT_TT_MATRIX4X4D)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	return *(ZEMatrix4x4d*)Value.Pointer;
+	return ConvertValue<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>(Value.Pointer);
 }
 
 ZEMatrix4x4d& ZEVariant::GetMatrix4x4dRef() const
 {
-	return ConvertRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
+	return ConvertRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>(Value.Pointer);
 }
 
 const ZEMatrix4x4d& ZEVariant::GetMatrix4x4dConstRef() const
 {
-	return ConvertConstRef<ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>();
+	return ConvertConstRef<const ZEMatrix4x4d, ZEMT_TT_MATRIX4X4D>(Value.Pointer);
 }
 
 const ZEString& ZEVariant::GetString() const
 {
-	// No Conversion
-	if (ValueType.Type != ZEMT_TT_STRING)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return Value.String;
-	else
-		return *(ZEString*)Value.Pointer;
+	return ConvertValue<ZEString, ZEMT_TT_STRING>(Value.Pointer);
 }
 
 ZEString& ZEVariant::GetStringRef() const
 {
-	return ConvertRef<ZEString, ZEMT_TT_STRING>();
+	return ConvertRef<ZEString, ZEMT_TT_STRING>(&Value.String);
 }
 
 const ZEString& ZEVariant::GetStringConstRef() const
 {
-	return ConvertConstRef<ZEString, ZEMT_TT_STRING>();
+	return ConvertConstRef<const ZEString, ZEMT_TT_STRING>(&Value.String);
 }
 
 ZEObject* ZEVariant::GetObjectPtr() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant type cast mismatch. Cannot cast const value to non-const value.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return (ZEObject*)Value.Pointer;
-	else
-		return *(ZEObject**)Value.Pointer;
+	return ConvertValue<ZEObject*, ZEMT_TT_OBJECT_PTR>(Value.Pointer);
 }
 
 const ZEObject* ZEVariant::GetObjectPtrConst() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		return (const ZEObject*)Value.Pointer;
-	else
-		return *(const ZEObject**)Value.Pointer;
+	return ConvertConstValue<ZEObject*, ZEMT_TT_OBJECT_PTR>(Value.Pointer);
 }
 
 ZEObject*& ZEVariant::GetObjectPtrRef() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier != ZEMT_TQ_REFERENCE)
-		zeCriticalError("Variant type cast mismatch. Cannot cast reference type to non-reference type.");
-
-	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>();
+	return ConvertRef<ZEObject*, ZEMT_TT_OBJECT_PTR>(Value.Pointer);
 }
 
 const ZEObject*& ZEVariant::GetObjectPtrConstRef() const
 {
-	if (ValueType.Type != ZEMT_TT_OBJECT_PTR)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.Type != ZEMT_TQ_REFERENCE && ValueType.Type != ZEMT_TQ_VALUE)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variant type mismatch. Can not convert value type to reference type.");
-
-	return *(const ZEObject**)Value.Pointer;
+	return ConvertConstRef<const ZEObject*, ZEMT_TT_OBJECT_PTR>(Value.Pointer);
 }
 
 ZEClass* ZEVariant::GetClass() const
 {
-	if (ValueType.Type != ZEMT_TT_CLASS)
-		zeCriticalError("Variant type mismatch. Can not convert non-numerical non-scaler types.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return (ZEClass*)Value.Pointer;
-	else
-		return *(ZEClass**)Value.Pointer;
+	return ConvertValue<ZEClass*, ZEMT_TT_CLASS>(Value.Pointer);
 }
 
 ZEClass*& ZEVariant::GetClassRef() const
 {
-	return ConvertRef<ZEClass*, ZEMT_TT_CLASS>();
-}
-
-ZEClass* const& ZEVariant::GetClassConstRef() const
-{
-	if (ValueType.Type != ZEMT_TT_CLASS)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		zeCriticalError("Variant is a value. Can not convert value to const reference.");
-
-	return (ZEClass* const)Value.Pointer;
+	return ConvertRef<ZEClass*, ZEMT_TT_CLASS>(Value.Pointer);
 }
 
 ZEValue ZEVariant::GetValue()
@@ -1664,6 +1526,9 @@ ZEValue ZEVariant::GetValue()
 			return ZEValue(GetMatrix4x4d());
 
 		case ZEMT_TT_ENUMERATOR:
+			return ZEValue(GetInt32());
+
+		case ZEMT_TT_FLAGS:
 			return ZEValue(GetInt32());
 	}
 }
