@@ -103,14 +103,14 @@ class ZEModelHelper : public ZEObject, public ZEDestroyable
 		void									SetScale(const ZEVector3& Scale);
 		const ZEVector3&						GetScale() const;
 
-		const ZEVector3							GetModelPosition() const;
-		const ZEVector3							GetWorldPosition() const;
+		ZEVector3								GetModelPosition() const;
+		ZEVector3								GetWorldPosition() const;
 
-		const ZEQuaternion						GetModelRotation() const;
-		const ZEQuaternion						GetWorldRotation() const;
+		ZEQuaternion							GetModelRotation() const;
+		ZEQuaternion							GetWorldRotation() const;
 
-		const ZEVector3							GetModelScale() const;
-		const ZEVector3							GetWorldScale() const;
+		ZEVector3								GetModelScale() const;
+		ZEVector3								GetWorldScale() const;
 
 		ZEVector3								GetFront() const;
 		ZEVector3								GetRight() const;

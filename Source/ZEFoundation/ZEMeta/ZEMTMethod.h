@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEMTType.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEClass;
 struct ZEMTAttribute;
@@ -56,11 +57,9 @@ enum ZEMTOperatorType
 	ZEMT_OT_MODULO_ASSIGNMENT,
 	ZEMT_OT_INCREMENT,
 	ZEMT_OT_DECREMENT,
-
 	ZEMT_OT_LOGICAL_NOT,
 	ZEMT_OT_LOGICAL_AND,
 	ZEMT_OT_LOGICAL_OR,
-
 	ZEMT_OT_BITWISE_AND,
 	ZEMT_OT_BITWISE_AND_ASSIGNMENT,
 	ZEMT_OT_BITWISE_OR,
@@ -78,10 +77,22 @@ enum ZEMTOperatorType
 	ZEMT_OT_LESS_EQUAL,
 	ZEMT_OT_GREATER,
 	ZEMT_OT_GREATER_AND_EQUAL,
-
 	ZEMT_OT_FUNCTION_CALL,
 	ZEMT_OT_ARRAY_SUBSCRIPT
 };
+
+enum ZEMTMethodFlag
+{
+	ZEMT_MF_NONE,
+	ZEMT_MF_CONST,
+	ZEMT_MF_EVENT,
+	ZEMT_MF_VIRTUAL,
+	ZEMT_MF_STATIC,
+	ZEMF_MF_OPERATOR,
+	ZEMF_MF_CONSTRUCTOR,
+	ZEMF_MF_DESTRUCTOR
+};
+typedef ZEFlags ZEMTMethodFlags;
 
 struct ZEMTMethodParameter
 {
@@ -98,13 +109,9 @@ struct ZEMTMethod
 	ZEClass*							MemberOf;
 	void*								MethodPtr;
 
-	bool								IsConst;
-	bool								IsEvent;
-	bool								IsVirtual;
-	bool								IsStatic;
-	bool								IsOperator;
-
+	ZEMTMethodFlags						Flags;
 	ZEMTOperatorType					OperatorType;
+
 	ZEMTType							ReturnType;
 	ZEMTMethodParameter*				Parameters;
 	ZESize								ParameterCount;

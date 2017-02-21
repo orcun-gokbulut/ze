@@ -492,7 +492,7 @@ void ZEModelBone::SetModelPosition(const ZEVector3& ModelPosition)
 	}
 }
 
-const ZEVector3 ZEModelBone::GetModelPosition() const
+ZEVector3 ZEModelBone::GetModelPosition() const
 {
 	if (Parent == NULL)
 	{
@@ -521,7 +521,7 @@ void ZEModelBone::SetModelRotation(const ZEQuaternion& ModelRotation)
 	}
 }
 
-const ZEQuaternion ZEModelBone::GetModelRotation() const
+ZEQuaternion ZEModelBone::GetModelRotation() const
 {
 	if (Parent == NULL)
 	{
@@ -559,7 +559,7 @@ void ZEModelBone::SetWorldPosition(const ZEVector3& WorldPosition)
 	}
 }
 
-const ZEVector3 ZEModelBone::GetWorldPosition() const
+ZEVector3 ZEModelBone::GetWorldPosition() const
 {
 	if (Model == NULL)
 	{
@@ -607,7 +607,7 @@ void ZEModelBone::SetWorldRotation(const ZEQuaternion& WorldRotation)
 	}
 }
 
-const ZEQuaternion ZEModelBone::GetWorldRotation() const
+ZEQuaternion ZEModelBone::GetWorldRotation() const
 {
 	if (Model == NULL)
 	{

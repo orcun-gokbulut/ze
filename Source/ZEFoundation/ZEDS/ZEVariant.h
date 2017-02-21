@@ -85,7 +85,7 @@ class ZEVariant
 		void*							(*Cloner)(const void*);
 		void							(*Deleter)(void*);
 
-		ZEMTType							ValueType;
+		ZEMTType						ValueType;
 		void							SetType(const ZEMTType& NewType);
 
 		template<typename ZETypeInstance>
@@ -213,11 +213,15 @@ class ZEVariant
 		void							SetObjectConstRef(const ZEObjectType& Object);
 
 		void							SetObjectPtr(ZEObject* Object);
+		void							SetObjectPtrConst(const ZEObject* Object);
 		void							SetObjectPtrRef(ZEObject*& Object);
 		void							SetObjectPtrConstRef(const ZEObject*& Object);
 
+
 		template<typename ZEItemType>
 		void							SetArray(const ZEArray<ZEItemType>& Array);
+		template<typename ZEItemType>
+		void							SetArray(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
 		template<typename ZEItemType>
 		void							SetArrayRef(ZEArray<ZEItemType>& Array);
 		template<typename ZEItemType>
@@ -332,8 +336,9 @@ class ZEVariant
 		const ZEString&					GetStringConstRef() const;
 
 		ZEObject*						GetObjectPtr() const;
+		const ZEObject*					GetObjectPtrConst() const;
 		ZEObject*&						GetObjectPtrRef() const;
-		ZEObject*const&					GetObjectPtrConstRef() const;
+		const ZEObject*&				GetObjectPtrConstRef() const;
 
 		template<typename ZEObjecType>
 		const ZEObjecType&				GetObject() const;
@@ -429,6 +434,21 @@ void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 
 	Type.TypeQualifier = ZEMT_TQ_VALUE;
 	Type.ContainerType = ZEMT_CT_ARRAY;
+
+	SetType(Type);
+	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
+	Deleter = &DeleterTemplate<ZEArray<ZEItemType> >;
+	Value.Pointer = new ZEArray<ZEItemType>(Array);
+}
+
+template<typename ZEItemType>
+void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass)
+{
+	ZEMTType Type;
+	Type.Type = ZEMT_TT_OBJECT_PTR;
+	Type.TypeQualifier = ZEMT_TQ_VALUE;
+	Type.ContainerType = ZEMT_CT_ARRAY;
+	Type.Class = ObjectPtrClass;
 
 	SetType(Type);
 	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;

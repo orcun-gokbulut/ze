@@ -37,18 +37,35 @@
 
 #include "ZETypes.h"
 #include "ZEMTType.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEClass;
 struct ZEMTAttribute;
-struct ZEEnum;
 
-enum ZEPropertyAccess
+#define ZEMT_PROPERTY_SETTER(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, Setter, #PropertyName)
+#define ZEMT_PROPERTY_GETTER(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, Getter, #PropertyName)
+#define ZEMT_PROPERTY_COUNTER(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, Counter, #PropertyName)
+#define ZEMT_PROPERTY_ADDER(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, Adder, #PropertyName)
+#define ZEMT_PROPERTY_REMOVER(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, Remover, #PropertyName)
+#define ZEMT_PROPERTY_SETTER_ITEM(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, SetterItem, #PropertyName)
+#define ZEMT_PROPERTY_GETTER_ITEM(PropertyName) ZEMT_ATTRIBUTE(ZEMC.PropertyAccessor, GetterItem, #PropertyName)
+
+enum ZEMTPropertyAccess
 {
 	ZEMT_PA_NONE		= 0,
 	ZEMT_PA_READ		= 1,
 	ZEMT_PA_WRITE		= 2,
 	ZEMT_PA_READ_WRITE	= 3
 };
+
+enum ZEMTPropertyFlag
+{
+	ZEMT_PF_NONE,
+	ZEMT_PF_GENERATED,
+	ZEMT_PF_CONTAINER,
+	ZEMT_PF_STATIC
+};
+typedef ZEFlags ZEMTPropertyFlags;
 
 struct ZEMTProperty
 {
@@ -58,18 +75,15 @@ struct ZEMTProperty
 	const char*							Name;
 	ZEUInt32							Hash;
 	void*								OffsetOrAddress;
-	ZEMTType								Type;
+	ZEMTType							Type;
 
-	ZEPropertyAccess					Access;
-
-	bool								IsGenerated;
-	bool								IsContainer;
-	bool								IsStatic;
+	ZEMTPropertyAccess					Access;
+	ZEMTPropertyFlags					Flags;
 
 	ZEMTAttribute*						Attributes;
 	ZESize								AttributeCount;
 
-	const ZEMTAttribute*					GetAttribute(const char* Name) const;
+	const ZEMTAttribute*				GetAttribute(const char* Name) const;
 	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;
 
 	bool								CheckAttribute(const char* Name) const;

@@ -104,7 +104,6 @@ bool ZEMCParser::ProcessCommands(Decl* Declaration)
 	ZEMCAttribute AttributeData;
 	for (RecordDecl::attr_iterator CurrentAttr = Declaration->attr_begin(), LastAttr = Declaration->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
-
 		if (!AnnotateAttr::classof(*CurrentAttr))
 			continue;
 

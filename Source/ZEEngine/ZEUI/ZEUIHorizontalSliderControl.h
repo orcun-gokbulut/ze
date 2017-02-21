@@ -39,9 +39,7 @@
 
 #include "ZEUIControl.h"
 
-ZEMT_FORWARD_DECLARE(ZEUIRenderer);
-ZEMT_FORWARD_DECLARE(ZEUIRectangle);
-ZEMT_FORWARD_DECLARE(ZEUIMaterial);
+class ZEUIMaterial;
 
 class ZEUIHorizontalSliderControl : public ZEUIControl
 {

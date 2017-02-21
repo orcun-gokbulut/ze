@@ -562,7 +562,9 @@ ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& C
 				break;
 		}
 
-		if (Type.TypeQualifier == ZEMC_TQ_REFERENCE)
+		if (Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+			Output.Append("Const");
+		else if (Type.TypeQualifier == ZEMC_TQ_REFERENCE)
 			Output.Append("Ref");
 		else if (Type.TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
 			Output.Append("ConstRef");

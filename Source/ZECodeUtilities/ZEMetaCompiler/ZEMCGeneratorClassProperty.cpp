@@ -207,10 +207,35 @@ void ZEMCGenerator::GenerateClassGetProperties_Properties(ZEMCClass* CurrentClas
 				break;
 		}
 
-		// Is
-		WriteToFile("%s, ",	CurrentProperty->HasAccessors ? "true" : "false");
-		WriteToFile("%s, ",	CurrentProperty->IsContainer ? "true" : "false");
-		WriteToFile("%s, ",	CurrentProperty->IsStatic ? "true" : "false");
+		bool HasFlag = false;
+		if (CurrentProperty->HasAccessors)
+		{
+			WriteToFile("ZEMT_PF_GENERATED");
+			HasFlag = true;
+		}
+
+		if (CurrentProperty->IsContainer)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+
+			WriteToFile("ZEMT_PF_CONTAINER");
+			HasFlag = true;
+		}
+
+		if (CurrentProperty->IsStatic)
+		{
+			if (HasFlag)
+				WriteToFile(" | ");
+				
+			WriteToFile("ZEMT_PF_STATIC");
+			HasFlag = true;
+		}
+
+		if (!HasFlag)
+			WriteToFile("ZEMT_PF_NONE");
+
+		WriteToFile(", ");
 		
 		// Attributes
 		if (CurrentProperty->Attributes.GetCount() > 0)
