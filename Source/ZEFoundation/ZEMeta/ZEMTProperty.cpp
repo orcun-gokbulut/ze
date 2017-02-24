@@ -38,6 +38,21 @@
 #include "ZEMTAttribute.h"
 #include <string.h>
 
+bool ZEMTProperty::IsGenerated() const
+{
+	return (Flags & ZEMT_PF_GENERATED) == 0;
+}
+
+bool ZEMTProperty::IsStatic() const
+{
+	return (Flags & Flags & ZEMT_PF_STATIC) == 0;
+}
+
+bool ZEMTProperty::IsMutable() const
+{
+	return (Flags & Flags & ZEMT_PF_MUTABLE) == 0;
+}
+
 const ZEMTAttribute* ZEMTProperty::GetAttribute(const char* Name) const
 {
 	if (Name == NULL)

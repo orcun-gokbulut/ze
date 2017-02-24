@@ -214,7 +214,7 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 			if (Output.Class->IsFundamental)
 				return false;
 
-			if (Output.ContainerType == ZEMC_CT_NONE && ClangType->getPointeeType().isConstQualified())
+			if (Output.CollectionType == ZEMC_CT_NONE && ClangType->getPointeeType().isConstQualified())
 			{
 				if (Output.TypeQualifier != ZEMC_TQ_VALUE)
 					return false;
@@ -226,8 +226,8 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 	else if(ClangType->isEnumeralType())
 	{
 		Output.BaseType = ZEMC_BT_ENUMERATOR;
-		Output.Enumurator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
-		if (Output.Enumurator == NULL)
+		Output.Enumerator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
+		if (Output.Enumerator == NULL)
 			return false;
 	}
 	else
@@ -238,6 +238,71 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 	return true;
 }
 
+
+bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
+{
+	ZEMCType TempType;
+	QualType CanonicalType = ClangType.getCanonicalType();
+	const Type* TypePtr = CanonicalType.getTypePtr();
+
+	if (TypePtr->isReferenceType())
+	{
+		TempType.TypeQualifier = CanonicalType.isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
+		CanonicalType = CanonicalType->getPointeeType();
+		TypePtr = CanonicalType.getTypePtr();
+	}
+	else
+	{
+		TempType.TypeQualifier = CanonicalType.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
+	}
+
+	// Collection
+	if (TypePtr->isClassType() && isa<ClassTemplateSpecializationDecl>(TypePtr->getAsCXXRecordDecl()))
+	{
+		const ClassTemplateSpecializationDecl* TemplateType = llvm::cast<ClassTemplateSpecializationDecl>(TypePtr->getAsCXXRecordDecl());
+		if (TemplateType == NULL)
+			return false;
+
+		if (TemplateType->getNameAsString() == "ZEArray")
+		{
+			TempType.CollectionType = ZEMC_CT_ARRAY;
+			TempType.CollectionQualifier = TempType.TypeQualifier;
+
+			if (TemplateType->getTemplateArgs().size() < 1)
+				return false;
+
+			QualType Argument = TemplateType->getTemplateArgs().get(0).getAsType();
+
+			// Const does not allowed in containers
+			if (Argument.isConstQualified())
+				return false;
+
+			// References are not allowed in containers
+			if(Argument.getTypePtr()->isReferenceType())
+				return false;
+
+			if (!ProcessBaseType(TempType,  Argument.getTypePtr()))
+				return false;
+
+		}
+		else if (TemplateType->getNameAsString() != "ZEHolder")
+		{
+			return false;
+		}
+		else
+		{
+			
+
+
+			BaseTypePtr = Argument.getTypePtr();
+		}
+	}
+
+
+	Output = TempType;
+	return true;
+}
+/*
 bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 {
 	ZEMCType TempType;
@@ -266,11 +331,11 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 		if (TemplateType != NULL)
 		{
 			if (TemplateType->getNameAsString() == "ZEArray")
-				TempType.ContainerType = ZEMC_CT_ARRAY;
+				TempType.CollectionType = ZEMC_CT_ARRAY;
 			else if (TemplateType->getNameAsString() == "ZEList")
-				TempType.ContainerType = ZEMC_CT_LIST;
+				TempType.CollectionType = ZEMC_CT_LIST;
 			else if (TemplateType->getNameAsString() == "ZEContainer")
-				TempType.ContainerType = ZEMC_CT_CONTAINER;
+				TempType.CollectionType = ZEMC_CT_COLLECTION;
 			else
 				return false;
 
@@ -296,4 +361,4 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 
 	Output = TempType;
 	return true;
-}
+}*/

@@ -123,6 +123,7 @@ void ZEMCGenerator::GenerateClassMethods(ZEMCClass* CurrentClass)
 	GenerateClassAddEventDelegate(CurrentClass);
 	GenerateClassRemoveEventDelegate(CurrentClass);
 	GenerateClassCallMethod(CurrentClass);
+	GenerateClassCallMethodConst(CurrentClass);
 }
 
 void ZEMCGenerator::GenerateClassMethodIdRangeCheck(ZEMCClass* CurrentClass)
@@ -355,7 +356,7 @@ void ZEMCGenerator::GenerateClassGetMethods_Methods(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetMethods(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"const ZEMTMethod* %sClass::GetMethods()\n"
+		"const ZEMTMethod* %sClass::GetMethods() const\n"
 		"{\n", CurrentClass->Name.ToCString());
 
 	if (CurrentClass->Methods.GetCount() == 0)
@@ -376,7 +377,7 @@ void ZEMCGenerator::GenerateClassGetMethods(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetMethodCount(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetMethodCount()\n"
+		"ZESize %sClass::GetMethodCount() const\n"
 		"{\n"
 		"\treturn %d;\n"
 		"}\n\n",
@@ -390,7 +391,7 @@ void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 		return;
 
 	WriteToFile(
-		"ZESize %sClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex)\n"
+		"ZESize %sClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex) const\n"
 		"{\n", CurrentClass->Name.ToCString());
 
 	if (CurrentClass->Methods.GetCount() != 0)
@@ -430,7 +431,7 @@ void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassAddEventDelegate(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"bool %sClass::AddEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate)\n"
+		"bool %sClass::AddEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate) const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -471,7 +472,7 @@ void ZEMCGenerator::GenerateClassAddEventDelegate(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassRemoveEventDelegate(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"bool %sClass::RemoveEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate)\n"
+		"bool %sClass::RemoveEventDelegate(ZEObject* Object, ZESize MethodId, ZEEventDelegateBase* Delegate) const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -512,7 +513,7 @@ void ZEMCGenerator::GenerateClassRemoveEventDelegate(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"bool %sClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)\n"
+		"bool %sClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 	
@@ -539,13 +540,14 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 			ZEString VariantSetterParam;
 			if (ReturnType.BaseType != ZEMC_BT_VOID)
 			{
-				ZEString VariantPostfix = GenerateVariantPostfix(ReturnType, ZEString(), VariantSetterParam);
-				
-				ZEString VariantCast;
-				if (ReturnType.ContainerType == ZEMC_CT_NONE && ReturnType.BaseType == ZEMC_BT_OBJECT_PTR && ReturnType.Class->IsForwardDeclared)
-					VariantCast = "(ZEObject*)";
+				ZEString VariantFunctionName;
+				ZEString VariantCastingExpression;
+				GenerateVariantSetter(ReturnType, VariantFunctionName, VariantCastingExpression);
+								
+				if (ReturnType.CollectionType == ZEMC_CT_NONE && ReturnType.BaseType == ZEMC_BT_OBJECT_PTR && ReturnType.Class->IsForwardDeclared)
+					VariantCastingExpression = "(ZEObject*)";
 
-				WriteToFile("ReturnValue.Set%s(%s", VariantPostfix.ToCString(), VariantCast.ToCString());
+				WriteToFile("ReturnValue.%s(%s", VariantFunctionName.ToCString(), VariantCastingExpression.ToCString());
 			}
 			
 			if (CurrentMethod->IsStatic)
@@ -565,12 +567,13 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 				else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
 					ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
 
-				ZEString VariantCast;
-				ZEString VariantPostfix = GenerateVariantPostfix(ModifiedParameterType, VariantCast, ZEString());
-				WriteToFile("%sParameters[%d]->Get%s()%s", 
-					VariantCast.ToCString(),
+				ZEString VariantFunctionName;
+				ZEString VariantCastingExpression;
+				GenerateVariantGetter(ModifiedParameterType, VariantFunctionName, VariantCastingExpression);
+				WriteToFile("%sParameters[%d]->%s()%s", 
+					VariantCastingExpression.ToCString(),
 					N, 
-					VariantPostfix.ToCString(),
+					VariantFunctionName.ToCString(),
 					N + 1 >= CurrentMethod->Parameters.GetCount() ? "" : ", ");
 			}
 			
@@ -590,6 +593,16 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 	WriteToFile(
 		"\treturn false;\n"
 		"}\n\n");
+}
+
+void ZEMCGenerator::GenerateClassCallMethodConst(ZEMCClass* CurrentClass)
+{
+	WriteToFile(
+		"bool %sClass::CallMethodConst(const ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const\n"
+		"{\n"
+		"\treturn false;\n"
+		"}\n\n",
+		CurrentClass->Name.ToCString());
 }
 
 void ZEMCGenerator::GenerateClassWrapperMethods(ZEMCClass* CurrentClass)

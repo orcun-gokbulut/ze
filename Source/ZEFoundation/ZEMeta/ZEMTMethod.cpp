@@ -38,6 +38,36 @@
 #include "ZEMTAttribute.h"
 #include <string.h>
 
+bool ZEMTMethod::IsEvent() const
+{
+	return (Flags & ZEMT_MF_EVENT) != 0;
+}
+
+bool ZEMTMethod::IsConst() const
+{
+	return (Flags & ZEMT_MF_CONST) != 0;
+}
+
+bool ZEMTMethod::IsStatic() const
+{
+	return (Flags & ZEMT_MF_STATIC) != 0;
+}
+
+bool ZEMTMethod::IsOperator() const
+{
+	return (Flags & ZEMT_MF_OPERATOR) != 0;
+}
+
+bool ZEMTMethod::IsConstructor() const
+{
+	return (Flags & ZEMT_MF_CONSTRUCTOR) != 0;
+}
+
+bool ZEMTMethod::IsDeconstructor() const
+{
+	return (Flags & ZEMT_MF_DECONSTRUCTOR) != 0;
+}
+
 const ZEMTAttribute* ZEMTMethod::GetAttribute(const char* Name) const
 {
 	for (ZESize I = 0; I < AttributeCount; I++)

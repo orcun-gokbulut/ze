@@ -83,14 +83,14 @@ enum ZEMTOperatorType
 
 enum ZEMTMethodFlag
 {
-	ZEMT_MF_NONE,
-	ZEMT_MF_CONST,
-	ZEMT_MF_EVENT,
-	ZEMT_MF_VIRTUAL,
-	ZEMT_MF_STATIC,
-	ZEMF_MF_OPERATOR,
-	ZEMF_MF_CONSTRUCTOR,
-	ZEMF_MF_DESTRUCTOR
+	ZEMT_MF_NONE			= 0x00,
+	ZEMT_MF_EVENT			= 0x01,
+	ZEMT_MF_CONST			= 0x02,
+	ZEMT_MF_VIRTUAL			= 0x04,
+	ZEMT_MF_STATIC			= 0x08,
+	ZEMT_MF_OPERATOR		= 0x10,
+	ZEMT_MF_CONSTRUCTOR		= 0x20,
+	ZEMT_MF_DECONSTRUCTOR	= 0x40
 };
 typedef ZEFlags ZEMTMethodFlags;
 
@@ -118,6 +118,13 @@ struct ZEMTMethod
 
 	ZEMTAttribute*						Attributes;
 	ZESize								AttributeCount;
+
+	bool								IsEvent() const;
+	bool								IsConst() const;
+	bool								IsStatic() const;
+	bool								IsOperator() const;
+	bool								IsConstructor() const;
+	bool								IsDeconstructor() const;
 
 	const ZEMTAttribute*				GetAttribute(const char* Name) const;
 	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;

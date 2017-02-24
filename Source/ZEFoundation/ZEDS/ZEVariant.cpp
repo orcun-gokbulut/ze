@@ -120,6 +120,85 @@ inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 	return 0;
 }
 
+
+template <typename ZEReturnType, ZEMTBaseType Type>
+inline ZEReturnType ZEVariant::ConvertValue(const void* ValuePointer) const
+{
+	if (ValueType.CollectionType != ZEMT_CT_NONE)
+		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
+
+	if (ValueType.Type != Type)
+		zeCriticalError("Variant type mismatch. Cannot convert non-primitive value type to a different value type.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE)
+		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
+	else if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
+		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
+	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+		zeCriticalError("Variant type mismatch. Cannot convert const value type to non-const reference type.");
+	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");
+	else
+		zeCriticalError("Variant internal error. Unknown type qualifier.");
+}
+
+template <typename ZEReturnType, ZEMTBaseType Type>
+inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer) const
+{
+	if (ValueType.CollectionType != ZEMT_CT_NONE)
+		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
+
+	if (ValueType.Type != Type)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		return *static_cast<const ZEReturnType*>(ValuePointer);
+	else if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+		return *static_cast<const ZEReturnType*>(Value.Pointer);
+	else
+		zeCriticalError("Variant internal error. Unknown type qualifier.");
+
+	return 0;
+}
+
+template <typename ZEReturnType, ZEMTBaseType Type>
+inline ZEReturnType& ZEVariant::ConvertRef(const void* ValuePointer) const
+{
+	if (ValueType.CollectionType != ZEMT_CT_NONE)
+		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection reference type.");
+
+	if (ValueType.Type != Type)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE)
+		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
+	else if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
+		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
+	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+		zeCriticalError("Variant type mismatch. Cannot convert const reference type to non-const reference type.");
+	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");
+	else
+		zeCriticalError("Variant internal error. Unknown type qualifier.");
+}
+
+template <typename ZEReturnType, ZEMTBaseType Type>
+inline ZEReturnType& ZEVariant::ConvertConstRef(const void* ValuePointer) const
+{
+	if (ValueType.CollectionType != ZEMT_CT_NONE)
+		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
+
+	if (ValueType.Type != Type)
+		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
+
+	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
+		return *(ZEReturnType*)(ValuePointer);
+	else if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+		return *static_cast<ZEReturnType*>(Value.Pointer);
+	else
+		zeCriticalError("Variant internal error. Unknown type qualifier.");
+}
+
 void ZEVariant::SetType(const ZEMTType& NewType)
 {
 	if (ValueType == NewType)
@@ -128,7 +207,7 @@ void ZEVariant::SetType(const ZEMTType& NewType)
 	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE && Value.Pointer != NULL)
 	{
 		if (ValueType.Type == ZEMT_BT_OBJECT)
-			Deleter(Value.Pointer);
+			ValueType.Class->Destroy(static_cast<ZEObject*>(Value.Pointer));
 		else if (ValueType.Type == ZEMT_BT_STRING)
 			Value.String.Clear();
 		else if (ValueType.Type == ZEMT_BT_MATRIX3X3)
@@ -143,8 +222,6 @@ void ZEVariant::SetType(const ZEMTType& NewType)
 		Value.Pointer = NULL;
 	}
 
-	Cloner = NULL;
-	Deleter = NULL;
 	ValueType = NewType;
 
 	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE && Value.Pointer == NULL)
@@ -177,7 +254,7 @@ void ZEVariant::SetVariant(const ZEVariant& Variant)
 	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
 	{
 		if (ValueType.Type == ZEMT_BT_OBJECT)
-			Value.Pointer = Variant.Cloner(Variant.Value.Pointer);
+			Value.Pointer = ValueType.Class->Clone(static_cast<ZEObject*>(Value.Pointer));
 		else if (ValueType.Type == ZEMT_BT_MATRIX3X3)
 			Value.Pointer = new ZEMatrix3x3(*(const ZEMatrix3x3*)Variant.Value.Pointer);
 		else if (ValueType.Type == ZEMT_BT_MATRIX3X3D)
@@ -1399,7 +1476,7 @@ const ZEMatrix4x4d& ZEVariant::GetMatrix4x4dConstRef() const
 	return ConvertConstRef<const ZEMatrix4x4d, ZEMT_BT_MATRIX4X4D>(Value.Pointer);
 }
 
-const ZEString& ZEVariant::GetString() const
+ZEString ZEVariant::GetString() const
 {
 	return ConvertValue<ZEString, ZEMT_BT_STRING>(Value.Pointer);
 }
@@ -1536,8 +1613,6 @@ ZEValue ZEVariant::GetValue()
 ZEVariant::ZEVariant()
 {
 	Value.Pointer = NULL;
-	Deleter = NULL;
-	Cloner = NULL;
 }
 
 ZEVariant::ZEVariant(const ZEVariant& Value)

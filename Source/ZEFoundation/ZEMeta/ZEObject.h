@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEClass.h"
+#include "ZEPointer/ZEReferenceCounted.h"
 
 #define ZEMT_INCLUDE(IncludeFile) ZEMT_ATTRIBUTE_GLOBAL(ZEMC.Include, IncludeFile)
 #define ZEMT_FORWARD_DECLARE(ClassName) class ZEMT_ATTRIBUTE(ZEMC.ForwardDeclare, #ClassName) ClassName
@@ -65,7 +66,7 @@
 
 class ZEMTEventBase;
 
-class ZEObject
+class ZEObject : public ZEReferenceCounted
 {
 	template<typename TSignature> friend class ZEEvent;
 	private:

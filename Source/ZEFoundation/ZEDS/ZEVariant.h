@@ -63,7 +63,8 @@ class ZEReference;
 
 class ZEVariant
 {
-	public:
+	friend class ZEMTCollection;
+	private:
 		struct ZEVariantValue
 		{
 			union
@@ -76,22 +77,14 @@ class ZEVariant
 				bool					Boolean;
 				float					Vectors[4];
 				double					DoubleVectors[4];
-
 				void*					Pointer;
 			};
 			ZEString					String;
-		}Value;
-
-		void*							(*Cloner)(const void*);
-		void							(*Deleter)(void*);
+		} Value;
 
 		ZEMTType						ValueType;
-		void							SetType(const ZEMTType& NewType);
 
-		template<typename ZETypeInstance>
-		static void*					ClonerTemplate(const void* Instance);
-		template<typename ZETypeInstance>
-		static void						DeleterTemplate(void* Instance);
+		void							SetType(const ZEMTType& NewType);
 
 		template<typename ZEReturnType>
 		ZEReturnType					ConvertValuePrimitive() const;
@@ -208,35 +201,23 @@ class ZEVariant
 		void							SetStringRef(ZEString& Value);
 		void							SetStringConstRef(const ZEString& Value);
 
-		template<typename ZEObjectType>
-		void							SetObject(const ZEObjectType& Object);
-		template<typename ZEObjectType>
-		void							SetObjectRef(ZEObjectType& Object);
-		template<typename ZEObjectType>
-		void							SetObjectConstRef(const ZEObjectType& Object);
+		void							SetObject(ZEObject* Object);
+		void							SetObjectConst(const ZEObject* Object);
+		void							SetObjectRef(ZEObject*& Object);
+		void							SetObjectConstRef(const ZEObject*& Object);
 
 		void							SetObjectPtr(ZEObject* Object);
 		void							SetObjectPtrConst(const ZEObject* Object);
 		void							SetObjectPtrRef(ZEObject*& Object);
 		void							SetObjectPtrConstRef(const ZEObject*& Object);
 
-
-		template<typename ZEItemType>
-		void							SetArray(const ZEArray<ZEItemType>& Array);
-		template<typename ZEItemType>
-		void							SetArray(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
-		template<typename ZEItemType>
-		void							SetArrayRef(ZEArray<ZEItemType>& Array);
-		template<typename ZEItemType>
-		void							SetArrayRef(ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
-		template<typename ZEItemType>
-		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array);
-		template<typename ZEItemType>
-		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass);
-
 		void							SetClass(ZEClass* Object);
 		void							SetClassRef(ZEClass*& Object);
 		void							SetClassConstRef(const ZEClass*& Object);
+
+		void							SetCollection(void* Collection, ZEMTType& CollectionType);
+		void							SetCollectionRef(void*& Collection, ZEMTType& CollectionType);
+		void							SetCollectionConstRef(const void*& Collection, ZEMTType& CollectionType);
 
 		void							SetValue(const ZEValue& Value);
 
@@ -334,7 +315,7 @@ class ZEVariant
 		ZEMatrix4x4d&					GetMatrix4x4dRef() const;
 		const ZEMatrix4x4d&				GetMatrix4x4dConstRef() const;
 
-		const ZEString&					GetString() const;
+		ZEString						GetString() const;
 		ZEString&						GetStringRef() const;
 		const ZEString&					GetStringConstRef() const;
 
@@ -343,21 +324,13 @@ class ZEVariant
 		ZEObject*&						GetObjectPtrRef() const;
 		const ZEObject*&				GetObjectPtrConstRef() const;
 
-		template<typename ZEObjecType>
-		const ZEObjecType&				GetObject() const;
-		
-		template<typename ZEObjecType>
-		ZEObjecType&					GetObjectRef() const;
+		const ZEObject*&				GetObject() const;
+		ZEObject*&						GetObjectRef() const;
+		const ZEObject*&				GetObjectConstRef() const;		
 
-		template<typename ZEObjecType>
-		const ZEObjecType&				GetObjectConstRef() const;		
-
-		template<typename ZEItemType>
-		const ZEArray<ZEItemType>&		GetArray() const;
-		template<typename ZEItemType>
-		ZEArray<ZEItemType>&			GetArrayRef() const;
-		template<typename ZEItemType>
-		const ZEArray<ZEItemType>&		GetArrayConstRef() const;
+		const ZEMTCollection&			GetCollection() const;
+		ZEMTCollection&					GetCollectionRef() const;
+		const ZEMTCollection&			GetCollectionConstRef() const;
 
 		ZEClass*						GetClass() const;
 		ZEClass*&						GetClassRef() const;
@@ -392,19 +365,6 @@ class ZEVariant
 										ZEVariant(const ZEMatrix3x3d& Value);
 										ZEVariant(const ZEMatrix4x4& Value);
 										ZEVariant(const ZEMatrix4x4d& Value);
-										
-										template<typename ZEObjectType>
-										ZEVariant(const ZEObjectType& Value);
-
-										template<typename ZEObjectType>
-										ZEVariant(ZEObjectType* Value);
-
-										template<typename ZEObjectType>
-										ZEVariant(const ZEObjectType* Value);
-
-										template<typename ZEArrayType>
-										ZEVariant(const ZEArray<ZEArrayType>& Value);
-
 										ZEVariant(ZEClass* Class);
 										~ZEVariant();
 };

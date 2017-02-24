@@ -39,7 +39,7 @@
 void ZEMCGenerator::GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetSizeOfObject()\n"
+		"ZESize %sClass::GetSizeOfObject() const\n"
 		"{\n"
 		"\treturn sizeof(%s);\n"
 		"}\n\n", 
@@ -50,7 +50,7 @@ void ZEMCGenerator::GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassCreateInstance(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZEObject* %sClass::CreateInstance()\n"
+		"ZEObject* %sClass::CreateInstance() const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -79,7 +79,7 @@ void ZEMCGenerator::GenerateClassCreateInstance(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassDestroy(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Destroy(ZEObject* Object)\n"
+		"bool %sClass::Destroy(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
@@ -106,7 +106,7 @@ void ZEMCGenerator::GenerateClassDestroy(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassDynamicCast(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"ZEObject* %sClass::DynamicCast(ZEObject* Object)\n"
+		"ZEObject* %sClass::DynamicCast(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
@@ -126,7 +126,7 @@ void ZEMCGenerator::GenerateClassDynamicCast(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassClone(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"ZEObject* %sClass::Clone(ZEObject* Object)\n"
+		"ZEObject* %sClass::Clone(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
@@ -150,7 +150,7 @@ void ZEMCGenerator::GenerateClassClone(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassConstruct(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Construct(ZEObject* Object)\n"
+		"bool %sClass::Construct(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 	
@@ -172,7 +172,7 @@ void ZEMCGenerator::GenerateClassConstruct(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassDeconstruct(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Deconstruct(ZEObject* Object)\n"
+		"bool %sClass::Deconstruct(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
@@ -194,7 +194,7 @@ void ZEMCGenerator::GenerateClassDeconstruct(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassAssign(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Assign(ZEObject* Object, ZEObject* Source)\n"
+		"bool %sClass::Assign(ZEObject* Object, ZEObject* Source) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 

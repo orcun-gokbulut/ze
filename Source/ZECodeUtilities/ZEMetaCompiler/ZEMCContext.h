@@ -59,7 +59,6 @@ enum ZEMCBaseType
 	ZEMC_BT_FLOAT,
 	ZEMC_BT_DOUBLE,
 	ZEMC_BT_BOOLEAN,
-	ZEMC_BT_ENUMERATOR,
 	ZEMC_BT_STRING,
 	ZEMC_BT_QUATERNION,
 	ZEMC_BT_VECTOR2,
@@ -75,7 +74,17 @@ enum ZEMCBaseType
 	ZEMC_BT_CLASS,
 	ZEMC_BT_OBJECT,
 	ZEMC_BT_OBJECT_PTR,
-	ZEMC_BT_CONTAINER
+	ZEMC_BT_OBJECT_HOLDER,
+	ZEMC_BT_ENUMERATOR,
+	ZEMC_BT_FLAGS,
+};
+
+enum ZEMCContainerType
+{
+	ZEMC_CT_NONE,
+	ZEMC_CT_ARRAY,
+	ZEMC_CT_LIST,
+	ZEMC_CT_COLLECTION
 };
 
 enum ZEMCOperatorType
@@ -138,15 +147,7 @@ enum ZEMCTypeQualifier
 	ZEMC_TQ_VALUE,
 	ZEMC_TQ_CONST_VALUE,
 	ZEMC_TQ_REFERENCE,
-	ZEMC_TQ_CONST_REFERENCE
-};
-
-enum ZEMCContainerType
-{
-	ZEMC_CT_NONE,
-	ZEMC_CT_ARRAY,
-	ZEMC_CT_LIST,
-	ZEMC_CT_CONTAINER
+	ZEMC_TQ_CONST_REFERENCE,
 };
 
 class ZEMCDeclaration;
@@ -158,15 +159,18 @@ class ZEMCType
 	public:
 		ZEMCBaseType					BaseType;
 		ZEMCTypeQualifier				TypeQualifier;
-		ZEMCContainerType				ContainerType;
-
+		ZEMCContainerType				CollectionType;
+		ZEMCTypeQualifier				CollectionQualifier;
+		
 		ZEMCClass*						Class;
-		ZEMCEnumerator*					Enumurator;
+		ZEMCEnumerator*					Enumerator;
 
 		bool							operator==(const ZEMCType& Other) const;
 		bool							operator!=(const ZEMCType& Other) const;
 
 		static bool						Equal(const ZEMCType& A, const ZEMCType& B);
+
+		bool							Check();
 
 										ZEMCType();
 										~ZEMCType();
