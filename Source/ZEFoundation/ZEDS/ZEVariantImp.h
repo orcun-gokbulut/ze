@@ -33,94 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-template <typename ZEReturnType, ZEMTBaseType Type>
-inline ZEReturnType ZEVariant::ConvertValue(const void* ValuePointer) const
-{
-	if (ValueType.ContainerType != ZEMT_CT_NONE)
-		zeCriticalError("Variant type mismatch. Cannot convert container type to non-container type.");
-
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Cannot convert non-primitive value type to a different value type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE)
-		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
-	else if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
-	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant type mismatch. Cannot convert const value type to non-const reference type.");
-	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");
-	else
-		zeCriticalError("Variant internal error. Unknown type qualifier.");
-}
-
-template <typename ZEReturnType, ZEMTBaseType Type>
-inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer) const
-{
-	if (ValueType.ContainerType != ZEMT_CT_NONE)
-		zeCriticalError("Variant type mismatch. Cannot convert container type to non-container type.");
-
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		return *static_cast<const ZEReturnType*>(ValuePointer);
-	else if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		return *static_cast<const ZEReturnType*>(Value.Pointer);
-	else
-		zeCriticalError("Variant internal error. Unknown type qualifier.");
-}
-
-template <typename ZEReturnType, ZEMTBaseType Type>
-inline ZEReturnType& ZEVariant::ConvertRef(const void* ValuePointer) const
-{
-	if (ValueType.ContainerType != ZEMT_CT_NONE)
-		zeCriticalError("Variant type mismatch. Cannot convert container type to non-container reference type.");
-
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE)
-		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
-	else if (ValueType.TypeQualifier == ZEMT_TQ_VALUE)
-		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
-	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant type mismatch. Cannot convert const reference type to non-const reference type.");
-	else if (ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");
-	else
-		zeCriticalError("Variant internal error. Unknown type qualifier.");
-}
-
-template <typename ZEReturnType, ZEMTBaseType Type>
-inline ZEReturnType& ZEVariant::ConvertConstRef(const void* ValuePointer) const
-{
-	if (ValueType.ContainerType != ZEMT_CT_NONE)
-		zeCriticalError("Variant type mismatch. Cannot convert container type to non-container type.");
-
-	if (ValueType.Type != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
-
-	if (ValueType.TypeQualifier == ZEMT_TQ_VALUE || ValueType.TypeQualifier == ZEMT_TQ_CONST_VALUE)
-		return *(ZEReturnType*)(ValuePointer);
-	else if (ValueType.TypeQualifier == ZEMT_TQ_REFERENCE || ValueType.TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
-		return *static_cast<ZEReturnType*>(Value.Pointer);
-	else
-		zeCriticalError("Variant internal error. Unknown type qualifier.");
-}
-
-template<typename ZETypeInstance>
-void* ZEVariant::ClonerTemplate(const void* Instance)
-{
-	return new ZETypeInstance(*(const ZETypeInstance*)Instance);
-}
-
-template<typename ZETypeInstance>
-void ZEVariant::DeleterTemplate(void* Instance)
-{
-	delete (ZETypeInstance*)Instance;
-}
-
+/*
 template<typename ZEItemType>
 void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 {
@@ -132,24 +45,22 @@ void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array)
 		zeCriticalError("Only value or object pointer type arrays supported.");
 
 	Type.TypeQualifier = ZEMT_TQ_VALUE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-
+	Type.CollectionType = ZEMT_CT_ARRAY;
 	SetType(Type);
+
 	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
 	Deleter = &DeleterTemplate<ZEArray<ZEItemType> >;
 	Value.Pointer = new ZEArray<ZEItemType>(Array);
 }
 
 template<typename ZEItemType>
-void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array, ZEClass* ObjectPtrClass)
+void ZEVariant::SetArray(const ZEArray<ZEItemType>& Array, const ZEMTType& ItemType)
 {
-	ZEMTType Type;
-	Type.Type = ZEMT_BT_OBJECT_PTR;
-	Type.TypeQualifier = ZEMT_TQ_VALUE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-	Type.Class = ObjectPtrClass;
-
+	ZEMTType Type = ItemType;
+	Type.CollectionType = ZEMT_CT_ARRAY;
+	Type.CollectionQualifier = ZEMT_TQ_VALUE;
 	SetType(Type);
+
 	Cloner = &ClonerTemplate<ZEArray<ZEItemType> >;
 	Deleter = &DeleterTemplate<ZEArray<ZEItemType> >;
 	Value.Pointer = new ZEArray<ZEItemType>(Array);
@@ -159,30 +70,29 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+	
 	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
 
-	if (Type.ContainerType == ZEMT_CT_NONE)
+	if (Type.CollectionType != ZEMT_CT_NONE)
 		zeCriticalError("Array to arrays are not supported.");
 
-	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
+	if (Type.TypeQualifier != ZEMT_TQ_VALUE || Type.TypeQualifier != ZEMT_TQ_CONST_VALUE)
 		zeCriticalError("Only value or object pointer type arrays supported.");
 
 	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-
+	Type.CollectionType = ZEMT_CT_ARRAY;
 	SetType(Type);
+
 	Value.Pointer = &Array;
 }
 
 template<typename ZEItemType>
-void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
+void ZEVariant::SetArrayRef(ZEArray<ZEItemType>& Array, const ZEMTType& ItemType)
 {
-	ZEMTType Type;
-	Type.Type = ZEMT_BT_OBJECT_PTR;
-	Type.TypeQualifier = ZEMT_TQ_REFERENCE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-	Type.Class = ObjectClass;
+	ZEMTType Type = ItemType;
+	Type.CollectionType = ZEMT_CT_ARRAY;
+	Type.CollectionQualifier = ZEMT_TQ_REFERENCE;
 
 	SetType(Type);
 	Value.Pointer = &Array;
@@ -192,33 +102,28 @@ template<typename ZEItemType>
 void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array)
 {
 	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	
+
 	if (Type.Type == ZEMT_BT_UNDEFINED)
 		return;
-	
-	if (Type.ContainerType == ZEMT_CT_NONE)
+
+	if (Type.CollectionType != ZEMT_CT_NONE)
 		zeCriticalError("Array to arrays are not supported.");
 
-	if (Type.TypeQualifier != ZEMT_TQ_VALUE)
-		zeCriticalError("Only value or object pointer type arrays supported.");
+	Type.CollectionType = ZEMT_CT_ARRAY;
+	Type.CollectionQualifier = ZEMT_TQ_CONST_REFERENCE;
 
-	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-	
 	SetType(Type);
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
 }
 
 template<typename ZEItemType>
-void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array, ZEClass* ObjectClass)
+void ZEVariant::SetArrayConstRef(const ZEArray<ZEItemType>& Array, const ZEMTType& ItemType)
 {
-	ZEMTType Type;
-	Type.Type = ZEMT_BT_OBJECT_PTR;
-	Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
-	Type.ContainerType = ZEMT_CT_ARRAY;
-	Type.Class = ObjectClass;
-
+	ZEMTType Type = ItemType;
+	Type.CollectionType = ZEMT_CT_ARRAY;
+	Type.CollectionQualifier = ZEMT_TQ_CONST_REFERENCE;
 	SetType(Type);
+
 	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
 }
 
@@ -341,4 +246,4 @@ template<typename ZEArrayType>
 ZEVariant::ZEVariant(const ZEArray<ZEArrayType>& Value)
 {
 	SetArray(Value);
-}
+}*/

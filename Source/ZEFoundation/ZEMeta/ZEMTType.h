@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZETypes.h"
+
 enum ZEMTBaseType
 {
 	ZEMT_BT_UNDEFINED				= 0,
@@ -64,9 +66,18 @@ enum ZEMTBaseType
 	ZEMT_BT_MATRIX4X4D				= 24,
 	ZEMT_BT_OBJECT					= 25,
 	ZEMT_BT_OBJECT_PTR				= 26,
-	ZEMT_BT_CLASS					= 27,
-	ZEMT_BT_ENUMERATOR				= 28,
-	ZEMT_BT_FLAGS					= 29
+	ZEMT_BT_OBJECT_HOLDER			= 27,
+	ZEMT_BT_CLASS					= 28,
+	ZEMT_BT_ENUMERATOR				= 29,
+	ZEMT_BT_FLAGS					= 30
+};
+
+enum ZEMTCollectionType
+{
+	ZEMT_CT_NONE,
+	ZEMT_CT_ARRAY,
+	ZEMT_CT_LIST,
+	ZEMT_CT_PROPERTY
 };
 
 enum ZEMTTypeQualifier
@@ -77,14 +88,6 @@ enum ZEMTTypeQualifier
 	ZEMT_TQ_CONST_REFERENCE
 };
 
-enum ZEMTContainerType
-{
-	ZEMT_CT_NONE,
-	ZEMT_CT_ARRAY,
-	ZEMT_CT_LIST,
-	ZEMT_CT_CONTAINER
-};
-
 class ZEClass;
 class ZEMTEnumerator;
 
@@ -93,18 +96,36 @@ class ZEMTType
 	public:
 		ZEMTBaseType			Type;
 		ZEMTTypeQualifier		TypeQualifier;
-		ZEMTContainerType		ContainerType;
+		ZEMTCollectionType		CollectionType;
+		ZEMTTypeQualifier		CollectionQualifier;
 
 		ZEClass*				Class;
 		ZEMTEnumerator*			Enumerator;
 
+		bool					IsValid() const;
+		bool					IsReference() const;
+		bool					IsConst() const;
+		bool					IsCollection() const;
+		bool					IsCollectionReference() const;
+		bool					IsCollectionConst() const;
+		ZEMTType				GetCollectionItemType() const;
+
+		ZESize					GetInstanceSize() const;
+		void*					CreateInstance() const;
+		bool					DestroyInstance(void* Instance) const;
+		bool					ConstructInstance(void* Destination) const;
+		bool					DeconstructInstance(void* Destination) const;
+		bool					CopyInstance(void* Destination, const void* Source) const;
+		void*					CloneInstance(const void* Source) const;
+
 		bool					operator==(const ZEMTType& Other) const;
 		bool					operator!=(const ZEMTType& Other) const;
 
+								ZEMTType();
+								ZEMTType(ZEMTBaseType Type, ZEMTTypeQualifier TypeQualifier,
+									ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier,
+									ZEClass* Class, ZEMTEnumerator* Enumerator);
+
 		static bool				Equal(const ZEMTType& A, const ZEMTType& B);
 
-								ZEMTType();
-								ZEMTType(ZEMTBaseType Type, ZEMTTypeQualifier TypeQualifier, 
-									ZEMTContainerType ContainerType, 
-									ZEClass* Class, ZEMTEnumerator* Enumerator);
 };

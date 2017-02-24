@@ -106,7 +106,7 @@ void ZEMCGenerator::GenerateClassMacros(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetParentClass(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZEClass* %sClass::GetParentClass()\n"
+		"ZEClass* %sClass::GetParentClass() const\n"
 		"{\n", CurrentClass->Name.ToCString());
 
 	if (CurrentClass->BaseClass == NULL)
@@ -120,7 +120,7 @@ void ZEMCGenerator::GenerateClassGetParentClass(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetFlags(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZEMTClassFlags %sClass::GetFlags()\n"
+		"ZEMTClassFlags %sClass::GetFlags() const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -138,22 +138,25 @@ void ZEMCGenerator::GenerateClassGetFlags(ZEMCClass* CurrentClass)
 	if (!CurrentClass->IsAbstract)
 	{
 		if (CurrentClass->HasPublicDefaultConstructor || CurrentClass->HasCreateInstanceMethod)
-			WriteToFile(" | ZEMT_CF_CREATE_INSTANCE");
+			WriteToFile(" | ZEMT_CF_CREATABLE");
 
 		if (CurrentClass->HasPublicDestroyMethod || CurrentClass->HasPublicDestructor)
-			WriteToFile(" | ZEMT_CF_DESTROY");
+			WriteToFile(" | ZEMT_CF_DESTROYABLE");
 
 		if (CurrentClass->HasPublicAssignmentOperator)
-			WriteToFile(" | ZEMT_CF_ASSIGN");
+			WriteToFile(" | ZEMT_CF_ASSIGNABLE");
 
 		if (CurrentClass->HasPublicCopyConstructor)
-			WriteToFile(" | ZEMT_CF_CLONE");
+			WriteToFile(" | ZEMT_CF_CLONEABLE");
+
+		if (CurrentClass->HasPublicCopyConstructor)
+			WriteToFile(" | ZEMT_CF_COPYABLE");
 
 		if (CurrentClass->HasPublicDefaultConstructor)
-			WriteToFile(" | ZEMT_CF_CONSTRUCT");
+			WriteToFile(" | ZEMT_CF_CONSTRUCTIBLE");
 
 		if (CurrentClass->HasPublicDestructor)
-			WriteToFile(" | ZEMT_CF_DECONSTRUCT");
+			WriteToFile(" | ZEMT_CF_DECONSTRUCTIBLE");
 	}
 
 	WriteToFile(";\n");

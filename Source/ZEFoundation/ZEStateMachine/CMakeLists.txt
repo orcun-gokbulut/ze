@@ -45,5 +45,5 @@ ze_add_source(ZEStateMachine.h					Sources Headers ZEMC)
 ze_add_library(TARGET ZEStateMachine
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	ZEMC ${ZEMC}
+	#ZEMC ${ZEMC}
 	LIBS ZEDS)

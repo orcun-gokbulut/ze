@@ -52,18 +52,18 @@ struct ZEMTAttribute;
 
 enum ZEMTPropertyAccess
 {
-	ZEMT_PA_NONE		= 0,
-	ZEMT_PA_READ		= 1,
-	ZEMT_PA_WRITE		= 2,
-	ZEMT_PA_READ_WRITE	= 3
+	ZEMT_PA_NONE			= 0x00,
+	ZEMT_PA_READ			= 0x01,
+	ZEMT_PA_WRITE			= 0x02,
+	ZEMT_PA_READ_WRITE		= 0x03
 };
 
 enum ZEMTPropertyFlag
 {
-	ZEMT_PF_NONE,
-	ZEMT_PF_GENERATED,
-	ZEMT_PF_CONTAINER,
-	ZEMT_PF_STATIC
+	ZEMT_PF_NONE			= 0x00,
+	ZEMT_PF_GENERATED		= 0x01,
+	ZEMT_PF_STATIC			= 0x02,
+	ZEMT_PF_MUTABLE			= 0x04
 };
 typedef ZEFlags ZEMTPropertyFlags;
 
@@ -82,6 +82,10 @@ struct ZEMTProperty
 
 	ZEMTAttribute*						Attributes;
 	ZESize								AttributeCount;
+
+	bool								IsGenerated() const;
+	bool								IsStatic() const;
+	bool								IsMutable() const;
 
 	const ZEMTAttribute*				GetAttribute(const char* Name) const;
 	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;

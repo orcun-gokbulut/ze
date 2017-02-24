@@ -35,11 +35,16 @@
 
 #pragma once
 
+#pragma warning(push)
+#pragma warning(disable: 4348)
+
 #include "ZETypes.h"
+#include "ZEError.h"
 #include "ZEAllocator.h"
 #include "ZEArrayIterator.h"
-#include "ZEError.h"
 #include "ZEThread/ZELockRW.h"
+#include "ZEMeta/ZEMTCollection.h"
+#include "ZEMeta/ZEMTTypeGenerator.h"
 
 #include <stdlib.h>
 
@@ -52,15 +57,24 @@
 #define ZE_ARRAY_OTHER_SPEC ZEItemType, ZEAllocatorTypeOther, ZELockTypeOther
 
 template<typename ZEItemType, typename ZEAllocatorType = ZEAllocatorBase<ZEItemType>, typename ZELockType = ZELockRW>
-class ZEArray
+class ZEArray : public ZEMTCollection
 {
+	friend class ZEMTType;
 	private:
-		ZESize							Count;
-		ZEAllocatorType					Allocator;
 		ZEItemType*						Items;
+		ZESize							Count;
 		mutable ZELockRW				Lock;
+		ZEAllocatorType					Allocator;
+
+		virtual ZESize					GetCountRaw() const override;
+		virtual bool					RemoveRaw(ZESize Index) override;
+		virtual bool					InsertRaw(ZESize Index, const void* ItemPointer) override;
+		virtual bool					SetItemRaw(ZESize Index, const void* ItemPointer) override;
+		virtual bool					GetItemRaw(ZESize Index, void* ItemPointer) const override;
 
 	public:
+		virtual ZEMTType				GetType() const override;
+
 		inline void						SetCount(ZESize Count);
 		inline ZESize					GetCount() const;
 		inline void						Resize(ZESize Count);
@@ -185,6 +199,64 @@ class ZEChunkArrayMT : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, C
 
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
+
+ZE_ARRAY_TEMPLATE
+ZEMTType ZEArray<ZE_ARRAY_SPECIALIZATION>::GetType() const
+{
+	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+	if (!Type.IsValid() || Type.IsCollection())
+		return ZEMTType();
+
+	Type.CollectionType = ZEMT_CT_ARRAY;
+	Type.CollectionQualifier = ZEMT_TQ_VALUE;
+	return Type;
+}
+
+ZE_ARRAY_TEMPLATE
+ZESize ZEArray<ZE_ARRAY_SPECIALIZATION>::GetCountRaw() const
+{
+	return GetCount();
+}
+
+ZE_ARRAY_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::RemoveRaw(ZESize Index)
+{
+	if (Index >= Count)
+		return false;
+
+	Remove(Index);
+	return true;
+}
+
+ZE_ARRAY_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::InsertRaw(ZESize Index, const void* ItemPointer)
+{
+	if (Index >= Count)
+		return false;
+
+	Insert(Index, *(ZEItemType*)(ItemPointer));
+	return true;
+}
+
+ZE_ARRAY_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::SetItemRaw(ZESize Index, const void* ItemPointer)
+{
+	if (Index >= Count)
+		return false;
+
+	Items[Index] = *(ZEItemType*)(ItemPointer);
+	return true;
+}
+
+ZE_ARRAY_TEMPLATE
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::GetItemRaw(ZESize Index, void* ItemPointer) const
+{
+	if (Index >= Count)
+		return false;
+
+	*static_cast<ZEItemType*>(ItemPointer) = Items[Index];
+	return true;
+}
 
 ZE_ARRAY_TEMPLATE
 void ZEArray<ZE_ARRAY_SPECIALIZATION>::SetCount(ZESize Count)
@@ -981,3 +1053,5 @@ ZEArray<ZE_ARRAY_SPECIALIZATION>::~ZEArray()
 {
 	Clear();
 }
+
+#pragma warning(pop)

@@ -55,14 +55,19 @@ class ZEMCGenerator
 		const char*				ConvertOperatorTypeToString(ZEMCOperatorType OperatorType);
 
 		const char*				ConvertTypeQualifierToEnum(ZEMCTypeQualifier TypeQualifier);
-		const char*				ConvertContainerTypeToEnum(ZEMCContainerType ContainerType);
-		const char*				ConvertBaseTypeToEnum(ZEMCBaseType BaseType);
+		const char*				ConvertBaseTypeToEnum(ZEMCBaseType Type);
 		ZEString				ConvertBaseTypeToName(const ZEMCType& Type);
-
-		ZEString				GenerateVariantPostfix(const ZEMCType& baseType, ZEString& CastOutput, ZEString& SetterExtraParams);
+		const char*				ConvertContainerTypeToEnum(ZEMCContainerType ContainerType);
+		
 		ZEString				GenerateTypeSignature(const ZEMCType& Type);
 		ZEString				GenerateTypeConstructor(const ZEMCType& Type);
 		ZEString				GenerateMethodPointerCast(ZEMCMethod* CurrentMethod, ZEMCClass* CurrentClass);
+
+		// Variant
+		const char*				ConvertVariantFunctionTypePostfix(ZEMCBaseType Type);
+		const char*				ConvertVariantFunctionQualifierPostfix(ZEMCTypeQualifier Qualifier);
+		void					GenerateVariantSetter(const ZEMCType& Type, ZEString& FunctionName, ZEString& CastingExpression);
+		void					GenerateVariantGetter(const ZEMCType& Type, ZEString& FunctionName, ZEString& CastingExpression);
 
 		// File
 		void					GenerateIncludes();
@@ -101,12 +106,9 @@ class ZEMCGenerator
 		void					GenerateClassGetPropertyCount(ZEMCClass* CurrentClass);
 		void					GenerateClassGetPropertyId(ZEMCClass* CurrentClass);
 		void					GenerateClassSetProperty(ZEMCClass* CurrentClass);
+		void					GenerateClassSetPropertyConst(ZEMCClass* CurrentClass);
 		void					GenerateClassGetProperty(ZEMCClass* CurrentClass);
-		void					GenerateClassSetPropertyItem(ZEMCClass* CurrentClass);
-		void					GenerateClassGetPropertyItem(ZEMCClass* CurrentClass);
-		void					GenerateClassAddItemToProperty(ZEMCClass* CurrentClass);
-		void					GenerateClassRemoveItemFromProperty(ZEMCClass* CurrentClass);
-		void					GenerateClassGetPropertyItemCount(ZEMCClass* CurrentClass);
+		void					GenerateClassGetPropertyConst(ZEMCClass* CurrentClass);
 
 		// Methods
 		bool					HasEventMethod(ZEMCClass* CurrentClass);
@@ -123,6 +125,7 @@ class ZEMCGenerator
 		void					GenerateClassAddEventDelegate(ZEMCClass* CurrentClass);
 		void					GenerateClassRemoveEventDelegate(ZEMCClass* CurrentClass);
 		void					GenerateClassCallMethod(ZEMCClass* CurrentClass);
+		void					GenerateClassCallMethodConst(ZEMCClass* CurrentClass);
 		void					GenerateClassWrapperMethods(ZEMCClass* CurrentClass);
 
 		// Scripting

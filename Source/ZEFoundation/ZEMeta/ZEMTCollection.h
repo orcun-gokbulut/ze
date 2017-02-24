@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMTContainer.h
+ Zinek Engine - ZEMTCollection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,61 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CONTAINER_H__
-#define __ZE_CONTAINER_H__
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEClass;
-class ZEObject;
+class ZEMTType;
+class ZEVariant;
 
-class ZEMTContainerBase
+class ZEMTCollection
 {
+	private:
+		static void*				GetVariantPointer(ZEVariant& Item);
+
 	public:
-		virtual ZEClass*			GetClass() const = 0;
-		virtual bool				GetAllowDerived() const = 0;
+		virtual ZEMTType			GetType() const = 0;
+		virtual ZESize				GetCountRaw() const = 0;
+		virtual bool				RemoveRaw(ZESize Index) = 0;
+		virtual bool				InsertRaw(ZESize Index, const void* ItemPointer) = 0;
+		virtual bool				SetItemRaw(ZESize Index, const void* ItemPointer) = 0;
+		virtual bool				GetItemRaw(ZESize Index, void* ItemPointer) const = 0;
 
-		virtual ZESize				GetCount() const = 0;
-		virtual bool				Insert(ZESize Index, ZEObject* Item);
-		virtual bool				Remove(ZESize Index);
-		virtual bool				SetItem(ZESize Index, ZEObject* Item);
-		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const = 0;
+
+		bool						InsertVariant(ZESize Index, const ZEVariant& Item);
+		bool						SetItemVariant(ZESize Index, const ZEVariant& Item);
+		bool						GetItemVariant(ZESize Index, ZEVariant& Item) const;
 };
-
-template<typename ZEMTType, bool AllowDerived = true>
-class ZEMTContainer : public ZEMTContainerBase
-{
-	public:
-		virtual ZEClass*			GetClass() const;
-		virtual bool				GetAllowDerived() const;
-
-		virtual ZESize				GetCount() const;
-		virtual bool				GetItem(ZESize Index, ZEObject*& Item) const;
-};
-
-
-template<typename ZEMTType, bool AllowDerived>
-ZEClass* ZEMTContainer<ZEMTType, AllowDerived>::GetClass() const
-{
-	return ZEMTType::Class();
-}
-
-template<typename ZEMTType, bool AllowDerived>
-bool ZEMTContainer<ZEMTType, AllowDerived>::GetAllowDerived() const
-{
-	return AllowDerived;
-}
-
-template<typename ZEMTType, bool AllowDerived>
-ZESize ZEMTContainer<ZEMTType, AllowDerived>::GetCount() const
-{
-	return 0;
-}
-
-template<typename ZEMTType, bool AllowDerived>
-bool ZEMTContainer<ZEMTType, AllowDerived>::GetItem(ZESize Index, ZEObject*& Item) const
-{
-	return false;
-}
-
-#endif
