@@ -109,14 +109,15 @@ void ZEDPropertyEditor::Populate()
 		if (Properties[I].Access == ZEMT_PA_NONE || Properties[I].Access == ZEMT_PA_WRITE)
 			continue;
 
-		if (Properties[I].Type.ContainerType != ZEMT_CT_NONE)
+		if (Properties[I].Type.IsCollection())
 			continue;
 
 		if (!Properties[I].CheckAttributeHasValue("ZEDEditor.PropertyEditor.Display", "true"))
 			continue;
 
-		switch (Properties[I].Type.Type)
+		switch (Properties[I].Type.GetBaseType())
 		{
+			default:
 			case ZEMT_BT_UNDEFINED:
 			case ZEMT_BT_VOID:
 				continue;
@@ -192,6 +193,7 @@ void ZEDPropertyEditor::Populate()
 
 			case ZEMT_BT_OBJECT:
 			case ZEMT_BT_OBJECT_PTR:
+			case ZEMT_BT_OBJECT_HOLDER:
 				continue;
 
 			case ZEMT_BT_CLASS:

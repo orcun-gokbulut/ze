@@ -41,6 +41,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "ZETerminalUtils.h"
 
 static ZETestItem* CurrentTestItem = NULL;
 static void ZEErrorManagerErrorCallback(ZEErrorType Type)
@@ -63,17 +64,50 @@ static void ZEErrorManagerErrorCallback(ZEErrorType Type)
 		}
 
 		char Buffer[4096];
-		sprintf(Buffer, "ZEError::RaiseError redirected. Error type : %s.", ZEError::GetErrorTypeString(Type));
+		sprintf(Buffer, " ZEError event has been caught. Error type : %s.", ZEError::GetErrorTypeString(Type));
 
 		CurrentTestItem->ReportProblem(ProblemType, Buffer, CurrentTestItem->GetName(), 1);
 	}
 }
 
-
 void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line)
 {
+	ZETerminalUtils::Reset();
+
 	if (Type == ZE_TPT_ERROR)
+	{
+		if (Result == ZE_TR_NOT_RUN)
+		{
+			ZETerminalUtils::SetBold(true);
+			ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+			printf("FAILED\n");
+		}
+
 		Result = ZE_TR_FAILED;
+	}
+
+	switch(Type)
+	{
+		case ZE_TPT_ERROR:
+			ZETerminalUtils::SetBold(true);
+			ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+			printf(" ERROR");
+			break;
+
+		case ZE_TPT_WARNING:
+			ZETerminalUtils::SetForgroundColor(ZE_TC_YELLOW);
+			printf(" Warning");
+			break;
+
+		default:
+		case ZE_TPT_NOTICE:
+			printf(" Info");
+			break;
+	}
+
+	ZETerminalUtils::Reset();
+	printf(": %s\n", Problem);
+
 	ZETestManager::GetInstance()->ReportProblem(Owner, this, Type, Problem, File, Line);
 }
 
@@ -102,7 +136,7 @@ ZETestResult ZETestItem::GetResult()
 	return Result;
 }
 
-float ZETestItem::GetEleapsedTime()
+double ZETestItem::GetEleapsedTime()
 {
 	return ElapsedTime;
 }
@@ -129,7 +163,7 @@ bool ZETestItem::RunTest()
 		TestImpl();
 		Timer.Stop();
 
-        ElapsedTime = Timer.GetTime();
+        ElapsedTime = Timer.GetTimeMilliseconds();
 
 		if (Result == ZE_TR_NOT_RUN)
 			Result = ZE_TR_PASSED;
@@ -145,7 +179,7 @@ bool ZETestItem::RunTest()
 	catch (...)
 	{
 		Timer.Stop();
-        ElapsedTime = Timer.GetTime();
+        ElapsedTime = Timer.GetTimeMicroseconds();
 
 		Result = ZE_TR_FAILED;
 		return false;

@@ -88,6 +88,7 @@ class ZEReference;
 class ZEScriptObject;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
+class ZEReferenceCounted;
 
 enum ZEMTClassFlag
 {
@@ -232,15 +233,12 @@ class ZEClass : public ZEMTDeclaration
 		virtual ZEObject*				CreateInstance() const;
 		virtual ZEObject*				Clone(ZEObject* Object) const;
 		virtual bool					Destroy(ZEObject* Object) const;
-
 		virtual bool					Construct(ZEObject* Object) const;
 		virtual bool					Deconstruct(ZEObject* Object) const;
-
 		virtual bool					Assign(ZEObject* Destination, const ZEObject* Source) const;
 		virtual bool					Copy(ZEObject* Destination, const ZEObject* Source) const;
 		virtual bool					Equals(ZEObject* A, const ZEObject* B) const;
 		virtual bool					NotEquals(ZEObject* A, const ZEObject* B) const;
-
 		virtual ZEObject*				DynamicCast(ZEObject* Object) const;
 
 		// Scripting

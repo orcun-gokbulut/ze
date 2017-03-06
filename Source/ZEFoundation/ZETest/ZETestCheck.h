@@ -58,6 +58,22 @@
 		} } \
 	while(false)
 
+#define ZETestCheckMessage(Condition, ErrorMessage)\
+	do\
+	{\
+	try\
+		{\
+		if (!(Condition))\
+			{\
+				this->ReportProblem(ZE_TPT_ERROR, (ErrorMessage), __FILE__, __LINE__);\
+			} \
+		} \
+		catch (...)\
+		{\
+			this->ReportProblem(ZE_TPT_ERROR, (ErrorMessage), __FILE__, __LINE__);\
+		} } \
+		while(false)
+
 #define ZETestCheckString(Value, Expected) \
 	do {\
 		ZETestCheck(strcmp(Value, Expected) == 0);\

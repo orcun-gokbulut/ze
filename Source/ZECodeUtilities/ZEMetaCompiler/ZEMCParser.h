@@ -43,6 +43,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/AST/DeclCXX.h>
 #include <clang/AST/Attr.h>
+#include "ZEMeta/ZEObject.h"
 
 using namespace clang;
 
@@ -78,9 +79,9 @@ class ZEMCParser
 		void							RaiseCriticalError(SourceLocation& Location, const char* ErrorText);
 
 		// Checks
-		bool							CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
+		bool							CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class, bool& IsReferenceCounted);
 		bool							CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
-		bool							CheckClass(CXXRecordDecl* Class);
+		bool							CheckClass(CXXRecordDecl* Class, bool& IsReferenceCounted);
 		bool							CheckFundamentalClass(CXXRecordDecl* Class);
 		bool							CheckTargetDeclaration(Decl* Declaration);
 
@@ -123,7 +124,6 @@ class ZEMCParser
 		void							FilterPropertyAccessors(ZEMCClass* Class, ZEArray<ZEMCAccessor>& Accessors);
 		void							ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCMethod* MethodData);
 		void							ProcessPropertyAccessors(ZEMCClass* ClassData);
-
 		
 		void							RemoveMetaCompilerAttributes(ZEMCClass* Class);
 

@@ -61,33 +61,33 @@ class ZEArray : public ZEMTCollection
 {
 	friend class ZEMTType;
 	private:
-		ZEItemType*						Items;
-		ZESize							Count;
-		mutable ZELockRW				Lock;
-		ZEAllocatorType					Allocator;
+		ZEItemType*											Items;
+		ZESize												Count;
+		mutable ZELockRW									Lock;
+		ZEAllocatorType										Allocator;
 
-		virtual ZESize					GetCountRaw() const override;
-		virtual bool					RemoveRaw(ZESize Index) override;
-		virtual bool					InsertRaw(ZESize Index, const void* ItemPointer) override;
-		virtual bool					SetItemRaw(ZESize Index, const void* ItemPointer) override;
-		virtual bool					GetItemRaw(ZESize Index, void* ItemPointer) const override;
+		virtual ZESize										GetCountRaw() const override;
+		virtual bool										RemoveRaw(ZESize Index) override;
+		virtual bool										InsertRaw(ZESize Index, const void* ItemPointer) override;
+		virtual bool										SetItemRaw(ZESize Index, const void* ItemPointer) override;
+		virtual bool										GetItemRaw(ZESize Index, void* ItemPointer) const override;
 
 	public:
-		virtual ZEMTType				GetType() const override;
+		virtual ZEMTType									GetType() const override;
 
-		inline void						SetCount(ZESize Count);
-		inline ZESize					GetCount() const;
-		inline void						Resize(ZESize Count);
-		inline ZESize					GetSize() const;
+		inline void											SetCount(ZESize Count);
+		inline ZESize										GetCount() const;
+		inline void											Resize(ZESize Count);
+		inline ZESize										GetSize() const;
 
-		inline void						SetItem(ZESize Index, ZEItemType Value);
-		inline const ZEItemType&		GetItem(ZESize Index) const;
-		inline ZEItemType&				GetItem(ZESize Index);
+		inline void											SetItem(ZESize Index, ZEItemType Value);
+		inline const ZEItemType&							GetItem(ZESize Index) const;
+		inline ZEItemType&									GetItem(ZESize Index);
 
-		inline ZEItemType&				GetFirstItem();
-		inline const ZEItemType&		GetFirstItem() const;
-		inline ZEItemType&				GetLastItem();
-		inline const ZEItemType&		GetLastItem() const;
+		inline ZEItemType&									GetFirstItem();
+		inline const ZEItemType&							GetFirstItem() const;
+		inline ZEItemType&									GetLastItem();
+		inline const ZEItemType&							GetLastItem() const;
 
 		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>			GetIterator();
 		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION>			GetIterator(ZESize Index);
@@ -96,85 +96,85 @@ class ZEArray : public ZEMTCollection
 		ZEArrayIterator<ZE_ARRAY_SPECIALIZATION> 			GetIteratorEnd();
 		ZEArrayIteratorConst<ZE_ARRAY_SPECIALIZATION> 		GetIteratorEnd() const;
 
-		inline ZEItemType*				GetCArray();
-		inline const ZEItemType*		GetConstCArray() const;
+		inline ZEItemType*									GetCArray();
+		inline const ZEItemType*							GetConstCArray() const;
 
-		inline ZESSize					FindIndex(ZEItemType Item, ZESize StartIndex = 0) const;
-		inline bool						Exists(ZEItemType Value) const;
-		inline ZESize					Circular(ZESSize Index) const;
+		inline ZESSize										FindIndex(ZEItemType Item, ZESize StartIndex = 0) const;
+		inline bool											Exists(ZEItemType Value) const;
+		inline ZESize										Circular(ZESSize Index) const;
 
-		inline ZEItemType*				Add();
-		inline void						AddByRef(const ZEItemType& NewItem);
-		inline void						Add(ZEItemType NewItem);
-		inline ZEItemType*				AddMultiple(ZESize ItemCount);
-		inline void						AddMultiple(const ZEItemType* NewItems, ZESize ItemCount);
+		inline ZEItemType*									Add();
+		inline void											AddByRef(const ZEItemType& NewItem);
+		inline void											Add(ZEItemType NewItem);
+		inline ZEItemType*									AddMultiple(ZESize ItemCount);
+		inline void											AddMultiple(const ZEItemType* NewItems, ZESize ItemCount);
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline void						AddMultiple(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline void											AddMultiple(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
-		inline ZEItemType*				Insert(ZESize Index);
-		inline void						Insert(ZESize Index, ZEItemType NewItem);
-		inline ZEItemType*				InsertMultiple(ZESize Index, ZESize ItemCount);
-		inline void						InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
+		inline ZEItemType*									Insert(ZESize Index);
+		inline void											Insert(ZESize Index, ZEItemType NewItem);
+		inline ZEItemType*									InsertMultiple(ZESize Index, ZESize ItemCount);
+		inline void											InsertMultiple(ZESize Index, ZEItemType* NewItems, ZESize ItemCount);
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline void						InsertMultiple(ZESize Index, const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline void											InsertMultiple(ZESize Index, const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
-		inline void						Remove(ZESize Index);
-		inline void						RemoveMultiple(ZESize Index, ZESize Count);
-		inline void						RemoveValue(ZEItemType Value);
+		inline void											Remove(ZESize Index);
+		inline void											RemoveMultiple(ZESize Index, ZESize Count);
+		inline void											RemoveValue(ZEItemType Value);
 		
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline void						Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther, ZELockTypeOther>& OtherArray);
+		inline void											Copy(const ZEArray<ZEItemType, ZEAllocatorTypeOther, ZELockTypeOther>& OtherArray);
 
-		inline void						Clear();
+		inline void											Clear();
 		
-		inline void						Enqueue(ZEItemType Value);
-		inline ZEItemType				Dequeue();
+		inline void											Enqueue(ZEItemType Value);
+		inline ZEItemType									Dequeue();
 
-		inline void						Push(ZEItemType Value);
-		inline ZEItemType				Pop();
+		inline void											Push(ZEItemType Value);
+		inline ZEItemType									Pop();
 
-		inline void						Fill(ZEItemType Value);
-		void							Traverse();
+		inline void											Fill(ZEItemType Value);
+		void												Traverse();
 
 		template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
-		inline void						Sort();
+		inline void											Sort();
 		template<ZEInt CompareFunction(const ZEItemType&, const ZEItemType&)>
-		inline void						Sort2();
-		inline void						Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*));
+		inline void											Sort2();
+		inline void											Sort(ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*));
 
 		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEItemType&, ZESearchValueType)>
-		ZESSize							BinarySearch(ZESearchValueType TargetValue) const;
-		inline ZESSize					BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*));
+		ZESSize												BinarySearch(ZESearchValueType TargetValue) const;
+		inline ZESSize										BinarySearch(const ZEItemType& Element, ZEInt (*CompareFunction)(const ZEItemType*, const ZEItemType*));
 	
-		inline ZEItemType&				operator[](ZESize Index);	
-		inline const ZEItemType&		operator[](ZESize Index) const;
+		inline ZEItemType&									operator[](ZESize Index);	
+		inline const ZEItemType&							operator[](ZESize Index) const;
 
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline ZEArray					operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline ZEArray										operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline ZEArray&					operator+=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
-
-		ZE_ARRAY_OTHER_TEMPLATE
-		inline bool						operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
-		ZE_ARRAY_OTHER_TEMPLATE
-		inline bool						operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline ZEArray&										operator+=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline void						operator=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
-		inline void						operator=(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
+		inline bool											operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline bool											operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
-		void							LockRead() const;
-		void							UnlockRead() const;
+		ZE_ARRAY_OTHER_TEMPLATE
+		inline void											operator=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline void											operator=(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
 
-		void							LockWrite();
-		void							LockWriteNested();
-		void							UnlockWrite();
+		void												LockRead() const;
+		void												UnlockRead() const;
 
-										ZEArray();
-										ZE_ARRAY_OTHER_TEMPLATE
-										ZEArray(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
-										ZEArray(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
-										~ZEArray();
+		void												LockWrite();
+		void												LockWriteNested();
+		void												UnlockWrite();
+
+															ZEArray();
+															ZE_ARRAY_OTHER_TEMPLATE
+															ZEArray(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+															ZEArray(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
+															~ZEArray();
 };
 
 template <typename ZEItemType, typename ZEAllocatorType = ZEAllocatorBase<ZEItemType>>
@@ -203,13 +203,20 @@ class ZEChunkArrayMT : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, C
 ZE_ARRAY_TEMPLATE
 ZEMTType ZEArray<ZE_ARRAY_SPECIALIZATION>::GetType() const
 {
-	ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
-	if (!Type.IsValid() || Type.IsCollection())
+	return ZEMTType();
+
+	// FUCKING FORWARD DECLERATIONS
+	/*ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+
+	if (!Type.IsValid() || Type.IsReference() || Type.IsCollection())
 		return ZEMTType();
 
-	Type.CollectionType = ZEMT_CT_ARRAY;
-	Type.CollectionQualifier = ZEMT_TQ_VALUE;
-	return Type;
+	if (Type.IsConst() && (Type.GetBaseType() != ZEMT_BT_OBJECT_PTR && Type.GetBaseType() != ZEMT_BT_OBJECT_HOLDER))
+		return ZEMTType();
+
+	Type.SetCollectionType(ZEMT_CT_ARRAY);
+	Type.SetCollectionQualifier(ZEMT_TQ_VALUE);
+	return Type;*/
 }
 
 ZE_ARRAY_TEMPLATE

@@ -562,10 +562,20 @@ void ZEMCGenerator::GenerateClassCallMethod(ZEMCClass* CurrentClass)
 				ZEMCMethodParameter* CurrentParameter = &CurrentMethod->Parameters[N];
 	
 				ZEMCType ModifiedParameterType = CurrentParameter->Type;
-				if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_VALUE)
-					ModifiedParameterType.TypeQualifier = ZEMC_TQ_REFERENCE;
-				else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
-					ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
+				if (ModifiedParameterType.CollectionType == ZEMC_CT_NONE)
+				{
+					if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_VALUE)
+						ModifiedParameterType.TypeQualifier = ZEMC_TQ_REFERENCE;
+					else if (CurrentParameter->Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+						ModifiedParameterType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
+				}
+				else
+				{
+					if (CurrentParameter->Type.CollectionQualifier == ZEMC_TQ_VALUE)
+						ModifiedParameterType.CollectionQualifier = ZEMC_TQ_REFERENCE;
+					else if (CurrentParameter->Type.CollectionQualifier == ZEMC_TQ_CONST_VALUE)
+						ModifiedParameterType.CollectionQualifier = ZEMC_TQ_CONST_REFERENCE;
+				}
 
 				ZEString VariantFunctionName;
 				ZEString VariantCastingExpression;

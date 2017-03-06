@@ -56,16 +56,16 @@ bool ZEDPropertyEditorItemNumeric::InitializeInternal()
 
 	const ZEMTProperty* Property = GetProperty();
 
-	if (Property->Type.Type != ZEMT_BT_INTEGER_8&&
-		Property->Type.Type != ZEMT_BT_INTEGER_16	&&
-		Property->Type.Type != ZEMT_BT_INTEGER_32	&&
-		Property->Type.Type != ZEMT_BT_INTEGER_64	&&
-		Property->Type.Type != ZEMT_BT_UNSIGNED_INTEGER_8	&&
-		Property->Type.Type != ZEMT_BT_UNSIGNED_INTEGER_16 &&
-		Property->Type.Type != ZEMT_BT_UNSIGNED_INTEGER_32 &&
-		Property->Type.Type != ZEMT_BT_UNSIGNED_INTEGER_64 &&
-		Property->Type.Type != ZEMT_BT_FLOAT &&
-		Property->Type.Type != ZEMT_BT_DOUBLE)
+	if (Property->Type.GetBaseType() != ZEMT_BT_INTEGER_8&&
+		Property->Type.GetBaseType() != ZEMT_BT_INTEGER_16	&&
+		Property->Type.GetBaseType() != ZEMT_BT_INTEGER_32	&&
+		Property->Type.GetBaseType() != ZEMT_BT_INTEGER_64	&&
+		Property->Type.GetBaseType() != ZEMT_BT_UNSIGNED_INTEGER_8	&&
+		Property->Type.GetBaseType() != ZEMT_BT_UNSIGNED_INTEGER_16 &&
+		Property->Type.GetBaseType() != ZEMT_BT_UNSIGNED_INTEGER_32 &&
+		Property->Type.GetBaseType() != ZEMT_BT_UNSIGNED_INTEGER_64 &&
+		Property->Type.GetBaseType() != ZEMT_BT_FLOAT &&
+		Property->Type.GetBaseType() != ZEMT_BT_DOUBLE)
 	{
 		setText(1, "Type Error");
 		return false;
@@ -98,7 +98,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 	ValueChanged = true;
 
 	Value.SetUndefined();
-	switch(GetProperty()->Type.Type)
+	switch(GetProperty()->Type.GetBaseType())
 	{
 		default:
 		case ZEMT_BT_INTEGER_8:
@@ -289,7 +289,7 @@ void ZEDPropertyEditorItemNumeric::Update()
 	}
 	else
 	{
-		switch (GetProperty()->Type.Type)
+		switch (GetProperty()->Type.GetBaseType())
 		{
 			case ZEMT_BT_INTEGER_8:
 				TextEdit->setText(QString::number(Value.GetInt8()));

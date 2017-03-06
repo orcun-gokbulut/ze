@@ -38,6 +38,11 @@
 #include "ZETest/ZETestCheck.h"
 #include "ZEError.h"
 
+// Unit Tests
+	// Unit Tests
+	// Function Test
+		// Cases
+
 ZETestSuite(ZETimeCounter)
 {
 	ZETest("ZETimeCounter::ZETimeCounter()")
@@ -53,7 +58,7 @@ ZETestSuite(ZETimeCounter)
 	{
 		ZETimeCounter TimeCounter;
 
-		ZEUInt64 Time = TimeCounter.GetTime();
+		ZEUInt64 Time = TimeCounter.GetTimeMicroseconds();
 		ZETestCheckEqual(Time, 0);
 
 		ZETestCase("start time counter")
@@ -64,7 +69,7 @@ ZETestSuite(ZETimeCounter)
 			//TimeCounter.EndTime = 0
 			//TimeCounter.Frequency 2766640
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			//ZETestCheckEqual(Time, 44094391);
 		}
 
@@ -73,7 +78,7 @@ ZETestSuite(ZETimeCounter)
 			TimeCounter.Reset();
 			//TimeCounter.Started true
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			//Time = TimeCounter.EndTime
 		}
 
@@ -82,7 +87,7 @@ ZETestSuite(ZETimeCounter)
 			TimeCounter.Stop();
 			//TimeCounter.Started false
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			//Time = TimeCounter.EndTime
 		}
 
@@ -90,7 +95,7 @@ ZETestSuite(ZETimeCounter)
 		{
 			TimeCounter.SetTime(44094391);
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 		}
 
 		ZETestCase("reset and set time")
@@ -98,7 +103,7 @@ ZETestSuite(ZETimeCounter)
 			TimeCounter.Reset();
 			TimeCounter.SetTime(44094391);
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			ZETestCheckEqual(Time, ZEUInt64(-44094391));
 		}
 	}
@@ -109,7 +114,7 @@ ZETestSuite(ZETimeCounter)
 		//TimeCounter.Started false
 
 		TimeCounter.SetTime(0);
-		ZETestCheckEqual(TimeCounter.GetTime(), 0);
+		ZETestCheckEqual(TimeCounter.GetTimeMicroseconds(), 0);
 
 		ZETestCase("microseconds different from zero")
 		{
@@ -117,7 +122,7 @@ ZETestSuite(ZETimeCounter)
 
 			TimeCounter.SetTime(Microseconds);
 			//TimeCounter.StartTime = Microseconds
-			ZETestCheckEqual(TimeCounter.GetTime(), ZEUInt64(-Microseconds));
+			ZETestCheckEqual(TimeCounter.GetTimeMicroseconds(), ZEUInt64(-Microseconds));
 		}
 
 		ZETestCase("start time counter")

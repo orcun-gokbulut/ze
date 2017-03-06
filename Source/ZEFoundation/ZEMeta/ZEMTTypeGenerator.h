@@ -58,10 +58,7 @@ template<typename ZEItemType, typename ZEAllocatorType, typename ZELockType>
 class ZEArray;
 
 template <typename T, class Enable = void>
-class ZEMTTypeGenerator;
-
-template <typename T>
-class ZEMTTypeGenerator<T>
+class ZEMTTypeGenerator 
 {
 	public:
 		static ZEMTType GetType()
@@ -77,42 +74,156 @@ class ZEMTTypeGenerator<const T>
 		static ZEMTType GetType()
 		{
 			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (Type.Type == ZEMT_BT_UNDEFINED)
+			if (Type.BaseType == ZEMT_BT_UNDEFINED)
 				return ZEMTType();
 
-			Type.Class = NULL;
-			Type.TypeQualifier = ZEMT_TQ_CONST_VALUE;
+			if (Type.IsCollection())
+			{
+				if (Type.CollectionQualifier == ZEMT_TQ_VALUE)
+					Type.CollectionQualifier = ZEMT_TQ_CONST_VALUE;
+				else if (Type.CollectionQualifier == ZEMT_TQ_REFERENCE)
+					Type.CollectionQualifier = ZEMT_TQ_CONST_REFERENCE;
+				else
+					return ZEMTType();
+			}
+			else
+			{
+				// const ZEHolder<>
+				if (Type.BaseType == ZEMT_BT_OBJECT_HOLDER)
+						return ZEMTType();
+
+				if (Type.BaseQualifier == ZEMT_TQ_VALUE)
+					Type.BaseQualifier = ZEMT_TQ_CONST_VALUE;
+				else if (Type.BaseQualifier == ZEMT_TQ_REFERENCE)
+					Type.BaseQualifier = ZEMT_TQ_CONST_REFERENCE;
+				else
+					return ZEMTType();
+			}
+
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEMTTypeGenerator<T &>
+class ZEMTTypeGenerator<T&>
 {
 	public:
 		static ZEMTType GetType()
 		{
 			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (Type.Type == ZEMT_BT_UNDEFINED)
+			if (Type.BaseType == ZEMT_BT_UNDEFINED)
 				return ZEMTType();
 
-			Type.TypeQualifier = ZEMT_TQ_REFERENCE;
+			if (Type.IsCollection())
+			{
+				if (Type.CollectionQualifier == ZEMT_TQ_VALUE)
+					Type.CollectionQualifier = ZEMT_TQ_REFERENCE;
+				else if (Type.CollectionQualifier == ZEMT_TQ_CONST_VALUE)
+					Type.CollectionQualifier = ZEMT_TQ_CONST_REFERENCE;
+				else
+					return ZEMTType();
+			}
+			else
+			{
+				if (Type.BaseQualifier == ZEMT_TQ_VALUE)
+					Type.BaseQualifier = ZEMT_TQ_REFERENCE;
+				else if (Type.BaseQualifier == ZEMT_TQ_CONST_VALUE)
+					Type.BaseQualifier = ZEMT_TQ_CONST_REFERENCE;
+				else
+					return ZEMTType();
+			}
+
 			return Type;
 		}
 };
 
 template <typename T>
-class ZEMTTypeGenerator<const T &>
+class ZEMTTypeGenerator<T, typename std::enable_if<!std::is_const<T>::value && std::is_base_of<ZEObject, T>::value>::type>
+{
+	public:
+		static ZEMTType GetType()
+		{
+			ZEMTType Type;
+			Type.BaseType = ZEMT_BT_OBJECT;
+			Type.BaseQualifier = ZEMT_TQ_VALUE;
+			Type.Declaration = (ZEUInt64)T::Class();
+			return Type;
+		}
+};
+
+template <typename T>
+class ZEMTTypeGenerator<T*, typename std::enable_if<std::is_base_of<ZEObject, T>::value>::type>
+{
+	public:
+		static ZEMTType GetType()
+		{
+			ZEMTType Type;
+			Type.BaseType = ZEMT_BT_OBJECT_PTR;
+			Type.BaseQualifier = ZEMT_TQ_VALUE;
+			Type.Declaration = (ZEUInt64)T::Class();
+			return Type;
+		}
+};
+
+
+template <typename T>
+class ZEMTTypeGenerator<const T*, typename std::enable_if<std::is_base_of<ZEObject, T>::value>::type>
+{
+	public:
+		static ZEMTType GetType()
+		{
+			ZEMTType Type;
+			Type.BaseType = ZEMT_BT_OBJECT_PTR;
+			Type.BaseQualifier = ZEMT_TQ_CONST_VALUE;
+			Type.Declaration = (ZEUInt64)T::Class();
+			return Type;
+		}
+};
+
+template <typename T>
+class ZEMTTypeGenerator<ZEHolder<T>, typename std::enable_if<std::is_base_of<ZEObject, T>::value>::type>
+{
+	public:
+		static ZEMTType GetType()
+		{
+			ZEMTType Type;
+			Type.BaseType = ZEMT_BT_OBJECT_HOLDER;
+			Type.BaseQualifier = ZEMT_TQ_VALUE;
+			Type.Declaration = (ZEUInt64)T::Class();
+			return Type;
+		}
+};
+
+template <typename T>
+class ZEMTTypeGenerator<ZEHolder<const T>, typename std::enable_if<std::is_base_of<ZEObject, T>::value>::type>
+{
+	public:
+		static ZEMTType GetType()
+		{
+			ZEMTType Type;
+			Type.BaseType = ZEMT_BT_OBJECT_HOLDER;
+			Type.BaseQualifier = ZEMT_TQ_CONST_VALUE;
+			Type.Declaration = (ZEUInt64)T::Class();
+			return Type;
+		}
+};
+
+template <typename T, typename A, typename L>
+class ZEMTTypeGenerator<ZEArray<T, A, L>>
 {
 	public:
 		static ZEMTType GetType()
 		{
 			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (Type.Type == ZEMT_BT_UNDEFINED)
+			
+			if (!Type.IsValid() || Type.IsReference() || Type.IsCollection())
 				return ZEMTType();
 
-			Type.Class = NULL;
-			Type.TypeQualifier = ZEMT_TQ_CONST_REFERENCE;
+			if (Type.IsConst() && (Type.GetBaseType() != ZEMT_BT_OBJECT_PTR && Type.GetBaseType() != ZEMT_BT_OBJECT_HOLDER))
+				return ZEMTType();
+
+			Type.CollectionType = ZEMT_CT_ARRAY;
+			Type.CollectionQualifier = ZEMT_TQ_VALUE;
 			return Type;
 		}
 };
@@ -290,138 +401,4 @@ class ZEMTTypeGenerator<ZEClass*>
 {
 	public:
 		static ZEMTType GetType();
-};
-
-template <typename T>
-class ZEMTTypeGenerator<T, typename std::enable_if<std::is_base_of<ZEObject, T>::value>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type;
-			Type.Type = ZEMT_BT_OBJECT;
-			Type.TypeQualifier = ZEMT_TQ_VALUE;
-			Type.Class = T::Class();
-			return Type;
-		}
-};
-
-template <typename T>
-class ZEMTTypeGenerator<T*, typename std::enable_if<std::is_base_of<ZEObject, T>::value>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type;
-			Type.Type = ZEMT_BT_OBJECT;
-			Type.TypeQualifier = ZEMT_TQ_VALUE;
-			Type.Class = T::Class();
-			return Type;
-		}
-};
-
-template <typename T>
-class ZEMTTypeGenerator<const T*, typename std::enable_if<std::is_base_of<ZEObject, T>::value>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type;
-			Type.Type = ZEMT_BT_OBJECT;
-			Type.TypeQualifier = ZEMT_TQ_CONST_VALUE;
-			Type.Class = T::Class();
-			return Type;
-		}
-};
-
-template <typename T>
-class ZEMTTypeGenerator<ZEHolder<T>, typename std::enable_if<std::is_base_of<ZEObject, T>::value>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type;
-			Type.Type = ZEMT_BT_OBJECT_HOLDER;
-			Type.TypeQualifier = ZEMT_TQ_VALUE;
-			Type.Class = T::Class();
-			return Type;
-		}
-};
-
-template <typename T>
-class ZEMTTypeGenerator<ZEHolder<const T>, typename std::enable_if<std::is_base_of<ZEObject, T>::value>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type;
-			Type.Type = ZEMT_BT_OBJECT_HOLDER;
-			Type.TypeQualifier = ZEMT_TQ_CONST_VALUE;
-			Type.Class = T::Class();
-			return Type;
-		}
-};
-
-template <typename T, typename A, typename L>
-class ZEMTTypeGenerator<ZEArray<T, A, L>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (!IsValid() || IsCollection())
-				return ZEMTType();
-
-			Type.CollectionType = ZEMT_CT_ARRAY;
-			Type.CollectionQualifier = ZEMT_TQ_VALUE;
-			return Type;
-		}
-};
-
-template <typename T, typename A, typename L>
-class ZEMTTypeGenerator<const ZEArray<T, A, L>>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (!IsValid() || IsCollection())
-				return ZEMTType();
-
-			Type.CollectionType = ZEMT_CT_ARRAY;
-			Type.CollectionQualifier = ZEMT_TQ_CONST_VALUE;
-			return Type;
-		}
-};
-
-template <typename T, typename A, typename L>
-class ZEMTTypeGenerator<ZEArray<T, A, L>&>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (!IsValid() || IsCollection())
-				return ZEMTType();
-
-			Type.CollectionType = ZEMT_CT_ARRAY;
-			Type.CollectionQualifier = ZEMT_TQ_REFERENCE;
-			return Type;
-		}
-};
-
-template <typename T, typename A, typename L>
-class ZEMTTypeGenerator<const ZEArray<T, A, L>&>
-{
-	public:
-		static ZEMTType GetType()
-		{
-			ZEMTType Type = ZEMTTypeGenerator<T>::GetType();
-			if (!IsValid() || IsCollection())
-				return ZEMTType();
-
-			Type.CollectionType = ZEMT_CT_ARRAY;
-			Type.CollectionQualifier = ZEMT_TQ_CONST_REFERENCE;
-			return Type;
-		}
 };

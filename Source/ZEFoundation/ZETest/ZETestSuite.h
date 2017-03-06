@@ -50,7 +50,7 @@ class ZETestSuiteItem
 		ZETestItem*			Tests[65536];
 		ZEUInt				TotalTestCount;
 		ZETestResult		Result;
-        ZEUInt64			ElapsedTime;
+        double				ElapsedTime;
 		ZEUInt				PassedTestCount;
 
 	public:
@@ -61,7 +61,7 @@ class ZETestSuiteItem
 		bool				RunTests();
 		void				Reset();
 		ZETestResult		GetResult();
-		float				GetElapsedTime();
+		double				GetElapsedTime();
 
 		ZEUInt				GetTotalTestCount();
 		ZEUInt				GetFailedTestCount();

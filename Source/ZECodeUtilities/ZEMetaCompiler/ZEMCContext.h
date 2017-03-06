@@ -315,6 +315,7 @@ class ZEMCClass : public ZEMCDeclaration
 
 		bool								IsAbstract;
 		bool								IsFundamental;
+		bool								IsReferenceCounted;
 
 		bool								HasCreateInstanceMethod;
 		bool								HasPublicCopyConstructor;

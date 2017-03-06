@@ -56,7 +56,7 @@ class ZEMTDeclaration
 
 		virtual const char*					GetName() const = 0;
 		virtual const ZEGUID&				GetGUID() const = 0;
-		virtual const ZEMTAttribute*			GetAttributes() const = 0;
+		virtual const ZEMTAttribute*		GetAttributes() const = 0;
 		virtual ZESize						GetAttributeCount() const = 0;
 
 		const ZEMTAttribute*					GetAttribute(const char* Name) const;

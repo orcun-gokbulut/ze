@@ -39,6 +39,9 @@
 
 #include <string.h>
 #include <stdio.h>
+#include "ZETerminalUtils.h"
+
+
 
 const char* ZETestSuiteItem::GetName()
 {
@@ -54,23 +57,33 @@ void ZETestSuiteItem::RegisterTest(ZETestItem* Test)
 bool ZETestSuiteItem::RunTests()
 {
 	Reset();
-
-	printf("Running Test Suite \"%s\".\n", GetName());
+	printf("Test Suite - %s\n\n", GetName());
 
 	bool CurrentResult = true;
 	for (ZESize I = 0; I < (ZESize)TotalTestCount; I++)
 	{
-		printf("  Test #%Iu/%u - %s.\n", I + 1, TotalTestCount, Tests[I]->GetName());
+		ZETerminalUtils::Reset();
+		printf("Test ");
+		ZETerminalUtils::SetBold(true);
+		printf("#%u/%u", I + 1, TotalTestCount);
+		ZETerminalUtils::Reset();
+		printf(" - %s - ", Tests[I]->GetName());
 
-		if (!Tests[I]->RunTest())
+		if (Tests[I]->RunTest())
 		{
-            printf("  Test #%Iu/%u  - \"%s\"FAILED !!! Elapsed time : %llu microseconds. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
-			CurrentResult = false;
+			PassedTestCount++;
+			ZETerminalUtils::Reset();
+			ZETerminalUtils::SetForgroundColor(ZE_TC_GREEN);
+			ZETerminalUtils::SetBold(true);
+			printf("PASSED");
+			ZETerminalUtils::Reset();
+			printf(" (%f ms)\n", Tests[I]->GetEleapsedTime());
+
 		}
 		else
 		{
-			PassedTestCount++;
-            printf("  Test #%Iu/%u - \"%s\" passed. Elapsed time : %llu microseconds. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
+			printf(" Elapsed Time: %f ms\n\n", Tests[I]->GetEleapsedTime());
+			CurrentResult = false;
 		}
 
 		ElapsedTime += Tests[I]->GetEleapsedTime();
@@ -78,10 +91,30 @@ bool ZETestSuiteItem::RunTests()
 
 	Result = CurrentResult ? ZE_TR_PASSED : ZE_TR_FAILED;
 
+	ZETerminalUtils::Reset();
+	printf("\n\nTest suite \"%s\" has ", GetName());
+	ZETerminalUtils::SetBold(true);
 	if (CurrentResult)
-		printf("Test suite \"%s\" has passed. Total Time : %f ms \n", GetName(), ElapsedTime);
+	{
+		ZETerminalUtils::SetForgroundColor(ZE_TC_GREEN);
+		printf("PASSED\n");
+	}
 	else
-		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %u, Failed test count : %u.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
+	{
+		ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+		printf("FAILED\n");
+	}
+
+	ZETerminalUtils::Reset();
+	printf(
+		" Total Test Count: %u\n"
+		" Passed Test Count: %u\n"
+		" Failed Test Count: %u\n"
+		" Elapsed Time: %f ms\n",
+		TotalTestCount,
+		PassedTestCount,
+		TotalTestCount - PassedTestCount,
+		ElapsedTime);
 
 	return CurrentResult;
 }
@@ -100,7 +133,7 @@ ZETestResult ZETestSuiteItem::GetResult()
 	return Result;
 }
 
-float ZETestSuiteItem::GetElapsedTime()
+double ZETestSuiteItem::GetElapsedTime()
 {
 	return ElapsedTime;
 }

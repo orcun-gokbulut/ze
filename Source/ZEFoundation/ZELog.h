@@ -85,25 +85,25 @@ class ZELog
 		ZESize								LastSessionId;
 		ZEList2<ZELogSession, ZELockRW>*	Sessions;
 
-		void						LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args);
+		void								LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args);
 
-									ZELog();
-									~ZELog();
+											ZELog();
+											~ZELog();
 
 	public:
-		ZELogSession*				GetRootSession();
-		ZELogSession*				GetCurrentSession();
-		ZESize						GetSessionCount();
+		ZELogSession*						GetRootSession();
+		ZELogSession*						GetCurrentSession();
+		ZESize								GetSessionCount();
 
-		void						BeginSession(ZELogSession* Session);
-		void						EndSession(ZELogSession* Session);
+		void								BeginSession(ZELogSession* Session);
+		void								EndSession(ZELogSession* Session);
 
-		void						Log(const char* Module, const char* Format, ...);
-		void						Log(const char* Module, ZELogType Type, const char* Format, ...);
+		void								Log(const char* Module, const char* Format, ...);
+		void								Log(const char* Module, ZELogType Type, const char* Format, ...);
 
 		ZE_ENGINE_EXPORT 
-		static ZELog*				GetInstance();
+		static ZELog*						GetInstance();
 
-		static void					GetModuleName(char* Output, const char* FileName, const char* Function);
-		static const char*			GetLogTypeString(ZELogType Type);
+		static void							GetModuleName(char* Output, const char* FileName, const char* Function);
+		static const char*					GetLogTypeString(ZELogType Type);
 };
