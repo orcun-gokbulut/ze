@@ -34,3 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEHolder.h"
+
+#include "ZEMeta/ZEMTType.h"
+#include "ZEMeta/ZEClass.h"
+
+void ZEHolderBase::SetObjectPtr(ZEReferenceCounted* Pointer)
+{
+	ZEHolder<ZEReferenceCounted>* Holder = static_cast<ZEHolder<ZEReferenceCounted>*>(this);
+	*Holder = Pointer;
+}
+
+void ZEHolderBase::SetObjectPtrConst(const ZEReferenceCounted* Pointer)
+{
+	ZEHolder<const ZEReferenceCounted>* Holder = static_cast<ZEHolder<const ZEReferenceCounted>*>(this);
+	*Holder = Pointer;
+}
+
+ZEReferenceCounted* ZEHolderBase::GetObjectPtr() const
+{
+	const ZEHolder<ZEReferenceCounted>* Holder = static_cast<const ZEHolder<ZEReferenceCounted>*>(this);
+	return Holder->GetPointer();
+}
+
+const ZEReferenceCounted* ZEHolderBase::GetObjectPtrConst() const
+{
+	const ZEHolder<const ZEReferenceCounted>* Holder = static_cast<const ZEHolder<const ZEReferenceCounted>*>(this);
+	return Holder->GetPointer();
+}

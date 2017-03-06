@@ -324,6 +324,7 @@ const char* ZEMCGenerator::ConvertContainerTypeToEnum(ZEMCContainerType Containe
 			return "ZEMT_CT_COLLECTION";
 	}
 }
+
 ZEString ZEMCGenerator::ConvertBaseTypeToName(const ZEMCType& Type)
 {
 	switch (Type.BaseType)
@@ -460,7 +461,7 @@ ZEString ZEMCGenerator::GenerateTypeSignature(const ZEMCType& Type)
 	{
 		Output.Append(">");
 
-		if (Type.CollectionQualifier == ZEMC_TQ_CONST_VALUE || Type.CollectionQualifier == ZEMC_TQ_CONST_REFERENCE)
+		if (Type.CollectionQualifier == ZEMC_TQ_REFERENCE || Type.CollectionQualifier == ZEMC_TQ_CONST_REFERENCE)
 			Output.Append("&");
 	}
 
@@ -469,15 +470,30 @@ ZEString ZEMCGenerator::GenerateTypeSignature(const ZEMCType& Type)
 
 ZEString ZEMCGenerator::GenerateTypeConstructor(const ZEMCType& Type)
 {
-	return ZEFormat::Format("ZEMTType({0}, {1}, {2}, {3}, {4}, {5})",
+	ZEString DeclarationString;
+
+	if (Type.BaseType == ZEMC_BT_OBJECT || Type.BaseType == ZEMC_BT_OBJECT_PTR || Type.BaseType == ZEMC_BT_OBJECT_HOLDER)
+	{
+		if (Type.Class->IsForwardDeclared)
+			DeclarationString = ZEFormat::Format("{0}_Class()", Type.Class->Name);
+		else 
+			DeclarationString = ZEFormat::Format("{0}::Class()", Type.Class->Name);
+	}
+	else if (Type.BaseType == ZEMC_BT_ENUMERATOR || Type.BaseType == ZEMC_BT_FLAGS)
+	{
+		DeclarationString = ZEFormat::Format("{0}_Enumerator()", Type.Enumerator->Name);
+	}
+	else
+	{
+		DeclarationString = "NULL";
+	}
+
+	return ZEFormat::Format("ZEMTType({0}, {1}, {2}, {3}, {4})",
 		ConvertBaseTypeToEnum(Type.BaseType), 
 		ConvertTypeQualifierToEnum(Type.TypeQualifier),
 		ConvertContainerTypeToEnum(Type.CollectionType), 
-		ConvertTypeQualifierToEnum(Type.CollectionQualifier), 
-		Type.BaseType == ZEMC_BT_OBJECT || Type.BaseType == ZEMC_BT_OBJECT_PTR || Type.BaseType == ZEMC_BT_OBJECT_HOLDER ? 
-			(Type.Class->IsForwardDeclared ? ZEFormat::Format("{0}_Class()", Type.Class->Name) : ZEFormat::Format("{0}::Class()", Type.Class->Name)) : 
-			"NULL",
-		Type.BaseType == ZEMC_BT_ENUMERATOR ? ZEFormat::Format("{0}_Enumerator()", Type.Enumerator->Name) : "NULL");
+		ConvertTypeQualifierToEnum(Type.CollectionQualifier),
+		DeclarationString);
 }
 
 const char* ZEMCGenerator::ConvertVariantFunctionTypePostfix(ZEMCBaseType Type)
@@ -574,24 +590,61 @@ const char* ZEMCGenerator::ConvertVariantFunctionTypePostfix(ZEMCBaseType Type)
 	}
 }
 
-const char* ZEMCGenerator::ConvertVariantFunctionQualifierPostfix(const ZEMCTypeQualifier Qualifier)
+const char* ZEMCGenerator::ConvertVariantFunctionQualifierPostfix(ZEMCBaseType Type, ZEMCTypeQualifier Qualifier)
 {
-	switch (Qualifier)
+	if (Type == ZEMC_BT_OBJECT || Type == ZEMC_BT_OBJECT_PTR)
 	{
-		case ZEMC_TQ_VALUE:
-			return "";
+		switch (Qualifier)
+		{
+			case ZEMC_TQ_VALUE:
+				return "";
 
-		case ZEMC_TQ_CONST_VALUE:
-			return "Const";
+			case ZEMC_TQ_CONST_VALUE:
+				return "Const";
 
-		case ZEMC_TQ_REFERENCE:
-			return "Ref";
+			case ZEMC_TQ_REFERENCE:
+				return "Ref";
 
-		case  ZEMC_TQ_CONST_REFERENCE:
-			return "RefConst";
+			case  ZEMC_TQ_CONST_REFERENCE:
+				return "ConstRef";
 
-		default:
-			return NULL;
+			default:
+				return NULL;
+		}
+	}
+	else if (Type == ZEMC_BT_OBJECT_HOLDER || Type == ZEMC_BT_CLASS)
+	{
+		switch (Qualifier)
+		{
+			case ZEMC_TQ_VALUE:
+			case ZEMC_TQ_CONST_VALUE:
+				return "";
+
+			case ZEMC_TQ_REFERENCE:
+			case  ZEMC_TQ_CONST_REFERENCE:
+				return "Ref";
+
+			default:
+				return NULL;
+		}
+	}
+	else
+	{
+		switch (Qualifier)
+		{
+			case ZEMC_TQ_VALUE:
+			case ZEMC_TQ_CONST_VALUE:
+				return "";
+
+			case ZEMC_TQ_REFERENCE:
+				return "Ref";
+
+			case  ZEMC_TQ_CONST_REFERENCE:
+				return "ConstRef";
+
+			default:
+				return NULL;
+		}
 	}
 }
 
@@ -602,14 +655,16 @@ void ZEMCGenerator::GenerateVariantSetter(const ZEMCType& Type, ZEString& Functi
 	if (Type.CollectionType != ZEMC_CT_NONE)
 	{
 		FunctionName.Append("Collection");
-		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.CollectionQualifier));
+		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(ZEMC_BT_UNDEFINED, Type.CollectionQualifier));
+		if (Type.CollectionType == ZEMC_CT_ARRAY)
+			CastingExpression = ZEFormat::Format("({0})", GenerateTypeSignature(Type));
 	}
 	else
 	{
 		FunctionName.Append(ConvertVariantFunctionTypePostfix(Type.BaseType));
-		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.TypeQualifier));
-		if (Type.BaseType == ZEMC_BT_OBJECT)
-			CastingExpression = "&";
+		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.BaseType, Type.TypeQualifier));
+		if (Type.BaseType == ZEMC_BT_OBJECT_PTR)
+			CastingExpression = "(ZEObject*)";
 	}
 }
 
@@ -620,21 +675,32 @@ void ZEMCGenerator::GenerateVariantGetter(const ZEMCType& Type, ZEString& Functi
 	if (Type.CollectionType != ZEMC_CT_NONE)
 	{
 		FunctionName.Append("Collection");
-		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.CollectionQualifier));
-		if (Type.BaseType == ZEMC_BT_ENUMERATOR)
-			CastingExpression = Type.Enumerator->Name;
-	}
+		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(ZEMC_BT_OBJECT, Type.CollectionQualifier));
+		if (Type.CollectionType == ZEMC_CT_ARRAY)
+			CastingExpression = ZEFormat::Format("({0})", GenerateTypeSignature(Type));	}
 	else
 	{
 		FunctionName.Append(ConvertVariantFunctionTypePostfix(Type.BaseType));
-		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.TypeQualifier));
+		FunctionName.Append(ConvertVariantFunctionQualifierPostfix(Type.BaseType, Type.TypeQualifier));
 
 		if (Type.BaseType == ZEMC_BT_OBJECT)
-			CastingExpression = "*";
+		{
+			ZEMCType ModifiedType = Type;
+			if (Type.TypeQualifier == ZEMC_TQ_VALUE)
+				ModifiedType.TypeQualifier = ZEMC_TQ_REFERENCE;
+			else if (Type.TypeQualifier == ZEMC_TQ_CONST_VALUE)
+				ModifiedType.TypeQualifier = ZEMC_TQ_CONST_REFERENCE;
+
+			CastingExpression = ZEFormat::Format("({0})", GenerateTypeSignature(ModifiedType));
+		}
 		else if (Type.BaseType == ZEMC_BT_OBJECT_PTR || Type.BaseType == ZEMC_BT_OBJECT_HOLDER)
-			CastingExpression = ZEFormat::Format("({0}*)", Type.Class->Name);
+		{
+			CastingExpression = ZEFormat::Format("({0})", GenerateTypeSignature(Type));
+		}
 		else if (Type.BaseType == ZEMC_BT_ENUMERATOR || Type.BaseType == ZEMC_BT_FLAGS)
-			CastingExpression = ZEFormat::Format("({0})", Type.Enumerator->Name);
+		{
+			CastingExpression = ZEFormat::Format("({0})", GenerateTypeSignature(Type));
+		}
 	}
 }
 

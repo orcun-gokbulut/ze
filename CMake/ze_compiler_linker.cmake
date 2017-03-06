@@ -51,7 +51,9 @@ macro (ze_compiler_linker_msvc)
 	# /Og Global Optimization
 	# /Oy Omit Frame-Pointer
 	# /Oi Enable Instrint Functions
-	# /ZI Debug Information Format /Zi (PDB) /ZI (PDB with Edit and Continue)
+	# /Zi Debug Information Format (PDB) 
+	# /ZI Debug Information Format (PDB with Edit and Continue)
+	# /d2Zi+ Debug Optimized Code (Also /Zo in VS2013 Update3+)
 	# /IGNORE:4099 Ignore PDB file not found problem
 	
 	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
@@ -65,7 +67,7 @@ macro (ze_compiler_linker_msvc)
 	string(REPLACE "/GS" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	string(REPLACE "/GT" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 
-	set(ZEBUID_COMPILER_FLAGS_RELEASE "/fp:fast /GL /GT- /GS- /GR- /Zi /Ox /Ob2 /Oi /Ot /Oy /Gs /GF /Gy")
+	set(ZEBUID_COMPILER_FLAGS_RELEASE "/fp:fast /GL /GT- /GS- /GR- /Zi /d2Zi+ /Ox /Ob2 /Oi /Ot /Oy /Gs /GF /Gy")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${ZEBUID_COMPILER_FLAGS_RELEASE}")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${ZEBUID_COMPILER_FLAGS_RELEASE}")
 	

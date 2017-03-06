@@ -382,13 +382,13 @@ bool ZESector::Serialize(ZEMLWriterNode* Serializer)
 	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 	{
 		const ZEMTProperty* Current = &Properties[I];
-		if (Current->Type.ContainerType != ZEMT_CT_NONE)
+		if (Current->Type.GetCollectionType() != ZEMT_CT_NONE)
 			continue;
 
-		if (Current->Type.TypeQualifier != ZEMT_TQ_VALUE)
+		if (Current->Type.GetBaseQualifier() != ZEMT_TQ_VALUE)
 			continue;
 
-		if (Current->Type.Type == ZEMT_BT_OBJECT || Current->Type.Type == ZEMT_BT_OBJECT_PTR)
+		if (Current->Type.GetBaseType() == ZEMT_BT_OBJECT || Current->Type.GetBaseType() == ZEMT_BT_OBJECT_PTR)
 			continue;
 
 		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)

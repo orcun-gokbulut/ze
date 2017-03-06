@@ -86,17 +86,33 @@ static inline ZEUInt64 GetFreq()
     #endif
 }
 
-ZEUInt64 ZETimeCounter::GetTime()
+double ZETimeCounter::GetTimeSeconds() const
 {
-    if (Started)
+	if (Running)
+		EndTime = GetClock();
+
+	return (double)(EndTime - StartTime) / (double)Frequency;
+}
+
+double ZETimeCounter::GetTimeMilliseconds() const
+{
+	if (Running)
+		EndTime = GetClock();
+
+	return ((double)(EndTime - StartTime) * 1000.0) / (double)Frequency;
+}
+
+ZEUInt64 ZETimeCounter::GetTimeMicroseconds() const
+{
+    if (Running)
         EndTime = GetClock();
 
-    return (EndTime - StartTime) / (Frequency / 1000000);
+	return ((EndTime - StartTime) * 1000000ull) / Frequency;
 }
 
 void ZETimeCounter::SetTime(ZEUInt64 Microseconds)
 {
-    StartTime = Microseconds * Frequency / (ZEUInt64)1000000;
+    StartTime = (Microseconds * 100000ull) / Frequency;
 }
 
 void ZETimeCounter::Reset()
@@ -111,17 +127,17 @@ void ZETimeCounter::Start()
     Reset();
     Frequency = GetFreq();
     StartTime = GetClock();
-    Started = true;
+    Running = true;
 }
 
 void ZETimeCounter::Stop()
 {
     EndTime = GetClock();
-    Started = false;
+    Running = false;
 }
 
 ZETimeCounter::ZETimeCounter()
 {
-    Started = false;
+    Running = false;
 	Reset();
 }

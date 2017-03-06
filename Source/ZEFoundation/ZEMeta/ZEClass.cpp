@@ -295,6 +295,11 @@ bool ZEClass::CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant
 	return CallMethod(Object, MethodId, ReturnValue, Parameters, ParameterCount);
 }
 
+bool ZEClass::CallMethodConst(const ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const
+{
+	return false;
+}
+
 ZESize ZEClass::GetPropertyId(const ZEString& PropertyName) const
 {
 	return -1;
@@ -354,6 +359,21 @@ bool ZEClass::Assign(ZEObject* Object, const ZEObject* Source) const
 	*(ZEObject*)Object = *CastedSource;
 
 	return true;
+}
+
+bool ZEClass::Copy(ZEObject* Destination, const ZEObject* Source) const
+{
+	return false;
+}
+
+bool ZEClass::Equals(ZEObject* A, const ZEObject* B) const
+{
+	return false;
+}
+
+bool ZEClass::NotEquals(ZEObject* A, const ZEObject* B) const
+{
+	return false;
 }
 
 ZEObject* ZEClass::CreateScriptInstance() const
@@ -425,11 +445,11 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 		if (!GetProperty(Object, Property->ID, Value))
 			continue;
 
-		if (PropertyDescription->Type.Enumerator != NULL)
+		if (PropertyDescription->Type.GetBaseType() == ZEMT_BT_ENUMERATOR)
 		{
-			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEMTEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
-
+			ZEMTEnumerator* Enumurator = PropertyDescription->Type.GetEnumerator();
+			ZESize EnumeratorItemCount = Enumurator->GetItemCount();
+			const ZEMTEnumeratorItem* EnumeratorItems = Enumurator->GetItems();
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{
 				if (EnumeratorItems[I].Value != Value.GetInt32())
@@ -492,10 +512,11 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 		}
 
 		// Handle Enumerations
-		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.Enumerator != NULL)
+		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.GetBaseType() == ZEMT_BT_ENUMERATOR)
 		{
-			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEMTEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
+			ZEMTEnumerator* Enumerator = PropertyDescription->Type.GetEnumerator();
+			ZESize EnumeratorItemCount = Enumerator->GetItemCount();
+			const ZEMTEnumeratorItem* EnumeratorItems = Enumerator->GetItems();
 
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{

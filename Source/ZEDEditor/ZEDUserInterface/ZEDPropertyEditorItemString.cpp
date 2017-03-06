@@ -57,7 +57,7 @@ bool ZEDPropertyEditorItemString::InitializeInternal()
 	}
 
 	const ZEMTProperty* Property = GetProperty();
-	if (Property->Type.Type != ZEMT_BT_STRING)
+	if (Property->Type.GetBaseType() != ZEMT_BT_STRING)
 	{
 		setText(1, "Type Error");
 		return false;

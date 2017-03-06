@@ -53,7 +53,7 @@
 
 void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize MemberIndex, double MemberValue)
 {
-	switch (GetProperty()->Type.Type)
+	switch (GetProperty()->Type.GetBaseType())
 	{
 		case ZEMT_BT_VECTOR2:
 		{
@@ -161,7 +161,7 @@ void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize Mem
 
 double ZEDPropertyEditorItemVector::GetMemeberValue(const ZEVariant& Variant, ZESize MemberIndex)
 {
-	switch (GetProperty()->Type.Type)
+	switch (GetProperty()->Type.GetBaseType())
 	{
 		case ZEMT_BT_VECTOR2:
 			return Variant.GetVector2().M[MemberIndex];
@@ -233,7 +233,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 	}
 
 	const ZEMTProperty* Property = GetProperty();
-	switch (GetProperty()->Type.Type)
+	switch (GetProperty()->Type.GetBaseType())
 	{
 		case ZEMT_BT_VECTOR2:
 		case ZEMT_BT_VECTOR2D:
@@ -345,10 +345,10 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 	const char* Type = Property->GetAttributeValue("ZEDEditor.PropertyEditor.Semantic");
 	if (strcmp(Type, "Color") == 0 && 
-		(Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D ||
-		Property->Type.Type == ZEMT_BT_VECTOR4 || Property->Type.Type == ZEMT_BT_VECTOR4D))
+		(Property->Type.GetBaseType() == ZEMT_BT_VECTOR3 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR3D ||
+		Property->Type.GetBaseType() == ZEMT_BT_VECTOR4 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR4D))
 	{
-		if (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D)
+		if (Property->Type.GetBaseType() == ZEMT_BT_VECTOR3 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR3D)
 		{
 			Labels[0] = "Red";
 			Labels[1] = "Green";
@@ -358,7 +358,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 			ShortLabels[1] = "g";
 			ShortLabels[2] = "b";
 		}
-		else if (Property->Type.Type == ZEMT_BT_VECTOR4 || Property->Type.Type == ZEMT_BT_VECTOR4D)
+		else if (Property->Type.GetBaseType() == ZEMT_BT_VECTOR4 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR4D)
 		{
 			Labels[0] = "Red";
 			Labels[1] = "Green";
@@ -381,7 +381,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 		Detail = true;
 	}
-	else if (strcmp(Type, "EulerAngles") == 0 && (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D))
+	else if (strcmp(Type, "EulerAngles") == 0 && (Property->Type.GetBaseType() == ZEMT_BT_VECTOR3 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR3D))
 	{
 		Labels[0] = "Euler.x (Pitch)";
 		Labels[1] = "Euler.y (Yaw)";
@@ -393,7 +393,7 @@ bool ZEDPropertyEditorItemVector::InitializeInternal()
 
 		IsEulerAngles = true;
 	}
-	else if (strcmp(Type, "Attenuation") == 0 && (Property->Type.Type == ZEMT_BT_VECTOR3 || Property->Type.Type == ZEMT_BT_VECTOR3D))
+	else if (strcmp(Type, "Attenuation") == 0 && (Property->Type.GetBaseType() == ZEMT_BT_VECTOR3 || Property->Type.GetBaseType() == ZEMT_BT_VECTOR3D))
 	{
 		Labels[0] = "Constant";
 		Labels[1] = "Linear";
@@ -520,7 +520,7 @@ void ZEDPropertyEditorItemVector::DetailButton_clicked()
 		CurrentColor.setGreenF(TextEdits[1]->text().toFloat());
 		CurrentColor.setBlueF(TextEdits[2]->text().toFloat());
 
-		if (GetProperty()->Type.Type == ZEMT_BT_VECTOR4 || GetProperty()->Type.Type ==  ZEMT_BT_VECTOR4D)
+		if (GetProperty()->Type.GetBaseType() == ZEMT_BT_VECTOR4 || GetProperty()->Type.GetBaseType() ==  ZEMT_BT_VECTOR4D)
 		{
 			CurrentColor.setAlphaF(TextEdits[3]->text().toFloat());
 			Dialog.setOptions(QColorDialog::ShowAlphaChannel);
@@ -532,7 +532,7 @@ void ZEDPropertyEditorItemVector::DetailButton_clicked()
 		if (Dialog.result() == QDialog::Rejected)
 			return;
 
-		switch (GetProperty()->Type.Type)
+		switch (GetProperty()->Type.GetBaseType())
 		{
 			case ZEMT_BT_VECTOR3:
 				Changed(ZEVector3(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF()));
@@ -626,7 +626,7 @@ void ZEDPropertyEditorItemVector::Update()
 		}	
 	}
 
-	switch(GetProperty()->Type.Type)
+	switch(GetProperty()->Type.GetBaseType())
 	{
 		case ZEMT_BT_VECTOR2:
 		case ZEMT_BT_VECTOR2D:
@@ -663,7 +663,7 @@ void ZEDPropertyEditorItemVector::Update()
 		if (VectorMembersMultiValue[0] ||
 			VectorMembersMultiValue[1] ||
 			VectorMembersMultiValue[2] ||
-			((GetProperty()->Type.Type == ZEMT_BT_VECTOR4 || GetProperty()->Type.Type == ZEMT_BT_VECTOR4D) && VectorMembersMultiValue[3]))
+			((GetProperty()->Type.GetBaseType() == ZEMT_BT_VECTOR4 || GetProperty()->Type.GetBaseType() == ZEMT_BT_VECTOR4D) && VectorMembersMultiValue[3]))
 		{
 			ColorBox->setStyleSheet(
 				"* { "

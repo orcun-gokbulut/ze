@@ -114,8 +114,7 @@ class ZEOctree
 		ZEInt									FindOctant(const ZEVector3& Point) const;
 		ZEInt									FindOctant(const ZEAABBox& BoundingBox) const;
 
-		const ZEArray<ZEItemType>&				GetItems();
-		const ZEArray<const ZEItemType>&		GetItems() const;
+		const ZEArray<ZEItemType>&				GetItems() const;
 
 		ZEOctree*								AddItem(const ZEItemType& Item, const ZEVector3& Point);
 		ZEOctree*								AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
@@ -625,15 +624,9 @@ ZEUInt ZEOctree<ZE_OCTREE_SPEC>::GetMaxDepth()  const
 }
 
 ZE_OCTREE_TEMPLATE
-const ZEArray<ZEItemType>& ZEOctree<ZE_OCTREE_SPEC>::GetItems() 
+const ZEArray<ZEItemType>& ZEOctree<ZE_OCTREE_SPEC>::GetItems() const
 {
 	return Items;
-}
-
-ZE_OCTREE_TEMPLATE
-const ZEArray<const ZEItemType>& ZEOctree<ZE_OCTREE_SPEC>::GetItems() const
-{
-	return reinterpret_cast<const ZEArray<const ZEItemType>&>(Items);
 }
 
 ZE_OCTREE_TEMPLATE

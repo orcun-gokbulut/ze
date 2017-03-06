@@ -37,10 +37,25 @@
 
 #include "ZEError.h"
 #include "ZEReferenceCounted.h"
+#include "ZEMeta/ZEMTType.h"
+#include "ZEMeta/ZEMTTypeGenerator.h"
+
+class ZEObject;
+
+class ZEHolderBase
+{
+	public:
+		void								SetObjectPtr(ZEReferenceCounted* RawPointer);
+		void								SetObjectPtrConst(const ZEReferenceCounted* RawPointer);
+
+		ZEReferenceCounted*					GetObjectPtr() const;
+		const ZEReferenceCounted*			GetObjectPtrConst() const;
+};
 
 template<typename Type>
-class ZEHolder
+class ZEHolder : public ZEHolderBase
 {
+	friend class ZEHolderBase;
 	private:
 		const ZEReferenceCounted*			Pointer;
 
@@ -74,6 +89,10 @@ class ZEHolder
 											~ZEHolder();
 };
 
+
+// IMPLEMENTATION
+//////////////////////////////////////////////////////////////////////////////////////
+
 template<typename Type>
 bool ZEHolder<Type>::IsNull() const
 {
@@ -83,7 +102,7 @@ bool ZEHolder<Type>::IsNull() const
 template<typename Type>
 Type* ZEHolder<Type>::GetPointer() const
 {
-	return static_cast<Type*>(const_cast<ZEReferenceCounted*>(Pointer));
+	return reinterpret_cast<Type*>(const_cast<ZEReferenceCounted*>(Pointer));
 }
 
 template<typename Type>
@@ -92,17 +111,17 @@ Type& ZEHolder<Type>::GetValue() const
 	return *GetPointer();
 }
 template<typename Type>
-void ZEHolder<Type>::Reference(Type* RawPointer)
+void ZEHolder<Type>::Reference(Type* Pointer)
 {
-	const ZEReferenceCounted* CastedPointer = static_cast<const ZEReferenceCounted*>(RawPointer);
-	if (Pointer == CastedPointer)
+	const ZEReferenceCounted* CastedPointer = reinterpret_cast<const ZEReferenceCounted*>(Pointer);
+	if (this->Pointer == CastedPointer)
 		return;
 
 	Release();
 
-	Pointer = CastedPointer;
-	if (Pointer != NULL)
-		Pointer->Reference();
+	this->Pointer = CastedPointer;
+	if (this->Pointer != NULL)
+		this->Pointer->Reference();
 }
 
 template<typename Type>
@@ -125,10 +144,11 @@ void ZEHolder<Type>::Copy(const ZEHolder<Type>& OtherHolder)
 }
 
 template<typename Type>
-void ZEHolder<Type>::Overwrite(Type* RawPointer)
+void ZEHolder<Type>::Overwrite(Type* Pointer)
 {
+	const ZEReferenceCounted* CastedPointer = reinterpret_cast<const ZEReferenceCounted*>(Pointer);
 	Release();
-	Pointer = RawPointer;
+	this->Pointer = CastedPointer;
 }
 
 template<typename Type>
@@ -168,9 +188,9 @@ Type* ZEHolder<Type>::operator->() const
 }
 
 template<typename Type>
-ZEHolder<Type>& ZEHolder<Type>::operator=(Type* RawPointer)
+ZEHolder<Type>& ZEHolder<Type>::operator=(Type* Pointer)
 {
-	Reference(RawPointer);
+	Reference(Pointer);
 	return *this;
 }
 
@@ -196,10 +216,10 @@ ZEHolder<Type>::ZEHolder()
 }
 
 template<typename Type>
-ZEHolder<Type>::ZEHolder(Type* RawPointer)
+ZEHolder<Type>::ZEHolder(Type* Pointer)
 {
-	Pointer = NULL;
-	Reference(RawPointer);
+	this->Pointer = NULL;
+	Reference(Pointer);
 }
 
 template<typename Type>

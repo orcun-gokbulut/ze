@@ -65,7 +65,7 @@ class ZEMCGenerator
 
 		// Variant
 		const char*				ConvertVariantFunctionTypePostfix(ZEMCBaseType Type);
-		const char*				ConvertVariantFunctionQualifierPostfix(ZEMCTypeQualifier Qualifier);
+		const char*				ConvertVariantFunctionQualifierPostfix(ZEMCBaseType Type, ZEMCTypeQualifier Qualifier);
 		void					GenerateVariantSetter(const ZEMCType& Type, ZEString& FunctionName, ZEString& CastingExpression);
 		void					GenerateVariantGetter(const ZEMCType& Type, ZEString& FunctionName, ZEString& CastingExpression);
 
@@ -84,7 +84,7 @@ class ZEMCGenerator
 		void					GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaration);
 		void					GenerateDeclarationGetAttributeCount(ZEMCDeclaration* Declaration);
 
-		// Enumurator
+		// Enumerator
 		void					GenerateEnumeratorMacros(ZEMCEnumerator* Enumerator);
 		void					GenerateEnumeratorGetItems(ZEMCEnumerator* Enumerator);
 		void					GenerateEnumeratorGetItemCount(ZEMCEnumerator* Enumerator);

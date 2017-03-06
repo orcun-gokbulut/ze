@@ -194,7 +194,7 @@ int main(int Argc, const char** Argv)
 	if (!Parser.Parse())
 		Error("Cannot parse input file.");
 	if (Options.Benchmark)
-		printf("Parser is done. It took %I64u microseconds.\n", Counter.GetTime());
+		printf("Parser is done. It took %I64u microseconds.\n", Counter.GetTimeMicroseconds());
 		
 	ZEMCGenerator Generator;
 	Generator.SetOptions(&Options);
@@ -202,13 +202,13 @@ int main(int Argc, const char** Argv)
 	if (!Generator.Generate())
 		Error("Cannot generate ZEMeta file.");
 	if (Options.Benchmark)
-		printf("Generator is done. It took %I64u microseconds.\n", Counter.GetTime());
+		printf("Generator is done. It took %I64u microseconds.\n", Counter.GetTimeMicroseconds());
 
 	ZEMCRegisterer Registerer;
 	Registerer.SetOptions(&Options);
 	Registerer.GenerateRegisterFile(&Context);
 	if (Options.Benchmark)
-		printf("Registerer is done. It took %I64u microseconds.\n", Counter.GetTime());
+		printf("Registerer is done. It took %I64u microseconds.\n", Counter.GetTimeMicroseconds());
 
 	Counter.Stop();
 

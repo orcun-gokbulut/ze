@@ -115,33 +115,16 @@ bool ZETestManager::RunTests()
 
 void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, ZEInt Line)
 {
-	const char* TypeString;
-
-	switch(Type)
-	{
-		default:
-		case ZE_TPT_ERROR:
-			TypeString = "error";
-			break;
-
-		case ZE_TPT_WARNING:
-			TypeString = "warning";
-			break;
-
-		case ZE_TPT_NOTICE:
-			TypeString = "info";
-			break;
-	}
+	if (!VisualStudioOutput)
+		return;
 
 	if (Type == ZE_TPT_ERROR)
 	{
-		printf("  Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 		if (VisualStudioOutput)
 			printf("  %s(%d) : warning T0001: Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 	}
 	else
 	{
-		printf("  Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 		if (VisualStudioOutput)
 			printf("  %s(%d) : warning T0002: Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 	}

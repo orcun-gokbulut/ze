@@ -36,11 +36,13 @@
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
 
-bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class, bool& IsReferenceCounted)
 {
 	bool Result = false;
 	if (Class->getName() == "ZEObject")
 		Result = true;
+	else if (Class->getName() == "ZEReferenceCounted")
+		IsReferenceCounted = true;
 
 	if(Class->isCompleteDefinition())
 	{
@@ -49,7 +51,7 @@ bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 			if (!CurrentBaseClass->getType()->isClassType())
 				continue;
 
-			bool SubResult = CheckClassHasDerivedFromZEObject(CurrentBaseClass->getType()->getAsCXXRecordDecl());
+			bool SubResult = CheckClassHasDerivedFromZEObject(CurrentBaseClass->getType()->getAsCXXRecordDecl(), IsReferenceCounted);
 
 			if (CurrentBaseClass->getAccessSpecifier() != AccessSpecifier::AS_public)
 			{
@@ -62,7 +64,9 @@ bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 				RaiseError(CurrentBaseClass->getType()->getAsCXXRecordDecl()->getLocation(), "Class s\" has inherited ZEObject multiple times in it's inheritance tree. Check it's parents.");
 			}
 			else if (SubResult)
+			{
 				Result = true;
+			}
 		}
 	}
 
@@ -150,9 +154,9 @@ bool ZEMCParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 	return true;
 }
 
-bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClass(CXXRecordDecl* Class, bool& IsReferenceCounted)
 {
-	if (!CheckClassHasDerivedFromZEObject(Class))
+	if (!CheckClassHasDerivedFromZEObject(Class, IsReferenceCounted))
 		return false;
 
 	if (Class->isTemplateDecl())
@@ -199,8 +203,9 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	if (!Class->isCompleteDefinition())
 		return;
 
+	bool IsReferenceCounted = false;
 	bool FundamentalClass = CheckFundamentalClass(Class);
-	if (!FundamentalClass && !CheckClass(Class))
+	if (!FundamentalClass && !CheckClass(Class, IsReferenceCounted))
 		return;
 	
 	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
@@ -225,6 +230,7 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;
+	ClassData->IsReferenceCounted = IsReferenceCounted;
 
 	if (!ClassData->IsFundamental && ClassData->Name != "ZEObject")
 	{

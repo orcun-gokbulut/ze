@@ -43,6 +43,7 @@
 #include "ZEArray.h"
 #include "ZEList.h"
 #include "ZEValue.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEMeta/ZEMTType.h"
 #include "ZEMeta/ZEMTTypeGenerator.h"
 
@@ -59,6 +60,7 @@ class ZEMatrix4x4;
 class ZEMatrix4x4d;
 class ZEClass;
 class ZEObject;
+class ZEHolderBase;
 class ZEReference;
 
 class ZEVariant
@@ -79,6 +81,7 @@ class ZEVariant
 				double					DoubleVectors[4];
 				void*					Pointer;
 			};
+			ZEHolder<const ZEReferenceCounted> Holder;
 			ZEString					String;
 		} Value;
 
@@ -140,84 +143,86 @@ class ZEVariant
 		void							SetUInt64ConstRef(const ZEUInt64& Reference);
 
 		void							SetFloat(float Value);
-		void							SetFloatRef(float& Value);
-		void							SetFloatConstRef(const float& Value);
+		void							SetFloatRef(float& Reference);
+		void							SetFloatConstRef(const float& Reference);
 
 		void							SetDouble(double Value);
-		void							SetDoubleRef(double& Value);
-		void							SetDoubleConstRef(const double & Value);
+		void							SetDoubleRef(double& Reference);
+		void							SetDoubleConstRef(const double& Reference);
 
 		void							SetBool(bool Value);
-		void							SetBoolRef(bool& Value);
-		void							SetBoolConstRef(const bool & Value);
-
-		void							SetEnum(ZEInt32 Value);
+		void							SetBoolRef(bool& Reference);
+		void							SetBoolConstRef(const bool& Reference);
 
 		void							SetVector2(const ZEVector2& Value);
-		void							SetVector2Ref(ZEVector2& Value);
-		void							SetVector2ConstRef(const ZEVector2& Value);
+		void							SetVector2Ref(ZEVector2& Reference);
+		void							SetVector2ConstRef(const ZEVector2& Reference);
 
 		void							SetVector2d(const ZEVector2d& Value);
-		void							SetVector2dRef(ZEVector2d& Value);
-		void							SetVector2dConstRef(const ZEVector2d& Value);
+		void							SetVector2dRef(ZEVector2d& Reference);
+		void							SetVector2dConstRef(const ZEVector2d& Reference);
 
 		void							SetVector3(const ZEVector3& Value);
-		void							SetVector3Ref(ZEVector3& Value);
-		void							SetVector3ConstRef(const ZEVector3& Value);
+		void							SetVector3Ref(ZEVector3& Reference);
+		void							SetVector3ConstRef(const ZEVector3& Reference);
 
 		void							SetVector3d(const ZEVector3d& Value);
-		void							SetVector3dRef(ZEVector3d& Value);
-		void							SetVector3dConstRef(const ZEVector3d& Value);
+		void							SetVector3dRef(ZEVector3d& Reference);
+		void							SetVector3dConstRef(const ZEVector3d& Reference);
 
 		void							SetVector4(const ZEVector4& Value);
-		void							SetVector4Ref(ZEVector4& Value);
-		void							SetVector4ConstRef(const ZEVector4& Value);
+		void							SetVector4Ref(ZEVector4& Reference);
+		void							SetVector4ConstRef(const ZEVector4& Reference);
 
 		void							SetVector4d(const ZEVector4d& Value);
-		void							SetVector4dRef(ZEVector4d& Value);
-		void							SetVector4dConstRef(const ZEVector4d& Value);
+		void							SetVector4dRef(ZEVector4d& Reference);
+		void							SetVector4dConstRef(const ZEVector4d& Reference);
 		
 		void							SetQuaternion(const ZEQuaternion& Value);
-		void							SetQuaternionRef(ZEQuaternion& Value);
-		void							SetQuaternionConstRef(const ZEQuaternion& Value);
+		void							SetQuaternionRef(ZEQuaternion& Reference);
+		void							SetQuaternionConstRef(const ZEQuaternion& Reference);
 
 		void							SetMatrix3x3(const ZEMatrix3x3& Value);
-		void							SetMatrix3x3Ref(ZEMatrix3x3& Value);
-		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Value);
+		void							SetMatrix3x3Ref(ZEMatrix3x3& Reference);
+		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Reference);
 
 		void							SetMatrix3x3d(const ZEMatrix3x3d& Value);
-		void							SetMatrix3x3dRef(ZEMatrix3x3d& Value);
-		void							SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value);
+		void							SetMatrix3x3dRef(ZEMatrix3x3d& Reference);
+		void							SetMatrix3x3dConstRef(const ZEMatrix3x3d& Reference);
 
 		void							SetMatrix4x4(const ZEMatrix4x4& Value);
-		void							SetMatrix4x4Ref(ZEMatrix4x4& Value);
-		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Value);
+		void							SetMatrix4x4Ref(ZEMatrix4x4& Reference);
+		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Reference);
 
 		void							SetMatrix4x4d(const ZEMatrix4x4d& Value);
-		void							SetMatrix4x4dRef(ZEMatrix4x4d& Value);
-		void							SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value);
+		void							SetMatrix4x4dRef(ZEMatrix4x4d& Reference);
+		void							SetMatrix4x4dConstRef(const ZEMatrix4x4d& Reference);
 
 		void							SetString(const ZEString& Value);
-		void							SetStringRef(ZEString& Value);
-		void							SetStringConstRef(const ZEString& Value);
+		void							SetStringRef(ZEString& Reference);
+		void							SetStringConstRef(const ZEString& Reference);
 
-		void							SetObject(ZEObject* Object);
-		void							SetObjectConst(const ZEObject* Object);
-		void							SetObjectRef(ZEObject*& Object);
-		void							SetObjectConstRef(const ZEObject*& Object);
+		void							SetObject(ZEObject& Object);
+		void							SetObjectConst(const ZEObject& Reference);
+		void							SetObjectRef(ZEObject& Reference);
+		void							SetObjectConstRef(const ZEObject& Reference);
 
 		void							SetObjectPtr(ZEObject* Object);
-		void							SetObjectPtrConst(const ZEObject* Object);
-		void							SetObjectPtrRef(ZEObject*& Object);
-		void							SetObjectPtrConstRef(const ZEObject*& Object);
+		void							SetObjectPtrConst(const ZEObject* Reference);
+		void							SetObjectPtrRef(ZEObject*& Reference);
+		void							SetObjectPtrConstRef(const ZEObject*& Reference);
+
+		void							SetObjectHolder(ZEHolderBase& Object);
+		void							SetObjectHolderConst(ZEHolderBase& Object);
+		void							SetObjectHolderRef(ZEHolderBase& Reference);
+		void							SetObjectHolderConstRef(ZEHolderBase& Reference);
 
 		void							SetClass(ZEClass* Object);
-		void							SetClassRef(ZEClass*& Object);
-		void							SetClassConstRef(const ZEClass*& Object);
+		void							SetClassRef(ZEClass*& Reference);
 
-		void							SetCollection(void* Collection, ZEMTType& CollectionType);
-		void							SetCollectionRef(void*& Collection, ZEMTType& CollectionType);
-		void							SetCollectionConstRef(const void*& Collection, ZEMTType& CollectionType);
+		void							SetCollection(const ZEMTCollection& Collection);
+		void							SetCollectionRef(ZEMTCollection& Reference);
+		void							SetCollectionConstRef(const ZEMTCollection& Reference);
 
 		void							SetValue(const ZEValue& Value);
 
@@ -319,14 +324,20 @@ class ZEVariant
 		ZEString&						GetStringRef() const;
 		const ZEString&					GetStringConstRef() const;
 
+		ZEObject&						GetObject() const;
+		const ZEObject&					GetObjectConst() const;
+		ZEObject&						GetObjectRef() const;
+		const ZEObject&					GetObjectConstRef() const;		
+
 		ZEObject*						GetObjectPtr() const;
 		const ZEObject*					GetObjectPtrConst() const;
 		ZEObject*&						GetObjectPtrRef() const;
 		const ZEObject*&				GetObjectPtrConstRef() const;
 
-		const ZEObject*&				GetObject() const;
-		ZEObject*&						GetObjectRef() const;
-		const ZEObject*&				GetObjectConstRef() const;		
+		ZEHolderBase&					GetObjectHolder();
+		ZEHolderBase&					GetObjectHolderConst();
+		ZEHolderBase&					GetObjectHolderRef();
+		ZEHolderBase&					GetObjectHolderConstRef();
 
 		const ZEMTCollection&			GetCollection() const;
 		ZEMTCollection&					GetCollectionRef() const;
@@ -368,7 +379,5 @@ class ZEVariant
 										ZEVariant(ZEClass* Class);
 										~ZEVariant();
 };
-
-#include "ZEVariantImp.h"
 
 #pragma warning(pop)

@@ -39,10 +39,10 @@
 
 void* ZEMTCollection::GetVariantPointer(ZEVariant& Item)
 {
-	if (Item.GetType().TypeQualifier == ZEMT_TQ_REFERENCE || Item.GetType().TypeQualifier == ZEMT_TQ_CONST_REFERENCE)
+	if (Item.GetType().IsReference())
 		return &Item.Value.Pointer;
 
-	switch (Item.GetType().Type)
+	switch (Item.GetType().GetBaseType())
 	{
 		// Trivial
 		case ZEMT_BT_UNDEFINED:

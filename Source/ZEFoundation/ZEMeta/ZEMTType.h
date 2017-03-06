@@ -37,7 +37,9 @@
 
 #include "ZETypes.h"
 
-enum ZEMTBaseType
+#include "ZEDS/ZEString.h"
+
+enum ZEMTBaseType : unsigned
 {
 	ZEMT_BT_UNDEFINED				= 0,
 	ZEMT_BT_VOID					= 1,
@@ -53,13 +55,13 @@ enum ZEMTBaseType
 	ZEMT_BT_DOUBLE					= 11,
 	ZEMT_BT_BOOLEAN					= 12,
 	ZEMT_BT_STRING					= 13,
-	ZEMT_BT_QUATERNION				= 14,
-	ZEMT_BT_VECTOR2					= 15,
-	ZEMT_BT_VECTOR2D				= 16,
-	ZEMT_BT_VECTOR3					= 17,
-	ZEMT_BT_VECTOR3D				= 18,
-	ZEMT_BT_VECTOR4					= 19,
-	ZEMT_BT_VECTOR4D				= 20,
+	ZEMT_BT_VECTOR2					= 14,
+	ZEMT_BT_VECTOR2D				= 15,
+	ZEMT_BT_VECTOR3					= 16,
+	ZEMT_BT_VECTOR3D				= 17,
+	ZEMT_BT_VECTOR4					= 18,
+	ZEMT_BT_VECTOR4D				= 19,
+	ZEMT_BT_QUATERNION				= 20,
 	ZEMT_BT_MATRIX3X3				= 21,
 	ZEMT_BT_MATRIX3X3D				= 22,
 	ZEMT_BT_MATRIX4X4				= 23,
@@ -72,7 +74,7 @@ enum ZEMTBaseType
 	ZEMT_BT_FLAGS					= 30
 };
 
-enum ZEMTCollectionType
+enum ZEMTCollectionType : unsigned
 {
 	ZEMT_CT_NONE,
 	ZEMT_CT_ARRAY,
@@ -80,7 +82,7 @@ enum ZEMTCollectionType
 	ZEMT_CT_PROPERTY
 };
 
-enum ZEMTTypeQualifier
+enum ZEMTTypeQualifier : unsigned
 {
 	ZEMT_TQ_VALUE,
 	ZEMT_TQ_CONST_VALUE,
@@ -88,20 +90,43 @@ enum ZEMTTypeQualifier
 	ZEMT_TQ_CONST_REFERENCE
 };
 
+class ZEMTDeclaration;
 class ZEClass;
 class ZEMTEnumerator;
+template<typename T, class E> class ZEMTTypeGenerator;
 
 class ZEMTType
 {
+	template<typename T, class E> friend class ZEMTTypeGenerator;
+	private:
+		ZEMTBaseType			BaseType : 5;
+		ZEMTTypeQualifier		BaseQualifier : 2;
+		ZEMTCollectionType		CollectionType : 2;
+		ZEMTTypeQualifier		CollectionQualifier : 2;
+		bool					CannonicalBit : 1;
+		ZEUInt64				Declaration : 51;
+	
 	public:
-		ZEMTBaseType			Type;
-		ZEMTTypeQualifier		TypeQualifier;
-		ZEMTCollectionType		CollectionType;
-		ZEMTTypeQualifier		CollectionQualifier;
+		void					SetType(ZEMTBaseType BaseType, ZEMTTypeQualifier BaseQualifier, ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier, ZEMTDeclaration* Declaration);
 
-		ZEClass*				Class;
-		ZEMTEnumerator*			Enumerator;
+		void					SetBaseType(ZEMTBaseType Type, ZEMTDeclaration* Declaration);
+		ZEMTBaseType			GetBaseType() const;
+		
+		void					SetBaseQualifier(ZEMTTypeQualifier Qualifier);
+		ZEMTTypeQualifier		GetBaseQualifier() const;
+		
+		void					SetCollectionType(ZEMTCollectionType Type);
+		ZEMTCollectionType		GetCollectionType() const;
 
+		void					SetCollectionQualifier(ZEMTTypeQualifier Qualifier);
+		ZEMTTypeQualifier		GetCollectionQualifier() const;
+
+		void					SetDeclaration(ZEMTDeclaration* Declaration);
+		ZEMTDeclaration*		GetDeclaration() const;
+
+		ZEClass*				GetClass() const;
+		ZEMTEnumerator*			GetEnumerator() const;
+		
 		bool					IsValid() const;
 		bool					IsReference() const;
 		bool					IsConst() const;
@@ -121,10 +146,12 @@ class ZEMTType
 		bool					operator==(const ZEMTType& Other) const;
 		bool					operator!=(const ZEMTType& Other) const;
 
+		ZEString				ToString() const;
+
 								ZEMTType();
 								ZEMTType(ZEMTBaseType Type, ZEMTTypeQualifier TypeQualifier,
 									ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier,
-									ZEClass* Class, ZEMTEnumerator* Enumerator);
+									ZEMTDeclaration* Declaration);
 
 		static bool				Equal(const ZEMTType& A, const ZEMTType& B);
 

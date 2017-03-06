@@ -53,7 +53,7 @@ bool ZEDPropertyEditorItemBoolean::InitializeInternal()
 	}
 
 	const ZEMTProperty* Property = GetProperty();
-	if (Property->Type.Type != ZEMT_BT_BOOLEAN)
+	if (Property->Type.GetBaseType() != ZEMT_BT_BOOLEAN)
 	{
 		setText(1, "Type Error");
 		return false;
