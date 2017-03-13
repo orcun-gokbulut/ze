@@ -42,8 +42,10 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNStageID.h"
 #include "ZERNRenderer.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNCommand.h"
 
-#define  ZERN_SRDF_OUTPUT	1
+#define ZERN_SRDF_OUTPUT	1
 
 bool ZERNStageRenderDepth::InitializeInternal()
 {
@@ -56,8 +58,6 @@ bool ZERNStageRenderDepth::InitializeInternal()
 bool ZERNStageRenderDepth::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
-
-	OpaqueDepthTexture.Release();
 
 	DepthTexture = NULL;
 
@@ -100,15 +100,41 @@ bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
+	ze_for_each(Command, GetCommands())
+	{
+		if (Command->StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+			TransparentCommands.Add(Command.GetPointer());
+		else
+			OpaqueCommands.Add(Command.GetPointer());
+	}
+
 	Context->ClearDepthStencilBuffer(DepthTexture->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
 	Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer());
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
 	
-	return true;
+	ZERNRenderParameters Parameters;
+	Parameters.Context = Context;
+	Parameters.View = &GetRenderer()->GetView();
+	Parameters.Renderer = GetRenderer();
+	Parameters.Type = ZERN_RT_COLOR;
+	Parameters.Stage = this;
+
+
+	ze_for_each(Command, OpaqueCommands)
+		Command.GetItem()->Execute(&Parameters);
+
+	Context->SetStencilRef(1);
+	ze_for_each(Command, TransparentCommands)
+		Command.GetItem()->Execute(&Parameters);
+
+	return false;
 }
 
 void ZERNStageRenderDepth::CleanUp(ZEGRContext* Context)
 {
+	OpaqueCommands.Clear();
+	TransparentCommands.Clear();
+
 	ZERNStage::CleanUp(Context);
 }
 

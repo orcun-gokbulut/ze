@@ -89,6 +89,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		bool										DirtyPipeline;
 		bool										Resized;
 
+		ZEUInt										MSAASampleCount;
+
 		struct RendererConstants
 		{
 			float									Elapsedtime;
@@ -127,6 +129,9 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 
 		void										SetOutputTexture(const ZEGRTexture* OutputTexture);
 		const ZEGRTexture*							GetOutputTexture() const;
+
+		void										SetMSAASampleCount(ZEUInt SampleCount);
+		ZEUInt										GetMSAASampleCount() const;
 
 		const ZEList2<ZERNStage>&					GetStages();
 		ZERNStage*									GetStage(ZERNStageID Id);

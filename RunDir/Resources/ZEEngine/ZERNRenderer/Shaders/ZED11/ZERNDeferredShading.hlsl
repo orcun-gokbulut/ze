@@ -41,14 +41,6 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
 
-struct ZERNDeferredShading_VertexShader_Input
-{
-	float3	Position			: POSITION0;
-	float3	Normal				: NORMAL0;
-	float2	Texcoord			: TEXCOORD0;
-	float4	Color				: COLOR0;
-};
-
 struct ZERNDeferredShading_VertexShader_Output
 {
 	float4	Position			: SV_Position;
@@ -58,46 +50,23 @@ struct ZERNDeferredShading_VertexShader_Output
 struct ZERNDeferredShading_PixelShader_Input
 {
 	float4	PositionViewport	: SV_Position;
-	uint	InstanceID			: SV_InstanceID;
+	#ifndef ZERN_TILED_DEFERRED
+		uint	InstanceID			: SV_InstanceID;
+	#endif
 };
 
-cbuffer ZERNDeferredShading_EdgeDetection_Constants	: register(b10)
+
+cbuffer ZERNDeferredShading_InstancedLights_Transform_Constants		: register(b11)
 {
-	float	ZERNDeferredShading_EdgeDetection_DepthThreshold;
-	float	ZERNDeferredShading_EdgeDetection_NormalThreshold;
-	float2	ZERNDeferredShading_EdgeDetection_Reserved;
+	float4x4	ZERNDeferredShading_InstancedLights_Transforms[MAX_DEFERRED_LIGHT];
 };
 
-Texture2D<float3>	TiledDeferredOutputTexture	: register(t5);
-
-ZERNShading_Surface ZERNDeferredShading_GetSurfaceDataFromGBuffers(float2 PositionViewport, uint SampleIndex = 0)
-{
-	ZERNShading_Surface Surface;
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, SampleIndex));
-	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, SampleIndex);
-	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy, SampleIndex);
-	Surface.SubsurfaceScattering = ZERNGBuffer_GetSubsurfaceScattering(PositionViewport.xy, SampleIndex);
-	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy, SampleIndex);
-	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy, SampleIndex);
-	
-	return Surface;
-}
-
-float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID, uint2 PixelCoord = 0.0f)
+float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID)
 {
 	float3 ResultColor = 0.0f;
 	
-	#if defined ZERN_RENDER_DIRECTIONAL_LIGHT
-		[unroll(2)]
-		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
-			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
-		
-		if (ZERNShading_AddTiledDeferredOutput)
-			ResultColor += TiledDeferredOutputTexture[PixelCoord];
-	#elif defined ZERN_RENDER_SPOT_LIGHT
+	#if defined ZERN_RENDER_SPOT_LIGHT
 		ResultColor = ZERNShading_SpotShading(ZERNShading_SpotLights[InstanceID], Surface);
-	#elif defined ZERN_RENDER_SPOT_LIGHT_SHADOW
-		ResultColor = ZERNShading_SpotShading(ZERNShading_SpotLightsShadowConstant[InstanceID], InstanceID, Surface);
 	#elif defined ZERN_RENDER_POINT_LIGHT
 		ResultColor = ZERNShading_PointShading(ZERNShading_PointLights[InstanceID], Surface);
 	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
@@ -107,55 +76,40 @@ float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID, u
 	return ResultColor;
 }
 
-ZERNDeferredShading_VertexShader_Output ZERNDeferredShading_VertexShader_LightingStage(ZERNDeferredShading_VertexShader_Input Input, uint InstanceID : SV_InstanceID)
+ZERNDeferredShading_VertexShader_Output ZERNDeferredShading_VertexShader_LightingStage(float3 Position : POSITION0, uint InstanceID : SV_InstanceID)
 {
 	ZERNDeferredShading_VertexShader_Output Output;
-	
-	#if defined ZERN_RENDER_DIRECTIONAL_LIGHT
-		Output.Position = float4(Input.Position, 1.0f);
-	#elif defined ZERN_RENDER_SPOT_LIGHT
-		float4 PositionWorld = mul(ZERNShading_SpotLights[InstanceID].WorldMatrix, float4(Input.Position, 1.0f));
-		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	#elif defined ZERN_RENDER_SPOT_LIGHT_SHADOW
-		float4 PositionWorld = mul(ZERNShading_SpotLightsShadowConstant[InstanceID].SpotLight.WorldMatrix, float4(Input.Position, 1.0f));
-		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	#elif defined ZERN_RENDER_POINT_LIGHT
-		float4 PositionWorld = mul(ZERNShading_PointLights[InstanceID].WorldMatrix, float4(Input.Position, 1.0f));
-		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
-		float4 PositionWorld = mul(ZERNShading_ProjectiveLightConstant.WorldMatrix, float4(Input.Position, 1.0f));
-		Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	#endif
-	
+
+	float4 PositionWorld = mul(ZERNDeferredShading_InstancedLights_Transforms[InstanceID], float4(Position, 1.0f));
+
+	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.InstanceID = InstanceID;
-	
+
 	return Output;
 };
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(ZERNDeferredShading_PixelShader_Input Input) : SV_Target0
 {
-	#ifdef MSAA_ENABLED
-		uint2 PixelCoord = floor(Input.PositionViewport.xy) * uint2(2, 2);
-	#else
-		uint2 PixelCoord = Input.PositionViewport.xy;
-	#endif
+	ZERNShading_Surface Surface = ZERNShading_GetSurfaceFromGBuffers(Input.PositionViewport.xy);
 	
-	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(Input.PositionViewport.xy);
-	float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID, PixelCoord);
+	#if defined ZERN_TILED_DEFERRED
+		float3 ResultColor = ZERNShading_Shade(Input.PositionViewport.xy, Surface);
+	#else
+		float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID);
+	#endif
 	
 	return ResultColor;
 }
 
 float3 ZERNDeferredShading_PixelShader_PerSample_LightingStage(ZERNDeferredShading_PixelShader_Input Input, uint SampleIndex : SV_SampleIndex) : SV_Target0
 {
-	#ifdef MSAA_ENABLED
-		uint2 PixelCoord = floor(Input.PositionViewport.xy) * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
+	ZERNShading_Surface Surface = ZERNShading_GetSurfaceFromGBuffers(Input.PositionViewport.xy, SampleIndex);
+
+	#if defined ZERN_TILED_DEFERRED
+		float3 ResultColor = ZERNShading_Shade(Input.PositionViewport.xy, Surface);
 	#else
-		uint2 PixelCoord = Input.PositionViewport.xy;
+		float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID);
 	#endif
-	
-	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(Input.PositionViewport.xy, SampleIndex);
-	float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID, PixelCoord);
 	
 	return ResultColor;
 }
@@ -164,37 +118,17 @@ void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport 
 {
 	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
 	
-	Surfaces[0].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, 0));
-	Surfaces[0].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, 0);
-		
-	bool EdgePixel = false;
 	[unroll]
-	for (uint S = 1; S < SAMPLE_COUNT; S++)
-	{
-		Surfaces[S].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, S));
-		Surfaces[S].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, S);
-	
-		EdgePixel = EdgePixel || 
-		(abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > ZERNDeferredShading_EdgeDetection_DepthThreshold) || 
-		(dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < ZERNDeferredShading_EdgeDetection_NormalThreshold);
-	}
-	
-	if (!EdgePixel)
+	for (uint I = 0; I < SAMPLE_COUNT; I++)
+		Surfaces[I] = ZERNShading_GetSurfaceFromGBuffers(PositionViewport.xy, I);
+
+	if (!ZERNShading_EdgeDetection_MSAA(Surfaces))
 		discard;
 }
 
-float3 ZERNDeferredShading_Blend_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+float3 ZERNDeferredShading_DebugEdgeDetection_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	uint2 PixelCoord = floor(PositionViewport.xy) * uint2(2, 2);
-	
-	return TiledDeferredOutputTexture[PixelCoord];
-}
-
-float3 ZERNDeferredShading_BlendPerSample_PixelShader_Main(float4 PositionViewport : SV_Position, uint SampleIndex : SV_SampleIndex) : SV_Target0
-{
-	uint2 PixelCoord = floor(PositionViewport.xy) * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
-	
-	return TiledDeferredOutputTexture[PixelCoord];
+	return float3(1.0f, 0.0f, 0.0f);
 }
 
 #endif

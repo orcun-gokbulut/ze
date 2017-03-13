@@ -36,6 +36,18 @@
 #ifndef __ZERN_INTERSECTIONS_H__
 #define __ZERN_INTERSECTIONS_H__
 
+struct ZERNInterSections_Sphere
+{
+	float3	Center;
+	float	Radius;
+};
+
+struct ZERNInterSections_Plane
+{
+	float3	Normal;
+	float	Distance;
+};
+
 void ZERNIntersections_RaySphere1(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float SphereRadius, out float2 StartEndDistance)
 {
 	float3 RayOrigin_SphereCenter = RayOrigin - SphereCenter;
@@ -62,6 +74,11 @@ void ZERNIntersections_RaySphere2(float3 RayOrigin, float3 RayDirection, float3 
 	float2 RealRootMask = (Discriminant >= 0.0f);
 	
 	StartEndDistance = RealRootMask.xxyy * ((-B.xxyy + float4(-1.0f, 1.0f, -1.0f, 1.0f) * SquareRootDiscriminant.xxyy) / (2.0f * A.xxyy));
+}
+
+bool ZERNInterSections_PlaneSphere(ZERNInterSections_Plane Plane, ZERNInterSections_Sphere Sphere)
+{
+	return (dot(float4(Plane.Normal, Plane.Distance), float4(Sphere.Center, 1.0f)) >= -Sphere.Radius);
 }
 
 #endif

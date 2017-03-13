@@ -110,10 +110,13 @@ ZEGRResourceType ZEGRBuffer::GetResourceType() const
 	return ZEGR_RT_BUFFER;
 }
 
-void ZEGRBuffer::SetData(const void* Data)
+void ZEGRBuffer::SetData(const void* Data, ZESize DataSize)
 {
 	zeDebugCheck(GetResourceUsage() == ZEGR_RU_IMMUTABLE, "Immutable buffer cannot be modified.");
 	zeDebugCheck(GetResourceUsage() == ZEGR_RU_STAGING, "Staging buffer cannot be implicitly modified. Instead use Map with appropriate map-type.");
+	zeDebugCheck(DataSize > GetSizeInBytes(), "Out-of-range access");
+	
+	DataSize = (DataSize != 0) ? DataSize : GetSizeInBytes();
 
 	if (GetResourceUsage() == ZEGR_RU_DYNAMIC)
 	{
@@ -124,13 +127,13 @@ void ZEGRBuffer::SetData(const void* Data)
 			return;
 		}
 
-		memcpy(Buffer, Data, GetSizeInBytes());
+		memcpy(Buffer, Data, DataSize);
 
 		Unmap();
 	}
 	else if (GetResourceUsage() == ZEGR_RU_STATIC)
 	{
-		Update(Data, GetSizeInBytes());
+		Update(Data, DataSize);
 	}
 }
 

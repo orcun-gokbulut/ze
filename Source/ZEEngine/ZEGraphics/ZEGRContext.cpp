@@ -584,12 +584,12 @@ void ZEGRContext::GetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt
 
 void ZEGRContext::SetBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer)
 {
-	SetBuffers(Shader, Index, 1, &Buffer);
+	SetBuffers(Shader, Index, 1, Buffer != NULL ? &Buffer : NULL);
 }
 
 void ZEGRContext::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
 {
-	SetTextures(Shader, Index, 1, &Texture);
+	SetTextures(Shader, Index, 1, Texture != NULL ? &Texture : NULL);
 }
 
 void ZEGRContext::GetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRTexture** Textures)

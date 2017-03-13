@@ -494,30 +494,11 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		
 		Output.GBuffer = GBuffer;
 	#elif defined ZERN_FM_FORWARD
-		float3 ResultColor = 0.0f;
-		
-		[unroll(2)]
-		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
-			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
-		
-		//uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
-		//uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
-		//uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
-		//
-		//uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
-		//for (uint J = 0; J < TilePointLightCount; J++)
-		//	ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
-		//
-		//uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
-		//for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
-		//	ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
-		
-		ResultColor += Surface.Ambient + Surface.Emissive;
+		Output.Color.rgb = Surface.Ambient + Surface.Emissive + ZERNShading_Shade(Input.Position.xy, Surface);
+		Output.Color.a = Surface.Opacity;
 		
 		float4 FogColor = ZERNShading_CalculateFogColor(Surface.PositionView);
-		ResultColor = lerp(ResultColor, FogColor.rgb, FogColor.a);
-		
-		Output.Color = float4(ResultColor, Surface.Opacity);
+		Output.Color.rgb = lerp(Output.Color.rgb, FogColor.rgb, FogColor.a);
 	#endif
 	
 	return Output;

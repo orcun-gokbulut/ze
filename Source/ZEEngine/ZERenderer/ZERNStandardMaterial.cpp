@@ -278,9 +278,34 @@ bool ZERNStandardMaterial::UpdateRenderState()
 
 	ZEGRRenderState RenderState;
 	if (TransparencyEnabled)
+	{
 		RenderState = ZERNStageForwardTransparent::GetRenderState();
+
+		if (TransparencyMode == ZERN_TM_ADDITIVE)
+		{
+			ZEGRBlendRenderTarget RenderTargetBlend;
+			RenderTargetBlend.SetBlendEnable(true);
+			RenderTargetBlend.SetSource(ZEGR_BO_SRC_ALPHA);
+			RenderTargetBlend.SetDestination(ZEGR_BO_ONE);
+			RenderTargetBlend.SetOperation(ZEGR_BE_ADD);
+
+			ZEGRBlendState State;
+			State.SetBlendEnable(true);
+			State.SetRenderTargetBlend(0, RenderTargetBlend);
+			RenderState.SetBlendState(State);
+		}
+	}
 	else
+	{
 		RenderState = ZERNStageGBuffer::GetRenderState();
+
+		if (AlphaCullEnabled)
+		{
+			ZEGRBlendState BlendState;
+			BlendState.SetAlphaToCoverageEnable(true);
+			RenderState.SetBlendState(BlendState);
+		}
+	}
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
@@ -298,20 +323,6 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_Forward_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_Forward_PixelShader);
-
-	if (TransparencyEnabled && TransparencyMode == ZERN_TM_ADDITIVE)
-	{
-		ZEGRBlendRenderTarget RenderTargetBlend;
-		RenderTargetBlend.SetBlendEnable(true);
-		RenderTargetBlend.SetSource(ZEGR_BO_SRC_ALPHA);
-		RenderTargetBlend.SetDestination(ZEGR_BO_ONE);
-		RenderTargetBlend.SetOperation(ZEGR_BE_ADD);
-
-		ZEGRBlendState State;
-		State.SetBlendEnable(true);
-		State.SetRenderTargetBlend(0, RenderTargetBlend);
-		RenderState.SetBlendState(State);
-	}
 
 	StageGBuffer_Forward_RenderState = RenderState.Compile();
 	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer/forward render state.");
@@ -354,9 +365,31 @@ bool ZERNStandardMaterial::UpdateRenderState()
 		zeCheckError(StageShadowmapGeneration_Instancing_RenderState == NULL, false, "Cannot set shadow map generation instancing render state.");
 	}
 	
-	if (UseInteriorVertexLayout)
+	RenderState = ZERNStageRenderDepth::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+
+	if (SkinningEnabled)
+		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
+	else if (UseInteriorVertexLayout)
 		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
-	
+	else
+		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
+
+	if (TransparencyEnabled)
+	{
+		ZEGRDepthStencilState DepthStencilState;
+		DepthStencilState.SetDepthWriteEnable(false);
+		DepthStencilState.SetStencilTestEnable(true);
+		DepthStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
+		DepthStencilState.SetBackStencilPass(ZEGR_SO_REPLACE);
+
+		RenderState.SetDepthStencilState(DepthStencilState);
+	}
+
+	RasterizerState = RenderState.GetRasterizerState();
+	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
+	RenderState.SetRasterizerState(RasterizerState);
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageRenderDepth_PixelShader);
 
@@ -384,7 +417,7 @@ bool ZERNStandardMaterial::UpdateStageMask()
 		return true;
 
 	StageMask = ZERN_STAGE_DEBUG;
-	StageMask |= TransparencyEnabled ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_RENDER_DEPTH | ZERN_STAGE_GBUFFER;
+	StageMask |= ZERN_STAGE_RENDER_DEPTH | (TransparencyEnabled ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_GBUFFER);
 	StageMask |= ShadowCaster ? ZERN_STAGE_SHADOW_MAP_GENERATION : 0;
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_STAGE_MASK);
@@ -403,8 +436,6 @@ bool ZERNStandardMaterial::UpdateConstantBuffer()
 	Constants.EmissiveColor = (EmissiveEnabled ? 1.0f : 0.0f) * EmissiveFactor * EmissiveColor;
 	Constants.ReflectionColor = (ReflectionEnabled ? 1.0f : 0.0f) * ReflectionFactor * ReflectionColor;
 	Constants.RefractionColor = (RefractionEnabled ? 1.0f : 0.0f) * RefractionFactor * RefractionColor;
-
-	//Constants.AlphaCullLimit = 0.1f;
 
 	ConstantBuffer->SetData(&Constants);
 

@@ -37,35 +37,44 @@
 #define __ZERN_TILED_DEFERRED_SHADING_COMPUTE_HLSL__
 
 #include "ZERNShading.hlsl"
-#include "ZERNGBuffer.hlsl"
-#include "ZERNTransformations.hlsl"
+#include "ZERNIntersections.hlsl"
 
-groupshared uint					TileMinDepth;
-groupshared uint					TileMaxDepth;
-
-groupshared uint					TileLightCount;
-groupshared uint					TileLightIndices[MAX_TILED_LIGHT];
-
-#ifdef MSAA_ENABLED
-	groupshared	uint				PerSamplePixels[TILE_SIZE];
-	groupshared	uint				PerSamplePixelCount;
+groupshared uint								TileMinDepth;
+groupshared uint								TileMaxDepth;
+#if defined ZERN_TILED_TRANSPARENT
+	groupshared  uint							TileTransparent;
 #endif
 
-#ifdef ZERN_TILED_DEFERRED
-	RWTexture2D<float3>				ZERNTiledDeferredShadingCompute_OutputColorBuffer		: register(u0);
-#elif defined ZERN_TILED_FORWARD
-	RWStructuredBuffer<uint>		ZERNTiledDeferredShadingCompute_OutputTileLightIndices	: register(u0);
-#endif
+groupshared uint								TileLightCount;
+groupshared uint								TileLightIndices[MAX_TILED_LIGHT];
+
+StructuredBuffer<ZERNInterSections_Sphere>		PointLightsBoundingSpheres					: register(t6);
+StructuredBuffer<ZERNInterSections_Sphere>		SpotLightsBoundingSpheres					: register(t7);
+
+RWStructuredBuffer<uint>						OutputTileLightIndices						: register(u0);
 
 [numthreads(TILE_DIMENSION, TILE_DIMENSION, 1)]
 void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_GroupID,
 														uint3 DispatchThreadId				: SV_DispatchThreadID,
 														uint3 GroupThreadId					: SV_GroupThreadID)
 {
+	uint GroupIndex = GroupThreadId.y * TILE_DIMENSION + GroupThreadId.x;
 	float2 PixelCoord = DispatchThreadId.xy;
 	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
 	
 	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
+	#if defined ZERN_TILED_TRANSPARENT
+		uint PixelTransparent = 0;
+	#endif
+	[unroll]
+	for (uint I = 0; I < SAMPLE_COUNT; I++)
+	{
+		Surfaces[I] = ZERNShading_GetSurfaceFromGBuffers(PixelCoord, I);
+		#if defined ZERN_TILED_TRANSPARENT
+			uint Stencil = ZERNGBuffer_GetStencil(PixelCoord, I);
+			PixelTransparent |= Stencil;
+		#endif
+	}
 	
 	float MinDepth = ZERNView_FarZ;
 	float MaxDepth = ZERNView_NearZ;
@@ -73,25 +82,26 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	[unroll]
 	for (uint S = 0; S < SAMPLE_COUNT; S++)
 	{
-		Surfaces[S].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PixelCoord, S));
-		
 		MinDepth = min(MinDepth, Surfaces[S].PositionView.z);
 		MaxDepth = max(MaxDepth, Surfaces[S].PositionView.z);
 	}
 	
-	uint GroupIndex = GroupThreadId.y * TILE_DIMENSION + GroupThreadId.x;
 	if (GroupIndex == 0)
 	{
 		TileLightCount = 0;
 		TileMinDepth = 0x7F7FFFFF;	// Max float
 		TileMaxDepth = 0;
 		
-		#ifdef MSAA_ENABLED
-			PerSamplePixelCount = 0;
+		#if defined ZERN_TILED_TRANSPARENT
+			TileTransparent = 0;
 		#endif
 	}
 	
 	GroupMemoryBarrierWithGroupSync();
+	
+	#if defined ZERN_TILED_TRANSPARENT
+		InterlockedOr(TileTransparent, PixelTransparent);
+	#endif
 	
 	if (MaxDepth >= MinDepth)
 	{
@@ -111,27 +121,38 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	float4 ProjectionMatrixColumn1 = float4(0.0f, ZERNView_ProjectionTransform._22 * -TileScale.y, ZERNView_ProjectionTransform._23 * -TileScale.y + TileBias.y, 0.0f);
 	float4 ProjectionMatrixColumn3 = float4(0.0f, 0.0f, 1.0f, 0.0f);
 	
-	float4 TileFrustumPlanes[6];
-	
-	TileFrustumPlanes[0] = ProjectionMatrixColumn3 - ProjectionMatrixColumn0;	//Right
-	TileFrustumPlanes[1] = ProjectionMatrixColumn3 + ProjectionMatrixColumn0;	//Left
-	TileFrustumPlanes[2] = ProjectionMatrixColumn3 - ProjectionMatrixColumn1;	//Top
-	TileFrustumPlanes[3] = ProjectionMatrixColumn3 + ProjectionMatrixColumn1;	//Bottom
-	TileFrustumPlanes[4] = float4(0.0f, 0.0f, 1.0f, -TileMinZ);					//Near
-	TileFrustumPlanes[5] = float4(0.0f, 0.0f, -1.0f, TileMaxZ);					//Far
-	
+	ZERNInterSections_Plane TileFrustumPlanes[6] = 
+	{
+		{ProjectionMatrixColumn3.xyz - ProjectionMatrixColumn0.xyz, 0.0f},
+		{ProjectionMatrixColumn3.xyz + ProjectionMatrixColumn0.xyz, 0.0f},
+		{ProjectionMatrixColumn3.xyz - ProjectionMatrixColumn1.xyz, 0.0f},
+		{ProjectionMatrixColumn3.xyz + ProjectionMatrixColumn1.xyz, 0.0f},
+		{float3(0.0f, 0.0f, -1.0f), TileMaxZ},
+		{float3(0.0f, 0.0f, 1.0f), -TileMinZ}
+	};
+
+	[unroll]
 	for (uint I = 0; I < 4; I++)
-		TileFrustumPlanes[I] *= rcp(length(TileFrustumPlanes[I].xyz));
+		TileFrustumPlanes[I].Normal *= rcp(length(TileFrustumPlanes[I].Normal.xyz));
 	
+
 	for (uint PointLightIndex = GroupIndex; PointLightIndex < ZERNShading_PointLightCount; PointLightIndex += TILE_SIZE)
 	{
 		bool InsideFrustum = true;
-		ZERNShading_PointLight PointLight = ZERNShading_PointLights[PointLightIndex];
+		ZERNInterSections_Sphere BoundingSphere = PointLightsBoundingSpheres[PointLightIndex];
 		
-		for (uint I = 0; I < 6; I++)
-			InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(PointLight.PositionView, 1.0f)) >= -PointLight.Range);
+		[unroll]
+		for (uint I = 0; I < 4; I++)
+			InsideFrustum = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[I], BoundingSphere);
+
+		bool Visible = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[4], BoundingSphere);
+		InsideFrustum = Visible && ZERNInterSections_PlaneSphere(TileFrustumPlanes[5], BoundingSphere);
 		
-		if (InsideFrustum)
+		if (InsideFrustum
+		#if defined ZERN_TILED_TRANSPARENT
+			|| (TileTransparent != 0 && Visible)
+		#endif
+		)
 		{
 			uint Index;
 			InterlockedAdd(TileLightCount, 1, Index);
@@ -141,16 +162,18 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	
 	GroupMemoryBarrierWithGroupSync();
 	
-	#ifdef ZERN_TILED_FORWARD
-		uint TilePointLightCount = TileLightCount;
+	uint TilePointLightCount = TileLightCount;
 	
+	#if defined ZERN_TILED_TRANSPARENT
 		for (uint SpotLightIndex = GroupIndex; SpotLightIndex < ZERNShading_SpotLightCount; SpotLightIndex += TILE_SIZE)
 		{
 			bool InsideFrustum = true;
-			ZERNShading_SpotLight SpotLight = ZERNShading_SpotLights[SpotLightIndex];
 			
-			for (uint I = 0; I < 6; I++)
-				InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(SpotLight.CullPositionView, 1.0f)) >= -SpotLight.CullRange);
+			ZERNInterSections_Sphere BoundingSphere = SpotLightsBoundingSpheres[SpotLightIndex];
+			
+			[unroll]
+			for (uint I = 0; I < 5; I++)
+				InsideFrustum = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[I], BoundingSphere);
 			
 			if (InsideFrustum)
 			{
@@ -162,101 +185,29 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 		
 		GroupMemoryBarrierWithGroupSync();
 		
-		uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
-		uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
 		uint TileTotalLightCount = TileLightCount;
-			
-		for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + M] = TileLightIndices[M];
-			
-		for (uint N = (GroupIndex + TilePointLightCount); N < TileTotalLightCount; N += TILE_SIZE)
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 2 + N] = TileLightIndices[N];
-			
-		if (GroupIndex == 0)
-		{
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset] = TilePointLightCount;
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + TilePointLightCount] = TileTotalLightCount;
-		}
-	#elif defined ZERN_TILED_DEFERRED
-		uint TilePointLightCount = TileLightCount;
-		if (all(PixelCoord < GBufferDimensions) && TilePointLightCount > 0)
-		{
-			Surfaces[0].PositionView = ZERNTransformations_ViewportToView2(PixelCoord + 0.5f, GBufferDimensions, Surfaces[0].PositionView.z);
-			Surfaces[0].Diffuse = ZERNGBuffer_GetDiffuseColor(PixelCoord);
-			Surfaces[0].SubsurfaceScattering = ZERNGBuffer_GetSubsurfaceScattering(PixelCoord);
-			Surfaces[0].NormalView = ZERNGBuffer_GetViewNormal(PixelCoord);
-			Surfaces[0].Specular = ZERNGBuffer_GetSpecularColor(PixelCoord);
-			Surfaces[0].SpecularPower = ZERNGBuffer_GetSpecularPower(PixelCoord);
-			
-			float3 ResultColor = 0.0f;
-			
-			for (uint I = 0; I < TilePointLightCount; I++)
-				ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[TileLightIndices[I]], Surfaces[0]);
-			
-			#ifdef MSAA_ENABLED
-				uint2 MSAAPixelCoord = PixelCoord * uint2(2, 2);
-				ZERNTiledDeferredShadingCompute_OutputColorBuffer[MSAAPixelCoord] = ResultColor;
-				
-				bool EdgePixel = false;
-				[unroll]
-				for (uint S = 1; S < SAMPLE_COUNT; S++)
-				{
-					Surfaces[S].NormalView = ZERNGBuffer_GetViewNormal(PixelCoord, S);
-					
-					EdgePixel = EdgePixel || (abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > 0.1f) || (dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < 0.99f);
-				}
-				
-				if (EdgePixel)
-				{
-					uint Index;
-					InterlockedAdd(PerSamplePixelCount, 1, Index);
-					PerSamplePixels[Index] = (DispatchThreadId.x << 16) | DispatchThreadId.y;
-				}
-				else
-				{
-					[unroll]
-					for (uint S = 1; S < SAMPLE_COUNT; S++)
-					{
-						uint2 SamplePixelCoord = MSAAPixelCoord + uint2(S & 1, S > 1);
-						ZERNTiledDeferredShadingCompute_OutputColorBuffer[SamplePixelCoord] = ResultColor;
-					}
-				}
-			#else
-				ZERNTiledDeferredShadingCompute_OutputColorBuffer[PixelCoord] = ResultColor;
-			#endif
-		}
-		
-		#ifdef MSAA_ENABLED
-			GroupMemoryBarrierWithGroupSync();
-			
-			const uint SampleCount = SAMPLE_COUNT - 1;
-			uint TotalSampleCount = PerSamplePixelCount * SampleCount;
-			
-			for (uint GlobalSampleIndex = GroupIndex; GlobalSampleIndex < TotalSampleCount; GlobalSampleIndex += TILE_SIZE)
-			{
-				uint PixelIndex = GlobalSampleIndex / SampleCount;
-				uint PixelXYPacked = PerSamplePixels[PixelIndex];
-				uint2 PixelXY = uint2(PixelXYPacked >> 16, PixelXYPacked & 0x0000FFFF);
-				uint SampleIndex = GlobalSampleIndex % SampleCount + 1;
-				
-				ZERNShading_Surface Surface;
-				Surface.PositionView = ZERNTransformations_ViewportToView(PixelXY + 0.5f, GBufferDimensions, ZERNGBuffer_GetDepth(PixelXY, SampleIndex));
-				Surface.NormalView = ZERNGBuffer_GetViewNormal(PixelXY, SampleIndex);
-				Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PixelXY, SampleIndex);
-				Surface.SubsurfaceScattering = ZERNGBuffer_GetSubsurfaceScattering(PixelXY, SampleIndex);
-				Surface.Specular = ZERNGBuffer_GetSpecularColor(PixelXY, SampleIndex);
-				Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PixelXY, SampleIndex);
-				
-				float3 ResultColor = 0.0f;
-				
-				for (uint I = 0; I < TilePointLightCount; I++)
-					ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[TileLightIndices[I]], Surface);
-				
-				uint2 SamplePixelCoord = PixelXY * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
-				ZERNTiledDeferredShadingCompute_OutputColorBuffer[SamplePixelCoord] = ResultColor;
-			}
-		#endif
 	#endif
+
+	uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
+	uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
+
+	for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)
+		OutputTileLightIndices[TileStartOffset + 2 + M] = TileLightIndices[M];
+
+	#if defined ZERN_TILED_TRANSPARENT
+		for (uint N = (GroupIndex + TilePointLightCount); N < TileTotalLightCount; N += TILE_SIZE)
+			OutputTileLightIndices[TileStartOffset + 2 + N] = TileLightIndices[N];
+	#endif
+	
+	if (GroupIndex == 0)
+	{
+		OutputTileLightIndices[TileStartOffset] = TilePointLightCount;
+		#if defined ZERN_TILED_TRANSPARENT
+			OutputTileLightIndices[TileStartOffset + 1] = TileTotalLightCount;
+		#else
+			OutputTileLightIndices[TileStartOffset + 1] = TilePointLightCount;
+		#endif
+	}
 }
 
 #endif

@@ -36,18 +36,27 @@
 #ifndef __ZERN_SHADING_H__
 #define __ZERN_SHADING_H__
 
+#include "ZERNGBuffer.hlsl"
 #include "ZERNView.hlsl"
 #include "ZERNSamplers.hlsl"
+#include "ZERNTransformations.hlsl"
 
+#define SAMPLE_COUNT					4
+
+#define MAX_DEFERRED_LIGHT				1024
 #define MAX_TILED_LIGHT					1024
-#define MAX_SPOT_LIGHT_SHADOW			8
+#define MAX_POINT_LIGHT_SHADOW			2
+#define MAX_SPOT_LIGHT_SHADOW			4
+#define MAX_PROJECTIVE_LIGHT			8
 #define MAX_PROJECTIVE_LIGHT_SHADOW		4
 #define MAX_DIRECTIONAL_LIGHT			2
 #define MAX_DIRECTIONAL_LIGHT_SHADOW	1
 #define MAX_CASCADE						4
 
-#define TILE_DIMENSION			16
-#define TILE_SIZE				(TILE_DIMENSION * TILE_DIMENSION)
+#define TILE_DIMENSION					32
+#define TILE_SIZE						(TILE_DIMENSION * TILE_DIMENSION)
+
+#define WORK_COUNT						4
 
 struct ZERNShading_PointLight
 {
@@ -56,8 +65,6 @@ struct ZERNShading_PointLight
 	
 	float3										Color;
 	float										FalloffExponent;
-	
-	float4x4									WorldMatrix;
 };
 
 struct ZERNShading_SpotLight
@@ -66,24 +73,19 @@ struct ZERNShading_SpotLight
 	float										Range;
 	
 	float3										DirectionView;
-	float										Reserved;
-	
-	float3										CullPositionView;
-	float										CullRange;
+	float										CosOuterConeAngle;
 	
 	float3										Color;
 	float										FalloffExponent;
 	
 	float										CosInnerConeAngle;
-	float										CosOuterConeAngle;
-	float2										Reserved1;
-	
-	float4x4									WorldMatrix;
+	bool										CastShadow;
+	uint										ShadowIndex;
+	uint										Reserved;
 };
 
 struct ZERNShading_SpotLightShadow
 {
-	ZERNShading_SpotLight						SpotLight;
 	float4x4									ProjectionTransform;
 	uint										ShadowSampleCount;
 	float										ShadowSampleLength;
@@ -99,21 +101,19 @@ struct ZERNShading_ProjectiveLight
 	float3										Color;
 	float										FalloffExponent;
 	
+	float4x4									ProjectionTransform;
+	
 	bool										CastShadow;
 	uint										ShadowMapIndex;
 	float2										Reserved;
-	
-	float4x4									WorldMatrix;
-	float4x4									ProjectionTransform;
-	
 	uint										ShadowSampleCount;
 	float										ShadowSampleLength;
 	float										ShadowDepthBias;
 	float										ShadowNormalBias;
 };
-		
+
 struct ZERNShading_Cascade
-{				
+{
 	float4x4									ViewTransform;
 	float4x4									ProjectionTransform;
 	
@@ -124,7 +124,7 @@ struct ZERNShading_Cascade
 };
 
 struct ZERNShading_DirectionalLight
-{	
+{
 	float3										DirectionView;
 	bool										CastShadow;
 	
@@ -140,9 +140,7 @@ struct ZERNShading_DirectionalLight
 struct ZERNShading_Surface				
 {
 	float3										PositionView;
-	float										Reserved0;
 	float3										NormalView;
-	float										Reserved1;
 	float3										Diffuse;
 	float										SubsurfaceScattering;
 	float3										Specular;
@@ -150,7 +148,13 @@ struct ZERNShading_Surface
 	float3										Ambient;
 	float										Opacity;
 	float3										Emissive;
-	float										Reserved2;
+};
+
+cbuffer ZERNShading_EdgeDetection_Constants														: register(b9)
+{
+	float										ZERNShading_EdgeDetection_DepthThreshold;
+	float										ZERNShading_EdgeDetection_NormalThreshold;
+	float2										ZERNShading_EdgeDetection_Reserved;
 };
 
 cbuffer	ZERNShading_Constants																	: register(b8)
@@ -161,9 +165,23 @@ cbuffer	ZERNShading_Constants																	: register(b8)
 	uint										ZERNShading_SpotLightCount;
 	uint										ZERNShading_ProjectiveLightCount;
 	
-	bool										ZERNShading_AddTiledDeferredOutput;
 	uint										ZERNShading_TileCountX;
-	float2										ZERNShading_Reserved;
+	float3										ZERNShading_Reserved;
+};
+
+cbuffer ZERNShading_PointLights_Constants														: register(b9)
+{
+	ZERNShading_PointLight						ZERNShading_PointLights[MAX_TILED_LIGHT];
+};
+
+cbuffer ZERNShading_SpotLights_Constants														: register(b10)
+{
+	ZERNShading_SpotLight						ZERNShading_SpotLights[MAX_TILED_LIGHT];
+};
+
+cbuffer ZERNShading_SpotLightShadow_Constants													: register(b11)
+{
+	ZERNShading_SpotLightShadow					ZERNShading_SpotLightsShadow[MAX_SPOT_LIGHT_SHADOW];
 };
 
 cbuffer ZERNShading_ProjectiveLight_Constants													: register(b9)
@@ -171,12 +189,7 @@ cbuffer ZERNShading_ProjectiveLight_Constants													: register(b9)
 	ZERNShading_ProjectiveLight					ZERNShading_ProjectiveLightConstant;
 };
 
-cbuffer ZERNShading_SpotLightShadow_Constants													: register(b9)
-{
-	ZERNShading_SpotLightShadow					ZERNShading_SpotLightsShadowConstant[MAX_SPOT_LIGHT_SHADOW];
-};
-
-cbuffer ZERNFog_Constants																		: register(b10)
+cbuffer ZERNFog_Constants																		: register(b12)
 {
 	float										ZERNShading_FogDensity;
 	float										ZERNShading_FogStartDistance;
@@ -193,8 +206,6 @@ Texture2DArray<float>							ZERNShading_SpotShadowMaps						: register(t12);
 Texture2DArray<float>							ZERNShading_ProjectiveShadowMaps				: register(t13);
 Texture2D<float2>								ZERNShading_RandomVectors						: register(t14);
 
-StructuredBuffer<ZERNShading_PointLight>		ZERNShading_PointLights							: register(t15);
-StructuredBuffer<ZERNShading_SpotLight>			ZERNShading_SpotLights							: register(t16);
 StructuredBuffer<uint>							ZERNShading_TileLightIndices					: register(t17);
 
 static const float2 ZERNShading_PoissonDiskSamples[] = 
@@ -216,6 +227,54 @@ static const float2 ZERNShading_PoissonDiskSamples[] =
 	float2(-0.8184632f, 0.431774f),
 	float2(0.8985078f, 0.4366908f)
 };
+
+ZERNShading_Surface ZERNShading_GetSurfaceFromGBuffers(float2 PositionViewport
+#ifdef MSAA_ENABLED
+, float SampleIndex = 0
+#endif
+)
+{
+	#ifdef MSAA_ENABLED
+		float2 GBufferDimensions;
+		float Dummy;
+		ZERNGBuffer_DepthBuffer.GetDimensions(GBufferDimensions.x, GBufferDimensions.y, Dummy);
+		float Depth = ZERNGBuffer_DepthBuffer.Load(PositionViewport, SampleIndex).x;
+		float4 VelocitySpecularPower = ZERNGBuffer_Buffer1.Load(PositionViewport, SampleIndex);
+		float4 DiffuseSubsurface = ZERNGBuffer_Buffer2.Load(PositionViewport, SampleIndex);
+		float4 NormalSpecularColor = ZERNGBuffer_Buffer3.Load(PositionViewport, SampleIndex);
+	#else
+		float2 GBufferDimensions;
+		ZERNGBuffer_DepthBuffer.GetDimensions(GBufferDimensions.x, GBufferDimensions.y);
+		float Depth = ZERNGBuffer_DepthBuffer.Load(int3(PositionViewport, 0)).x;
+		float4 VelocitySpecularPower = ZERNGBuffer_Buffer1.Load(int3(PositionViewport, 0));
+		float4 DiffuseSubsurface = ZERNGBuffer_Buffer2.Load(int3(PositionViewport, 0));
+		float4 NormalSpecularColor = ZERNGBuffer_Buffer3.Load(int3(PositionViewport, 0));
+	#endif
+	
+	ZERNShading_Surface Surface;
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, Depth);
+	Surface.SpecularPower = VelocitySpecularPower.w;
+	Surface.Diffuse = DiffuseSubsurface.xyz;
+	Surface.SubsurfaceScattering = DiffuseSubsurface.w;
+	Surface.NormalView = normalize(NormalSpecularColor.xyz * 2.0f - 1.0f);
+	Surface.Specular = NormalSpecularColor.www;
+	
+	return Surface;
+}
+
+bool ZERNShading_EdgeDetection_MSAA(ZERNShading_Surface Surfaces[SAMPLE_COUNT])
+{
+	bool EdgePixel = false;
+	[unroll]
+	for (uint S = 1; S < SAMPLE_COUNT; S++)
+	{
+		EdgePixel = EdgePixel || 
+		(abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > ZERNShading_EdgeDetection_DepthThreshold) || 
+		(dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < ZERNShading_EdgeDetection_NormalThreshold);
+	}
+	
+	return EdgePixel;
+}
 
 float4 ZERNShading_CalculateFogColor(float3 PositionView)
 {
@@ -421,12 +480,15 @@ float3 ZERNShading_PointShading(ZERNShading_PointLight PointLight, ZERNShading_S
 	return ResultColor;
 }
 
-float3 ZERNShading_SpotShadowing(ZERNShading_SpotLightShadow SpotLightShadow, uint ShadowMapIndex, ZERNShading_Surface Surface)
+float3 ZERNShading_SpotShadowing(ZERNShading_SpotLight SpotLight, ZERNShading_Surface Surface)
 {
 	float Visibility = 1.0f;
 	
-	if (Surface.PositionView.z < ZERNView_ShadowDistance)
+	[branch]
+	if (SpotLight.CastShadow)
 	{
+		ZERNShading_SpotLightShadow SpotLightShadow = ZERNShading_SpotLightsShadow[SpotLight.ShadowIndex];
+
 		float3 TexCoordDepth;
 		if (ZERNShading_InsideLightVolume(SpotLightShadow.ProjectionTransform, Surface.PositionView, TexCoordDepth))
 		{
@@ -435,27 +497,17 @@ float3 ZERNShading_SpotShadowing(ZERNShading_SpotLightShadow SpotLightShadow, ui
 			ZERNShading_SpotShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 		
 			TexCoordDepth.z += SpotLightShadow.ShadowDepthBias;
-			Visibility = ZERNShading_CalculateVisibilityArray(SpotLightShadow.ShadowSampleCount, SpotLightShadow.ShadowSampleLength, ZERNShading_SpotShadowMaps, ShadowMapIndex, ShadowMapDimensions, TexCoordDepth);
+			Visibility = ZERNShading_CalculateVisibilityArray(SpotLightShadow.ShadowSampleCount, SpotLightShadow.ShadowSampleLength, ZERNShading_SpotShadowMaps, SpotLight.ShadowIndex, ShadowMapDimensions, TexCoordDepth);
 		}
 	}
 
 	return Visibility;
 }
 
-float3 ZERNShading_SpotShading(
-#ifdef ZERN_RENDER_SPOT_LIGHT_SHADOW
-ZERNShading_SpotLightShadow SpotLightShadow, uint ShadowMapIndex
-#else
-ZERNShading_SpotLight SpotLight
-#endif
-, ZERNShading_Surface Surface)
-{	
+float3 ZERNShading_SpotShading(ZERNShading_SpotLight SpotLight, ZERNShading_Surface Surface)
+{
 	float3 ResultColor = 0.0f;
-	
-	#ifdef ZERN_RENDER_SPOT_LIGHT_SHADOW
-		ZERNShading_SpotLight SpotLight = SpotLightShadow.SpotLight;
-	#endif
-	
+
 	float3 VectorToLight = SpotLight.PositionView - Surface.PositionView;
 	float DistanceToLight = length(VectorToLight);
 	if (DistanceToLight < SpotLight.Range)
@@ -472,13 +524,77 @@ ZERNShading_SpotLight SpotLight
 				ResultColor = ZERNShading_TotalBRDF(LightDirectionView, Surface) * SpotLight.Color * NdotL * 
 				pow(saturate((CosAlpha - SpotLight.CosOuterConeAngle) / (SpotLight.CosInnerConeAngle - SpotLight.CosOuterConeAngle)), SpotLight.FalloffExponent) * 
 				ZERNShading_DistanceAttenuation(SpotLight.FalloffExponent, SpotLight.Range, DistanceToLight);
-				#ifdef ZERN_RENDER_SPOT_LIGHT_SHADOW
-					ResultColor *= ZERNShading_SpotShadowing(SpotLightShadow, ShadowMapIndex, Surface);
-				#endif
+
+				ResultColor *= ZERNShading_SpotShadowing(SpotLight, Surface);
 			}
 		}
 	}
 	
 	return ResultColor;
 }
+
+float3 ZERNShading_Shade(float2 PositionViewport, ZERNShading_Surface Surface)
+{
+	float3 ResultColor = 0.0f;
+	
+	uint2 TileId = floor(PositionViewport) / TILE_DIMENSION;
+	uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
+	uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
+	
+	uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
+	uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1];
+	
+	[unroll(2)]
+	for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
+		ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
+	
+	uint LoopCount = TilePointLightCount & (WORK_COUNT - 1);
+	uint BufferIndex = TileStartOffset + 2;
+	uint LightIndices[WORK_COUNT];
+	
+	[unroll(WORK_COUNT - 1)]
+	for (uint JJ = 0; JJ < LoopCount; JJ++)
+	{
+		LightIndices[JJ] = ZERNShading_TileLightIndices[BufferIndex++];
+		
+		ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[LightIndices[JJ]], Surface);
+	}
+	
+	for (uint J = LoopCount; J < TilePointLightCount; J += WORK_COUNT)
+	{
+		[unroll]
+		for (int W = 0; W < WORK_COUNT; W++)
+			LightIndices[W] = ZERNShading_TileLightIndices[BufferIndex++];
+		
+		[unroll]
+		for (int WW = 0; WW < WORK_COUNT; WW++)
+			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[LightIndices[WW]], Surface);
+	}
+	
+	#ifdef ZERN_FM_FORWARD
+		uint SpotLightCount = TileTotalLightCount - TilePointLightCount;
+		LoopCount = (SpotLightCount & (WORK_COUNT - 1));
+		
+		[unroll(WORK_COUNT - 1)]
+		for (uint KK = 0; KK < LoopCount; KK++)
+		{
+			LightIndices[KK] = ZERNShading_TileLightIndices[BufferIndex++];
+			ResultColor += ZERNShading_SpotShading(ZERNShading_SpotLights[LightIndices[KK]], Surface);
+		}
+		
+		for (uint K = LoopCount; K < SpotLightCount; K += WORK_COUNT)
+		{
+			[unroll]
+			for (int W = 0; W < WORK_COUNT; W++)
+				LightIndices[W] = ZERNShading_TileLightIndices[BufferIndex++];
+			
+			[unroll]
+			for (int WW = 0; WW < WORK_COUNT; WW++)
+				ResultColor += ZERNShading_SpotShading(ZERNShading_SpotLights[LightIndices[WW]], Surface);
+		}
+	#endif
+	
+	return ResultColor;	
+}
+
 #endif
