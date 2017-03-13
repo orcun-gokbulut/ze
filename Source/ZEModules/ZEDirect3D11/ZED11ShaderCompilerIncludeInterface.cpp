@@ -114,6 +114,8 @@ bool ZED11ShaderCompilerIncludeInterface::ReadInclude(const ZEString& pFileName,
 		ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
 	}
 	
+	const_cast<ZEGRShaderCompileOptions*>(CompileOptions)->IncludeFiles.Add(FileInfo.GetFileName());
+
 	return true;
 
 }

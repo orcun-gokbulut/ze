@@ -39,7 +39,7 @@
 
 #include "ZEPointer/ZEHolder.h"
 
-ZE_ENUM(ZEGRBufferType)
+ZE_ENUM_TYPED(ZEGRBufferType, ZEUInt8)
 {
 	ZEGR_BT_NONE,
 	ZEGR_BT_VERTEX_BUFFER,
@@ -74,7 +74,7 @@ class ZEGRBuffer : public ZEGRResource
 		ZEGRBufferType						GetBufferType() const;
 		virtual ZEGRResourceType			GetResourceType() const;
 
-		void								SetData(const void* Data);
+		void								SetData(const void* Data, ZESize DataSize = 0);
 
 		virtual bool						Map(ZEGRResourceMapType MapType, void** Buffer, ZESize* SizeInBytes = NULL) = 0;
 		virtual void						Unmap() = 0;

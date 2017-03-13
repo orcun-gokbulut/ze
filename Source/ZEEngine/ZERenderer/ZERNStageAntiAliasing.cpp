@@ -240,6 +240,7 @@ void ZERNStageAntiAliasing::ClearTextures(ZEGRContext* Context)
 {
 	Context->ClearRenderTarget(EdgeRenderTarget, ZEVector4::Zero);
 	Context->ClearRenderTarget(BlendRenderTarget, ZEVector4::Zero);
+	Context->ClearDepthStencilBuffer(DepthTexture->GetDepthStencilBuffer(true), false, true, 0.0f, 0x00);
 }
 
 void ZERNStageAntiAliasing::DoEdgeDetection(ZEGRContext* Context)
@@ -467,7 +468,7 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	//if (TemporalEnabled)
 		//GenerateVelocityBuffer(Context);
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 12, VelocityBuffer);
+	//Context->SetTexture(ZEGR_ST_PIXEL, 12, VelocityBuffer);
 	
 	ClearTextures(Context);
 	DoEdgeDetection(Context);
