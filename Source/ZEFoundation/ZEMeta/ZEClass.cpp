@@ -326,22 +326,19 @@ bool ZEClass::Destroy(ZEObject* Object) const
 	return true;
 }
 
-ZEObject* ZEClass::DynamicCast(ZEObject* Object) const
-{
-	return Object;
-}
-
-ZEObject* ZEClass::Clone(ZEObject* Object) const
-{
-	ZEObject* NewObject = new ZEObject();
-	NewObject = Object;
-	return NewObject;
-}
-
 bool ZEClass::Construct(ZEObject* Object) const
 {
 	new(Object) ZEObject();
 	return false;
+}
+
+bool ZEClass::CopyConstruct(ZEObject* DestinationObject, const ZEObject* SourceObject) const
+{
+	if (SourceObject->GetClass() != ZEObject::Class())
+		return false;
+
+	new (DestinationObject) ZEObject(*SourceObject);
+	return true;
 }
 
 bool ZEClass::Deconstruct(ZEObject* Object) const
@@ -350,30 +347,26 @@ bool ZEClass::Deconstruct(ZEObject* Object) const
 	return true;
 }
 
-bool ZEClass::Assign(ZEObject* Object, const ZEObject* Source) const
+bool ZEClass::Assign(ZEObject* DestinationObject, const ZEObject* SourceObject) const
 {
-	ZEObject* CastedSource = ZEClass::Cast<ZEObject>(const_cast<ZEObject*>(Source));
-	if (CastedSource == NULL)
+	if (SourceObject->GetClass() != ZEObject::Class())
 		return false;
 
-	*(ZEObject*)Object = *CastedSource;
-
+	*DestinationObject = *SourceObject;
 	return true;
 }
 
-bool ZEClass::Copy(ZEObject* Destination, const ZEObject* Source) const
+ZEObject* ZEClass::Clone(const ZEObject* Object) const
 {
-	return false;
+	if (Object->GetClass() != ZEObject::Class())
+		return NULL;
+
+	return new ZEObject(*Object);
 }
 
-bool ZEClass::Equals(ZEObject* A, const ZEObject* B) const
+ZEObject* ZEClass::DynamicCast(ZEObject* Object) const
 {
-	return false;
-}
-
-bool ZEClass::NotEquals(ZEObject* A, const ZEObject* B) const
-{
-	return false;
+	return Object;
 }
 
 ZEObject* ZEClass::CreateScriptInstance() const

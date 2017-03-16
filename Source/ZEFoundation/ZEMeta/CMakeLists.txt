@@ -76,18 +76,23 @@ ze_add_source(ZEMTType.h							Sources Headers)
 ze_add_source(ZEMTTypeGenerator.cpp					Sources)
 ze_add_source(ZEMTTypeGenerator.h					Sources Headers)
 ze_add_source(ZEMTTypeGeneratorTests.cpp			Tests)
-ze_add_source(ZEMTTypeTestTable.h					Sources)
+ze_add_source(ZEMTTypeGeneratorDynamic.cpp			Sources)
+ze_add_source(ZEMTTypeGeneratorDynamic.h			Sources Headers)
+ze_add_source(ZEMTTypeGeneratorDynamicTests.cpp		Tests)
 ze_add_source(ZEMTRegistar.cpp						Sources)
 ze_add_source(ZEMTRegistar.h						Sources Headers)
 ze_add_source(ZEMTModuleRegistar.cpp				Sources)
 ze_add_source(ZEMTModuleRegistar.h					Sources Headers)
+ze_add_source(ZEMTTypeTestTable.h					Sources)
+ze_add_source(ZEMTTestObject.h						Tests ZEMC)
+ze_add_source(ZEMTTestObject.cpp					Tests)
 
 ze_add_library(TARGET ZEMeta 
 	SOURCES ${Sources}
-	HEADERS ${Headers} 
+	HEADERS ${Headers}
 	LIBS ZEDS)
 	
 ze_add_test(TARGET ZEMetaTests
-	SOURCES ${Tests}
+	SOURCES ${Tests} ZEVariantTest.cpp
 	LIBS ZEFoundation
 	TEST_TARGET ZEMeta)

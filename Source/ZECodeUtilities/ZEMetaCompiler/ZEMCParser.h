@@ -86,10 +86,10 @@ class ZEMCParser
 		bool							CheckTargetDeclaration(Decl* Declaration);
 
 		// Memory Management
-		void							CheckNonPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDefaultCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDefaultAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 

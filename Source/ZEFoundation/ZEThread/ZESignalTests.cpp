@@ -89,21 +89,21 @@ void SignalFunction4(ZEThread* Thread, void* Parameter)
 	Sleep(1000);
 }
 
-ZETestSuite(ZESignal)
+ZE_TEST(ZESignal)
 {
-	ZETest("ZESignal::ZESignal()")
+	ZE_TEST_ITEM("ZESignal::ZESignal()")
 	{
 		ZESignal TestSignal;
 	}
 
-	ZETest("ZESignal::ZESignal(const ZESignal& Other)")
+	ZE_TEST_ITEM("ZESignal::ZESignal(const ZESignal& Other)")
 	{
 		ZESignal SignalA;
 
 		ZESignal SignalB(SignalA);
 	}
 
-	ZETest("ZESignal ZESignal::operator=(const ZESignal& Other)")
+	ZE_TEST_ITEM("ZESignal ZESignal::operator=(const ZESignal& Other)")
 	{
 		ZESignal SignalA;
 		ZESignal SignalB;
@@ -111,7 +111,7 @@ ZETestSuite(ZESignal)
 		SignalA = SignalB;
 	}
 
-	ZETest("run thread which calls ZESignal::Wait()")
+	ZE_TEST_ITEM("run thread which calls ZESignal::Wait()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -133,7 +133,7 @@ ZETestSuite(ZESignal)
 		Signal.Signal();
 	}
 
-	ZETest("run threads which call ZESignal::Wait(), and the last one calls ZESignal::Signal()")
+	ZE_TEST_ITEM("run threads which call ZESignal::Wait(), and the last one calls ZESignal::Signal()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -155,7 +155,7 @@ ZETestSuite(ZESignal)
 		Signal.Signal();
 	}
 
-	ZETest("run threads which call ZESignal::Wait()")
+	ZE_TEST_ITEM("run threads which call ZESignal::Wait()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -181,7 +181,7 @@ ZETestSuite(ZESignal)
 		Sleep(1000);
 	}
 
-	ZETest("run thread which calls ZESignal::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run thread which calls ZESignal::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -202,7 +202,7 @@ ZETestSuite(ZESignal)
 		Sleep(3000);
 	}
 
-	ZETest("run threads which call ZESignal::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads which call ZESignal::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;

@@ -39,7 +39,6 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
 #include "ZEDS/ZEDelegate.h"
 
 enum ZEOptionAttribute

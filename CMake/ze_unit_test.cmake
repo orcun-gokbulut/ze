@@ -38,7 +38,7 @@ function (ze_add_test)
 		return()
 	endif()
 
-	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_process_source_parameters};${ze_check_parameters}" "" ${ARGV})
 		
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -46,7 +46,9 @@ function (ze_add_test)
 	endif()
 	
 	add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES} ${PARAMETER_EXTRA_SOURCES})
-
+	
+	ze_process_sources()
+	
 	if (PARAMETER_TARGET)
 		set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "Tests/${ZEBUILD_PROJECT_FOLDER}")
 	else()

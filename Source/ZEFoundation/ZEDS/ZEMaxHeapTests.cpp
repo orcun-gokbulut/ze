@@ -36,6 +36,6 @@
 #include "ZETest/ZETest.h"
 #include "ZEMaxHeap.h"
 
-ZETestSuite(ZEMaxHeap)
+ZE_TEST(ZEMaxHeap)
 {
 }

@@ -39,26 +39,26 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
 
-ZETestSuite(Rectangle)
+ZE_TEST(Rectangle)
 {
 
-	ZETest("RECT_Constructor")
+	ZE_TEST_ITEM("RECT_Constructor")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
 		ZERectangle R(LU, RD);
-		ZETestCheckEqual(R.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R.RightDown, ZEVector2(3.0f, 2.0f));
+		ZE_TEST_CHECK_EQUAL(R.LeftUp, ZEVector2(1.0f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(R.RightDown, ZEVector2(3.0f, 2.0f));
 
 		ZERectangle R2(LU, 2.0f, 2.0f);
-		ZETestCheckEqual(R2.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R2.RightDown, ZEVector2(3.0f, 2.0f));
+		ZE_TEST_CHECK_EQUAL(R2.LeftUp, ZEVector2(1.0f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(R2.RightDown, ZEVector2(3.0f, 2.0f));
 
 
 
 	}
 
-	ZETest("RECT_BoundingTest")
+	ZE_TEST_ITEM("RECT_BoundingTest")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -77,7 +77,7 @@ ZETestSuite(Rectangle)
 		CHECK_EQUAL(result3, true);
 	}
 
-	ZETest("RECT_GetCorner")
+	ZE_TEST_ITEM("RECT_GetCorner")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -88,14 +88,14 @@ ZETestSuite(Rectangle)
 		ZEVector2 C3 = R.GetCorner(ZE_RC_RIGHTDOWN);
 		ZEVector2 C4 = R.GetCorner(ZE_RC_RIGHTUP);
 
-		ZETestCheckEqual(C1, ZEVector2(1.0f, 2.0f));
-		ZETestCheckEqual(C2, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(C3, ZEVector2(3.0f, 2.0f));
-		ZETestCheckEqual(C4, ZEVector2(3.0f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(C1, ZEVector2(1.0f, 2.0f));
+		ZE_TEST_CHECK_EQUAL(C2, ZEVector2(1.0f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(C3, ZEVector2(3.0f, 2.0f));
+		ZE_TEST_CHECK_EQUAL(C4, ZEVector2(3.0f, 4.0f));
 
 	}
 
-	ZETest("RECT_GetWidth")
+	ZE_TEST_ITEM("RECT_GetWidth")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -103,11 +103,11 @@ ZETestSuite(Rectangle)
 
 		float w = R.GetWidth();
 
-		ZETestCheckEqual(w, 2.0f);
+		ZE_TEST_CHECK_EQUAL(w, 2.0f);
 
 	}
 
-	ZETest("RECT_GetHeight")
+	ZE_TEST_ITEM("RECT_GetHeight")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -115,7 +115,7 @@ ZETestSuite(Rectangle)
 
 		float h = R.GetHeight();
 
-		ZETestCheckEqual(h, 2.0f);
+		ZE_TEST_CHECK_EQUAL(h, 2.0f);
 
 	}
 }*/

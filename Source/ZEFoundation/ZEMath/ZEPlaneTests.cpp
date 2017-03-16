@@ -46,30 +46,30 @@
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
 
 
-ZETestSuite(ZEPlane)
+ZE_TEST(ZEPlane)
 {
-	ZETest("ZEPlane::ZEPlane(const ZEVector3 & n, const ZEVector3 & p)")
+	ZE_TEST_ITEM("ZEPlane::ZEPlane(const ZEVector3 & n, const ZEVector3 & p)")
 	{
 		ZEVector3 Normal(1.0f, 2.0f, 3.0f);
 		ZEVector3 Position(0.0f, 6.0f, 0.0f);
 
 		ZEPlane Plane(Normal.Normalize(), Position);
 
-		ZETestCheckClose(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
-		ZETestCheckClose(Plane.p, Position);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.p, Position);
 	}
-	ZETest("ZEPlane::ZEPlane(const ZEVector3 & n, const ZEVector3 & p) with usin normalize")
+	ZE_TEST_ITEM("ZEPlane::ZEPlane(const ZEVector3 & n, const ZEVector3 & p) with usin normalize")
 	{
 		ZEVector3 Normal(1.0f, 2.0f, 3.0f);
 		ZEVector3 Position(0.0f, 6.0f, 0.0f);
 
 		ZEPlane Plane(Normal.Normalize(), Position);
 
-		ZETestCheckClose(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
-		ZETestCheckClose(Plane.p, Position);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.p, Position);
 	}
 
-	ZETest("inline void ZEPlane::Create(ZEPlane & Plane, const ZEVector3 & n, const ZEVector3 & p)")
+	ZE_TEST_ITEM("inline void ZEPlane::Create(ZEPlane & Plane, const ZEVector3 & n, const ZEVector3 & p)")
 	{
 		ZEVector3 Normal(1.0f, 2.0f, 3.0f);
 		ZEVector3 Position(0.0f, 6.0f, 0.0f);
@@ -77,18 +77,18 @@ ZETestSuite(ZEPlane)
 
 		ZEPlane::Create(Plane, Normal.Normalize(), Position);
 		
-		ZETestCheckClose(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
-		ZETestCheckClose(Plane.p, Position);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.n, ZEVector3(0.26726124f, 0.53452247f, 0.80178368f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.p, Position);
 
 	}
 
-	ZETest("void ZEPlane::Create(ZEPlane & Plane, float a, float b, float c, float d)")
+	ZE_TEST_ITEM("void ZEPlane::Create(ZEPlane & Plane, float a, float b, float c, float d)")
 	{
 		//Due to errors known this test is skipped. (Refer to Redmine : Bug #208)
 
-		ZETestCheck(false);
+		ZE_TEST_CHECK_ERROR(false);
 	}
-	ZETest("void ZEPlane::Create(ZEPlane & Plane, const ZEVector3 & P1, const ZEVector3 & P2, const ZEVector3 & P3)")
+	ZE_TEST_ITEM("void ZEPlane::Create(ZEPlane & Plane, const ZEVector3 & P1, const ZEVector3 & P2, const ZEVector3 & P3)")
 	{
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZEVector3 P2(0.0f, 3.0f, 1.0f);
@@ -97,11 +97,11 @@ ZETestSuite(ZEPlane)
 
 		ZEPlane::Create(Plane, P1, P2, P3);
 
-		ZETestCheckClose(Plane.n, ZEVector3(11.0f, 3.0f, -4.0f));
-		ZETestCheckClose(Plane.p, P3);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.n, ZEVector3(11.0f, 3.0f, -4.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.p, P3);
 	}
 
-	ZETest("float ZEPlane::Distance(const ZEPlane & Plane, const ZEVector3 & Point)")
+	ZE_TEST_ITEM("float ZEPlane::Distance(const ZEPlane & Plane, const ZEVector3 & Point)")
 	{
 		ZEVector3 Position(-4.0f, 0.0f, 0.0f);
 		ZEVector3 Normal(2.0f, -2.0f, 5.0f);
@@ -111,10 +111,10 @@ ZETestSuite(ZEPlane)
 
 		float Distance = ZEPlane::Distance(Plane, Point);
 
-		ZETestCheckClose(Distance, ExpectedValue);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Distance, ExpectedValue);
 	}
 
-	ZETest("float ZEPlane::DistanceSigned(const ZEPlane & Plane, const ZEVector3 & Point)")
+	ZE_TEST_ITEM("float ZEPlane::DistanceSigned(const ZEPlane & Plane, const ZEVector3 & Point)")
 	{
 		ZEPlane Plane(ZEVector3::UnitY, ZEVector3::Zero);
 
@@ -122,19 +122,19 @@ ZETestSuite(ZEPlane)
 
 		float Distance = ZEPlane::DistanceSigned(Plane, Point);
 
-		ZETestCheckClose(Distance, 1.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Distance, 1.0f);
 
-		ZETestCase("Point is on the negative side of the Plane")
+		ZE_TEST_CASE("Point is on the negative side of the Plane")
 		{
 			Point = ZEVector3(0.0f, -1.0f, 0.0f);
 
 			Distance = ZEPlane::DistanceSigned(Plane, Point);
 
-			ZETestCheckClose(Distance, -1.0f);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Distance, -1.0f);
 		}
 	}
 
-	ZETest("bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)")
+	ZE_TEST_ITEM("bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)")
 	{
 		ZEPlane Plane(ZEVector3(-0.45415181f, 0.84296310f, -0.28823227f), ZEVector3(10.000000f, 10.000000f, 10.000000f));
 
@@ -145,11 +145,11 @@ ZETestSuite(ZEPlane)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEPlane::IntersectionTest(Plane, Line, Tmin));
-		ZETestCheckClose(Tmin, 3.1736126f);
+		ZE_TEST_CHECK_ERROR(ZEPlane::IntersectionTest(Plane, Line, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 3.1736126f);
 	}
 
-	ZETest("bool ZEPlane::IntersectionTest(const ZEPlane & Plane, const ZELineSegment & LineSegment, float & t)")
+	ZE_TEST_ITEM("bool ZEPlane::IntersectionTest(const ZEPlane & Plane, const ZELineSegment & LineSegment, float & t)")
 	{
 		ZEPlane Plane(ZEVector3(-0.38192877f, 0.58054721f, 0.71906567f), ZEVector3(10.000000f, 10.000000f, 9.9583693f));
 
@@ -161,11 +161,11 @@ ZETestSuite(ZEPlane)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEPlane::IntersectionTest(Plane, LineSegment, Tmin));
-		ZETestCheckClose(Tmin, 1.8733033f);
+		ZE_TEST_CHECK_ERROR(ZEPlane::IntersectionTest(Plane, LineSegment, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 1.8733033f);
 	}
 
-	ZETest("bool ZEPlane::IntersectionTest(const ZEPlane & Plane, const ZERay & Ray, float & t)")
+	ZE_TEST_ITEM("bool ZEPlane::IntersectionTest(const ZEPlane & Plane, const ZERay & Ray, float & t)")
 	{
 		ZEPlane Plane(ZEVector3(0.00011430681f, 0.027386654f, 0.99959040f), ZEVector3(10.000000f, 10.000000f, 10.000000f));
 
@@ -176,11 +176,11 @@ ZETestSuite(ZEPlane)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEPlane::IntersectionTest(Plane, Ray, Tmin));
-		ZETestCheckClose(Tmin, 3.6525095f);
+		ZE_TEST_CHECK_ERROR(ZEPlane::IntersectionTest(Plane, Ray, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 3.6525095f);
 	}
 
-	ZETest("bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line)")
+	ZE_TEST_ITEM("bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line)")
 	{
 		ZEPlane Plane(ZEVector3(-0.26467854f, 0.92264909f, -0.28022793f), ZEVector3(10.000000f, 10.000000f, 10.000000f));
 
@@ -188,48 +188,48 @@ ZETestSuite(ZEPlane)
 
 		ZELine IntersectionLine;
 
-		ZETestCheck(ZEPlane::IntersectionTest(Plane, Plane2, IntersectionLine));
-		ZETestCheckClose(IntersectionLine.v, ZEVector3(0.68456811f, 0.0074984729f, -0.62189388f));
-		ZETestCheckClose(IntersectionLine.p, ZEVector3(-1.9594314f, 2.8874888f, -2.1220863f));
+		ZE_TEST_CHECK_ERROR(ZEPlane::IntersectionTest(Plane, Plane2, IntersectionLine));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(IntersectionLine.v, ZEVector3(0.68456811f, 0.0074984729f, -0.62189388f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(IntersectionLine.p, ZEVector3(-1.9594314f, 2.8874888f, -2.1220863f));
 
-		ZETestCase("A Plane is perpendicular-like to the other Plane")
+		ZE_TEST_CASE("A Plane is perpendicular-like to the other Plane")
 		{
 			ZEPlane Plane3(ZEVector3(0.80723447f, -0.11843055f, -0.57823169f), ZEVector3(10.000000f, 10.000000f, 9.8403788f));
 			ZEPlane Plane4(ZEVector3(-0.24958232f, 0.75233221f, -0.60967606f), ZEVector3(0.00000000f, 0.00000000f, 0.00000000f));
 
-			ZETestCheck(ZEPlane::IntersectionTest(Plane3, Plane4, IntersectionLine));
-			ZETestCheckClose(IntersectionLine.v, ZEVector3(0.50722659f, 0.63646793f, 0.57775033f));
-			ZETestCheckClose(IntersectionLine.p, ZEVector3(0.98940450f, -0.19849156f, -0.64996719f));
+			ZE_TEST_CHECK_ERROR(ZEPlane::IntersectionTest(Plane3, Plane4, IntersectionLine));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(IntersectionLine.v, ZEVector3(0.50722659f, 0.63646793f, 0.57775033f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(IntersectionLine.p, ZEVector3(0.98940450f, -0.19849156f, -0.64996719f));
 		}
 	}
 
-	ZETest("ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane & Plane, const ZEVector3 & Point)")
+	ZE_TEST_ITEM("ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane & Plane, const ZEVector3 & Point)")
 	{
 		ZEPlane Plane1(ZEVector3(-0.34949848f, -0.59127051f, -0.72622430f), ZEVector3(10.000000f, 10.000000f, 10.000000f));
 
 		ZEVector3 Point1(3.0925016f, 4.8406324f, 3.4473403f);
 
-		ZETestCheckEqual(ZEPlane::TestHalfSpace(Plane1, Point1), ZE_HS_POSITIVE_SIDE);
+		ZE_TEST_CHECK_EQUAL(ZEPlane::TestHalfSpace(Plane1, Point1), ZE_HS_POSITIVE_SIDE);
 
-		ZETestCase("Point is on the negative side of Plane")
+		ZE_TEST_CASE("Point is on the negative side of Plane")
 		{
 			ZEPlane Plane2(ZEVector3(0.69542390f, 0.71835214f, -0.014615774f), ZEVector3(10.000000f, 10.000000f, 10.000000f));
 
 			ZEVector3 Point2(4.1709037f, 2.8175602f, 1.2879727f);
 
-			ZETestCheckEqual(ZEPlane::TestHalfSpace(Plane2, Point2), ZE_HS_NEGATIVE_SIDE);
+			ZE_TEST_CHECK_EQUAL(ZEPlane::TestHalfSpace(Plane2, Point2), ZE_HS_NEGATIVE_SIDE);
 		}
-		ZETestCase("Point is on the Plane")
+		ZE_TEST_CASE("Point is on the Plane")
 		{
 			ZEPlane Plane3(ZEVector3::UnitY, ZEVector3::Zero);
 
 			ZEVector3 Point3 = ZEVector3::UnitZ;
 
-			ZETestCheckEqual(ZEPlane::TestHalfSpace(Plane3, Point3), ZE_HS_ON_PLANE);
+			ZE_TEST_CHECK_EQUAL(ZEPlane::TestHalfSpace(Plane3, Point3), ZE_HS_ON_PLANE);
 		}
 	}
 
-	static bool ZETestCheckPlaneLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -262,19 +262,19 @@ ZETestSuite(ZEPlane)
 		return Result;
 	}
 
-	ZETest("ZEPlane vs ZELine Intersection Test")
+	ZE_TEST_ITEM("ZEPlane vs ZELine Intersection Test")
 	{
-		ZETestCheck(ZETestCheckPlaneLineIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckPlaneLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 
-	static bool ZETestCheckPlaneLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -311,19 +311,19 @@ ZETestSuite(ZEPlane)
 		return Result;
 	}
 
-	ZETest("ZEPlane vs ZELineSegment Intersection Test")
+	ZE_TEST_ITEM("ZEPlane vs ZELineSegment Intersection Test")
 	{
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckPlaneLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 
-	static bool ZETestCheckPlaneRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -351,15 +351,15 @@ ZETestSuite(ZEPlane)
 		return Result;
 	}
 
-	ZETest("ZEPlane vs ZERay Intersection Test")
+	ZE_TEST_ITEM("ZEPlane vs ZERay Intersection Test")
 	{
-		ZETestCheck(ZETestCheckPlaneRayIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckPlaneRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORPlaneRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 }

@@ -36,14 +36,14 @@
 #include "ZETest/ZETest.h"
 #include "ZEMinHeap.h"
 
-bool ZETestCheckHeapTree(ZEMinHeap<ZEInt> Heap, ZESize Index = 0)
+bool ZE_TEST_CHECK_ERRORHeapTree(ZEMinHeap<ZEInt> Heap, ZESize Index = 0)
 {
 	if (Heap.GetFirstChildIndex(Index) < Heap.GetCount())
 	{
 		if (Heap.GetFirstChild(Index) > Heap.GetArray()[Index])
 			return false;
 
-		if (ZETestCheckHeapTree(Heap, Heap.GetFirstChildIndex(Index)))
+		if (ZE_TEST_CHECK_ERRORHeapTree(Heap, Heap.GetFirstChildIndex(Index)))
 			return false;
 	}
 	
@@ -52,114 +52,114 @@ bool ZETestCheckHeapTree(ZEMinHeap<ZEInt> Heap, ZESize Index = 0)
 		if (Heap.GetSecondChild(Index) > Heap.GetArray()[Index])
 			return false;
 
-		if (ZETestCheckHeapTree(Heap, Heap.GetSecondChildIndex(Index)))
+		if (ZE_TEST_CHECK_ERRORHeapTree(Heap, Heap.GetSecondChildIndex(Index)))
 			return false;
 	}
 
 	return true;
 }
 
-ZETestSuite(ZEMinHeap)
+ZE_TEST(ZEMinHeap)
 {
-	ZETest("GetMin")
+	ZE_TEST_ITEM("GetMin")
 	{
 		
 	}
 
-	ZETest("Insert")
+	ZE_TEST_ITEM("Insert")
 	{
-		ZETestCase("InsertOrdered")
+		ZE_TEST_CASE("InsertOrdered")
 		{
 			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(1);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(2);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(3);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(4);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(5);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 		}
 
-		ZETestCase("InsertInverseOrdered")
+		ZE_TEST_CASE("InsertInverseOrdered")
 		{
 			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(5);
-			ZETestCheckEqual(TestHeap.GetMin(), 5);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 5);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(4);
-			ZETestCheckEqual(TestHeap.GetMin(), 4);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 4);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(3);
-			ZETestCheckEqual(TestHeap.GetMin(), 3);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 3);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(2);
-			ZETestCheckEqual(TestHeap.GetMin(), 2);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 2);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(1);
-			ZETestCheckEqual(TestHeap.GetMin(), 1);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 1);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 		}
 
-		ZETestCase("InsertNotOrdered")
+		ZE_TEST_CASE("InsertNotOrdered")
 		{
 			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(5);
-			ZETestCheckEqual(TestHeap.GetMin(), 5);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 5);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(10);
-			ZETestCheckEqual(TestHeap.GetMin(), 5);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 5);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(15);
-			ZETestCheckEqual(TestHeap.GetMin(), 5);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 5);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(10);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.InsertValue(15);
-			ZETestCheckEqual(TestHeap.GetMin(), 0);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 0);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 		}
 	}
 
-	ZETest("Remove")
+	ZE_TEST_ITEM("Remove")
 	{
 
-		ZETestCase("RemoveFirstElement")
+		ZE_TEST_CASE("RemoveFirstElement")
 		{
 			ZEMinHeap<ZEInt> TestHeap;
 			TestHeap.InsertValue(1);
@@ -170,46 +170,46 @@ ZETestSuite(ZEMinHeap)
 			TestHeap.InsertValue(6);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 2);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 2);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 3);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 3);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 4);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 4);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 5);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 5);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetMin(), 6);
-			ZETestCheckHeapTree(TestHeap);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetMin(), 6);
+			ZE_TEST_CHECK_ERRORHeapTree(TestHeap);
 
 			TestHeap.Remove(0);
-			ZETestCheckEqual(TestHeap.GetCount(), 0);
+			ZE_TEST_CHECK_EQUAL(TestHeap.GetCount(), 0);
 		}
 
 	}	
 
-	ZETest("GetCount")
+	ZE_TEST_ITEM("GetCount")
 	{
 		ZEMinHeap<ZEInt> TestHeap;
 
-		ZETestCheckEqual(TestHeap.GetCount(), 0);
+		ZE_TEST_CHECK_EQUAL(TestHeap.GetCount(), 0);
 
 		TestHeap.InsertValue(1);
 		TestHeap.InsertValue(2);
 		TestHeap.InsertValue(3);
 
-		ZETestCheckEqual(TestHeap.GetCount(), 3);
+		ZE_TEST_CHECK_EQUAL(TestHeap.GetCount(), 3);
 	}
 
 
-	ZETest("AssignmentAndCopyConstructor")
+	ZE_TEST_ITEM("AssignmentAndCopyConstructor")
 	{
 		ZEMinHeap<ZEInt> TestHeap;
 	}

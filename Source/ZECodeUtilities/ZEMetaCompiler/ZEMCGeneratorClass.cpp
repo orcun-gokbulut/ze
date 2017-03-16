@@ -54,12 +54,13 @@ void ZEMCGenerator::GenerateClass(ZEMCClass* CurrentClass)
 
 	GenerateClassGetSizeOfObject(CurrentClass);
 	GenerateClassCreateInstance(CurrentClass);
-	GenerateClassDestroy(CurrentClass);
-	GenerateClassDynamicCast(CurrentClass);
 	GenerateClassClone(CurrentClass);
+	GenerateClassDestroy(CurrentClass);
 	GenerateClassConstruct(CurrentClass);
+	GenerateClassCopyConstruct(CurrentClass);
 	GenerateClassDeconstruct(CurrentClass);
 	GenerateClassAssign(CurrentClass);
+	GenerateClassDynamicCast(CurrentClass);
 
 	GenerateClassGetSizeOfScriptObject(CurrentClass);
 	GenerateClassCreateScriptInstance(CurrentClass);
@@ -69,30 +70,115 @@ void ZEMCGenerator::GenerateClass(ZEMCClass* CurrentClass)
 	GenerateClassScriptObject(CurrentClass);
 }
 
-void ZEMCGenerator::GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName, const char* DestinationName)
+void ZEMCGenerator::GenerateClassTypeCheck(ZEMCClass* CurrentClass, const char* VariableName, bool AllowDerived)
 {
 	if (!CurrentClass->IsFundamental)
 	{
-		WriteToFile(
-			"\t%s* %s = ZEClass::Cast<%s>(%s);\n"
-			"\tif (%s == NULL)\n"
-			"\t\treturn false;\n\n",
-			CurrentClass->Name.ToCString(),
-			DestinationName,
-			CurrentClass->Name.ToCString(),
-			SourceName,
-			DestinationName);
+		if (AllowDerived)
+		{
+			WriteToFile(
+				"\tif (ZEClass::IsDerivedFrom(%s::Class(), %s->GetClass())\n"
+				"\t\treturn false;\n\n",
+				CurrentClass->Name.ToCString(),
+				VariableName);
+		}
+		else
+		{
+			WriteToFile(
+				"\tif (%s->GetClass() != %s::Class())\n"
+				"\t\treturn false;\n\n",
+				VariableName,
+				CurrentClass->Name.ToCString());
+		}
+	}
+	else
+	{
+
+	}
+}
+
+void ZEMCGenerator::GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName, const char* DestinationName, bool AllowDerived)
+{
+	if (!CurrentClass->IsFundamental)
+	{
+		if (AllowDerived)
+		{
+			WriteToFile(
+				"\t%s* %s = ZEClass::Cast<%s>(%s);\n"
+				"\tif (%s == NULL)\n"
+				"\t\treturn false;\n\n",
+				CurrentClass->Name.ToCString(),
+				DestinationName,
+				CurrentClass->Name.ToCString(),
+				SourceName,
+				DestinationName);
+		}
+		else
+		{
+			WriteToFile(
+				"\tif (%s->GetClass() != %s::Class())\n"
+				"\t\treturn false;\n"		
+				"\t%s* %s = static_cast<%s*>(%s);\n\n",
+				SourceName,
+				CurrentClass->Name.ToCString(),
+				CurrentClass->Name.ToCString(),
+				DestinationName,
+				CurrentClass->Name.ToCString(),
+				SourceName);
+		}
 	}
 	else
 	{
 		WriteToFile(
-			"\t%s* %s = reinterpret_cast<%s*>(%s);\n",
+			"\t%s* %s = reinterpret_cast<%s*>(%s);\n\n",
 			CurrentClass->Name.ToCString(),
 			DestinationName,
 			CurrentClass->Name.ToCString(),
 			SourceName);
 	}
 }
+
+void ZEMCGenerator::GenerateCastedObjectConst(ZEMCClass* CurrentClass, const char* SourceName, const char* DestinationName, bool AllowDerived)
+{
+	if (!CurrentClass->IsFundamental)
+	{
+		if (AllowDerived)
+		{
+			WriteToFile(
+				"\tconst %s* %s = ZEClass::CastConst<%s>(%s);\n"
+				"\tif (%s == NULL)\n"
+				"\t\treturn false;\n\n",
+				CurrentClass->Name.ToCString(),
+				DestinationName,
+				CurrentClass->Name.ToCString(),
+				SourceName,
+				DestinationName);
+		}
+		else
+		{
+			WriteToFile(
+				"\tif (%s->GetClass() != %s::Class())\n"
+				"\t\treturn false;\n"		
+				"\tconst %s* %s = static_cast<const %s*>(%s);\n\n",
+				SourceName,
+				CurrentClass->Name.ToCString(),
+				CurrentClass->Name.ToCString(),
+				DestinationName,
+				CurrentClass->Name.ToCString(),
+				SourceName);
+		}
+	}
+	else
+	{
+		WriteToFile(
+			"\tconst %s* %s = reinterpret_cast<const %s*>(%s);\n\n",
+			CurrentClass->Name.ToCString(),
+			DestinationName,
+			CurrentClass->Name.ToCString(),
+			SourceName);
+	}
+}
+
 
 void ZEMCGenerator::GenerateClassMacros(ZEMCClass* CurrentClass)
 {

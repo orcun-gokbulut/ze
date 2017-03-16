@@ -47,10 +47,10 @@
 
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
 
-ZETestSuite(ZETriangle)
+ZE_TEST(ZETriangle)
 {
 
-	ZETest("void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)")
+	ZE_TEST_ITEM("void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)")
 	{
 		ZEVector3 Point0(10.000000f, 10.000000f, 11.154700f);
 		ZEVector3 Point1(11.000000f, 10.000000f, 9.4226494f);
@@ -64,14 +64,14 @@ ZETestSuite(ZETriangle)
 		ZETriangle TriangleFromCreate;
 		ZETriangle::Create(TriangleFromCreate, Point0, Point1, Point2);
 
-		ZETestCheckClose(TriangleManual.V0, TriangleFromCreate.V0);
-		ZETestCheckClose(TriangleManual.V1, TriangleFromCreate.V1);
-		ZETestCheckClose(TriangleManual.V2, TriangleFromCreate.V2);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(TriangleManual.V0, TriangleFromCreate.V0);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(TriangleManual.V1, TriangleFromCreate.V1);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(TriangleManual.V2, TriangleFromCreate.V2);
 	}
 
-	ZETest("float ZETriangle::GetArea(const ZETriangle& Triangle)")
+	ZE_TEST_ITEM("float ZETriangle::GetArea(const ZETriangle& Triangle)")
 	{
-		ZETestCase("Calculating the area of an equilateral ZETriangle")
+		ZE_TEST_CASE("Calculating the area of an equilateral ZETriangle")
 		{
 			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
 			float ExpectedResult = ((2.0f * 2.0f) * ZEMath::Sqrt(3.0f)) / 4.0f;
@@ -79,10 +79,10 @@ ZETestSuite(ZETriangle)
 
 			Result = ZETriangle::GetArea(Triangle);
 
-			ZETestCheckClose(Result, ExpectedResult);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ExpectedResult);
 		}
 
-		ZETestCase("Calculating the area of an isoceles ZETriangle")
+		ZE_TEST_CASE("Calculating the area of an isoceles ZETriangle")
 		{
 			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 2.0f), ZEVector3(1.0f, 0.0f, 0.0f), ZEVector3(-1.0f, 0.0f, 0.0f));
 			float ExpectedResult = (2.0f * 2.0f) / 2.0f;
@@ -90,10 +90,10 @@ ZETestSuite(ZETriangle)
 
 			Result = ZETriangle::GetArea(Triangle);
 
-			ZETestCheckClose(Result, ExpectedResult);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ExpectedResult);
 		}
 
-		ZETestCase("ZETriangle is a random triangle")
+		ZE_TEST_CASE("ZETriangle is a random triangle")
 		{
 			ZETriangle Triangle(ZEVector3(4.0f, 6.0f, 0.0f), ZEVector3(2.0f, 1.0f, 0.0f), ZEVector3(6.0f, 3.0f, 0.0f));
 			float ExpectedResult = 0.0f;
@@ -110,11 +110,11 @@ ZETestSuite(ZETriangle)
 
 			Result = ZETriangle::GetArea(Triangle);
 
-			ZETestCheckClose(Result, ExpectedResult);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ExpectedResult);
 		}
 	}
 
-	ZETest("void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)")
+	ZE_TEST_ITEM("void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)")
 	{
 		ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
 		ZEVector3 BaryCoords;
@@ -125,31 +125,31 @@ ZETestSuite(ZETriangle)
 
 		ZETriangle::GetBarycentricCoordinates(Triangle, Centroid, BaryCoords);
 
-		ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
 	}
 
-	ZETest("ZEVector3 ZETriangle::GetCentroid() const")
+	ZE_TEST_ITEM("ZEVector3 ZETriangle::GetCentroid() const")
 	{
 		ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
 
 		ZEVector3 Centroid = Triangle.GetCentroid();
 
-		ZETestCheckClose(Centroid, ZEVector3::Zero);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Centroid, ZEVector3::Zero);
 	}
 
-	ZETest("void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)")
+	ZE_TEST_ITEM("void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)")
 	{
-		ZETestCase("ZETriangle is equilateral and it's centroid is positioned on origin.")
+		ZE_TEST_CASE("ZETriangle is equilateral and it's centroid is positioned on origin.")
 		{
 			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
 			ZEVector3 Centroid;
 
 			ZETriangle::GetCentroid(Triangle, Centroid);
 			
-			ZETestCheckClose(Centroid, ZEVector3::Zero);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Centroid, ZEVector3::Zero);
 		}
 
-		ZETestCase("ZETriangle is an Isosceles triangle")
+		ZE_TEST_CASE("ZETriangle is an Isosceles triangle")
 		{
 			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 2.0f), ZEVector3(1.0f, 0.0f, 0.0f), ZEVector3(-1.0f, 0.0f, 0.0f));
 			ZEVector3 BaryCoords;
@@ -161,10 +161,10 @@ ZETestSuite(ZETriangle)
 
 			float DoubleCheck = BaryCoords.x + BaryCoords.y + BaryCoords.z;
 			
-			ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
-			ZETestCheckEqual(DoubleCheck, 1.0f);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+			ZE_TEST_CHECK_EQUAL(DoubleCheck, 1.0f);
 		}
-		ZETestCase("ZETriangle is a random triangle")
+		ZE_TEST_CASE("ZETriangle is a random triangle")
 		{
 			ZETriangle Triangle(ZEVector3(24.0f, -8.0f, -17.0f), ZEVector3(8.0f, 6.0f, 11.0f), ZEVector3(-10.0f, -4.0f, -6.0f));
 			ZEVector3 BaryCoords;
@@ -176,13 +176,13 @@ ZETestSuite(ZETriangle)
 
 			float DoubleCheck = BaryCoords.x + BaryCoords.y + BaryCoords.z;
 
-			ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
-			ZETestCheckEqual(DoubleCheck, 1.0f);
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+			ZE_TEST_CHECK_EQUAL(DoubleCheck, 1.0f);
 		}
 
 	}
 
-	ZETest("void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)")
+	ZE_TEST_ITEM("void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)")
 	{
 		ZEVector3 P0(10.000000f, 10.000000f, 11.154700f);
 		ZEVector3 P1(11.000000f, 10.000000f, 9.4226494f);
@@ -192,9 +192,9 @@ ZETestSuite(ZETriangle)
 
 		ZETriangle::GetNormal(Triangle, Normal);
 
-		ZETestCheckClose(Normal, ZEVector3::UnitY);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Normal, ZEVector3::UnitY);
 
-		ZETestCase("Triangle is rotated.")
+		ZE_TEST_CASE("Triangle is rotated.")
 		{
 			ZEVector3 P3;
 			ZEVector3 P4;
@@ -213,11 +213,11 @@ ZETestSuite(ZETriangle)
 
 			ZETriangle::GetNormal(Triangle, Normal);
 
-			ZETestCheckClose(Normal, ZEVector3(-1.0f, 0.0f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Normal, ZEVector3(-1.0f, 0.0f, 0.0f));
 		}
 	}
 
-	ZETest("void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)")
+	ZE_TEST_ITEM("void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)")
 	{
 		ZEVector3 P0(10.000000f, 10.000000f, 11.154700f);
 		ZEVector3 P1(11.000000f, 10.000000f, 9.4226494f);
@@ -227,11 +227,11 @@ ZETestSuite(ZETriangle)
 
 		ZETriangle::GetSurfacePlane(Triangle, Plane);
 
-		ZETestCheckClose(Plane.p, ZEVector3(11.000000f, 10.000000f, 9.4226494f));
-		ZETestCheckClose(Plane.n, ZEVector3::UnitY);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.p, ZEVector3(11.000000f, 10.000000f, 9.4226494f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Plane.n, ZEVector3::UnitY);
 	}
 
-	ZETest("bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEVector3& Point)")
+	ZE_TEST_ITEM("bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEVector3& Point)")
 	{
 		ZEVector3 P0(3.9586830f, 1.6137114f, 5.5713701f);
 		ZEVector3 P1(4.7865424f, 2.1746445f, 3.8393197f);
@@ -240,17 +240,17 @@ ZETestSuite(ZETriangle)
 
 		ZEVector3 Point(5.1249733f, 0.90792572f, 4.3332620f);
 
-		ZETestCheck(ZETriangle::InsideTest(Triangle, Point));
+		ZE_TEST_CHECK_ERROR(ZETriangle::InsideTest(Triangle, Point));
 
-		ZETestCase("Triangle is not encapsulating the Point")
+		ZE_TEST_CASE("Triangle is not encapsulating the Point")
 		{
 			ZEVector3 Point2(5.1612906f, 3.1676991f, 1.6791284f);
 
-			ZETestCheck(!ZETriangle::InsideTest(Triangle, Point2));
+			ZE_TEST_CHECK_ERROR(!ZETriangle::InsideTest(Triangle, Point2));
 		}
 	}
 
-	ZETest("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELine& Line, float &t)")
+	ZE_TEST_ITEM("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELine& Line, float &t)")
 	{
 		ZEVector3 P0(9.0017929f, 10.580025f, 9.8238201f);
 		ZEVector3 P1(10.948232f, 10.496342f, 10.275554f);
@@ -263,11 +263,11 @@ ZETestSuite(ZETriangle)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZETriangle::IntersectionTest(Triangle, Line, Tmin));
-		ZETestCheckClose(Tmin, 3.8094397f);
+		ZE_TEST_CHECK_ERROR(ZETriangle::IntersectionTest(Triangle, Line, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 3.8094397f);
 	}
 
-	ZETest("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELineSegment& LineSegment, float &t)")
+	ZE_TEST_ITEM("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELineSegment& LineSegment, float &t)")
 	{
 		ZEVector3 P0(9.0347013f, 9.6489248f, 10.527431f);
 		ZEVector3 P1(10.749244f, 10.678031f, 10.558678f);
@@ -281,11 +281,11 @@ ZETestSuite(ZETriangle)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZETriangle::IntersectionTest(Triangle, LineSegment, Tmin));
-		ZETestCheckClose(Tmin, 2.8498566f);
+		ZE_TEST_CHECK_ERROR(ZETriangle::IntersectionTest(Triangle, LineSegment, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 2.8498566f);
 	}
 
-	ZETest("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, float &t)")
+	ZE_TEST_ITEM("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, float &t)")
 	{	
 		ZETriangle Triangle;
 		Triangle.V0 = ZEVector3(9.0087843f, 9.5797234f, 10.261058f);
@@ -298,18 +298,18 @@ ZETestSuite(ZETriangle)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZETriangle::IntersectionTest(Triangle, Ray, Tmin));
-		ZETestCheckClose(Tmin, 5.4100742f);
+		ZE_TEST_CHECK_ERROR(ZETriangle::IntersectionTest(Triangle, Ray, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 5.4100742f);
 	}
 
-	ZETest("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line)")
+	ZE_TEST_ITEM("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line)")
 	{
 		//Due to errors known this test is skipped. (Refer to Redmine : Bug #320)
 
-		ZETestCheck(false);
+		ZE_TEST_CHECK_ERROR(false);
 	}
 
-	static bool ZETestCheckTriangleLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -337,19 +337,19 @@ ZETestSuite(ZETriangle)
 		return Result;
 	}
 
-	ZETest("ZETriangle vs ZELine Intersection Test")
+	ZE_TEST_ITEM("ZETriangle vs ZELine Intersection Test")
 	{
-		ZETestCheck(ZETestCheckTriangleLineIntersection()); //BRU Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
-		ZETestCheck(ZETestCheckTriangleLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection()); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
 	}
 
-	static bool ZETestCheckTriangleLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -388,19 +388,19 @@ ZETestSuite(ZETriangle)
 
 	}
 
-	ZETest("ZETriangle vs ZELineSegment Intersection Test")
+	ZE_TEST_ITEM("ZETriangle vs ZELineSegment Intersection Test")
 	{
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection()); //BRU Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
-		ZETestCheck(ZETestCheckTriangleLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection()); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
 	}
 
-	static bool ZETestCheckTriangleRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	static bool ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
 	{
 		bool Result = true;
 		float Tmin = 0.0f;
@@ -436,16 +436,16 @@ ZETestSuite(ZETriangle)
 	}
 
 
-	ZETest("ZETriangle vs ZERay Intersection Test")
+	ZE_TEST_ITEM("ZETriangle vs ZERay Intersection Test")
 	{
-		ZETestCheck(ZETestCheckTriangleRayIntersection()); //BRU Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
-		ZETestCheck(ZETestCheckTriangleRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection()); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZE_TEST_CHECK_ERRORTriangleRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //FLD Octant
 	}
 
 }

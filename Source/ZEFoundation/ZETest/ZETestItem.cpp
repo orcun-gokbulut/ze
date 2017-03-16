@@ -34,164 +34,196 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETestItem.h"
-#include "ZETestSuite.h"
+
 #include "ZETestManager.h"
-#include "ZETimeCounter.h"
-#include "ZEError.h"
+#include "ZELog.h"
+#include "ZELogSession.h"
 
-#include <stdio.h>
-#include <string.h>
-#include "ZETerminalUtils.h"
-
-static ZETestItem* CurrentTestItem = NULL;
-static void ZEErrorManagerErrorCallback(ZEErrorType Type)
+void ZETestItem::ErrorCallback(ZEErrorType Type)
 {
-	if (CurrentTestItem != NULL)
+	if (ExpectingError && ExpectingErrorType == Type)
+	{
+		ExpectedErrorOccured = true;
+		return;
+	}
+	else
 	{
 		ZETestProblemType ProblemType;
-
 		switch(Type)
 		{
-			default:
-			case ZE_ET_CRITICAL_ERROR:
-			case ZE_ET_ERROR:
-				ProblemType = ZE_TPT_ERROR;
-				break;
+		default:
+		case ZE_ET_CRITICAL_ERROR:
+		case ZE_ET_ERROR:
+			ProblemType = ZE_TPT_ERROR;
+			break;
 
-			case ZE_ET_WARNING:
-				ProblemType = ZE_TPT_WARNING;
-				break;
+		case ZE_ET_WARNING:
+			ProblemType = ZE_TPT_WARNING;
+			break;
 		}
 
 		char Buffer[4096];
 		sprintf(Buffer, " ZEError event has been caught. Error type : %s.", ZEError::GetErrorTypeString(Type));
 
-		CurrentTestItem->ReportProblem(ProblemType, Buffer, CurrentTestItem->GetName(), 1);
+		ReportProblem(ProblemType, Buffer, NULL, 0);
+
+		ErrorCallbackChain.CheckAndCall(Type);
 	}
 }
 
-void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line)
+void ZETestItem::SetName(const ZEString& Name)
 {
-	ZETerminalUtils::Reset();
-
-	if (Type == ZE_TPT_ERROR)
-	{
-		if (Result == ZE_TR_NOT_RUN)
-		{
-			ZETerminalUtils::SetBold(true);
-			ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
-			printf("FAILED\n");
-		}
-
-		Result = ZE_TR_FAILED;
-	}
-
-	switch(Type)
-	{
-		case ZE_TPT_ERROR:
-			ZETerminalUtils::SetBold(true);
-			ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
-			printf(" ERROR");
-			break;
-
-		case ZE_TPT_WARNING:
-			ZETerminalUtils::SetForgroundColor(ZE_TC_YELLOW);
-			printf(" Warning");
-			break;
-
-		default:
-		case ZE_TPT_NOTICE:
-			printf(" Info");
-			break;
-	}
-
-	ZETerminalUtils::Reset();
-	printf(": %s\n", Problem);
-
-	ZETestManager::GetInstance()->ReportProblem(Owner, this, Type, Problem, File, Line);
+	this->Name = Name;
 }
 
-const char* ZETestItem::GetName()
+void ZETestItem::ReportProblem(ZETestProblemType Type, const ZEString& Description, const char* FileName, ZEInt Line)
+{
+	if (Type == ZE_TPT_CRITICAL_ERROR || Type == ZE_TPT_ERROR)
+		Result = ZE_TR_FAILED;
+
+	ZETestProblem* Problem = Problems.Add();
+	Problem->Item = this;
+	Problem->Type = Type;
+	Problem->Description = Description;
+	Problem->FileName = FileName;
+	Problem->Line = Line;
+}
+
+void ZETestItem::ResumeTimeCounter()
+{
+	TimeCounter.Start();
+}
+
+void ZETestItem::PauseTimeCounter()
+{
+	TimeCounter.Pause();
+}
+
+void ZETestItem::StartSuppressingLogging()
+{
+	SuppressingLogging = true;
+	SuppressingLoggingPreviousLevel = ZELog::GetInstance()->GetCurrentSession()->GetMinimumLevel();
+	ZELog::GetInstance()->GetCurrentSession()->SetMinimumLevel(ZE_LOG_CRITICAL_ERROR);
+}
+
+void ZETestItem::StopSuppressingLogging()
+{
+	zeDebugCheck(!SuppressingLogging, "Logging is not suppressed.");
+	SuppressingLogging = false;
+	ZELog::GetInstance()->GetCurrentSession()->SetMinimumLevel(SuppressingLoggingPreviousLevel);
+}
+
+void ZETestItem::StartExpectingError(ZEErrorType Type, const char* ModuleName)
+{
+	zeDebugCheck(ExpectingError, "Another error has already being expected.");
+	ExpectingError = true;
+	ExpectingErrorType = Type;
+	ExpectingErrorModuleName = ModuleName;
+	ExpectedErrorOccured = false;
+}
+
+bool ZETestItem::DidExpectedErrorOccured()
+{
+	zeDebugCheck(!ExpectingError, "Error hasn't being expected.");
+	return ExpectedErrorOccured;
+}
+
+bool ZETestItem::StopExpectingError()
+{
+	zeDebugCheck(!ExpectingError, "Error hasn't being expected.");
+	bool Temp = ExpectingError;
+	ExpectingError = false;
+	ExpectingErrorType = ZE_ET_NONE;
+	ExpectingErrorModuleName = ZEString::Empty;
+	ExpectedErrorOccured = false;
+	return Temp;
+}
+
+ZETest* ZETestItem::GetTest() const
+{
+	return Test;
+}
+
+const ZEString& ZETestItem::GetName() const
 {
 	return Name;
 }
 
-ZETestSuiteItem* ZETestItem::GetOwner()
-{
-	return Owner;
-}
-
-void ZETestItem::SetCurrentCase(const char* CaseName)
-{
-	strncpy(this->CaseName, CaseName, 255);
-}
-
-const char* ZETestItem::GetCurrentCase()
-{
-	return this->CaseName;
-}
-
-ZETestResult ZETestItem::GetResult()
+ZETestResult ZETestItem::GetResult() const
 {
 	return Result;
 }
 
-double ZETestItem::GetEleapsedTime()
+double ZETestItem::GetElapsedTime() const
 {
-	return ElapsedTime;
+	return TimeCounter.GetTimeMilliseconds();
 }
 
-void ZETestItem::Reset()
+const ZEArray<ZETestProblem>& ZETestItem::GetProblems() const
 {
-	Result = ZE_TR_NOT_RUN;
-	ElapsedTime = 0;
+	return Problems;
 }
 
-bool ZETestItem::RunTest()
+void ZETestItem::Run()
 {
+	Reset();
+
 	#ifdef __COVERAGESCANNER__ 
 	char Buffer[1024];
-	sprintf(Buffer, "%s::%s", Owner->GetName(), GetName());
+	sprintf(Buffer, "%s::%s", Test->GetName(), GetName());
 	__coveragescanner_clear();
 	__coveragescanner_testname(Buffer);
 	#endif
 
-    ZETimeCounter Timer;
+	ErrorCallbackChain = ZEError::GetInstance()->GetCallback();
+	ZEError::GetInstance()->SetCallback(ZEErrorCallback::Create<ZETestItem, &ZETestItem::ErrorCallback>(this));
+	
+	TimeCounter.Start();
 	try
 	{
-		Timer.Start();
-		TestImpl();
-		Timer.Stop();
-
-        ElapsedTime = Timer.GetTimeMilliseconds();
-
-		if (Result == ZE_TR_NOT_RUN)
-			Result = ZE_TR_PASSED;
-		
-		#ifdef __COVERAGESCANNER__  
-		__coveragescanner_teststate(Result == ZE_TR_PASSED ? "PASSED" : "FAILED");
-		__coveragescanner_save();
-		__coveragescanner_testname("");
-		#endif
-
-		return (Result == ZE_TR_PASSED ? true : false);
+		Implementation();
 	}
-	catch (...)
+	catch(...)
 	{
-		Timer.Stop();
-        ElapsedTime = Timer.GetTimeMicroseconds();
-
-		Result = ZE_TR_FAILED;
-		return false;
+		PauseTimeCounter();
+		ReportProblem(ZE_TPT_ERROR, "Unhandled exception has occurred.", "", 0);
 	}
+
+	TimeCounter.Stop();
+	ZEError::GetInstance()->SetCallback(ErrorCallbackChain);
+
+	zeDebugCheck(SuppressingLogging, "Log is still supressed. StopSuppressingLog is not called.");
+	zeDebugCheck(ExpectingError, "Error is still expecting. StopExpectingError is not called.");
+	#ifdef __COVERAGESCANNER__  
+	__coveragescanner_teststate(Result == ZE_TR_PASSED ? "PASSED" : "FAILED");
+	__coveragescanner_save();
+	__coveragescanner_testname("");
+	#endif
+
+	if (Result != ZE_TR_FAILED)
+		Result = ZE_TR_PASSED;
 }
 
-ZETestItem::ZETestItem(const char* Name, ZETestSuiteItem* Owner)
+void ZETestItem::Reset()
 {
-	strncpy(this->Name, Name, 255);
-	CaseName[0] = '\0';
-	this->Owner = Owner;
-	ElapsedTime = 0;
-	Owner->RegisterTest(this);
-	this->Result = ZE_TR_NOT_RUN;
+	Problems.Clear();
+	TimeCounter.Reset();
+	Result = ZE_TR_NOT_RUN;
+	ExpectingError = false;
+	ExpectingErrorType = ZE_ET_NONE;
+	ExpectingErrorModuleName = "";
+	ExpectedErrorOccured = false;
+	SuppressingLogging = false;
+	SuppressingLoggingPreviousLevel = ZE_LOG_ERROR;
+}
+
+ZETestItem::ZETestItem()
+{
+	Test = NULL;
+	Reset();
+}
+
+ZETestItem::~ZETestItem()
+{
+
 }

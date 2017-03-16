@@ -39,18 +39,18 @@
 #include "ZEError.h"
 #include "ZERandom.h"
 
-ZETestSuite(ZEGUID)
+ZE_TEST(ZEGUID)
 {
-	ZETest("ZEGUID::ZEGUID()")
+	ZE_TEST_ITEM("ZEGUID::ZEGUID()")
 	{
 		ZEGUID TestItem;
-		ZETestCheckEqual(TestItem.Data1, 3435973836);
-		ZETestCheckEqual(TestItem.Data2, 52428);
-		ZETestCheckEqual(TestItem.Data3, 52428);
-		ZETestCheckEqual(TestItem.Data4, 14757395258967641292);
+		ZE_TEST_CHECK_EQUAL(TestItem.Data1, 3435973836);
+		ZE_TEST_CHECK_EQUAL(TestItem.Data2, 52428);
+		ZE_TEST_CHECK_EQUAL(TestItem.Data3, 52428);
+		ZE_TEST_CHECK_EQUAL(TestItem.Data4, 14757395258967641292);
 	}
 
-	ZETest("ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)")
+	ZE_TEST_ITEM("ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)")
 	{
 		ZEUInt32 Data1 = ZERandom::GetUInt32();
 		ZEUInt16 Data2 = ZERandom::GetUInt16();
@@ -58,14 +58,14 @@ ZETestSuite(ZEGUID)
 		ZEUInt64 Data4 = ZERandom::GetUInt64();
 
 		ZEGUID TestItem1(Data1, Data2, Data3, Data4);
-		ZETestCheckEqual(TestItem1.Data1, Data1);
-		ZETestCheck(TestItem1.Data1 >= 0 && TestItem1.Data1 <= 4294967295);
-		ZETestCheckEqual(TestItem1.Data2, Data2);
-		ZETestCheck(TestItem1.Data2 >= 0 && TestItem1.Data2 <= 65535);
-		ZETestCheckEqual(TestItem1.Data3, Data3);
-		ZETestCheck(TestItem1.Data3 >= 0 && TestItem1.Data3 <= 65535);
-		ZETestCheckEqual(TestItem1.Data4, Data4);
-		ZETestCheck(TestItem1.Data4 >= 0 && TestItem1.Data4 <= 18446744073709551615);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data1, Data1);
+		ZE_TEST_CHECK_ERROR(TestItem1.Data1 >= 0 && TestItem1.Data1 <= 4294967295);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data2, Data2);
+		ZE_TEST_CHECK_ERROR(TestItem1.Data2 >= 0 && TestItem1.Data2 <= 65535);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data3, Data3);
+		ZE_TEST_CHECK_ERROR(TestItem1.Data3 >= 0 && TestItem1.Data3 <= 65535);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data4, Data4);
+		ZE_TEST_CHECK_ERROR(TestItem1.Data4 >= 0 && TestItem1.Data4 <= 18446744073709551615);
 
 		Data1 = 0x01234567;
 		Data2 = 0x0123;
@@ -73,13 +73,13 @@ ZETestSuite(ZEGUID)
 		Data4 = 0x0123456789ABCDEF;
 
 		ZEGUID TestItem2(Data1, Data2, Data3, Data4);
-		ZETestCheckEqual(TestItem2.Data1, Data1);
-		ZETestCheckEqual(TestItem2.Data2, Data2);
-		ZETestCheckEqual(TestItem2.Data3, Data3);
-		ZETestCheckEqual(TestItem2.Data4, Data4);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data1, Data1);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data2, Data2);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data3, Data3);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data4, Data4);
 	}
 
-	ZETest("ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining)")
+	ZE_TEST_ITEM("ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining)")
 	{
 		ZEUInt32 Data1 = 0x01234567;
 		ZEUInt16 Data2 = 0x0123;
@@ -88,15 +88,15 @@ ZETestSuite(ZEGUID)
 		ZEUInt64 Data4Remaining = 0x0123456789ABCDEF;
 
 		ZEGUID TestItem1(Data1, Data2, Data3, Data4FirstTwo, Data4Remaining);
-		ZETestCheckEqual(TestItem1.Data1, Data1);
-		ZETestCheckEqual(Data1, 19088743);
-		ZETestCheckEqual(TestItem1.Data2, Data2);
-		ZETestCheckEqual(Data2, 291);
-		ZETestCheckEqual(TestItem1.Data3, Data3);
-		ZETestCheckEqual(Data3, 8976);
-		ZETestCheckEqual(Data4FirstTwo, 291);
-		ZETestCheckEqual(Data4Remaining, 81985529216486895);
-		ZETestCheckEqual(TestItem1.Data4, 9927935178558959);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data1, Data1);
+		ZE_TEST_CHECK_EQUAL(Data1, 19088743);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data2, Data2);
+		ZE_TEST_CHECK_EQUAL(Data2, 291);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data3, Data3);
+		ZE_TEST_CHECK_EQUAL(Data3, 8976);
+		ZE_TEST_CHECK_EQUAL(Data4FirstTwo, 291);
+		ZE_TEST_CHECK_EQUAL(Data4Remaining, 81985529216486895);
+		ZE_TEST_CHECK_EQUAL(TestItem1.Data4, 9927935178558959);
 
 		Data1 = 0x604857D3;
 		Data2 = 0x01D3;
@@ -105,32 +105,32 @@ ZETestSuite(ZEGUID)
 		Data4Remaining = 0xEFCDAB8967452301;
 
 		ZEGUID TestItem2(Data1, Data2, Data3, Data4FirstTwo, Data4Remaining);
-		ZETestCheckEqual(TestItem2.Data1, Data1);
-		ZETestCheckEqual(Data1, 1615353811);
-		ZETestCheckEqual(TestItem2.Data2, Data2);
-		ZETestCheckEqual(Data2, 467);
-		ZETestCheckEqual(TestItem2.Data3, Data3);
-		ZETestCheckEqual(Data3, 930);
-		ZETestCheckEqual(Data4FirstTwo, 1110);
-		ZETestCheckEqual(Data4Remaining, 17279655951921914625);
-		ZETestCheckEqual(TestItem2.Data4, 57890976858317569);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data1, Data1);
+		ZE_TEST_CHECK_EQUAL(Data1, 1615353811);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data2, Data2);
+		ZE_TEST_CHECK_EQUAL(Data2, 467);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data3, Data3);
+		ZE_TEST_CHECK_EQUAL(Data3, 930);
+		ZE_TEST_CHECK_EQUAL(Data4FirstTwo, 1110);
+		ZE_TEST_CHECK_EQUAL(Data4Remaining, 17279655951921914625);
+		ZE_TEST_CHECK_EQUAL(TestItem2.Data4, 57890976858317569);
 	}
 
-	ZETest("ZEGUID ZEGUID::Generate()")
+	ZE_TEST_ITEM("ZEGUID ZEGUID::Generate()")
 	{
 		ZEGUID TestItem = ZEGUID::Generate();
 
-		ZETestCheck(TestItem.Data1 >= 0 && TestItem.Data1 <= 4294967295);
-		//ZETestCheckEqual(TestItem.Data1, 1767006096);
-		ZETestCheck(TestItem.Data2 >= 0 && TestItem.Data2 <= 65535);
-		//ZETestCheckEqual(TestItem.Data2, 5705);
-		ZETestCheck(TestItem.Data3 >= 0 && TestItem.Data3 <= 65535);
-		//ZETestCheckEqual(TestItem.Data3, 28145);
-		ZETestCheck(TestItem.Data4 >= 0 && TestItem.Data4 <= 18446744073709551615);
-		//ZETestCheckEqual(TestItem.Data4, 6553091204868276715);
+		ZE_TEST_CHECK_ERROR(TestItem.Data1 >= 0 && TestItem.Data1 <= 4294967295);
+		//ZE_TEST_CHECK_EQUAL(TestItem.Data1, 1767006096);
+		ZE_TEST_CHECK_ERROR(TestItem.Data2 >= 0 && TestItem.Data2 <= 65535);
+		//ZE_TEST_CHECK_EQUAL(TestItem.Data2, 5705);
+		ZE_TEST_CHECK_ERROR(TestItem.Data3 >= 0 && TestItem.Data3 <= 65535);
+		//ZE_TEST_CHECK_EQUAL(TestItem.Data3, 28145);
+		ZE_TEST_CHECK_ERROR(TestItem.Data4 >= 0 && TestItem.Data4 <= 18446744073709551615);
+		//ZE_TEST_CHECK_EQUAL(TestItem.Data4, 6553091204868276715);
 	}
 
-	ZETest("ZEInt ZEGUID::Compare(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("ZEInt ZEGUID::Compare(const ZEGUID& Other) const")
 	{
 		ZEUInt32 Data1 = 0x01234567;
 		ZEUInt16 Data2 = 0x0123;
@@ -141,296 +141,296 @@ ZETestSuite(ZEGUID)
 		ZEGUID TestItem2(Data1, Data2, Data3, Data4);
 
 		ZEInt Result = TestItem1.Compare(TestItem2);
-		ZETestCheckEqual(Result, 0);
+		ZE_TEST_CHECK_EQUAL(Result, 0);
 
-		ZETestCase("call function with a parameter whose data values are bigger")
+		ZE_TEST_CASE("call function with a parameter whose data values are bigger")
 		{
 			ZEGUID TestItem3(Data1, Data2, Data3, 6553091204868276715);
 
 			Result = TestItem1.Compare(TestItem3);
-			ZETestCheckEqual(Result, -1);
+			ZE_TEST_CHECK_EQUAL(Result, -1);
 
 			ZEGUID TestItem4(Data1, Data2, 28145, 6553091204868276715);
 
 			Result = TestItem1.Compare(TestItem4);
-			ZETestCheckEqual(Result, -1);
+			ZE_TEST_CHECK_EQUAL(Result, -1);
 
 			ZEGUID TestItem5(Data1, 5705, 28145, 6553091204868276715);
 
 			Result = TestItem1.Compare(TestItem5);
-			ZETestCheckEqual(Result, -1);
+			ZE_TEST_CHECK_EQUAL(Result, -1);
 
 			ZEGUID TestItem6(1767006096, 5705, 28145, 6553091204868276715);
 
 			Result = TestItem1.Compare(TestItem6);
-			ZETestCheckEqual(Result, -1);
+			ZE_TEST_CHECK_EQUAL(Result, -1);
 		}
 
-		ZETestCase("call function with parameter whose data values are smaller")
+		ZE_TEST_CASE("call function with parameter whose data values are smaller")
 		{
 			ZEGUID TestItem3(Data1, Data2, Data3, 0x0023456789ABCDEF);
 
 			Result = TestItem1.Compare(TestItem3);
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 
 			ZEGUID TestItem4(Data1, Data2, 0x1310, 0x0023456789ABCDEF);
 
 			Result = TestItem1.Compare(TestItem4);
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 
 			ZEGUID TestItem5(Data1, 0x0023, Data3, Data4);
 
 			Result = TestItem1.Compare(TestItem5);
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 
 			ZEGUID TestItem6(0x00234567, Data2, Data3, Data4);
 
 			Result = TestItem1.Compare(TestItem6);
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 		}
 	}
 
-	ZETest("bool ZEGUID::Equals(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::Equals(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 		ZEGUID TestItem2(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 		bool Equal = TestItem1.Equals(TestItem2);
-		ZETestCheck(Equal);
+		ZE_TEST_CHECK_ERROR(Equal);
 
-		ZETestCase("different Data1 values")
+		ZE_TEST_CASE("different Data1 values")
 		{
 			ZEGUID TestItem3(0x00234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Equal = TestItem1.Equals(TestItem3);
-			ZETestCheck(!Equal);
+			ZE_TEST_CHECK_ERROR(!Equal);
 		}
 
-		ZETestCase("different Data2 values")
+		ZE_TEST_CASE("different Data2 values")
 		{
 			ZEGUID TestItem3(0x01234567, 0x001, 0x2301, 0x0123456789ABCDEF);
 
 			Equal = TestItem1.Equals(TestItem3);
-			ZETestCheck(!Equal);
+			ZE_TEST_CHECK_ERROR(!Equal);
 		}
 
-		ZETestCase("different Data3 values")
+		ZE_TEST_CASE("different Data3 values")
 		{
 			ZEGUID TestItem3(0x01234567, 0x0123, 0x0123, 0x0123456789ABCDEF);
 
 			Equal = TestItem1.Equals(TestItem3);
-			ZETestCheck(!Equal);
+			ZE_TEST_CHECK_ERROR(!Equal);
 		}
 
-		ZETestCase("different Data4 values")
+		ZE_TEST_CASE("different Data4 values")
 		{
 			ZEGUID TestItem3(0x01234567, 0x0123, 0x2301, 0x0023456789ABCDEF);
 
 			Equal = TestItem1.Equals(TestItem3);
-			ZETestCheck(!Equal);
+			ZE_TEST_CHECK_ERROR(!Equal);
 		}
 
-		ZETestCase("different values")
+		ZE_TEST_CASE("different values")
 		{
 			ZEGUID TestItem3(0x00234567, 0x001, 0x0123, 0x0023456789ABCDEF);
 
 			Equal = TestItem1.Equals(TestItem3);
-			ZETestCheck(!Equal);
+			ZE_TEST_CHECK_ERROR(!Equal);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator<(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator<(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 		ZEGUID TestItem2(TestItem1);
 
 		bool Result = TestItem1 < TestItem2;
-		ZETestCheck(!Result);
+		ZE_TEST_CHECK_ERROR(!Result);
 
-		ZETestCase("parameter with bigger values")
+		ZE_TEST_CASE("parameter with bigger values")
 		{
 			ZEGUID TestItem3(0x11234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 < TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 
-		ZETestCase("parameter with smaller values")
+		ZE_TEST_CASE("parameter with smaller values")
 		{
 			ZEGUID TestItem3(0x00234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 < TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 
-		ZETestCase("item created by ZEGUID()")
+		ZE_TEST_CASE("item created by ZEGUID()")
 		{
 			ZEGUID TestItem3;
 
 			Result = TestItem1 < TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator>(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator>(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 		ZEGUID TestItem2(TestItem1);
 
 		bool Result = TestItem1 > TestItem2;
-		ZETestCheck(!Result);
+		ZE_TEST_CHECK_ERROR(!Result);
 
-		ZETestCase("parameter with smaller values")
+		ZE_TEST_CASE("parameter with smaller values")
 		{
 			ZEGUID TestItem3(0x00234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 > TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 
-		ZETestCase("parameter with bigger values")
+		ZE_TEST_CASE("parameter with bigger values")
 		{
 			ZEGUID TestItem3(0x11234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 > TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 
-		ZETestCase("item created by ZEGUID()")
+		ZE_TEST_CASE("item created by ZEGUID()")
 		{
 			ZEGUID TestItem3;
 
 			Result = TestItem1 > TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator<=(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator<=(const ZEGUID& Other) const")
 	{
  		ZEGUID TestItem1(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 		ZEGUID TestItem2(TestItem1);
 
 		bool Result = TestItem1 <= TestItem2;
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 
-		ZETestCase("parameter with bigger value")
+		ZE_TEST_CASE("parameter with bigger value")
 		{
 			ZEGUID TestItem3(0x01234567, 0x2301, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 <= TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 
-		ZETestCase("parameter with smaller value")
+		ZE_TEST_CASE("parameter with smaller value")
 		{
 			ZEGUID TestItem3(0x01234567, 0x0123, 0x2301, 0x0103456789ABCDEF);
 
 			Result = TestItem1 <= TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator>=(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator>=(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1(0x67452301, 0x4523, 0x2301, 0xEFCDAB8967452301);
 		ZEGUID TestItem2(TestItem1);
 
 		bool Result = TestItem1 >= TestItem2;
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 
-		ZETestCase("parameter with bigger value")
+		ZE_TEST_CASE("parameter with bigger value")
 		{
 			ZEGUID TestItem3(0x67452301, 0x4523, 0x3301, 0xEFCDAB8967452301);
 
 			Result = TestItem1 >= TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 
-		ZETestCase("parameter with smaller value")
+		ZE_TEST_CASE("parameter with smaller value")
 		{
 			ZEGUID TestItem3(0x01234567, 0x4523, 0x2301, 0xEFCDAB8967452301);
 
 			Result = TestItem1 >= TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator==(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator==(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1;
 		ZEGUID TestItem2;
 
 		bool Result = TestItem1 == TestItem2;
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 
-		ZETestCase("create with ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)")
+		ZE_TEST_CASE("create with ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)")
 		{
 			ZEGUID TestItem3(0, 0, 0, 0);
 
 			Result = TestItem1 == TestItem3;
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 		}
 
-		ZETestCase("for true")
+		ZE_TEST_CASE("for true")
 		{
 			ZEGUID TestItem3(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 			ZEGUID TestItem4(19088743, 291, 8961, 81985529216486895);
 
 			Result = TestItem3 == TestItem4;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 	}
 
-	ZETest("bool ZEGUID::operator!=(const ZEGUID& Other) const")
+	ZE_TEST_ITEM("bool ZEGUID::operator!=(const ZEGUID& Other) const")
 	{
 		ZEGUID TestItem1(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 		ZEGUID TestItem2(19088743, 291, 8961, 81985529216486895);
 
 		bool Result = TestItem1 != TestItem2;
-		ZETestCheck(!Result);
+		ZE_TEST_CHECK_ERROR(!Result);
 
-		ZETestCase("for different ZEGUIDs")
+		ZE_TEST_CASE("for different ZEGUIDs")
 		{
 			ZEGUID TestItem3(0x67452301, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			Result = TestItem1 != TestItem3;
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 		}
 	}
 
-	ZETest("ZEString ZEGUID::ToString()")
+	ZE_TEST_ITEM("ZEString ZEGUID::ToString()")
 	{
 		ZEGUID Item;
-		ZETestCheckEqual(Item.Data1, 3435973836);
-		ZETestCheckEqual(Item.Data2, 52428);
-		ZETestCheckEqual(Item.Data3, 52428);
-		ZETestCheckEqual(Item.Data4, 14757395258967641292);
+		ZE_TEST_CHECK_EQUAL(Item.Data1, 3435973836);
+		ZE_TEST_CHECK_EQUAL(Item.Data2, 52428);
+		ZE_TEST_CHECK_EQUAL(Item.Data3, 52428);
+		ZE_TEST_CHECK_EQUAL(Item.Data4, 14757395258967641292);
 
 		ZEString ItemString = Item.ToString();
-		//ZETestCheckString(ItemString, "CCCCCCCC-CCCC-CCCC-CCCCCCCCCCCC");
+		//ZE_TEST_CHECK_STRING_EQUAL(ItemString, "CCCCCCCC-CCCC-CCCC-CCCCCCCCCCCC");
 
-		ZETestCase("values in decimal form")
+		ZE_TEST_CASE("values in decimal form")
 		{
 			ZEGUID TestItem(19088743, 291, 8961, 81985529216486895);
 
 			ItemString = TestItem.ToString();
-			ZETestCheckString(ItemString, "01234567-0123-2301-0123-456789ABCDEF");
+			ZE_TEST_CHECK_STRING_EQUAL(ItemString, "01234567-0123-2301-0123-456789ABCDEF");
 		}
 
-		ZETestCase("values in hexadecimal form")
+		ZE_TEST_CASE("values in hexadecimal form")
 		{
 			ZEGUID TestItem(0x01234567, 0x0123, 0x2301, 0x0123456789ABCDEF);
 
 			ItemString = TestItem.ToString();
-			ZETestCheckString(ItemString, "01234567-0123-2301-0123-456789ABCDEF");
+			ZE_TEST_CHECK_STRING_EQUAL(ItemString, "01234567-0123-2301-0123-456789ABCDEF");
 		}
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEGUID TestItem(1615353811, 467, 930, 11564982415960004267);
 			
 			ItemString = TestItem.ToString();
-			ZETestCheckString(ItemString, "604857D3-01D3-03A2-A07F-123BC0EF56AB");
+			ZE_TEST_CHECK_STRING_EQUAL(ItemString, "604857D3-01D3-03A2-A07F-123BC0EF56AB");
 		}
 	}
 }

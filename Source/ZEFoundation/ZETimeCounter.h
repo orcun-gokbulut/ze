@@ -37,23 +37,35 @@
 
 #include "ZETypes.h"
 
+enum ZETimeCounterState
+{
+	ZE_TCS_STOPPED,
+	ZE_TCS_RUNNING,
+	ZE_TCS_PAUSED
+};
+
 class ZETimeCounter
 {
 	private:
-		bool						Running;
-		ZEUInt64					StartTime;
-		mutable ZEUInt64			EndTime;
-		ZEUInt64					Frequency;
+		ZETimeCounterState			State;
+		mutable ZEUInt64			AcumulatedTime;
+		mutable ZEUInt64			LastMeasuredTime;
+		static ZEUInt64				Frequency;
+
+		void						UpdateAcumulatedTime() const;
 
 	public:
-        void						SetTime(ZEUInt64 Microseconds);
+		ZETimeCounterState			GetState() const;
+
 		double						GetTimeSeconds() const;
 		double						GetTimeMilliseconds() const;
         ZEUInt64					GetTimeMicroseconds() const;
+		ZEUInt64					GetTimeNanoSeconds() const;
 
 		void						Start();
+		void						Pause();
 		void						Stop();
-        void						Reset();
+		void						Reset();
 
 									ZETimeCounter();
 };

@@ -218,15 +218,12 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->Name = Class->getNameAsString();
 	ClassData->MetaName = ClassData->Name + "Class";
 	ClassData->Hash = ClassData->Name.Hash();
-
 	ClassData->HasCreateInstanceMethod = false;
 	ClassData->HasPublicDestroyMethod = false;
-
-	ClassData->HasPublicCopyConstructor = true;
-	ClassData->HasPublicDefaultConstructor = true;
-	ClassData->HasPublicDestructor = true;
-	ClassData->HasPublicAssignmentOperator = true;
-	
+	ClassData->HasPublicCopyConstructor = false;
+	ClassData->HasPublicDefaultConstructor = false;
+	ClassData->HasPublicDestructor = false;
+	ClassData->HasPublicAssignmentOperator = false;
 	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;
@@ -254,6 +251,9 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 
 	ProcessClassAttributes(ClassData, Class);
 
+	if (ClassData->BaseClass != NULL && ClassData->BaseClass->HasPublicDestroyMethod)
+		ClassData->HasPublicDestroyMethod = true;
+
 	// Combine Methods and Properties
 	if (ClassData->BaseClass != NULL)
 	{
@@ -271,7 +271,6 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 			ClassData->Properties.Add(CloneProperty);
 		}
 	}
-
 
 	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
 	{

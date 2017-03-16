@@ -46,50 +46,50 @@ bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected
 	return (ZETestInternalCheckClose(Actual.x, Expected.x, Threshold.x) && ZETestInternalCheckClose(Actual.y, Expected.y, Threshold.y) && ZETestInternalCheckClose(Actual.z, Expected.z, Threshold.z));
 }
 
-ZETestSuite(ZEVector3)
+ZE_TEST(ZEVector3)
 {
-	/*ZETest("ZEVector3::ZEVector3()")
+	/*ZE_TEST_ITEM("ZEVector3::ZEVector3()")
 	{
 		ZEVector3 Vector();
 	}*/
 
-	ZETest("ZEVector3::ZEVector3(const ZEVector3& Start, const ZEVector3& End)")
+	ZE_TEST_ITEM("ZEVector3::ZEVector3(const ZEVector3& Start, const ZEVector3& End)")
 	{
 		ZEVector3 StartVector(1.0f, 2.0f, 3.0f);
 		ZEVector3 EndVector(3.0f, 2.0f, 4.0f);
 
 		ZEVector3 Result(StartVector, EndVector);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 0.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 0.0f, 1.0f));
 	}
 
-	ZETest("ZEVector3::ZEVector3(float x, float y, float z)")
+	ZE_TEST_ITEM("ZEVector3::ZEVector3(float x, float y, float z)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
-		ZETestCheckEqual(Vector, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Vector, ZEVector3(1.0f, 2.0f, 3.0f));
 	}
 
-	ZETest("ZEVector3::ZEVector3(ZEVector2& Base, float z)")
+	ZE_TEST_ITEM("ZEVector3::ZEVector3(ZEVector2& Base, float z)")
 	{
 		ZEVector2 Vector(2.1f, 3.4f);
 		float ZValue = 5.3f;
 
 		ZEVector3 Result(Vector, ZValue);
 
-		ZETestCheckEqual(Result, ZEVector3(2.1f, 3.4f, 5.3f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.1f, 3.4f, 5.3f));
 	}
 
-	ZETest("inline void ZEVector3::Create(ZEVector3& Out, float x, float y, float z)")
+	ZE_TEST_ITEM("inline void ZEVector3::Create(ZEVector3& Out, float x, float y, float z)")
 	{
 		ZEVector3 Result;
 
 		ZEVector3::Create(Result, 1.0f, 2.0f, 3.0f);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 2.0f, 3.0f));
 	}
 
-	ZETest("inline void ZEVector3::Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVector3 &End)")
+	ZE_TEST_ITEM("inline void ZEVector3::Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVector3 &End)")
 	{
 		ZEVector3 StartVector(1.0f, 2.0f, 3.0f);
 		ZEVector3 EndVector(4.0f, 6.0f, 8.0f);
@@ -97,10 +97,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Create(Result, StartVector, EndVector);
 
-		ZETestCheckEqual(Result, ZEVector3(3.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(3.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi)")
+	ZE_TEST_ITEM("void ZEVector3::CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi)")
 	{
 		ZEVector3 Out;
 		float Radius = 2.0f;
@@ -109,10 +109,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::CreateFromSpherical(Out, Radius, Theta, Phi);
 
-		ZETestCheckEqual(Out, ZEVector3(0.366025403f, 1.931851652f, 0.366025403f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEVector3(0.366025403f, 1.931851652f, 0.366025403f));
 	}
 
-	ZETest("void ZEVector3::ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi)")
+	ZE_TEST_ITEM("void ZEVector3::ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi)")
 	{
 		ZEVector3 Input(0.366025403f, 1.931851652f, 0.366025403f);
 		float Radius = 0.0f;
@@ -121,12 +121,12 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ConvertToSpherical(Input, Radius, Theta, Phi);
 
-		ZETestCheckClose(Radius, 2.0f);
-		ZETestCheckClose(Theta, ZE_PI_4);
-		ZETestCheckClose(Phi, ZE_PI_12);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Radius, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Theta, ZE_PI_4);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Phi, ZE_PI_12);
 	}
 
-	ZETest("void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height)")
+	ZE_TEST_ITEM("void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height)")
 	{
 		ZEVector3 Out;
 		float Radius = 2.0f;
@@ -135,10 +135,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::CreateFromCylindirical(Out, Radius, Theta, Height);
 
-		ZETestCheckEqual(Out, ZEVector3(1.414213562f, 5.000000000f, 1.414213562f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEVector3(1.414213562f, 5.000000000f, 1.414213562f));
 	}
 
-	ZETest("void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height)")
+	ZE_TEST_ITEM("void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height)")
 	{
 		ZEVector3 Input(1.414213562f, 5.000000000f, 1.414213562f);
 		float Radius = 0.0f;
@@ -147,56 +147,56 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ConvertToCylindirical(Input, Radius, Theta, Height);
 
-		ZETestCheckClose(Radius, 2.0f);
-		ZETestCheckClose(Theta, ZE_PI_4);
-		ZETestCheckClose(Height, 5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Radius, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Theta, ZE_PI_4);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Height, 5.0f);
 	}
 
-	ZETest("bool ZEVector3::IsValid() const")
+	ZE_TEST_ITEM("bool ZEVector3::IsValid() const")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		bool Result = Vector.IsValid();
 
-		ZETestCheckEqual(Result, true);
+		ZE_TEST_CHECK_EQUAL(Result, true);
 
-		ZETestCase("A non-valid vector is given as argument.")
+		ZE_TEST_CASE("A non-valid vector is given as argument.")
 		{
 			//Insert non-valid vector.
 		}
 	}
 
-	ZETest("inline void ZEVector3::Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("inline void ZEVector3::Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
 
 		ZEVector3::Add(Result, A, B);
-		ZETestCheckEqual(Result, ZEVector3(3.0f, 6.0f, 9.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(3.0f, 6.0f, 9.0f));
 	}
 
-	ZETest("inline void ZEVector3::Sub(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("inline void ZEVector3::Sub(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 3.0f, 4.0f);
 		ZEVector3 Result;
 
 		ZEVector3::Sub(Result, A, B);
-		ZETestCheckEqual(Result, ZEVector3(-1.0f, -1.0f, -1.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(-1.0f, -1.0f, -1.0f));
 	}
 
-	ZETest("inline void ZEVector3::Scale(ZEVector3& Out, const ZEVector3& A, float s)")
+	ZE_TEST_ITEM("inline void ZEVector3::Scale(ZEVector3& Out, const ZEVector3& A, float s)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 		ZEVector3 Result;
 
 		ZEVector3::Scale(Result, Vector, 10.5f);
 
-		ZETestCheckEqual(Result, ZEVector3(10.5f, 21.0f, 31.5f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(10.5f, 21.0f, 31.5f));
 	}
 
-	ZETest("void ZEVector3::Multiply(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("void ZEVector3::Multiply(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 4.0f, 6.0f);
@@ -204,10 +204,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Multiply(Result, A, B);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 8.0f, 18.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 8.0f, 18.0f));
 	}
 
-	ZETest("void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(2.0f, 8.0f, 18.0f);
 		ZEVector3 B(2.0f, 4.0f, 6.0f);
@@ -215,10 +215,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Divide(Result, A, B);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 2.0f, 3.0f));
 	}
 
-	ZETest("void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, float s)")
+	ZE_TEST_ITEM("void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, float s)")
 	{
 		ZEVector3 A(10.5f, 21.0f, 31.5f);
 		ZEVector3 Result;
@@ -226,133 +226,133 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Divide(Result, A, Value);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 2.0f, 3.0f));
 	}
 
-	ZETest("float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 3.0f, 4.0f);
 
 		float Result = ZEVector3::DotProduct(A, B);
 		
-		ZETestCheckEqual(Result, 20.0f);
+		ZE_TEST_CHECK_EQUAL(Result, 20.0f);
 	}
 
-	ZETest("inline void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("inline void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 3.0f, 4.0f);
 		ZEVector3 Result;
 		ZEVector3::CrossProduct(Result, A ,B);
 
-		ZETestCheckEqual(Result, ZEVector3(-1.0f, 2.0f, -1.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(-1.0f, 2.0f, -1.0f));
 	}
 
-	ZETest("bool ZEVector3::IsNormalized() const")
+	ZE_TEST_ITEM("bool ZEVector3::IsNormalized() const")
 	{
 		ZEVector3 Vector(0.0f, 1.0f, 0.0f);
 		
 		bool Result = Vector.IsNormalized();
 
-		ZETestCheckEqual(Result, true);
+		ZE_TEST_CHECK_EQUAL(Result, true);
 		
-		ZETestCase("A not normalized vector is given as argument.")
+		ZE_TEST_CASE("A not normalized vector is given as argument.")
 		{
 			ZEVector3 Vector(2.0f, 1.0f, 8.0f);
 
 			bool Result = Vector.IsNormalized();
 
-			ZETestCheckEqual(Result, false);
+			ZE_TEST_CHECK_EQUAL(Result, false);
 		}
 	}
 
-	ZETest("float ZEVector3::LengthSquare(const ZEVector3& Vector)")
+	ZE_TEST_ITEM("float ZEVector3::LengthSquare(const ZEVector3& Vector)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		float LengthSquare = ZEVector3::LengthSquare(Vector);
 
-		ZETestCheckEqual(LengthSquare, 14.0f);
+		ZE_TEST_CHECK_EQUAL(LengthSquare, 14.0f);
 	}
 
-	ZETest("float ZEVector3::LengthSquare() const")
+	ZE_TEST_ITEM("float ZEVector3::LengthSquare() const")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		float LengthSquare = Vector.LengthSquare();
 
-		ZETestCheckEqual(LengthSquare, 14.0f);
+		ZE_TEST_CHECK_EQUAL(LengthSquare, 14.0f);
 	}
 
-	ZETest("float ZEVector3::Length(const ZEVector3& Vector)")
+	ZE_TEST_ITEM("float ZEVector3::Length(const ZEVector3& Vector)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		float Length = ZEVector3::Length(Vector);
 
-		ZETestCheckEqual(Length, ZEMath::Sqrt(14.0f));
+		ZE_TEST_CHECK_EQUAL(Length, ZEMath::Sqrt(14.0f));
 	}
 
-	ZETest("inline float ZEVector3::Length() const")
+	ZE_TEST_ITEM("inline float ZEVector3::Length() const")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		float Length = Vector.Length();
 
-		ZETestCheckEqual(Length, ZEMath::Sqrt(14.0f));
+		ZE_TEST_CHECK_EQUAL(Length, ZEMath::Sqrt(14.0f));
 	}
 
-	ZETest("float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(4.0f, 5.0f, 6.0f);
 
 		float DistanceSquare = ZEVector3::DistanceSquare(A, B);
 
-		ZETestCheckEqual(DistanceSquare, 27.0f);
+		ZE_TEST_CHECK_EQUAL(DistanceSquare, 27.0f);
 	}
 
-	ZETest("float ZEVector3::Distance(const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("float ZEVector3::Distance(const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(4.0f, 5.0f, 6.0f);
 
 		float Distance = ZEVector3::Distance(A, B);
 
-		ZETestCheckEqual(Distance, ZEMath::Sqrt(27.0f));
+		ZE_TEST_CHECK_EQUAL(Distance, ZEMath::Sqrt(27.0f));
 	}
 
-	ZETest("void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)")
+	ZE_TEST_ITEM("void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 		ZEVector3 Result;
 
 		ZEVector3::Normalize(Result, Vector);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
-	ZETest("ZEVector3 ZEVector3::Normalize() const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::Normalize() const")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 		ZEVector3 Result;
 
 		Result = Vector.Normalize();
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
-	ZETest("void ZEVector3::NormalizeSelf()")
+	ZE_TEST_ITEM("void ZEVector3::NormalizeSelf()")
 	{
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		Vector.NormalizeSelf();
 
-		ZETestCheckEqual(Vector, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
+		ZE_TEST_CHECK_EQUAL(Vector, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
-	ZETest("void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor)")
+	ZE_TEST_ITEM("void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor)")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(6.0f, 9.0f, 5.0f);
@@ -361,28 +361,28 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Lerp(Result, A, B, Factor);
 
-		ZETestCheckClose(Result, ZEVector3(4.25f, 6.55f, 4.30f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ZEVector3(4.25f, 6.55f, 4.30f));
 
-		ZETestCase("A factor value of 0 is given as argument.")
+		ZE_TEST_CASE("A factor value of 0 is given as argument.")
 		{
 			Factor = 0.0f;
 
 			ZEVector3::Lerp(Result, A, B, Factor);
 
-			ZETestCheckEqual(Result, A);
+			ZE_TEST_CHECK_EQUAL(Result, A);
 		}
 
-		ZETestCase("A factor value of 1 is given as argument.")
+		ZE_TEST_CASE("A factor value of 1 is given as argument.")
 		{
 			Factor = 1.0f;
 
 			ZEVector3::Lerp(Result, A, B, Factor);
 
-			ZETestCheckEqual(Result, B);
+			ZE_TEST_CHECK_EQUAL(Result, B);
 		}
 	}
 
-	ZETest("void ZEVector3::Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("void ZEVector3::Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 5.0f);
 		ZEVector3 B(2.0f, 3.0f, 6.0f);
@@ -390,10 +390,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Max(Result, A, B);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 6.0f));
 	}
 
-	ZETest("void ZEVector3::Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
+	ZE_TEST_ITEM("void ZEVector3::Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 5.0f);
 		ZEVector3 B(2.0f, 3.0f, 6.0f);
@@ -401,30 +401,30 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Min(Result, A, B);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 3.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 3.0f, 5.0f));
 	}
 
-	ZETest("float ZEVector3::Max() const")
+	ZE_TEST_ITEM("float ZEVector3::Max() const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 5.0f);
 		float Result;
 
 		Result = A.Max();
 
-		ZETestCheckEqual(Result, 5.0f);
+		ZE_TEST_CHECK_EQUAL(Result, 5.0f);
 	}
 
-	ZETest("float ZEVector3::Min() const")
+	ZE_TEST_ITEM("float ZEVector3::Min() const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 5.0f);
 		float Result;
 
 		Result = A.Min();
 
-		ZETestCheckEqual(Result, 1.0f);
+		ZE_TEST_CHECK_EQUAL(Result, 1.0f);
 	}
 
-	ZETest("void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -433,10 +433,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Clamp(Result, A, Min, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::Clamp(float MinValue, float MaxValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::Clamp(float MinValue, float MaxValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -445,10 +445,10 @@ ZETestSuite(ZEVector3)
 
 		Result = A.Clamp(Min, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(5.0f, 5.0f, 5.0f);
@@ -457,10 +457,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Clamp(Result, A, Min, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::Clamp(const ZEVector3 & MinValue, const ZEVector3 & MaxValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::Clamp(const ZEVector3 & MinValue, const ZEVector3 & MaxValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(5.0f, 5.0f, 5.0f);
@@ -469,10 +469,10 @@ ZETestSuite(ZEVector3)
 
 		Result = A.Clamp(Min, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampSelf(float MinValue, float MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampSelf(float MinValue, float MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		float Min = 2.0f;
@@ -480,10 +480,10 @@ ZETestSuite(ZEVector3)
 
 		A.ClampSelf(Min, Max);
 
-		ZETestCheckEqual(A, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampSelf(const ZEVector3 & MinValue, const ZEVector3 & MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampSelf(const ZEVector3 & MinValue, const ZEVector3 & MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(5.0f, 5.0f, 5.0f);
@@ -491,10 +491,10 @@ ZETestSuite(ZEVector3)
 
 		A.ClampSelf(Min, Max);
 
-		ZETestCheckEqual(A, ZEVector3(2.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(2.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampLower(ZEVector3 & Out, const ZEVector3 & Vector, float MinValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampLower(ZEVector3 & Out, const ZEVector3 & Vector, float MinValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -502,10 +502,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ClampLower(Result, A, Min);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 6.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::ClampLower(float MinValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::ClampLower(float MinValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -513,10 +513,10 @@ ZETestSuite(ZEVector3)
 
 		Result = A.ClampLower(Min);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 4.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 4.0f, 6.0f));
 	}
 
-	ZETest("void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Min(2.0f, 5.0f, 2.0f);
@@ -524,10 +524,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ClampLower(Result, A, Min);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 5.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 5.0f, 6.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::ClampLower(const ZEVector3& MinValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::ClampLower(const ZEVector3& MinValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Min(2.0f, 5.0f, 2.0f);
@@ -535,30 +535,30 @@ ZETestSuite(ZEVector3)
 
 		Result = A.ClampLower(Min);
 
-		ZETestCheckEqual(Result, ZEVector3(2.0f, 5.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(2.0f, 5.0f, 6.0f));
 	}
 
-	ZETest("void ZEVector3::ClampLowerSelf(float MinValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampLowerSelf(float MinValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		float Min = 2.0f;
 
 		A.ClampLowerSelf(Min);
 
-		ZETestCheckEqual(A, ZEVector3(2.0f, 4.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(2.0f, 4.0f, 6.0f));
 	}
 
-	ZETest("void ZEVector3::ClampLowerSelf(const ZEVector3 & MinValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampLowerSelf(const ZEVector3 & MinValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Min(2.0f, 5.0f, 2.0f);
 
 		A.ClampLowerSelf(Min);
 
-		ZETestCheckEqual(A, ZEVector3(2.0f, 5.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(2.0f, 5.0f, 6.0f));
 	}
 
-	ZETest("void ZEVector3::ClampUpper(ZEVector3 & Out, const ZEVector3 & Vector, float MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampUpper(ZEVector3 & Out, const ZEVector3 & Vector, float MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -566,10 +566,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ClampUpper(Result, A, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::ClampUpper(float MaxValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::ClampUpper(float MaxValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Result;
@@ -577,10 +577,10 @@ ZETestSuite(ZEVector3)
 
 		Result = A.ClampUpper(Max);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampUpper(ZEVector3 & Out, const ZEVector3 & Vector, const ZEVector3 & MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampUpper(ZEVector3 & Out, const ZEVector3 & Vector, const ZEVector3 & MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(2.0f, 3.0f, 5.0f);
@@ -588,10 +588,10 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::ClampUpper(Result, A, Max);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 3.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 3.0f, 5.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::ClampUpper(const ZEVector3 & MaxValue) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::ClampUpper(const ZEVector3 & MaxValue) const")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(2.0f, 3.0f, 5.0f);
@@ -599,10 +599,10 @@ ZETestSuite(ZEVector3)
 
 		Result = A.ClampUpper(Max);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 3.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 3.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampUpperSelf(float MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampUpperSelf(float MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 
@@ -610,63 +610,63 @@ ZETestSuite(ZEVector3)
 
 		A.ClampUpperSelf(Max);
 
-		ZETestCheckEqual(A, ZEVector3(1.0f, 4.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(1.0f, 4.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::ClampUpperSelf(const ZEVector3 & MaxValue)")
+	ZE_TEST_ITEM("void ZEVector3::ClampUpperSelf(const ZEVector3 & MaxValue)")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 Max(2.0f, 3.0f, 5.0f);
 
 		A.ClampUpperSelf(Max);
 
-		ZETestCheckEqual(A, ZEVector3(1.0f, 3.0f, 5.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(1.0f, 3.0f, 5.0f));
 	}
 
-	ZETest("void ZEVector3::Saturate(ZEVector3 & Out, const ZEVector3 & Vector)")
+	ZE_TEST_ITEM("void ZEVector3::Saturate(ZEVector3 & Out, const ZEVector3 & Vector)")
 	{
 		ZEVector3 A(2.0f, 0.4f, -1.2f);
 		ZEVector3 Result;
 
 		ZEVector3::Saturate(Result, A);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 0.4f, 0.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 0.4f, 0.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::Saturate() const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::Saturate() const")
 	{
 		const ZEVector3 A(2.0f, 0.4f, -1.2f);
 		ZEVector3 Result;
 
 		Result = A.Saturate();
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f, 0.4f, 0.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(1.0f, 0.4f, 0.0f));
 	}
 
-	ZETest("void ZEVector3::SaturateSelf()")
+	ZE_TEST_ITEM("void ZEVector3::SaturateSelf()")
 	{
 		ZEVector3 A(2.0f, 0.4f, -1.2f);
 		ZEVector3 Result;
 
 		A.SaturateSelf();
 
-		ZETestCheckEqual(A, ZEVector3(1.0f, 0.4f, 0.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(1.0f, 0.4f, 0.0f));
 	}
 
-	ZETest("bool ZEVector3::Equals(const ZEVector3& Vector) const")
+	ZE_TEST_ITEM("bool ZEVector3::Equals(const ZEVector3& Vector) const")
 	{
 		ZEVector3 VectorA(1.0f, 2.0f, 3.0f);
 		ZEVector3 VectorB(0.0f, 2.0f, 3.0f);
 		ZEVector3 VectorC(1.00000001f, 2.0f, 3.0f);
 
 		bool Equal = VectorA.Equals(VectorB);
-		ZETestCheck(!Equal);
+		ZE_TEST_CHECK_ERROR(!Equal);
 
 		Equal = VectorA.Equals(VectorC);
-		ZETestCheck(Equal);
+		ZE_TEST_CHECK_ERROR(Equal);
 	}
 
-	ZETest("bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const")
+	ZE_TEST_ITEM("bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const")
 	{
 		float Threshold = 0.1f;
 		ZEVector3 VectorA(1.11f, 2.11f, 3.11f);
@@ -674,73 +674,73 @@ ZETestSuite(ZEVector3)
 		ZEVector3 VectorC(1.0f, 2.11f, 3.11f);
 
 		bool Equal = VectorA.Equals(VectorB, Threshold);
-		ZETestCheck(Equal);
+		ZE_TEST_CHECK_ERROR(Equal);
 
 		Equal = VectorA.Equals(VectorC, Threshold);
-		ZETestCheck(!Equal);
+		ZE_TEST_CHECK_ERROR(!Equal);
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator-() const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator-() const")
 	{
 		ZEVector3 A(10.0f, 1.0f, 4.0f);
 
 		ZEVector3 Result = -A;
 
-		ZETestCheckEqual(Result, ZEVector3(-10.0f, -1.0f, -4.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(-10.0f, -1.0f, -4.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator+(const ZEVector3 & RightOperand) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator+(const ZEVector3 & RightOperand) const")
 	{
 		ZEVector3 A(10.0f, 1.0f, 2.0f);
 		ZEVector3 B(3.0f, 5.0f, 6.0f);
 
 		ZEVector3 Result = A + B;
 
-		ZETestCheckEqual(Result, ZEVector3(13.0f, 6.0f, 8.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(13.0f, 6.0f, 8.0f));
 	}
 
-	ZETest("ZEVector3 & ZEVector3::operator+=(const ZEVector3 & RightOperand)")
+	ZE_TEST_ITEM("ZEVector3 & ZEVector3::operator+=(const ZEVector3 & RightOperand)")
 	{
 		ZEVector3 A(10.0f, 1.0f, 2.0f);
 		ZEVector3 B(3.0f, 5.0f, 6.0f);
 
 		A += B;
 
-		ZETestCheckEqual(A, ZEVector3(13.0f, 6.0f, 8.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(13.0f, 6.0f, 8.0f));
 
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator-(const ZEVector3 & RightOperand) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator-(const ZEVector3 & RightOperand) const")
 	{
 		ZEVector3 A(10.0f, 5.0f, 3.0f);
 		ZEVector3 B(3.0f, 2.0f, 2.0f);
 
 		ZEVector3 Result = A - B;
 
-		ZETestCheckEqual(Result, ZEVector3(7.0f, 3.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(7.0f, 3.0f, 1.0f));
 	}
 
-	ZETest("ZEVector3& ZEVector3::operator-=(const ZEVector3 &RightOperand)")
+	ZE_TEST_ITEM("ZEVector3& ZEVector3::operator-=(const ZEVector3 &RightOperand)")
 	{
 		ZEVector3 A(10.0f, 5.0f, 3.0f);
 		ZEVector3 B(3.0f, 2.0f, 2.0f);
 
 		A -= B;
 
-		ZETestCheckEqual(A, ZEVector3(7.0f, 3.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(7.0f, 3.0f, 1.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator*(const ZEVector3 & RightOperand) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator*(const ZEVector3 & RightOperand) const")
 	{
 		ZEVector3 A(10.0f, 1.0f, 6.0f);
 		ZEVector3 B(3.0f, 2.0f, 3.0f);
 
 		ZEVector3 Result = A * B;
 
-		ZETestCheckEqual(Result, ZEVector3(30.0f, 2.0f, 18.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(30.0f, 2.0f, 18.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator*(float s) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator*(float s) const")
 	{
 
 		ZEVector3 A(3.0f, 2.0f, 1.0f);
@@ -748,70 +748,70 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3 Result = A * ScalarValue;
 
-		ZETestCheckEqual(Result, ZEVector3(7.5f, 5.0f, 2.5f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(7.5f, 5.0f, 2.5f));
 	}
 
-	ZETest("ZEVector3 & ZEVector3::operator*=(const ZEVector3 & RightOperand)")
+	ZE_TEST_ITEM("ZEVector3 & ZEVector3::operator*=(const ZEVector3 & RightOperand)")
 	{
 		ZEVector3 A(10.0f, 1.0f, 6.0f);
 		ZEVector3 B(3.0f, 2.0f, 3.0f);
 
 		A *= B;
 
-		ZETestCheckEqual(A, ZEVector3(30.0f, 2.0f, 18.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(30.0f, 2.0f, 18.0f));
 	}
 
-	ZETest("ZEVector3 & ZEVector3::operator*=(float S)")
+	ZE_TEST_ITEM("ZEVector3 & ZEVector3::operator*=(float S)")
 	{
 		ZEVector3 A(2.1f, 3.0f, 4.0f);
 		float ScalarValue = 7.0f;
 
 		A *= ScalarValue;
 
-		ZETestCheckClose(A, ZEVector3(14.7f, 21.0f, 28.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(A, ZEVector3(14.7f, 21.0f, 28.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator/(const ZEVector3 & RightOperand) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator/(const ZEVector3 & RightOperand) const")
 	{
 		ZEVector3 A(10.0f, 6.0f, 8.0f);
 		ZEVector3 B(2.0f, 3.0f, 2.0f);
 
 		ZEVector3 Result = A / B;
 
-		ZETestCheckEqual(Result, ZEVector3(5.0f, 2.0f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(5.0f, 2.0f, 4.0f));
 	}
 
-	ZETest("ZEVector3 ZEVector3::operator/(float s) const")
+	ZE_TEST_ITEM("ZEVector3 ZEVector3::operator/(float s) const")
 	{
 		ZEVector3 A(10.0f, 4.0f, 6.0f);
 		float ScalarValue = 2.0f;
 
 		ZEVector3 Result = A / ScalarValue;
 
-		ZETestCheckEqual(Result, ZEVector3(5.0f, 2.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(5.0f, 2.0f, 3.0f));
 	}
 
-	ZETest("ZEVector3 & ZEVector3::operator/=(const ZEVector3 & RightOperand)")
+	ZE_TEST_ITEM("ZEVector3 & ZEVector3::operator/=(const ZEVector3 & RightOperand)")
 	{
 		ZEVector3 A(10.0f, 4.0f, 6.0f);
 		ZEVector3 B(2.0f, 1.0f, 2.0f);
 
 		A /= B;
 
-		ZETestCheckEqual(A, ZEVector3(5.0f, 4.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(5.0f, 4.0f, 3.0f));
 	}
 
-	ZETest("ZEVector3 & ZEVector3::operator/=(float S)")
+	ZE_TEST_ITEM("ZEVector3 & ZEVector3::operator/=(float S)")
 	{
 		ZEVector3 A(10.0f, 1.0f, 20.0f);
 		float ScalarValue = 5.0f;
 
 		A /= ScalarValue;
 
-		ZETestCheckEqual(A, ZEVector3(2.0f, 0.2f, 4.0f));
+		ZE_TEST_CHECK_EQUAL(A, ZEVector3(2.0f, 0.2f, 4.0f));
 	}
 
-	ZETest("float ZEVector3::operator[](ZESize Index) const")
+	ZE_TEST_ITEM("float ZEVector3::operator[](ZESize Index) const")
 	{
 		const ZEVector3 A(24.0f, 12.0f, 32.0f);
 		ZEVector3 Result;
@@ -820,10 +820,10 @@ ZETestSuite(ZEVector3)
 		Result[1] = A[2];
 		Result[2] = A[0];
 
-		ZETestCheckEqual(Result, ZEVector3(12.0f, 32.0f, 24.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(12.0f, 32.0f, 24.0f));
 	}
 
-	ZETest("float & ZEVector3::operator[](ZESize Index)")
+	ZE_TEST_ITEM("float & ZEVector3::operator[](ZESize Index)")
 	{
 		ZEVector3 A(24.0f, 12.0f, 32.0f);
 		ZEVector3 Result;
@@ -832,44 +832,44 @@ ZETestSuite(ZEVector3)
 		Result[1] = A[2];
 		Result[2] = A[0];
 
-		ZETestCheckEqual(Result, ZEVector3(12.0f, 32.0f, 24.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(12.0f, 32.0f, 24.0f));
 	}
 
-	ZETest("bool ZEVector3::operator==(const ZEVector3 &RightOperand) const")
+	ZE_TEST_ITEM("bool ZEVector3::operator==(const ZEVector3 &RightOperand) const")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(1.0f, 2.0f, 3.0f);
 
 		bool Result = (A == B);
 
-		ZETestCheckEqual(Result, true);
+		ZE_TEST_CHECK_EQUAL(Result, true);
 
-		ZETestCase("Checking two different vectors for falsifying")
+		ZE_TEST_CASE("Checking two different vectors for falsifying")
 		{
 			ZEVector3 C(1.0f, 3.0f, 5.0f);
 
 			bool Result = (A == C);
 
-			ZETestCheckEqual(Result, false);
+			ZE_TEST_CHECK_EQUAL(Result, false);
 		}
 	}
 
-	ZETest("bool ZEVector3::operator!=(const ZEVector3 &RightOperand) const")
+	ZE_TEST_ITEM("bool ZEVector3::operator!=(const ZEVector3 &RightOperand) const")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(1.0f, 3.0f, 5.0f);
 
 		bool Result = (A != B);
 
-		ZETestCheckEqual(Result, true);
+		ZE_TEST_CHECK_EQUAL(Result, true);
 
-		ZETestCase("Checking two identical vectors for falsifying")
+		ZE_TEST_CASE("Checking two identical vectors for falsifying")
 		{
 			ZEVector3 C(1.0f, 2.0f, 3.0f);
 
 			bool Result = (A != C);
 
-			ZETestCheckEqual(Result, false);
+			ZE_TEST_CHECK_EQUAL(Result, false);
 		}
 	}
 }

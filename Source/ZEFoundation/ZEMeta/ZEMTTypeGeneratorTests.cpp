@@ -35,6 +35,7 @@
 
 #include "ZETest/ZETest.h"
 
+#include "ZEMTTypeGenerator.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
@@ -46,40 +47,23 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEPointer/ZEReferenceCounted.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEMTTestObject.h"
 
-#define ZEMT_TYPE_TEST(Expression, Value, Type) \
-	ZETest(ZEFormat::Format("ZEMTTypeGenerator<{0}>::GetType()", #Expression)) \
+#define ZEMT_TYPE_TEST(Declaration, BaseType, FunctionPostfix, InitialValue, Type) \
+	ZE_TEST_ITEM(ZEFormat::Format("ZEMTTypeGenerator<{0}>::GetType()", #Declaration)) \
 	{ \
-		ZEMTType GeneratedType = ZEMTTypeGenerator<Expression>::GetType(); \
-		ZETestCheckMessage(Type == GeneratedType, ZEFormat::Format("Generated type is wrong. Generated Type: \"{0}\".", GeneratedType.ToString())); \
+		ZEMTType GeneratedType = ZEMTTypeGenerator<Declaration>::GetType(); \
+		ZE_TEST_CHECK_ERROR(Type == GeneratedType, "Generated type is wrong. Generated Type: \"{0}\".", GeneratedType.ToString()); \
 	}
 
-
-#define ZEMT_TYPE_TEST_INVALID(Expression) \
-	ZETest(ZEFormat::Format("Invalid cases of ZEMTTypeGenerator<{0}>::GetType()", #Expression)) \
+#define ZEMT_TYPE_TEST_INVALID(Declaration) \
+	ZE_TEST_ITEM(ZEFormat::Format("Invalid cases of ZEMTTypeGenerator<{0}>::GetType()", #Declaration)) \
 	{ \
-		ZEMTType GeneratedType = ZEMTTypeGenerator<Expression>::GetType(); \
-		ZETestCheckMessage(!GeneratedType.IsValid(), ZEFormat::Format("Type is not valid but ZEMTTypeGenerator generated a valid type. Generated Type: \"{0}\".", GeneratedType.ToString())); \
+		ZEMTType GeneratedType = ZEMTTypeGenerator<Declaration>::GetType(); \
+		ZE_TEST_CHECK_ERROR(!GeneratedType.IsValid(), "Type is not valid but ZEMTTypeGenerator generated a valid type. Generated Type: \"{0}\".", GeneratedType.ToString()); \
 	}
 
-class ZETestObjectClass : public ZEClass
-{
-	public:
-		virtual ZEClass* GetParent() const { return ZEObject::Class(); } 
-		virtual const char* GetName() const { return "ZETestObject"; }
-};
-
-class ZETestObject : public ZEObject, public ZEReferenceCounted
-{
-	public:
-		static ZEClass* Class() { static ZETestObjectClass Class; return &Class; }
-		virtual ZEClass* GetClass()  const { return ZETestObject::Class(); }
-		static ZETestObject Instance;
-};
-
-ZETestObject ZETestObject::Instance;
-
-ZETestSuite(ZEMTTypeGenerator)
+ZE_TEST(ZEMTTypeGenerator)
 {
 	#include "ZEMTTypeTestTable.h"
 }

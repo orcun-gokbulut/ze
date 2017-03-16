@@ -34,12 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEST_H__
-#define __ZE_TEST_H__
 
-#include "ZETestItem.h"
-#include "ZETestSuite.h"
+#include "ZETypes.h"
 #include "ZETestCheck.h"
+#include "ZETestItem.h"
 #include "ZETestManager.h"
 
-#endif
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEMacro/ZEMacro.h"
+
+#define ZE_TEST_INTERNAL(Name, Identifier) \
+	class Identifier : public ZETest \
+	{ \
+		public: \
+			Identifier(); \
+	}; \
+	Identifier::Identifier() \
+	{ \
+		SetName(#Name); \
+		 ZETestManager::GetInstance()->RegisterTest(this); \
+	} \
+	static Identifier TestInstance; \
+	namespace
+#define ZE_TEST(Name) ZE_TEST_INTERNAL(Name, ZE_MACRO_CONCAT(ZE_MACRO_CONCAT(ZETest, __COUNTER__), __LINE__))
+
+class ZETest
+{
+	private:
+		ZEString						Name;
+		ZEArray<ZETestItem*>			Items;
+
+	public:
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
+
+		ZETestResult					GetResult() const;
+		ZESize							GetPassedItemCount() const;
+		ZESize							GetFailedItemCount() const;
+		double							GetElapsedTime() const;
+		ZEArray<ZETestProblem>			GetProblems() const;
+
+		const ZEArray<ZETestItem*>&		GetItems() const;
+		void							AddItem(ZETestItem* Item);
+		void							RemoveItem(ZETestItem* Item);
+
+		void							Run();
+		void							Reset();
+
+										ZETest();
+		virtual							~ZETest();
+};

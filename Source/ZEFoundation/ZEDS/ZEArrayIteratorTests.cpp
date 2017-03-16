@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEArrayIteratorsTests.cpp
+ Zinek Engine - ZEArrayIteratorTests.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,523 +37,523 @@
 #include "ZETest/ZETest.h"
 #include "ZETest/ZETestCheck.h"
 
-ZETestSuite(ZEArrayIterator)
+ZE_TEST(ZEArrayIterator)
 {
-	ZETest("inline bool IsEnd() const")
+	ZE_TEST_ITEM("inline bool IsEnd() const")
 	{
 		ZEArray<ZEInt32> Array;
 		ZEArrayIterator<ZEInt32, ZEAllocatorBase<ZEInt32>> Iterator = Array.GetIterator();
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
 
 		bool End = Iterator.IsEnd();
-		ZETestCheck(End);
+		ZE_TEST_CHECK_ERROR(End);
 
-		ZETestCase("for false")
+		ZE_TEST_CASE("for false")
 		{
 			Array.Add(1);
 			Array.Add(2);
 			Array.Add(3);
 			Iterator = Array.GetIterator();
-			ZETestCheckEqual(Iterator.GetIndex(), 0);
+			ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
 
 			End = Iterator.IsEnd();
-			ZETestCheck(!End);
-
-			Iterator.MoveNext();
-			ZETestCheckEqual(Iterator.GetIndex(), 1);
-			End = Iterator.IsEnd();
-			ZETestCheck(!End);
+			ZE_TEST_CHECK_ERROR(!End);
 
 			Iterator.MoveNext();
-			ZETestCheckEqual(Iterator.GetIndex(), 2);
+			ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
 			End = Iterator.IsEnd();
-			ZETestCheck(End);
+			ZE_TEST_CHECK_ERROR(!End);
 
 			Iterator.MoveNext();
-			ZETestCheckEqual(Iterator.GetIndex(), 2);
+			ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
 			End = Iterator.IsEnd();
-			ZETestCheck(End);
+			ZE_TEST_CHECK_ERROR(End);
+
+			Iterator.MoveNext();
+			ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+			End = Iterator.IsEnd();
+			ZE_TEST_CHECK_ERROR(End);
 		}
 	}
 
-	ZETest("inline ZEType* GetItem()")
+	ZE_TEST_ITEM("inline ZEType* GetItem()")
 	{
 		ZEArray<ZEInt64> Array;
 		ZEArrayIterator<ZEInt64, ZEAllocatorBase<ZEInt64>> Iterator = Array.GetIterator();
 
 		ZEInt64* Item = Iterator.GetItem();
 		//error Index is out of range.
-		ZETestCheckEqual(Item, NULL);
+		ZE_TEST_CHECK_EQUAL(Item, NULL);
 
 		Array.Add(81985529216486895);
 		Array.Add(11564982415960004267);
 		Iterator = Array.GetIterator();
 
 		Item = Iterator.GetItem();
-		ZETestCheckEqual(*Item, 81985529216486895);
+		ZE_TEST_CHECK_EQUAL(*Item, 81985529216486895);
 	}
 
-	ZETest("inline ZEType* MovePrevious()")
+	ZE_TEST_ITEM("inline ZEType* MovePrevious()")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		ZEInt* Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Array.Add(1);
 		Array.Add(2);
 		Array.Add(3);
 
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
 
 		ZEInt* Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 3);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 3);
+		ZE_TEST_CHECK_EQUAL(*Next, 3);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 3);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 3);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 3);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 3);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 3);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(*Previous, 2);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_EQUAL(*Previous, 2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(*Previous, 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(*Previous, 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
 	}
 
-	ZETest("inline ZEType* MoveNext()")
+	ZE_TEST_ITEM("inline ZEType* MoveNext()")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		ZEInt* Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Array.Add(1);
 		Array.Add(2);
 
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Array.Add(3);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 3);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 3);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 3);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 3);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 	}
 
-	ZETest("inline ZESize GetIndex()")
+	ZE_TEST_ITEM("inline ZESize GetIndex()")
 	{
 		ZEArray<ZEInt8> Array;
 		ZEArrayIterator<ZEInt8, ZEAllocatorBase<ZEInt8>> Iterator = Array.GetIterator();
 
 		ZESize Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
+		ZE_TEST_CHECK_EQUAL(Index, 0);
 
 		Array.Add('z');
 		Array.Add('e');
 		Array.Add('Z');
 
 		Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
+		ZE_TEST_CHECK_EQUAL(Index, 0);
 
 		Iterator.MoveNext();
 		Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 1);
+		ZE_TEST_CHECK_EQUAL(Index, 1);
 
 		Iterator.MoveNext();
 		Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 2);
+		ZE_TEST_CHECK_EQUAL(Index, 2);
 	}
 
-	ZETest("class ZEArrayIterator mixed test")
+	ZE_TEST_ITEM("class ZEArrayIterator mixed test")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIterator<ZEInt, ZEAllocatorBase<ZEInt>> Iterator = Array.GetIterator();
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Array.Add(0);
 		Array.Add(1);
 		Array.Add(2);
 
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 0);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		ZEInt* Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
-		ZETestCheckEqual(*Iterator.GetItem(), 2);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		ZEInt* Prev = Iterator.MovePrevious();
-		ZETestCheckEqual(*Prev, 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Prev, 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Prev = Iterator.MovePrevious();
-		ZETestCheckEqual(*Prev, 0);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 0);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Prev, 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Prev = Iterator.MovePrevious();
-		ZETestCheckEqual(Prev, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 0);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Prev, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Prev = Iterator.MovePrevious();
-		ZETestCheckEqual(Prev, NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheckEqual(*Iterator.GetItem(), 0);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Prev, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(*Next, 1);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
-		ZETestCheckEqual(*Iterator.GetItem(), 1);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*Iterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 	}
 }
 
-ZETestSuite(ZEArrayIteratorConst)
+ZE_TEST(ZEArrayIteratorConst)
 {
-	ZETest("inline bool IsEnd() const")
+	ZE_TEST_ITEM("inline bool IsEnd() const")
 	{
 		ZEArray<ZEString> Array;
 		ZEArrayIteratorConst<ZEString, ZEAllocatorBase<ZEString>> ConstIterator = Array.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
 
 		bool End = ConstIterator.IsEnd();
-		ZETestCheck(End);
+		ZE_TEST_CHECK_ERROR(End);
 
-		ZETestCase("for false")
+		ZE_TEST_CASE("for false")
 		{
 			Array.Add("New");
 			Array.Add("Test");
 			Array.Add("String");
 			ConstIterator = Array.GetConstIterator();
-			ZETestCheckEqual(ConstIterator.GetIndex(), 0);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
 
 			End = ConstIterator.IsEnd();
-			ZETestCheck(!End);
-
-			ConstIterator.MoveNext();
-			ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-			End = ConstIterator.IsEnd();
-			ZETestCheck(!End);
+			ZE_TEST_CHECK_ERROR(!End);
 
 			ConstIterator.MoveNext();
-			ZETestCheckEqual(ConstIterator.GetIndex(), 2);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
 			End = ConstIterator.IsEnd();
-			ZETestCheck(End);
+			ZE_TEST_CHECK_ERROR(!End);
 
 			ConstIterator.MoveNext();
-			ZETestCheckEqual(ConstIterator.GetIndex(), 2);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
 			End = ConstIterator.IsEnd();
-			ZETestCheck(End);
+			ZE_TEST_CHECK_ERROR(End);
+
+			ConstIterator.MoveNext();
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+			End = ConstIterator.IsEnd();
+			ZE_TEST_CHECK_ERROR(End);
 		}
 	}
 
-	ZETest("inline const ZEType* GetItem() const")
+	ZE_TEST_ITEM("inline const ZEType* GetItem() const")
 	{
 		ZEArray<ZEInt16> Array;
 		ZEArrayIteratorConst<ZEInt16, ZEAllocatorBase<ZEInt16>> ConstIterator = Array.GetConstIterator();
 
 		const ZEInt16* Item = ConstIterator.GetItem();
 		//error Index is out of range.
-		ZETestCheckEqual(Item, NULL);
+		ZE_TEST_CHECK_EQUAL(Item, NULL);
 
 		Array.Add(1);
 		Array.Add(2);
 		ConstIterator = Array.GetConstIterator();
 
 		Item = ConstIterator.GetItem();
-		ZETestCheckEqual(*Item, 1);
+		ZE_TEST_CHECK_EQUAL(*Item, 1);
 	}
 
-	ZETest("inline const ZEType* MovePrevious() const")
+	ZE_TEST_ITEM("inline const ZEType* MovePrevious() const")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> ConstIterator = Array.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 		//error Index is out of range.
 
 		const ZEInt* Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Array.Add(1);
 		Array.Add(2);
 
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
 
 		Array.Add(3);
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		const ZEInt* Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 3);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 3);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 3);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 3);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(*Previous, 2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Previous, 2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(*Previous, 1);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Previous, 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 	}
 
-	ZETest("inline const ZEType* MoveNext() const")
+	ZE_TEST_ITEM("inline const ZEType* MoveNext() const")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> ConstIterator = Array.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 		//error Index is out of range.
 
 		const ZEInt* Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Array.Add(1);
 		Array.Add(2);
 
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Array.Add(3);
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 3);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 3);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 3);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 3);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 3);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 	}
 
-	ZETest("inline ZESize GetIndex()")
+	ZE_TEST_ITEM("inline ZESize GetIndex()")
 	{
 		ZEArray<const char*> Array;
 		ZEArrayIteratorConst<const char*, ZEAllocatorBase<const char*>> ConstIterator = Array.GetConstIterator();
 
 		ZESize Index = ConstIterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
+		ZE_TEST_CHECK_EQUAL(Index, 0);
 
 		Array.Add("z");
 		Array.Add("e");
 
 		Index = ConstIterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
+		ZE_TEST_CHECK_EQUAL(Index, 0);
 
 		ConstIterator.MoveNext();
 
 		Index = ConstIterator.GetIndex();
-		ZETestCheckEqual(Index, 1);
+		ZE_TEST_CHECK_EQUAL(Index, 1);
 
 		ConstIterator.MoveNext();
 
 		Index = ConstIterator.GetIndex();
-		ZETestCheckEqual(Index, 1);
+		ZE_TEST_CHECK_EQUAL(Index, 1);
 	}
 
-	ZETest("class ZEArrayIteratorConst mixed test")
+	ZE_TEST_ITEM("class ZEArrayIteratorConst mixed test")
 	{
 		ZEArray<ZEInt> Array;
 		ZEArrayIteratorConst<ZEInt, ZEAllocatorBase<ZEInt>> ConstIterator = Array.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 		//error Index is out of range.
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Array.Add(0);
 		Array.Add(1);
 		Array.Add(2);
 
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 0);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		const ZEInt* Prev = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Prev, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 0);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Prev, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Prev = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Prev, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 0);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Prev, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 0);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		const ZEInt* Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 1);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(*Next, 2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Next, 2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 2);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 2);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		Prev = ConstIterator.MovePrevious();
-		ZETestCheckEqual(*Prev, 1);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
-		ZETestCheckEqual(*ConstIterator.GetItem(), 1);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(*Prev, 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(*ConstIterator.GetItem(), 1);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 	}
 }

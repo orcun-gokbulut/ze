@@ -173,15 +173,15 @@ void F(ZEThread* Thread, void* Parameter)
 
 
 
-ZETestSuite(ZEMutex)
+ZE_TEST(ZEMutex)
 {
-	ZETest("ZEMutex::ZEMutex()")
+	ZE_TEST_ITEM("ZEMutex::ZEMutex()")
 	{
 		ZEMutex TestMutex;
-		ZETestCheck(!TestMutex.IsLocked());
+		ZE_TEST_CHECK_ERROR(!TestMutex.IsLocked());
 	}
 
-	ZETest("ZEMutex::ZEMutex(const ZEMutex& Lock)")
+	ZE_TEST_ITEM("ZEMutex::ZEMutex(const ZEMutex& Lock)")
 	{
 		ZEMutex TestMutex1;
 
@@ -189,7 +189,7 @@ ZETestSuite(ZEMutex)
 		//Handle of TestMutex1 != Handle of TestMutex2
 	}
 
-	ZETest("ZEMutex ZEMutex::operator=(const ZEMutex& Lock)")
+	ZE_TEST_ITEM("ZEMutex ZEMutex::operator=(const ZEMutex& Lock)")
 	{
 		ZEMutex TestMutex1;
 		ZEMutex TestMutex2;
@@ -198,7 +198,7 @@ ZETestSuite(ZEMutex)
 		//Handle of TestMutex1 != Handle of TestMutex2
 	}
 
-	ZETest("run threads which call ZEMutex::Wait()")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Wait()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -224,7 +224,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run threads which call ZEMutex::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -250,7 +250,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run threads which call ZEMutex::Lock(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Lock(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -277,7 +277,7 @@ ZETestSuite(ZEMutex)
 		Mutex.Unlock();
 	}
 
-	ZETest("run threads which call ZEMutex::Lock()")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Lock()")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
@@ -303,7 +303,7 @@ ZETestSuite(ZEMutex)
 // 		Sleep(3000);
 	}
 
-	ZETest("call ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Wait(ZEUInt Milliseconds) outside of the thread function")
+	ZE_TEST_ITEM("call ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Wait(ZEUInt Milliseconds) outside of the thread function")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -314,7 +314,7 @@ ZETestSuite(ZEMutex)
 		Thread1.Run(NULL);
 
 		bool Locked = Mutex.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 		bool Res = Mutex.Lock(3000); //true
 
 		Thread2.SetName("Thread2");
@@ -330,7 +330,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run thread which calls ZEMutex::Wait()")
+	ZE_TEST_ITEM("run thread which calls ZEMutex::Wait()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -341,7 +341,7 @@ ZETestSuite(ZEMutex)
 		Thread1.Run(NULL);
 
 		bool Locked = Mutex.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&F>());
@@ -360,7 +360,7 @@ ZETestSuite(ZEMutex)
 		Mutex.Unlock();
 	}
 
-	ZETest("run threads which call ZEMutex::Wait() inside of the check condition")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Wait() inside of the check condition")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -386,7 +386,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run threads which call ZEMutex::Wait(ZEUInt Milliseconds) inside of the check condition")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Wait(ZEUInt Milliseconds) inside of the check condition")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -412,7 +412,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run thread which calls ZEMutex::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run thread which calls ZEMutex::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -438,7 +438,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
 
-	ZETest("run threads which call ZEMutex::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads which call ZEMutex::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -464,7 +464,7 @@ ZETestSuite(ZEMutex)
  		Sleep(1000);
 	}
 
-	ZETest("run threads respectively which call ZEMutex::Wait(ZEUInt Milliseconds) and LockUnlock(ZEThread* Thread, void* Parameter)")
+	ZE_TEST_ITEM("run threads respectively which call ZEMutex::Wait(ZEUInt Milliseconds) and LockUnlock(ZEThread* Thread, void* Parameter)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -490,7 +490,7 @@ ZETestSuite(ZEMutex)
  		Sleep(1000);
 	}
 
-	ZETest("run threads respectively which call LockUnlock(ZEThread* Thread, void* Parameter) and ZEMutex::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads respectively which call LockUnlock(ZEThread* Thread, void* Parameter) and ZEMutex::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -516,7 +516,7 @@ ZETestSuite(ZEMutex)
 		Sleep(3000);
 	}
 
-	ZETest("run threads respectively which call ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("run threads respectively which call ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -542,7 +542,7 @@ ZETestSuite(ZEMutex)
 		Sleep(1000);
 	}
  
-	ZETest("run threads respectively which call ZEMutex::Lock() and ZEMutex::Wait()")
+	ZE_TEST_ITEM("run threads respectively which call ZEMutex::Lock() and ZEMutex::Wait()")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
@@ -569,7 +569,7 @@ ZETestSuite(ZEMutex)
 // 		Mutex.Unlock();
 	}
 
-	ZETest("run 3 threads first one calls ZEMutex::Lock(), the others call ZEMutex::Wait()")
+	ZE_TEST_ITEM("run 3 threads first one calls ZEMutex::Lock(), the others call ZEMutex::Wait()")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
@@ -595,7 +595,7 @@ ZETestSuite(ZEMutex)
 // 		Sleep(1000);
 	}
 
-	ZETest("run thread which calls LockUnlock1(ZEThread* Thread, void* Parameter)")
+	ZE_TEST_ITEM("run thread which calls LockUnlock1(ZEThread* Thread, void* Parameter)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -621,7 +621,7 @@ ZETestSuite(ZEMutex)
 		Sleep(3000);
 	}
 
-	ZETest("run threads which call LockUnlock1(ZEThread* Thread, void* Parameter)")
+	ZE_TEST_ITEM("run threads which call LockUnlock1(ZEThread* Thread, void* Parameter)")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
@@ -647,7 +647,7 @@ ZETestSuite(ZEMutex)
 // 		Sleep(3000);
 	}
 	
-	ZETest("run thread which calls ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Unlock()")
+	ZE_TEST_ITEM("run thread which calls ZEMutex::Lock(ZEUInt Milliseconds) and ZEMutex::Unlock()")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
@@ -673,7 +673,7 @@ ZETestSuite(ZEMutex)
 // 		Sleep(3000);
 	}
 	
-	ZETest("run threads which call LockUnlock(ZEThread* Thread, void* Parameter)")
+	ZE_TEST_ITEM("run threads which call LockUnlock(ZEThread* Thread, void* Parameter)")
 	{
 // 		ZEThread Thread1;
 // 		ZEThread Thread2;
