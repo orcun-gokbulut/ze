@@ -80,7 +80,8 @@ class ZEHolder : public ZEHolderBase
 
 		ZEHolder<Type>&						operator=(Type* RawPointer);
 		ZEHolder<Type>&						operator=(const ZEHolder<Type>& OtherHolder);
-
+		/*bool								operator==(const ZEHolder<Type>& OtherHolder) const;
+		bool								operator!=(const ZEHolder<Type>& OtherHolder) const;*/
 											operator Type*() const;
 
 											ZEHolder();

@@ -94,9 +94,9 @@ void FunctionWithUnlock(ZEThread* Thread, void* Parameter)
 }
 
 
-ZETestSuite(ZELock)
+ZE_TEST(ZELock)
 {
-	ZETest("ZELock::ZELock()")
+	ZE_TEST_ITEM("ZELock::ZELock()")
 	{
 		ZELock LockTest;
 
@@ -104,12 +104,12 @@ ZETestSuite(ZELock)
 		//NextNumber   : 0
 	}
 
-	ZETest("ZELock::ZELock(const ZELock& Lock)")
+	ZE_TEST_ITEM("ZELock::ZELock(const ZELock& Lock)")
 	{
 		ZELock LockTest1;
 
 		bool Unlocked = LockTest1.Unlock();
-		ZETestCheck(Unlocked);
+		ZE_TEST_CHECK_ERROR(Unlocked);
 		//CurrentNumber: 2
 		//NextNumber   : 0
 
@@ -118,13 +118,13 @@ ZETestSuite(ZELock)
 		//NextNumber   : 0
 	}
 
-	ZETest("ZELock ZELock::operator=(const ZELock& Lock)")
+	ZE_TEST_ITEM("ZELock ZELock::operator=(const ZELock& Lock)")
 	{
 		ZELock LockTest1;
 		ZELock LockTest2;
 
 		bool Unlocked = LockTest2.Unlock();
-		ZETestCheck(Unlocked);
+		ZE_TEST_CHECK_ERROR(Unlocked);
 		//CurrentNumber: 2
 		//NextNumber   : 0
 
@@ -133,7 +133,7 @@ ZETestSuite(ZELock)
 		//NextNumber    : 0
 	}
 
-	ZETest("run threads function with Value and ZELock::Lock() and function with Value")
+	ZE_TEST_ITEM("run threads function with Value and ZELock::Lock() and function with Value")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -143,19 +143,19 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock->IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FunctionA>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock->IsLocked();
-		//ZETestCheck(Locked);
+		//ZE_TEST_CHECK_ERROR(Locked);
 		
 		Sleep(1000);
 	}
 
-	ZETest("run threads and call ZELock::Lock() and ZELock::Wait() outside of the thread functions")
+	ZE_TEST_ITEM("run threads and call ZELock::Lock() and ZELock::Wait() outside of the thread functions")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -165,10 +165,10 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 		
 		bool Locked = LockA->IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 		LockA->Lock();
 		Locked = LockA->IsLocked();
-		ZETestCheck(Locked);
+		ZE_TEST_CHECK_ERROR(Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction>());
@@ -180,7 +180,7 @@ ZETestSuite(ZELock)
 		Sleep(1000);	
 	}
 
-	ZETest("call ZELock::Wait() outside of the thread")
+	ZE_TEST_ITEM("call ZELock::Wait() outside of the thread")
 	{
 		bool Unlocked = LockA->Unlock();
 		ZEThread Thread1;
@@ -191,7 +191,7 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = LockA->IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 		
 		LockA->Wait(); //!waiting
 
@@ -200,7 +200,7 @@ ZETestSuite(ZELock)
 		Thread2.Run(NULL);
 
 		Locked = LockA->IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Sleep(1000);
 	}
@@ -228,7 +228,7 @@ ZETestSuite(ZELock)
 		}
 	}
 
-	ZETest("run threads with ZELock::Lock() and ZELock::Wait() respectively")
+	ZE_TEST_ITEM("run threads with ZELock::Lock() and ZELock::Wait() respectively")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -238,23 +238,23 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock1.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FirstCallWait>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock1.IsLocked();
-		//ZETestCheck(Locked);
+		//ZE_TEST_CHECK_ERROR(Locked);
 
 		Sleep(1000);
 
 		Locked = TestLock1.IsLocked();
-		ZETestCheck(Locked);
+		ZE_TEST_CHECK_ERROR(Locked);
 		bool Unlocked = TestLock1.Unlock();
 	}
 
-	ZETest("run threads with ZELock::Wait() and ZELock::Lock() respectively")
+	ZE_TEST_ITEM("run threads with ZELock::Wait() and ZELock::Lock() respectively")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -264,19 +264,19 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock1.IsLocked(); //false
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FirstCallLock>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock1.IsLocked(); //false
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Sleep(1000);
 
 		Locked = TestLock1.IsLocked(); //true
-		ZETestCheck(Locked);
+		ZE_TEST_CHECK_ERROR(Locked);
 		bool Unlocked = TestLock1.Unlock();
 	}
 
@@ -305,7 +305,7 @@ ZETestSuite(ZELock)
 		}
 	}
 
-	ZETest("run threads with functions CallLockAndUnlock and CallWait respectively")
+	ZE_TEST_ITEM("run threads with functions CallLockAndUnlock and CallWait respectively")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -315,14 +315,14 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock2.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&CallWait>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock2.IsLocked();
-		//ZETestCheck(Locked);
+		//ZE_TEST_CHECK_ERROR(Locked);
 
 		Sleep(1000);
 	}
@@ -351,7 +351,7 @@ ZETestSuite(ZELock)
 		}
 	}
 
-	ZETest("run threads respectively which call ZELock::Lock() and ZELock::Wait() first inside of the check condition")
+	ZE_TEST_ITEM("run threads respectively which call ZELock::Lock() and ZELock::Wait() first inside of the check condition")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -361,14 +361,14 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock3.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&WaitFirst>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock3.IsLocked();
-		//ZETestCheck(Locked);
+		//ZE_TEST_CHECK_ERROR(Locked);
 
 		Sleep(1000);
 
@@ -376,7 +376,7 @@ ZETestSuite(ZELock)
 		bool Unlocked = TestLock3.Unlock();
 	}
 
-	ZETest("run threads respectively which call ZELock::Wait() and ZELock::Lock() first inside of the check condition")
+	ZE_TEST_ITEM("run threads respectively which call ZELock::Wait() and ZELock::Lock() first inside of the check condition")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -386,19 +386,19 @@ ZETestSuite(ZELock)
 		Thread1.Run(NULL);
 
 		bool Locked = TestLock2.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&LockFirst>());
 		Thread2.Run(NULL);
 
 		Locked = TestLock2.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Sleep(1000);
 
 		Locked = TestLock2.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 	}
 
 	//for next test
@@ -414,28 +414,28 @@ ZETestSuite(ZELock)
 		}
 	}
 
-	ZETest("run threads with functions FunctionWithLock")
+	ZE_TEST_ITEM("run threads with functions FunctionWithLock")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
 		ZEThread Thread3;
 
 		bool Locked = Lock1.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread1.SetName("Thread1");
 		Thread1.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FunctionWithLock>());
 		Thread1.Run(NULL);
 
 		Locked = Lock1.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FunctionWithLock>());
 		Thread2.Run(NULL);
 
 		Locked = Lock1.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction>());
@@ -443,7 +443,7 @@ ZETestSuite(ZELock)
 
 		Sleep(1000);
 		Locked = Lock1.IsLocked();
-		ZETestCheck(Locked);
+		ZE_TEST_CHECK_ERROR(Locked);
 		bool Unlocked = Lock1.Unlock();
 	}
 
@@ -460,14 +460,14 @@ ZETestSuite(ZELock)
 		}
 	}
 
-	ZETest("bool ZELock::IsLocked()")
+	ZE_TEST_ITEM("bool ZELock::IsLocked()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
 		ZEThread Thread3;
 
 		bool Locked = LockIsLocked.IsLocked();
-		ZETestCheck(!Locked);
+		ZE_TEST_CHECK_ERROR(!Locked);
 
 		Thread1.SetName("Thread1");
 		Thread1.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&FunctionLock>());
@@ -486,7 +486,7 @@ ZETestSuite(ZELock)
 		Thread3.Run(NULL);
 
 		Locked = LockIsLocked.IsLocked();
-		//ZETestCheck(Locked);
+		//ZE_TEST_CHECK_ERROR(Locked);
 
 		Sleep(1000);
 		bool Unlocked = LockIsLocked.Unlock();

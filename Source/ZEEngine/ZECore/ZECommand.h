@@ -40,11 +40,11 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
+#include "ZEDS/ZEDelegate.h"
 
 class ZECommand;
 typedef ZEArray<ZEValue> ZECommandParameterList;
-typedef fastdelegate::FastDelegate2<ZECommand*, const ZECommandParameterList*, bool> ZECommandCallback;
+typedef ZEDelegate<bool (ZECommand*, const ZECommandParameterList*)> ZECommandCallback;
 
 class ZECommand
 {

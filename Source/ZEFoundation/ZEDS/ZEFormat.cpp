@@ -217,3 +217,8 @@ ZEString ZEFormat::FormatInner(const char* Input, const ZEValue** Arguments, ZES
 
 	return Output;
 }
+
+ZEString ZEFormat::Format()
+{
+	return ZEString::Empty;
+}

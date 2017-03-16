@@ -76,7 +76,9 @@ class ZEMCGenerator
 		void					GenerateEnding();
 		
 		// Generic
-		void					GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName = "Object", const char* DestinationName = "CastedObject");
+		void					GenerateClassTypeCheck(ZEMCClass* CurrentClass, const char* VariableName = "Object", bool AllowDerived = false);
+		void					GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName = "Object", const char* DestinationName = "CastedObject", bool AllowDerived = false);
+		void					GenerateCastedObjectConst(ZEMCClass* CurrentClass, const char* SourceName = "Object", const char* DestinationName = "CastedObject", bool AllowDerived = false);
 
 		// Declaration
 		void					GenerateDeclarationGetName(ZEMCDeclaration* Declaration);
@@ -133,15 +135,16 @@ class ZEMCGenerator
 		void					GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass);
 		void					GenerateClassCreateScriptInstance(ZEMCClass* CurrentClass);
 
-		// Memory Management
+		// Life Cycle Management
 		void					GenerateClassGetSizeOfScriptObject(ZEMCClass* CurrentClass);
 		void					GenerateClassCreateInstance(ZEMCClass* CurrentClass);
 		void					GenerateClassDestroy(ZEMCClass* CurrentClass);
-		void					GenerateClassDynamicCast(ZEMCClass* CurrentClass);
-		void					GenerateClassClone(ZEMCClass* CurrentClass);
 		void					GenerateClassConstruct(ZEMCClass* CurrentClass);
+		void					GenerateClassCopyConstruct(ZEMCClass* CurrentClass);
 		void					GenerateClassDeconstruct(ZEMCClass* CurrentClass);
 		void					GenerateClassAssign(ZEMCClass* CurrentClass);
+		void					GenerateClassClone(ZEMCClass* CurrentClass);
+		void					GenerateClassDynamicCast(ZEMCClass* CurrentClass);
 
 	public:
 		void					SetMetaContext(ZEMCContext* context);

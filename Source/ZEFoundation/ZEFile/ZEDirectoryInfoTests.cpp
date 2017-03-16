@@ -43,9 +43,9 @@
 #include "ZEError.h"
 #include "ZEPathUtils.h"
 
-ZETestSuite(ZEDirectoryInfo)
+ZE_TEST(ZEDirectoryInfo)
 {
-	ZETest("set paths")
+	ZE_TEST_ITEM("set paths")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 		const ZEString CompanyName;
@@ -63,25 +63,25 @@ ZETestSuite(ZEDirectoryInfo)
 		ZEPathManager::SetApplicationResourcesPath(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + ".." + Seperator + "TestResources" + Seperator + "RunDir" + Seperator + "resources" + Seperator + "Engine", false));
 	}
 
-	ZETest("ZEDirectoryInfo::~ZEDirectoryInfo()")
+	ZE_TEST_ITEM("ZEDirectoryInfo::~ZEDirectoryInfo()")
 	{
 
 	}
 
-	ZETest("ZEDirectoryInfo::ZEDirectoryInfo()")
+	ZE_TEST_ITEM("ZEDirectoryInfo::ZEDirectoryInfo()")
 	{
 		ZEDirectoryInfo Directory;
 	}
 
-	ZETest("ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("ZEDirectoryInfo::ZEDirectoryInfo(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory(ZEPathManager::GetResourcesPath() + Seperator + "Directory");
-		ZETestCheckString(Directory.GetName(), "Directory");
-		ZETestCheckString(Directory.GetPath(), ZEPathManager::GetResourcesPath() + Seperator + "Directory");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetName(), "Directory");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetPath(), ZEPathManager::GetResourcesPath() + Seperator + "Directory");
 
-		ZETestCase("open a file through the specified path")
+		ZE_TEST_CASE("open a file through the specified path")
 		{
 			ZEFileTime CreationDate;
 			ZEFileTime ModificationDate;
@@ -91,13 +91,13 @@ ZETestSuite(ZEDirectoryInfo)
 
 			ZEDirectoryInfo DirectoryInfo(FilePath);
 
-			ZETestCheckString(DirectoryInfo.GetName(), "DirectoryInfo.txt");
-			ZETestCheckString(DirectoryInfo.GetPath(), FilePath);
+			ZE_TEST_CHECK_STRING_EQUAL(DirectoryInfo.GetName(), "DirectoryInfo.txt");
+			ZE_TEST_CHECK_STRING_EQUAL(DirectoryInfo.GetPath(), FilePath);
 			bool Created = DirectoryInfo.GetCreationDate(CreationDate);
-			ZETestCheck(Created);
+			ZE_TEST_CHECK_ERROR(Created);
 			//CreationDate will be the current date
 			bool Modified = DirectoryInfo.GetModificationDate(ModificationDate);
-			ZETestCheck(Modified);
+			ZE_TEST_CHECK_ERROR(Modified);
 			//ModificationDate will be the current date
 
 			File.Close();
@@ -105,62 +105,62 @@ ZETestSuite(ZEDirectoryInfo)
 		}
 	}
 
-	ZETest("void ZEDirectoryInfo::SetPath(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("void ZEDirectoryInfo::SetPath(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory("resources\\DirName.txt");
-		ZETestCheckString(Directory.GetName(), "DirName.txt");
-		ZETestCheckString(Directory.GetPath(), "resources\\DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetName(), "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetPath(), "resources\\DirName.txt");
 
 		Directory.SetPath(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
-		ZETestCheckString(Directory.GetName(), "DirName.txt");
-		ZETestCheckString(Directory.GetPath(), ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetName(), "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Directory.GetPath(), ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
 	}
 
-	ZETest("const ZEString& ZEDirectoryInfo::GetName() const")
+	ZE_TEST_ITEM("const ZEString& ZEDirectoryInfo::GetName() const")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory1("DirName.txt");
 		const ZEString Name1 = Directory1.GetName();
-		ZETestCheckString(Name1, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Name1, "DirName.txt");
 
 		ZEDirectoryInfo Directory2("resources\\DirName.txt");
 		const ZEString Name2 = Directory2.GetName();
-		ZETestCheckString(Name2, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Name2, "DirName.txt");
 
 		ZEDirectoryInfo Directory3(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
 		const ZEString Name3 = Directory3.GetName();
-		ZETestCheckString(Name3, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Name3, "DirName.txt");
 
 		ZEDirectoryInfo Directory4(ZEPathManager::GetResourcesPath());
 		const ZEString Name4 = Directory4.GetName();
-		ZETestCheckString(Name4, "resources");
+		ZE_TEST_CHECK_STRING_EQUAL(Name4, "resources");
 	}
 
-	ZETest("const ZEString& ZEDirectoryInfo::GetPath() const")
+	ZE_TEST_ITEM("const ZEString& ZEDirectoryInfo::GetPath() const")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory1("DirName.txt");
 		const ZEString Path1 = Directory1.GetPath();
-		ZETestCheckString(Path1, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Path1, "DirName.txt");
 
 		ZEDirectoryInfo Directory2("resources\\DirName.txt");
 		const ZEString Path2 = Directory2.GetPath();
-		ZETestCheckString(Path2, "resources\\DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Path2, "resources\\DirName.txt");
 
 		ZEDirectoryInfo Directory3(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
 		const ZEString Path3 = Directory3.GetPath();
-		ZETestCheckString(Path3, ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Path3, ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
 
 		ZEDirectoryInfo Directory4(ZEPathManager::GetResourcesPath());
 		const ZEString Path4 = Directory4.GetPath();
-		ZETestCheckString(Path4, ZEPathManager::GetResourcesPath());
+		ZE_TEST_CHECK_STRING_EQUAL(Path4, ZEPathManager::GetResourcesPath());
 	}
 
-	ZETest("bool ZEDirectoryInfo::GetCreationDate(ZEFileTime& Time)")
+	ZE_TEST_ITEM("bool ZEDirectoryInfo::GetCreationDate(ZEFileTime& Time)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
@@ -168,21 +168,21 @@ ZETestSuite(ZEDirectoryInfo)
 		ZEDirectoryInfo Directory(ZEPathManager::GetResourcesPath() + Seperator + "DirectoryInfo.txt");
 
 		bool Created = Directory.GetCreationDate(CreationDate);
-		ZETestCheck(!Created);
+		ZE_TEST_CHECK_ERROR(!Created);
 		//CreationDate 0
 
 		ZEFile File;
 		bool Opened = File.Open(ZEPathManager::GetResourcesPath() + Seperator +"DirectoryInfo.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 		Created = Directory.GetCreationDate(CreationDate);
-		ZETestCheck(Created);
+		ZE_TEST_CHECK_ERROR(Created);
 		//CreationDate = Creation
 
 		File.Close();
 		remove(ZEPathManager::GetResourcesPath() + Seperator + "DirectoryInfo.txt");
 	}
 
-	ZETest("bool ZEDirectoryInfo::GetModificationDate(ZEFileTime& Time)")
+	ZE_TEST_ITEM("bool ZEDirectoryInfo::GetModificationDate(ZEFileTime& Time)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
@@ -190,130 +190,130 @@ ZETestSuite(ZEDirectoryInfo)
 		ZEDirectoryInfo Directory(ZEPathManager::GetResourcesPath() + Seperator + "DirectoryInfo.txt");
 
 		bool Modified = Directory.GetModificationDate(ModificationDate);
-		ZETestCheck(!Modified);
+		ZE_TEST_CHECK_ERROR(!Modified);
 		//ModificationDate 0
 
 		ZEFile File;
 		bool Opened = File.Open(ZEPathManager::GetResourcesPath() + Seperator + "DirectoryInfo.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 		Modified = Directory.GetModificationDate(ModificationDate);
-		ZETestCheck(Modified);
+		ZE_TEST_CHECK_ERROR(Modified);
 		//ModificationDate = Modification
 
 		File.Close();
 		remove(ZEPathManager::GetResourcesPath() + Seperator + "DirectoryInfo.txt");
  	}
 
-	ZETest("ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()")
+	ZE_TEST_ITEM("ZEArray<ZEFileInfo*>* ZEDirectoryInfo::GetFileList()")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory1(ZEPathManager::GetResourcesPath());
 
 		ZEArray<ZEFileInfo*>* FileList = Directory1.GetFileList();
-		ZETestCheckEqual(FileList->GetCount(), 1);
+		ZE_TEST_CHECK_EQUAL(FileList->GetCount(), 1);
 
 		ZEDirectoryInfo Directory2(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + ".." + Seperator + "\\TestResources", false));
 
 		FileList = Directory2.GetFileList();
-		ZETestCheckEqual(FileList->GetCount(), 0);
+		ZE_TEST_CHECK_EQUAL(FileList->GetCount(), 0);
 	}
 
-	ZETest("ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()")
+	ZE_TEST_ITEM("ZEArray<ZEDirectoryInfo*>* ZEDirectoryInfo::GetDirectoryList()")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEDirectoryInfo Directory1(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + ".." + Seperator + "\\TestResources", false));
 
 		ZEArray<ZEDirectoryInfo*>* DirectoryList = Directory1.GetDirectoryList();
-		ZETestCheckEqual(DirectoryList->GetCount(), 5);
+		ZE_TEST_CHECK_EQUAL(DirectoryList->GetCount(), 5);
 
 		ZEDirectoryInfo Directory2(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + ".." + Seperator + "TestResources" + Seperator + "RunDir", false));
 
 		DirectoryList = Directory2.GetDirectoryList();
-		ZETestCheckEqual(DirectoryList->GetCount(), 3);
+		ZE_TEST_CHECK_EQUAL(DirectoryList->GetCount(), 3);
 	}
 
-	ZETest("bool ZEDirectoryInfo::IsDirectory(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("bool ZEDirectoryInfo::IsDirectory(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		bool Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetWorkingDrive());
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetWorkingDirectory());
-		ZETestCheck(Directory);
+		ZE_TEST_CHECK_ERROR(Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
-		ZETestCheck(Directory);
+		ZE_TEST_CHECK_ERROR(Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + ".." + "DirName.txt", false));
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetResourcesPath());
-		ZETestCheck(Directory);
+		ZE_TEST_CHECK_ERROR(Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory("DirName.txt");
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetWorkingDrive() + Seperator + "Test");
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetWorkingDrive() + Seperator + "Test" + Seperator + "DirName.txt");
-		ZETestCheck(!Directory);
+		ZE_TEST_CHECK_ERROR(!Directory);
 
 		Directory = ZEDirectoryInfo::IsDirectory(ZEPathManager::GetSavedGamesPath());
-		ZETestCheck(Directory);
+		ZE_TEST_CHECK_ERROR(Directory);
 	}
 
-	ZETest("ZEString ZEDirectoryInfo::GetDirectoryName(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("ZEString ZEDirectoryInfo::GetDirectoryName(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEString DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
-		ZETestCheckString(DirectoryName, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "DirName.txt");
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathManager::GetResourcesPath());
-		ZETestCheckString(DirectoryName, "resources");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "resources");
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathManager::GetWorkingDrive());
-		ZETestCheckString(DirectoryName, ZEPathManager::GetWorkingDrive());
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, ZEPathManager::GetWorkingDrive());
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
-		ZETestCheckString(DirectoryName, "trunk");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "trunk");
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathManager::GetApplicationResourcesPath());
-		ZETestCheckString(DirectoryName, "Engine");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "Engine");
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetSavedGamesPath() + Seperator + "..", false));
-		ZETestCheckString(DirectoryName, "Zinek");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "Zinek");
 
 		DirectoryName = ZEDirectoryInfo::GetDirectoryName("DirName.txt");
-		ZETestCheckString(DirectoryName, "DirName.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(DirectoryName, "DirName.txt");
 	}
 
-	ZETest("ZEString ZEDirectoryInfo::GetParentDirectory(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("ZEString ZEDirectoryInfo::GetParentDirectory(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEString ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathManager::GetWorkingDrive());
 
 		ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathManager::GetWorkingDirectory());
-		ZETestCheckString(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
 
 		ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathManager::GetWorkingDirectory() + Seperator + "DirName.txt");
-		ZETestCheckString(ParentDirectory, ZEPathManager::GetWorkingDirectory());
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathManager::GetWorkingDirectory());
 
 		ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathManager::GetResourcesPath());
-		ZETestCheckString(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetResourcesPath() + Seperator + "..", false));
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetResourcesPath() + Seperator + "..", false));
 
 		ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathManager::GetResourcesPath() + Seperator + "DirName.txt");
-		ZETestCheckString(ParentDirectory, ZEPathManager::GetResourcesPath());
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathManager::GetResourcesPath());
 
 		ParentDirectory = ZEDirectoryInfo::GetParentDirectory(ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetApplicationResourcesPath() + Seperator + ".." + Seperator + "..", false));
-		ZETestCheckString(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetApplicationResourcesPath() + Seperator + ".." + Seperator + ".." + Seperator + "..", false));
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetApplicationResourcesPath() + Seperator + ".." + Seperator + ".." + Seperator + "..", false));
 	}
 }

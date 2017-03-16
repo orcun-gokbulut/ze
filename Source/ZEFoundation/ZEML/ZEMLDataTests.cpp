@@ -41,174 +41,174 @@
 #include "ZEMLNode.h"
 
 
-ZETestSuite(ZEMLData)
+ZE_TEST(ZEMLData)
 {
-	ZETest("ZEMLDataProperty::~ZEMLDataProperty()")
+	ZE_TEST_ITEM("ZEMLDataProperty::~ZEMLDataProperty()")
 	{
 
 	}
 
-	ZETest("ZEMLDataProperty::ZEMLDataProperty()")
+	ZE_TEST_ITEM("ZEMLDataProperty::ZEMLDataProperty()")
 	{
 		ZEMLDataProperty DataProperty;
 
-		ZETestCheckEqual(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
-		ZETestCheck(DataProperty.GetName() == NULL);
-		ZETestCheck(DataProperty.GetData() == NULL);
+		ZE_TEST_CHECK_EQUAL(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
+		ZE_TEST_CHECK_ERROR(DataProperty.GetName() == NULL);
+		ZE_TEST_CHECK_ERROR(DataProperty.GetData() == NULL);
 	}
 
-	ZETest("ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name)")
+	ZE_TEST_ITEM("ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name)")
 	{
 		ZEMLDataProperty DataProperty("TestDataProperty");
 
-		ZETestCheckEqual(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
-		ZETestCheckString(DataProperty.GetName(), "TestDataProperty");
-		ZETestCheck(DataProperty.GetData() == NULL);
+		ZE_TEST_CHECK_EQUAL(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
+		ZE_TEST_CHECK_STRING_EQUAL(DataProperty.GetName(), "TestDataProperty");
+		ZE_TEST_CHECK_ERROR(DataProperty.GetData() == NULL);
 	}
 
-	ZETest("ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)")
+	ZE_TEST_ITEM("ZEMLDataProperty::ZEMLDataProperty(const ZEString& Name ,void* Data, ZEUInt64 DataSize, bool Cache)")
 	{
 		void* Data = new char[sizeof(unsigned char)];
 
 		ZEMLDataProperty DataProperty("TestDataProperty", Data, sizeof(unsigned char), true);
 
-		ZETestCheckEqual(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
-		ZETestCheckString(DataProperty.GetName(), "TestDataProperty");
-		ZETestCheck(DataProperty.GetData() != Data);
+		ZE_TEST_CHECK_EQUAL(DataProperty.GetType(), ZEML_IT_INLINE_DATA);
+		ZE_TEST_CHECK_STRING_EQUAL(DataProperty.GetName(), "TestDataProperty");
+		ZE_TEST_CHECK_ERROR(DataProperty.GetData() != Data);
 		ZEInt Result = memcmp(Data, DataProperty.GetData(), sizeof(unsigned char));
-		ZETestCheckEqual(Result, 0);
-		ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(unsigned char));
+		ZE_TEST_CHECK_EQUAL(Result, 0);
+		ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(unsigned char));
 
-		ZETestCase("for cached false")
+		ZE_TEST_CASE("for cached false")
 		{
 			ZEMLDataProperty TestDataProperty("TestDataProperty", Data, sizeof(unsigned char), false);
 
-			ZETestCheckEqual(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
-			ZETestCheckString(TestDataProperty.GetName(), "TestDataProperty");
-			ZETestCheckEqual(TestDataProperty.GetData(), Data);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
+			ZE_TEST_CHECK_STRING_EQUAL(TestDataProperty.GetName(), "TestDataProperty");
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetData(), Data);
 			Result = memcmp(Data, TestDataProperty.GetData(), sizeof(unsigned char));
-			ZETestCheckEqual(Result, 0);
-			ZETestCheckEqual(TestDataProperty.GetDataSize(), sizeof(unsigned char));
+			ZE_TEST_CHECK_EQUAL(Result, 0);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetDataSize(), sizeof(unsigned char));
 		}
 
-		ZETestCase("for different DataSize and cached")
+		ZE_TEST_CASE("for different DataSize and cached")
 		{
 			ZEMLDataProperty TestDataProperty("TestDataProperty", Data, sizeof(ZEInt32), true);
 
-			ZETestCheckEqual(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
-			ZETestCheckString(TestDataProperty.GetName(), "TestDataProperty");
-			ZETestCheck(TestDataProperty.GetData() != Data);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
+			ZE_TEST_CHECK_STRING_EQUAL(TestDataProperty.GetName(), "TestDataProperty");
+			ZE_TEST_CHECK_ERROR(TestDataProperty.GetData() != Data);
 			Result = memcmp(Data, TestDataProperty.GetData(), sizeof(ZEInt32));
-			ZETestCheckEqual(Result, 0);
-			ZETestCheckEqual(TestDataProperty.GetDataSize(), sizeof(ZEInt32));
+			ZE_TEST_CHECK_EQUAL(Result, 0);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetDataSize(), sizeof(ZEInt32));
 		}
 
-		ZETestCase("for different DataSize and not cached")
+		ZE_TEST_CASE("for different DataSize and not cached")
 		{
 			ZEMLDataProperty TestDataProperty("TestDataProperty", Data, sizeof(ZEInt32), false);
 
-			ZETestCheckEqual(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
-			ZETestCheckString(TestDataProperty.GetName(), "TestDataProperty");
-			ZETestCheckEqual(TestDataProperty.GetData(), Data);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetType(), ZEML_IT_INLINE_DATA);
+			ZE_TEST_CHECK_STRING_EQUAL(TestDataProperty.GetName(), "TestDataProperty");
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetData(), Data);
 			Result = memcmp(Data, TestDataProperty.GetData(), sizeof(ZEInt32));
-			ZETestCheckEqual(Result, 0);
-			ZETestCheckEqual(TestDataProperty.GetDataSize(), sizeof(ZEInt32));
+			ZE_TEST_CHECK_EQUAL(Result, 0);
+			ZE_TEST_CHECK_EQUAL(TestDataProperty.GetDataSize(), sizeof(ZEInt32));
 		}
 	}
 
-	ZETest("ZEUInt64 ZEMLDataProperty::GetTotalSize()")
+	ZE_TEST_ITEM("ZEUInt64 ZEMLDataProperty::GetTotalSize()")
 	{
 		ZEUInt64 TotalSize;
 		void* Data = new char[sizeof(unsigned char)];
 		
-		ZETestCase("for DataSize unsigned char")
+		ZE_TEST_CASE("for DataSize unsigned char")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(unsigned char), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(unsigned char));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(unsigned char));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 17);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 17);
 		}
 
-		ZETestCase("for DataSize ZEInt8")
+		ZE_TEST_CASE("for DataSize ZEInt8")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(ZEInt8), true);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(ZEInt8));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(ZEInt8));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 17);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 17);
 		}
 
-		ZETestCase("for DataSize ZEInt16")
+		ZE_TEST_CASE("for DataSize ZEInt16")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(ZEInt16), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(ZEInt16));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(ZEInt16));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 18);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 18);
 		}
 
-		ZETestCase("for DataSize ZEInt32")
+		ZE_TEST_CASE("for DataSize ZEInt32")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(ZEInt32), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(ZEInt32));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(ZEInt32));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 20);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 20);
 		}
 
-		ZETestCase("for DataSize ZEInt64")
+		ZE_TEST_CASE("for DataSize ZEInt64")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(ZEInt64), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(ZEInt64));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(ZEInt64));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 24);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 24);
 		}
 
-		ZETestCase("for DataSize ZEUInt8")
+		ZE_TEST_CASE("for DataSize ZEUInt8")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(ZEUInt8), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(ZEUInt8));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(ZEUInt8));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 17);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 17);
 		}
 
-		ZETestCase("for DataSize boolean")
+		ZE_TEST_CASE("for DataSize boolean")
 		{
 			ZEMLDataProperty DataProperty("Test", Data, sizeof(bool), false);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(bool));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(bool));
 
 			TotalSize = DataProperty.GetTotalSize();
-			ZETestCheckEqual(TotalSize, 17);
+			ZE_TEST_CHECK_EQUAL(TotalSize, 17);
 		}
 	}
 
-	ZETest("void ZEMLDataProperty::SetData(void* Data, ZEUInt64 DataSize, bool Cache)")
+	ZE_TEST_ITEM("void ZEMLDataProperty::SetData(void* Data, ZEUInt64 DataSize, bool Cache)")
 	{
 		ZEMLDataProperty DataProperty;
 		void* Data = new char[sizeof(unsigned char)];
 		
-		ZETestCase("for cached true")
+		ZE_TEST_CASE("for cached true")
 		{
 			DataProperty.SetData(Data, sizeof(unsigned char), true);
-			ZETestCheck(DataProperty.GetData() != Data);
+			ZE_TEST_CHECK_ERROR(DataProperty.GetData() != Data);
 			ZEInt Result = memcmp(Data, DataProperty.GetData(), sizeof(unsigned char));
-			ZETestCheckEqual(Result, 0);
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(unsigned char));
+			ZE_TEST_CHECK_EQUAL(Result, 0);
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(unsigned char));
 		}
 
-		ZETestCase("for cached false")
+		ZE_TEST_CASE("for cached false")
 		{
 			DataProperty.SetData(Data, sizeof(unsigned char), false);
-			ZETestCheckEqual(DataProperty.GetData(), Data);
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetData(), Data);
 			ZEInt Result = memcmp(Data, DataProperty.GetData(), sizeof(unsigned char));
-			ZETestCheckEqual(DataProperty.GetDataSize(), sizeof(unsigned char));
+			ZE_TEST_CHECK_EQUAL(DataProperty.GetDataSize(), sizeof(unsigned char));
 		}
 	}
 
-	ZETest("const void* ZEMLDataProperty::GetData()")
+	ZE_TEST_ITEM("const void* ZEMLDataProperty::GetData()")
 	{
 		void* Data = new char[sizeof(unsigned char)];
 
@@ -216,18 +216,18 @@ ZETestSuite(ZEMLData)
 		DataProperty.SetData(Data, sizeof(ZEInt32), true);
 
 		const void* PropertyData = DataProperty.GetData();
-		ZETestCheck(PropertyData != Data);
+		ZE_TEST_CHECK_ERROR(PropertyData != Data);
 		ZEInt Result = memcmp(Data, PropertyData, sizeof(ZEInt32));
-		ZETestCheckEqual(Result, 0);
+		ZE_TEST_CHECK_EQUAL(Result, 0);
 
-		ZETestCase("for not cached")
+		ZE_TEST_CASE("for not cached")
 		{
 			DataProperty.SetData(Data, sizeof(ZEInt32), false);
 
 			const void* TestData = DataProperty.GetData();
-			ZETestCheckEqual(TestData, Data);
+			ZE_TEST_CHECK_EQUAL(TestData, Data);
 			Result = memcmp(Data, TestData, sizeof(ZEInt32));
-			ZETestCheckEqual(Result, 0);
+			ZE_TEST_CHECK_EQUAL(Result, 0);
 		}
 	}
 }

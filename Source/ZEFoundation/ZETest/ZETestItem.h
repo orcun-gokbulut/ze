@@ -34,10 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEST_ITEM_H__
-#define __ZE_TEST_ITEM_H__
-
 #include "ZETypes.h"
+
+#include "ZETimeCounter.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+
+#define ZE_TEST_ITEM_INTERNAL(Name, Identifier) \
+	class Identifier : public ZETestItem \
+	{ \
+		public: \
+			virtual void Implementation() override; \
+			Identifier(); \
+	}; \
+	static Identifier ZE_MACRO_CONCAT(Identifier, Instance); \
+	Identifier::Identifier() \
+	{ \
+		SetName(Name); \
+		TestInstance.AddItem(this); \
+	} \
+	void Identifier::Implementation()
+#define ZE_TEST_ITEM(Name) ZE_TEST_ITEM_INTERNAL(Name, ZE_MACRO_CONCAT(ZETestItem, __COUNTER__))
+
+#define ZE_TEST_CASE(Name)
 
 class ZETestSuiteItem;
 
@@ -50,54 +69,73 @@ enum ZETestResult
 
 enum ZETestProblemType
 {
+	ZE_TPT_CRITICAL_ERROR,
 	ZE_TPT_ERROR,
 	ZE_TPT_WARNING,
-	ZE_TPT_NOTICE
 };
+
+class ZETestItem;
+
+class ZETestProblem
+{
+	public:
+		ZETestItem*						Item;
+		ZETestProblemType				Type;
+		ZEString						Description;
+		ZEString						FileName;
+		ZEUInt							Line;
+};
+
 
 class ZETestItem
 {
+	friend class ZETest;
 	private:
-		char					Name[256];
-		char					CaseName[256];
-		ZETestSuiteItem*		Owner;
-		ZETestResult			Result;
-        double					ElapsedTime;
+		ZETest*							Test;
+		ZEString						Name;
+		ZETestResult					Result;
+		ZETimeCounter					TimeCounter;
+		ZEArray<ZETestProblem>			Problems;
+		bool							ExpectingError;
+		ZEErrorType						ExpectingErrorType;
+		ZEString						ExpectingErrorModuleName;
+		bool							ExpectedErrorOccured;
+
+		bool							SuppressingLogging;
+		ZELogType						SuppressingLoggingPreviousLevel;
+		
+
+		ZEErrorCallback					ErrorCallbackChain;
+		void							ErrorCallback(ZEErrorType Type);
+
+	protected:
+		void							ReportProblem(ZETestProblemType Type, const ZEString& Description, const char* File, ZEInt Line);
+		
+		void							ResumeTimeCounter();
+		void							PauseTimeCounter();
+
+		void							StartSuppressingLogging();
+		void							StopSuppressingLogging();
+
+		void							StartExpectingError(ZEErrorType Type, const char* ModuleName);
+		bool							DidExpectedErrorOccured();
+		bool							StopExpectingError();
+
+		virtual void					Implementation() = 0;
 
 	public:
-		const char*				GetName();
-		ZETestSuiteItem*		GetOwner();
+		ZETest*							GetTest() const;
 
-		void					SetCurrentCase(const char* CaseName);
-		const char*				GetCurrentCase();
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
 
-		void					ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line);
+		ZETestResult					GetResult() const;
+		double							GetElapsedTime() const;
+		const ZEArray<ZETestProblem>&	GetProblems() const;
 
-		virtual void			TestImpl() = 0;
+		void							Run();
+		void							Reset();
 
-		bool					RunTest();
-		void					Reset();
-		ZETestResult			GetResult();
-		double					GetEleapsedTime();
-
-								ZETestItem(const char* Name, ZETestSuiteItem* Owner);
+										ZETestItem();
+		virtual							~ZETestItem();
 };
-
-#define ZETestScope() 
-
-#define ZETestCase(CaseName)\
-	SetCurrentCase(CaseName);
-
-#define ZETestNameCombiner_(x, y) x ## y
-#define ZETestNameCombiner(x, y) ZETestNameCombiner_(x, y)
-
-#define ZETest(Name)\
-	class ZETestNameCombiner(ZETest_, __LINE__) : public ZETestItem\
-	{\
-		public:\
-			virtual void TestImpl();\
-			ZETestNameCombiner(ZETest_, __LINE__)(const char* Name1, ZETestSuiteItem* Owner1) : ZETestItem(Name1, Owner1) {}\
-	} ZETestNameCombiner(Test_, __LINE__)(Name, &Suite);\
-	void ZETestNameCombiner(ZETest_, __LINE__)::TestImpl()
-
-#endif

@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEOption.h"
+
 #include "ZEOptionSection.h"
 #include "ZEError.h"
 
-using namespace fastdelegate;
 
 const ZEString& ZEOption::GetName()
 {

@@ -145,7 +145,7 @@ ZEErrorManager::ZEErrorManager()
 
 
 	ZEOptionManager::GetInstance()->RegisterSection(&ErrorOptions);
-	ZEError::GetInstance()->SetCallback(&ZEErrorManager::ErrorCallback);
+	ZEError::GetInstance()->SetCallback(ZEErrorCallback::Create<&ZEErrorManager::ErrorCallback>());
 }
 
 ZEErrorManager::~ZEErrorManager()

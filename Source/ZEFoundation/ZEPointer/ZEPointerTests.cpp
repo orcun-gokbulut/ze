@@ -37,77 +37,77 @@
 #include "ZESharedPointer.h"
 #include "ZEPointerTestClass.h"
 
-ZETestSuite(ZESharedPointer)
+ZE_TEST(ZESharedPointer)
 {
-	ZETest("TestClassTest")
+	ZE_TEST_ITEM("TestClassTest")
 	{
 		ZETestReset();
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 
 		ZETestClass* A = new ZETestClass();
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 		delete A;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 
 		A = new ZETestClass();
 		ZETestClass* B = new ZETestClass();
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(2);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(2);
 
 		delete A;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 		delete B;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 	}
 
-	ZETest("DefaultConstructor")
+	ZE_TEST_ITEM("DefaultConstructor")
 	{
 		ZETestReset();
 
 		ZESharedPointer<ZETestClass> SharedPointer1;
-		ZETestCheck(SharedPointer1.IsNull());
-		ZETestCheck(SharedPointer1.GetReferenceCount() == 0);
-		ZETestCheck(SharedPointer1.GetPointer() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointer1.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointer1.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointer1.GetPointer() == 0);
 
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
 
 		ZESharedPointer<ZETestClass> SharedPointer2(NULL);
-		ZETestCheck(SharedPointer2.IsNull());
-		ZETestCheck(SharedPointer2.GetReferenceCount() == 0);
-		ZETestCheck(SharedPointer2.GetPointer() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointer2.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointer2.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointer2.GetPointer() == 0);
 
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
 
 	}
 
-	ZETest("CreateRelease")
+	ZE_TEST_ITEM("CreateRelease")
 	{
 		ZETestReset();
 		ZETestClass* TestClass = new ZETestClass();
 		ZESharedPointer<ZETestClass> SharedPointer;
 
 		SharedPointer.Create(TestClass);
-		ZETestCheck(!SharedPointer.IsNull());
-		ZETestCheck(SharedPointer.GetReferenceCount() == 1);
-		ZETestCheck(SharedPointer.GetPointer() != NULL);
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERROR(!SharedPointer.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetPointer() != NULL);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 		SharedPointer.Release();
-		ZETestCheck(SharedPointer.IsNull());
-		ZETestCheck(SharedPointer.GetReferenceCount() == 0);
-		ZETestCheck(SharedPointer.GetPointer() == NULL);
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERROR(SharedPointer.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetPointer() == NULL);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 	}
 
-	ZETest("Assingments")
+	ZE_TEST_ITEM("Assingments")
 	{
 		ZETestReset();
 		ZETestScope()
@@ -115,11 +115,11 @@ ZETestSuite(ZESharedPointer)
 			ZETestClass* TestClass = new ZETestClass();
 			ZESharedPointer<ZETestClass> SharedPointer(TestClass);
 
-			ZETestCheck(!SharedPointer.IsNull());
-			ZETestCheck(SharedPointer.GetReferenceCount() == 1);
-			ZETestCheck(SharedPointer.GetPointer() != NULL);
-			ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(!SharedPointer.IsNull());
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetPointer() != NULL);
+			ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 		}
 
 		ZETestReset();
@@ -129,15 +129,15 @@ ZETestSuite(ZESharedPointer)
 			ZESharedPointer<ZETestClass> SharedPointer;
 			SharedPointer = TestClass;
 
-			ZETestCheck(!SharedPointer.IsNull());
-			ZETestCheck(SharedPointer.GetReferenceCount() == 1);
-			ZETestCheck(SharedPointer.GetPointer() != NULL);
-			ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(!SharedPointer.IsNull());
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetPointer() != NULL);
+			ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 		}
 	}
 
-	ZETest("ReferanceCounting")
+	ZE_TEST_ITEM("ReferanceCounting")
 	{
 		ZETestReset();
 		ZESharedPointer<ZETestClass> SharedPointerScope;
@@ -145,47 +145,47 @@ ZETestSuite(ZESharedPointer)
 		{
 			ZESharedPointer<ZETestClass> SharedPointer1;
 			SharedPointer1 = new ZETestClass();
-			ZETestCheck(SharedPointer1.GetReferenceCount() == 1);
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(SharedPointer1.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 			ZESharedPointer<ZETestClass> SharedPointer2 = SharedPointer1;
-			ZETestCheck(SharedPointer1.GetReferenceCount() == 2);
-			ZETestCheck(SharedPointer2.GetReferenceCount() == 2);
-			ZETestCheck(SharedPointer2.GetPointer() == SharedPointer1.GetPointer());
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(SharedPointer1.GetReferenceCount() == 2);
+			ZE_TEST_CHECK_ERROR(SharedPointer2.GetReferenceCount() == 2);
+			ZE_TEST_CHECK_ERROR(SharedPointer2.GetPointer() == SharedPointer1.GetPointer());
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 			ZESharedPointer<ZETestClass> SharedPointer3 = SharedPointer1;
-			ZETestCheck(SharedPointer1.GetReferenceCount() == 3);
-			ZETestCheck(SharedPointer2.GetReferenceCount() == 3);
-			ZETestCheck(SharedPointer3.GetReferenceCount() == 3);
-			ZETestCheck(SharedPointer3.GetPointer() == SharedPointer1.GetPointer());
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(SharedPointer1.GetReferenceCount() == 3);
+			ZE_TEST_CHECK_ERROR(SharedPointer2.GetReferenceCount() == 3);
+			ZE_TEST_CHECK_ERROR(SharedPointer3.GetReferenceCount() == 3);
+			ZE_TEST_CHECK_ERROR(SharedPointer3.GetPointer() == SharedPointer1.GetPointer());
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 			ZESharedPointer<ZETestClass> SharedPointer4(SharedPointer2);
-			ZETestCheck(SharedPointer1.GetReferenceCount() == 4);
-			ZETestCheck(SharedPointer2.GetReferenceCount() == 4);
-			ZETestCheck(SharedPointer3.GetReferenceCount() == 4);
-			ZETestCheck(SharedPointer4.GetReferenceCount() == 4);
-			ZETestCheck(SharedPointer4.GetPointer() == SharedPointer1.GetPointer());
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERROR(SharedPointer1.GetReferenceCount() == 4);
+			ZE_TEST_CHECK_ERROR(SharedPointer2.GetReferenceCount() == 4);
+			ZE_TEST_CHECK_ERROR(SharedPointer3.GetReferenceCount() == 4);
+			ZE_TEST_CHECK_ERROR(SharedPointer4.GetReferenceCount() == 4);
+			ZE_TEST_CHECK_ERROR(SharedPointer4.GetPointer() == SharedPointer1.GetPointer());
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 			SharedPointerScope = SharedPointer1;
 		}
 
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 
-		ZETestCheck(!SharedPointerScope.IsNull());
-		ZETestCheck(SharedPointerScope.GetReferenceCount() == 1);
-		ZETestCheck(SharedPointerScope.GetPointer() != NULL);
+		ZE_TEST_CHECK_ERROR(!SharedPointerScope.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointerScope.GetReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(SharedPointerScope.GetPointer() != NULL);
 
 		SharedPointerScope.Release();
 
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 
-		ZETestCheck(SharedPointerScope.IsNull());
-		ZETestCheck(SharedPointerScope.GetReferenceCount() == 0);
-		ZETestCheck(SharedPointerScope.GetPointer() == NULL);
+		ZE_TEST_CHECK_ERROR(SharedPointerScope.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointerScope.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(SharedPointerScope.GetPointer() == NULL);
 	}
 }

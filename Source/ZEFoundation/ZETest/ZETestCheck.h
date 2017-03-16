@@ -34,94 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEST_CHECK_H__
-#define __ZE_TEST_CHECK_H__
 
-#include <stdio.h>
 #include "ZEMath/ZEMath.h"
+#include <stdio.h>
 
 #define ZE_TEST_CLOSE_THRESHOLD 0.00001f
-
-#define ZETestCheck(Condition)\
-	do\
-	{\
-		try\
-		{\
-			if (!(Condition))\
-			{\
-				this->ReportProblem(ZE_TPT_ERROR, ("Check condition \"" #Condition "\" has failed."), __FILE__, __LINE__);\
-			} \
-		} \
-		catch (...)\
-		{\
-			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at check condition. Condition : \"" #Condition "\"."), __FILE__, __LINE__);\
-		} } \
-	while(false)
-
-#define ZETestCheckMessage(Condition, ErrorMessage)\
-	do\
-	{\
-	try\
-		{\
-		if (!(Condition))\
-			{\
-				this->ReportProblem(ZE_TPT_ERROR, (ErrorMessage), __FILE__, __LINE__);\
-			} \
-		} \
-		catch (...)\
-		{\
-			this->ReportProblem(ZE_TPT_ERROR, (ErrorMessage), __FILE__, __LINE__);\
-		} } \
-		while(false)
-
-#define ZETestCheckString(Value, Expected) \
-	do {\
-		ZETestCheck(strcmp(Value, Expected) == 0);\
-		if (strcmp(Value, Expected) != 0)\
-		{\
-			printf("    Value : \"%s\"\n", Value);\
-			printf("    Expected : \"%s\"\n", Expected);\
-		}\
-	}while(false)
-
-
-#define ZETestCheckEqual(Actual, Expected)\
-	do\
-	{\
-		try\
-		{\
-			if ((Actual) != (Expected))\
-			{\
-				this->ReportProblem(ZE_TPT_ERROR, ("Actual \"" #Actual "\" is not equal to expected \"" #Expected "\"."), __FILE__, __LINE__);\
-			} \
-		} \
-		catch (...)\
-		{\
-			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at equality check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
-		} } \
-	while(false)
-
 
 static bool ZETestInternalCheckClose(const float& Actual, const float& Expected, const float& Threshold = ZE_TEST_CLOSE_THRESHOLD)
 {
 	return (ZEMath::Abs(Actual - Expected) <= Threshold);
 }
 
-#define ZETestCheckClose(Actual, Expected)\
-	do\
-	{\
-		try\
-		{\
-			if (!ZETestInternalCheckClose(Actual, Expected))\
-			{\
-				this->ReportProblem(ZE_TPT_ERROR, ("Actual value \"" #Actual "\" is not close  to expected value \"" #Expected "\"."), __FILE__, __LINE__);\
-			} \
-		} \
-		catch (...)\
-		{\
-			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
-		} } \
-	while(false)
-#endif
+#define ZE_TEST_CHECK(Condition, ProblemType, ...) \
+	do { \
+	try { if (!(Condition)) {PauseTimeCounter(); ReportProblem(ProblemType, ZEFormat::Format("Check for condition \"" #Condition "\" has failed. " __VA_ARGS__), __FILE__, __LINE__); ResumeTimeCounter(); if (ProblemType == ZE_TPT_CRITICAL_ERROR) return;}} \
+		catch(...) {PauseTimeCounter(); ReportProblem(ProblemType, "Exception occurred while checking \"" #Condition "\" condition.", __FILE__, __LINE__); ResumeTimeCounter(); if (ProblemType == ZE_TPT_CRITICAL_ERROR) return;} \
+	} while(false)
+#define ZE_TEST_CHECK_CRITICAL_ERROR(Condition, ...) ZE_TEST_CHECK(Condition, ZE_TPT_CRITICAL_ERROR, __VA_ARGS__)
+#define ZE_TEST_CHECK_ERROR(Condition, ...) ZE_TEST_CHECK(Condition, ZE_TPT_ERROR, __VA_ARGS__)
+#define ZE_TEST_CHECK_WARNING(Condition, ...) ZE_TEST_CHECK(Condition, ZE_TPT_WARNING,  __VA_ARGS__)
 
-//((Actual) >= ((Expected) - (Tolerance))) && ((Actual) <= ((Expected) + (Tolerance)))
+#define ZE_TEST_CHECK_EQUAL(Result, Expected) \
+	ZE_TEST_CHECK((Result) == (Expected), ZE_TPT_ERROR, \
+		"Result and expected value is not equal. \n" \
+		" Result: {0}\n" \
+		" Expected: {1}", Result, Expected)
+
+#define ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, Expected) \
+	ZE_TEST_CHECK(ZETestInternalCheckClose(Result, Expected), ZE_TPT_ERROR, \
+		"Result and expected are not equal or close. \n" \
+		" Result: {0}\n" \
+		" Expected: {1}\n" \
+		" Treshold: {2}", \
+		Result, Expected, ZE_TEST_CLOSE_THRESHOLD)
+
+#define ZE_TEST_CHECK_STRING_EQUAL(Result, Expected) \
+	ZE_TEST_CHECK(strcmp(Result, Expected) == 0, ZE_TPT_ERROR, \
+		"Result and expected are not equal. \n" \
+		" Result: {0}\n" \
+		" Expected: {1}", Result, Expected)

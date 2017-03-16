@@ -38,6 +38,10 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
+#ifdef GetObject
+	#undef GetObject
+#endif
+
 #include "ZETypes.h"
 #include "ZEString.h"
 #include "ZEArray.h"
@@ -89,16 +93,19 @@ class ZEVariant
 
 		void							SetType(const ZEMTType& NewType);
 
+		void							CheckConversionType(ZEMTBaseType TargetType) const;
+		void							CheckConversionMutable() const;
+
 		template<typename ZEReturnType>
 		ZEReturnType					ConvertValuePrimitive() const;
 		template<typename ZEReturnType, ZEMTBaseType Type>
-		ZEReturnType					ConvertValue(const void* ValuePointer) const;
+		ZEReturnType&					ConvertValue(const void* ValuePointer) const;
 		template<typename ZEReturnType, ZEMTBaseType Type>
-		const ZEReturnType				ConvertConstValue(const void* ValuePointer) const;
+		const ZEReturnType&				ConvertConstValue(const void* ValuePointer) const;
 		template <typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType&					ConvertRef(const void* ValuePointer) const;
 		template <typename ZEReturnType, ZEMTBaseType Type>
-		ZEReturnType&					ConvertConstRef(const void* ValuePointer) const;
+		const ZEReturnType&				ConvertConstRef(const void* ValuePointer) const;
 
 	public:
 		const ZEMTType&					GetType() const;
@@ -203,7 +210,6 @@ class ZEVariant
 		void							SetStringConstRef(const ZEString& Reference);
 
 		void							SetObject(ZEObject& Object);
-		void							SetObjectConst(const ZEObject& Reference);
 		void							SetObjectRef(ZEObject& Reference);
 		void							SetObjectConstRef(const ZEObject& Reference);
 
@@ -213,9 +219,7 @@ class ZEVariant
 		void							SetObjectPtrConstRef(const ZEObject*& Reference);
 
 		void							SetObjectHolder(ZEHolderBase& Object);
-		void							SetObjectHolderConst(ZEHolderBase& Object);
 		void							SetObjectHolderRef(ZEHolderBase& Reference);
-		void							SetObjectHolderConstRef(ZEHolderBase& Reference);
 
 		void							SetClass(ZEClass* Object);
 		void							SetClassRef(ZEClass*& Reference);
@@ -324,8 +328,7 @@ class ZEVariant
 		ZEString&						GetStringRef() const;
 		const ZEString&					GetStringConstRef() const;
 
-		ZEObject&						GetObject() const;
-		const ZEObject&					GetObjectConst() const;
+		const ZEObject&					GetObject() const;
 		ZEObject&						GetObjectRef() const;
 		const ZEObject&					GetObjectConstRef() const;		
 
@@ -334,10 +337,8 @@ class ZEVariant
 		ZEObject*&						GetObjectPtrRef() const;
 		const ZEObject*&				GetObjectPtrConstRef() const;
 
-		ZEHolderBase&					GetObjectHolder();
-		ZEHolderBase&					GetObjectHolderConst();
-		ZEHolderBase&					GetObjectHolderRef();
-		ZEHolderBase&					GetObjectHolderConstRef();
+		ZEHolderBase&					GetObjectHolder() const;
+		ZEHolderBase&					GetObjectHolderRef() const;
 
 		const ZEMTCollection&			GetCollection() const;
 		ZEMTCollection&					GetCollectionRef() const;

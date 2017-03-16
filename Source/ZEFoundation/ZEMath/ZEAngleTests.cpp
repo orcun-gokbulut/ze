@@ -43,59 +43,59 @@ static bool fequal(float a, float b)
 	return ZEMath::Abs(a-b) < 0.00001;
 }
 
-ZETestSuite(ZEAngle)
+ZE_TEST(ZEAngle)
 {
-	ZETest("ToDegreeRangeDistanceToRadian")
+	ZE_TEST_ITEM("ToDegreeRangeDistanceToRadian")
 	{
 		float TestItem1 = ZEAngle::ToDegree(ZE_PI_2);
-		ZETestCheck(fequal(TestItem1, 90.0f));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem1, 90.0f));
 		float TestItem2 = ZEAngle::Range(ZE_PI_2);
-		ZETestCheck(fequal(TestItem2, ZE_PI_2));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem2, ZE_PI_2));
 		float TestItem3 = ZEAngle::Range(ZE_PI_2+ZE_PI);//270 degree
-		ZETestCheck(fequal(TestItem3, -ZE_PI_2));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem3, -ZE_PI_2));
 		float TestItem4 = ZEAngle::Range(-ZE_PI_2);
-		ZETestCheck(fequal(TestItem4, -ZE_PI_2));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem4, -ZE_PI_2));
 		float TestItem5= ZEAngle::Distance(ZE_PI_2, ZE_PI_4);
-		ZETestCheck(fequal(TestItem5, ZE_PI_4));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem5, ZE_PI_4));
 		float TestItem6 = ZEAngle::Distance(ZE_PI_4, ZE_PI_2);
-		ZETestCheck(fequal(TestItem6, ZE_PI_4));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem6, ZE_PI_4));
 		float TestItem7 = ZEAngle::ToRadian(ZE_PI_2);
-		ZETestCheck(fequal(TestItem7, ZE_PI_2));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem7, ZE_PI_2));
 		
 
 	}
-	ZETest("trigonometry")
+	ZE_TEST_ITEM("trigonometry")
 	{
 		float TestItem1 = ZEAngle::Cos(ZE_PI_4);
-		ZETestCheck(fequal(TestItem1,  0.7071067818f));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem1,  0.7071067818f));
 		float TestItem2 = ZEAngle::Cos(ZE_PI);
-		ZETestCheck(fequal(TestItem2,  -1.0f));
+		ZE_TEST_CHECK_ERROR(fequal(TestItem2,  -1.0f));
 		float TestItem3 = ZEAngle::Sin(ZE_PI_4);
-		ZETestCheck(fequal(TestItem3, 0.70710678118f));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem3, 0.70710678118f));//
 		float TestItem4 = ZEAngle::Sin(ZE_PI_2);
-		ZETestCheck(fequal(TestItem4, 1.0f));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem4, 1.0f));//
 		float TestItem5 = ZEAngle::Tan(ZE_PI_4);
-		ZETestCheck(fequal(TestItem5, 1.0f));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem5, 1.0f));//
 		float TestItem6 = ZEAngle::Tan(ZE_PI_12);
-		ZETestCheck(fequal(TestItem6, 0.2679491924f));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem6, 0.2679491924f));//
 		float TestItem7 = ZEAngle::Cot(ZE_PI_2);
-		ZETestCheck(fequal(TestItem7, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem7, ));//
 		float TestItem8 = ZEAngle::Cot((ZE_PI));
-		ZETestCheck(fequal(TestItem8, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem8, ));//
 		float TestItem9 = ZEAngle::ArcSin(ZE_PI_4);
-		ZETestCheck(fequal(TestItem9, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem9, ));//
 		float TestItem10 = ZEAngle::ArcCos(ZE_PI_4);
-		ZETestCheck(fequal(TestItem10, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem10, ));//
 		float TestItem11 = ZEAngle::ArcTan(ZE_PI_2);
-		ZETestCheck(fequal(TestItem11, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem11, ));//
 		float TestItem12 = ZEAngle::ArcTan2(ZE_PI_2);
-		ZETestCheck(fequal(TestItem12, ));//
+		ZE_TEST_CHECK_ERROR(fequal(TestItem12, ));//
 
 	}
-	ZETest("ToVector")
+	ZE_TEST_ITEM("ToVector")
 	{
 		ZEVector2 TestItem1 = ZEAngle::ToVector(ZE_PI_4);
-		ZETestCheck(TestItem1, );
+		ZE_TEST_CHECK_ERROR(TestItem1, );
 	}
 	
 }*/

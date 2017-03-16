@@ -57,11 +57,28 @@
 #pragma warning(push)
 #pragma warning(disable:4800)
 
+void ZEVariant::CheckConversionType(ZEMTBaseType TargetType) const
+{
+	if (ValueType.IsCollection())
+		zeError("Variant type mismatch. Cannot convert between collection types and primitive types.");
+
+	if (ValueType.GetBaseType() != TargetType)
+		zeError("Variant type mismatch. Can not convert reference type to a different reference type.");
+}
+
+void ZEVariant::CheckConversionMutable() const
+{
+	if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_REFERENCE)
+		zeError("Variant type mismatch. Cannot convert const reference type to non-const reference type.");
+	else if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_VALUE)
+		zeError("Variant type mismatch. Cannot convert const value type to non-const reference type.");
+}
+
 template<typename ZEReturnType>
 inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 {
 	if (ValueType.IsCollection())
-		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
+		zeError("Variant type mismatch. Cannot convert collection type to non-collection type.");
 
 	if (!ValueType.IsReference())
 	{
@@ -87,7 +104,7 @@ inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 			default:
 			case ZEMT_BT_UNDEFINED:
 			case ZEMT_BT_VOID:
-				zeCriticalError("Variant type mismatch. Cannot convert non-primitive value type to primitive value type.");
+				zeError("Variant type mismatch. Cannot convert non-primitive value type to primitive value type.");
 		}
 	}
 	else
@@ -117,7 +134,7 @@ inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 			case ZEMT_BT_BOOLEAN:
 				return (ZEReturnType)*(const bool*)Value.Pointer;
 			default:
-				zeCriticalError("Variant type mismatch. Cannot convert non-primitive reference type to primitive value type.");
+				zeError("Variant type mismatch. Cannot convert non-primitive reference type to primitive value type.");
 		}
 	}
 
@@ -125,33 +142,20 @@ inline ZEReturnType ZEVariant::ConvertValuePrimitive() const
 }
 
 template <typename ZEReturnType, ZEMTBaseType Type>
-inline ZEReturnType ZEVariant::ConvertValue(const void* ValuePointer) const
+inline ZEReturnType& ZEVariant::ConvertValue(const void* ValuePointer) const
 {
-	if (ValueType.IsCollection())
-		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
-
-	if (ValueType.GetBaseType() != Type)
-		zeCriticalError("Variant type mismatch. Cannot convert non-primitive value type to a different value type.");
-
-	/*if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant type mismatch. Cannot convert const value type to non-const reference type.");
-	else if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");*/
+	CheckConversionType(Type);
 	
-	if (ValueType.GetBaseQualifier() == ZEMT_TQ_REFERENCE)
+	if (ValueType.IsReference())
 		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
 	else
 		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer)); 
 }
 
 template <typename ZEReturnType, ZEMTBaseType Type>
-inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer) const
+inline const ZEReturnType& ZEVariant::ConvertConstValue(const void* ValuePointer) const
 {
-	if (ValueType.IsCollection())
-		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
-
-	if (ValueType.GetBaseType() != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
+	CheckConversionType(Type);
 
 	if (ValueType.IsReference())
 		return *static_cast<const ZEReturnType*>(Value.Pointer);
@@ -162,36 +166,24 @@ inline const ZEReturnType ZEVariant::ConvertConstValue(const void* ValuePointer)
 template <typename ZEReturnType, ZEMTBaseType Type>
 inline ZEReturnType& ZEVariant::ConvertRef(const void* ValuePointer) const
 {
-	if (ValueType.IsCollection())
-		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection reference type.");
+	CheckConversionType(Type);
+	CheckConversionMutable();
 
-	if (ValueType.GetBaseType() != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
-
-	else if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant type mismatch. Cannot convert const reference type to non-const reference type.");
-	else if (ValueType.GetBaseQualifier() == ZEMT_TQ_CONST_VALUE)
-		zeCriticalError("Variatn type mismatch. Cannot convert const value type to non-const reference type.");
-	
-	if (ValueType.GetBaseQualifier() == ZEMT_TQ_REFERENCE)
+	if (ValueType.IsReference())
 		return *static_cast<ZEReturnType*>(const_cast<void*>(Value.Pointer));
 	else 
 		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
 }
 
 template <typename ZEReturnType, ZEMTBaseType Type>
-inline ZEReturnType& ZEVariant::ConvertConstRef(const void* ValuePointer) const
+inline const ZEReturnType& ZEVariant::ConvertConstRef(const void* ValuePointer) const
 {
-	if (ValueType.IsCollection())
-		zeCriticalError("Variant type mismatch. Cannot convert collection type to non-collection type.");
-
-	if (ValueType.GetBaseType() != Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to a different reference type.");
+	CheckConversionType(Type);
 
 	if (ValueType.IsReference())
 		return *static_cast<ZEReturnType*>(Value.Pointer);
 	else
-		return *(ZEReturnType*)(ValuePointer);
+		return *static_cast<ZEReturnType*>(const_cast<void*>(ValuePointer));
 }
 
 static bool CheckSpecialType(const ZEMTType& Type)
@@ -218,7 +210,7 @@ void ZEVariant::SetType(const ZEMTType& NewType)
 	if (ValueType == NewType)
 		return;
 
-	bool SpecialType = CheckSpecialType(ValueType);
+	bool SpecialType = CheckSpecialType(NewType);
 	if (SpecialType && Value.Pointer != NULL)
 		ValueType.DestroyInstance(Value.Pointer);
 
@@ -243,9 +235,9 @@ void ZEVariant::SetVariant(const ZEVariant& Variant)
 	SetType(Variant.ValueType);
 
 	if (CheckSpecialType(ValueType))
-		ValueType.CopyInstance(Value.Pointer, Variant.Value.Pointer);
+		ValueType.AssignInstance(Value.Pointer, Variant.Value.Pointer);
 	else
-		ValueType.CopyInstance(&Value, &Variant.Value);
+		ValueType.AssignInstance(&Value, &Variant.Value);
 }
 
 void ZEVariant::SetReference(const ZEReference& Reference)
@@ -674,12 +666,6 @@ void ZEVariant::SetObject(ZEObject& Object)
 	Value.Pointer = Object.GetClass()->Clone(&Object);
 }
 
-void ZEVariant::SetObjectConst(const ZEObject& Object)
-{
-	SetType(ZEMTType(ZEMT_BT_OBJECT, ZEMT_TQ_VALUE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Object.GetClass()));
-	Value.Pointer = Object.GetClass()->Clone(const_cast<ZEObject*>(&Object));
-}
-
 void ZEVariant::SetObjectRef(ZEObject& Reference)
 {
 	SetType(ZEMTType(ZEMT_BT_OBJECT, ZEMT_TQ_REFERENCE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Reference.GetClass()));
@@ -688,7 +674,7 @@ void ZEVariant::SetObjectRef(ZEObject& Reference)
 
 void ZEVariant::SetObjectConstRef(const ZEObject& Reference)
 {
-	SetType(ZEMTType(ZEMT_BT_OBJECT, ZEMT_TQ_CONST_VALUE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Reference.GetClass()));
+	SetType(ZEMTType(ZEMT_BT_OBJECT, ZEMT_TQ_CONST_REFERENCE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Reference.GetClass()));
 	Value.Pointer = const_cast<ZEObject*>(&Reference);
 }
 
@@ -722,21 +708,9 @@ void ZEVariant::SetObjectHolder(ZEHolderBase& Object)
 	Value.Holder = Object.GetObjectPtr();
 }
 
-void ZEVariant::SetObjectHolderConst(ZEHolderBase& Object)
-{
-	SetType(ZEMTType(ZEMT_BT_OBJECT_HOLDER, ZEMT_TQ_CONST_VALUE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Object.GetObjectPtrConst() == NULL ? ZEObject::Class() : Object.GetObjectPtrConst()->GetClass()));
-	Value.Holder = Object.GetObjectPtrConst();
-}
-
 void ZEVariant::SetObjectHolderRef(ZEHolderBase& Reference)
 {
 	SetType(ZEMTType(ZEMT_BT_OBJECT_HOLDER, ZEMT_TQ_REFERENCE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Reference.GetObjectPtr() == NULL ? ZEObject::Class() : Reference.GetObjectPtr()->GetClass()));
-	Value.Pointer = const_cast<ZEHolderBase*>(&Reference);
-}
-
-void ZEVariant::SetObjectHolderConstRef(ZEHolderBase& Reference)
-{
-	SetType(ZEMTType(ZEMT_BT_OBJECT_HOLDER, ZEMT_TQ_CONST_REFERENCE, ZEMT_CT_NONE, ZEMT_TQ_VALUE, Reference.GetObjectPtr() == NULL ? ZEObject::Class() : Reference.GetObjectPtr()->GetClass()));
 	Value.Pointer = const_cast<ZEHolderBase*>(&Reference);
 }
 
@@ -756,7 +730,7 @@ void ZEVariant::SetCollection(const ZEMTCollection& Collection)
 {
 	ZEMTType CollectionType = Collection.GetType();
 	SetType(CollectionType);
-	Value.Pointer = CollectionType.CloneInstance(&Collection);
+	CollectionType.AssignInstance(Value.Pointer, &Collection);
 }
 
 void ZEVariant::SetCollectionRef(ZEMTCollection& Reference)
@@ -1221,7 +1195,7 @@ const ZEMatrix4x4d& ZEVariant::GetMatrix4x4dConstRef() const
 
 ZEString ZEVariant::GetString() const
 {
-	return ConvertValue<ZEString, ZEMT_BT_STRING>(Value.Pointer);
+	return ConvertValue<ZEString, ZEMT_BT_STRING>(&Value.String);
 }
 
 ZEString& ZEVariant::GetStringRef() const
@@ -1234,14 +1208,10 @@ const ZEString& ZEVariant::GetStringConstRef() const
 	return ConvertConstRef<const ZEString, ZEMT_BT_STRING>(&Value.String);
 }
 
-ZEObject& ZEVariant::GetObject() const
+const ZEObject& ZEVariant::GetObject() const
 {
-	return ConvertValue<ZEObject, ZEMT_BT_OBJECT>(Value.Pointer);
-}
-
-const ZEObject& ZEVariant::GetObjectConst() const
-{
-	return ConvertValue<ZEObject, ZEMT_BT_OBJECT>(Value.Pointer);
+	CheckConversionType(ZEMT_BT_OBJECT);
+	return *static_cast<ZEObject*>(const_cast<void*>(Value.Pointer));
 }
 
 ZEObject& ZEVariant::GetObjectRef() const
@@ -1256,42 +1226,36 @@ const ZEObject& ZEVariant::GetObjectConstRef() const
 
 ZEObject* ZEVariant::GetObjectPtr() const
 {
-	return ConvertValue<ZEObject*, ZEMT_BT_OBJECT_PTR>(Value.Pointer);
+	return ConvertValue<ZEObject*, ZEMT_BT_OBJECT_PTR>(&Value.Pointer);
 }
 
 const ZEObject* ZEVariant::GetObjectPtrConst() const
 {
-	return ConvertConstValue<ZEObject*, ZEMT_BT_OBJECT_PTR>(Value.Pointer);
+	return ConvertConstValue<ZEObject*, ZEMT_BT_OBJECT_PTR>(&Value.Pointer);
 }
 
 ZEObject*& ZEVariant::GetObjectPtrRef() const
 {
-	return ConvertRef<ZEObject*, ZEMT_BT_OBJECT_PTR>(Value.Pointer);
+	return ConvertRef<ZEObject*, ZEMT_BT_OBJECT_PTR>(&Value.Pointer);
 }
 
 const ZEObject*& ZEVariant::GetObjectPtrConstRef() const
 {
-	return ConvertConstRef<const ZEObject*, ZEMT_BT_OBJECT_PTR>(Value.Pointer);
+	CheckConversionType(ZEMT_BT_OBJECT_PTR);
+	if (ValueType.IsReference())
+		return *(const ZEObject**)(Value.Pointer);
+	else
+		return *(const ZEObject**)(&Value.Pointer);
 }
 
-ZEHolderBase& ZEVariant::GetObjectHolder()
+ZEHolderBase& ZEVariant::GetObjectHolder() const
 {
 	return ConvertValue<ZEHolderBase, ZEMT_BT_OBJECT_HOLDER>(&Value.Holder);
 }
 
-ZEHolderBase& ZEVariant::GetObjectHolderConst()
-{
-	return *const_cast<ZEHolderBase*>(&ConvertConstValue<ZEHolderBase, ZEMT_BT_OBJECT_HOLDER>(&Value.Holder));
-}
-
-ZEHolderBase& ZEVariant::GetObjectHolderRef()
+ZEHolderBase& ZEVariant::GetObjectHolderRef() const
 {
 	return ConvertRef<ZEHolderBase, ZEMT_BT_OBJECT_HOLDER>(&Value.Holder);
-}
-
-ZEHolderBase& ZEVariant::GetObjectHolderConstRef()
-{
-	return ConvertConstRef<ZEHolderBase, ZEMT_BT_OBJECT_HOLDER>(&Value.Holder);
 }
 
 ZEClass* ZEVariant::GetClass() const
@@ -1304,6 +1268,39 @@ ZEClass*& ZEVariant::GetClassRef() const
 	return ConvertRef<ZEClass*, ZEMT_BT_CLASS>(&Value.Pointer);
 }
 
+const ZEMTCollection& ZEVariant::GetCollection() const
+{
+	if (!ValueType.IsCollection())
+		zeError("Variant type mismatch. Cannot convert between collection types and primitive types.");
+
+	if (!ValueType.IsReference())
+		return *static_cast<const ZEMTCollection*>(Value.Pointer);
+	else
+		return **static_cast<const ZEMTCollection**>(Value.Pointer);
+}
+
+ZEMTCollection& ZEVariant::GetCollectionRef() const
+{
+	if (!ValueType.IsCollection())
+		zeError("Variant type mismatch. Cannot convert between collection types and primitive types.");
+
+	if (!ValueType.IsReference())
+		return *static_cast<ZEMTCollection*>(Value.Pointer);
+	else
+		return **static_cast<ZEMTCollection** const>(Value.Pointer);
+}
+
+const ZEMTCollection& ZEVariant::GetCollectionConstRef() const
+{
+	if (!ValueType.IsCollection())
+		zeError("Variant type mismatch. Cannot convert between collection types and primitive types.");
+
+	if (!ValueType.IsReference())
+		return *static_cast<ZEMTCollection*>(Value.Pointer);
+	else
+		return **static_cast<ZEMTCollection** const>(Value.Pointer);
+}
+
 ZEValue ZEVariant::GetValue()
 {
 	if (ValueType.IsCollection())
@@ -1312,7 +1309,7 @@ ZEValue ZEVariant::GetValue()
 	switch (ValueType.GetBaseType())
 	{
 		default:
-			zeCriticalError("Unknown variant type.");
+			zeError("Unknown variant type.");
 		
 		case ZEMT_BT_UNDEFINED:
 		case ZEMT_BT_VOID:

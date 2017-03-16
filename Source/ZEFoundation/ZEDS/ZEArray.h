@@ -44,7 +44,7 @@
 #include "ZEArrayIterator.h"
 #include "ZEThread/ZELockRW.h"
 #include "ZEMeta/ZEMTCollection.h"
-#include "ZEMeta/ZEMTTypeGenerator.h"
+#include "ZEMeta/ZEMTTypeGeneratorDynamic.h"
 
 #include <stdlib.h>
 
@@ -63,6 +63,7 @@ class ZEArray : public ZEMTCollection
 	private:
 		ZEItemType*											Items;
 		ZESize												Count;
+		mutable ZEMTType									Type;
 		mutable ZELockRW									Lock;
 		ZEAllocatorType										Allocator;
 
@@ -73,7 +74,7 @@ class ZEArray : public ZEMTCollection
 		virtual bool										GetItemRaw(ZESize Index, void* ItemPointer) const override;
 
 	public:
-		virtual ZEMTType									GetType() const override;
+		virtual const ZEMTType&								GetType() const override;
 
 		inline void											SetCount(ZESize Count);
 		inline ZESize										GetCount() const;
@@ -150,14 +151,14 @@ class ZEArray : public ZEMTCollection
 		inline const ZEItemType&							operator[](ZESize Index) const;
 
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline ZEArray										operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline ZEArray										operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const;
 		ZE_ARRAY_OTHER_TEMPLATE
 		inline ZEArray&										operator+=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline bool											operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline bool											operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const;
 		ZE_ARRAY_OTHER_TEMPLATE
-		inline bool											operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
+		inline bool											operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const;
 
 		ZE_ARRAY_OTHER_TEMPLATE
 		inline void											operator=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
@@ -201,22 +202,24 @@ class ZEChunkArrayMT : public ZEArray<ZEItemType, ZEChunkAllocator<ZEItemType, C
 //////////////////////////////////////////////////////////////////////////////////////
 
 ZE_ARRAY_TEMPLATE
-ZEMTType ZEArray<ZE_ARRAY_SPECIALIZATION>::GetType() const
+const ZEMTType& ZEArray<ZE_ARRAY_SPECIALIZATION>::GetType() const
 {
-	return ZEMTType();
+	if (!Type.IsBinded())
+	{
+		Type = ZEMT_TYPE_GENERATOR_DYNAMIC(ZEItemType);
+		Type.SetBinded(true);
 
-	// FUCKING FORWARD DECLERATIONS
-	/*ZEMTType Type = ZEMTTypeGenerator<ZEItemType>::GetType();
+		if (!Type.IsValid() || Type.IsReference() || Type.IsCollection())
+			return Type;
 
-	if (!Type.IsValid() || Type.IsReference() || Type.IsCollection())
-		return ZEMTType();
+		if (Type.IsConst() && (Type.GetBaseType() != ZEMT_BT_OBJECT_PTR && Type.GetBaseType() != ZEMT_BT_OBJECT_HOLDER))
+			return Type;
 
-	if (Type.IsConst() && (Type.GetBaseType() != ZEMT_BT_OBJECT_PTR && Type.GetBaseType() != ZEMT_BT_OBJECT_HOLDER))
-		return ZEMTType();
+		Type.SetCollectionType(ZEMT_CT_ARRAY);
+		Type.SetCollectionQualifier(ZEMT_TQ_VALUE);
+	}
 
-	Type.SetCollectionType(ZEMT_CT_ARRAY);
-	Type.SetCollectionQualifier(ZEMT_TQ_VALUE);
-	return Type;*/
+	return Type;
 }
 
 ZE_ARRAY_TEMPLATE
@@ -230,6 +233,7 @@ bool ZEArray<ZE_ARRAY_SPECIALIZATION>::RemoveRaw(ZESize Index)
 {
 	if (Index >= Count)
 		return false;
+
 
 	Remove(Index);
 	return true;
@@ -920,11 +924,19 @@ const ZEItemType& ZEArray<ZE_ARRAY_SPECIALIZATION>::operator[](ZESize Index) con
 
 ZE_ARRAY_TEMPLATE
 ZE_ARRAY_OTHER_TEMPLATE
-ZEArray<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
+ZEArray<ZE_ARRAY_SPECIALIZATION> ZEArray<ZE_ARRAY_SPECIALIZATION>::operator+(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const
 {
 	ZEArray Temp;
-	Temp.MassAdd(*this);
-	Temp.MassAdd(OtherArray);
+
+	Lock.LockRead();
+	OtherArray.LockRead();
+	{
+		Temp.MassAdd(*this);
+		Temp.MassAdd(OtherArray);
+	}
+	OtherArray.UnlockRead();
+	Lock.UnlockRead();
+
 	return Temp;
 }
 
@@ -938,7 +950,7 @@ ZEArray<ZE_ARRAY_SPECIALIZATION>& ZEArray<ZE_ARRAY_SPECIALIZATION>::operator+=(c
 
 ZE_ARRAY_TEMPLATE
 ZE_ARRAY_OTHER_TEMPLATE
-bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator==(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const
 {
 	Lock.LockRead();
 	{
@@ -950,11 +962,11 @@ bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator==(const ZEArray<ZE_ARRAY_OTHER_S
 
 		for (ZESize I = 0; I < Count; I++)
 		{
-			if (Items[I] != OtherArray.Items[I])
-			{
-				Lock.UnlockRead();
-				return false;
-			}
+			if (Items[I] == OtherArray.Items[I])
+				continue;
+
+			Lock.UnlockRead();
+			return false;
 		}
 	}
 	Lock.UnlockRead();
@@ -964,7 +976,7 @@ bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator==(const ZEArray<ZE_ARRAY_OTHER_S
 
 ZE_ARRAY_TEMPLATE
 ZE_ARRAY_OTHER_TEMPLATE
-bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray)
+bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator!=(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray) const
 {
 	Lock.LockRead();
 	{
@@ -976,11 +988,11 @@ bool ZEArray<ZE_ARRAY_SPECIALIZATION>::operator!=(const ZEArray<ZE_ARRAY_OTHER_S
 
 		for (ZESize I = 0; I < Count; I++)
 		{
-			if (Items[I] == OtherArray.Items[I])
-			{
-				Lock.UnlockRead();
-				return false;
-			}
+			if (Items[I] != OtherArray.Items[I])
+				continue;
+
+			Lock.UnlockRead();
+			return false;
 		}
 	}
 	Lock.UnlockRead();

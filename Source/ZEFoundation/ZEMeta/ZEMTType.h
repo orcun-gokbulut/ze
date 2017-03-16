@@ -98,16 +98,19 @@ template<typename T, class E> class ZEMTTypeGenerator;
 class ZEMTType
 {
 	template<typename T, class E> friend class ZEMTTypeGenerator;
+	template<typename T, class E> friend class ZEMTTypeGeneratorDynamic;
 	private:
 		ZEMTBaseType			BaseType : 5;
 		ZEMTTypeQualifier		BaseQualifier : 2;
 		ZEMTCollectionType		CollectionType : 2;
 		ZEMTTypeQualifier		CollectionQualifier : 2;
 		bool					CannonicalBit : 1;
+		bool					Binded : 1;
 		ZEUInt64				Declaration : 51;
 	
 	public:
 		void					SetType(ZEMTBaseType BaseType, ZEMTTypeQualifier BaseQualifier, ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier, ZEMTDeclaration* Declaration);
+		void					SetTypeDynamic(ZEMTBaseType BaseType, ZEMTTypeQualifier BaseQualifier, ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier, const char* DeclarationName);
 
 		void					SetBaseType(ZEMTBaseType Type, ZEMTDeclaration* Declaration);
 		ZEMTBaseType			GetBaseType() const;
@@ -127,6 +130,9 @@ class ZEMTType
 		ZEClass*				GetClass() const;
 		ZEMTEnumerator*			GetEnumerator() const;
 		
+		void					SetBinded(bool Binded);
+
+		bool					IsBinded() const;
 		bool					IsValid() const;
 		bool					IsReference() const;
 		bool					IsConst() const;
@@ -137,11 +143,12 @@ class ZEMTType
 
 		ZESize					GetInstanceSize() const;
 		void*					CreateInstance() const;
+		void*					CloneInstance(const void* Instance) const;
 		bool					DestroyInstance(void* Instance) const;
-		bool					ConstructInstance(void* Destination) const;
-		bool					DeconstructInstance(void* Destination) const;
-		bool					CopyInstance(void* Destination, const void* Source) const;
-		void*					CloneInstance(const void* Source) const;
+		bool					ConstructInstance(void* Instance) const;
+		bool					CopyConstructInstance(void* DestinationInstance, const void* SourceInstance) const;
+		bool					DeconstructInstance(void* Instance) const;
+		bool					AssignInstance(void* DestinationInstance, const void* SourceInstance) const;
 
 		bool					operator==(const ZEMTType& Other) const;
 		bool					operator!=(const ZEMTType& Other) const;

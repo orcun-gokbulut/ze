@@ -315,8 +315,8 @@ ZEMCClass::ZEMCClass()
 	BaseClass = NULL;
 	HasScriptBase = false;
 	HasPublicDefaultConstructor = false;
-	HasPublicDestructor = true;
-	HasPublicCopyConstructor = true;
+	HasPublicDestructor = false;
+	HasPublicCopyConstructor = false;
 	HasCreateInstanceMethod = false;
 	HasPublicAssignmentOperator = false;
 	HasPublicDestroyMethod = false;

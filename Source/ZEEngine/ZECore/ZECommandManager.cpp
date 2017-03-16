@@ -208,8 +208,8 @@ ZECommandManager* ZECommandManager::GetInstance()
 ZECommandManager::ZECommandManager()
 {
 	Commands.SetName("Commands");
-	Commands.AddCommand(new ZECommand("ListCommands", BindDelegate(this, &ZECommandManager::Callback_ListCommands)));
-	Commands.AddCommand(new ZECommand("ListSections",BindDelegate(this, &ZECommandManager::Callback_ListSections)));
+	Commands.AddCommand(new ZECommand("ListCommands", ZECommandCallback::Create<ZECommandManager, &ZECommandManager::Callback_ListCommands>(this)));
+	Commands.AddCommand(new ZECommand("ListSections", ZECommandCallback::Create<ZECommandManager, &ZECommandManager::Callback_ListSections>(this)));
 	RegisterSection(&Commands);
 }
 

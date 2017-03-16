@@ -75,7 +75,7 @@ ZEMLElement* ZEMLData::Clone()
 	}
 	else
 	{
-		SetData(this->Data, this->DataSize, this->Referred);
+		CloneData->SetData(this->Data, this->DataSize, this->Referred);
 	}
 
 	return CloneData;

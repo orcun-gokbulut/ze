@@ -47,7 +47,7 @@ class ZEMTCollection
 		static void*				GetVariantPointer(ZEVariant& Item);
 
 	public:
-		virtual ZEMTType			GetType() const = 0;
+		virtual const ZEMTType&		GetType() const = 0;
 		virtual ZESize				GetCountRaw() const = 0;
 		virtual bool				RemoveRaw(ZESize Index) = 0;
 		virtual bool				InsertRaw(ZESize Index, const void* ItemPointer) = 0;

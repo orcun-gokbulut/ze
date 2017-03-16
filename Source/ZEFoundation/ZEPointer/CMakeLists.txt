@@ -55,9 +55,10 @@ ze_add_source(ZEHolder.h				Sources Headers)
 
 ze_add_library(TARGET ZEPointer 
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	ZEMC ${ZEMC})
+	HEADERS ${Headers})
 	
 ze_add_test(TARGET ZEPointerTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEPointer)
+
+ze_add_foundation_zemc(${ZEMC})

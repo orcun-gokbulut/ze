@@ -35,11 +35,14 @@
 
 #include "ZEMTProvider.h"
 
+#include "ZEObject.h"
 #include "ZEClass.h"
 #include "ZEEnumerator.h"
+#include "ZEDS\ZEArray.h"
 #include "ZEML\ZEMLReader.h"
-#include "ZEObject.h"
 
+static ZEArray<ZEClass*> Classes;
+static ZEArray<ZEMTEnumerator*> Enumerators;
 
 const ZEArray<ZEClass*>& ZEMTProvider::GetClasses()
 {
