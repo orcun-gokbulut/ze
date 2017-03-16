@@ -140,20 +140,13 @@ void ZEMCParser::CheckPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* M
 		return;
 
 	CXXConstructorDecl* ConstructorDecl = cast<CXXConstructorDecl>(MethodDecl);
-
-	if (ConstructorDecl->isDefaultConstructor())
-		return;
-
 	if (MethodDecl->param_size() != 0)
 		return;
 
-	if (MethodDecl->getParent()->getNameAsString() != Class->Name.ToStdString())
+	if (ConstructorDecl->getAccess() == AccessSpecifier::AS_public)
 		return;
 
-	if (ConstructorDecl->getAccess() != AccessSpecifier::AS_public)
-		return;
-
-	Class->HasPublicDefaultConstructor = true;
+	Class->HasPublicDefaultConstructor = false;
 }
 
 void ZEMCParser::CheckPublicCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
@@ -168,13 +161,10 @@ void ZEMCParser::CheckPublicCopyContructor(ZEMCClass* Class, CXXMethodDecl* Meth
 	if (!ConstructorDecl->isCopyConstructor())
 		return;
 
-	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
+	if (MethodDecl->getAccess() == AccessSpecifier::AS_public)
 		return;
 
-	if (MethodDecl->getParent()->getNameAsString() != Class->Name.ToStdString())
-		return;
-
-	Class->HasPublicCopyConstructor = true;
+	Class->HasPublicCopyConstructor = false;
 }
 
 void ZEMCParser::CheckPublicAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
@@ -185,24 +175,10 @@ void ZEMCParser::CheckPublicAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* 
 	if (MethodDecl->getParent()->getNameAsString() != Class->Name.ToStdString())
 		return;
 
-	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
+	if (MethodDecl->getAccess() == AccessSpecifier::AS_public)
 		return;
 
-	Class->HasPublicAssignmentOperator = true;
-}
-
-void ZEMCParser::CheckPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
-{
-	if (!isa<CXXDestructorDecl>(MethodDecl))
-		return;
-
-	if (MethodDecl->getAccess() != AccessSpecifier::AS_public)
-		return;
-
-	if (MethodDecl->getParent()->getNameAsString() != Class->Name.ToStdString())
-		return;
-
-	Class->HasPublicDestructor = true;
+	Class->HasPublicAssignmentOperator = false;
 }
 
 void ZEMCParser::CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
@@ -264,7 +240,6 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	CheckPublicDefaultContructor(ClassData, MethodDecl);
 	CheckPublicCopyContructor(ClassData, MethodDecl);
 	CheckPublicAssignmentOperator(ClassData, MethodDecl);
-	CheckPublicDestructor(ClassData, MethodDecl);
 	CheckCreateInstanceMethod(ClassData, MethodDecl);
 	CheckDestroyMethod(ClassData, MethodDecl);
 

@@ -42,8 +42,8 @@
 
 class ZED11Module;
 enum ZEGRFormat;
-enum ZEGRResourceUsage;
-enum ZEGRResourceMapType;
+enum ZEGRResourceUsage		: ZEUInt8;
+enum ZEGRResourceMapType	: ZEUInt8;
 
 class ZED11ComponentBase
 {

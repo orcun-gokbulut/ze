@@ -48,10 +48,13 @@ class ZEGRShader : public ZEGRResource
 	private:
 		ZEGRShaderType						ShaderType;
 
-		static ZEList2<ZEGRShader>			ShaderCache;
 		ZELink<ZEGRShader>					ShaderCacheLink;
 
-		ZEUInt32							Hash;
+		ZEGRShaderCompileOptions			CompileOptions;
+
+		static bool							CheckIncludeFile(const ZEGRShaderCompileOptions& Options, const ZEString& Filename);
+		static bool							RequiredCompilation(const ZEGRShaderCompileOptions& Options, ZEArray<ZEBYTE>& ShaderByteCode);
+		static bool							LoadFromFile(ZEArray<ZEBYTE>& OutputData, const ZEString& FileName);
 
 	protected:
 		virtual bool						Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
@@ -65,6 +68,8 @@ class ZEGRShader : public ZEGRResource
 	public:
 		virtual ZEGRResourceType			GetResourceType() const;
 		virtual ZEGRShaderType				GetShaderType() const;
+
+		const ZEGRShaderCompileOptions&		GetCompileOptions() const;
 
 		static ZEHolder<ZEGRShader>			CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
 		static ZEHolder<ZEGRShader>			Compile(const ZEGRShaderCompileOptions& Options);

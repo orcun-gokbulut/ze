@@ -47,6 +47,7 @@ class ZEGRTexture;
 class ZEGRSampler;
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
+class ZEGRTextureView;
 
 class ZEGRContext : public ZEObject
 {
@@ -94,6 +95,9 @@ class ZEGRContext : public ZEObject
 		void							SetBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRBuffer* Buffer);
 		virtual void					SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers) = 0;
 
+		virtual void					SetTextureView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTextureView* TextureView) = 0;
+		virtual void					SetRWTextureView(ZEUInt Index, const ZEGRTextureView* RWTextureView) = 0;
+
 		void							SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
 		virtual void					SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
 		virtual void					GetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, ZEGRTexture** Textures);
@@ -128,11 +132,9 @@ class ZEGRContext : public ZEObject
 		
 		virtual void					Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ) = 0;
 
-		virtual void					GenerateMipMaps(const ZEGRTexture* Texture) = 0;
-
 		virtual void					ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void					ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
-		virtual void					ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor) = 0;
+		virtual void					ClearRWView(const ZEGRTextureView* RWTextureView, const ZEVector4& ClearColor) = 0;
 
 		virtual void					ClearShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count);
 		virtual void					ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count);

@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 
-ZE_ENUM(ZEGRTextureType)
+ZE_ENUM_TYPED(ZEGRTextureType, ZEUInt8)
 {
 	ZEGR_TT_NONE	= 0,
 	ZEGR_TT_2D		= 1,
@@ -72,6 +72,32 @@ class ZEGRTextureOptions : public ZEObject
 
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
+class ZEGRTexture;
+
+class ZEGRTextureView : public ZEObject
+{
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRTextureView)
+	friend class ZEGRTexture;
+	protected:
+		const ZEGRTexture*		Texture;
+		ZEGRFormat				Format;
+		ZEUInt					LevelMin;
+		ZEUInt					LevelCount;
+		ZEUInt					LayerMin;
+		ZEUInt					LayerCount;
+
+								ZEGRTextureView();
+								ZEGRTextureView(ZEGRFormat Format, ZEUInt LevelMin, ZEUInt LevelCount, ZEUInt LayerMin, ZEUInt LayerCount);
+
+	public:
+		const ZEGRTexture*		GetTexture() const;
+		ZEGRFormat				GetFormat() const;
+		ZEUInt					GetLevelMin() const;
+		ZEUInt					GetLevelCount() const;
+		ZEUInt					GetLayerMin() const;
+		ZEUInt					GetLayerCount() const;
+};
 
 class ZEGRTexture : public ZEGRResource
 {
@@ -87,11 +113,13 @@ class ZEGRTexture : public ZEGRResource
 		ZEUInt												Width;
 		ZEUInt												Height;
 		ZEUInt												LevelCount;
-		ZEUInt												CurrentLevel;
 		ZEUInt												SampleCount;
 		ZEUInt												DepthOrArrayCount;
 		ZEGRTextureType										Type;
 		ZEGRTextureOptions									TextureOptions;
+		
+		mutable ZEArray<ZEGRTextureView*>					ShaderResourceViews;
+		mutable ZEArray<ZEGRTextureView*>					UnorderedAccessViews;
 
 		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>			RenderTargets;
 		mutable ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>	DepthStencilBuffers;
@@ -114,13 +142,14 @@ class ZEGRTexture : public ZEGRResource
 		ZEUInt												GetWidth() const;
 		ZEUInt												GetHeight() const;
 		ZEUInt												GetLevelCount() const;
-		ZEUInt												GetCurrentLevel() const;
 		ZEUInt												GetSampleCount() const;
 		ZEUInt												GetDepthOrArrayCount() const;
 		ZEGRTextureType										GetTextureType() const;
-		virtual void*										GetNativeTexture() const = 0;
 
 		virtual ZEGRResourceType							GetResourceType() const;
+
+		virtual const ZEGRTextureView*						GetView(ZEGRFormat Format = ZEGR_TF_NONE, ZEUInt LevelMin = 0, ZEUInt LevelCount = 0, ZEUInt LayerMin = 0, ZEUInt LayerCount = 0) const = 0;
+		virtual const ZEGRTextureView*						GetRWView(ZEGRFormat Format = ZEGR_TF_NONE, ZEUInt Level = 0, ZEUInt LayerMin = 0, ZEUInt LayerCount = 0) const = 0;
 
 		virtual const ZEGRRenderTarget*						GetRenderTarget(ZEUInt DepthOrArrayIndex = 0, ZEUInt Level = 0) const = 0;
 		virtual const ZEGRDepthStencilBuffer*				GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const = 0;

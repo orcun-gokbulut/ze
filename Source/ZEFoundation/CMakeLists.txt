@@ -138,8 +138,3 @@ ze_add_test(TARGET ZEFoundationTests
 	TEST_TARGET ZEFoundation)
 
 ze_link(ZEFoundation LIBS rt PLATFORMS Unix)
-
-message("ListA: ${FoundationMetaHeaders}")
-foreach (VARIABLE_FILE IN LISTS FoundationMetaHeaders)
-	message("List: ${VARIABLE_FILE}")
-endforeach()

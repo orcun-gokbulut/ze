@@ -373,6 +373,69 @@ void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUIn
 	UnlockContext();
 }
 
+void ZED11Context::SetTextureView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTextureView* TextureView)
+{
+	if (TextureView == NULL)
+		return;
+
+	ID3D11ShaderResourceView* ShaderResourceView = static_cast<const ZED11ShaderResourceView*>(TextureView)->View;//static_cast<const ZED11Texture*>(TextureView->GetTexture())->GetSrv(*TextureView);
+
+	LockContext();
+
+	switch (Shader)
+	{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetShaderResources(Index, 1, &ShaderResourceView);
+			Context->PSSetShaderResources(Index, 1, &ShaderResourceView);
+			Context->GSSetShaderResources(Index, 1, &ShaderResourceView);
+			Context->DSSetShaderResources(Index, 1, &ShaderResourceView);
+			Context->HSSetShaderResources(Index, 1, &ShaderResourceView);
+			Context->CSSetShaderResources(Index, 1, &ShaderResourceView);
+			break;
+
+		default:
+			break;
+	}
+
+	UnlockContext();
+}
+
+void ZED11Context::SetRWTextureView(ZEUInt Index, const ZEGRTextureView* RWTextureView)
+{
+	if (RWTextureView == NULL)
+		return;
+	
+	ID3D11UnorderedAccessView* UnorderedAccessView = static_cast<const ZED11UnorderedAccessView*>(RWTextureView)->View;
+
+	LockContext();
+	Context->CSSetUnorderedAccessViews(Index, 1, &UnorderedAccessView, NULL);
+	UnlockContext();
+}
+
 void ZED11Context::SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers)
 {
 	if (!CheckShaderResources(Shader, Index, Count, reinterpret_cast<const ZEGRResource*const*>(Buffers)))
@@ -396,7 +459,10 @@ void ZED11Context::SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count,
 				break;
 
 			case ZEGR_RT_TEXTURE:
-				NativeShaderResources[I] = static_cast<const ZED11Texture*>(Resource)->ShaderResourceView;
+				{
+					const ZED11Texture* Texture = static_cast<const ZED11Texture*>(Resource);
+					NativeShaderResources[I] = static_cast<ZED11ShaderResourceView*>(Texture->ShaderResourceViews[0])->View;
+				}
 				break;
 
 			default:
@@ -471,7 +537,10 @@ void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 				break;
 
 			case ZEGR_RT_TEXTURE:
-				NativeShaderResources[I] = static_cast<const ZED11Texture*>(Resource)->ShaderResourceView;
+				{
+					const ZED11Texture* Texture = static_cast<const ZED11Texture*>(Resource);
+					NativeShaderResources[I] = static_cast<ZED11ShaderResourceView*>(Texture->ShaderResourceViews[0])->View;
+				}
 				break;
 
 			default:
@@ -695,7 +764,10 @@ void ZED11Context::SetRWBuffers(ZEUInt Index, ZEUInt Count, const ZEGRBuffer*con
 					break;
 
 				case ZEGR_RT_TEXTURE:
-					NativeUnorderedAccesses[I] = static_cast<const ZED11Texture*>(Resource)->UnorderedAccessView;
+					{
+						const ZED11Texture* Texture = static_cast<const ZED11Texture*>(Resource);
+						NativeUnorderedAccesses[I] = static_cast<ZED11UnorderedAccessView*>(Texture->UnorderedAccessViews[0])->View;
+					}
 					break;
 
 				default:
@@ -730,7 +802,10 @@ void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*c
 					break;
 
 				case ZEGR_RT_TEXTURE:
-					NativeUnorderedAccesses[I] = static_cast<const ZED11Texture*>(Resource)->UnorderedAccessView;
+					{
+						const ZED11Texture* Texture = static_cast<const ZED11Texture*>(Resource);
+						NativeUnorderedAccesses[I] = static_cast<ZED11UnorderedAccessView*>(Texture->UnorderedAccessViews[0])->View;
+					}
 					break;
 
 				default:
@@ -839,17 +914,6 @@ void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt Group
 	UnlockContext();
 }
 
-void ZED11Context::GenerateMipMaps(const ZEGRTexture* Texture)
-{
-	ID3D11ShaderResourceView* NativeShaderResource = static_cast<const ZED11Texture*>(Texture)->ShaderResourceView;
-	if (NativeShaderResource != NULL)
-	{
-		LockContext();
-		GetMainContext()->GenerateMips(NativeShaderResource);
-		UnlockContext();
-	}
-}
-
 void ZED11Context::ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
 	LockContext();
@@ -868,9 +932,9 @@ void ZED11Context::ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthSt
 	UnlockContext();
 }
 
-void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor)
+void ZED11Context::ClearRWView(const ZEGRTextureView* RWView, const ZEVector4& ClearColor)
 {
-	ID3D11UnorderedAccessView* NativeView = static_cast<const ZED11Texture*>(Texture)->UnorderedAccessView;
+	ID3D11UnorderedAccessView* NativeView = static_cast<const ZED11UnorderedAccessView*>(RWView)->View;
 
 	LockContext();
 	GetMainContext()->ClearUnorderedAccessViewFloat(NativeView, ClearColor.M);

@@ -45,22 +45,57 @@ ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString&
 	this->Value = Value;
 }
 
-ZEUInt32 ZEGRShaderCompileOptions::Hash() const
+ZEUInt32 ZEGRShaderCompileOptions::GetHash() const
 {
-	ZEUInt32 Hash = 0;
+	ZEString Data;
+	Data = ZEString::FromUInt8(Type) + ZEString::FromUInt8(Model) + FileName + EntryPoint;
 
-	Hash += Type;
-	Hash += Model;
-	Hash += FileName.Hash();
-	Hash += EntryPoint.Hash();
+	ze_for_each(IncDir, IncludeDirectories)
+		Data += IncDir.GetItem();
 
-	for (ZESize I = 0; I < Definitions.GetCount(); I++)
-		Hash += Definitions[I].Name.Hash() + Definitions[I].Value.Hash();
+	ze_for_each(Def, Definitions)
+		Data += Def->Name + Def->Value;
 
-	for (ZESize I = 0; I < IncludeDirectories.GetCount(); I++)
-		Hash += IncludeDirectories[I].Hash();
+	ZEUInt32 Hash = 0x811c9dc5;
+	for (ZEUInt I = 0; I < Data.GetLength(); I++)
+	{
+		Hash ^= (*reinterpret_cast<ZEBYTE*>(&Data[I]));
+		Hash *= 16777619;
+	}
 
 	return Hash;
+
+}
+
+bool ZEGRShaderCompileOptions::Equal(const ZEGRShaderCompileOptions& Other) const
+{
+	if (this->Type != Other.Type || 
+		this->Model != Other.Model || 
+		this->FileName != Other.FileName || 
+		this->EntryPoint != Other.EntryPoint)
+		return false;
+
+	
+	if (this->IncludeDirectories.GetCount() != Other.IncludeDirectories.GetCount())
+		return false;
+
+	for (ZEUInt I = 0; I < this->IncludeDirectories.GetCount(); I++)
+	{
+		if (this->IncludeDirectories[I] != Other.IncludeDirectories[I])
+			return false;
+	}
+
+	if (this->Definitions.GetCount() != Other.Definitions.GetCount())
+		return false;
+
+	for (ZEUInt I = 0; I < this->Definitions.GetCount(); I++)
+	{
+		if (this->Definitions[I].Name != Other.Definitions[I].Name || 
+			this->Definitions[I].Value != Other.Definitions[I].Value)
+			return false;
+	}
+	
+	return true;
 }
 
 ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()

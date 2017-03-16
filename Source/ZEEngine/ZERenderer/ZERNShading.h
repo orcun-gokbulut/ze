@@ -36,17 +36,20 @@
 #pragma once
 
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEVector.h"
 
+#define MAX_DEFERRED_LIGHT				1024
 #define MAX_TILED_LIGHT					1024
-#define MAX_SPOT_LIGHT_SHADOW			8
+#define MAX_POINT_LIGHT_SHADOW			2
+#define MAX_SPOT_LIGHT_SHADOW			4
+#define MAX_PROJECTIVE_LIGHT			8
 #define MAX_PROJECTIVE_LIGHT_SHADOW		4
 #define MAX_DIRECTIONAL_LIGHT			2
 #define MAX_DIRECTIONAL_LIGHT_SHADOW	1
 #define MAX_CASCADE						4
 
-#define TILE_DIMENSION			16
-#define TILE_SIZE				(TILE_DIMENSION * TILE_DIMENSION)
+#define TILE_DIMENSION					32
+#define TILE_SIZE						(TILE_DIMENSION * TILE_DIMENSION)
 
 struct ZERNShading_PointLight
 {
@@ -55,8 +58,6 @@ struct ZERNShading_PointLight
 
 	ZEVector3							Color;
 	float								FalloffExponent;
-
-	ZEMatrix4x4							WorldMatrix;
 };
 
 struct ZERNShading_SpotLight
@@ -65,24 +66,19 @@ struct ZERNShading_SpotLight
 	float								Range;
 
 	ZEVector3							DirectionView;
-	float								Reserved;
-
-	ZEVector3							CullPositionView;
-	float								CullRange;
+	float								CosOuterConeAngle;
 
 	ZEVector3							Color;
 	float								FalloffExponent;
 
 	float								CosInnerConeAngle;
-	float								CosOuterConeAngle;
-	ZEVector2							Reserved1;
-
-	ZEMatrix4x4							WorldMatrix;
+	ZEBool32							CastShadow;
+	ZEUInt								ShadowIndex;
+	float								Reserved;
 };
 
 struct ZERNShading_SpotLightShadow
 {
-	ZERNShading_SpotLight				SpotLight;
 	ZEMatrix4x4							ProjectionTransform;
 	ZEUInt								ShadowSampleCount;
 	float								ShadowSampleLength;
@@ -97,13 +93,13 @@ struct ZERNShading_ProjectiveLight
 
 	ZEVector3							Color;
 	float								FalloffExponent;
-
+	
+	ZEMatrix4x4							ProjectionTransform;
+	
 	ZEBool32							CastShadow;
 	ZEUInt								ShadowMapIndex;
-	ZEVector2							Reserved;
-
-	ZEMatrix4x4							WorldMatrix;
-	ZEMatrix4x4							ProjectionTransform;
+	ZEUInt								WorldTransformIndex;
+	float								Reserved;
 
 	ZEUInt								ShadowSampleCount;
 	float								ShadowSampleLength;
@@ -134,4 +130,23 @@ struct ZERNShading_DirectionalLight
 	ZEVector3							Reserved;
 
 	ZERNShading_Cascade					Cascades[MAX_CASCADE];
+};
+
+struct ZERNShading_Constants
+{
+	ZERNShading_DirectionalLight		DirectionalLights[MAX_DIRECTIONAL_LIGHT];
+	ZEUInt								DirectionalLightCount;
+	ZEUInt								PointLightCount;
+	ZEUInt								SpotLightCount;
+	ZEUInt								ProjectiveLightCount;
+
+	ZEUInt								TileCountX;
+	ZEVector3							Reserved;
+};
+
+struct ZERNShading_EdgeDetectionConstants
+{
+	float								DepthThreshold;
+	float								NormalThreshold;
+	ZEVector2							Reserved;
 };

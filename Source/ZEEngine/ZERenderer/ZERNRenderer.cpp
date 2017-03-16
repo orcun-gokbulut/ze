@@ -377,6 +377,20 @@ const ZEGRTexture* ZERNRenderer::GetOutputTexture() const
 	return OutputTexture;
 }
 
+void ZERNRenderer::SetMSAASampleCount(ZEUInt SampleCount)
+{
+	if (IsInitialized())
+		return;
+
+	this->MSAASampleCount = SampleCount;
+	ZEGRGraphicsModule::SAMPLE_COUNT = SampleCount;
+}
+
+ZEUInt ZERNRenderer::GetMSAASampleCount() const
+{
+	return MSAASampleCount;
+}
+
 const ZEList2<ZERNStage>& ZERNRenderer::GetStages()
 {
 	return Stages;

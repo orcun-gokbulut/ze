@@ -126,7 +126,7 @@ bool ZERNStageAtmosphere::Setup(ZEGRContext* Context)
 			return false;
 	}
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 10, FogConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 12, FogConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthBufferReadonly);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 

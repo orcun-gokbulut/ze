@@ -220,10 +220,10 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->Hash = ClassData->Name.Hash();
 	ClassData->HasCreateInstanceMethod = false;
 	ClassData->HasPublicDestroyMethod = false;
-	ClassData->HasPublicCopyConstructor = false;
-	ClassData->HasPublicDefaultConstructor = false;
-	ClassData->HasPublicDestructor = false;
-	ClassData->HasPublicAssignmentOperator = false;
+	ClassData->HasPublicCopyConstructor = Class->hasCopyConstructorWithConstParam() | Class->hasTrivialCopyConstructor();
+	ClassData->HasPublicDefaultConstructor = Class->hasDefaultConstructor() | Class->hasUserDeclaredConstructor();
+	ClassData->HasPublicDestructor = (Class->hasSimpleDestructor() | Class->hasUserDeclaredDestructor() | Class->hasTrivialDestructor()) && Class->getDestructor()->getAccess() == AS_public;
+	ClassData->HasPublicAssignmentOperator = Class->hasCopyAssignmentWithConstParam() | Class->hasTrivialCopyAssignment();
 	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;

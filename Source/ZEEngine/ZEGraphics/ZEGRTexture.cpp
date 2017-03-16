@@ -60,6 +60,56 @@ ZEGRTextureOptions::ZEGRTextureOptions()
 	sRGB = false;
 }
 
+ZEGRTextureView::ZEGRTextureView()
+{
+	Texture = NULL;
+	Format = ZEGR_TF_NONE;
+	LevelMin = 0;
+	LevelCount = 1;
+	LayerMin = 0;
+	LayerCount = 1;
+}
+
+ZEGRTextureView::ZEGRTextureView(ZEGRFormat Format, ZEUInt LevelMin, ZEUInt LevelCount, ZEUInt LayerMin, ZEUInt LayerCount)
+{
+	Texture = NULL;
+	this->Format = Format;
+	this->LevelMin = LevelMin;
+	this->LevelCount = LevelCount;
+	this->LayerMin = LayerMin;
+	this->LayerCount = LayerCount;
+}
+
+const ZEGRTexture* ZEGRTextureView::GetTexture() const
+{
+	return Texture;
+}
+
+ZEGRFormat ZEGRTextureView::GetFormat() const
+{
+	return Format;
+}
+
+ZEUInt ZEGRTextureView::GetLevelMin() const
+{
+	return LevelMin;
+}
+
+ZEUInt ZEGRTextureView::GetLevelCount() const
+{
+	return LevelCount;
+}
+
+ZEUInt ZEGRTextureView::GetLayerMin() const
+{
+	return LayerMin;
+}
+
+ZEUInt ZEGRTextureView::GetLayerCount() const
+{
+	return LayerCount;
+}
+
 ZESize ZEGRTexture::CalculateSize()
 {
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(GetFormat());
@@ -109,7 +159,6 @@ bool ZEGRTexture::Initialize(ZEGRTextureType TextureType, ZEUInt Width, ZEUInt H
 	SetSize(CalculateSize());
 
 	DepthStencilBuffers.SetCount(8);
-
 
 	return true;
 }
@@ -364,7 +413,6 @@ ZEGRTexture::ZEGRTexture()
 	Width = 0;
 	Height = 0;
 	LevelCount = 0;
-	CurrentLevel = 0;
 	SampleCount = 0;
 	DepthOrArrayCount = 0;
 	Type = ZEGR_TT_NONE;
@@ -375,6 +423,15 @@ ZEGRTexture::ZEGRTexture()
 ZEGRTexture::~ZEGRTexture()
 {
 	Unregister();
+
+	ze_for_each(Srv, ShaderResourceViews)
+		delete Srv.GetItem();
+
+	ze_for_each(Uav, UnorderedAccessViews)
+		delete Uav.GetItem();
+
+	ShaderResourceViews.Clear();
+	UnorderedAccessViews.Clear();
 
 	RenderTargets.Clear();
 	DepthStencilBuffers.Clear();
@@ -407,11 +464,6 @@ ZEUInt ZEGRTexture::GetHeight() const
 ZEUInt ZEGRTexture::GetLevelCount() const
 {
 	return LevelCount;
-}
-
-ZEUInt ZEGRTexture::GetCurrentLevel() const
-{
-	return CurrentLevel;
 }
 
 ZEUInt ZEGRTexture::GetSampleCount() const

@@ -44,7 +44,138 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRShaderCompiler.h"
 
-ZEList2<ZEGRShader>	ZEGRShader::ShaderCache;
+static ZEArray<ZEList2<ZEGRShader>> ShaderCache(1024);
+
+bool ZEGRShader::CheckIncludeFile(const ZEGRShaderCompileOptions& Options, const ZEString& Filename)
+{
+	ZEFileInfo FileInfo(Options.PrecompiledFilename);
+	ZEFileInfo IncludeFileInfo(FileInfo.GetParentDirectory() + "/" + Filename);
+	bool FileExist = false;
+
+	if (IncludeFileInfo.IsExists())
+	{
+		FileExist = true;
+	}
+	else
+	{
+		ze_for_each(Directory, Options.IncludeDirectories)
+		{
+			IncludeFileInfo.SetPath(Directory.GetItem() + "/" + Filename);
+
+			if (IncludeFileInfo.IsExists())
+			{
+				FileExist = true;
+				break;
+			}
+		}
+	}
+	
+	return FileExist && IncludeFileInfo.GetModificationTime() > FileInfo.GetModificationTime();
+}
+
+bool ZEGRShader::RequiredCompilation(const ZEGRShaderCompileOptions& Options, ZEArray<ZEBYTE>& ShaderByteCode)
+{
+	ZEFileInfo FileInfo(Options.FileName);
+	ZEFileInfo CompiledFileInfo(Options.PrecompiledFilename);
+	if (!CompiledFileInfo.IsExists() || (CompiledFileInfo.GetModificationTime() < FileInfo.GetModificationTime()))
+		return true;
+	
+	ZEFile File;
+	if (!File.Open(CompiledFileInfo.GetPath(), ZE_FOM_READ, ZE_FCM_NONE))
+		return false;
+
+	ZEUInt64 Size = File.GetSize();
+	ZEArray<ZEBYTE> ShaderData;
+	ShaderData.SetCount(Size);
+
+	if (File.Read(ShaderData.GetCArray(), Size, 1) != 1)
+	return true;
+
+	File.Close();
+
+	ZEUInt ReadIndex = 0;
+	ZEBYTE IncludeFileCount = ShaderData[ReadIndex++];
+
+
+	for (ZEUInt I = 0; I < IncludeFileCount; I++)
+	{
+		ZEString IncludeFilename;
+		IncludeFilename.SetValue(&ShaderData[ReadIndex + 1], ShaderData[ReadIndex]);
+
+		if (CheckIncludeFile(Options, IncludeFilename))
+			return true;
+
+		ReadIndex += ShaderData[ReadIndex] + 1;
+	}
+
+	ShaderByteCode.AddMultiple(&ShaderData[ReadIndex], ShaderData.GetCount() - ReadIndex);
+
+	return false;
+}
+
+bool ZEGRShader::LoadFromFile(ZEArray<ZEBYTE>& Output, const ZEString& FileName)
+{
+	ZEFile File;
+	ZEFileInfo FileInfo(FileName);
+	ZEFileInfo EncriptedFileInfo(FileName + ".ZEEnc");
+	if (EncriptedFileInfo.IsExists() && (EncriptedFileInfo.GetModificationTime() > FileInfo.GetModificationTime()))
+	{
+		if (!File.Open(EncriptedFileInfo.GetPath(), ZE_FOM_READ, ZE_FCM_NONE))
+			return false;
+	}
+	else
+	{
+		if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+			return false;
+	}
+	
+	ZEUInt64 Size = File.GetSize();
+	ZEArray<ZEBYTE> Buffer;
+	Buffer.SetCount(Size);
+
+	if (File.Read(Buffer.GetCArray(), Size, 1) != 1)
+	{
+		zeError("Cannot read shader file. File Name: \"%s", FileName.ToCString());
+		return false;
+	}
+	File.Close();
+	
+	const ZEBYTE Key[32] =
+	{
+		0x49, 0x5d, 0xea, 0xff, 0x97, 0x48, 0x08, 0xd4, 
+		0xc8, 0xa9,	0xcd, 0xf6, 0x49, 0xb0, 0xa3, 0x72, 
+		0xa6, 0xa1, 0xf5, 0xf9, 0xf3, 0xeb, 0xa4, 0xfe, 
+		0x56, 0xc4, 0x1c, 0x09, 0x42, 0xa8, 0x4c, 0xd8
+	};
+	
+	if (*(ZEUInt32*)Buffer.GetCArray() == 'ZEEN')
+	{
+		ZELCEncryption::AESDecrypt(Output, Buffer.GetCArray() + 4, Size - 4, Key, 32);
+	}
+	else
+	{
+		ZELCEncryption::AESEncrypt(Output, Buffer.GetCArray(), Size, Key, 32);
+	
+		bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
+		ZEPathManager::GetInstance()->SetAccessControl(false);
+		ZEFile File;
+		if (File.Open(FileName + ".ZEEnc", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		{
+			ZEUInt32 Header = 'ZEEN';
+			File.Write(&Header, sizeof(ZEUInt32), 1);
+				
+			File.Write(Output.GetCArray(), Output.GetCount(), 1);
+			File.Close();
+		}
+		ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
+		
+		Output = Buffer;
+	}
+	
+	Output.Add('\0');
+
+	return true;
+}
 
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
@@ -63,7 +194,8 @@ void ZEGRShader::PreDestroy()
 {
 	ShaderCache.LockWrite();
 	{
-		ShaderCache.Remove(&ShaderCacheLink);
+		ZEUInt32 Index = CompileOptions.GetHash() % ShaderCache.GetCount();
+		ShaderCache[Index].Remove(&ShaderCacheLink);
 	}
 	ShaderCache.UnlockWrite();
 }
@@ -71,7 +203,6 @@ void ZEGRShader::PreDestroy()
 ZEGRShader::ZEGRShader() : ShaderCacheLink(this)
 {
 	ShaderType = ZEGR_ST_NONE;
-	Hash = 0;
 
 	Register();
 }
@@ -91,6 +222,11 @@ ZEGRShaderType ZEGRShader::GetShaderType() const
 	return ShaderType;
 }
 
+const ZEGRShaderCompileOptions& ZEGRShader::GetCompileOptions() const
+{
+	return CompileOptions;
+}
+
 ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	ZEHolder<ZEGRShader> Shader = ZEGRGraphicsModule::GetInstance()->CreateShader();
@@ -105,101 +241,66 @@ ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const
 
 ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 {
-	ZEUInt32 Hash = Options.Hash();
-	ShaderCache.LockRead();
-	ze_for_each(Entry, ShaderCache)
+	ZEUInt32 Hash = Options.GetHash();
+	ZEUInt32 Index = Hash % ShaderCache.GetCount();
+
+	ShaderCache[Index].LockRead();
+	ze_for_each(Entry, ShaderCache[Index])
 	{
-		if (Entry->Hash == Hash)
+		ZEGRShaderCompileOptions DestOptions = Entry->GetCompileOptions();
+		if (DestOptions.Equal(Options))
 		{
 			ZEHolder<ZEGRShader> Temp = Entry.GetPointer();
-			ShaderCache.UnlockRead();
+			ShaderCache[Index].UnlockRead();
+
 			return Temp;
 		}
 	}
-	ShaderCache.UnlockRead();
-
-	ZEFile File;
-
-	ZEFileInfo FileInfo(Options.FileName);
-	ZEFileInfo EncriptedFileInfo(Options.FileName + ".ZEEnc");
-	if (EncriptedFileInfo.IsExists() && (EncriptedFileInfo.GetModificationTime() > FileInfo.GetModificationTime()))
-	{
-		if (!File.Open(EncriptedFileInfo.GetPath(), ZE_FOM_READ, ZE_FCM_NONE))
-			return false;
-	}
-	else
-	{
-		if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
-			return false;
-	}
-
-	ZEUInt64 Size = File.GetSize();
-	ZEArray<ZEBYTE> Buffer;
-	Buffer.SetCount(Size + 1);
-
-	if (File.Read(Buffer.GetCArray(), Size, 1) != 1)
-	{
-		zeError("Cannot read shader file. File Name: \"%s", Options.FileName.ToCString());
-		return NULL;
-	}
-	File.Close();
-
-	const ZEBYTE Key[32] =
-	{
-		0x49, 0x5d, 0xea, 0xff, 0x97, 0x48, 0x08, 0xd4, 
-		0xc8, 0xa9,	0xcd, 0xf6, 0x49, 0xb0, 0xa3, 0x72, 
-		0xa6, 0xa1, 0xf5, 0xf9, 0xf3, 0xeb, 0xa4, 0xfe, 
-		0x56, 0xc4, 0x1c, 0x09, 0x42, 0xa8, 0x4c, 0xd8
-	};
+	ShaderCache[Index].UnlockRead();
 
 	ZEGRShaderCompileOptions UpdatedOptions = Options;
-	if (*(ZEUInt32*)Buffer.GetCArray() == 'ZEEN')
+	if (UpdatedOptions.PrecompiledFilename.IsEmpty())
+		UpdatedOptions.PrecompiledFilename = ZEFileInfo(Options.FileName).GetParentDirectory() + "/" + Options.EntryPoint + ZEString::FromUInt32(Hash) + ".ZECS";
+	
+	ZEArray<ZEBYTE> ShaderByteCode;
+	if (RequiredCompilation(UpdatedOptions, ShaderByteCode))
 	{
-		ZEArray<ZEBYTE> Output;
-		ZELCEncryption::AESDecrypt(Output, Buffer.GetCArray() + 4, Size - 4, Key, 32);
-		Output.Add('\0');
-		UpdatedOptions.SourceData = reinterpret_cast<char*>(Output.GetCArray());
-	}
-	else
-	{
-		Buffer[Size] = '\0';
-		UpdatedOptions.SourceData = reinterpret_cast<char*>(Buffer.GetCArray());
+		zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Enumerator()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
 
-		ZEArray<ZEBYTE> Output;
-		ZELCEncryption::AESEncrypt(Output, Buffer.GetCArray(), Size, Key, 32);
+		if (!LoadFromFile(UpdatedOptions.SourceData, UpdatedOptions.FileName))
+			return NULL;
+		
+		ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
+		if (!Compiler->Compile(ShaderByteCode, UpdatedOptions, NULL, NULL))
+			return NULL;
+
+		ZEArray<ZEBYTE> ShaderData;
+
+		ShaderData.Add(UpdatedOptions.IncludeFiles.GetCount());
+		ze_for_each(IncludeFile, UpdatedOptions.IncludeFiles)
+		{
+			ShaderData.Add(IncludeFile.GetItem().GetLength() + 1);
+			ShaderData.AddMultiple(reinterpret_cast<ZEBYTE*>(const_cast<char*>(IncludeFile.GetItem().ToCString())), IncludeFile.GetItem().GetLength() + 1);
+		}
+
+		ShaderData.AddMultiple(ShaderByteCode);
 
 		bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
 		ZEPathManager::GetInstance()->SetAccessControl(false);
 		ZEFile File;
-		if (File.Open(Options.FileName + ".ZEEnc", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		if (File.Open(UpdatedOptions.PrecompiledFilename, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
-			ZEUInt32 Header = 'ZEEN';
-			File.Write(&Header, sizeof(ZEUInt32), 1);
-				
-			File.Write(Output.GetCArray(), Output.GetCount(), 1);
+			File.Write(ShaderData.GetCArray(), ShaderData.GetCount(), 1);
 			File.Close();
 		}
 		ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
 	}
-
-	#ifdef ZEGR_DEBUG_SHADERS
-		UpdatedOptions.Debug = true;
-		UpdatedOptions.OptimizationLevel = 0;
-	#endif
-
-	zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Enumerator()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
-
-	ZEArray<ZEBYTE> OutputShaderBinary;
-	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
-	if (!Compiler->Compile(OutputShaderBinary, UpdatedOptions, NULL, NULL))
-		return NULL;
-
-	ZEHolder<ZEGRShader> Shader = ZEGRShader::CreateInstance(Options.Type, OutputShaderBinary.GetConstCArray(), OutputShaderBinary.GetCount());
+	
+	ZEHolder<ZEGRShader> Shader = ZEGRShader::CreateInstance(Options.Type, ShaderByteCode.GetConstCArray(), ShaderByteCode.GetCount());
 	if (Shader != NULL)
 	{
-		Shader->Hash = Hash;
-		ShaderCache.AddEnd(&Shader->ShaderCacheLink);
+		Shader->CompileOptions = Options;
+		ShaderCache[Index].AddEnd(&Shader->ShaderCacheLink);
 	}
-
 	return Shader;
 }

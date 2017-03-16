@@ -44,6 +44,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERNShading.h"
+#include "ZEMath/ZEBSphere.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -61,59 +62,57 @@ class ZELightOmniProjective;
 class ZERNStageLighting : public ZERNStage
 {
 	ZE_OBJECT
+	friend class ZERNStageForward;
 	private:
 		ZEFlags										DirtyFlags;
 		ZEGRViewport								Viewport;
 
 		ZEHolder<ZEGRShader>						ScreenCoverVertexShader;
-		ZEHolder<ZEGRShader>						DeferredDirectionalLightVertexShader;
-		ZEHolder<ZEGRShader>						DeferredSpotLightVertexShader;
-		ZEHolder<ZEGRShader>						DeferredSpotLightShadowVertexShader;
-		ZEHolder<ZEGRShader>						DeferredPointLightVertexShader;
-		ZEHolder<ZEGRShader>						DeferredDirectionalLightPixelShader;
+		ZEHolder<ZEGRShader>						DeferredLightsVertexShader;
+		ZEHolder<ZEGRShader>						DeferredirectionalLightPixelShader;
 		ZEHolder<ZEGRShader>						DeferredSpotLightPixelShader;
-		ZEHolder<ZEGRShader>						DeferredSpotLightShadowPixelShader;
+
 		ZEHolder<ZEGRShader>						DeferredPointLightPixelShader;
-		ZEHolder<ZEGRShader>						DeferredDirectionalLightPixelShaderPerSample;
+
 		ZEHolder<ZEGRShader>						DeferredSpotLightPixelShaderPerSample;
-		ZEHolder<ZEGRShader>						DeferredSpotLightShadowPixelShaderPerSample;
 		ZEHolder<ZEGRShader>						DeferredPointLightPixelShaderPerSample;
 		ZEHolder<ZEGRShader>						EdgeDetectionPixelShader;
-		ZEHolder<ZEGRShader>						BlendPixelShader;
-		ZEHolder<ZEGRShader>						BlendPixelShaderPerSample;
+		ZEHolder<ZEGRShader>						DebugEdgeDetectionPixelShader;
 		ZEHolder<ZEGRShader>						TiledDeferredComputeShader;
+		ZEHolder<ZEGRShader>						TiledDeferredTransparencyComputeShader;
+		ZEHolder<ZEGRShader>						TiledDeferredPixelShader;
+		ZEHolder<ZEGRShader>						TiledDeferredPixelShaderPerSample;
 
-		ZEHolder<ZEGRRenderStateData>				DeferredDirectionalLightRenderState;
 		ZEHolder<ZEGRRenderStateData>				DeferredPointLightRenderState;
 		ZEHolder<ZEGRRenderStateData>				DeferredSpotLightRenderState;
-		ZEHolder<ZEGRRenderStateData>				DeferredSpotLightShadowRenderState;
-		ZEHolder<ZEGRRenderStateData>				DeferredDirectionalLightRenderStatePerSample;
+
 		ZEHolder<ZEGRRenderStateData>				DeferredPointLightRenderStatePerSample;
 		ZEHolder<ZEGRRenderStateData>				DeferredSpotLightRenderStatePerSample;
-		ZEHolder<ZEGRRenderStateData>				DeferredSpotLightShadowRenderStatePerSample;
 		ZEHolder<ZEGRRenderStateData>				EdgeDetectionRenderState;
-		ZEHolder<ZEGRRenderStateData>				BlendRenderState;
-		ZEHolder<ZEGRRenderStateData>				BlendRenderStatePerSample;
+		ZEHolder<ZEGRRenderStateData>				DebugEdgeDetectionRenderState;
 		ZEHolder<ZEGRComputeRenderStateData>		TiledDeferredComputeRenderState;
+		ZEHolder<ZEGRComputeRenderStateData>		TiledDeferredTransparencyComputeRenderState;
+		ZEHolder<ZEGRRenderStateData>				TiledDeferredGraphicsRenderState;
+		ZEHolder<ZEGRRenderStateData>				TiledDeferredGraphicsRenderStatePerSample;
 
-		ZEHolder<ZEGRShader>						ProjectiveLightVertexShader;
 		ZEHolder<ZEGRShader>						ProjectiveLightPixelShader;
 		ZEHolder<ZEGRShader>						ProjectiveLightPixelShaderPerSample;
 
 		ZEHolder<ZEGRRenderStateData>				ProjectiveLightRenderState;
 		ZEHolder<ZEGRRenderStateData>				ProjectiveLightRenderStatePerSample;
+		
+		ZEHolder<ZEGRBuffer>						DeferredLightsVertexBuffer;
+		ZEHolder<ZEGRBuffer>						DeferredLightsTransformsConstantBuffer;
+		
+		ZEHolder<ZEGRBuffer>						PointLightsBoundingSpheresStructuredBuffer;
+		ZEHolder<ZEGRBuffer>						SpotLightsBoundingSpheresStructuredBuffer;
 
-		ZEHolder<ZEGRBuffer>						ConstantBuffer;
-		ZEHolder<ZEGRBuffer>						PointLightStructuredBuffer;
-		ZEHolder<ZEGRBuffer>						SpotLightStructuredBuffer;
-		ZEHolder<ZEGRBuffer>						DeferredLightVertexBuffer;
-
-		ZEHolder<ZEGRBuffer>						SpotLightShadowConstantBuffer;
-		ZEHolder<ZEGRBuffer>						ProjectiveLightConstantBuffer;
 		ZEHolder<ZEGRBuffer>						EdgeDetectionConstantBuffer;
 
 		ZEHolder<ZEGRTexture>						RandomVectorsTexture;
-		ZEHolder<ZEGRTexture>						TiledDeferredOutputTexture;
+
+		ZEHolder<ZEGRBuffer>						LightsConstantBuffer;
+		ZEHolder<ZEGRBuffer>						TileLightStructuredBuffer;
 
 		ZEHolder<const ZEGRTexture>					AccumulationTexture;
 		ZEHolder<const ZEGRTexture>					GBufferEmissive;
@@ -125,48 +124,58 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<const ZEGRTexture>					ProjectiveShadowMaps;
 
 		bool										ShowCascades;
+		bool										ShowMSAAEdges;
 		bool										UseTiledDeferred;
 
-		struct
-		{
-			ZERNShading_DirectionalLight			DirectionalLights[MAX_DIRECTIONAL_LIGHT];
-			ZEUInt									DirectionalLightCount;
-			ZEUInt									PointLightCount;
-			ZEUInt									SpotLightCount;
-			ZEUInt									ProjectiveLightCount;
-
-			ZEBool32								AddTiledDeferredOutput;
-			ZEUInt									TileCountX;
-			ZEVector2								Reserved;
-		} Constants;
-
-		struct
-		{
-			float									DepthThreshold;
-			float									NormalThreshold;
-			ZEVector2								Reserved;
-		} EdgeDetectionConstants;
+		ZERNShading_Constants						Constants;
+		ZERNShading_EdgeDetectionConstants			EdgeDetectionConstants;
 
 		ZESmartArray<ZERNShading_PointLight>		PointLights;
 		ZESmartArray<ZERNShading_SpotLight>			SpotLights;
 
+		ZESmartArray<ZEMatrix4x4>					PointLightsTransforms;
+		ZESmartArray<ZEMatrix4x4>					SpotLightsTransforms;
+		
+		ZESmartArray<ZEBSphere>						PointLightsBoundingSpheres;
+		ZESmartArray<ZEBSphere>						SpotLightsBoundingSpheres;
+
 		ZEArray<ZERNShading_SpotLightShadow>		SpotLightsShadow;
+		
 		ZEArray<ZERNShading_ProjectiveLight>		ProjectiveLights;
+		ZEArray<ZEMatrix4x4>						ProjectiveLightsTransforms;
 		ZEArray<ZEHolder<const ZEGRTexture>>		ProjectionTextures;
+
+		struct ZERNBufferRange
+		{
+			ZEUInt	Offset;
+			ZEUInt	Count;
+		};
+		
+		ZERNBufferRange								CommonParamsRange;
+		ZERNBufferRange								PointLightRange;
+		ZERNBufferRange								SpotLightRange;
+		ZERNBufferRange								SpotLightShadowRange;
+		ZERNBufferRange								ProjectiveLightRange;
+
+		ZERNBufferRange								PointLightVertexRange;
+		ZERNBufferRange								SpotLightVertexRange;
+		ZERNBufferRange								ProjectiveLightVertexRange;
 
 		void										CreateRandomVectors();
 		void										CreateLightGeometries();
 
 		bool										UpdateShaders();
 		bool										UpdateRenderState();
-		bool										UpdateLightBuffers();
+		bool										UpdateBuffers();
 		bool										Update();
 
 		virtual bool								InitializeInternal();
 		virtual bool								DeinitializeInternal();
 
+		bool										SetupLights(ZEGRContext* Context);
 		void										DrawLights(ZEGRContext* Context, bool PerSample);
-		void										BlendTiledDeferred(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, bool PerSample);
+
+		virtual void								CreateOutput(const ZEString& Name);
 
 	public:
 		virtual ZEInt								GetId() const;
@@ -174,6 +183,9 @@ class ZERNStageLighting : public ZERNStage
 
 		void										SetShowCascades(bool ShowCascades);
 		bool										GetShowCascades() const;
+
+		void										SetShowMSAAEdges(bool ShowMSAAEdges);
+		bool										GetShowMSAAEdges() const;
 
 		void										SetUseTiledDeferred(bool UseTiledDeferred);
 		bool										GetUseTiledDeferred() const;

@@ -46,9 +46,11 @@ class ZERNStageRenderDepth : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
-		ZEHolder<ZEGRTexture>			OpaqueDepthTexture;
 
 		ZEHolder<const ZEGRTexture>		DepthTexture;
+
+		ZESmartArray<ZERNCommand*>		OpaqueCommands;
+		ZESmartArray<ZERNCommand*>		TransparentCommands;
 
 		virtual bool					InitializeInternal();						
 		virtual bool					DeinitializeInternal();
