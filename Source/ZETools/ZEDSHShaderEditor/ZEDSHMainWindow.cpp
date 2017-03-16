@@ -171,7 +171,7 @@ void ZEDSHMainWindow::SaveDocument(const QString& FileName)
 	PathManager->SetAccessControl(AccessControl);
 
 	ZEGRShaderCompileOptions TempOptions = GetCompileOptionsWindow()->GetOptions();
-	TempOptions.SourceData = Editor->toPlainText().toLocal8Bit().begin();
+	TempOptions.SourceData.AddMultiple((ZEBYTE*)Editor->toPlainText().toLocal8Bit().data(), Editor->toPlainText().toLocal8Bit().count());
 	GetCompileOptionsWindow()->SetOptions(TempOptions);
 
 	this->statusBar()->showMessage("Changes Saved!");
@@ -373,7 +373,7 @@ void ZEDSHMainWindow::actCompile_OnTrigger()
 	OutputWindow->Print("\n");
 
 	ZEGRShaderCompileOptions Options = CompileOptionsWindow->GetOptions();
-	Options.SourceData = Editor->toPlainText().toLocal8Bit().begin();
+	Options.SourceData.AddMultiple((ZEBYTE*)Editor->toPlainText().toLocal8Bit().data(), Editor->toPlainText().toLocal8Bit().count());
 
 	ZEPointer<ZEDSHShaderCompiler> Compiler = new ZEDSHShaderCompiler();
 
@@ -476,7 +476,7 @@ ZEDSHCompileOptionsWindow* ZEDSHMainWindow::GetCompileOptionsWindow()
 void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions& Options)
 {
 	CompileOptionsWindow->SetOptions(Options);
-	Editor->setPlainText(Options.SourceData.ToCString());
+	Editor->setPlainText((char*)Options.SourceData.GetCArray());
 
 	Loaded = true;
 	Engine = true;

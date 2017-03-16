@@ -80,6 +80,9 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									SetIndexBuffer(const ZEGRBuffer* Buffer, ZEUInt Offset = 0);
 		virtual void									SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers, const ZEUInt* FirstConstant = NULL, const ZEUInt* NumConstants = NULL);
 
+		virtual void									SetTextureView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTextureView* TextureView);
+		virtual void									SetRWTextureView(ZEUInt Index, const ZEGRTextureView* RWTextureView);
+
 		virtual void									SetBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRBuffer*const* Buffers);
 		virtual void									SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures);
 
@@ -107,11 +110,9 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 
 		virtual void									Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ);
 
-		virtual void									GenerateMipMaps(const ZEGRTexture* Texture);
-
 		virtual void									ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
 		virtual void									ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
-		virtual void									ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor);
+		virtual void									ClearRWView(const ZEGRTextureView* RWTextureView, const ZEVector4& ClearColor);
 
 		virtual void									ClearState();
 

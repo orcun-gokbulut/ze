@@ -172,6 +172,7 @@ class ZEArray : public ZEMTCollection
 		void												UnlockWrite();
 
 															ZEArray();
+		explicit						ZEArray(ZESize Count);
 															ZE_ARRAY_OTHER_TEMPLATE
 															ZEArray(const ZEArray<ZE_ARRAY_OTHER_SPEC>& OtherArray);
 															ZEArray(const ZEArray<ZE_ARRAY_SPECIALIZATION>& OtherArray);
@@ -1048,6 +1049,14 @@ ZEArray<ZE_ARRAY_SPECIALIZATION>::ZEArray()
 {
 	Items = NULL;
 	Count = 0;
+}
+
+ZE_ARRAY_TEMPLATE
+ZEArray<ZE_ARRAY_SPECIALIZATION>::ZEArray(ZESize Count)
+{
+	Items = NULL;
+	this->Count = 0;
+	SetCount(Count);
 }
 
 ZE_ARRAY_TEMPLATE

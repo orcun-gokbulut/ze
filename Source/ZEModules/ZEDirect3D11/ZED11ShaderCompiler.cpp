@@ -34,10 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11ShaderCompiler.h"
+
 #include "ZED11ShaderCompilerIncludeInterface.h"
 #include "ZED11ShaderMetaCompiler.h"
 
-#define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
+#define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
 //#define ZE_DEBUG_D3D11_DEBUG_SHADERS
 
 #ifdef ZE_DEBUG_D3D11_DEBUG_SHADERS
@@ -46,9 +47,7 @@
 	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_OPTIMIZATION_LEVEL3)
 #endif
 
-#define ZE_D3D11_DEVICE_REGISTER_SIZE			16	// Bytes
-
-typedef void (*ZEGRShaderEditorFunction)( ZEGRShaderCompileOptions& Options);
+typedef void (*ZEGRShaderEditorFunction)(ZEGRShaderCompileOptions& Options);
 
 bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen)
 {
@@ -56,7 +55,7 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 	ZED11ShaderCompilerIncludeInterface IncludeInterface;
 	ZEString Profile;
 
-	if(!PrepareOptions(Options, Macros, IncludeInterface, Profile))
+	if (!PrepareOptions(Options, Macros, IncludeInterface, Profile))
 		return false;
 
 	ID3DBlob* CompileOutput = NULL;
@@ -64,7 +63,7 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 	ZEGRShaderCompileOptions ResultOptions = Options;
 
 	// Compile
-	HRESULT Result = D3DCompile(Options.SourceData.ToCString(), Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, 0, &ByteCode, &CompileOutput);
+	HRESULT Result = D3DCompile(Options.SourceData.GetConstCArray(), Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, 0, &ByteCode, &CompileOutput);
 	if (FAILED(Result))
 	{	
 		if (!ShaderEditorOpen)
@@ -74,12 +73,13 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 				if(!PrepareOptions(ResultOptions, Macros, IncludeInterface, Profile))
 					return false;
 
-				Result = D3DCompile(ResultOptions.SourceData.ToCString(), ResultOptions.SourceData.GetSize(), ResultOptions.FileName, Macros.GetConstCArray(), &IncludeInterface, ResultOptions.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
+				Result = D3DCompile(ResultOptions.SourceData.GetConstCArray(), ResultOptions.SourceData.GetSize(), ResultOptions.FileName, Macros.GetConstCArray(), &IncludeInterface, ResultOptions.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
 			}
 		}
 		// Compile
 		if (FAILED(Result))
-		{	
+		{
+			void* Addr = CompileOutput->GetBufferPointer();
 			zeError("Can not compile shader.\r\nFile: \"%s\".\r\nCompile output: \r\n%s\r\n", ResultOptions.FileName.ToCString(), CompileOutput->GetBufferPointer());
 			if (Output != NULL)
 				*Output = (char*)CompileOutput->GetBufferPointer();
@@ -115,7 +115,7 @@ bool ZED11ShaderCompiler::OpenShaderEditor(ZEGRShaderCompileOptions& Options)
 	 }
 
 	 ZEGRShaderEditorFunction Function = (ZEGRShaderEditorFunction)GetProcAddress(Module, "ZEDSHEditor_RunEditor");
-	 if(Function == NULL)
+	 if (Function == NULL)
 		 return false;
 
 	 Function(Options);
@@ -125,7 +125,7 @@ bool ZED11ShaderCompiler::OpenShaderEditor(ZEGRShaderCompileOptions& Options)
 
 bool ZED11ShaderCompiler::PrepareOptions(const ZEGRShaderCompileOptions& Options, ZEArray<D3D_SHADER_MACRO>& OutMacros, ZED11ShaderCompilerIncludeInterface& OutIncludeInterface, ZEString& OutProfile)
 {
-	zeDebugCheck(Options.SourceData.IsEmpty(), "No shader source available.");
+	zeDebugCheck(Options.SourceData.GetCount() <= 1, "No shader source available.");
 	zeDebugCheck(Options.EntryPoint.IsEmpty(), "Shader entry point is not available");
 	zeDebugCheck(Options.Model < ZEGR_SM_4_0, "Shader model is not supported by this module.");
 	

@@ -89,7 +89,6 @@ class ZEMCParser
 		void							CheckPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckPublicCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckPublicAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 

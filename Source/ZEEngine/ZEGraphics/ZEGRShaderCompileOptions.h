@@ -61,13 +61,17 @@ class ZEGRShaderCompileOptions : public ZEObject
 		ZEGRShaderModel					Model;
 		bool							Debug;
 		ZEUInt							OptimizationLevel;
+		ZEString						PrecompiledFilename;
 		ZEString						FileName;
 		ZEString						EntryPoint;
-		ZEString						SourceData;
+		ZEArray<ZEBYTE>					SourceData;
 		ZEArray<ZEGRShaderDefinition>	Definitions;
 		ZEArray<ZEString>				IncludeDirectories;
+		ZEArray<ZEString>				IncludeFiles;
 
-		ZEUInt32						Hash() const;
+		ZEUInt32						GetHash() const;
+
+		bool							Equal(const ZEGRShaderCompileOptions& Other) const;
 
 										ZEGRShaderCompileOptions();
 };

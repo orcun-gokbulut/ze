@@ -54,21 +54,14 @@ class ZERNStageForward : public ZERNStage
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
 
-		ZEHolder<ZEGRShader>					TiledForwardComputeShader;
-		ZEHolder<ZEGRComputeRenderStateData>	TiledForwardComputeRenderState;
-
-		ZEHolder<ZEGRBuffer>					TileLightStructuredBuffer;
+		ZEHolder<const ZEGRBuffer>				LightsConstantBuffer;
+		ZEHolder<const ZEGRBuffer>				TileLightStructuredBuffer;
 
 		ZEHolder<const ZEGRTexture>				DepthTexture;
 		ZEHolder<const ZEGRTexture>				AccumulationTexture;
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
-
-		bool									UpdateShaders();
-		bool									UpdateRenderStates();
-		bool									UpdateTileLightBuffer();
-		bool									Update();
 
 		virtual void							CreateOutput(const ZEString& Name);
 

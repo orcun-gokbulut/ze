@@ -39,6 +39,7 @@
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZERNCommand.h"
+#include "ZERNStageLighting.h"
 #include "ZELightPoint.h"
 #include "ZELightDirectional.h"
 #include "ZELightProjective.h"
@@ -52,9 +53,6 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-#define MAX_LIGHT					512
-#define TILE_DIMENSION				16
-
 #define ZERN_SFDF_SHADERS			1
 #define ZERN_SFDF_RENDER_STATES		2
 #define ZERN_SFDF_TILE_LIGHT_BUFFER	4
@@ -65,91 +63,19 @@ bool ZERNStageForward::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	return Update();
+	return true;
 }
 
 bool ZERNStageForward::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
-
-	TiledForwardComputeShader.Release();
-	TiledForwardComputeRenderState.Release();
-
-	TileLightStructuredBuffer.Release();
-
+	
+	LightsConstantBuffer = NULL;
+	TileLightStructuredBuffer = NULL;
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
 	return ZERNStage::DeinitializeInternal();
-}
-
-bool ZERNStageForward::UpdateShaders()
-{
-	if (!DirtyFlags.GetFlags(ZERN_SFDF_SHADERS))
-		return true;
-
-	ZEGRShaderCompileOptions Options;
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTiledDeferredShadingCompute.hlsl";
-	Options.Model = ZEGR_SM_5_0;
-	Options.Type = ZEGR_ST_COMPUTE;
-	Options.EntryPoint = "ZERNTiledDeferredShadingCompute_ComputeShader_Main";
-
-	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString::FromInt32(ZEGRGraphicsModule::SAMPLE_COUNT)));
-	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_TILED_FORWARD"));
-	TiledForwardComputeShader = ZEGRShader::Compile(Options);
-	zeCheckError(TiledForwardComputeShader == NULL, false, "Cannot set compute shader.");
-
-	DirtyFlags.UnraiseFlags(ZERN_SFDF_SHADERS);
-	DirtyFlags.RaiseFlags(ZERN_SFDF_RENDER_STATES);
-
-	return true;
-}
-
-bool ZERNStageForward::UpdateRenderStates()
-{
-	if (!DirtyFlags.GetFlags(ZERN_SFDF_RENDER_STATES))
-		return true;
-
-	ZEGRComputeRenderState ComputeRenderState;
-	ComputeRenderState.SetComputeShader(TiledForwardComputeShader);
-	TiledForwardComputeRenderState = ComputeRenderState.Compile();
-	zeCheckError(TiledForwardComputeRenderState == NULL, false, "Cannot set render state.");
-
-	DirtyFlags.UnraiseFlags(ZERN_SFDF_RENDER_STATES);
-
-	return true;
-}
-
-bool ZERNStageForward::UpdateTileLightBuffer()
-{
-	if (!DirtyFlags.GetFlags(ZERN_SFDF_TILE_LIGHT_BUFFER))
-		return true;
-
-	ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
-
-	ZEUInt TileCountX = (Width + TILE_DIMENSION - 1) / TILE_DIMENSION;
-	ZEUInt TileCountY = (Height + TILE_DIMENSION - 1) / TILE_DIMENSION;
-	
-	TileLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, TileCountX * TileCountY * (MAX_LIGHT + 2) * sizeof(ZEUInt), sizeof(ZEUInt), ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
-
-	DirtyFlags.UnraiseFlags(ZERN_SFDF_TILE_LIGHT_BUFFER);
-
-	return true;
-}
-
-bool ZERNStageForward::Update()
-{
-	if (!UpdateShaders())
-		return false;
-
-	if (!UpdateRenderStates())
-		return false;
-
-	if (!UpdateTileLightBuffer())
-		return false;
-
-	return true;
 }
 
 void ZERNStageForward::CreateOutput(const ZEString& Name)
@@ -191,15 +117,24 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	if (!Update())
-		return false;
-
 	if (GetCommands().GetCount() == 0)
 		return false;
 	
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 	if (!DirtyFlags.GetFlags(ZERN_SFDF_OUTPUT) && AccumulationTexture->GetSampleCount() > 1)
 		Context->ClearRenderTarget(RenderTarget, ZEVector4::Zero);
+	
+	ZERNStageLighting* StageLighting = static_cast<ZERNStageLighting*>(GetRenderer()->GetStage(ZERN_STAGE_LIGHTING));
+	if (StageLighting != NULL)
+	{
+		Context->SetBuffer(ZEGR_ST_PIXEL, 17, TileLightStructuredBuffer);
+
+		const ZEGRBuffer* Buffers[] = {LightsConstantBuffer, LightsConstantBuffer, LightsConstantBuffer, LightsConstantBuffer};
+		const ZEUInt Offsets[] = {StageLighting->CommonParamsRange.Offset, StageLighting->PointLightRange.Offset, StageLighting->SpotLightRange.Offset, StageLighting->SpotLightShadowRange.Offset};
+		const ZEUInt Counts[] = {StageLighting->CommonParamsRange.Count, StageLighting->PointLightRange.Count, StageLighting->SpotLightRange.Count, StageLighting->SpotLightShadowRange.Count};
+	
+		Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 4, Buffers, Offsets, Counts);
+	}
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer());
 	Context->SetViewports(1, &Viewport);
@@ -216,6 +151,8 @@ ZERNStageForward::ZERNStageForward()
 {
 	DirtyFlags.RaiseAll();
 
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&LightsConstantBuffer), "LightsConstantBuffer", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
+	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&TileLightStructuredBuffer), "TileLightBuffer", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_REQUIRED);
 	AddInputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DepthTexture), "DepthTexture", ZERN_SRUT_READ, ZERN_SRCF_GET_FROM_PREV);
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&AccumulationTexture), "ColorTexture", ZERN_SRUT_WRITE, ZERN_SRCF_GET_FROM_PREV | ZERN_SRCF_CREATE_OWN | ZERN_SRCF_GET_OUTPUT);
@@ -255,7 +192,7 @@ const ZEString& ZERNStageForwardTransparent::GetName() const
 bool ZERNStageForwardTransparent::DeinitializeInternal()
 {
 	FogConstantBuffer = NULL;
-
+	
 	return ZERNStageForward::DeinitializeInternal();
 }
 
@@ -264,21 +201,9 @@ bool ZERNStageForwardTransparent::Setup(ZEGRContext* Context)
 	if (!ZERNStageForward::Setup(Context))
 		return false;
 
-	//Context->SetComputeRenderState(TiledForwardComputeRenderState);
-	//ZEGRBuffer* TileLightStructuredBufferPointer = TileLightStructuredBuffer;
-	//Context->SetRWBuffers(0, 1, &TileLightStructuredBufferPointer);
-	//Context->SetTexture(ZEGR_ST_COMPUTE, 4, DepthTexture);
-	//
-	//ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
-	//ZEUInt TileCountY = (AccumulationTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
-	//
-	//Context->Dispatch(TileCountX, TileCountY, 1);
-
-	//Context->SetBuffer(ZEGR_ST_PIXEL, 16, TileLightStructuredBuffer);
-
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 10, FogConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 12, FogConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 
 	return true;

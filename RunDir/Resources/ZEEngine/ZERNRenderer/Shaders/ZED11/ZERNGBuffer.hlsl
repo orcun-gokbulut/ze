@@ -44,17 +44,19 @@
 #endif
 
 #ifdef MSAA_ENABLED
-	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer0		: register(t0);
-	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer1		: register(t1);
-	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer2		: register(t2);
-	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer3		: register(t3);
-	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_DepthBuffer	: register(t4);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer0			: register(t0);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer1			: register(t1);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer2			: register(t2);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer3			: register(t3);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_DepthBuffer		: register(t4);
+	Texture2DMS<uint2, SAMPLE_COUNT>	ZERNGBuffer_StencilBuffer	: register(t5);
 #else
-	Texture2D<float3>					ZERNGBuffer_Buffer0		: register(t0);
-	Texture2D<float4>					ZERNGBuffer_Buffer1		: register(t1);
-	Texture2D<float4>					ZERNGBuffer_Buffer2		: register(t2);
-	Texture2D<float4>					ZERNGBuffer_Buffer3		: register(t3);
-	Texture2D<float>					ZERNGBuffer_DepthBuffer	: register(t4);
+	Texture2D<float3>					ZERNGBuffer_Buffer0			: register(t0);
+	Texture2D<float4>					ZERNGBuffer_Buffer1			: register(t1);
+	Texture2D<float4>					ZERNGBuffer_Buffer2			: register(t2);
+	Texture2D<float4>					ZERNGBuffer_Buffer3			: register(t3);
+	Texture2D<float>					ZERNGBuffer_DepthBuffer		: register(t4);
+	Texture2D<uint2>					ZERNGBuffer_StencilBuffer	: register(t5);
 #endif
 
 struct ZERNGBuffer
@@ -92,6 +94,18 @@ float ZERNGBuffer_GetDepth(float2 ScreenPos, float SampleIndex = 0)
 		return ZERNGBuffer_DepthBuffer.Load(ScreenPos, SampleIndex).x;
 	#else
 		return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos, 0)).x;
+	#endif
+}
+
+// STENCIL
+///////////////////////////////////////////////////////////////////////////////
+
+uint ZERNGBuffer_GetStencil(float2 ScreenPos, float SampleIndex = 0)
+{
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_StencilBuffer.Load(ScreenPos, SampleIndex).y;
+	#else
+		return ZERNGBuffer_StencilBuffer.Load(int3(ScreenPos, 0)).y;
 	#endif
 }
 

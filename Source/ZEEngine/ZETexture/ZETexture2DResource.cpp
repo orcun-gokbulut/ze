@@ -257,9 +257,6 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	ZETextureLevel& TextureLevel = TextureData.GetSurfaces()[0].GetLevels()[0];
 	TextureResource->Texture->Update(TextureLevel.GetData(), TextureLevel.GetPitch());
 
-	if (FinalOptions.MaximumMipmapLevel > 1)
-		ZEGRGraphicsModule::GetInstance()->GetMainContext()->GenerateMipMaps(TextureResource->Texture);
-
 	// Set Other Variables
 	TextureResource->SetFileName(ResourceFile->GetPath());
 	TextureResource->Cached = false;
