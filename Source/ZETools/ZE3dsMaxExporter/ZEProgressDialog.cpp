@@ -80,7 +80,7 @@ ZEProgressDialog::ZEProgressDialog()
 	CurrentTask = NULL;
 	SignalHandler = new ZEProgressDialogSignalHandler(this, this->Dialog);
 
-	ZEError::GetInstance()->SetCallback(NULL);
+	ZEError::GetInstance()->SetCallback(ZEErrorCallback());
 }
 
 ZEProgressDialog::~ZEProgressDialog()

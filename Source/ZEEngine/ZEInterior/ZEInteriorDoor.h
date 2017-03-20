@@ -41,8 +41,8 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEGraphics/ZEGRCanvas.h"
 
-ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+ZEMT_FORWARD_DECLARE(ZEInterior);
+ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
 
 class ZERNCommand;
 struct ZEInteriorResourceDoor;

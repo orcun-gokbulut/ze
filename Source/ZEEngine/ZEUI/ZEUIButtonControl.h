@@ -39,7 +39,7 @@
 
 #include "ZEUIFrameControl.h"
 
-ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
+ZEMT_FORWARD_DECLARE(ZEUILabel);
 
 class ZEUIButtonControl : public ZEUIFrameControl
 {

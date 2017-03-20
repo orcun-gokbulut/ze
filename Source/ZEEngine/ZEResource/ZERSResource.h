@@ -59,7 +59,7 @@ class ZERSResourceIdentifier
 		virtual ZEString						ToString() const;
 };
 
-class ZERSResource : public ZEObject, public ZEReferenceCounted
+class ZERSResource : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERSResource)

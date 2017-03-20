@@ -41,9 +41,9 @@
 #include "ZEMath/ZEMath.h"
 
 
-ZETestSuite(Rectangle3D)
+ZE_TEST(Rectangle3D)
 {
-	ZETest("RECT3D_Constructor")
+	ZE_TEST_ITEM("RECT3D_Constructor")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(4.0f, 5.0f, 6.0f);
@@ -52,13 +52,13 @@ ZETestSuite(Rectangle3D)
 		
 		ZERectangle3D R(A, B, C, D);
 
-		ZETestCheckEqual(R.P1, A);
-		ZETestCheckEqual(R.P2, B);
-		ZETestCheckEqual(R.P3, C);
-		ZETestCheckEqual(R.P4, D);
+		ZE_TEST_CHECK_EQUAL(R.P1, A);
+		ZE_TEST_CHECK_EQUAL(R.P2, B);
+		ZE_TEST_CHECK_EQUAL(R.P3, C);
+		ZE_TEST_CHECK_EQUAL(R.P4, D);
 	}
 
-	ZETest("RECT3D_GetPlane")
+	ZE_TEST_ITEM("RECT3D_GetPlane")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 B(3.0f, 4.0f, 6.0f);
@@ -70,11 +70,11 @@ ZETestSuite(Rectangle3D)
 		ZEPlane P ;
 		R.GetPlane(P);
 
-		ZETestCheckEqual(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
-		ZETestCheckEqual(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
+		ZE_TEST_CHECK_EQUAL(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
+		ZE_TEST_CHECK_EQUAL(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
 	}
 
-	ZETest("RECT3D_GetPoint")
+	ZE_TEST_ITEM("RECT3D_GetPoint")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 B(3.0f, 4.0f, 6.0f);
@@ -88,9 +88,9 @@ ZETestSuite(Rectangle3D)
 		ZEVector3 P3 = R.GetPoint(2);
 		ZEVector3 P4 = R.GetPoint(3);
 
-		ZETestCheckEqual(A, P1);
-		ZETestCheckEqual(B, P2);
-		ZETestCheckEqual(C, P3);
-		ZETestCheckEqual(D, P4);
+		ZE_TEST_CHECK_EQUAL(A, P1);
+		ZE_TEST_CHECK_EQUAL(B, P2);
+		ZE_TEST_CHECK_EQUAL(C, P3);
+		ZE_TEST_CHECK_EQUAL(D, P4);
 	}
 }*/

@@ -35,7 +35,7 @@
 
 #include "ZEDEditorCore.h"
 
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZECore/ZESystemMessageManager.h"
@@ -51,17 +51,17 @@ extern HINSTANCE ApplicationInstance;
 
 void ZEDEditorCore::LoadClasses()
 {
-	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
-	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator();
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
 	#include "../ZEMetaRegister.h"
-	#undef ZE_META_REGISTER_ENUM
-	#undef ZE_META_REGISTER_CLASS
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 
-	#define ZE_META_REGISTER_ENUM(Name) ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
-	#define ZE_META_REGISTER_CLASS(Name) ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "../ZEMetaRegister.h"
-	#undef ZE_META_REGISTER_ENUM
-	#undef ZE_META_REGISTER_CLASS
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 }
 
 bool ZEDEditorCore::InitializeInternal()

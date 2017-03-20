@@ -101,6 +101,6 @@ class ZEATSkyBox : public ZEEntity
 
 		static ZEATSkyBox*					CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
-ZE_META_ATTRIBUTE(ZEDEditor.EntityWrapper3D.DrawBoundingBox, false);
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false)
+ZEMT_ATTRIBUTE(ZEDEditor.EntityWrapper3D.DrawBoundingBox, false);

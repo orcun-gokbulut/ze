@@ -44,4 +44,4 @@ ze_add_source(ZEMain.cpp					Sources)
 ze_add_executable(TARGET ZEFileCompiler 
 	CONSOLE 
 	SOURCES ${Sources} 
-	LIBS ZEFoundation)
+	LIBS ZEFoundationBase)

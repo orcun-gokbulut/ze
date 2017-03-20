@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETimeCounter.h"
+
 #include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
@@ -47,7 +48,7 @@
     #include <time.h>
 #endif
 
-#include <time.h>
+ZEUInt64 ZETimeCounter::Frequency = 0;
 
 static inline ZEUInt64 GetClock()
 {
@@ -86,42 +87,87 @@ static inline ZEUInt64 GetFreq()
     #endif
 }
 
-ZEUInt64 ZETimeCounter::GetTime()
+void ZETimeCounter::UpdateAcumulatedTime() const
 {
-    if (Started)
-        EndTime = GetClock();
-
-    return (EndTime - StartTime) / (Frequency / 1000000);
+	ZEUInt64 CurrentTime = GetClock();
+	AcumulatedTime += CurrentTime - LastMeasuredTime;
+	LastMeasuredTime = CurrentTime;
 }
 
-void ZETimeCounter::SetTime(ZEUInt64 Microseconds)
+ZETimeCounterState ZETimeCounter::GetState() const
 {
-    StartTime = Microseconds * Frequency / (ZEUInt64)1000000;
+	return State;
 }
 
-void ZETimeCounter::Reset()
+double ZETimeCounter::GetTimeSeconds() const
 {
-	StartTime = 0;
-	EndTime = 0;
-    Frequency = 1000000;
+	if (State == ZE_TCS_RUNNING)
+		UpdateAcumulatedTime();
+
+	return (double)AcumulatedTime / (double)Frequency;
+}
+
+double ZETimeCounter::GetTimeMilliseconds() const
+{
+	if (State == ZE_TCS_RUNNING)
+		UpdateAcumulatedTime();
+
+	return ((double)AcumulatedTime * 1000.0) / (double)Frequency;
+}
+
+ZEUInt64 ZETimeCounter::GetTimeMicroseconds() const
+{
+    if (State == ZE_TCS_RUNNING)
+        UpdateAcumulatedTime();
+
+	return (AcumulatedTime * 1000000ull) / Frequency;
+}
+
+ZEUInt64 ZETimeCounter::GetTimeNanoSeconds() const
+{
+	if (State == ZE_TCS_RUNNING)
+		UpdateAcumulatedTime();
+
+	return (AcumulatedTime * 1000ull) / Frequency;
 }
 
 void ZETimeCounter::Start()
 {
-    Reset();
-    Frequency = GetFreq();
-    StartTime = GetClock();
-    Started = true;
+    if (State == ZE_TCS_RUNNING)
+		return;
+	else if (State == ZE_TCS_STOPPED)
+		Reset();
+
+	State = ZE_TCS_RUNNING;
+	LastMeasuredTime = GetClock();
+}
+
+void ZETimeCounter::Pause()
+{
+	if (State != ZE_TCS_RUNNING)
+		return;
+
+	UpdateAcumulatedTime();
+	State = ZE_TCS_PAUSED;
 }
 
 void ZETimeCounter::Stop()
 {
-    EndTime = GetClock();
-    Started = false;
+	UpdateAcumulatedTime();
+	State = ZE_TCS_STOPPED;
+}
+
+void ZETimeCounter::Reset()
+{
+	State = ZE_TCS_STOPPED;
+	LastMeasuredTime = 0;
+	AcumulatedTime = 0;
 }
 
 ZETimeCounter::ZETimeCounter()
 {
-    Started = false;
+	if (Frequency == 0)
+		Frequency = GetFreq();
+
 	Reset();
 }

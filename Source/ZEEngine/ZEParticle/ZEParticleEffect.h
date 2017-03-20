@@ -96,4 +96,4 @@ class ZEParticleEffect : public ZEEntity
 		static ZEParticleEffect*			CreateInstance();
 
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEParticle.png");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEParticle.png");

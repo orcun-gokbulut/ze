@@ -53,7 +53,7 @@ class ZEGRBuffer;
 class ZERayCastParameters;
 class ZERayCastReport;
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
 
 class ZEModelMesh : public ZEObject, public ZEDestroyable
 {
@@ -154,22 +154,22 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		const ZEVector3&						GetScale() const;
 
 		void									SetModelPosition(const ZEVector3& ModelPosition);
-		const ZEVector3							GetModelPosition() const;
+		ZEVector3								GetModelPosition() const;
 
 		void									SetModelRotation(const ZEQuaternion& ModelRotation);
-		const ZEQuaternion						GetModelRotation() const;
+		ZEQuaternion							GetModelRotation() const;
 
 		void									SetModelScale(const ZEVector3& ModelScale);
-		const ZEVector3							GetModelScale() const;
+		ZEVector3								GetModelScale() const;
 
 		void									SetWorldPosition(const ZEVector3& WorldPosition);
-		const ZEVector3							GetWorldPosition() const;
+		ZEVector3								GetWorldPosition() const;
 
 		void									SetWorldRotation(const ZEQuaternion& WorldRotation);
-		const ZEQuaternion						GetWorldRotation() const;
+		ZEQuaternion							GetWorldRotation() const;
 
 		void									SetWorldScale(const ZEVector3& WorldScale);
-		const ZEVector3							GetWorldScale() const;
+		ZEVector3								GetWorldScale() const;
 
 		void									SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType					GetAnimationType();

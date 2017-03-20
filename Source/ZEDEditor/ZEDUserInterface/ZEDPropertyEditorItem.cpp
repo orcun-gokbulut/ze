@@ -69,7 +69,7 @@ ZEDPropertyEditor* ZEDPropertyEditorItem::GetPropertyEditor() const
 	return static_cast<ZEDPropertyEditor*>(treeWidget());
 }
 
-void ZEDPropertyEditorItem::SetProperty(const ZEProperty* Property)
+void ZEDPropertyEditorItem::SetProperty(const ZEMTProperty* Property)
 {
 	if (this->Property == Property)
 		return;
@@ -83,7 +83,7 @@ void ZEDPropertyEditorItem::SetProperty(const ZEProperty* Property)
 	}
 }
 
-const ZEProperty* ZEDPropertyEditorItem::GetProperty() const
+const ZEMTProperty* ZEDPropertyEditorItem::GetProperty() const
 {
 	return Property;
 }

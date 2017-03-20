@@ -78,7 +78,7 @@ ZEDPropertyOperation::ZEDPropertyOperation()
 	Property = NULL;
 }
 
-ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEVariant& Value)
+ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEMTProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = new ZEDPropertyOperation();
 	Operation->Property = Property;
@@ -100,7 +100,7 @@ ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrappe
 	return Operation;
 }
 
-ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
+ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values)
 {
 	ZEDPropertyOperation* Operation = new ZEDPropertyOperation();
 	Operation->Property = Property;

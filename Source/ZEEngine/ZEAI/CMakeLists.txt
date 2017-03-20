@@ -83,5 +83,4 @@ ze_add_library(TARGET ZEAI
 	
 ze_add_test(TARGET ZEAITests 
 	SOURCES ${Tests}
-	ZEMC ${ZEMC}
 	TEST_TARGET ZEAI)

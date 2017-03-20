@@ -44,335 +44,335 @@
 #include "ZETest/ZETestCheck.h"
 #include "ZEError.h"
 
-ZETestSuite(ZEEndian)
+ZE_TEST(ZEEndian)
 {
-	ZETest("static ZE_FORCE_INLINE ZEEndianness GetEndianness()")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEEndianness GetEndianness()")
 	{
 		ZEEndianness Endianness = ZEEndian::GetEndianness();
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Endianness, ZE_ET_LITTLE);
+		ZE_TEST_CHECK_EQUAL(Endianness, ZE_ET_LITTLE);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Endianness, ZE_ET_BIG);
+		//ZE_TEST_CHECK_EQUAL(Endianness, ZE_ET_BIG);
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEType Uni(ZEType Value, ZEEndianness Endianness)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEType Uni(ZEType Value, ZEEndianness Endianness)")
 	{
 		ZEInt16 Value = 0x0123;
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
 		ZEInt16 Result = ZEEndian::Uni(Value, ZE_ET_BIG);
-		ZETestCheckEqual(Result, 0x2301);
+		ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 
 		Result = ZEEndian::Uni(Value, ZE_ET_LITTLE);
-		ZETestCheckEqual(Result, 0x0123);
+		ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
 // 		ZEInt16 Result = ZEEndian::Uni(Value, ZE_ET_BIG);
-// 		ZETestCheckEqual(Result, 0x0123);
+// 		ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 // 
 // 		Result = ZEEndian::Uni(Value, ZE_ET_LITTLE);
-// 		ZETestCheckEqual(Result, 0x2301);
+// 		ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt16 Little(ZEUInt16 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt16 Little(ZEUInt16 Value)")
 	{
 		ZEUInt16 Value = 0x0123;
 
 		ZEUInt16 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x0123);
+		ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x2301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt16 NegValue = -0x0123;
 			ZEUInt16 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 0xFEDD);
+			ZE_TEST_CHECK_EQUAL(Res, 0xFEDD);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 0xDDFE);
+			//ZE_TEST_CHECK_EQUAL(Res, 0xDDFE);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt32 Little(ZEUInt32 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt32 Little(ZEUInt32 Value)")
 	{
 		ZEUInt32 Value = 0x01234567;
 
 		ZEUInt32 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x01234567);
+		ZE_TEST_CHECK_EQUAL(Result, 0x01234567);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x67452301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x67452301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt32 NegValue = -0x01234567;
 			ZEUInt32 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 0xFEDCBA99);
+			ZE_TEST_CHECK_EQUAL(Res, 0xFEDCBA99);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 0x99BADCFE);
+			//ZE_TEST_CHECK_EQUAL(Res, 0x99BADCFE);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt64 Little(ZEUInt64 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt64 Little(ZEUInt64 Value)")
 	{
 		ZEUInt64 Value = 0x0123456789ABCDEF;
 
 		ZEUInt64 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x0123456789ABCDEF);
+		ZE_TEST_CHECK_EQUAL(Result, 0x0123456789ABCDEF);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0xEFCDAB8967452301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0xEFCDAB8967452301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt64 NegValue = -0x0123456789ABCDEF;
 			ZEUInt64 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 18364758544493064721);
+			ZE_TEST_CHECK_EQUAL(Res, 18364758544493064721);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 1239145715825564926);
+			//ZE_TEST_CHECK_EQUAL(Res, 1239145715825564926);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt16 Little(ZEInt16 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt16 Little(ZEInt16 Value)")
 	{
 		ZEInt16 Value = 0x0123;
 
 		ZEInt16 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x0123);
+		ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x2301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt16 NegValue = -0x0123;
 			ZEInt16 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, -0x0123);
+			ZE_TEST_CHECK_EQUAL(Res, -0x0123);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, -0x2202);
+			//ZE_TEST_CHECK_EQUAL(Res, -0x2202);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt32 Little(ZEInt32 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt32 Little(ZEInt32 Value)")
 	{
 		ZEInt32 Value = 0x01234567;
 
 		ZEInt32 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x01234567);
+		ZE_TEST_CHECK_EQUAL(Result, 0x01234567);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x67452301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x67452301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt32 NegValue = -0x01234567;
 			ZEUInt32 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, -0x01234567);
+			ZE_TEST_CHECK_EQUAL(Res, -0x01234567);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, -0x66452302);
+			//ZE_TEST_CHECK_EQUAL(Res, -0x66452302);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt64 Little(ZEInt64 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt64 Little(ZEInt64 Value)")
 	{
 		ZEInt64 Value = 0x0123456789ABCDEF;
 
 		ZEInt64 Result = ZEEndian::Little(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x0123456789ABCDEF);
+		ZE_TEST_CHECK_EQUAL(Result, 0x0123456789ABCDEF);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0xEFCDAB8967452301);
+		//ZE_TEST_CHECK_EQUAL(Result, 0xEFCDAB8967452301);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt64 NegValue = -0x0123456789ABCDEF;
 			ZEInt64 Res = ZEEndian::Little(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, -0x0123456789ABCDEF);
+			ZE_TEST_CHECK_EQUAL(Res, -0x0123456789ABCDEF);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 1239145715825564926);
+			//ZE_TEST_CHECK_EQUAL(Res, 1239145715825564926);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt16 Big(ZEUInt16 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt16 Big(ZEUInt16 Value)")
 	{
 		ZEUInt16 Value = 0x0123;
 
 		ZEUInt16 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x2301);
+		ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x0123);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt16 NegValue = -0x0123;
 			ZEUInt16 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 0xDDFE);
+			ZE_TEST_CHECK_EQUAL(Res, 0xDDFE);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 0xFEDD);
+			//ZE_TEST_CHECK_EQUAL(Res, 0xFEDD);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt32 Big(ZEUInt32 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt32 Big(ZEUInt32 Value)")
 	{
 		ZEUInt32 Value = 0x01234567;
 
 		ZEUInt32 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x67452301);
+		ZE_TEST_CHECK_EQUAL(Result, 0x67452301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x01234567);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x01234567);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt32 NegValue = -0x01234567;
 			ZEUInt32 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 0x99BADCFE);
+			ZE_TEST_CHECK_EQUAL(Res, 0x99BADCFE);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 0xFEDCBA99);
+			//ZE_TEST_CHECK_EQUAL(Res, 0xFEDCBA99);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEUInt64 Big(ZEUInt64 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEUInt64 Big(ZEUInt64 Value)")
 	{
 		ZEUInt64 Value = 0x0123456789ABCDEF;
 
 		ZEUInt64 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0xEFCDAB8967452301);
+		ZE_TEST_CHECK_EQUAL(Result, 0xEFCDAB8967452301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x0123456789ABCDEF);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x0123456789ABCDEF);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEUInt64 NegValue = -0x0123456789ABCDEF;
 			ZEUInt64 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 1239145715825564926);
+			ZE_TEST_CHECK_EQUAL(Res, 1239145715825564926);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, 18364758544493064721);
+			//ZE_TEST_CHECK_EQUAL(Res, 18364758544493064721);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt16 Big(ZEInt16 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt16 Big(ZEInt16 Value)")
 	{
 		ZEInt16 Value = 0x0123;
 
 		ZEInt16 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x2301);
+		ZE_TEST_CHECK_EQUAL(Result, 0x2301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x0123);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x0123);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt16 NegValue = -0x0123;
 			ZEInt16 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, -0x2202);
+			ZE_TEST_CHECK_EQUAL(Res, -0x2202);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, -0x0123);
+			//ZE_TEST_CHECK_EQUAL(Res, -0x0123);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt32 Big(ZEInt32 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt32 Big(ZEInt32 Value)")
 	{
 		ZEInt32 Value = 0x01234567;
 
 		ZEInt32 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0x67452301);
+		ZE_TEST_CHECK_EQUAL(Result, 0x67452301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x01234567);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x01234567);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt32 NegValue = -0x01234567;
 			ZEInt32 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, -0x66452302);
+			ZE_TEST_CHECK_EQUAL(Res, -0x66452302);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, -0x01234567);
+			//ZE_TEST_CHECK_EQUAL(Res, -0x01234567);
 		}
 	}
 
-	ZETest("static ZE_FORCE_INLINE ZEInt64 Big(ZEInt64 Value)")
+	ZE_TEST_ITEM("static ZE_FORCE_INLINE ZEInt64 Big(ZEInt64 Value)")
 	{
 		ZEInt64 Value = 0x0123456789ABCDEF;
 
 		ZEInt64 Result = ZEEndian::Big(Value);
 
 		//ZE_PLATFORM_ENDIANNESS_LITTLE
-		ZETestCheckEqual(Result, 0xEFCDAB8967452301);
+		ZE_TEST_CHECK_EQUAL(Result, 0xEFCDAB8967452301);
 
 		//ZE_PLATFORM_ENDIANNESS_BIG
-		//ZETestCheckEqual(Result, 0x0123456789ABCDEF);
+		//ZE_TEST_CHECK_EQUAL(Result, 0x0123456789ABCDEF);
 
-		ZETestCase("for negative value")
+		ZE_TEST_CASE("for negative value")
 		{
 			ZEInt64 NegValue = -0x0123456789ABCDEF;
 			ZEInt64 Res = ZEEndian::Big(NegValue);
 
 			//ZE_PLATFORM_ENDIANNESS_LITTLE
-			ZETestCheckEqual(Res, 1239145715825564926);
+			ZE_TEST_CHECK_EQUAL(Res, 1239145715825564926);
 
 			//ZE_PLATFORM_ENDIANNESS_BIG
-			//ZETestCheckEqual(Res, -0x0123456789ABCDEF);
+			//ZE_TEST_CHECK_EQUAL(Res, -0x0123456789ABCDEF);
 		}
 	}
 }

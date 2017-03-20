@@ -91,61 +91,61 @@ void TestFunction5(ZEThread* Thread, void* Parameter)
 }
 
 
-ZETestSuite(ZEThread)
+ZE_TEST(ZEThread)
 {
-	ZETest("void ZEThread::SetName(const ZEString& Name)")
+	ZE_TEST_ITEM("void ZEThread::SetName(const ZEString& Name)")
 	{
 		ZEThread Thread;
 
 		Thread.SetName("Thread");
-		ZETestCheckEqual(Thread.GetName(), "Thread");
+		ZE_TEST_CHECK_EQUAL(Thread.GetName(), "Thread");
 	}
 
-	ZETest("const ZEString& ZEThread::GetName()")
+	ZE_TEST_ITEM("const ZEString& ZEThread::GetName()")
 	{
 		ZEThread Thread;
 
 		Thread.SetName("Thread");
 
 		const ZEString Name = Thread.GetName();
-		ZETestCheckEqual(Name, "Thread");
+		ZE_TEST_CHECK_EQUAL(Name, "Thread");
 	}
 
-	ZETest("ZEThreadStatus ZEThread::GetStatus()")
+	ZE_TEST_ITEM("ZEThreadStatus ZEThread::GetStatus()")
 	{
 		ZEThread Thread;
 
 		ZEThreadStatus Status = Thread.GetStatus();
-		ZETestCheckEqual(Status, ZE_TS_NONE);
+		ZE_TEST_CHECK_EQUAL(Status, ZE_TS_NONE);
 	}
 
-	ZETest("bool ZEThread::IsAlive()")
+	ZE_TEST_ITEM("bool ZEThread::IsAlive()")
 	{
 		ZEThread Thread;
 
 		bool Alive = Thread.IsAlive();
-		ZETestCheck(!Alive);
+		ZE_TEST_CHECK_ERROR(!Alive);
 	}
 
-	ZETest("void ZEThread::SetParameter(void* Parameter)")
+	ZE_TEST_ITEM("void ZEThread::SetParameter(void* Parameter)")
 	{
 		ZEThread Thread;
 
 		Thread.SetParameter("a");
-		ZETestCheckEqual(Thread.GetParameter(), "a");
+		ZE_TEST_CHECK_EQUAL(Thread.GetParameter(), "a");
 	}
 
-	ZETest("void* ZEThread::GetParameter()")
+	ZE_TEST_ITEM("void* ZEThread::GetParameter()")
 	{
 		ZEThread Thread;
 
 		Thread.SetParameter("a");
 
 		void* Parameter = Thread.GetParameter();
-		ZETestCheckEqual(Parameter, "a");
+		ZE_TEST_CHECK_EQUAL(Parameter, "a");
 	}
 
-	ZETest("void ZEThread::SetFunction(ZEThreadFunction Function)")
+	ZE_TEST_ITEM("void ZEThread::SetFunction(ZEThreadFunction Function)")
 	{
 		ZEThread Thread;
 
@@ -153,7 +153,7 @@ ZETestSuite(ZEThread)
 		ZEThreadFunction Function = Thread.GetFunction();
 	}
 
-	ZETest("ZEThreadFunction& ZEThread::GetFunction()")
+	ZE_TEST_ITEM("ZEThreadFunction& ZEThread::GetFunction()")
 	{
 		ZEThread Thread;
 
@@ -162,7 +162,7 @@ ZETestSuite(ZEThread)
 		ZEThreadFunction Function = Thread.GetFunction();
 	}
 
-	ZETest("void ZEThread::Wait()")
+	ZE_TEST_ITEM("void ZEThread::Wait()")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -189,7 +189,7 @@ ZETestSuite(ZEThread)
 		Sleep(3000);
 	}
 
-	ZETest("run threads which call Exit() and call ZEThread::Wait(ZEIntMilliseconds) through threads")
+	ZE_TEST_ITEM("run threads which call Exit() and call ZEThread::Wait(ZEIntMilliseconds) through threads")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -204,21 +204,21 @@ ZETestSuite(ZEThread)
 		Thread2.Run(NULL);
 
 		bool Waiting = Thread1.Wait(300);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
 		Thread3.Run(NULL);
 
 		Waiting = Thread1.Wait(300);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 		Waiting = Thread2.Wait(300);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		Sleep(1000);
 	}
 
-	ZETest("Wait(ZEIntMilliseconds)")
+	ZE_TEST_ITEM("Wait(ZEIntMilliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -239,7 +239,7 @@ ZETestSuite(ZEThread)
 
 		bool Waiting = Thread1.Wait(1000); //false WaitForSingleObject returns 258
 		Waiting = Thread2.Wait(1000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -259,7 +259,7 @@ ZETestSuite(ZEThread)
 		Sleep(2000);
 	}
 
-	ZETest("run threads with ZEThread::Sleep(ZEUInt Milliseconds), ZEThread::Exit() and ZEThread::Exit() respectively")
+	ZE_TEST_ITEM("run threads with ZEThread::Sleep(ZEUInt Milliseconds), ZEThread::Exit() and ZEThread::Exit() respectively")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -292,7 +292,7 @@ ZETestSuite(ZEThread)
 		Sleep(1000);
 	}
 
-	ZETest("set different functions which include Sleep(ZEUInt Milliseconds), Exit() functions individually")
+	ZE_TEST_ITEM("set different functions which include Sleep(ZEUInt Milliseconds), Exit() functions individually")
 	{
 		ZEThreadStatus Status1;
 		ZEThreadStatus Status2;
@@ -312,7 +312,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //none
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -323,7 +323,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //true		
 		Status1 = Thread1.GetStatus(); //running
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 		
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction5>());
@@ -336,7 +336,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //done
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread4.SetName("Thread4");
 		Thread4.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -351,12 +351,12 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //done
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Sleep(3000);
 	}
 
-	ZETest("set function which call Sleep(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("set function which call Sleep(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -385,7 +385,7 @@ ZETestSuite(ZEThread)
 		Sleep(3000);
 	}
 
-	ZETest("set function which includes ControlPoint(), then call Wait(ZEUInt Miilliseconds) through a thread")
+	ZE_TEST_ITEM("set function which includes ControlPoint(), then call Wait(ZEUInt Miilliseconds) through a thread")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -428,7 +428,7 @@ ZETestSuite(ZEThread)
 		Sleep(1000);
 	}
 
-	ZETest("set different functions to different threads")
+	ZE_TEST_ITEM("set different functions to different threads")
 	{
 		ZEThreadStatus Status1;
 		ZEThreadStatus Status2;
@@ -447,7 +447,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //none
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -458,7 +458,7 @@ ZETestSuite(ZEThread)
 		Status2 = Thread2.GetStatus(); //none
 		Status1 = Thread1.GetStatus(); // running
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction3>());
@@ -471,12 +471,12 @@ ZETestSuite(ZEThread)
 		Status2 = Thread2.GetStatus(); //running
 		Status1 = Thread1.GetStatus(); //running
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Sleep(1000);
 	}
 
-	ZETest("set function which calls Exit()")
+	ZE_TEST_ITEM("set function which calls Exit()")
 	{
 		ZEThreadStatus Status1;
 		ZEThreadStatus Status2;
@@ -495,7 +495,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //none
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -506,7 +506,7 @@ ZETestSuite(ZEThread)
 		Status2 = Thread2.GetStatus(); //none
 		Status1 = Thread1.GetStatus(); //running
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -519,12 +519,12 @@ ZETestSuite(ZEThread)
 		Status3 = Thread3.GetStatus(); //none
 		Status2 = Thread2.GetStatus(); //done
 		Status1 = Thread1.GetStatus(); //done
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Sleep(1000);
 	}
 
-	ZETest("set function which calls Exit() without ControlPoint()")
+	ZE_TEST_ITEM("set function which calls Exit() without ControlPoint()")
 	{
 		ZEThreadStatus Status1;
 		ZEThreadStatus Status2;
@@ -543,7 +543,7 @@ ZETestSuite(ZEThread)
 		Alive = Thread1.IsAlive(); //false
 		Status1 = Thread1.GetStatus(); //none
 		Current = ZEThread::GetCurrentThread();
-		ZETestCheckEqual(Current, NULL);
+		ZE_TEST_CHECK_EQUAL(Current, NULL);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction2>());
@@ -570,7 +570,7 @@ ZETestSuite(ZEThread)
 		Sleep(1000);
 	}
 
-	ZETest("bool ZEThread::Wait(ZEUInt Milliseconds)")
+	ZE_TEST_ITEM("bool ZEThread::Wait(ZEUInt Milliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -582,10 +582,10 @@ ZETestSuite(ZEThread)
 		Thread1.Run(NULL);
 
 		bool Alive = Thread2.IsAlive();
-		ZETestCheck(!Alive);
+		ZE_TEST_CHECK_ERROR(!Alive);
 
 		bool Waiting = Thread2.Wait(1000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		Thread2.SetName("Thread2");
 		Thread2.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction4>());
@@ -615,7 +615,7 @@ ZETestSuite(ZEThread)
 
 		Sleep(1000);
 
-		ZETestCase("set function with ControlPoint() and Exit(), then call Wait(ZEUInt Milliseconds)")
+		ZE_TEST_CASE("set function with ControlPoint() and Exit(), then call Wait(ZEUInt Milliseconds)")
 		{
 			ZEThread ThreadA;
 			ZEThread ThreadB;
@@ -628,7 +628,7 @@ ZETestSuite(ZEThread)
 			ThreadB.SetName("ThreadB");
 
 			Waiting = ThreadB.Wait(1000);
-			ZETestCheck(!Waiting);
+			ZE_TEST_CHECK_ERROR(!Waiting);
 
 			ThreadB.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
 			ThreadB.Run(NULL);
@@ -641,7 +641,7 @@ ZETestSuite(ZEThread)
 			ThreadC.SetName("ThreadC");
 
 			Waiting = ThreadC.Wait(1000);
-			ZETestCheck(!Waiting);
+			ZE_TEST_CHECK_ERROR(!Waiting);
 			Waiting = ThreadA.Wait(1000);
 
 			ThreadC.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -658,7 +658,7 @@ ZETestSuite(ZEThread)
 		}
 	}
 
-	ZETest("set function with Sleep(ZEUInt Milliseconds), then call Wait(ZEUInt Milliseconds) through a thread")
+	ZE_TEST_ITEM("set function with Sleep(ZEUInt Milliseconds), then call Wait(ZEUInt Milliseconds) through a thread")
 	{
 		ZEThread ThreadA;
 		ZEThread ThreadB;
@@ -671,9 +671,9 @@ ZETestSuite(ZEThread)
 		ThreadB.SetName("ThreadB");
 
 		bool Alive = ThreadB.IsAlive();
-		ZETestCheck(!Alive);
+		ZE_TEST_CHECK_ERROR(!Alive);
 		bool Waiting = ThreadB.Wait(1000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		ThreadB.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction3>());
 		ThreadB.Run(NULL);
@@ -684,14 +684,14 @@ ZETestSuite(ZEThread)
 		ZEThreadStatus StatusB = ThreadB.GetStatus(); //none
 
 		Waiting = ThreadB.Wait(1000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		ThreadC.SetName("ThreadC");
 		
 		Alive = ThreadC.IsAlive();
-		ZETestCheck(!Alive);
+		ZE_TEST_CHECK_ERROR(!Alive);
 		Waiting = ThreadC.Wait(1000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		ThreadC.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction3>());
 		ThreadC.Run(NULL);
@@ -706,7 +706,7 @@ ZETestSuite(ZEThread)
 		Sleep(1000);
 	}
 
-	ZETest("Wait(ZEIntMilliseconds)")
+	ZE_TEST_ITEM("Wait(ZEIntMilliseconds)")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;
@@ -727,7 +727,7 @@ ZETestSuite(ZEThread)
 
 		bool Waiting = Thread1.Wait(3000); //false WaitForSingleObject returns 258
 		Waiting = Thread2.Wait(3000);
-		ZETestCheck(!Waiting);
+		ZE_TEST_CHECK_ERROR(!Waiting);
 
 		Thread3.SetName("Thread3");
 		Thread3.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<&TestFunction1>());
@@ -747,7 +747,7 @@ ZETestSuite(ZEThread)
 		Sleep(3000);
 	}
 
-	ZETest("set function which calls Exit() without ControlPoint(), then call ZEThread::Terminate() through a thread")
+	ZE_TEST_ITEM("set function which calls Exit() without ControlPoint(), then call ZEThread::Terminate() through a thread")
 	{
 		ZEThread Thread1;
 		ZEThread Thread2;

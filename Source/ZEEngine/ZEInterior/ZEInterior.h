@@ -37,7 +37,6 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLNode.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZERayCast.h"
 
@@ -53,9 +52,9 @@ class ZEViewVolume;
 class ZEViewFrustum;
 class ZEInteriorResource;
 
-ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorHelper, "ZEInteriorHelper.h");
+ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
+ZEMT_FORWARD_DECLARE(ZEInteriorDoor);
+ZEMT_FORWARD_DECLARE(ZEInteriorHelper);
 
 class ZEInterior : public ZEEntity
 {
@@ -108,4 +107,4 @@ class ZEInterior : public ZEEntity
 
 		static ZEInterior*						CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEInterior.png");
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEInterior.png");

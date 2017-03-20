@@ -35,14 +35,14 @@
 
 #pragma once
 
-#include "ZEMethodSignatureGenerator.h"
+#include "ZEMTMethodSignatureGenerator.h"
 #include "ZEEventDelegate.h"
 
 #include "ZEObject.h"
 
 #define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
 
-class ZEEventBase
+class ZEMTEventBase
 {
 	friend class ZEObject;
 	private:
@@ -51,14 +51,14 @@ class ZEEventBase
 		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
 
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
+		virtual const ZEMTMethodSignature&	GetSignature() const = 0;
 
 		void								SetSuppressed(bool Suppressed);
 		bool								GetSuppressed() const;
 
 		virtual void						DisconnectObject(ZEObject* Object) = 0;
 
-											ZEEventBase();
+											ZEMTEventBase();
 };
 
 template <typename TSignature> 

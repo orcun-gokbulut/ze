@@ -39,61 +39,61 @@
 #include "ZEFormatArgument.h"
 #include "ZEMath/ZEAngle.h"
 
-ZETestSuite(ZEFormatArgument)
+ZE_TEST(ZEFormatArgument)
 {
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt Argument, const char* ArgumentFormat)")
 	{
 		ZEInt Argument = -124;
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "d:-6");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "-124  ");
+		ZE_TEST_CHECK_ERROR(String == "-124  ");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt Argument, const char* ArgumentFormat)")
 	{
 		ZEUInt Argument = 48567;
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "d:+06");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "048567");
+		ZE_TEST_CHECK_ERROR(String == "048567");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEInt64 Argument, const char* ArgumentFormat)")
 	{
 		ZEInt64 Argument = 987654321;
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "x:016");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "000000003ade68b1");
+		ZE_TEST_CHECK_ERROR(String == "000000003ade68b1");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEUInt64 Argument, const char* ArgumentFormat)")
 	{
 		ZEUInt64 Argument = 26578319;
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "X:-16");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "1958D8F         ");
+		ZE_TEST_CHECK_ERROR(String == "1958D8F         ");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, float Argument, const char* ArgumentFormat)")
 	{
 		float ArgumentPos = 10.236;
 		float ArgumentNeg = -10.236;
@@ -101,93 +101,93 @@ ZETestSuite(ZEFormatArgument)
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, ArgumentPos, "5.");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "   10");
+		ZE_TEST_CHECK_ERROR(String == "   10");
 
 		Result = ZEFormatArgument::Format(Output, ArgumentNeg, "5.");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "  -10");
+		ZE_TEST_CHECK_ERROR(String == "  -10");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat)")
 	{
 		bool Argument = true;
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "false");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "false");
+		ZE_TEST_CHECK_ERROR(String == "false");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat)")
 	{
 		ZEVector2 Argument(3.8f, -5.7f);
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, ".");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<4, -6>");
+		ZE_TEST_CHECK_ERROR(String == "<4, -6>");
 
-		ZETestCase("ArgumentFormat ':' ")
+		ZE_TEST_CASE("ArgumentFormat ':' ")
 		{
 			Result = ZEFormatArgument::Format(Output, Argument, ":");
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 			Output.AppendEnd();
 			Output.Output(String);
-			ZETestCheck(String == "<3.800, -5.700>");
+			ZE_TEST_CHECK_ERROR(String == "<3.800, -5.700>");
 		}
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat)")
 	{
 		ZEVector3 Argument(2.1f, 6.9f, -1.6f);
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "+7.2");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<  +2.10,   +6.90,   -1.60>");
+		ZE_TEST_CHECK_ERROR(String == "<  +2.10,   +6.90,   -1.60>");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat)")
 	{
 		ZEVector4 Argument(-1.3f, 3.6f, 3.0f, -5.7f);
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "-5.");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<-1   , 4    , 3    , -6   >");
+		ZE_TEST_CHECK_ERROR(String == "<-1   , 4    , 3    , -6   >");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat)")
 	{
 		ZEQuaternion Argument(ZE_PI_4, ZEVector3::UnitX);
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "+-06.1");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<+0.4  , +0.0  , +0.0  , +0.9  >");
+		ZE_TEST_CHECK_ERROR(String == "<+0.4  , +0.0  , +0.0  , +0.9  >");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat)")
 	{
 		ZEMatrix3x3 Argument(34.0f, 21.0f, -13.0f,
 			8.0f, -5.0f, 3.0f,
@@ -196,13 +196,13 @@ ZETestSuite(ZEFormatArgument)
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "08.1");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<000034.0, 000021.0, -00013.0, 000008.0, -00005.0, 000003.0, 000002.0, 000001.0, -00001.0>");
+		ZE_TEST_CHECK_ERROR(String == "<000034.0, 000021.0, -00013.0, 000008.0, -00005.0, 000003.0, 000002.0, 000001.0, -00001.0>");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument, const char* ArgumentFormat)")
 	{
 		ZEMatrix4x4 Argument(-35.0f, 23.0f, 16.0f, 12.0f,
 			10.0f, 9.0f, 9.0f, -9.0f, 
@@ -212,79 +212,79 @@ ZETestSuite(ZEFormatArgument)
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "+05.");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "<-0035, +0023, +0016, +0012, +0010, +0009, +0009, -0009, +0010, +0001, -0002, +0003, +0004, -0005, +0006, +0007>");
+		ZE_TEST_CHECK_ERROR(String == "<-0035, +0023, +0016, +0012, +0010, +0009, +0009, -0009, +0010, +0001, -0002, +0003, +0004, -0005, +0006, +0007>");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat)")
 	{
 		ZEString Argument("String");
 		ZEString String;
 		ZEStringWriter Output;
 
 		bool Result = ZEFormatArgument::Format(Output, Argument, "test");
-		ZETestCheck(Result);
+		ZE_TEST_CHECK_ERROR(Result);
 		Output.AppendEnd();
 		Output.Output(String);
-		ZETestCheck(String == "String");
+		ZE_TEST_CHECK_ERROR(String == "String");
 	}
 
-	ZETest("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEObject* Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEObject* Argument, const char* ArgumentFormat)")
 	{
 
 	}
 
-	ZETest("bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat)")
+	ZE_TEST_ITEM("bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat)")
 	{
 		ZEStringWriter Output;
 		ZEVariant Argument;
 		ZEString String;
 		bool Result;
 
-		ZETestCase("for ZE_VRT_FLOAT")
+		ZE_TEST_CASE("for ZE_VRT_FLOAT")
 		{
 			Argument.SetFloat(3.7f);
 			
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "-+7.3");
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 			Output.AppendEnd();
 			Output.Output(String);
-			ZETestCheck(String == "+3.700 ");
+			ZE_TEST_CHECK_ERROR(String == "+3.700 ");
 		}
 
-		ZETestCase("for ZE_VRT_DOUBLE")
+		ZE_TEST_CASE("for ZE_VRT_DOUBLE")
 		{
 			Argument.SetDouble(3.7);
 
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "+.");
-			ZETestCheck(Result);
+			ZE_TEST_CHECK_ERROR(Result);
 			Output.AppendEnd();
 			Output.Output(String);
-			ZETestCheck(String == "+4");
+			ZE_TEST_CHECK_ERROR(String == "+4");
 		}
 
-		ZETestCase("Invalid ArgumentFormat for ZE_VRT_INTEGER_64")
+		ZE_TEST_CASE("Invalid ArgumentFormat for ZE_VRT_INTEGER_64")
 		{
 			Argument.SetInt64(6824610);
 
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "10");
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 			Output.AppendEnd();
 			Output.Output(String);
-			ZETestCheck(String == "");
+			ZE_TEST_CHECK_ERROR(String == "");
 		}
 
-		ZETestCase("Invalid ArgumentFormat for ZE_VRT_VECTOR2")
+		ZE_TEST_CASE("Invalid ArgumentFormat for ZE_VRT_VECTOR2")
 		{
 			Argument.SetVector2(ZEVector2(5.82, 11.3));
 
 			Result = ZEFormatArgument::FormatVariant(Output, Argument, "05d");
-			ZETestCheck(!Result);
+			ZE_TEST_CHECK_ERROR(!Result);
 			Output.AppendEnd();
 			Output.Output(String);
-			ZETestCheck(String == "");
+			ZE_TEST_CHECK_ERROR(String == "");
 		}
 	}
 }

@@ -39,7 +39,7 @@
 
 #include "ZEPointer/ZEHolder.h"
 
-ZE_META_FORWARD_DECLARE(ZEGRTexture, "ZEGraphics/ZETexture2D.h")
+ZEMT_FORWARD_DECLARE(ZEGRTexture);
 
 class ZETexture2DResource : public ZETextureResource
 {

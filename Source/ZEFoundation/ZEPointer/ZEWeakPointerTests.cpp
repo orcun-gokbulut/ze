@@ -37,67 +37,67 @@
 #include "ZEWeakPointer.h"
 #include "ZEPointerTestClass.h"
 
-ZETestSuite(ZEWeakPointer)
+ZE_TEST(ZEWeakPointer)
 {
-	ZETest("TestClassTest")
+	ZE_TEST_ITEM("TestClassTest")
 	{
 		ZETestReset();
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 
 		ZETestClass* A = new ZETestClass();
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 		delete A;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 
 		A = new ZETestClass();
 		ZETestClass* B = new ZETestClass();
-		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-		ZETestCheckInstanceCount(2);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(2);
 
 		delete A;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(1);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(1);
 		delete B;
-		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
-		ZETestCheckInstanceCount(0);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_DESTRUCTED);
+		ZE_TEST_CHECK_ERRORInstanceCount(0);
 	}
 
-	ZETest("DefaultConstructor")
+	ZE_TEST_ITEM("DefaultConstructor")
 	{
 		ZETestReset();
 
 		ZEWeakPointer<ZETestClass> WeakPointer1;
-		ZETestCheck(WeakPointer1.IsNull());
-		ZETestCheck(WeakPointer1.GetReferenceCount() == 0);
-		ZETestCheck(WeakPointer1.GetWeakReferenceCount() == 0);
-		ZETestCheck(WeakPointer1.GetPointer() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer1.IsNull());
+		ZE_TEST_CHECK_ERROR(WeakPointer1.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer1.GetWeakReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer1.GetPointer() == 0);
 
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
 
 		ZESharedPointer<ZETestClass> SharedNull;
 		ZEWeakPointer<ZETestClass> WeakPointer2(SharedNull);
-		ZETestCheck(WeakPointer2.IsNull());
-		ZETestCheck(WeakPointer2.GetReferenceCount() == 0);
-		ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 0);
-		ZETestCheck(WeakPointer2.GetPointer() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer2.IsNull());
+		ZE_TEST_CHECK_ERROR(WeakPointer2.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer2.GetPointer() == 0);
 
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
 
 		ZEWeakPointer<ZETestClass> WeakPointer3;
 		WeakPointer3 = SharedNull;
-		ZETestCheck(WeakPointer3.IsNull());
-		ZETestCheck(WeakPointer3.GetReferenceCount() == 0);
-		ZETestCheck(WeakPointer3.GetWeakReferenceCount() == 0);
-		ZETestCheck(WeakPointer3.GetPointer() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer3.IsNull());
+		ZE_TEST_CHECK_ERROR(WeakPointer3.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer3.GetWeakReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer3.GetPointer() == 0);
 
-		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZE_TEST_CHECK_ERRORStatus(ZE_TCS_NOT_CONSTRUCTED);
 	}
 
-	ZETest("CopyRelease")
+	ZE_TEST_ITEM("CopyRelease")
 	{
 		ZETestReset();
 
@@ -106,23 +106,23 @@ ZETestSuite(ZEWeakPointer)
 		ZEWeakPointer<ZETestClass> WeakPointer;
 
 		WeakPointer.Copy(SharedPointer);
-		ZETestCheck(!WeakPointer.IsNull());
-		ZETestCheck(WeakPointer.GetReferenceCount() == 1);
-		ZETestCheck(WeakPointer.GetWeakReferenceCount() == 1);
-		ZETestCheck(WeakPointer.GetPointer() == SharedPointer.GetPointer());
-		ZETestCheck(SharedPointer.GetWeakReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(!WeakPointer.IsNull());
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetWeakReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetPointer() == SharedPointer.GetPointer());
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetWeakReferenceCount() == 1);
 
 		WeakPointer.Release();
-		ZETestCheck(WeakPointer.IsNull());
-		ZETestCheck(WeakPointer.GetReferenceCount() == 0);
-		ZETestCheck(WeakPointer.GetWeakReferenceCount() == 0);
-		ZETestCheck(WeakPointer.GetPointer() == NULL);
-		ZETestCheck(!SharedPointer.IsNull());
-		ZETestCheck(SharedPointer.GetReferenceCount() == 1);
-		ZETestCheck(SharedPointer.GetWeakReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer.IsNull());
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetWeakReferenceCount() == 0);
+		ZE_TEST_CHECK_ERROR(WeakPointer.GetPointer() == NULL);
+		ZE_TEST_CHECK_ERROR(!SharedPointer.IsNull());
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 1);
+		ZE_TEST_CHECK_ERROR(SharedPointer.GetWeakReferenceCount() == 0);
 	}
 
-	ZETest("Assingments")
+	ZE_TEST_ITEM("Assingments")
 	{
 		ZETestReset();
 		ZESharedPointer<ZETestClass> SharedPointer(new ZETestClass());
@@ -130,9 +130,9 @@ ZETestSuite(ZEWeakPointer)
 		{
 			ZEWeakPointer<ZETestClass> WeakPointer(SharedPointer);
 			
-			ZETestCheck(!WeakPointer.IsNull());
-			ZETestCheck(WeakPointer.GetWeakReferenceCount() == 1);
-			ZETestCheck(WeakPointer.GetPointer() == SharedPointer.GetPointer());
+			ZE_TEST_CHECK_ERROR(!WeakPointer.IsNull());
+			ZE_TEST_CHECK_ERROR(WeakPointer.GetWeakReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(WeakPointer.GetPointer() == SharedPointer.GetPointer());
 		}
 
 		ZETestReset();
@@ -140,9 +140,9 @@ ZETestSuite(ZEWeakPointer)
 		{
 			ZEWeakPointer<ZETestClass> WeakPointer;
 			WeakPointer = SharedPointer;
-			ZETestCheck(WeakPointer.GetReferenceCount() == 1);
-			ZETestCheck(WeakPointer.GetWeakReferenceCount() == 1);
-			ZETestCheck(WeakPointer.GetPointer() == SharedPointer.GetPointer());
+			ZE_TEST_CHECK_ERROR(WeakPointer.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(WeakPointer.GetWeakReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(WeakPointer.GetPointer() == SharedPointer.GetPointer());
 		}
 
 		ZETestReset();
@@ -150,9 +150,9 @@ ZETestSuite(ZEWeakPointer)
 		{
 			ZEWeakPointer<ZETestClass> WeakPointer1(SharedPointer);	
 			ZEWeakPointer<ZETestClass> WeakPointer2(WeakPointer1);	
-			ZETestCheck(WeakPointer2.GetReferenceCount() == 1);
-			ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 2);
-			ZETestCheck(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 2);
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
 		}
 
 		ZETestReset();
@@ -161,13 +161,13 @@ ZETestSuite(ZEWeakPointer)
 			ZEWeakPointer<ZETestClass> WeakPointer1(SharedPointer);	
 			ZEWeakPointer<ZETestClass> WeakPointer2;
 			WeakPointer2 = WeakPointer1;	
-			ZETestCheck(WeakPointer2.GetReferenceCount() == 1);
-			ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 2);
-			ZETestCheck(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 2);
+			ZE_TEST_CHECK_ERROR(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
 		}
 	}
 
-	ZETest("ReferanceCounting")
+	ZE_TEST_ITEM("ReferanceCounting")
 	{
 		// Chain Assingment
 		ZETestReset();
@@ -178,38 +178,38 @@ ZETestSuite(ZEWeakPointer)
 			ZETestScope()
 			{
 				ZEWeakPointer<ZETestClass> WeakPointer1(SharedPointer);
-				ZETestCheck(WeakPointer1.GetWeakReferenceCount() == 1);
-				ZETestCheckInstanceCount(1);
+				ZE_TEST_CHECK_ERROR(WeakPointer1.GetWeakReferenceCount() == 1);
+				ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 				ZEWeakPointer<ZETestClass> WeakPointer2 = WeakPointer1;
-				ZETestCheck(WeakPointer1.GetWeakReferenceCount() == 2);
-				ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 2);
-				ZETestCheck(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
-				ZETestCheckInstanceCount(1);
+				ZE_TEST_CHECK_ERROR(WeakPointer1.GetWeakReferenceCount() == 2);
+				ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 2);
+				ZE_TEST_CHECK_ERROR(WeakPointer2.GetPointer() == SharedPointer.GetPointer());
+				ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 				ZEWeakPointer<ZETestClass> WeakPointer3 = WeakPointer1;
-				ZETestCheck(WeakPointer1.GetWeakReferenceCount() == 3);
-				ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 3);
-				ZETestCheck(WeakPointer3.GetWeakReferenceCount() == 3);
-				ZETestCheck(WeakPointer3.GetPointer() == SharedPointer.GetPointer());
-				ZETestCheckInstanceCount(1);
+				ZE_TEST_CHECK_ERROR(WeakPointer1.GetWeakReferenceCount() == 3);
+				ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 3);
+				ZE_TEST_CHECK_ERROR(WeakPointer3.GetWeakReferenceCount() == 3);
+				ZE_TEST_CHECK_ERROR(WeakPointer3.GetPointer() == SharedPointer.GetPointer());
+				ZE_TEST_CHECK_ERRORInstanceCount(1);
 
 				ZEWeakPointer<ZETestClass> WeakPointer4(WeakPointer2);
-				ZETestCheck(WeakPointer1.GetWeakReferenceCount() == 4);
-				ZETestCheck(WeakPointer2.GetWeakReferenceCount() == 4);
-				ZETestCheck(WeakPointer3.GetWeakReferenceCount() == 4);
-				ZETestCheck(WeakPointer4.GetWeakReferenceCount() == 4);
-				ZETestCheck(WeakPointer4.GetPointer() == SharedPointer.GetPointer());
-				ZETestCheckInstanceCount(1);
+				ZE_TEST_CHECK_ERROR(WeakPointer1.GetWeakReferenceCount() == 4);
+				ZE_TEST_CHECK_ERROR(WeakPointer2.GetWeakReferenceCount() == 4);
+				ZE_TEST_CHECK_ERROR(WeakPointer3.GetWeakReferenceCount() == 4);
+				ZE_TEST_CHECK_ERROR(WeakPointer4.GetWeakReferenceCount() == 4);
+				ZE_TEST_CHECK_ERROR(WeakPointer4.GetPointer() == SharedPointer.GetPointer());
+				ZE_TEST_CHECK_ERRORInstanceCount(1);
 			}
 
-			ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
-			ZETestCheckInstanceCount(1);
+			ZE_TEST_CHECK_ERRORStatus(ZE_TCS_CONSTRUCTED);
+			ZE_TEST_CHECK_ERRORInstanceCount(1);
 
-			ZETestCheck(!SharedPointer.IsNull());
-			ZETestCheck(SharedPointer.GetReferenceCount() == 1);
-			ZETestCheck(SharedPointer.GetWeakReferenceCount() == 0);
-			ZETestCheck(SharedPointer.GetPointer() != NULL);
+			ZE_TEST_CHECK_ERROR(!SharedPointer.IsNull());
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetWeakReferenceCount() == 0);
+			ZE_TEST_CHECK_ERROR(SharedPointer.GetPointer() != NULL);
 		}
 
 		// Shared pointer is dead and weak pointers are also dead.
@@ -224,15 +224,15 @@ ZETestSuite(ZEWeakPointer)
 				WeakPointer2 = SharedPointer;
 				WeakPointer3 = WeakPointer1;
 
-				ZETestCheck(SharedPointer.GetWeakReferenceCount() == 3);
+				ZE_TEST_CHECK_ERROR(SharedPointer.GetWeakReferenceCount() == 3);
 
-				ZETestCheck(!WeakPointer1.IsNull());
-				ZETestCheck(!WeakPointer2.IsNull());
-				ZETestCheck(!WeakPointer3.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer1.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer2.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer3.IsNull());
 			}
-			ZETestCheck(WeakPointer1.IsNull());
-			ZETestCheck(WeakPointer2.IsNull());
-			ZETestCheck(WeakPointer3.IsNull());
+			ZE_TEST_CHECK_ERROR(WeakPointer1.IsNull());
+			ZE_TEST_CHECK_ERROR(WeakPointer2.IsNull());
+			ZE_TEST_CHECK_ERROR(WeakPointer3.IsNull());
 		}
 
 		// Original shared pointer is dead but another shared pointer is living and weak pointers are not dead.
@@ -250,20 +250,20 @@ ZETestSuite(ZEWeakPointer)
 
 				SharedPointerScope = WeakPointer3.GetInstance();
 
-				ZETestCheck(SharedPointer.GetWeakReferenceCount() == 3);
+				ZE_TEST_CHECK_ERROR(SharedPointer.GetWeakReferenceCount() == 3);
 
-				ZETestCheck(!WeakPointer1.IsNull());
-				ZETestCheck(!WeakPointer2.IsNull());
-				ZETestCheck(!WeakPointer3.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer1.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer2.IsNull());
+				ZE_TEST_CHECK_ERROR(!WeakPointer3.IsNull());
 
-				ZETestCheck(SharedPointer.GetReferenceCount() == 2);
+				ZE_TEST_CHECK_ERROR(SharedPointer.GetReferenceCount() == 2);
 			}
 
-			ZETestCheck(!WeakPointer1.IsNull());
-			ZETestCheck(!WeakPointer2.IsNull());
-			ZETestCheck(!WeakPointer3.IsNull());
-			ZETestCheck(SharedPointerScope.GetWeakReferenceCount() == 3);
-			ZETestCheck(SharedPointerScope.GetReferenceCount() == 1);
+			ZE_TEST_CHECK_ERROR(!WeakPointer1.IsNull());
+			ZE_TEST_CHECK_ERROR(!WeakPointer2.IsNull());
+			ZE_TEST_CHECK_ERROR(!WeakPointer3.IsNull());
+			ZE_TEST_CHECK_ERROR(SharedPointerScope.GetWeakReferenceCount() == 3);
+			ZE_TEST_CHECK_ERROR(SharedPointerScope.GetReferenceCount() == 1);
 		}
 	}
 }

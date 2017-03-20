@@ -59,7 +59,6 @@ enum ZEMCBaseType
 	ZEMC_BT_FLOAT,
 	ZEMC_BT_DOUBLE,
 	ZEMC_BT_BOOLEAN,
-	ZEMC_BT_ENUMERATOR,
 	ZEMC_BT_STRING,
 	ZEMC_BT_QUATERNION,
 	ZEMC_BT_VECTOR2,
@@ -75,46 +74,56 @@ enum ZEMCBaseType
 	ZEMC_BT_CLASS,
 	ZEMC_BT_OBJECT,
 	ZEMC_BT_OBJECT_PTR,
-	ZEMC_BT_CONTAINER
+	ZEMC_BT_OBJECT_HOLDER,
+	ZEMC_BT_ENUMERATOR,
+	ZEMC_BT_FLAGS,
 };
 
-enum ZEMCMetaOperatorType
+enum ZEMCContainerType
 {
-	ZEMC_MOT_NONE,
-	ZEMC_MOT_ADDITION,
-	ZEMC_MOT_ADDITION_ASSIGNMENT,
-	ZEMC_MOT_SUBTRACTION,
-	ZEMC_MOT_SUBSTRACTION_ASSIGNMENT,
-	ZEMC_MOT_MULTIPLICATION,
-	ZEMC_MOT_MULTIPLICATION_ASSIGNMENT,
-	ZEMC_MOT_DIVISION,
-	ZEMC_MOT_DIVISION_ASSIGNMENT,
-	ZEMC_MOT_MODULO,
-	ZEMC_MOT_MODULO_ASSIGNMENT,
-	ZEMC_MOT_INCREMENT,
-	ZEMC_MOT_DECREMENT,
-	ZEMC_MOT_LOGICAL_NOT,
-	ZEMC_MOT_LOGICAL_AND,
-	ZEMC_MOT_LOGICAL_OR,
-	ZEMC_MOT_BITWISE_AND,
-	ZEMC_MOT_BITWISE_AND_ASSIGNMENT,
-	ZEMC_MOT_BITWISE_OR,
-	ZEMC_MOT_BITWISE_OR_ASSIGNMENT,
-	ZEMC_MOT_BITWISE_XOR,
-	ZEMC_MOT_BITWISE_XOR_ASSIGNMENT,
-	ZEMC_MOT_LEFT_SHIFT,
-	ZEMC_MOT_LEFT_SHIFT_ASSIGNMENT,
-	ZEMC_MOT_RIGHT_SHIFT,
-	ZEMC_MOT_RIGHT_SHIFT_ASSIGNMENT,
-	ZEMC_MOT_ASSIGNMENT,
-	ZEMC_MOT_EQUAL,
-	ZEMC_MOT_NOT_EQUAL,
-	ZEMC_MOT_LESS,
-	ZEMC_MOT_LESS_EQUAL,
-	ZEMC_MOT_GREATER,
-	ZEMC_MOT_GREATER_AND_EQUAL,
-	ZEMC_MOT_FUNCTION_CALL,
-	ZEMC_MOT_ARRAY_SUBSCRIPT
+	ZEMC_CT_NONE,
+	ZEMC_CT_ARRAY,
+	ZEMC_CT_LIST,
+	ZEMC_CT_COLLECTION
+};
+
+enum ZEMCOperatorType
+{
+	ZEMC_OT_NONE,
+	ZEMC_OT_ADDITION,
+	ZEMC_OT_ADDITION_ASSIGNMENT,
+	ZEMC_OT_SUBTRACTION,
+	ZEMC_OT_SUBSTRACTION_ASSIGNMENT,
+	ZEMC_OT_MULTIPLICATION,
+	ZEMC_OT_MULTIPLICATION_ASSIGNMENT,
+	ZEMC_OT_DIVISION,
+	ZEMC_OT_DIVISION_ASSIGNMENT,
+	ZEMC_OT_MODULO,
+	ZEMC_OT_MODULO_ASSIGNMENT,
+	ZEMC_OT_INCREMENT,
+	ZEMC_OT_DECREMENT,
+	ZEMC_OT_LOGICAL_NOT,
+	ZEMC_OT_LOGICAL_AND,
+	ZEMC_OT_LOGICAL_OR,
+	ZEMC_OT_BITWISE_AND,
+	ZEMC_OT_BITWISE_AND_ASSIGNMENT,
+	ZEMC_OT_BITWISE_OR,
+	ZEMC_OT_BITWISE_OR_ASSIGNMENT,
+	ZEMC_OT_BITWISE_XOR,
+	ZEMC_OT_BITWISE_XOR_ASSIGNMENT,
+	ZEMC_OT_LEFT_SHIFT,
+	ZEMC_OT_LEFT_SHIFT_ASSIGNMENT,
+	ZEMC_OT_RIGHT_SHIFT,
+	ZEMC_OT_RIGHT_SHIFT_ASSIGNMENT,
+	ZEMC_OT_ASSIGNMENT,
+	ZEMC_OT_EQUAL,
+	ZEMC_OT_NOT_EQUAL,
+	ZEMC_OT_LESS,
+	ZEMC_OT_LESS_EQUAL,
+	ZEMC_OT_GREATER,
+	ZEMC_OT_GREATER_AND_EQUAL,
+	ZEMC_OT_FUNCTION_CALL,
+	ZEMC_OT_ARRAY_SUBSCRIPT
 };
 
 enum ZEMCPropertyAccess
@@ -125,20 +134,20 @@ enum ZEMCPropertyAccess
 	ZEMC_PA_READ_WRITE	= 3
 };
 
+enum ZEMCDeclarationType
+{
+	ZEMC_DT_NONE		= 0,
+	ZEMC_DT_CLASS		= 1,
+	ZEMC_DT_ENUMERATOR	= 2,
+	ZEMC_DT_FLAGS		= 3
+};
+
 enum ZEMCTypeQualifier
 {
 	ZEMC_TQ_VALUE,
 	ZEMC_TQ_CONST_VALUE,
 	ZEMC_TQ_REFERENCE,
-	ZEMC_TQ_CONST_REFERENCE
-};
-
-enum ZEMCContainerType
-{
-	ZEMC_CT_NONE,
-	ZEMC_CT_ARRAY,
-	ZEMC_CT_LIST,
-	ZEMC_CT_CONTAINER
+	ZEMC_TQ_CONST_REFERENCE,
 };
 
 class ZEMCDeclaration;
@@ -150,15 +159,18 @@ class ZEMCType
 	public:
 		ZEMCBaseType					BaseType;
 		ZEMCTypeQualifier				TypeQualifier;
-		ZEMCContainerType				ContainerType;
-
+		ZEMCContainerType				CollectionType;
+		ZEMCTypeQualifier				CollectionQualifier;
+		
 		ZEMCClass*						Class;
-		ZEMCEnumerator*					Enumurator;
+		ZEMCEnumerator*					Enumerator;
 
 		bool							operator==(const ZEMCType& Other) const;
 		bool							operator!=(const ZEMCType& Other) const;
 
 		static bool						Equal(const ZEMCType& A, const ZEMCType& B);
+
+		bool							Check();
 
 										ZEMCType();
 										~ZEMCType();
@@ -178,12 +190,17 @@ class ZEMCAttribute
 class ZEMCForwardDeclaration
 {
 	public:
-		ZEString						HeaderFileDeclaredIn;
-		ZEString						ClassName;
-		ZEString						HeaderName;
+		ZEMCDeclarationType				Type;							
+		ZEString						Name;
 		
 										ZEMCForwardDeclaration();
 										~ZEMCForwardDeclaration();
+};
+
+class ZEMCInclude
+{
+	public:
+		ZEString						HeaderFileName;
 };
 
 class ZEMCDeclaration
@@ -212,116 +229,119 @@ class ZEMCDeclaration
 class ZEMCEnumeratorItem
 {
 	public:
-		ZEString						Name;
-		ZEUInt32						Value;
+		ZEString							Name;
+		ZEUInt32							Value;
 
-										ZEMCEnumeratorItem();
-										~ZEMCEnumeratorItem();
+											ZEMCEnumeratorItem();
+											~ZEMCEnumeratorItem();
 };
 
 class ZEMCEnumerator : public ZEMCDeclaration
 {
 	public:
-		ZEArray<ZEMCEnumeratorItem>		Items;
+		ZEArray<ZEMCEnumeratorItem>			Items;
 
-										ZEMCEnumerator();
-										~ZEMCEnumerator();
+											ZEMCEnumerator();
+											~ZEMCEnumerator();
 };
 
 class ZEMCProperty : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass*						Class;
+		ZEMCClass*							Class;
 
-		ZESize							ID;
-		ZEMCType						Type;
+		ZESize								ID;
+		ZEMCType							Type;
 
-		bool							HasAccessors;
-		ZEMCMethod*						Getter;
-		ZEMCMethod*						Setter;
-		ZEMCMethod*						Adder;
-		ZEMCMethod*						Remover;
+		bool								HasAccessors;
+		ZEMCMethod*							Getter;
+		ZEMCMethod*							Setter;
+		ZEMCMethod*							Adder;
+		ZEMCMethod*							Remover;
+		ZEMCMethod*							Counter;
 
-		bool							IsStatic;
-		bool							IsContainer;
+		bool								IsStatic;
+		bool								IsContainer;
 
-		ZEMCPropertyAccess				Access;
+		ZEMCPropertyAccess					Access;
 
-										ZEMCProperty();
-										~ZEMCProperty();
+											ZEMCProperty();
+											~ZEMCProperty();
 };
 
 class ZEMCMethodParameter
 {
 	public:
-		ZEString						Name;
-		ZEMCType						Type;
+		ZEString							Name;
+		ZEMCType							Type;
 
-										ZEMCMethodParameter();
-										~ZEMCMethodParameter();
+											ZEMCMethodParameter();
+											~ZEMCMethodParameter();
 };
 
 class ZEMCMethod : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass*						Class;
+		ZEMCClass*							Class;
 
-		ZESize							ID;
+		ZESize								ID;
 
-		bool							IsVirtual;
-		bool							IsPure;
-		bool							IsStatic;
-		bool							IsEvent;
-		bool							IsConst;
-		bool							IsConstructor;
-		bool							IsOperator;
+		bool								IsVirtual;
+		bool								IsPure;
+		bool								IsStatic;
+		bool								IsEvent;
+		bool								IsConst;
+		bool								IsConstructor;
+		bool								IsOperator;
 
-		ZEMCMetaOperatorType			OperatorType;
+		ZEMCOperatorType				OperatorType;
 
-		ZEMCType						ReturnValue;
-		ZEArray<ZEMCMethodParameter>	Parameters;
+		ZEMCType							ReturnValue;
+		ZEArray<ZEMCMethodParameter>		Parameters;
 
-										ZEMCMethod();
-		virtual							~ZEMCMethod();
+											ZEMCMethod();
+		virtual								~ZEMCMethod();
 };
 
 class ZEMCClass : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass*						BaseClass;
-		ZEArray<ZEMCProperty*>			Properties;
-		ZEArray<ZEMCMethod*>			Methods;
+		ZEMCClass*							BaseClass;
+		ZEArray<ZEMCProperty*>				Properties;
+		ZEArray<ZEMCMethod*>				Methods;
 
-		bool							IsForwardDeclared;
-		bool							HasScriptBase;
+		bool								IsForwardDeclared;
+		bool								HasScriptBase;
 
-		bool							IsAbstract;
-		bool							IsFundamental;
+		bool								IsAbstract;
+		bool								IsFundamental;
+		bool								IsReferenceCounted;
 
-		bool							HasCreateInstanceMethod;
-		bool							HasPublicCopyConstructor;
-		bool							HasPublicDefaultConstructor;
-		bool							HasPublicDestructor;
-		bool							HasPublicAssignmentOperator;
-		bool							HasPublicDestroyMethod;
+		bool								HasCreateInstanceMethod;
+		bool								HasPublicCopyConstructor;
+		bool								HasPublicDefaultConstructor;
+		bool								HasPublicDestructor;
+		bool								HasPublicAssignmentOperator;
+		bool								HasPublicDestroyMethod;
 
-										ZEMCClass();
-		virtual							~ZEMCClass();
+											ZEMCClass();
+		virtual								~ZEMCClass();
 };
 
 class ZEMCContext
 {
 	public:
-		ZEArray<ZEMCClass*>				Classes;
-		ZEArray<ZEMCEnumerator*>		Enumerators;
+		ZEArray<ZEMCClass*>					Classes;
+		ZEArray<ZEMCEnumerator*>			Enumerators;
 
-		ZEArray<ZEMCClass*>				TargetClasses;
-		ZEArray<ZEMCEnumerator*>		TargetEnumerators;
+		ZEArray<ZEMCClass*>					TargetClasses;
+		ZEArray<ZEMCEnumerator*>			TargetEnumerators;
 
-		ZEArray<ZEMCForwardDeclaration*> ForwardDeclarations;
+		ZEArray<ZEMCForwardDeclaration*>	ForwardDeclarations;
+		ZEArray<ZEMCInclude*>				Includes;
 
-										ZEMCContext();
-										~ZEMCContext();
+											ZEMCContext();
+											~ZEMCContext();
 };
 
 #endif

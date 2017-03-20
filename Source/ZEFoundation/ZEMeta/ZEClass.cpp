@@ -95,7 +95,7 @@ const ZEGUID& ZEClass::GetGUID() const
 	return ZEGUID::Zero;
 }
 
-const ZEAttribute* ZEClass::GetAttributes() const
+const ZEMTAttribute* ZEClass::GetAttributes() const
 {
 	return NULL;
 }
@@ -105,52 +105,72 @@ ZESize ZEClass::GetAttributeCount() const
 	return 0;
 }
 
-ZEClass* ZEClass::GetParentClass()
+ZEClass* ZEClass::GetParentClass() const
 {
 	return NULL;
 }
 
-ZEClassFlags ZEClass::GetFlags()
+ZEMTClassFlags ZEClass::GetFlags() const
 {
-	return ZE_CF_CREATE_INSTANCE | ZE_CF_DESTROY | ZE_CF_ASSIGN | ZE_CF_CLONE | ZE_CF_CONSTRUCT | ZE_CF_DECONSTRUCT;
+	return ZEMT_CF_CREATABLE | ZEMT_CF_DESTROYABLE | ZEMT_CF_ASSIGNABLE | ZEMT_CF_COPYABLE | ZEMT_CF_CLONEABLE | ZEMT_CF_CONSTRUCTIBLE | ZEMT_CF_DECONSTRUCTIBLE;
 }
 
-bool ZEClass::IsAbstract()
+bool ZEClass::IsAbstract() const
 {
-	return (GetFlags() & ZE_CF_ABSTRACT) != 0;
+	return (GetFlags() & ZEMT_CF_ABSTRACT) != 0;
 }
 
-bool ZEClass::IsFundamental()
+bool ZEClass::IsFundamental() const
 {
-	return (GetFlags() & ZE_CF_FUNDAMENTAL) != 0;
+	return (GetFlags() & ZEMT_CF_FUNDAMENTAL) != 0;
 }
 
-bool ZEClass::IsDynamic()
+bool ZEClass::IsCreatable() const
 {
-	return (GetFlags() & ZE_CF_SCRIPT) != 0;
+	return (GetFlags() & ZEMT_CF_CREATABLE) != 0;
 }
 
-bool ZEClass::IsValueObject()
+bool ZEClass::IsDestroyable() const
 {
-	return (GetFlags() & ZE_CF_VALUE_OBJECT) != 0;
+	return (GetFlags() & ZEMT_CF_DESTROYABLE) != 0;
 }
 
-bool ZEClass::IsCloneable()
+bool ZEClass::IsAssignable() const
 {
-	return (GetFlags() & ZE_CF_CLONE) != 0;
+	return (GetFlags() & ZEMT_CF_ASSIGNABLE) != 0;
 }
 
-const ZEProperty* ZEClass::GetProperties()
+bool ZEClass::IsCopyable() const
+{
+	return (GetFlags() & ZEMT_CF_COPYABLE) != 0;
+}
+
+bool ZEClass::IsCloneable() const
+{
+	return (GetFlags() & ZEMT_CF_CLONEABLE) != 0;
+}
+
+bool ZEClass::IsConstructible() const
+{
+	return (GetFlags() & ZEMT_CF_CONSTRUCTIBLE) != 0;
+}
+
+bool ZEClass::IsDeconstructible() const
+{
+	return (GetFlags() & ZEMT_CF_DECONSTRUCTIBLE) != 0;
+}
+
+const ZEMTProperty* ZEClass::GetProperties() const
 {
 	return NULL;
 }
 
-ZESize ZEClass::GetPropertyCount()
+ZESize ZEClass::GetPropertyCount() const
 {
 	return 0;
 }
 
-const ZEProperty* ZEClass::GetPropertyDescription(ZESize PropertyId)
+const ZEMTProperty* ZEClass::GetPropertyDescription(ZESize PropertyId) const
 {
 	if (PropertyId >= GetPropertyCount())
 		return NULL;
@@ -158,7 +178,7 @@ const ZEProperty* ZEClass::GetPropertyDescription(ZESize PropertyId)
 	return &GetProperties()[PropertyId];
 }
 
-const ZEProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName)
+const ZEMTProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName) const
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == (ZESize)-1)
@@ -167,22 +187,22 @@ const ZEProperty* ZEClass::GetPropertyDescription(const ZEString& PropertyName)
 	return &GetProperties()[PropertyId];
 }
 
-const ZEMethod* ZEClass::GetMethods()
+const ZEMTMethod* ZEClass::GetMethods() const
 {
 	return NULL;
 }
 
-ZESize ZEClass::GetMethodCount()
+ZESize ZEClass::GetMethodCount() const
 {
 	return 0;
 }
 
-bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value)
+bool ZEClass::SetProperty(ZEObject* Object, ZESize PropertyId, const ZEVariant& Value) const
 {
 	return false;
 }
 
-bool ZEClass::SetProperty(ZEObject* Object, const ZEString& PropertyName, const ZEVariant& Value)
+bool ZEClass::SetProperty(ZEObject* Object, const ZEString& PropertyName, const ZEVariant& Value) const
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -191,12 +211,26 @@ bool ZEClass::SetProperty(ZEObject* Object, const ZEString& PropertyName, const 
 	return SetProperty(Object, PropertyId, Value);
 }
 
-bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
+bool ZEClass::SetPropertyConst(const ZEObject* Object, ZESize PropertyId, const ZEVariant& Value) const
 {
 	return false;
 }
 
-bool ZEClass::GetProperty(ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value)
+bool ZEClass::SetPropertyConst(const ZEObject* Object, const ZEString& PropertyName, const ZEVariant& Value) const
+{
+	ZESize PropertyId = GetPropertyId(PropertyName);
+	if (PropertyId == -1)
+		return false;
+
+	return SetPropertyConst(Object, PropertyId, Value);
+}
+
+bool ZEClass::GetProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value) const
+{
+	return false;
+}
+
+bool ZEClass::GetProperty(ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value) const
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
@@ -205,106 +239,26 @@ bool ZEClass::GetProperty(ZEObject* Object, const ZEString& PropertyName, ZEVari
 	return GetProperty(Object, PropertyId, Value);
 }
 
-bool ZEClass::GetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
+bool ZEClass::GetPropertyConst(const ZEObject* Object, ZESize PropertyId, ZEVariant& Value) const
 {
 	return false;
 }
 
-bool ZEClass::GetPropertyItem(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
+bool ZEClass::GetPropertyConst(const ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value) const
 {
 	ZESize PropertyId = GetPropertyId(PropertyName);
 	if (PropertyId == -1)
 		return false;
 
-	return GetPropertyItem(Object, PropertyId, Index, Value);
+	return GetPropertyConst(Object, PropertyId, Value);
 }
 
-bool ZEClass::SetPropertyItem(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
+bool ZEClass::AddEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate) const
 {
 	return false;
 }
 
-bool ZEClass::SetPropertyItem(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
-{
-	ZESize PropertyId = GetPropertyId(PropertyName);
-	if (PropertyId == -1)
-		return false;
-
-	return SetPropertyItem(Object, PropertyId, Index, Value);
-}
-
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZEVariant& Value)
-{
-	ZESize Count;
-	bool Result = GetPropertyItemCount(Object, PropertyId, Count);
-	if (!Result)
-		return false;
-
-	return AddItemToProperty(Object, PropertyId, Count, Value);
-}
-
-bool ZEClass::AddItemToProperty(ZEObject* Object, const ZEString& PropertyName, ZEVariant& Value)
-{
-	ZESize PropertyId = GetPropertyId(PropertyName);
-	if (PropertyId == -1)
-		return false;
-
-	ZESize Count;
-	bool Result = GetPropertyItemCount(Object, PropertyId, Count);
-	if (!Result)
-		return false;
-
-	return AddItemToProperty(Object, PropertyId, Count, Value);
-}
-
-bool ZEClass::AddItemToProperty(ZEObject* Object, ZESize PropertyId, ZESize Index, ZEVariant& Value)
-{
-	return false;
-}
-
-bool ZEClass::AddItemToProperty(ZEObject* Object, const ZEString& PropertyName, ZESize Index, ZEVariant& Value)
-{
-	ZESize PropertyId = GetPropertyId(PropertyName);
-	if (PropertyId == -1)
-		return false;
-
-	return AddItemToProperty(Object, PropertyId, Index, Value);
-}
-
-bool ZEClass::RemoveItemFromProperty(ZEObject* Object, ZESize PropertyId, ZESize Index)
-{
-	return false;
-}
-
-bool ZEClass::RemoveItemFromProperty(ZEObject* Object, const ZEString& PropertyName, ZESize Index)
-{
-	ZESize PropertyId = GetPropertyId(PropertyName);
-	if (PropertyId == -1)
-		return false;
-
-	return RemoveItemFromProperty(Object, PropertyId, Index);
-}
-
-bool ZEClass::GetPropertyItemCount(ZEObject* Object, ZESize PropertyId, ZESize& Count)
-{
-	return false;
-}
-
-bool ZEClass::GetPropertyItemCount(ZEObject* Object, const ZEString& PropertyName, ZESize& Count)
-{
-	ZESize PropertyId = GetPropertyId(PropertyName);
-	if (PropertyId == -1)
-		return false;
-
-	return GetPropertyItemCount(Object, PropertyId, Count);
-}
-
-bool ZEClass::AddEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate)
-{
-	return false;
-}
-
-bool ZEClass::AddEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate)
+bool ZEClass::AddEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate) const
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
@@ -313,12 +267,12 @@ bool ZEClass::AddEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEv
 	return AddEventDelegate(Object, MethodId, Delegate);
 }
 
-bool ZEClass::RemoveEventDelegate(ZEObject* Object, ZESize EventId, ZEEventDelegateBase* Delegate)
+bool ZEClass::RemoveEventDelegate(ZEObject* Object, ZESize EventId, ZEEventDelegateBase* Delegate) const
 {
 	return false;
 }
 
-bool ZEClass::RemoveEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate)
+bool ZEClass::RemoveEventDelegate(ZEObject* Object, const ZEString& EventName, ZEEventDelegateBase* Delegate) const
 {
 	ZESize MethodId = GetPropertyId(EventName);
 	if (MethodId == -1)
@@ -327,12 +281,12 @@ bool ZEClass::RemoveEventDelegate(ZEObject* Object, const ZEString& EventName, Z
 	return RemoveEventDelegate(Object, MethodId, Delegate);
 }
 
-bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+bool ZEClass::CallMethod(ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const
 {
 	return false;
 }
 
-bool ZEClass::CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount)
+bool ZEClass::CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const
 {
 	ZESize MethodId = GetPropertyId(MethodName);
 	if (MethodId == -1)
@@ -341,73 +295,86 @@ bool ZEClass::CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant
 	return CallMethod(Object, MethodId, ReturnValue, Parameters, ParameterCount);
 }
 
-ZESize ZEClass::GetPropertyId(const ZEString& PropertyName)
+bool ZEClass::CallMethodConst(const ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const
+{
+	return false;
+}
+
+ZESize ZEClass::GetPropertyId(const ZEString& PropertyName) const
 {
 	return -1;
 }
 
-ZESize ZEClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex)
+ZESize ZEClass::GetMethodId(const ZEString& MethodName, ZESize OverloadIndex) const
 {
 	return -1;
 }
 
-ZESize ZEClass::GetSizeOfObject()
+ZESize ZEClass::GetSizeOfObject() const
 {
 	return sizeof(ZEObject);
 }
 
-ZEObject* ZEClass::CreateInstance()
+ZEObject* ZEClass::CreateInstance() const
 {
 	return new ZEObject();
 }
 
-bool ZEClass::Destroy(ZEObject* Object)
+bool ZEClass::Destroy(ZEObject* Object) const
 {
 	delete Object;
 	return true;
 }
 
-ZEObject* ZEClass::DynamicCast(ZEObject* Object)
-{
-	return Object;
-}
-
-ZEObject* ZEClass::Clone(ZEObject* Object)
-{
-	ZEObject* NewObject = new ZEObject();
-	NewObject = Object;
-	return NewObject;
-}
-
-bool ZEClass::Construct(ZEObject* Object)
+bool ZEClass::Construct(ZEObject* Object) const
 {
 	new(Object) ZEObject();
 	return false;
 }
 
-bool ZEClass::Deconstruct(ZEObject* Object)
+bool ZEClass::CopyConstruct(ZEObject* DestinationObject, const ZEObject* SourceObject) const
+{
+	if (SourceObject->GetClass() != ZEObject::Class())
+		return false;
+
+	new (DestinationObject) ZEObject(*SourceObject);
+	return true;
+}
+
+bool ZEClass::Deconstruct(ZEObject* Object) const
 {
 	Object->~ZEObject();
 	return true;
 }
 
-bool ZEClass::Assign(ZEObject* Object, ZEObject* Source)
+bool ZEClass::Assign(ZEObject* DestinationObject, const ZEObject* SourceObject) const
 {
-	ZEObject* CastedSource = ZEClass::Cast<ZEObject>(Source);
-	if (CastedSource == NULL)
+	if (SourceObject->GetClass() != ZEObject::Class())
 		return false;
 
-	*(ZEObject*)Object = *CastedSource;
-
+	*DestinationObject = *SourceObject;
 	return true;
 }
 
-ZEObject* ZEClass::CreateScriptInstance()
+ZEObject* ZEClass::Clone(const ZEObject* Object) const
+{
+	if (Object->GetClass() != ZEObject::Class())
+		return NULL;
+
+	return new ZEObject(*Object);
+}
+
+ZEObject* ZEClass::DynamicCast(ZEObject* Object) const
+{
+	return Object;
+}
+
+ZEObject* ZEClass::CreateScriptInstance() const
 {
 	return NULL;
 }
 
-ZESize ZEClass::GetSizeOfScriptObject()
+ZESize ZEClass::GetSizeOfScriptObject() const
 {
 	return 0;
 }
@@ -436,7 +403,7 @@ bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEObject* Object)
 	return IsDerivedFrom(ParentClass, Object->GetClass());
 }
 
-bool ZEClass::Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode)
+bool ZEClass::Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode) const
 {
 	if (this != Object->GetClass())
 		return false;
@@ -455,15 +422,15 @@ bool ZEClass::Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode)
 	return true;
 }
 
-bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNode)
+bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNode) const
 {
 	for (ZESize I = 0; I < GetPropertyCount(); I++)
 	{
-		const ZEProperty* Property = GetProperties() + I;
+		const ZEMTProperty* Property = GetProperties() + I;
 		if (Property->Access != ZEMT_PA_READ_WRITE)
 			continue;
 
-		const ZEProperty* PropertyDescription = GetPropertyDescription(I);
+		const ZEMTProperty* PropertyDescription = GetPropertyDescription(I);
 		if (PropertyDescription == NULL)
 			continue;
 
@@ -471,11 +438,11 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 		if (!GetProperty(Object, Property->ID, Value))
 			continue;
 
-		if (PropertyDescription->Type.Enumerator != NULL)
+		if (PropertyDescription->Type.GetBaseType() == ZEMT_BT_ENUMERATOR)
 		{
-			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
-
+			ZEMTEnumerator* Enumurator = PropertyDescription->Type.GetEnumerator();
+			ZESize EnumeratorItemCount = Enumurator->GetItemCount();
+			const ZEMTEnumeratorItem* EnumeratorItems = Enumurator->GetItems();
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{
 				if (EnumeratorItems[I].Value != Value.GetInt32())
@@ -494,7 +461,7 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 	return true;
 }
 
-bool ZEClass::Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode)
+bool ZEClass::Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode) const
 {
 	if (ObjectNode.ReadString("Class") != Object->GetClass()->GetName())
 	{
@@ -517,7 +484,7 @@ bool ZEClass::Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode)
 	return UnserializeProperties(Object, Properties);
 }
 
-bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& PropertiesNode)
+bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& PropertiesNode) const
 {
 	const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
@@ -527,7 +494,7 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 		if (Element->ElementType != ZEML_ET_PROPERTY)
 			continue;
 
-		const ZEProperty* PropertyDescription = GetPropertyDescription(Element->Name);
+		const ZEMTProperty* PropertyDescription = GetPropertyDescription(Element->Name);
 		if (PropertyDescription == NULL)
 		{
 			zeWarning("Property not found. Class Name: \"%s\", Property Name: \"%s\", ZEML Path: \"%s\".", 
@@ -538,10 +505,11 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 		}
 
 		// Handle Enumerations
-		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.Enumerator != NULL)
+		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.GetBaseType() == ZEMT_BT_ENUMERATOR)
 		{
-			ZESize EnumeratorItemCount = PropertyDescription->Type.Enumerator->GetItemCount();
-			const ZEEnumeratorItem* EnumeratorItems = PropertyDescription->Type.Enumerator->GetItems();
+			ZEMTEnumerator* Enumerator = PropertyDescription->Type.GetEnumerator();
+			ZESize EnumeratorItemCount = Enumerator->GetItemCount();
+			const ZEMTEnumeratorItem* EnumeratorItems = Enumerator->GetItems();
 
 			for (ZESize N = 0; N < EnumeratorItemCount; N++)
 			{

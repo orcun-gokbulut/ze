@@ -38,7 +38,7 @@ function (ze_add_test)
 		return()
 	endif()
 
-	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_process_source_parameters};${ze_check_parameters}" "" ${ARGV})
 		
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -46,8 +46,15 @@ function (ze_add_test)
 	endif()
 	
 	add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES} ${PARAMETER_EXTRA_SOURCES})
-	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
-	#set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "${ZEBUILD_PROJECT_FOLDER}/Tests")
+	
+	ze_process_sources()
+	
+	if (PARAMETER_TARGET)
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "Tests/${ZEBUILD_PROJECT_FOLDER}")
+	else()
+		set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "Tests/${ZEBUILD_PROJECT_FOLDER}/${PARAMETER_TARGET}")	
+	endif()
+	
 	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
 		
 	if (PARAMETER_TEST_TARGET)
@@ -60,7 +67,7 @@ function (ze_add_test)
 		endif()
 	endif()
 
-	ze_link(TARGET ${PARAMETER_TARGET} LIBS ZETest)
+	ze_link(TARGET ${PARAMETER_TARGET} LIBS ZETest ${PARAMETER_LIBS})
 
 	# Copy dependent DLLs
 	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})

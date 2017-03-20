@@ -39,9 +39,9 @@
 #include <mbstring.h>
 #include "ZEArray.h"
 
-ZETestSuite(ZECharacter)
+ZE_TEST(ZECharacter)
 {
-	ZETest("void ZECharacter::SetValue(char Character)")
+	ZE_TEST_ITEM("void ZECharacter::SetValue(char Character)")
 	{
 		ZECharacter Character;
 
@@ -49,10 +49,10 @@ ZETestSuite(ZECharacter)
 
 		Character.SetValue(SingleByteChar);
 
-		ZETestCheck(Character == 'A');
+		ZE_TEST_CHECK_ERROR(Character == 'A');
 	}
 	
-	ZETest("void ZECharacter::SetValue(const char* MultiByteCharacter)")
+	ZE_TEST_ITEM("void ZECharacter::SetValue(const char* MultiByteCharacter)")
 	{
 		ZECharacter Character;
 
@@ -60,10 +60,10 @@ ZETestSuite(ZECharacter)
 
 		Character.SetValue(&MultiByteCharacters[0]);
 
-		ZETestCheck(Character == MultiByteCharacters);
+		ZE_TEST_CHECK_ERROR(Character == MultiByteCharacters);
 	}
 
-	ZETest("void ZECharacter::SetValue(const wchar_t* WideCharacter)")
+	ZE_TEST_ITEM("void ZECharacter::SetValue(const wchar_t* WideCharacter)")
 	{
 		char MultiByteCharacters[] = "€";
 		wchar_t WideCharacters[2] = {8364, 0};	
@@ -71,10 +71,10 @@ ZETestSuite(ZECharacter)
 		ZECharacter Character;
 		Character.SetValue(WideCharacters);
 
-		ZETestCheck(Character == MultiByteCharacters);
+		ZE_TEST_CHECK_ERROR(Character == MultiByteCharacters);
 	}
 
-	ZETest("void ZECharacter::SetValue(ZEInt Character)")
+	ZE_TEST_ITEM("void ZECharacter::SetValue(ZEInt Character)")
 	{
 		char MultiByteCharacters[] = "€";
 		int MultiByteInt = '€';
@@ -82,10 +82,10 @@ ZETestSuite(ZECharacter)
 		ZECharacter Character;
 		Character.SetValue(MultiByteInt);
 
-		ZETestCheck(Character == MultiByteCharacters);
+		ZE_TEST_CHECK_ERROR(Character == MultiByteCharacters);
 	}
 
-	ZETest("void ZECharacter::SetOwner(ZEString* Owner, ZESize Index)")
+	ZE_TEST_ITEM("void ZECharacter::SetOwner(ZEString* Owner, ZESize Index)")
 	{
 		ZECharacter Character('p');
 		ZEString String("Lorem Ipsum");
@@ -93,20 +93,20 @@ ZETestSuite(ZECharacter)
 		Character.SetOwner(&String, 7);
 		Character.SetValue('k');
 
-		ZETestCheck(String == "Lorem Iksum");
+		ZE_TEST_CHECK_ERROR(String == "Lorem Iksum");
 	}
 
-	ZETest("const char* ZECharacter::GetValue() const")
+	ZE_TEST_ITEM("const char* ZECharacter::GetValue() const")
 	{
 		char MultiByteCharacters[] = "€";
 
 		ZECharacter Character;
 		Character.SetValue(MultiByteCharacters);
 
-		ZETestCheck(strncmp(Character.GetValue(), MultiByteCharacters, Character.GetSize()) == 0);
+		ZE_TEST_CHECK_ERROR(strncmp(Character.GetValue(), MultiByteCharacters, Character.GetSize()) == 0);
 	}
 
-	ZETest("ZESize ZECharacter::GetSize() const")
+	ZE_TEST_ITEM("ZESize ZECharacter::GetSize() const")
 	{
 		char MultiByteCharacters[] = "€";
 
@@ -115,10 +115,10 @@ ZETestSuite(ZECharacter)
 
 		ZESize SizeWithoutNull = strlen(MultiByteCharacters);
 
-		ZETestCheck(Character.GetSize() == SizeWithoutNull);
+		ZE_TEST_CHECK_ERROR(Character.GetSize() == SizeWithoutNull);
 	}
 
-	ZETest("bool ZECharacter::Equals(const ZECharacter& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::Equals(const ZECharacter& Character) const")
 	{
 		char MultiByteCharactersForEuro[] = "€";
 
@@ -130,20 +130,20 @@ ZETestSuite(ZECharacter)
 		ZECharacter CharacterEuro2;
 		CharacterEuro2.SetValue(MultiByteCharactersForEuro2);
 
-		ZETestCheck(CharacterEuro.Equals(CharacterEuro2));
+		ZE_TEST_CHECK_ERROR(CharacterEuro.Equals(CharacterEuro2));
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			char MultiByteCharactersForKip[] = "₭";
 
 			ZECharacter CharacterKip;
 			CharacterKip.SetValue(MultiByteCharactersForKip);
 
-			ZETestCheck(!CharacterEuro.Equals(CharacterKip));
+			ZE_TEST_CHECK_ERROR(!CharacterEuro.Equals(CharacterKip));
 		}
 	}
 
-	ZETest("bool ZECharacter::Equals(const char& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::Equals(const char& Character) const")
 	{
 		ZECharacter Character;
 
@@ -151,31 +151,31 @@ ZETestSuite(ZECharacter)
 
 		Character.SetValue(SingleByteChar);
 
-		ZETestCheck(Character.Equals('A'));
+		ZE_TEST_CHECK_ERROR(Character.Equals('A'));
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!Character.Equals('B'));
+			ZE_TEST_CHECK_ERROR(!Character.Equals('B'));
 		}
 	}
 
-	ZETest("bool ZECharacter::Equals(const char* MultiByteCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::Equals(const char* MultiByteCharacter) const")
 	{
 		char MultiByteCharacters[] = "€";
 
 		ZECharacter Character;
 		Character.SetValue(MultiByteCharacters);
 
-		ZETestCheck(Character.Equals("€"));
-		ZETestCheck(Character.Equals("€a"));
+		ZE_TEST_CHECK_ERROR(Character.Equals("€"));
+		ZE_TEST_CHECK_ERROR(Character.Equals("€a"));
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!Character.Equals("₭"));
+			ZE_TEST_CHECK_ERROR(!Character.Equals("₭"));
 		}
 	}
 
-	ZETest("bool ZECharacter::Equals(const wchar_t* WideCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::Equals(const wchar_t* WideCharacter) const")
 	{
 		char MultiByteCharacters[] = "€";
 
@@ -184,75 +184,75 @@ ZETestSuite(ZECharacter)
 
 		wchar_t WideCharacter[2] = {8364, 0};
 
-		ZETestCheck(Character.Equals(WideCharacter));
+		ZE_TEST_CHECK_ERROR(Character.Equals(WideCharacter));
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			char AnotherMultiByteCharacter[] = "₭";
 
 			wchar_t AnotherWideCharacter[2] = {8365, 0};
 
-			ZETestCheck(!Character.Equals(AnotherWideCharacter));
+			ZE_TEST_CHECK_ERROR(!Character.Equals(AnotherWideCharacter));
 		}
 	}
 
-	ZETest("ZECharacter ZECharacter::Upper() const")
+	ZE_TEST_ITEM("ZECharacter ZECharacter::Upper() const")
 	{
 		ZECharacter Character;
 		Character.SetValue("a");
 
 		ZECharacter UpperCaseCharacter = Character.Upper();
 
-		ZETestCheck(UpperCaseCharacter == "A");
+		ZE_TEST_CHECK_ERROR(UpperCaseCharacter == "A");
 	}
 
-	ZETest("void ZECharacter::UpperSelf()")
+	ZE_TEST_ITEM("void ZECharacter::UpperSelf()")
 	{
 		ZECharacter Character;
 		Character.SetValue("a");
 
 		Character.UpperSelf();
 
-		ZETestCheck(Character == "A");
+		ZE_TEST_CHECK_ERROR(Character == "A");
 	}
 
-	ZETest("ZECharacter ZECharacter::Lower() const")
+	ZE_TEST_ITEM("ZECharacter ZECharacter::Lower() const")
 	{
 		ZECharacter Character;
 		Character.SetValue("A");
 
 		ZECharacter LowerCaseCharacter = Character.Lower();
 
-		ZETestCheck(LowerCaseCharacter == "a");
+		ZE_TEST_CHECK_ERROR(LowerCaseCharacter == "a");
 	}
 
-	ZETest("void ZECharacter::LowerSelf()")
+	ZE_TEST_ITEM("void ZECharacter::LowerSelf()")
 	{
 		ZECharacter Character;
 		Character.SetValue("A");
 
 		Character.LowerSelf();
 
-		ZETestCheck(Character == "a");
+		ZE_TEST_CHECK_ERROR(Character == "a");
 	}
 
-	ZETest("ZECharacter ZECharacter::FromChar(const char& Value)")
+	ZE_TEST_ITEM("ZECharacter ZECharacter::FromChar(const char& Value)")
 	{
 		char SingleByteCharacter = 'A';
 		ZECharacter Character = ZECharacter::FromChar(SingleByteCharacter);
 
-		ZETestCheck(Character == 'A');
+		ZE_TEST_CHECK_ERROR(Character == 'A');
 	}
 
-	ZETest("ZECharacter ZECharacter::FromMBChar(const char* Value)")
+	ZE_TEST_ITEM("ZECharacter ZECharacter::FromMBChar(const char* Value)")
 	{
 		char MultiByteCharacter[] = "€";
 		ZECharacter Character = ZECharacter::FromMBChar(MultiByteCharacter);
 
-		ZETestCheck(Character == "€");
+		ZE_TEST_CHECK_ERROR(Character == "€");
 	}
 
-	ZETest("ZECharacter ZECharacter::FromWChar(const wchar_t* Value)")
+	ZE_TEST_ITEM("ZECharacter ZECharacter::FromWChar(const wchar_t* Value)")
 	{
 		char MultiByteCharacter[] = "€";
 
@@ -260,159 +260,159 @@ ZETestSuite(ZECharacter)
 
 		ZECharacter Character = ZECharacter::FromWChar(WideCharacter);
 
-		ZETestCheck(Character == "€");
+		ZE_TEST_CHECK_ERROR(Character == "€");
 	}
 
-	ZETest("ZECharacter& ZECharacter::operator=(const ZECharacter& Character)")
+	ZE_TEST_ITEM("ZECharacter& ZECharacter::operator=(const ZECharacter& Character)")
 	{
 		ZECharacter TempCharacter("€");
 
-		ZETestCheck(TempCharacter == "€");
+		ZE_TEST_CHECK_ERROR(TempCharacter == "€");
 
 		ZECharacter ResultCharacter("₭");
 
 		TempCharacter = ResultCharacter;
 
-		ZETestCheck(TempCharacter == "₭");
+		ZE_TEST_CHECK_ERROR(TempCharacter == "₭");
 	}
 
-	ZETest("ZECharacter& ZECharacter::operator=(const char& Character)")
+	ZE_TEST_ITEM("ZECharacter& ZECharacter::operator=(const char& Character)")
 	{
 		ZECharacter Character('A');
 
-		ZETestCheck(Character == 'A');
+		ZE_TEST_CHECK_ERROR(Character == 'A');
 
 		Character = 'B';
 
-		ZETestCheck(Character == 'B');
+		ZE_TEST_CHECK_ERROR(Character == 'B');
 	}
 
-	ZETest("ZECharacter& ZECharacter::operator=(const char* MultiByteCharacter)")
+	ZE_TEST_ITEM("ZECharacter& ZECharacter::operator=(const char* MultiByteCharacter)")
 	{
 		ZECharacter Character("€");
 
-		ZETestCheck(Character == "€");
+		ZE_TEST_CHECK_ERROR(Character == "€");
 
 		char MultiByteCharacter[] = "A";
 
 		Character = MultiByteCharacter;
 
-		ZETestCheck(Character == "A");
+		ZE_TEST_CHECK_ERROR(Character == "A");
 	}
 
-	ZETest("ZECharacter& ZECharacter::operator=(const wchar_t* WideCharacter)")
+	ZE_TEST_ITEM("ZECharacter& ZECharacter::operator=(const wchar_t* WideCharacter)")
 	{
 		ZECharacter Character("€");
 
-		ZETestCheck(Character == "€");
+		ZE_TEST_CHECK_ERROR(Character == "€");
 
 		wchar_t WideCharacter[2] = {8365, 0};
 
 		Character = WideCharacter;
 
-		ZETestCheck(Character == "₭");
+		ZE_TEST_CHECK_ERROR(Character == "₭");
 	}
 
-	ZETest("bool ZECharacter::operator!=(const ZECharacter& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator!=(const ZECharacter& Character) const")
 	{
 		ZECharacter CharacterEuro("€");
 
 		ZECharacter CharacterKip("₭");
 
-		ZETestCheck((CharacterEuro != CharacterKip));
+		ZE_TEST_CHECK_ERROR((CharacterEuro != CharacterKip));
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			ZECharacter CharacterEuro2("€");
 
-			ZETestCheck(!(CharacterEuro != CharacterEuro2));
+			ZE_TEST_CHECK_ERROR(!(CharacterEuro != CharacterEuro2));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator!=(const char& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator!=(const char& Character) const")
 	{
 		ZECharacter Character('A');
 
-		ZETestCheck(Character != 'B');
+		ZE_TEST_CHECK_ERROR(Character != 'B');
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!(Character != 'A'));
+			ZE_TEST_CHECK_ERROR(!(Character != 'A'));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator!=(const char* MultiByteCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator!=(const char* MultiByteCharacter) const")
 	{
 		ZECharacter Character("€");
 
-		ZETestCheck(Character != "₭");
+		ZE_TEST_CHECK_ERROR(Character != "₭");
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!(Character != "€"));
-			ZETestCheck(!(Character != "€a"));
+			ZE_TEST_CHECK_ERROR(!(Character != "€"));
+			ZE_TEST_CHECK_ERROR(!(Character != "€a"));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator!=(const wchar_t* WideCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator!=(const wchar_t* WideCharacter) const")
 	{
 		char MultiByteCharacter[] = "€";
 		ZECharacter Character(MultiByteCharacter);
 
 		wchar_t AnotherWideCharacter[2] = {8365, 0};
 
-		ZETestCheck(Character != AnotherWideCharacter);
+		ZE_TEST_CHECK_ERROR(Character != AnotherWideCharacter);
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			wchar_t WideCharacter[2] = {8364, 0};
 
-			ZETestCheck(!(Character != WideCharacter));
+			ZE_TEST_CHECK_ERROR(!(Character != WideCharacter));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator==(const ZECharacter& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator==(const ZECharacter& Character) const")
 	{
 		ZECharacter CharacterEuro("€");
 		
 		ZECharacter CharacterEuro2("€");
 
-		ZETestCheck(CharacterEuro == CharacterEuro2);
+		ZE_TEST_CHECK_ERROR(CharacterEuro == CharacterEuro2);
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			ZECharacter CharacterKip("₭");
 
-			ZETestCheck(!(CharacterEuro == CharacterKip));
+			ZE_TEST_CHECK_ERROR(!(CharacterEuro == CharacterKip));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator==(const char& Character) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator==(const char& Character) const")
 	{
 		ZECharacter Character('A');
 
-		ZETestCheck(Character == 'A');
+		ZE_TEST_CHECK_ERROR(Character == 'A');
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!(Character == 'B'));
+			ZE_TEST_CHECK_ERROR(!(Character == 'B'));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator==(const char* MultiByteCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator==(const char* MultiByteCharacter) const")
 	{
 		ZECharacter Character("€");
 
-		ZETestCheck(Character == "€");
-		ZETestCheck(Character == "€a");
+		ZE_TEST_CHECK_ERROR(Character == "€");
+		ZE_TEST_CHECK_ERROR(Character == "€a");
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
-			ZETestCheck(!(Character == "₭"));
+			ZE_TEST_CHECK_ERROR(!(Character == "₭"));
 		}
 	}
 
-	ZETest("bool ZECharacter::operator==(const wchar_t* WideCharacter) const")
+	ZE_TEST_ITEM("bool ZECharacter::operator==(const wchar_t* WideCharacter) const")
 	{
 		char MultiByteCharacter[] = "€";
 
@@ -420,35 +420,35 @@ ZETestSuite(ZECharacter)
 
 		wchar_t WideCharacter[2] = {8364, 0};
 
-		ZETestCheck(Character == WideCharacter);
+		ZE_TEST_CHECK_ERROR(Character == WideCharacter);
 
-		ZETestCase("False Condition")
+		ZE_TEST_CASE("False Condition")
 		{
 			wchar_t AnotherWideCharacter[2] = {8365, 0};
 
-			ZETestCheck(!(Character == AnotherWideCharacter));
+			ZE_TEST_CHECK_ERROR(!(Character == AnotherWideCharacter));
 		}
 	}
 
-	ZETest("ZECharacter::operator char() const")
+	ZE_TEST_ITEM("ZECharacter::operator char() const")
 	{
 		ZECharacter Character('A');
 
 		char Result = Character;
 
-		ZETestCheck(Result == 'A');
+		ZE_TEST_CHECK_ERROR(Result == 'A');
 	}
 
-	ZETest("ZECharacter::operator const char*() const")
+	ZE_TEST_ITEM("ZECharacter::operator const char*() const")
 	{
 		ZECharacter Character("€");
 
 		const char* Result = Character;
 
-		ZETestCheck(strncmp(Result, "€", Character.GetSize()) == 0);
+		ZE_TEST_CHECK_ERROR(strncmp(Result, "€", Character.GetSize()) == 0);
 	}
 
-	ZETest("ZECharacter::operator wchar_t() const")
+	ZE_TEST_ITEM("ZECharacter::operator wchar_t() const")
 	{
 		ZECharacter Character("€");
 
@@ -456,6 +456,6 @@ ZETestSuite(ZECharacter)
 
 		ZEString Result(Temp);
 
-		ZETestCheck(strcmp(Result, "€") == 0);
+		ZE_TEST_CHECK_ERROR(strcmp(Result, "€") == 0);
 	}
 }

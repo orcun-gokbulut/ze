@@ -42,7 +42,6 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	if (PropertyDeclaration->getAccess() != AccessSpecifier::AS_public)
 		return;
 
-	std::string Name = PropertyDeclaration->getNameAsString();
 	ZEMCType PropertyType;
 	if (!ProcessType(PropertyType, PropertyDeclaration->getType()))
 		return;
@@ -56,7 +55,7 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	PropertyData->Name = PropertyDeclaration->getNameAsString();
 	PropertyData->Hash = PropertyData->Name.Hash();
 	PropertyData->IsStatic = isa<VarDecl>(PropertyDeclaration);
-	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
+	PropertyData->IsContainer = PropertyType.CollectionType != ZEMC_CT_NONE;
 	PropertyData->Type = PropertyType;
 	PropertyData->Access = PropertyType.TypeQualifier == ZEMC_TQ_VALUE ? ZEMC_PA_READ_WRITE : ZEMC_PA_READ;
 
@@ -136,7 +135,6 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
 		Accessor.Type = ZEMC_AT_SETTER;
 		Accessor.PropertyType = MethodData->Parameters[0].Type;
-		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
 		Accessor.Method = MethodData;
 		Accessors.Add(Accessor);
 
@@ -156,7 +154,6 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
 		Accessor.Type = ZEMC_AT_GETTER;
 		Accessor.PropertyType = MethodData->ReturnValue;
-		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
 		Accessor.Method = MethodData;
 		Accessors.Add(Accessor);
 	}
@@ -173,7 +170,7 @@ void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
 
 	for (ZESize I = 0; I < Accessors.GetCount(); I++)
 	{
-		if (Accessors[I].PropertyType.ContainerType != ZEMC_CT_NONE)
+		if (Accessors[I].PropertyType.CollectionType != ZEMC_CT_NONE)
 			continue;
 
 		ZEMCAccessor& AccessorData = Accessors[I];
@@ -193,7 +190,7 @@ void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
 			PropertyData->Class = ClassData;
 			PropertyData->Name = AccessorData.Name;
 			PropertyData->Type = AccessorData.PropertyType;
-			PropertyData->IsContainer = AccessorData.PropertyType.ContainerType != ZEMC_CT_NONE;
+			PropertyData->IsContainer = AccessorData.PropertyType.CollectionType != ZEMC_CT_NONE;
 			PropertyData->Hash = PropertyData->Name.Hash();
 
 			ProcessMemberAttributes(PropertyData, NULL, false, NULL);

@@ -46,8 +46,8 @@
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
 
-ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
-ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
+ZEMT_FORWARD_DECLARE(ZEModel);
+ZEMT_FORWARD_DECLARE(ZEAABBox);
 
 class ZEModelBone : public ZEObject, public ZEDestroyable
 {
@@ -151,16 +151,16 @@ class ZEModelBone : public ZEObject, public ZEDestroyable
 		const ZEQuaternion&						GetRotation() const;
 
 		void									SetModelPosition(const ZEVector3& ModelPosition);
-		const ZEVector3							GetModelPosition() const;
+		ZEVector3								GetModelPosition() const;
 
 		void									SetModelRotation(const ZEQuaternion& ModelRotation);
-		const ZEQuaternion						GetModelRotation() const;
+		ZEQuaternion							GetModelRotation() const;
 
 		void									SetWorldPosition(const ZEVector3& WorldPosition);
-		const ZEVector3							GetWorldPosition() const;
+		ZEVector3								GetWorldPosition() const;
 
 		void									SetWorldRotation(const ZEQuaternion& WorldRotation);
-		const ZEQuaternion						GetWorldRotation() const;
+		ZEQuaternion							GetWorldRotation() const;
 
 		void									SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType					GetAnimationType() const;

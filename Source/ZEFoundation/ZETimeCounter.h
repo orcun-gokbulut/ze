@@ -34,28 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TIME_COUNTER_H__
-#define __ZE_TIME_COUNTER_H__
 
 #include "ZETypes.h"
+
+enum ZETimeCounterState
+{
+	ZE_TCS_STOPPED,
+	ZE_TCS_RUNNING,
+	ZE_TCS_PAUSED
+};
 
 class ZETimeCounter
 {
 	private:
-        bool            Started;
-		ZEUInt64		StartTime;
-		ZEUInt64		EndTime;
-		ZEUInt64		Frequency;
+		ZETimeCounterState			State;
+		mutable ZEUInt64			AcumulatedTime;
+		mutable ZEUInt64			LastMeasuredTime;
+		static ZEUInt64				Frequency;
+
+		void						UpdateAcumulatedTime() const;
 
 	public:
-        void            SetTime(ZEUInt64 Microseconds);
-        ZEUInt64		GetTime();
+		ZETimeCounterState			GetState() const;
 
-		void			Start();
-		void			Stop();
-        void			Reset();
+		double						GetTimeSeconds() const;
+		double						GetTimeMilliseconds() const;
+        ZEUInt64					GetTimeMicroseconds() const;
+		ZEUInt64					GetTimeNanoSeconds() const;
 
-                        ZETimeCounter();
+		void						Start();
+		void						Pause();
+		void						Stop();
+		void						Reset();
+
+									ZETimeCounter();
 };
-
-#endif

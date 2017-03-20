@@ -196,7 +196,7 @@ const ZEVector3& ZEModelHelper::GetScale() const
 	return Scale;
 }
 
-const ZEVector3 ZEModelHelper::GetModelPosition() const
+ZEVector3 ZEModelHelper::GetModelPosition() const
 {
 	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
 		return ParentMesh->GetModelTransform() * GetPosition();
@@ -206,7 +206,7 @@ const ZEVector3 ZEModelHelper::GetModelPosition() const
 		return  GetPosition();
 }
 
-const ZEVector3 ZEModelHelper::GetWorldPosition() const
+ZEVector3 ZEModelHelper::GetWorldPosition() const
 {
 	if (ParentType == ZE_MHPT_MODEL && Model != NULL)
 		return Model->GetWorldTransform() * GetPosition();
@@ -218,7 +218,7 @@ const ZEVector3 ZEModelHelper::GetWorldPosition() const
 		return GetPosition();
 }
 
-const ZEQuaternion ZEModelHelper::GetModelRotation() const
+ZEQuaternion ZEModelHelper::GetModelRotation() const
 {
 	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
 		return (ParentMesh->GetModelRotation() * GetRotation()).Normalize();
@@ -228,7 +228,7 @@ const ZEQuaternion ZEModelHelper::GetModelRotation() const
 		return GetRotation();
 }
 
-const ZEQuaternion ZEModelHelper::GetWorldRotation() const
+ZEQuaternion ZEModelHelper::GetWorldRotation() const
 {
 	if (ParentType == ZE_MRHPT_MODEL && Model != NULL)
 		return (Model->GetWorldRotation() * GetRotation()).Normalize();
@@ -240,7 +240,7 @@ const ZEQuaternion ZEModelHelper::GetWorldRotation() const
 		return GetRotation();
 }
 
-const ZEVector3 ZEModelHelper::GetModelScale() const
+ZEVector3 ZEModelHelper::GetModelScale() const
 {
 	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
 		return ParentMesh->GetModelScale() * GetScale();
@@ -248,7 +248,7 @@ const ZEVector3 ZEModelHelper::GetModelScale() const
 		return GetScale();
 }
 
-const ZEVector3 ZEModelHelper::GetWorldScale() const
+ZEVector3 ZEModelHelper::GetWorldScale() const
 {
 	if (ParentType == ZE_MHPT_MODEL && Model != NULL)
 		return Model->GetWorldScale() * GetScale();

@@ -265,7 +265,7 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 	ZEArray<ZEBYTE> ShaderByteCode;
 	if (RequiredCompilation(UpdatedOptions, ShaderByteCode))
 	{
-		zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Declaration()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
+		zeLog("Compiling shader. Type: \"%s\", Entry: \"%s\", Filename: \"%s\"", ZEGRShaderType_Enumerator()->ToText(Options.Type).ToCString(), Options.EntryPoint.ToCString(), Options.FileName.ToCString());
 
 		if (!LoadFromFile(UpdatedOptions.SourceData, UpdatedOptions.FileName))
 			return NULL;

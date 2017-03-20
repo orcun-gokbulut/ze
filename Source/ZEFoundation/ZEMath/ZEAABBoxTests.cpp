@@ -49,75 +49,75 @@
 
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
 
-ZETestSuite(ZEAABBox)
+ZE_TEST(ZEAABBox)
 {
-	ZETest("void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)")
+	ZE_TEST_ITEM("void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 		ZEBSphere Result;
 
 		ZEAABBox::GenerateBoundingSphere(Result, AABBox);
 
-		ZETestCheckClose(Result.Position, ZEVector3(10.000000f, 10.000000f, 10.000000f));
-		ZETestCheckClose(Result.Radius, 0.86602539f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Position, ZEVector3(10.000000f, 10.000000f, 10.000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Radius, 0.86602539f);
 	}
 
-	ZETest("void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox)")
+	ZE_TEST_ITEM("void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 		ZEOBBox Result;
 
 		ZEAABBox::GenerateOBoundingBox(Result, AABBox);
 
-		ZETestCheckClose(Result.Center, ZEVector3(10.000000f, 10.000000f, 10.000000f));
-		ZETestCheckClose(Result.Right, ZEVector3(1.0000000f, 0.00000000f, 0.00000000f));
-		ZETestCheckClose(Result.Up, ZEVector3(0.00000000f, 1.0000000f, 0.00000000f));
-		ZETestCheckClose(Result.Front, ZEVector3(0.00000000f, 0.00000000f, 1.0000000f));
-		ZETestCheckClose(Result.HalfSize, ZEVector3(0.50000000f, 0.50000000f, 0.50000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Center, ZEVector3(10.000000f, 10.000000f, 10.000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Right, ZEVector3(1.0000000f, 0.00000000f, 0.00000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Up, ZEVector3(0.00000000f, 1.0000000f, 0.00000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.Front, ZEVector3(0.00000000f, 0.00000000f, 1.0000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result.HalfSize, ZEVector3(0.50000000f, 0.50000000f, 0.50000000f));
 	}
 
-	ZETest("ZEVector3 ZEAABBox::GetCenter() const")
+	ZE_TEST_ITEM("ZEVector3 ZEAABBox::GetCenter() const")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
 		ZEVector3 Center = AABBox.GetCenter();
 
-		ZETestCheckClose(Center, ZEVector3(10.000000f, 10.000000f, 10.000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Center, ZEVector3(10.000000f, 10.000000f, 10.000000f));
 	}
 
-	ZETest("float ZEAABBox::GetLenght() const")
+	ZE_TEST_ITEM("float ZEAABBox::GetLenght() const")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 		
 		float LengthOfDiagonal = AABBox.GetLenght();
 
-		ZETestCheckClose(LengthOfDiagonal, ZEVector3::Distance(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f)));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(LengthOfDiagonal, ZEVector3::Distance(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f)));
 	}
 
-	ZETest("ZEVector3 ZEAABBox::GetVertex(unsigned char Index) const")
+	ZE_TEST_ITEM("ZEVector3 ZEAABBox::GetVertex(unsigned char Index) const")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
   
-		ZETestCheckClose(AABBox.GetVertex(0), ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(1), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(2), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(3), ZEVector3(10.500000f, 10.500000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(4), ZEVector3(9.5000000f, 9.5000000f, 10.500000f));
-		ZETestCheckClose(AABBox.GetVertex(5), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
-		ZETestCheckClose(AABBox.GetVertex(6), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
-		ZETestCheckClose(AABBox.GetVertex(7), ZEVector3(10.500000f, 10.500000f, 10.500000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(0), ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(1), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(2), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(3), ZEVector3(10.500000f, 10.500000f, 9.5000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(4), ZEVector3(9.5000000f, 9.5000000f, 10.500000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(5), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(6), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.GetVertex(7), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)")
 	{
 		ZEAABBox AABBox(ZEVector3(1.9993184f, 5.0916834f, 4.0711741f), ZEVector3(2.9993184f, 6.0916834f, 5.0711741f));
 
 		ZEBSphere BSphere(ZEVector3(2.3270669f, 5.8254647f, 4.0549030f), 0.50000000f);
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, BSphere));
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, BSphere));
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -125,10 +125,10 @@ ZETestSuite(ZEAABBox)
 		Line.v = ZEVector3(-0.99329460f, -0.11474650f, -0.014108747f);
 		Line.p = ZEVector3(16.774904f, 10.661500f, 10.084741f);
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Line));
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Line));
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -138,11 +138,11 @@ ZETestSuite(ZEAABBox)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Line, Tmin));
-		ZETestCheckClose(Tmin, 6.3172641f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Line, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 6.3172641f);
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -153,12 +153,12 @@ ZETestSuite(ZEAABBox)
 		float Tmin = 0.0f;
 		float Tmax = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Line, Tmin, Tmax));
-		ZETestCheckClose(Tmin, 6.3172641f);
-		ZETestCheckClose(Tmax, 7.3240147f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Line, Tmin, Tmax));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 6.3172641f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmax, 7.3240147f);
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -167,10 +167,10 @@ ZETestSuite(ZEAABBox)
 		LineSegment.p = ZEVector3(12.655836f, 10.099570f, 10.100832f);
 		LineSegment.Length = 3.5186925f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, LineSegment));
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, LineSegment));
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line, float& TMin)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line, float& TMin)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -181,11 +181,11 @@ ZETestSuite(ZEAABBox)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, LineSegment, Tmin));
-		ZETestCheckClose(Tmin, 2.1617754f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, LineSegment, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 2.1617754f);
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -197,35 +197,35 @@ ZETestSuite(ZEAABBox)
 		float Tmin = 0.0f;
 		float Tmax = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, LineSegment, Tmin, Tmax));
-		ZETestCheckClose(Tmin, 2.1617754f);
-		ZETestCheckClose(Tmax, 3.1645303f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, LineSegment, Tmin, Tmax));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 2.1617754f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmax, 3.1645303f);
 	}
 
-	ZETest("ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane)")
+	ZE_TEST_ITEM("ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
-		ZETestCase("AABBox is intersecting the Plane")
+		ZE_TEST_CASE("AABBox is intersecting the Plane")
 		{
 			ZEPlane Plane(ZEVector3(-0.36145043f, 0.79461271f, -0.48779538f), ZEVector3::Zero);
-			ZETestCheckEqual(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_INTERSECTS);
+			ZE_TEST_CHECK_EQUAL(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_INTERSECTS);
 		}
 
-		ZETestCase("AABBox is on positive side of the Plane")
+		ZE_TEST_CASE("AABBox is on positive side of the Plane")
 		{
 			ZEPlane Plane(ZEVector3(0.56687558f, 0.77218467f, 0.28702420f), ZEVector3::Zero);
-			ZETestCheckEqual(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_POSITIVE_SIDE);
+			ZE_TEST_CHECK_EQUAL(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_POSITIVE_SIDE);
 		}
 
-		ZETestCase("AABBox is on negative side of the Plane")
+		ZE_TEST_CASE("AABBox is on negative side of the Plane")
 		{
 			ZEPlane Plane(ZEVector3(-0.64037079f, 0.71312839f, -0.28525996f), ZEVector3::Zero);
-			ZETestCheckEqual(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_NEGATIVE_SIDE);
+			ZE_TEST_CHECK_EQUAL(ZEAABBox::IntersectionTest(AABBox, Plane), ZE_HS_NEGATIVE_SIDE);
 		}
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -233,10 +233,10 @@ ZETestSuite(ZEAABBox)
 		Ray.v = ZEVector3(-0.99582845f, -0.089878544f, 0.015733540f);
 		Ray.p = ZEVector3(19.678036f, 11.065289f, 9.8985271f);
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Ray));
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Ray));
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line, float& TMin)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line, float& TMin)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -246,11 +246,11 @@ ZETestSuite(ZEAABBox)
 
 		float Tmin = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Ray, Tmin));
-		ZETestCheckClose(Tmin, 9.2164831f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Ray, Tmin));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 9.2164831f);
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, float & TMin, float& TMax)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, float & TMin, float& TMax)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
@@ -261,55 +261,55 @@ ZETestSuite(ZEAABBox)
 		float Tmin = 0.0f;
 		float Tmax = 0.0f;
 
-		ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Ray, Tmin, Tmax));
-		ZETestCheckClose(Tmin, 9.2164831f);
-		ZETestCheckClose(Tmax, 10.220672f);
+		ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Ray, Tmin, Tmax));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmin, 9.2164831f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Tmax, 10.220672f);
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point)")
 	{
 		ZEAABBox AABBox(ZEVector3(3.6039853f, 2.2905931f, 3.3190460f), ZEVector3(4.6039853f, 3.2905931f, 4.3190460f));
 
-		ZETestCase("A point is given inside the ZEAABBox")
+		ZE_TEST_CASE("A point is given inside the ZEAABBox")
 		{
 			ZEVector3 Point(4.0286264f, 2.4825892f, 4.0162358f);
 
-			ZETestCheck(ZEAABBox::IntersectionTest(AABBox, Point));
+			ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, Point));
 		}
 
-		ZETestCase("A point is given outside the ZEAABBox")
+		ZE_TEST_CASE("A point is given outside the ZEAABBox")
 		{
 			ZEVector3 Point(5.1911983f, 2.1796625f, 3.8908355f);
 
-			ZETestCheck(!(ZEAABBox::IntersectionTest(AABBox, Point)));
+			ZE_TEST_CHECK_ERROR(!(ZEAABBox::IntersectionTest(AABBox, Point)));
 		}
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2)")
 	{
 		ZEAABBox AABBox(ZEVector3(5.3589416f, 1.9059958f, 5.1632857f), ZEVector3(6.3589416f, 2.9059958f, 6.1632857f));
 
-		ZETestCase("Two AABBoxes are intersecting")
+		ZE_TEST_CASE("Two AABBoxes are intersecting")
 		{
 			ZEAABBox ExampleAABBox1(ZEVector3(5.7656059f, 2.7649648f, 5.0221748f), ZEVector3(6.1656055f, 3.1649649f, 5.4221745f));
-			ZETestCheck(ZEAABBox::IntersectionTest(AABBox, ExampleAABBox1));
+			ZE_TEST_CHECK_ERROR(ZEAABBox::IntersectionTest(AABBox, ExampleAABBox1));
 		}
 
-		ZETestCase("Two AABBoxes are not intersecting")
+		ZE_TEST_CASE("Two AABBoxes are not intersecting")
 		{
 			ZEAABBox ExampleAABBox2(ZEVector3(6.5741935f, 3.3494554f, 0.56329846f), ZEVector3(6.9741931f, 3.7494555f, 0.96329844f));
-			ZETestCheck(!(ZEAABBox::IntersectionTest(AABBox, ExampleAABBox2)));
+			ZE_TEST_CHECK_ERROR(!(ZEAABBox::IntersectionTest(AABBox, ExampleAABBox2)));
 		}
 
 	}
 
-	ZETest("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)")
+	ZE_TEST_ITEM("bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)")
 	{
 		//Due to errors known this test is skipped. (Refer to Redmine : Bug #303)
-		ZETestCheck(false);
+		ZE_TEST_CHECK_ERROR(false);
 	}
 
-	ZETest("void ZEAABBox::Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix)")
+	ZE_TEST_ITEM("void ZEAABBox::Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix)")
 	{
 		ZEAABBox AABBox(ZEVector3(4.5f, -0.5f, -0.5f), ZEVector3(5.5f, 0.5f, 0.5f));
 		ZEMatrix4x4 TransformMatrix;
@@ -326,16 +326,16 @@ ZETestSuite(ZEAABBox)
 		ZEMatrix4x4::CreateTranslation(TransformMatrix, ZEVector3(10.0f, 10.0f, 10.0f));
 		ZEAABBox::Transform(ResultingBox, RotatedBox, TransformMatrix);
 
-		ZETestCheckClose(ResultingBox.Min, ZEVector3(9.2928934f, 9.5000000f, 9.2928934f));
-		ZETestCheckClose(ResultingBox.Max, ZEVector3(10.707107f, 10.500000f, 10.707107f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingBox.Min, ZEVector3(9.2928934f, 9.5000000f, 9.2928934f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingBox.Max, ZEVector3(10.707107f, 10.500000f, 10.707107f));
 	}
 
-	ZETest("ZEAABBox::ZEAABBox(const ZEVector3& Min, const ZEVector3& Max)")
+	ZE_TEST_ITEM("ZEAABBox::ZEAABBox(const ZEVector3& Min, const ZEVector3& Max)")
 	{
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
-		ZETestCheckClose(AABBox.Min, ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
-		ZETestCheckClose(AABBox.Max, ZEVector3(10.500000f, 10.500000f, 10.500000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.Min, ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(AABBox.Max, ZEVector3(10.500000f, 10.500000f, 10.500000f));
 	}
 
 	static bool ZETestCheckAABBoxLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
@@ -400,16 +400,16 @@ ZETestSuite(ZEAABBox)
 		return Result;
 	}
 
-	ZETest("ZEAABBox vs ZELine Intersection Test")
+	ZE_TEST_ITEM("ZEAABBox vs ZELine Intersection Test")
 	{
-		ZETestCheck(ZETestCheckAABBoxLineIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 
 	static bool ZETestCheckAABBoxLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
@@ -493,16 +493,16 @@ ZETestSuite(ZEAABBox)
 		return Result;
 	}
 
-	ZETest("ZEAABBox vs ZELineSegment Intersection Test")
+	ZE_TEST_ITEM("ZEAABBox vs ZELineSegment Intersection Test")
 	{
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 
 	static bool ZETestCheckAABBoxRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
@@ -576,15 +576,15 @@ ZETestSuite(ZEAABBox)
 		return Result;
 	}
 
-	ZETest("ZEAABBox vs ZERay Intersection Test")
+	ZE_TEST_ITEM("ZEAABBox vs ZERay Intersection Test")
 	{
-		ZETestCheck(ZETestCheckAABBoxRayIntersection()); //FRU Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
-		ZETestCheck(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection()); //FRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZE_TEST_CHECK_ERROR(ZETestCheckAABBoxRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 }

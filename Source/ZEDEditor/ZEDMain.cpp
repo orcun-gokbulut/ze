@@ -37,16 +37,33 @@
 
 #include "ZEDCore/ZEDEditorCore.h"
 #include "ZEDEntityEditor/ZEDEntityEditor.h"
+#include "ZEFile/ZEPathManager.h"
+#include "ZEThread/ZETaskPool.h"
+#include "ZEThread/ZETaskManager.h"
+#include "ZEThread/ZETask.h"
 
-#include "qglobal.h"
+#include <qglobal.h>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEFile/ZEPathManager.h"
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
 	Q_INIT_RESOURCE(ZEDCommon);
+
+	ZETaskPool* RealTimePool = new ZETaskPool();
+	RealTimePool->SetId(ZE_TPI_REAL_TIME);
+	RealTimePool->SetName("RealTime Pool");
+	RealTimePool->SetSchedulingPolicy(ZE_TSP_ALWAYS_FIRST);
+	RealTimePool->SetReservedThreadCount(1);
+	ZETaskManager::GetInstance()->RegisterPool(RealTimePool);
+
+	ZETaskPool* ConcurrentPool = new ZETaskPool();
+	ConcurrentPool->SetId(ZE_TPI_CONCURENT);
+	ConcurrentPool->SetName("Concurrent Pool");
+	ZETaskManager::GetInstance()->RegisterPool(ConcurrentPool);
+
+	ZETaskManager::GetInstance()->SetThreadCount(3);
 
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();

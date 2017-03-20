@@ -529,12 +529,12 @@ ZEOptionManager* ZEOptionManager::GetInstance()
 ZEOptionManager::ZEOptionManager()
 {
 	Commands.SetName("Options");
-	Commands.AddCommand(new ZECommand("Save", BindDelegate(this, &ZEOptionManager::SaveCommand)));
-	Commands.AddCommand(new ZECommand("Load", BindDelegate(this, &ZEOptionManager::LoadCommand)));
-	Commands.AddCommand(new ZECommand("ListSections", BindDelegate(this, &ZEOptionManager::ListSectionsCommand)));
-	Commands.AddCommand(new ZECommand("ListOptions",BindDelegate(this, &ZEOptionManager::ListOptionsCommand)));
-	Commands.AddCommand(new ZECommand("CommitChanges", BindDelegate(this, &ZEOptionManager::CommitChangesCommand)));
-	Commands.AddCommand(new ZECommand("ResetChanges",BindDelegate(this, &ZEOptionManager::ResetChangesCommand)));
+	Commands.AddCommand(new ZECommand("Save", ZECommandCallback::Create<ZEOptionManager, &ZEOptionManager::SaveCommand>(this)));
+	Commands.AddCommand(new ZECommand("Load", ZECommandCallback::Create<ZEOptionManager, &ZEOptionManager::LoadCommand>(this)));
+	Commands.AddCommand(new ZECommand("ListSections",  ZECommandCallback::Create<ZEOptionManager, &ZEOptionManager::ListSectionsCommand>(this)));
+	Commands.AddCommand(new ZECommand("ListOptions",   ZECommandCallback::Create<ZEOptionManager, &ZEOptionManager::ListOptionsCommand>(this)));
+	Commands.AddCommand(new ZECommand("CommitChanges", ZECommandCallback::Create<ZEOptionManager,  &ZEOptionManager::CommitChangesCommand>(this)));
+	Commands.AddCommand(new ZECommand("ResetChanges",  ZECommandCallback::Create<ZEOptionManager,  &ZEOptionManager::ResetChangesCommand>(this)));
 	ZECommandManager::GetInstance()->RegisterSection(&Commands);
 }
 

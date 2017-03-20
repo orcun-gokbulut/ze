@@ -55,45 +55,45 @@ public:
 	}
 };
 
-ZETestSuite(ZEListIterator)
+ZE_TEST(ZEListIterator)
 {
-	ZETest("inline bool IsEnd() const")
+	ZE_TEST_ITEM("inline bool IsEnd() const")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListIterator<ZEListTestItem> Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 
 		bool End = Iterator.IsEnd();
-		ZETestCheck(End);
+		ZE_TEST_CHECK_ERROR(End);
 
-		ZETestCase("for false")
+		ZE_TEST_CASE("for false")
 		{
 			ZEListTestItem Item;
 			List.Insert(&Item);
 
 			Iterator = List.GetIterator();
-			ZETestCheckEqual(Iterator.GetItem(), &Item);
+			ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item);
 
 			End = Iterator.IsEnd();
-			ZETestCheck(!End);
+			ZE_TEST_CHECK_ERROR(!End);
 
 			ZEListItem* Next = Iterator.MoveNext();
-			ZETestCheckEqual(Next, NULL);
+			ZE_TEST_CHECK_EQUAL(Next, NULL);
 
 			End = Iterator.IsEnd();
-			ZETestCheck(End);
+			ZE_TEST_CHECK_ERROR(End);
 		}
 	}
 
-	ZETest("inline const ZEType* GetItem() const")
+	ZE_TEST_ITEM("inline const ZEType* GetItem() const")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListIterator<ZEListTestItem> Iterator = List.GetIterator();
 
 		const ZEListTestItem* Result = Iterator.GetItem();
-		ZETestCheckEqual(Result, NULL);
+		ZE_TEST_CHECK_EQUAL(Result, NULL);
 
-		ZETestCase("for not an empty list")
+		ZE_TEST_CASE("for not an empty list")
 		{
 			ZEListTestItem Item1;
 			List.Insert(&Item1);
@@ -101,25 +101,25 @@ ZETestSuite(ZEListIterator)
 			Iterator = List.GetIterator();
 
 			Result = Iterator.GetItem();
-			ZETestCheckEqual(Result, &Item1);
+			ZE_TEST_CHECK_EQUAL(Result, &Item1);
 
 			ZEListTestItem Item2;
 			List.Insert(&Item2);
 			Iterator = List.GetIterator();
 
 			Result = Iterator.GetItem();
-			ZETestCheckEqual(Result, &Item2);
+			ZE_TEST_CHECK_EQUAL(Result, &Item2);
 
 			ZEListTestItem Item3;
 			List.Append(&Item3);
 			Iterator = List.GetIterator();
 
 			Result = Iterator.GetItem();
-			ZETestCheckEqual(Result, &Item2);
+			ZE_TEST_CHECK_EQUAL(Result, &Item2);
 		}
 	}
 
-	ZETest("inline ZEType* MovePrevious()")
+	ZE_TEST_ITEM("inline ZEType* MovePrevious()")
 	{
 		ZEList<ZEListItem> List;
 		ZEListTestItem Item1;
@@ -128,7 +128,7 @@ ZETestSuite(ZEListIterator)
 		ZEListIterator<ZEListItem> Iterator = List.GetIterator();
 
 		ZEListItem* Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 
 		ZEListTestItem Item2;
 		List.Append(&Item2);
@@ -136,7 +136,7 @@ ZETestSuite(ZEListIterator)
 		Iterator = List.GetIterator();
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 
 		ZEListTestItem Item3;
 		List.Append(&Item3);
@@ -144,7 +144,7 @@ ZETestSuite(ZEListIterator)
 		Iterator = List.GetIterator();
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 
 		ZEListTestItem Item4;
 		List.Insert(&Item4);
@@ -152,10 +152,10 @@ ZETestSuite(ZEListIterator)
 		Iterator = List.GetIterator();
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 	}
 
-	ZETest("inline ZEType* MoveNext()")
+	ZE_TEST_ITEM("inline ZEType* MoveNext()")
 	{
 		ZEList<ZEListItem> List;
 		ZEListTestItem Item1;
@@ -164,7 +164,7 @@ ZETestSuite(ZEListIterator)
 		ZEListIterator<ZEListItem> Iterator = List.GetIterator();
 
 		ZEListItem* Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
 
 		ZEListTestItem Item2;
 		List.Append(&Item2);
@@ -172,7 +172,7 @@ ZETestSuite(ZEListIterator)
 		Iterator = List.GetIterator();
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item2);
+		ZE_TEST_CHECK_EQUAL(Next, &Item2);
 
 		ZEListTestItem Item3;
 		List.Insert(&Item3);
@@ -180,13 +180,13 @@ ZETestSuite(ZEListIterator)
 		Iterator = List.GetIterator();
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item1);
+		ZE_TEST_CHECK_EQUAL(Next, &Item1);
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item2);
+		ZE_TEST_CHECK_EQUAL(Next, &Item2);
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
 
-		ZETestCase("MoveNext and MovePrevious")
+		ZE_TEST_CASE("MoveNext and MovePrevious")
 		{
 			ZEList<ZEListItem> List1;
 			ZEListTestItem Item1;
@@ -198,41 +198,41 @@ ZETestSuite(ZEListIterator)
 			Iterator = List1.GetIterator();
 
 			Next = Iterator.MoveNext();
-			ZETestCheckEqual(Next, NULL);
+			ZE_TEST_CHECK_EQUAL(Next, NULL);
 
 			List1.Append(&Item2);
 
 			Iterator = List1.GetIterator();
 			Next = Iterator.MoveNext();
-			ZETestCheckEqual(Next, &Item2);
+			ZE_TEST_CHECK_EQUAL(Next, &Item2);
 			ZEListItem* Previous = Iterator.MovePrevious();
-			ZETestCheckEqual(Previous, &Item1);
+			ZE_TEST_CHECK_EQUAL(Previous, &Item1);
 
 			List1.Append(&Item3);
 			Iterator = List1.GetIterator();
 
 			Next = Iterator.MoveNext();
-			ZETestCheckEqual(Next, &Item2);
+			ZE_TEST_CHECK_EQUAL(Next, &Item2);
 			Next = Iterator.MoveNext();
-			ZETestCheckEqual(Next, &Item3);
+			ZE_TEST_CHECK_EQUAL(Next, &Item3);
 			Previous = Iterator.MovePrevious();
-			ZETestCheckEqual(Previous, &Item2);
+			ZE_TEST_CHECK_EQUAL(Previous, &Item2);
 			Previous = Iterator.MovePrevious();
-			ZETestCheckEqual(Previous, &Item1);
+			ZE_TEST_CHECK_EQUAL(Previous, &Item1);
 			Previous = Iterator.MovePrevious();
-			ZETestCheckEqual(Previous, NULL);
+			ZE_TEST_CHECK_EQUAL(Previous, NULL);
 		}
 	}
 
-	ZETest("inline ZESize GetIndex()")
+	ZE_TEST_ITEM("inline ZESize GetIndex()")
 	{
 		ZEList<ZEListItem> List;
 		ZEListIterator<ZEListItem> Iterator = List.GetIterator();
 
 		ZESize Index = Iterator.GetIndex();
-		ZETestCheckEqual(Index, 0);
+		ZE_TEST_CHECK_EQUAL(Index, 0);
 
-		ZETestCase("for not an empty list")
+		ZE_TEST_CASE("for not an empty list")
 		{
 			ZEListTestItem Item1;
 			List.Insert(&Item1);
@@ -240,33 +240,33 @@ ZETestSuite(ZEListIterator)
 			Iterator = List.GetIterator();
 
 			Index = Iterator.GetIndex();
-			ZETestCheckEqual(Index, 0);
+			ZE_TEST_CHECK_EQUAL(Index, 0);
 
 			ZEListTestItem Item2;
 			List.Insert(&Item2);
 
 			Index = Iterator.GetIndex();
-			ZETestCheckEqual(Index, 1);
+			ZE_TEST_CHECK_EQUAL(Index, 1);
 
 			ZEListTestItem Item3;
 			List.Insert(&Item3);
 
 			Index = Iterator.GetIndex();
-			ZETestCheckEqual(Index, 2);
+			ZE_TEST_CHECK_EQUAL(Index, 2);
 
 			Iterator = List.GetIterator();
 			Index = Iterator.GetIndex();
-			ZETestCheckEqual(Index, 0);
+			ZE_TEST_CHECK_EQUAL(Index, 0);
 
 			ZEListTestItem Item4;
 			List.Append(&Item4);
 
 			Index = Iterator.GetIndex();
-			ZETestCheckEqual(Index, 0);
+			ZE_TEST_CHECK_EQUAL(Index, 0);
 		}
 	}
 
-	ZETest("class ZEListIterator mixed test")
+	ZE_TEST_ITEM("class ZEListIterator mixed test")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListTestItem Item1;
@@ -275,96 +275,96 @@ ZETestSuite(ZEListIterator)
 		ZEListTestItem Item4;
 
 		ZEListIterator<ZEListTestItem> Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
 
 		List.Insert(&Item1);
 		Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), &Item1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item1);
 
 		List.Insert(&Item2);
 		Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item2);
 
 		ZEListTestItem* Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item1);
+		ZE_TEST_CHECK_EQUAL(Next, &Item1);
 
 		ZEListTestItem* Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, &Item2);
+		ZE_TEST_CHECK_EQUAL(Previous, &Item2);
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 
 		Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), &Item2);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
 
 		List.Insert(&Item3);
-		ZETestCheckEqual(Iterator.GetItem(), &Item2);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
 
 		List.Insert(&Item4);
-		ZETestCheckEqual(Iterator.GetItem(), &Item2);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
 
 		Previous = Iterator.MovePrevious();
-		ZETestCheckEqual(Previous, &Item3);
-		ZETestCheckEqual(Iterator.GetItem(), &Item3);
-		ZETestCheckEqual(Iterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, &Item3);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item3);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 1);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item2);
-		ZETestCheckEqual(Iterator.GetItem(), &Item2);
-		ZETestCheckEqual(Iterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(Next, &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 2);
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, &Item1);
-		ZETestCheckEqual(Iterator.GetItem(), &Item1);
-		ZETestCheckEqual(Iterator.GetIndex(), 3);
-		ZETestCheck(!Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, &Item1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item1);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 3);
+		ZE_TEST_CHECK_ERROR(!Iterator.IsEnd());
 
 		Next = Iterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(Iterator.GetItem(), NULL);
-		ZETestCheckEqual(Iterator.GetIndex(), 0);
-		ZETestCheck(Iterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetIndex(), 0);
+		ZE_TEST_CHECK_ERROR(Iterator.IsEnd());
 
 		Iterator = List.GetIterator();
-		ZETestCheckEqual(Iterator.GetItem(), &Item4);
+		ZE_TEST_CHECK_EQUAL(Iterator.GetItem(), &Item4);
 	}
 }
 
-ZETestSuite(ZEListIteratorConst)
+ZE_TEST(ZEListIteratorConst)
 {
-	ZETest("inline bool IsEnd() const")
+	ZE_TEST_ITEM("inline bool IsEnd() const")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListIteratorConst<ZEListTestItem> ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 
 		bool End = ConstIterator.IsEnd();
-		ZETestCheck(End);
+		ZE_TEST_CHECK_ERROR(End);
 
-		ZETestCase("for false")
+		ZE_TEST_CASE("for false")
 		{
 			ZEListTestItem Item;
 			List.Insert(&Item);
 
 			ConstIterator = List.GetConstIterator();
-			ZETestCheckEqual(ConstIterator.GetItem(), &Item);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item);
 
 			End = ConstIterator.IsEnd();
-			ZETestCheck(!End);
+			ZE_TEST_CHECK_ERROR(!End);
 		}
 	}
 
-	ZETest("inline const ZEType* GetItem() const")
+	ZE_TEST_ITEM("inline const ZEType* GetItem() const")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListIteratorConst<ZEListTestItem> ConstIterator = List.GetConstIterator();
 
 		const ZEListTestItem* Result = ConstIterator.GetItem();
-		ZETestCheckEqual(Result, NULL);
+		ZE_TEST_CHECK_EQUAL(Result, NULL);
 
-		ZETestCase("for not an empty list")
+		ZE_TEST_CASE("for not an empty list")
 		{
 			ZEListTestItem Item1;
 			List.Insert(&Item1);
@@ -372,7 +372,7 @@ ZETestSuite(ZEListIteratorConst)
 			ConstIterator = List.GetConstIterator();
 
 			Result = ConstIterator.GetItem();
-			ZETestCheckEqual(Result, &Item1);
+			ZE_TEST_CHECK_EQUAL(Result, &Item1);
 
 			ZEListTestItem Item2;
 			List.Insert(&Item2);
@@ -380,7 +380,7 @@ ZETestSuite(ZEListIteratorConst)
 			ConstIterator = List.GetConstIterator();
 
 			Result = ConstIterator.GetItem();
-			ZETestCheckEqual(Result, &Item2);
+			ZE_TEST_CHECK_EQUAL(Result, &Item2);
 
 			ZEListTestItem Item3;
 			List.Append(&Item3);
@@ -388,49 +388,49 @@ ZETestSuite(ZEListIteratorConst)
 			ConstIterator = List.GetConstIterator();
 
 			Result = ConstIterator.GetItem();
-			ZETestCheckEqual(Result, &Item2);
+			ZE_TEST_CHECK_EQUAL(Result, &Item2);
 		}
 	}
 
-	ZETest("inline ZESize GetIndex()")
+	ZE_TEST_ITEM("inline ZESize GetIndex()")
 	{
 		 ZEList<ZEListTestItem> List;
 		 ZEListIteratorConst<ZEListTestItem> ConstIterator = List.GetConstIterator();
 		 
 		 ZESize Index = ConstIterator.GetIndex();
-		 ZETestCheckEqual(Index, 0);
+		 ZE_TEST_CHECK_EQUAL(Index, 0);
 		 
-		 ZETestCase("for not an empty list")
+		 ZE_TEST_CASE("for not an empty list")
 		 {
 			ZEListTestItem Item1;
 			List.Insert(&Item1);
 
 		 	ConstIterator = List.GetConstIterator();
 		 
-			ZETestCheckEqual(ConstIterator.GetItem(), &Item1);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item1);
 		 	Index = ConstIterator.GetIndex();
-		 	ZETestCheckEqual(Index, 0);
+		 	ZE_TEST_CHECK_EQUAL(Index, 0);
 		 
 			ZEListTestItem Item2;
 			List.Insert(&Item2);
 		 
 		 	Index = ConstIterator.GetIndex();
-		 	ZETestCheckEqual(Index, 1);
+		 	ZE_TEST_CHECK_EQUAL(Index, 1);
 
 			ZEListTestItem Item3;
 			List.Insert(&Item3);
 
 			Index = ConstIterator.GetIndex();
-			ZETestCheckEqual(Index, 2);
+			ZE_TEST_CHECK_EQUAL(Index, 2);
 
 			ConstIterator = List.GetConstIterator();
-			ZETestCheckEqual(ConstIterator.GetItem(), &Item3);
+			ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item3);
 			Index = ConstIterator.GetIndex();
-			ZETestCheckEqual(Index, 0);
+			ZE_TEST_CHECK_EQUAL(Index, 0);
 		  }
 	}
 
-	ZETest("inline const ZEType* MovePrevious()")
+	ZE_TEST_ITEM("inline const ZEType* MovePrevious()")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListTestItem Item1;
@@ -439,19 +439,19 @@ ZETestSuite(ZEListIteratorConst)
  		ZEListIteratorConst<ZEListTestItem> ConstIterator = List.GetConstIterator();
  
 		const ZEListTestItem* Previous = ConstIterator.MovePrevious();
- 		ZETestCheckEqual(Previous, NULL);
+ 		ZE_TEST_CHECK_EQUAL(Previous, NULL);
  
 		ZEListTestItem Item2;
 		List.Insert(&Item2);
  
 		ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
 
  		Previous = ConstIterator.MovePrevious();
-  		ZETestCheckEqual(Previous, NULL);
+  		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 	}
 
-	ZETest("inline const ZEType* MoveNext()")
+	ZE_TEST_ITEM("inline const ZEType* MoveNext()")
 	{ 		
 		ZEList<ZEListItem> List;
 		ZEListTestItem Item1;
@@ -460,7 +460,7 @@ ZETestSuite(ZEListIteratorConst)
 		ZEListIteratorConst<ZEListItem> ConstIterator = List.GetConstIterator();
 	
 		const ZEListItem* Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
 
 		ZEListTestItem Item2;
 		List.Append(&Item2);
@@ -468,10 +468,10 @@ ZETestSuite(ZEListIteratorConst)
 		ConstIterator = List.GetConstIterator();
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, &Item2);
+		ZE_TEST_CHECK_EQUAL(Next, &Item2);
 	}
 
-	ZETest("class ZEListIteratorConst mixed test")
+	ZE_TEST_ITEM("class ZEListIteratorConst mixed test")
 	{
 		ZEList<ZEListTestItem> List;
 		ZEListTestItem Item1;
@@ -480,59 +480,59 @@ ZETestSuite(ZEListIteratorConst)
 		ZEListTestItem Item4;
 
 		ZEListIteratorConst<ZEListTestItem> ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
 
 		List.Insert(&Item1);
 		ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item1);
 
 		List.Insert(&Item2);
 		ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
 
 		const ZEListTestItem* Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, &Item1);
+		ZE_TEST_CHECK_EQUAL(Next, &Item1);
 
 		const ZEListTestItem* Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, &Item2);
+		ZE_TEST_CHECK_EQUAL(Previous, &Item2);
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, NULL);
+		ZE_TEST_CHECK_EQUAL(Previous, NULL);
 
 		ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
 
 		List.Insert(&Item3);
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
 
 		List.Insert(&Item4);
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
 
 		Previous = ConstIterator.MovePrevious();
-		ZETestCheckEqual(Previous, &Item3);
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item3);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 1);
+		ZE_TEST_CHECK_EQUAL(Previous, &Item3);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item3);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 1);
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, &Item2);
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item2);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 2);
+		ZE_TEST_CHECK_EQUAL(Next, &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item2);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 2);
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, &Item1);
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item1);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 3);
-		ZETestCheck(!ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, &Item1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item1);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 3);
+		ZE_TEST_CHECK_ERROR(!ConstIterator.IsEnd());
 
 		Next = ConstIterator.MoveNext();
-		ZETestCheckEqual(Next, NULL);
-		ZETestCheckEqual(ConstIterator.GetItem(), NULL);
-		ZETestCheckEqual(ConstIterator.GetIndex(), 0);
-		ZETestCheck(ConstIterator.IsEnd());
+		ZE_TEST_CHECK_EQUAL(Next, NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), NULL);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetIndex(), 0);
+		ZE_TEST_CHECK_ERROR(ConstIterator.IsEnd());
 
 		ConstIterator = List.GetConstIterator();
-		ZETestCheckEqual(ConstIterator.GetItem(), &Item4);
+		ZE_TEST_CHECK_EQUAL(ConstIterator.GetItem(), &Item4);
 	}
 }

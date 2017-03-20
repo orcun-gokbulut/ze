@@ -89,4 +89,4 @@ class ZEDEntityWrapper : public ZEDObjectWrapper3D
 
 		static ZEDEntityWrapper*			CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);

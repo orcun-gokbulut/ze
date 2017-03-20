@@ -41,7 +41,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 
 #include "ZEEntity.h"
 #include "ZECore/ZECore.h"
@@ -889,7 +889,7 @@ bool ZEScene::Unserialize(const ZEString& FileName)
 			return false;
 		}
 		
-		ZEClass* EntityClass = ZEProvider::GetInstance()->GetClass(EntityNode.ReadString("Class"));
+		ZEClass* EntityClass = ZEMTProvider::GetInstance()->GetClass(EntityNode.ReadString("Class"));
 		if (EntityClass == NULL)
 		{
 			zeWarning("Problem in loading scene. Entity class is not registered. Class Name: \"%s\".", EntityNode.ReadString("Class").ToCString());

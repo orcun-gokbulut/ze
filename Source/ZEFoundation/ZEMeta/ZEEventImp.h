@@ -50,17 +50,17 @@
 #define ZE_TEMPLATE_SPECIALIZATION TReturn (ZE_TEMPLATE_ARGUMENTS)
 
 ZE_TEMPLATE_KEYWORD
-class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEEventBase
+class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEMTEventBase
 {
 	private:
-		ZEMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
+		ZEMTMethodSignatureGenerator<void (ZE_TEMPLATE_ARGUMENTS)> SignatureGenerator;
 		ZEArray<ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION> > Delegates;
 
 		void								Clone(const ZEEvent& Event);
 		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject);
 
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const;
+		virtual const ZEMTMethodSignature&	GetSignature() const;
 
 		bool								AddDelegate(const ZEEventDelegateBase* Delegate);
 		void								AddDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
@@ -88,7 +88,7 @@ class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEEventBase
 };
 
 ZE_TEMPLATE_KEYWORD
-const ZEMethodSignature& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() const
+const ZEMTMethodSignature& ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::GetSignature() const
 {
 	return SignatureGenerator.GetSignature();
 }
@@ -152,7 +152,7 @@ ZE_TEMPLATE_KEYWORD
 bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegateBase* Delegate)
 {
 	zeCheckError(Delegate == NULL, false, "Cannot add delegate. Delegate is NULL.");
-	zeCheckError(!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
+	zeCheckError(!ZEMTMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
 		"Cannot add delegate. ZEEventDelegate signature does not match with the event. "
 		"Event Signature: \"%s\", "
 		"Delegate Object Name: \"%s\", "
@@ -187,7 +187,7 @@ ZE_TEMPLATE_KEYWORD
 bool ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::RemoveDelegate(const ZEEventDelegateBase* Delegate)
 {
 	zeCheckError(Delegate == NULL, false, "Cannot add delegate. Delegate is NULL.");
-	zeCheckError(!ZEMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
+	zeCheckError(!ZEMTMethodSignature::Compare(SignatureGenerator.GetSignature(), Delegate->GetSignature()), false, 
 		"Cannot add delegate. ZEEventDelegate signature does not match with the event. Delegate Object Name: \"%s\".", Delegate->GetObject()->GetClass()->GetName());
 
 	Delegates.LockWrite();

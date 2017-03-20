@@ -37,17 +37,17 @@
 #define __ZEDS_LIST_ITERATORS_H__
 
 #include "ZETypes.h"
-template<typename ZEType>
+template<typename ZEMTType>
 class ZEList;
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZEListIterator
 {
-	friend class ZEList<ZEType>;
+	friend class ZEList<ZEMTType>;
 	private:
-		ZEType* Item;
+		ZEMTType* Item;
 
-		ZEListIterator(ZEList<ZEType>* List)
+		ZEListIterator(ZEList<ZEMTType>* List)
 		{
 			Item = List->GetFirstItem();
 		}
@@ -58,30 +58,30 @@ class ZEListIterator
 			return Item == NULL;
 		}
 
-		inline ZEType* GetItem()
+		inline ZEMTType* GetItem()
 		{
 			return Item;
 		}
 
-		inline ZEType* MovePrevious()
+		inline ZEMTType* MovePrevious()
 		{
-            Item = (ZEType*)Item->PrevItem;
+            Item = (ZEMTType*)Item->PrevItem;
             return Item;
 		}
 
-		inline ZEType* MoveNext()
+		inline ZEMTType* MoveNext()
 		{
-            Item = (ZEType*)Item->NextItem;
+            Item = (ZEMTType*)Item->NextItem;
             return Item;
 		}
 
 		inline ZESize GetIndex()
 		{
 			ZESize Index = 0;
-			ZEType* Current = Item;
+			ZEMTType* Current = Item;
 			while(Current != NULL)
 			{
-				Current = (ZEType*)Current->PrevItem;
+				Current = (ZEMTType*)Current->PrevItem;
 				if (Current == NULL)
 				{
 					return Index;
@@ -93,32 +93,32 @@ class ZEListIterator
 			return Index;
 		}
 
-		operator ZEType*()
+		operator ZEMTType*()
 		{
 			return Item;
 		}
 
-		operator const ZEType*() const 
+		operator const ZEMTType*() const 
 		{
 			return Item;
 		}
 		
-		ZEType& operator*()
+		ZEMTType& operator*()
 		{
 			return *Item;
 		}
 		
-		const ZEType& operator*() const
+		const ZEMTType& operator*() const
 		{
 			return *Item;
 		}
 
-		ZEType* operator->()
+		ZEMTType* operator->()
 		{
 			return Item;
 		}
 
-		const ZEType* operator->() const
+		const ZEMTType* operator->() const
 		{
 			return Item;
 		}
@@ -150,14 +150,14 @@ class ZEListIterator
 		}
 };
 
-template<typename ZEType>
+template<typename ZEMTType>
 class ZEListIteratorConst
 {
-	friend class ZEList<ZEType>;
+	friend class ZEList<ZEMTType>;
 	private:
-		const ZEType* Item;
+		const ZEMTType* Item;
 				
-		ZEListIteratorConst(const ZEList<ZEType>* List)
+		ZEListIteratorConst(const ZEList<ZEMTType>* List)
 		{
 			Item = List->GetFirstItem();
 		}
@@ -168,7 +168,7 @@ class ZEListIteratorConst
 			return Item == NULL;
 		}
 
-		inline const ZEType* GetItem() const
+		inline const ZEMTType* GetItem() const
 		{
 			return Item;
 		}
@@ -176,10 +176,10 @@ class ZEListIteratorConst
 		inline ZESize GetIndex()
 		{
 			ZESize Index = 0;
-			const ZEType* Current = Item;
+			const ZEMTType* Current = Item;
 			while(Current != NULL)
 			{
-				Current = (const ZEType*)Current->PrevItem;
+				Current = (const ZEMTType*)Current->PrevItem;
 				if (Current == NULL)
 				{
 					return Index;
@@ -191,15 +191,15 @@ class ZEListIteratorConst
 			return Index;
 		}
 
-		inline const ZEType* MovePrevious()
+		inline const ZEMTType* MovePrevious()
 		{
-			Item = (const ZEType*)Item->PrevItem;
+			Item = (const ZEMTType*)Item->PrevItem;
 			return Item;
 		}
 
-		inline const ZEType* MoveNext()
+		inline const ZEMTType* MoveNext()
 		{
-			Item = (const ZEType*)Item->NextItem;
+			Item = (const ZEMTType*)Item->NextItem;
  			return Item;			
 		}
 };

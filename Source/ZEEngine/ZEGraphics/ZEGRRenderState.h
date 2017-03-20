@@ -51,11 +51,11 @@
 
 typedef ZEGRColorMask ColorBlendMask;
 
-ZE_META_FORWARD_DECLARE(ZEGRShader, "ZEGRShader.h");
-ZE_META_FORWARD_DECLARE(ZEGRContext, "ZEGRContext.h");
-ZE_META_FORWARD_DECLARE(ZEGRRenderState, "ZEGRRenderState.h");
+ZEMT_FORWARD_DECLARE(ZEGRShader);
+ZEMT_FORWARD_DECLARE(ZEGRContext);
+ZEMT_FORWARD_DECLARE(ZEGRRenderState);
 
-class ZEGRRenderStateData :  public ZEObject, public ZEReferenceCounted
+class ZEGRRenderStateData : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRRenderStateData)

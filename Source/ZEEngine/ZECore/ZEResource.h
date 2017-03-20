@@ -41,7 +41,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEMeta/ZEObject.h"
 
-ZE_META_FORWARD_DECLARE(ZEResourceManager, "ZEResourceManager.h")
+ZEMT_FORWARD_DECLARE(ZEResourceManager);
 
 class ZEResource : public ZEObject
 {

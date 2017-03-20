@@ -53,8 +53,6 @@ ze_add_source(ZEDelegate.cpp					Sources)
 ze_add_source(ZEDelegate.h						Sources Headers)
 ze_add_source(ZEDelegateImp.h					Sources Headers)
 ze_add_source(ZEDelegateTests.cpp				Tests)
-ze_add_source(ZEFastDelegate.h					Sources Headers)
-ze_add_source(ZEFastDelegateBind.h				Sources Headers)
 
 ze_add_source(ZEFlags.cpp						Sources)
 ze_add_source(ZEFlags.h							Sources Headers)
@@ -111,6 +109,7 @@ ze_add_source(ZEValue.cpp						Sources)
 ze_add_source(ZEValue.h							Sources Headers)
 ze_add_source(ZEVariant.cpp						Sources)
 ze_add_source(ZEVariant.h						Sources Headers)
+ze_add_source(ZEVariantImp.h					Sources Headers)
 ze_add_source(ZEVariantTests.cpp				Tests)
 ze_add_source(ZEReference.h						Sources Headers)
 ze_add_source(ZEReference.cpp					Sources)
@@ -119,7 +118,7 @@ ze_add_source(ZEReference.cpp					Sources)
 ze_add_library(TARGET ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEThread)
+	LIBS ZEThread ZERegEx)
 	
 ze_add_test(TARGET ZEDSTests 
 	SOURCES ${Tests}

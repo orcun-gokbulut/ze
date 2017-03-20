@@ -40,13 +40,13 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEInitializable.h"
 
-struct ZEProperty;
+struct ZEMTProperty;
 class ZEDPropertyEditor;
 
 class ZEDPropertyEditorItem : public QTreeWidgetItem, public ZEInitializable
 {
 	private:
-		const ZEProperty*			Property;
+		const ZEMTProperty*			Property;
 	
 	protected:
 		void						Changed(const ZEVariant& NewValue);
@@ -57,8 +57,8 @@ class ZEDPropertyEditorItem : public QTreeWidgetItem, public ZEInitializable
 	public:
 		ZEDPropertyEditor*			GetPropertyEditor() const;
 		
-		void						SetProperty(const ZEProperty* Property);
-		const ZEProperty*			GetProperty() const;
+		void						SetProperty(const ZEMTProperty* Property);
+		const ZEMTProperty*			GetProperty() const;
 
 		virtual void				Update();
 

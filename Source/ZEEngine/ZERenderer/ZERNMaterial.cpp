@@ -39,7 +39,7 @@
 #include "ZERNStageID.h"
 #include "ZERNCommand.h"
 #include "ZEML/ZEMLReader.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZEResource/ZERSTemplates.h"
 
 ZEClass* ZERNMaterial::DetermineClass(const ZEString& FileName)
@@ -52,7 +52,7 @@ ZEClass* ZERNMaterial::DetermineClass(const ZEString& FileName)
 
 	MaterialFile.Close();
 
-	ZEClass* Class = ZEProvider::GetInstance()->GetClass(ClassName);
+	ZEClass* Class = ZEMTProvider::GetInstance()->GetClass(ClassName);
 	if (Class == NULL)
 		return NULL;
 
