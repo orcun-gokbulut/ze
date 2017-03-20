@@ -171,8 +171,8 @@ ZE_TEST(ZEVariant)
 			Variant.GetType().ToString(), Type.ToString());
 
 		ZE_TEST_CHECK_ERROR(*(ZETestObject*)&Variant.GetObject() == ZETestObject::Instance);
-		ZE_TEST_CHECK_ERROR(*(ZETestObject*)&Variant.GetObjectRef() == ZETestObject::Instance);
-		ZE_TEST_CHECK_ERROR(*(const ZETestObject*)&Variant.GetObjectConstRef() == ZETestObject::Instance);
+		ZE_TEST_CHECK_ERROR((ZETestObject*)&Variant.GetObjectRef() == &ZETestObject::Instance);
+		ZE_TEST_CHECK_ERROR((const ZETestObject*)&Variant.GetObjectConstRef() == &ZETestObject::Instance);
 		
 		Variant.SetUndefined();
 		ZE_TEST_CHECK_ERROR(!ZE_MEMORY_CHECK_INTERNAL, "Memory corruption detected.");
@@ -192,7 +192,7 @@ ZE_TEST(ZEVariant)
 			" Expected: {1}\n",
 			Variant.GetType().ToString(), Type.ToString());
 
-		ZE_TEST_CHECK_ERROR(*(const ZETestObject*)&Variant.GetObjectConstRef() == ZETestObject::Instance);
+		ZE_TEST_CHECK_ERROR((const ZETestObject*)&Variant.GetObjectConstRef() == &ZETestObject::Instance);
 		ZE_TEST_CHECK_ERROR(*(ZETestObject*)&Variant.GetObject() == ZETestObject::Instance);
 		
 		StartSuppressingLogging();

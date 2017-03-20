@@ -51,15 +51,15 @@ void ZETestItem::ErrorCallback(ZEErrorType Type)
 		ZETestProblemType ProblemType;
 		switch(Type)
 		{
-		default:
-		case ZE_ET_CRITICAL_ERROR:
-		case ZE_ET_ERROR:
-			ProblemType = ZE_TPT_ERROR;
-			break;
+			default:
+			case ZE_ET_CRITICAL_ERROR:
+			case ZE_ET_ERROR:
+				ProblemType = ZE_TPT_ERROR;
+				break;
 
-		case ZE_ET_WARNING:
-			ProblemType = ZE_TPT_WARNING;
-			break;
+			case ZE_ET_WARNING:
+				ProblemType = ZE_TPT_WARNING;
+				break;
 		}
 
 		char Buffer[4096];

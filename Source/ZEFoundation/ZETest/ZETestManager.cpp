@@ -157,6 +157,37 @@ bool ZETestManager::RunTests()
 
 	LogSession.EndSession();
 
+	if (NormalOutputEnabled)
+	{
+		printf("\n\n\n");
+		ZETerminalUtils::Reset();
+		printf(
+			"Test Results:\n"
+			"Test                                                Result     Ratio\n"
+			"-----------------------------------------------------------------------\n");
+
+		for (ZESize I = 0; I < Tests.GetCount(); I++)
+		{
+			ZETerminalUtils::Reset();
+			printf("%-52s", Tests[I]->GetName().ToCString());
+
+			ZETerminalUtils::SetBold(true);
+			if (Tests[I]->GetResult() == ZE_TR_PASSED)
+			{
+				ZETerminalUtils::SetForgroundColor(ZE_TC_GREEN);
+				printf("PASSED    ");
+			}
+			else
+			{
+				ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+				printf("FAILED    ");
+			}
+
+			ZETerminalUtils::Reset();
+			printf("%llu/%llu\n", Tests[I]->GetPassedItemCount(), Tests[I]->GetItems().GetCount());
+		}
+	}
+
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(true);

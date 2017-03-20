@@ -1216,12 +1216,12 @@ const ZEObject& ZEVariant::GetObject() const
 
 ZEObject& ZEVariant::GetObjectRef() const
 {
-	return ConvertRef<ZEObject, ZEMT_BT_OBJECT>(&Value.Pointer);
+	return ConvertRef<ZEObject, ZEMT_BT_OBJECT>(Value.Pointer);
 }
 
 const ZEObject& ZEVariant::GetObjectConstRef() const
 {
-	return ConvertConstRef<ZEObject, ZEMT_BT_OBJECT>(&Value.Pointer);
+	return ConvertConstRef<ZEObject, ZEMT_BT_OBJECT>(Value.Pointer);
 }
 
 ZEObject* ZEVariant::GetObjectPtr() const
@@ -1283,6 +1283,11 @@ ZEMTCollection& ZEVariant::GetCollectionRef() const
 {
 	if (!ValueType.IsCollection())
 		zeError("Variant type mismatch. Cannot convert between collection types and primitive types.");
+
+	if (ValueType.GetCollectionQualifier() == ZEMT_TQ_CONST_REFERENCE)
+		zeError("Variant type mismatch. Cannot convert const reference type to non-const reference type.");
+	else if (ValueType.GetCollectionQualifier() == ZEMT_TQ_CONST_VALUE)
+		zeError("Variant type mismatch. Cannot convert const value type to non-const reference type.");
 
 	if (!ValueType.IsReference())
 		return *static_cast<ZEMTCollection*>(Value.Pointer);

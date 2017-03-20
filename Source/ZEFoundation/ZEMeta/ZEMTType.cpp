@@ -50,9 +50,21 @@
 
 
 template<typename ZEItemType>
-void CastAndCopy(void* Destination, const void* Source)
+void CastAndAssign(void* DestinationInstance, const void* SourceInstance)
 {
-	*static_cast<ZEItemType*>(Destination) = *static_cast<const ZEItemType*>(Source);
+	*static_cast<ZEItemType*>(DestinationInstance) = *static_cast<const ZEItemType*>(SourceInstance);
+}
+
+template<typename ZEItemType>
+void CastAndCopyConstruct(void* DestinationInstance, const void* SourceInstance)
+{
+	new(static_cast<ZEItemType*>(DestinationInstance)) ZEItemType(*static_cast<const ZEItemType*>(SourceInstance));
+}
+
+template<typename ZEItemType>
+ZEItemType* CastAndClone(const void* Instance)
+{
+	return new ZEItemType(*static_cast<const ZEItemType*>(Instance));
 }
 
 void ZEMTType::SetType(ZEMTBaseType BaseType, ZEMTTypeQualifier BaseQualifier, ZEMTCollectionType CollectionType, ZEMTTypeQualifier CollectionQualifier, ZEMTDeclaration* Declaration)
@@ -467,73 +479,73 @@ void* ZEMTType::CloneInstance(const void* Instance) const
 				return NULL;
 
 			case ZEMT_BT_INTEGER_8:
-				return new ZEInt8(*static_cast<const ZEInt8*>(Instance));
+				return CastAndClone<ZEInt8>(Instance);
 
 			case ZEMT_BT_INTEGER_16:
-				return new ZEInt16(*static_cast<const ZEInt16*>(Instance));
+				return CastAndClone<ZEInt16>(Instance);
 
 			case ZEMT_BT_INTEGER_32:
-				return new ZEInt32(*static_cast<const ZEInt32*>(Instance));
+				return CastAndClone<ZEInt32>(Instance);
 
 			case ZEMT_BT_INTEGER_64:
-				return new ZEInt64(*static_cast<const ZEInt64*>(Instance));
+				return CastAndClone<ZEInt64>(Instance);
 
 			case ZEMT_BT_UNSIGNED_INTEGER_8:
-				return new ZEUInt8(*static_cast<const ZEUInt8*>(Instance));
+				return CastAndClone<ZEUInt8>(Instance);
 
 			case ZEMT_BT_UNSIGNED_INTEGER_16:
-				return new ZEUInt16(*static_cast<const ZEUInt16*>(Instance));
+				return CastAndClone<ZEUInt16>(Instance);
 
 			case ZEMT_BT_UNSIGNED_INTEGER_32:
-				return new ZEUInt32(*static_cast<const ZEUInt32*>(Instance));
+				return CastAndClone<ZEUInt32>(Instance);
 
 			case ZEMT_BT_UNSIGNED_INTEGER_64:
-				return new ZEUInt64(*static_cast<const ZEUInt64*>(Instance));
+				return CastAndClone<ZEUInt64>(Instance);
 
 			case ZEMT_BT_FLOAT:
-				return new float(*static_cast<const float*>(Instance));
+				return CastAndClone<float>(Instance);
 
 			case ZEMT_BT_DOUBLE:
-				return new double(*static_cast<const double*>(Instance));
+				return CastAndClone<double>(Instance);
 
 			case ZEMT_BT_BOOLEAN:
-				return new bool(*static_cast<const bool*>(Instance));
+				return CastAndClone<bool>(Instance);
 
 			case ZEMT_BT_STRING:
-				return new ZEString(*static_cast<const ZEString*>(Instance));
+				return CastAndClone<ZEString>(Instance);
 
 			case ZEMT_BT_QUATERNION:
-				return new ZEQuaternion(*static_cast<const ZEQuaternion*>(Instance));
+				return CastAndClone<ZEQuaternion>(Instance);
 
 			case ZEMT_BT_VECTOR2:
-				return new ZEVector2(*static_cast<const ZEVector2*>(Instance));
+				return CastAndClone<ZEVector2>(Instance);
 
 			case ZEMT_BT_VECTOR2D:
-				return new ZEVector2d(*static_cast<const ZEVector2d*>(Instance));
+				return CastAndClone<ZEVector2d>(Instance);
 
 			case ZEMT_BT_VECTOR3:
-				return new ZEVector3(*static_cast<const ZEVector3*>(Instance));
+				return CastAndClone<ZEVector3>(Instance);
 
 			case ZEMT_BT_VECTOR3D:
-				return new ZEVector3d(*static_cast<const ZEVector3d*>(Instance));
+				return CastAndClone<ZEVector3d>(Instance);
 
 			case ZEMT_BT_VECTOR4:
-				return new ZEVector4(*static_cast<const ZEVector4*>(Instance));
+				return CastAndClone<ZEVector4>(Instance);
 
 			case ZEMT_BT_VECTOR4D:
-				return new ZEVector4d(*static_cast<const ZEVector4d*>(Instance));
+				return CastAndClone<ZEVector4d>(Instance);
 
 			case ZEMT_BT_MATRIX3X3:
-				return new ZEMatrix3x3(*static_cast<const ZEMatrix3x3*>(Instance));
+				return CastAndClone<ZEMatrix3x3>(Instance);
 
 			case ZEMT_BT_MATRIX3X3D:
-				return new ZEMatrix3x3d(*static_cast<const ZEMatrix3x3d*>(Instance));
+				return CastAndClone<ZEMatrix3x3d>(Instance);
 
 			case ZEMT_BT_MATRIX4X4:
-				return new ZEMatrix4x4(*static_cast<const ZEMatrix4x4*>(Instance));
+				return CastAndClone<ZEMatrix4x4>(Instance);
 
 			case ZEMT_BT_MATRIX4X4D:
-				return new ZEMatrix4x4d(*static_cast<const ZEMatrix4x4d*>(Instance));
+				return CastAndClone<ZEMatrix4x4d>(Instance);
 
 			case ZEMT_BT_OBJECT:
 				if (Declaration == NULL)
@@ -543,7 +555,7 @@ void* ZEMTType::CloneInstance(const void* Instance) const
 			case ZEMT_BT_OBJECT_PTR:
 				if (Declaration == NULL)
 					return NULL;
-				return new ZEObject*(*(ZEObject**)Instance);
+				return CastAndClone<ZEObject*>(Instance);
 
 			case ZEMT_BT_OBJECT_HOLDER:
 				if (Declaration == NULL)
@@ -581,7 +593,7 @@ void* ZEMTType::CloneInstance(const void* Instance) const
 				const ZEBYTE* SourceCursor = SourceArray->GetConstCArray();
 				for (ZESize I = 0; I < ItemCount; I++)
 				{
-					if (!ItemType.AssignInstance(DestinationCursor, SourceCursor))
+					if (!ItemType.CopyConstructInstance(DestinationCursor, SourceCursor))
 					{
 						SourceArray->UnlockRead();
 						delete DestinationArray;
@@ -780,7 +792,7 @@ bool ZEMTType::AssignInstance(void* DestinationInstance, const void* SourceInsta
 {
 	if (IsReference() || IsCollectionReference())
 	{
-		CastAndCopy<void*>(DestinationInstance, SourceInstance);
+		CastAndAssign<void*>(DestinationInstance, SourceInstance);
 		return true;
 	}
 	else 
@@ -796,95 +808,95 @@ bool ZEMTType::AssignInstance(void* DestinationInstance, const void* SourceInsta
 					return false;
 
 				case ZEMT_BT_INTEGER_8:
-					CastAndCopy<ZEInt8>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEInt8>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_INTEGER_16:
-					CastAndCopy<ZEInt16>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEInt16>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_INTEGER_32:
-					CastAndCopy<ZEInt32>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEInt32>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_INTEGER_64:
-					CastAndCopy<ZEInt64>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEInt64>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_UNSIGNED_INTEGER_8:
-					CastAndCopy<ZEUInt8>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEUInt8>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_UNSIGNED_INTEGER_16:
-					CastAndCopy<ZEUInt16>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEUInt16>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_UNSIGNED_INTEGER_32:
-					CastAndCopy<ZEUInt32>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEUInt32>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_UNSIGNED_INTEGER_64:
-					CastAndCopy<ZEUInt64>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEUInt64>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_FLOAT:
-					CastAndCopy<float>(DestinationInstance, SourceInstance);
+					CastAndAssign<float>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_DOUBLE:
-					CastAndCopy<double>(DestinationInstance, SourceInstance);
+					CastAndAssign<double>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_BOOLEAN:
-					CastAndCopy<bool>(DestinationInstance, SourceInstance);
+					CastAndAssign<bool>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_STRING:
-					CastAndCopy<ZEString>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEString>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_QUATERNION:
-					CastAndCopy<ZEQuaternion>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEQuaternion>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR2:
-					CastAndCopy<ZEVector2>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector2>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR2D:
-					CastAndCopy<ZEVector2d>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector2d>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR3:
-					CastAndCopy<ZEVector3>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector3>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR3D:
-					CastAndCopy<ZEVector3d>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector3d>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR4:
-					CastAndCopy<ZEVector4>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector4>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_VECTOR4D:
-					CastAndCopy<ZEVector4d>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEVector4d>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_MATRIX3X3:
-					CastAndCopy<ZEMatrix3x3>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEMatrix3x3>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_MATRIX3X3D:
-					CastAndCopy<ZEMatrix4x4>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEMatrix3x3d>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_MATRIX4X4:
-					CastAndCopy<ZEMatrix4x4>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEMatrix4x4>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_MATRIX4X4D:
-					CastAndCopy<ZEMatrix4x4d>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEMatrix4x4d>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_OBJECT:
@@ -893,23 +905,23 @@ bool ZEMTType::AssignInstance(void* DestinationInstance, const void* SourceInsta
 					return static_cast<ZEClass*>(GetDeclaration())->Assign(static_cast<ZEObject*>(DestinationInstance), static_cast<const ZEObject*>(SourceInstance));
 
 				case ZEMT_BT_OBJECT_PTR:
-					CastAndCopy<ZEObject*>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEObject*>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_OBJECT_HOLDER:
-					CastAndCopy<ZEHolder<ZEReferenceCounted>>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEHolder<ZEReferenceCounted>>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_CLASS:
-					CastAndCopy<ZEClass>(DestinationInstance, SourceInstance);
+					CastAndAssign<ZEClass>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_ENUMERATOR:
-					CastAndCopy<int>(DestinationInstance, SourceInstance);
+					CastAndAssign<int>(DestinationInstance, SourceInstance);
 					return true;
 
 				case ZEMT_BT_FLAGS:
-					CastAndCopy<int>(DestinationInstance, SourceInstance);
+					CastAndAssign<int>(DestinationInstance, SourceInstance);
 					return true;
 			}
 		}
@@ -933,7 +945,7 @@ bool ZEMTType::AssignInstance(void* DestinationInstance, const void* SourceInsta
 					const ZEBYTE* SourceCursor = SourceArray->GetConstCArray();
 					for (ZESize I = 0; I < ItemCount; I++)
 					{
-						if (!ItemType.AssignInstance(DestinationCursor, SourceCursor))
+						if (!ItemType.CopyConstructInstance(DestinationCursor, SourceCursor))
 						{
 							SourceArray->UnlockRead();
 							return false;
@@ -994,7 +1006,180 @@ bool ZEMTType::ConstructInstance(void* Instance) const
 
 bool ZEMTType::CopyConstructInstance(void* DestinationInstance, const void* SourceInstance) const
 {
-	return false;
+	if (IsReference() || IsCollectionReference())
+	{
+		CastAndCopyConstruct<void*>(DestinationInstance, SourceInstance);
+		return true;
+	}
+	else 
+	{
+		if (!IsCollection())
+		{
+
+			switch (BaseType)
+			{
+				default:
+				case ZEMT_BT_UNDEFINED:
+				case ZEMT_BT_VOID:
+					return false;
+
+				case ZEMT_BT_INTEGER_8:
+					CastAndCopyConstruct<ZEInt8>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_INTEGER_16:
+					CastAndCopyConstruct<ZEInt16>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_INTEGER_32:
+					CastAndCopyConstruct<ZEInt32>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_INTEGER_64:
+					CastAndCopyConstruct<ZEInt64>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_UNSIGNED_INTEGER_8:
+					CastAndCopyConstruct<ZEUInt8>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_UNSIGNED_INTEGER_16:
+					CastAndCopyConstruct<ZEUInt16>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_UNSIGNED_INTEGER_32:
+					CastAndCopyConstruct<ZEUInt32>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_UNSIGNED_INTEGER_64:
+					CastAndCopyConstruct<ZEUInt64>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_FLOAT:
+					CastAndCopyConstruct<float>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_DOUBLE:
+					CastAndCopyConstruct<double>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_BOOLEAN:
+					CastAndCopyConstruct<bool>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_STRING:
+					CastAndCopyConstruct<ZEString>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_QUATERNION:
+					CastAndCopyConstruct<ZEQuaternion>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR2:
+					CastAndCopyConstruct<ZEVector2>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR2D:
+					CastAndCopyConstruct<ZEVector2d>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR3:
+					CastAndCopyConstruct<ZEVector3>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR3D:
+					CastAndCopyConstruct<ZEVector3d>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR4:
+					CastAndCopyConstruct<ZEVector4>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_VECTOR4D:
+					CastAndCopyConstruct<ZEVector4d>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_MATRIX3X3:
+					CastAndCopyConstruct<ZEMatrix3x3>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_MATRIX3X3D:
+					CastAndCopyConstruct<ZEMatrix3x3d>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_MATRIX4X4:
+					CastAndCopyConstruct<ZEMatrix4x4>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_MATRIX4X4D:
+					CastAndCopyConstruct<ZEMatrix4x4d>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_OBJECT:
+					if (Declaration == NULL)
+						return false;			
+					return static_cast<ZEClass*>(GetDeclaration())->CopyConstruct(static_cast<ZEObject*>(DestinationInstance), static_cast<const ZEObject*>(SourceInstance));
+
+				case ZEMT_BT_OBJECT_PTR:
+					CastAndCopyConstruct<ZEObject*>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_OBJECT_HOLDER:
+					CastAndCopyConstruct<ZEHolder<ZEReferenceCounted>>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_CLASS:
+					CastAndCopyConstruct<ZEClass>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_ENUMERATOR:
+					CastAndCopyConstruct<int>(DestinationInstance, SourceInstance);
+					return true;
+
+				case ZEMT_BT_FLAGS:
+					CastAndCopyConstruct<int>(DestinationInstance, SourceInstance);
+					return true;
+			}
+		}
+		else
+		{
+			if (CollectionType == ZEMT_CT_ARRAY)
+			{
+				const ZEArray<ZEBYTE>* SourceArray = static_cast<const ZEArray<ZEBYTE>*>(SourceInstance);
+				ZEArray<ZEBYTE>* DestinationArray = static_cast<ZEArray<ZEBYTE>*>(DestinationInstance);
+
+				ZEMTType ItemType = GetCollectionItemType();
+				ZESize ItemSize = ItemType.GetInstanceSize();
+
+				DestinationArray->Resize(SourceArray->GetCount() * ItemSize);
+
+				ZEBYTE* DestinationCursor = DestinationArray->GetCArray();
+				ZESize ItemCount;
+				SourceArray->LockRead();
+				{
+					ItemCount = SourceArray->GetCount();
+					const ZEBYTE* SourceCursor = SourceArray->GetConstCArray();
+					for (ZESize I = 0; I < ItemCount; I++)
+					{
+						if (!ItemType.CopyConstructInstance(DestinationCursor, SourceCursor))
+						{
+							SourceArray->UnlockRead();
+							return false;
+						}
+						DestinationCursor += ItemSize;
+						SourceCursor += ItemSize;
+					}
+				}
+				SourceArray->UnlockRead();
+				DestinationArray->Count = ItemCount;
+				DestinationArray->Allocator.Size = ItemCount;
+
+				return true;
+			}
+		}
+	}
+
+	return false;	
 }
 
 bool ZEMTType::DeconstructInstance(void* Instance) const
