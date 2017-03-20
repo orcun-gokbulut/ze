@@ -94,5 +94,6 @@ ze_add_library(TARGET ZEMeta
 	
 ze_add_test(TARGET ZEMetaTests
 	SOURCES ${Tests} ZEVariantTest.cpp
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation
 	TEST_TARGET ZEMeta)

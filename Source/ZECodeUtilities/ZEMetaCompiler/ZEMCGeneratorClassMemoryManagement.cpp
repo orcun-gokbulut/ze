@@ -162,7 +162,7 @@ void ZEMCGenerator::GenerateClassCopyConstruct(ZEMCClass* CurrentClass)
 
 	if (CurrentClass->HasPublicCopyConstructor && !CurrentClass->IsAbstract)
 	{
-		GenerateCastedObject(CurrentClass, "DestinationObject", "CastedDestinationObject", true);
+		WriteToFile("\t%s* CastedDestinationObject = static_cast<%s*>(DestinationObject);\n\n", CurrentClass->Name.ToCString(), CurrentClass->Name.ToCString());
 		GenerateCastedObjectConst(CurrentClass, "SourceObject", "CastedSourceObject");
 
 		WriteToFile("\tnew(CastedDestinationObject) %s(*CastedSourceObject);\n", CurrentClass->Name.ToCString());
