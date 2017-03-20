@@ -48,4 +48,4 @@ class ZEDSectorWrapper : public ZEDEntityWrapper
 		
 		static ZEDSectorWrapper*			CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZESector);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZESector);

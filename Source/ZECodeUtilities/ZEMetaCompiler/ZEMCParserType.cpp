@@ -46,14 +46,19 @@ ZEMCClass* ZEMCParser::FindClass(const char* ClassName)
 
 	for (int I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
 	{
-		if (Context->ForwardDeclarations[I]->ClassName == ClassName)
-		{
-			ZEMCClass* ForwardDeclaredClass = new ZEMCClass();
-			ForwardDeclaredClass->Name = ClassName;
-			ForwardDeclaredClass->IsForwardDeclared = true;
-			Context->Classes.Add(ForwardDeclaredClass);
-			return ForwardDeclaredClass;
-		}
+		ZEMCForwardDeclaration* ForwardDeclaration = Context->ForwardDeclarations[I];
+
+		if (Context->ForwardDeclarations[I]->Type != ZEMC_DT_CLASS)
+			continue;
+
+		if (Context->ForwardDeclarations[I]->Name != ClassName)
+			continue;
+
+		ZEMCClass* ForwardDeclaredClass = new ZEMCClass();
+		ForwardDeclaredClass->Name = ClassName;
+		ForwardDeclaredClass->IsForwardDeclared = true;
+		Context->Classes.Add(ForwardDeclaredClass);
+		return ForwardDeclaredClass;
 	}
 
 	return NULL;
@@ -180,20 +185,13 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		}
 		else
 		{
-			if (ClassDecl->getNameAsString() == "ZEClass")
-			{
-				Output.BaseType = ZEMC_BT_CLASS;
-			}
-			else
-			{
-				Output.BaseType = ZEMC_BT_OBJECT;
-				Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
-				if (Output.Class == NULL)
-					return false;
+			Output.BaseType = ZEMC_BT_OBJECT;
+			Output.Class = FindClass(ClassDecl->getNameAsString().c_str());
+			if (Output.Class == NULL)
+				return false;
 
-				if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
-					return false;
-			}
+			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
+				return false;
 		}
 	}
 	else if (ClangType->isPointerType())
@@ -216,18 +214,23 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 			if (Output.Class->IsFundamental)
 				return false;
 
-			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
-				return false;
+			if (Output.CollectionType == ZEMC_CT_NONE && ClangType->getPointeeType().isConstQualified())
+			{
+				if (Output.TypeQualifier != ZEMC_TQ_VALUE)
+					return false;
+
+				Output.TypeQualifier = ZEMC_TQ_CONST_VALUE;
+			}
 		}
 	}
 	else if(ClangType->isEnumeralType())
 	{
 		Output.BaseType = ZEMC_BT_ENUMERATOR;
-		Output.Enumurator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
-		if (Output.Enumurator == NULL)
+		Output.Enumerator = FindEnumurator(ClangType->getAs<EnumType>()->getDecl()->getNameAsString().c_str());
+		if (Output.Enumerator == NULL)
 			return false;
-
 	}
+
 	else
 	{
 		return false;
@@ -238,67 +241,85 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 
 bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 {
-	ZEMCType TempType;
 	QualType CanonicalType = ClangType.getCanonicalType();
-	const Type* TypePtr = CanonicalType.getTypePtr();
-	const Type* BaseTypePtr = NULL;
 	
-	// Check Qualifier
-	if (TypePtr->isReferenceType())
+	ZEMCType FirstLevelType;
+	if (CanonicalType->isReferenceType())
 	{
-		if (TypePtr->getPointeeType()->isPointerType() || TypePtr->getPointeeType()->isReferenceType())
-			return false;
-
-		TempType.TypeQualifier = TypePtr->getPointeeType().isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
-		BaseTypePtr = TypePtr->getPointeeType().getTypePtr();
+		CanonicalType = CanonicalType->getPointeeType();
+		FirstLevelType.TypeQualifier = CanonicalType.isConstQualified() ? ZEMC_TQ_CONST_REFERENCE : ZEMC_TQ_REFERENCE;
 	}
 	else
 	{
-		TempType.TypeQualifier = ClangType.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
-		BaseTypePtr = TypePtr;
+		FirstLevelType.TypeQualifier = CanonicalType.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
 	}
 
-	if (BaseTypePtr->isClassType() && isa<ClassTemplateSpecializationDecl>(BaseTypePtr->getAsCXXRecordDecl()))
+	// Template Types (ZEHolder, ZEArray)
+	if (CanonicalType->isClassType() && isa<ClassTemplateSpecializationDecl>(CanonicalType->getAsCXXRecordDecl()))
 	{
-		const ClassTemplateSpecializationDecl* TemplateType = llvm::cast<ClassTemplateSpecializationDecl>(BaseTypePtr->getAsCXXRecordDecl());
-		if (TemplateType != NULL)
+		const ClassTemplateSpecializationDecl* TemplateType = llvm::cast<ClassTemplateSpecializationDecl>(CanonicalType->getAsCXXRecordDecl());
+		if (TemplateType == NULL)
+			return false;
+
+		if (TemplateType->getTemplateArgs().size() < 1)
+			return false;
+
+		QualType Argument = TemplateType->getTemplateArgs().get(0).getAsType();
+
+		if (TemplateType->getNameAsString() == "ZEArray")
 		{
-			if (TemplateType->getNameAsString() == "ZEArray")
-			{
-				TempType.ContainerType = ZEMC_CT_ARRAY;
-			}
-			else if (TemplateType->getNameAsString() == "ZEList")
-			{
-				TempType.ContainerType = ZEMC_CT_LIST;
-			}
-			else if (TemplateType->getNameAsString() == "ZEContainer")
-			{
-				TempType.ContainerType = ZEMC_CT_CONTAINER;
-			}
-			else
-			{
-				return false;
-			}
-
-			if (TemplateType->getTemplateArgs().size() < 1)
+			// References are not allowed in containers
+			if (Argument.getTypePtr()->isReferenceType())
 				return false;
 
-			QualType Argument = TemplateType->getTemplateArgs().get(0).getAsType();
-
-			// Const does not allowed in containers
-			if (Argument.isConstQualified())
+			ZEMCType SecondLevelType;
+			SecondLevelType.TypeQualifier = Argument.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
+			
+			if (!ProcessBaseType(SecondLevelType,  Argument.getTypePtr()))
 				return false;
 
-			if(Argument.getTypePtr()->isReferenceType())
+			// Only ZEObjectPtr can be const inside Array
+			if (SecondLevelType.TypeQualifier == ZEMC_TQ_CONST_VALUE &&	SecondLevelType.BaseType != ZEMC_BT_OBJECT_PTR)
 				return false;
 
-			BaseTypePtr = Argument.getTypePtr();
+			Output.CollectionType = ZEMC_CT_ARRAY;
+			Output.CollectionQualifier = FirstLevelType.TypeQualifier;
+			Output.BaseType = SecondLevelType.BaseType;
+			Output.TypeQualifier = SecondLevelType.TypeQualifier;
+			Output.Class = SecondLevelType.Class;
+			Output.Enumerator = SecondLevelType.Enumerator;
+
+			return true;
+		}
+		else if (TemplateType->getNameAsString() == "ZEHolder")
+		{
+			// References are not allowed in holder
+			if (Argument.getTypePtr()->isReferenceType())
+				return false;
+
+			ZEMCType SecondLevelType;
+			SecondLevelType.TypeQualifier = Argument.isConstQualified() ? ZEMC_TQ_CONST_VALUE : ZEMC_TQ_VALUE;
+
+			if (!ProcessBaseType(SecondLevelType,  Argument.getTypePtr()))
+				return false;
+
+			if (SecondLevelType.BaseType != ZEMC_BT_OBJECT)
+				return false;
+
+			Output.BaseType = ZEMC_BT_OBJECT_HOLDER;
+			Output.TypeQualifier = SecondLevelType.TypeQualifier;
+
+			return true;
 		}
 	}
+	else
+	{
+		if (!ProcessBaseType(FirstLevelType, CanonicalType.getTypePtr()))
+			return false;
 
-	if (!ProcessBaseType(TempType,  BaseTypePtr))
-		return false;
+		Output = FirstLevelType;
+		return true;
+	}
 
-	Output = TempType;
-	return true;
+	return false;
 }

@@ -39,7 +39,13 @@ project (ZEFoundation)
 
 ze_set_project_folder("ZEFoundation")
 
-set(BuiltIn)
+set(FoundationMetaHeaders)
+macro(ze_add_foundation_zemc)
+	foreach (VARIABLE_FILE ${ARGN})
+		set(TEMP_LIST ${TEMP_LIST} "${CMAKE_CURRENT_SOURCE_DIR}/${VARIABLE_FILE}")
+	endforeach()
+	set(FoundationMetaHeaders ${FoundationMetaHeaders} ${TEMP_LIST} PARENT_SCOPE)
+endmacro()
 
 add_subdirectory(ZEDS)
 add_subdirectory(ZEMath)
@@ -60,8 +66,6 @@ add_subdirectory(ZEMeta)
 add_subdirectory(ZEPointer)
 add_subdirectory(ZEITIntegrity)
 
-ze_add_source(ZEAutoExp.txt						Sources Headers)
-ze_add_source(ZE.natvis							Sources Headers)
 ze_add_source(ZEData.h 							Sources Headers)
 ze_add_source(ZEData.cpp 						Sources)
 ze_add_source(ZEDLL.h 							Sources Headers)
@@ -88,6 +92,8 @@ ze_add_source(ZELog.h							Sources Headers)
 ze_add_source(ZELog.cpp							Sources)
 ze_add_source(ZELogSession.h					Sources Headers)
 ze_add_source(ZELogSession.cpp					Sources)
+ze_add_source(ZETerminalUtils.h					Sources Headers)
+ze_add_source(ZETerminalUtils.cpp				Sources)
 ze_add_source(ZEPacking.h 						Sources Headers)
 ze_add_source(ZEPacking.cpp 					Sources)
 ze_add_source(ZERandom.h 						Sources Headers)
@@ -107,15 +113,24 @@ ze_add_source(ZEInitializable.h					Sources Headers)
 ze_add_source(ZEEncryption.cpp					Sources)
 ze_add_source(ZEEncryption.h					Sources Headers)
 
-ze_add_library(TARGET ZEFoundation
-	COMBINE
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta libCryptopp
+ze_add_source(ZEAutoExp.txt						FoundationSources FoundationHeaders)
+ze_add_source(ZE.natvis							FoundationSources FoundationHeaders)
+	
+ze_add_library(TARGET ZEFoundationBase
 	SOURCES ${Sources} 
-	HEADERS ${Headers})
+	HEADERS ${Headers}
+	COMBINE
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta libCryptopp)
 
-#ze_add_library(TARGET ZEFoundationMeta
-#	SOURCES ${BuiltIn}
-#	ZEMC ${BuildIn})
+ze_add_library(TARGET ZEFoundationMeta
+	SOURCES ${FoundationMetaHeaders}
+	ZEMC ${FoundationMetaHeaders})
+
+ze_add_library(TARGET ZEFoundation
+	SOURCES ${FoundationSources} ZEFoundation.cpp
+	HEADERS ${FoundationHeaders}
+	COMBINE
+	LIBS ZEFoundationBase ZEFoundationMeta)
 
 ze_add_test(TARGET ZEFoundationTests
 	SOURCES ${Tests}

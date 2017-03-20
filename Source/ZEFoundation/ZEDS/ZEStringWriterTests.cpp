@@ -57,20 +57,20 @@ ZEInt CompareFunc(const ZEInt *F, const ZEInt *E)
 	return ReturnValue;
 };
 
-ZETestSuite(ZEStringWriter)
+ZE_TEST(ZEStringWriter)
 {
-	ZETest("ZEStringWriter::ZEStringWriter()")
+	ZE_TEST_ITEM("ZEStringWriter::ZEStringWriter()")
 	{
 		ZEStringWriter Writer;
 
 		ZEString Output;
 
 		Writer.Output(Output);
-		ZETestCheck(Output == NULL);
-		ZETestCheckEqual(Output.GetSize(), 0);
+		ZE_TEST_CHECK_ERROR(Output == NULL);
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 0);
 	}
 
-	ZETest("ZEStringWriter::~ZEStringWriter()")
+	ZE_TEST_ITEM("ZEStringWriter::~ZEStringWriter()")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
@@ -80,11 +80,11 @@ ZETestSuite(ZEStringWriter)
 		Writer.~ZEStringWriter();
 
 		Writer.Output(Output);
-		ZETestCheck(Output == NULL);
-		ZETestCheckEqual(Output.GetSize(), 0);
+		ZE_TEST_CHECK_ERROR(Output == NULL);
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 0);
 	}
 
-	ZETest("void ZEStringWriter::Append(const char* String)")
+	ZE_TEST_ITEM("void ZEStringWriter::Append(const char* String)")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
@@ -101,10 +101,10 @@ ZETestSuite(ZEStringWriter)
 		Writer.AppendEnd();
 
 		Writer.Output(Output);
-		ZETestCheck(Output == "New Test String");
-		ZETestCheck(Output.GetSize() == 16);
+		ZE_TEST_CHECK_ERROR(Output == "New Test String");
+		ZE_TEST_CHECK_ERROR(Output.GetSize() == 16);
 
-		ZETestCase("call Append(const char* String) after AppendEnd()")
+		ZE_TEST_CASE("call Append(const char* String) after AppendEnd()")
 		{
 			Writer.Append(String1);
 			Writer.AppendEnd();
@@ -116,11 +116,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "New ");
-			ZETestCheckEqual(Output.GetSize(), 18);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "New ");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 18);
 		}
 
-		ZETestCase("append string and caharacter")
+		ZE_TEST_CASE("append string and caharacter")
 		{
 			const char* String = "Zine";
 			char Character = 'k';
@@ -130,11 +130,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "Zinek");
-			ZETestCheckEqual(Output.GetSize(), 6);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "Zinek");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 6);
 		}
 
-		ZETestCase("append the previous output string and a new string")
+		ZE_TEST_CASE("append the previous output string and a new string")
 		{
 			const char* NewString = " Engine";
 
@@ -143,11 +143,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "Zinek Engine");
-			ZETestCheckEqual(Output.GetSize(), 13);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "Zinek Engine");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 13);
 		}
 
-		ZETestCase("UTF-8 encoding compatibility test")
+		ZE_TEST_CASE("UTF-8 encoding compatibility test")
 		{
 			const char* StringA = "Işık ";
 			const char* StringB = "çok";
@@ -161,11 +161,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "Işık çok süt iç.");
-			ZETestCheckEqual(Output.GetSize(), 22);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "Işık çok süt iç.");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 22);
 		}
 
-		ZETestCase("append a formatted string to Writer")
+		ZE_TEST_CASE("append a formatted string to Writer")
 		{
 			ZEVariant Arg0;
 			ZEVariant Arg1;
@@ -192,11 +192,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "The sorted array elements' hexadecimal equivalents : First item 0xC, Second item 0x62, Third item 0x7E, Fourth item 0x1F4, Fifth item 0x25A");
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "The sorted array elements' hexadecimal equivalents : First item 0xC, Second item 0x62, Third item 0x7E, Fourth item 0x1F4, Fifth item 0x25A");
 		}
 	}
 
-	ZETest("void ZEStringWriter::Append(char Character)")
+	ZE_TEST_ITEM("void ZEStringWriter::Append(char Character)")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
@@ -208,16 +208,16 @@ ZETestSuite(ZEStringWriter)
 		Writer.AppendEnd();
 
 		Writer.Output(Output);
-		ZETestCheckString(Output, "ZE");
-		ZETestCheckEqual(Output.GetSize(), 3);
+		ZE_TEST_CHECK_STRING_EQUAL(Output, "ZE");
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 3);
 	}
 
-	ZETest("void ZEStringWriter::AppendUTF8(char* Character)")
+	ZE_TEST_ITEM("void ZEStringWriter::AppendUTF8(char* Character)")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
 
-		ZETestCase("append € and ü")
+		ZE_TEST_CASE("append € and ü")
 		{
 			char* Character1 = "€";
 			char* Character2 = "ü";
@@ -227,11 +227,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "€ü");
-			ZETestCheckEqual(Output.GetSize(), 6);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "€ü");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 6);
 		}
 
-		ZETestCase("append euro sign with its hex equivalent")
+		ZE_TEST_CASE("append euro sign with its hex equivalent")
 		{
 			char* Character = "\xe2\x82\xac";
 
@@ -239,11 +239,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 			
 			Writer.Output(Output);
-			ZETestCheckString(Output, "€");
-			ZETestCheckEqual(Output.GetSize(), 4);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "€");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 4);
 		}
 
-		ZETestCase("append 1 byte, 2 byte and 3 byte chars respectively")
+		ZE_TEST_CASE("append 1 byte, 2 byte and 3 byte chars respectively")
 		{
 			char* Character1 = "$";
 			char* Character2 = "£";
@@ -255,11 +255,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "$£€");
-			ZETestCheckEqual(Output.GetSize(), 7);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "$£€");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 7);
 		}
 
-		ZETestCase("use all append functions")
+		ZE_TEST_CASE("use all append functions")
 		{
 			Writer.Append("The most common 3 currency units are ");
 			Writer.AppendUTF8("$");
@@ -271,11 +271,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "The most common 3 currency units are $, € and £.");
-			ZETestCheckEqual(Output.GetSize(), 52);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "The most common 3 currency units are $, € and £.");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 52);
 		}
 
-		ZETestCase("append a 4 byte character with its hex equivalent")
+		ZE_TEST_CASE("append a 4 byte character with its hex equivalent")
 		{
 			char* Character = "\xf0\xa0\x9c\x8e";
 
@@ -283,11 +283,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheck(Output == Character);
-			ZETestCheckEqual(Output.GetSize(), 5);
+			ZE_TEST_CHECK_ERROR(Output == Character);
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 5);
 		}
 
-		ZETestCase("multiple chars")
+		ZE_TEST_CASE("multiple chars")
 		{
 			char Character1[] = "Işık";
 			char* Character2 = "çok";
@@ -298,29 +298,29 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "I");
-			ZETestCheckEqual(Output.GetSize(), 2);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "I");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 2);
 
 			Writer.AppendUTF8(Character2);
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "ç");
-			ZETestCheckEqual(Output.GetSize(), 3);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "ç");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 3);
 
 			Writer.AppendUTF8(Character3);
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "s");
-			ZETestCheckEqual(Output.GetSize(), 2);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "s");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 2);
 
 			Writer.AppendUTF8(Character4);
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "i");
-			ZETestCheckEqual(Output.GetSize(), 2);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "i");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 2);
 
 			Writer.AppendUTF8(Character1);
 			Writer.AppendUTF8(Character2);
@@ -329,8 +329,8 @@ ZETestSuite(ZEStringWriter)
 			Writer.Append('\0');
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "Içsi");
-			ZETestCheckEqual(Output.GetSize(), 6);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "Içsi");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 6);
 
 			char* Char1 = "I";
 			char* Char2 = "ş";
@@ -344,12 +344,12 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "Işık");
-			ZETestCheckEqual(Output.GetSize(), 7);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "Işık");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 7);
 		}
 	}
 
-	ZETest("void ZEStringWriter::AppendEnd()")
+	ZE_TEST_ITEM("void ZEStringWriter::AppendEnd()")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
@@ -357,25 +357,25 @@ ZETestSuite(ZEStringWriter)
 		Writer.AppendEnd();
 
 		Writer.Output(Output);
-		ZETestCheck(Output == "");
-		ZETestCheckEqual(Output.GetSize(), 1);
+		ZE_TEST_CHECK_ERROR(Output == "");
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 1);
 
 		const char* String = "ZE";
 
 		Writer.Append(String);
 
 		Writer.Output(Output);
-		ZETestCheckEqual(Output.GetSize(), 2);
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 2);
 
 		Writer.Append(String);
 		Writer.AppendEnd();
 
 		Writer.Output(Output);
-		ZETestCheckString(Output, "ZE");
-		ZETestCheckEqual(Output.GetSize(), 3);
+		ZE_TEST_CHECK_STRING_EQUAL(Output, "ZE");
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 3);
 	}
 
-	ZETest("void ZEStringWriter::Clear()")
+	ZE_TEST_ITEM("void ZEStringWriter::Clear()")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
@@ -387,10 +387,10 @@ ZETestSuite(ZEStringWriter)
 		Writer.Clear();
 
 		Writer.Output(Output);
-		ZETestCheck(Output == NULL);
-		ZETestCheckEqual(Output.GetSize(), 0);
+		ZE_TEST_CHECK_ERROR(Output == NULL);
+		ZE_TEST_CHECK_EQUAL(Output.GetSize(), 0);
 
-		ZETestCase("call Clear after append string then append another string")
+		ZE_TEST_CASE("call Clear after append string then append another string")
 		{
 			Writer.Append(String);
 
@@ -400,35 +400,35 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "test clear");
-			ZETestCheckEqual(Output.GetSize(), 11);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "test clear");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 11);
 		}
 	}
 
-	ZETest("void ZEStringWriter::Output(ZEString& String)")
+	ZE_TEST_ITEM("void ZEStringWriter::Output(ZEString& String)")
 	{
 		ZEStringWriter Writer;
 		ZEString Output;
 
-		ZETestCase("assign value to Output string first then call ZEStringWriter functions")
+		ZE_TEST_CASE("assign value to Output string first then call ZEStringWriter functions")
 		{
 			Output = "string";
-			ZETestCheckEqual(Output.GetSize(), 7);
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 7);
 
 			Writer.Output(Output);
-			ZETestCheck(Output == "");
-			ZETestCheckEqual(Output.GetSize(), 0);
+			ZE_TEST_CHECK_ERROR(Output == "");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 0);
 
 			Output = "string";
-			ZETestCheckEqual(Output.GetSize(), 7);
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 7);
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheck(Output == "");
-			ZETestCheckEqual(Output.GetSize(), 1);
+			ZE_TEST_CHECK_ERROR(Output == "");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 1);
 		}
 
-		ZETestCase("assign a value to Output string then append that Output string to Writer")
+		ZE_TEST_CASE("assign a value to Output string then append that Output string to Writer")
 		{
 			Output = "string";
 			
@@ -436,11 +436,11 @@ ZETestSuite(ZEStringWriter)
 			Writer.AppendEnd();
 
 			Writer.Output(Output);
-			ZETestCheckString(Output, "string");
-			ZETestCheckEqual(Output.GetSize(), 7);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "string");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 7);
 		}
 
-		ZETestCase("use same Output string value for different writers")
+		ZE_TEST_CASE("use same Output string value for different writers")
 		{
 			ZEStringWriter Writer1;
 			ZEStringWriter Writer2;
@@ -449,16 +449,16 @@ ZETestSuite(ZEStringWriter)
 			Writer1.AppendEnd();
 
 			Writer1.Output(Output);
-			ZETestCheckString(Output, "test");
-			ZETestCheckEqual(Output.GetSize(), 5);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "test");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 5);
 
 			Writer2.Append(Output);
 			Writer2.Append(" string");
 			Writer2.AppendEnd();
 
 			Writer2.Output(Output);
-			ZETestCheckString(Output, "test string");
-			ZETestCheckEqual(Output.GetSize(), 12);
+			ZE_TEST_CHECK_STRING_EQUAL(Output, "test string");
+			ZE_TEST_CHECK_EQUAL(Output.GetSize(), 12);
 		}
 	}
 }

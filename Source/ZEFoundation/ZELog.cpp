@@ -36,6 +36,7 @@
 #include "ZELog.h"
 
 #include "ZEPlatform.h"
+#include "ZETerminalUtils.h"
 #include "ZELogSession.h"
 #include "ZEDS/ZEList2.h"
 #include "ZEThread/ZEThread.h"
@@ -51,79 +52,49 @@
 #endif
 
 static void DefaultCallback(const char* Module, ZELogType Level, const char* LogText);
-
-static void SetColor(int Type)
-{
-	#ifdef ZE_PLATFORM_WINDOWS
-		switch(Type)
-		{
-			case ZE_LOG_CRITICAL_ERROR:
-			case ZE_LOG_ERROR:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY);
-
-				break;
-
-			case ZE_LOG_WARNING:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-				break;
-
-			case ZE_LOG_SUCCESS:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-				break;
-
-			case -2:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
-				break;
-
-			default:
-				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-				break;
-		}
-	#elif defined(ZE_PLATFORM_UNIX)
-		switch(Type)
-		{
-			case ZE_LOG_ERROR:
-				printf("\033[01;31m");
-				break;
-
-			case ZE_LOG_WARNING:
-				printf("\033[01;33m");
-				break;
-
-			case ZE_LOG_INFO:
-				printf("\033[01;37m");
-				break;
-
-			case ZE_LOG_SUCCESS:
-				printf("\033[01;32m");
-				break;
-
-			default:
-				printf("\033[0;37m");
-		}
-	#else
-
-	#endif
-}
-
 static void DefaultCallback(const ZELogSession* Session, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	if (Session != NULL)
 		printf("(%d) ", Session->GetSessionID());
 
-	SetColor(-1);
+	ZETerminalUtils::Reset();
 	printf("[");
 
-	SetColor(-2);
+	ZETerminalUtils::SetForgroundColor(ZE_TC_WHITE);
+	ZETerminalUtils::SetBold(true);
 	printf("%s",  Module);
-	
-	SetColor(-1);
+
+	ZETerminalUtils::Reset();
 	printf("] ");
 
-	SetColor(Type);
+	switch (Type)
+	{
+		case ZE_LOG_CRITICAL_ERROR:
+			ZETerminalUtils::SetForgroundColor(ZE_TC_WHITE);
+			ZETerminalUtils::SetBackgroundColor(ZE_TC_RED);
+			break;
+
+		case ZE_LOG_ERROR:
+			ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+			break;
+
+		case ZE_LOG_WARNING:
+			ZETerminalUtils::SetForgroundColor(ZE_TC_YELLOW);
+			break;
+
+		case ZE_LOG_SUCCESS:
+			ZETerminalUtils::SetForgroundColor(ZE_TC_GREEN);
+			break;
+
+		default:
+		case ZE_LOG_INFO:
+		case ZE_LOG_DEBUG:
+		case ZE_LOG_NONE:
+			break;
+	}
 	printf("%s", ZELog::GetLogTypeString(Type));
 
-	SetColor(-1);
+	ZETerminalUtils::Reset();
 	printf(": %s\n", LogText);
 }
 

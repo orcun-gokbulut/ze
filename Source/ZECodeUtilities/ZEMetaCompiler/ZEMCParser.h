@@ -43,6 +43,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/AST/DeclCXX.h>
 #include <clang/AST/Attr.h>
+#include "ZEMeta/ZEObject.h"
 
 using namespace clang;
 
@@ -52,6 +53,7 @@ enum ZEMCAccessorType
 	ZEMC_AT_GETTER,
 	ZEMC_AT_ADDER,
 	ZEMC_AT_REMOVER,
+	ZEMC_AT_COUNTER
 };
 
 struct ZEMCAccessor
@@ -77,17 +79,16 @@ class ZEMCParser
 		void							RaiseCriticalError(SourceLocation& Location, const char* ErrorText);
 
 		// Checks
-		bool							CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
+		bool							CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class, bool& IsReferenceCounted);
 		bool							CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
-		bool							CheckClass(CXXRecordDecl* Class);
+		bool							CheckClass(CXXRecordDecl* Class, bool& IsReferenceCounted);
 		bool							CheckFundamentalClass(CXXRecordDecl* Class);
 		bool							CheckTargetDeclaration(Decl* Declaration);
 
 		// Memory Management
-		void							CheckNonPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDefaultCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDefaultAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
-		void							CheckNonPublicDestructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicDefaultContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicCopyContructor(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
+		void							CheckPublicAssignmentOperator(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckCreateInstanceMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 		void							CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 
@@ -104,10 +105,10 @@ class ZEMCParser
 		bool							IsEvent();
 
 		// Processors
-		ZEMCMetaOperatorType			GetOperatorType(OverloadedOperatorKind OperatorKind);
+		ZEMCOperatorType				GetOperatorType(OverloadedOperatorKind OperatorKind);
 		void							ProcessDeclaration(Decl* BaseDeclaration);
+		bool							ProcessCommands(Decl* Declaration);
 		void							ProcessEnumerator(EnumDecl* EnumDeclaration);
-		bool							ProcessForwardDeclaration(CXXRecordDecl* ClassDeclaration);
 		void							ProcessClass(CXXRecordDecl* ClassDeclaration);
 		void							ProcessClassAttributes(ZEMCClass* ClassData, CXXRecordDecl* ClassDeclaration);
 
@@ -122,7 +123,6 @@ class ZEMCParser
 		void							FilterPropertyAccessors(ZEMCClass* Class, ZEArray<ZEMCAccessor>& Accessors);
 		void							ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCMethod* MethodData);
 		void							ProcessPropertyAccessors(ZEMCClass* ClassData);
-
 		
 		void							RemoveMetaCompilerAttributes(ZEMCClass* Class);
 

@@ -48,11 +48,14 @@ ZEInt main(ZEInt Argc, char** Argv)
 
 	ZETestManager* Manager = ZETestManager::GetInstance();
 
-	Manager->SetVisualStudioOutput(false);
-	if (Argc == 2)
-		Manager->SetVisualStudioOutput(strcmp(Argv[1], "-vs") == 0);
+	for (ZEInt I = 2; I < Argc; I++)
+	{
+		if (strcmp(Argv[1], "--msbuild") == 0)
+			Manager->SetMSBuildOutputEnabled(true);
+		else if (strcmp(Argv[1], "--quiet") == 0)
+			Manager->SetNormalOutputEnabled(false);
+	}
 
-	Manager->SetPackageName(Argv[0]);
 	Manager->RunTests();
 
 	return EXIT_SUCCESS;

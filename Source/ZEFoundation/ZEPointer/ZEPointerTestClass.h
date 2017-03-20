@@ -61,8 +61,8 @@ class ZETestClass
 
 #define ZETestReset() ZETestClass::Reset()
 #define ZETestScope() 
-#define ZETestCheckStatus(Status1) ZETestCheck(ZETestClass::Status == Status1)
-#define ZETestCheckInstanceCount(Count) ZETestCheck(ZETestClass::InstanceCount == Count)
-#define ZETestCheckDestroyedInstaceCount(Count) ZETestCheck(ZETestClass::DestroyedInstanceCount == Count)
+#define ZE_TEST_CHECK_ERRORStatus(Status1) ZE_TEST_CHECK_ERROR(ZETestClass::Status == Status1)
+#define ZE_TEST_CHECK_ERRORInstanceCount(Count) ZE_TEST_CHECK_ERROR(ZETestClass::InstanceCount == Count)
+#define ZE_TEST_CHECK_ERRORDestroyedInstaceCount(Count) ZE_TEST_CHECK_ERROR(ZETestClass::DestroyedInstanceCount == Count)
 
 #endif

@@ -38,9 +38,14 @@
 #include "ZETest/ZETestCheck.h"
 #include "ZEError.h"
 
-ZETestSuite(ZETimeCounter)
+// Unit Tests
+	// Unit Tests
+	// Function Test
+		// Cases
+
+ZE_TEST(ZETimeCounter)
 {
-	ZETest("ZETimeCounter::ZETimeCounter()")
+	ZE_TEST_ITEM("ZETimeCounter::ZETimeCounter()")
 	{
 		ZETimeCounter TimeCounter;
 		//TimeCounter.Started false
@@ -49,14 +54,14 @@ ZETestSuite(ZETimeCounter)
 		//TimeCounter.Frequency = 1000000
 	}
 
-	ZETest("ZEUInt64 ZETimeCounter::GetTime()")
+	ZE_TEST_ITEM("ZEUInt64 ZETimeCounter::GetTime()")
 	{
 		ZETimeCounter TimeCounter;
 
-		ZEUInt64 Time = TimeCounter.GetTime();
-		ZETestCheckEqual(Time, 0);
+		ZEUInt64 Time = TimeCounter.GetTimeMicroseconds();
+		ZE_TEST_CHECK_EQUAL(Time, 0);
 
-		ZETestCase("start time counter")
+		ZE_TEST_CASE("start time counter")
 		{
 			TimeCounter.Start();
 			//TimeCounter.Started true
@@ -64,63 +69,63 @@ ZETestSuite(ZETimeCounter)
 			//TimeCounter.EndTime = 0
 			//TimeCounter.Frequency 2766640
 
-			Time = TimeCounter.GetTime();
-			//ZETestCheckEqual(Time, 44094391);
+			Time = TimeCounter.GetTimeMicroseconds();
+			//ZE_TEST_CHECK_EQUAL(Time, 44094391);
 		}
 
-		ZETestCase("reset time counter")
+		ZE_TEST_CASE("reset time counter")
 		{
 			TimeCounter.Reset();
 			//TimeCounter.Started true
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			//Time = TimeCounter.EndTime
 		}
 
-		ZETestCase("stop time counter")
+		ZE_TEST_CASE("stop time counter")
 		{
 			TimeCounter.Stop();
 			//TimeCounter.Started false
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 			//Time = TimeCounter.EndTime
 		}
 
-		ZETestCase("set time")
+		ZE_TEST_CASE("set time")
 		{
 			TimeCounter.SetTime(44094391);
 
-			Time = TimeCounter.GetTime();
+			Time = TimeCounter.GetTimeMicroseconds();
 		}
 
-		ZETestCase("reset and set time")
+		ZE_TEST_CASE("reset and set time")
 		{
 			TimeCounter.Reset();
 			TimeCounter.SetTime(44094391);
 
-			Time = TimeCounter.GetTime();
-			ZETestCheckEqual(Time, ZEUInt64(-44094391));
+			Time = TimeCounter.GetTimeMicroseconds();
+			ZE_TEST_CHECK_EQUAL(Time, ZEUInt64(-44094391));
 		}
 	}
 
-	ZETest("void ZETimeCounter::SetTime(ZEUInt64 Microseconds)")
+	ZE_TEST_ITEM("void ZETimeCounter::SetTime(ZEUInt64 Microseconds)")
 	{
 		ZETimeCounter TimeCounter;
 		//TimeCounter.Started false
 
 		TimeCounter.SetTime(0);
-		ZETestCheckEqual(TimeCounter.GetTime(), 0);
+		ZE_TEST_CHECK_EQUAL(TimeCounter.GetTimeMicroseconds(), 0);
 
-		ZETestCase("microseconds different from zero")
+		ZE_TEST_CASE("microseconds different from zero")
 		{
 			ZEUInt64 Microseconds = 44094391;
 
 			TimeCounter.SetTime(Microseconds);
 			//TimeCounter.StartTime = Microseconds
-			ZETestCheckEqual(TimeCounter.GetTime(), ZEUInt64(-Microseconds));
+			ZE_TEST_CHECK_EQUAL(TimeCounter.GetTimeMicroseconds(), ZEUInt64(-Microseconds));
 		}
 
-		ZETestCase("start time counter")
+		ZE_TEST_CASE("start time counter")
 		{
 			TimeCounter.Start();
 			ZEUInt64 Microseconds = 44094391;
@@ -130,14 +135,14 @@ ZETestSuite(ZETimeCounter)
 		}
 	}
 
-	ZETest("void ZETimeCounter::Reset()")
+	ZE_TEST_ITEM("void ZETimeCounter::Reset()")
 	{
 		ZETimeCounter TimeCounter;
 
 		TimeCounter.Reset();
 		//TimeCounter.Started false
 
-		ZETestCase("start time counter")
+		ZE_TEST_CASE("start time counter")
 		{
 			TimeCounter.Start();
 			//TimeCounter.Started true
@@ -152,7 +157,7 @@ ZETestSuite(ZETimeCounter)
 			//TimeCounter.Frequency = 1000000
 		}
 
-		ZETestCase("stop time counter")
+		ZE_TEST_CASE("stop time counter")
 		{
 			TimeCounter.Stop();
 			//TimeCounter.Started false
@@ -168,7 +173,7 @@ ZETestSuite(ZETimeCounter)
 		}
 	}
 
-	ZETest("void ZETimeCounter::Start()")
+	ZE_TEST_ITEM("void ZETimeCounter::Start()")
 	{
 		ZETimeCounter TimeCounter;
 		//TimeCounter.Started false
@@ -179,7 +184,7 @@ ZETestSuite(ZETimeCounter)
 		//TimeCounter.EndTime = 0
 		//TimeCounter.Frequency = 2766640
 
-		ZETestCase("stop time counter")
+		ZE_TEST_CASE("stop time counter")
 		{
 			TimeCounter.Stop();
 			//TimeCounter.Started false
@@ -194,7 +199,7 @@ ZETestSuite(ZETimeCounter)
 			//TimeCounter.Frequency = 2766640
 		}
 
-		ZETestCase("reset time counter")
+		ZE_TEST_CASE("reset time counter")
 		{
 			TimeCounter.Reset();
 			//TimeCounter.Started true
@@ -210,7 +215,7 @@ ZETestSuite(ZETimeCounter)
 		}
 	}
 
-	ZETest("void ZETimeCounter::Stop()")
+	ZE_TEST_ITEM("void ZETimeCounter::Stop()")
 	{
 		ZETimeCounter TimeCounter;
 
@@ -220,7 +225,7 @@ ZETestSuite(ZETimeCounter)
 		//TimeCounter.EndTime != 0
 		//TimeCounter.Frequency = 1000000
 
-		ZETestCase("start time counter")
+		ZE_TEST_CASE("start time counter")
 		{
 			TimeCounter.Start();
 			//TimeCounter.Started true
@@ -235,7 +240,7 @@ ZETestSuite(ZETimeCounter)
 			//TimeCounter.Frequency = 2766640
 		}
 
-		ZETestCase("reset time counter")
+		ZE_TEST_CASE("reset time counter")
 		{
 			TimeCounter.Reset();
 			//TimeCounter.Started false

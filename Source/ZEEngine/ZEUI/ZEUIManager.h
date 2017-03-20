@@ -171,8 +171,8 @@ enum ZEUIInputKey
 
 enum ZEUIMouseKey;
 
-ZE_META_FORWARD_DECLARE(ZEUIControl, "ZEUIControl.h")
-ZE_META_FORWARD_DECLARE(ZEUICursorControl, "ZEUICursorControl.h")
+ZEMT_FORWARD_DECLARE(ZEUIControl);
+ZEMT_FORWARD_DECLARE(ZEUICursorControl);
 
 class ZEUIManager : public ZEObject, public ZEInitializable
 {

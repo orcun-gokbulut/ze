@@ -41,6 +41,7 @@
 #include "ZELog.h"
 #include "ZEDLL.h"
 #include "ZEPlatform.h"
+#include "ZEDS\ZEDelegate.h"
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_COMPILER_MSVC)
 	#include <intrin.h>
@@ -55,7 +56,8 @@ enum ZEErrorType
 	ZE_ET_ERROR					= 3,
 	ZE_ET_DEBUG_CHECK_FAILED	= 2,
 	ZE_ET_WARNING				= 1,
-	ZE_ET_DEBUG_CHECK_WARNING	= 0
+	ZE_ET_DEBUG_CHECK_WARNING	= 0,
+	ZE_ET_NONE					= 0
 };
 
 #ifdef ZE_PLATFORM_WINDOWS
@@ -112,7 +114,7 @@ enum ZEErrorType
 #else
 	#define ZEDebugCheckMemory()
 #endif
-typedef void (*ZEErrorCallback)(ZEErrorType Type);
+typedef ZEDelegate<void (ZEErrorType)> ZEErrorCallback;
 
 class ZEError
 {
@@ -137,7 +139,7 @@ class ZEError
 		bool								GetBreakOnWarningEnabled();
 
 		void								SetCallback(ZEErrorCallback Callback);
-		ZEErrorCallback						GetCallBack();
+		ZEErrorCallback						GetCallback();
 
 		void								RaiseError(ZEErrorType Type);
 

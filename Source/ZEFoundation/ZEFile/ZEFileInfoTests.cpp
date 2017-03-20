@@ -42,191 +42,191 @@
 #include "ZEError.h"
 #include "ZEPathUtils.h"
 
-ZETestSuite(ZEFileInfo)
+ZE_TEST(ZEFileInfo)
 {
-	ZETest("ZEFileInfo::~ZEFileInfo()")
+	ZE_TEST_ITEM("ZEFileInfo::~ZEFileInfo()")
 	{
 
 	}
 
-	ZETest("ZEFileInfo::ZEFileInfo()")
+	ZE_TEST_ITEM("ZEFileInfo::ZEFileInfo()")
 	{
 		ZEFileInfo FileInfo;
 
 	}
 
-	ZETest("ZEFileInfo::ZEFileInfo(const ZEString& FilePath)")
+	ZE_TEST_ITEM("ZEFileInfo::ZEFileInfo(const ZEString& FilePath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEFileInfo FileInfo("resources" + Seperator + "FileInfo.txt");
 
-		ZETestCheckString(FileInfo.GetName(), "FileInfo.txt");
-		ZETestCheckString(FileInfo.GetPath(), "resources" + Seperator + "FileInfo.txt");
-		ZETestCheckString(FileInfo.GetExtension(), ".txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileInfo.GetName(), "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileInfo.GetPath(), "resources" + Seperator + "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileInfo.GetExtension(), ".txt");
 	}
 
-	ZETest("const ZEString& ZEFileInfo::GetName() const")
+	ZE_TEST_ITEM("const ZEString& ZEFileInfo::GetName() const")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEFileInfo FileInfo("resources" + Seperator + "FileInfo.txt");
 
 		const ZEString Name = FileInfo.GetName();
-		ZETestCheckString(Name, "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Name, "FileInfo.txt");
 	}
 
-	ZETest("void ZEFileInfo::SetPath(const ZEString& FilePath)")
+	ZE_TEST_ITEM("void ZEFileInfo::SetPath(const ZEString& FilePath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 		ZEFileInfo FileInfo;
 
 		FileInfo.SetPath("FileInfo.txt");
-		ZETestCheckString(FileInfo.GetPath(), "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileInfo.GetPath(), "FileInfo.txt");
 
-		ZETestCase("set different FileInfo name")
+		ZE_TEST_CASE("set different FileInfo name")
 		{
 			ZEFileInfo FileInfo2("FileInfo2.txt");
-			ZETestCheckString(FileInfo2.GetPath(), "FileInfo2.txt");
+			ZE_TEST_CHECK_STRING_EQUAL(FileInfo2.GetPath(), "FileInfo2.txt");
 
 			FileInfo2.SetPath("FileInfo.txt");
-			ZETestCheckString(FileInfo2.GetPath(), "FileInfo.txt");
+			ZE_TEST_CHECK_STRING_EQUAL(FileInfo2.GetPath(), "FileInfo.txt");
 		}
 
-		ZETestCase("path with a directory and without an extension")
+		ZE_TEST_CASE("path with a directory and without an extension")
 		{
 			FileInfo.SetPath("resources" + Seperator + "FileInfo3");
-			ZETestCheckString(FileInfo.GetPath(), "resources" + Seperator + "FileInfo3");
+			ZE_TEST_CHECK_STRING_EQUAL(FileInfo.GetPath(), "resources" + Seperator + "FileInfo3");
 		}
 	}
 
-	ZETest("const ZEString&	ZEFileInfo::GetPath() const")
+	ZE_TEST_ITEM("const ZEString&	ZEFileInfo::GetPath() const")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEFileInfo FileInfo("resources" + Seperator + "FileInfo.txt");
 		const ZEString Path = FileInfo.GetPath();
-		ZETestCheckString(Path, "resources" + Seperator + "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Path, "resources" + Seperator + "FileInfo.txt");
 
 		ZEFileInfo FileInfo2(ZEPathManager::GetResourcesPath() + Seperator + "FileInfo2.txt");
 		const ZEString Path2 = FileInfo2.GetPath();
-		ZETestCheckString(Path2, ZEPathManager::GetResourcesPath() + Seperator + "FileInfo2.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Path2, ZEPathManager::GetResourcesPath() + Seperator + "FileInfo2.txt");
 
 		ZEFileInfo FileInfo3(ZEPathManager::GetResourcesPath());
 		const ZEString Path3 = FileInfo3.GetPath();
-		ZETestCheckString(Path3, ZEPathManager::GetResourcesPath());
+		ZE_TEST_CHECK_STRING_EQUAL(Path3, ZEPathManager::GetResourcesPath());
 	}
 
-	ZETest("const ZEString&	ZEFileInfo::GetExtension() const")
+	ZE_TEST_ITEM("const ZEString&	ZEFileInfo::GetExtension() const")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEFileInfo FileInfo("resources" + Seperator + "FileInfo.txt");
 		const ZEString Extension = FileInfo.GetExtension();
-		ZETestCheckString(Extension, ".txt");
+		ZE_TEST_CHECK_STRING_EQUAL(Extension, ".txt");
 
 		ZEFileInfo FileInfo2(ZEPathManager::GetResourcesPath() + Seperator + "Info.test");
 		const ZEString Extension2 = FileInfo2.GetExtension();
-		ZETestCheckString(Extension2, ".test");
+		ZE_TEST_CHECK_STRING_EQUAL(Extension2, ".test");
 	}
 
-	ZETest("ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)")
+	ZE_TEST_ITEM("ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEString FileName = ZEFileInfo::GetFileName("resources" + Seperator + "FileInfo.txt");
-		ZETestCheckString(FileName, "FileInfo.txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileName, "FileInfo.txt");
 
-		ZETestCase("FileInfo path without a directory")
+		ZE_TEST_CASE("FileInfo path without a directory")
 		{
 			FileName = ZEFileInfo::GetFileName("FileInfo2.txt");
-			ZETestCheckString(FileName, "FileInfo2.txt");
+			ZE_TEST_CHECK_STRING_EQUAL(FileName, "FileInfo2.txt");
 		}
 
-		ZETestCase("FileInfo path without an extension")
+		ZE_TEST_CASE("FileInfo path without an extension")
 		{
 			FileName = ZEFileInfo::GetFileName("FileInfo3");
-			ZETestCheckString(FileName, "FileInfo3");
+			ZE_TEST_CHECK_STRING_EQUAL(FileName, "FileInfo3");
 		}
 
-		ZETestCase("FileInfo path with a directory and without an extension")
+		ZE_TEST_CASE("FileInfo path with a directory and without an extension")
 		{
 			FileName = ZEFileInfo::GetFileName("resources" + Seperator + "FileInfo4");
-			ZETestCheckString(FileName, "FileInfo4");
+			ZE_TEST_CHECK_STRING_EQUAL(FileName, "FileInfo4");
 		}
 
-		ZETestCase("with an absolute path")
+		ZE_TEST_CASE("with an absolute path")
 		{
 			FileName = ZEFileInfo::GetFileName(ZEPathManager::GetResourcesPath());
-			ZETestCheckString(FileName, "resources");
+			ZE_TEST_CHECK_STRING_EQUAL(FileName, "resources");
 		}
 
-		ZETestCase("with an absolute path with a file")
+		ZE_TEST_CASE("with an absolute path with a file")
 		{
 			FileName = ZEFileInfo::GetFileName(ZEPathManager::GetResourcesPath() + Seperator + "Info.txt");
-			ZETestCheckString(FileName, "Info.txt");
+			ZE_TEST_CHECK_STRING_EQUAL(FileName, "Info.txt");
 		}
 	}
 
-	ZETest("ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)")
+	ZE_TEST_ITEM("ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEString FileExtension = ZEFileInfo::GetFileExtension("resources" + Seperator + "FileInfo.txt");
-		ZETestCheckString(FileExtension, ".txt");
+		ZE_TEST_CHECK_STRING_EQUAL(FileExtension, ".txt");
 
-		ZETestCase("FileInfo path without a directory")
+		ZE_TEST_CASE("FileInfo path without a directory")
 		{
 			FileExtension = ZEFileInfo::GetFileExtension("FileInfo2.test");
-			ZETestCheckString(FileExtension, ".test");
+			ZE_TEST_CHECK_STRING_EQUAL(FileExtension, ".test");
 		}
 
-		ZETestCase("FileInfo path without an extension")
+		ZE_TEST_CASE("FileInfo path without an extension")
 		{
 			FileExtension = ZEFileInfo::GetFileExtension("resources\\FileInfo3");
-			//ZETestCheckString(FileExtension, "");
+			//ZE_TEST_CHECK_STRING_EQUAL(FileExtension, "");
 		}
 
-		ZETestCase("FileInfo path with an absolute path with an extension")
+		ZE_TEST_CASE("FileInfo path with an absolute path with an extension")
 		{
 			FileExtension = ZEFileInfo::GetFileExtension(ZEPathManager::GetResourcesPath() + Seperator + "Info.txt");
-			ZETestCheckString(FileExtension, ".txt");
+			ZE_TEST_CHECK_STRING_EQUAL(FileExtension, ".txt");
 		}
 	}
 
-	ZETest("ZEString ZEFileInfo::GetParentDirectory(const ZEString& DirectoryPath)")
+	ZE_TEST_ITEM("ZEString ZEFileInfo::GetParentDirectory(const ZEString& DirectoryPath)")
 	{
 		ZEString Seperator = ZEPathUtils::GetSeperator();
 
 		ZEString ParentDirectory = ZEFileInfo::GetParentDirectory("resources" + Seperator + "FileInfo.txt");
-		ZETestCheckString(ParentDirectory, "resources");
+		ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, "resources");
 
-		ZETestCase("FileInfo path without an extension")
+		ZE_TEST_CASE("FileInfo path without an extension")
 		{
 			ParentDirectory = ZEFileInfo::GetParentDirectory("resources" + Seperator + "FileInfo2");
-			ZETestCheckString(ParentDirectory, "resources");
+			ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, "resources");
 		}
 
-		ZETestCase("for working directory")
+		ZE_TEST_CASE("for working directory")
 		{
 			ParentDirectory = ZEFileInfo::GetParentDirectory(ZEPathManager::GetWorkingDirectory());
-			ZETestCheckString(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
+			ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathUtils::GetSimplifiedPath(ZEPathManager::GetWorkingDirectory() + Seperator + "..", false));
 		}
 
-		ZETestCase("for file of resources path")
+		ZE_TEST_CASE("for file of resources path")
 		{
 			ParentDirectory = ZEFileInfo::GetParentDirectory(ZEPathManager::GetResourcesPath() + Seperator + "Info.txt");
-			ZETestCheckString(ParentDirectory, ZEPathManager::GetResourcesPath());
+			ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, ZEPathManager::GetResourcesPath());
 		}
 
-		ZETestCase("FileInfo path without a directory")
+		ZE_TEST_CASE("FileInfo path without a directory")
 		{
 			ParentDirectory = ZEFileInfo::GetParentDirectory("FileInfo3.txt");
-			//ZETestCheckString(ParentDirectory, "");
+			//ZE_TEST_CHECK_STRING_EQUAL(ParentDirectory, "");
 		}
 	}
 
-	ZETest("ZEInt64 ZEFileInfo::GetSize()")
+	ZE_TEST_ITEM("ZEInt64 ZEFileInfo::GetSize()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		for ( ZEInt I = 0; I < 1024; I++)
@@ -243,32 +243,32 @@ ZETestSuite(ZEFileInfo)
 		File.Close();
 
 		ZEInt64 Size = FileInfo.GetSize();
-		ZETestCheckEqual(Size, 15);
+		ZE_TEST_CHECK_EQUAL(Size, 15);
 
 		remove("FileInfo.txt");
 
-		ZETestCase("call function without write to file")
+		ZE_TEST_CASE("call function without write to file")
 		{
 			ZEFileInfo Info("Info.txt");
 
 			Size = Info.GetSize();
-			ZETestCheckEqual(Size, -1);
+			ZE_TEST_CHECK_EQUAL(Size, -1);
 		}
 
-		ZETestCase("call function after open the file")
+		ZE_TEST_CASE("call function after open the file")
 		{
 			ZEFileInfo Info("Info.txt");
 			File.Open("Info.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 			Size = Info.GetSize();
-			ZETestCheckEqual(Size, 0);
+			ZE_TEST_CHECK_EQUAL(Size, 0);
 
 			File.Close();
 			remove("Info.txt");
 		}
 	}
 
-	ZETest("ZEInt64 ZEFileInfo::GetFileSize(const ZEString& FilePath)")
+	ZE_TEST_ITEM("ZEInt64 ZEFileInfo::GetFileSize(const ZEString& FilePath)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		for (ZEInt I = 0 ; I < 1024 ; I++)
@@ -285,64 +285,64 @@ ZETestSuite(ZEFileInfo)
 		File.Close();
 
 		ZEInt64 FileSize = FileInfo.GetFileSize("FileInfo.txt");
-		ZETestCheckEqual(FileSize, 15);
+		ZE_TEST_CHECK_EQUAL(FileSize, 15);
 
 		remove("FileInfo.txt");
 
-		ZETestCase("call function without write to file")
+		ZE_TEST_CASE("call function without write to file")
 		{
 			ZEFileInfo Info("Info.txt");
 
 			Size = Info.GetFileSize("Info.txt");
-			ZETestCheckEqual(Size, -1);
+			ZE_TEST_CHECK_EQUAL(Size, -1);
 		}
 
-		ZETestCase("call function after open the file")
+		ZE_TEST_CASE("call function after open the file")
 		{
 			ZEFileInfo Info("Info.txt");
 			File.Open("Info.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 			Size = Info.GetFileSize("Info.txt");
-			ZETestCheckEqual(Size, 0);
+			ZE_TEST_CHECK_EQUAL(Size, 0);
 
 			File.Close();
 			remove("Info.txt");
 		}
 	}
 
-	ZETest("bool ZEFileInfo::IsFile(const ZEString& FilePath)")
+	ZE_TEST_ITEM("bool ZEFileInfo::IsFile(const ZEString& FilePath)")
 	{
 		bool IsFile = ZEFileInfo::IsFile("FileInfo.txt");
-		ZETestCheck(!IsFile);
+		ZE_TEST_CHECK_ERROR(!IsFile);
 
-		ZETestCase("open a file with the file info path")
+		ZE_TEST_CASE("open a file with the file info path")
 		{
 			ZEFile File;
 			bool Opened = File.Open("FileInfo.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 			IsFile = ZEFileInfo::IsFile("FileInfo.txt");
-			ZETestCheck(IsFile);
+			ZE_TEST_CHECK_ERROR(IsFile);
 
 			File.Close();
 			remove("FileInfo.txt");
 		}
 	}
 
-	ZETest("bool ZEFileInfo::GetCreationDate(ZEFileTime& Time)")
+	ZE_TEST_ITEM("bool ZEFileInfo::GetCreationDate(ZEFileTime& Time)")
 	{
 		ZEFileTime Time;
 		ZEFileInfo FileInfo("FileInfo.txt");
 
 		bool Created = FileInfo.GetCreationDate(Time);
-		ZETestCheck(!Created);
+		ZE_TEST_CHECK_ERROR(!Created);
 
-		ZETestCase("open a file through the FileInfo path")
+		ZE_TEST_CASE("open a file through the FileInfo path")
 		{
 			ZEFile File;
 			File.Open("FileInfo.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 			Created = FileInfo.GetCreationDate(Time);
-			ZETestCheck(Created);
+			ZE_TEST_CHECK_ERROR(Created);
 			//Time will be the current time
 
 			File.Close();
@@ -350,21 +350,21 @@ ZETestSuite(ZEFileInfo)
 		}
 	}
 
-	ZETest("bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)")
+	ZE_TEST_ITEM("bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)")
 	{
 		ZEFileTime Time;
 		ZEFileInfo FileInfo("FileInfo.txt");
 
 		bool Modified = FileInfo.GetModificationDate(Time);
-		ZETestCheck(!Modified);
+		ZE_TEST_CHECK_ERROR(!Modified);
 
-		ZETestCase("open a file through the FileInfo path")
+		ZE_TEST_CASE("open a file through the FileInfo path")
 		{
 			ZEFile File;
 			File.Open("FileInfo.txt", ZE_FOM_READ_WRITE, ZE_FCM_CREATE);
 
 			Modified = FileInfo.GetModificationDate(Time);
-			ZETestCheck(Modified);
+			ZE_TEST_CHECK_ERROR(Modified);
 			//Time will be the current time
 
 			File.Close();

@@ -59,8 +59,8 @@ class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 		virtual void						TickEvent(const ZEDTickEvent* Event);
 
 	protected:
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
+		virtual void						PropertyChanged(const ZEMTProperty* Property, const ZEVariant& Value);
+		virtual void						PropertyChanged(const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values);
 
 	public:
 		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;

@@ -58,7 +58,7 @@ ZEError::ZEError()
 	BreakOnAssertEnabled = true;
 	BreakOnErrorEnabled = true;
 	BreakOnWarningEnabled = true;
-	ErrorCallback = DefaultErrorCallback;
+	ErrorCallback = ZEErrorCallback::Create<&DefaultErrorCallback>();
 }
 
 void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)
@@ -120,7 +120,7 @@ void ZEError::SetCallback(ZEErrorCallback Callback)
 	ErrorCallback = Callback;
 }
 
-ZEErrorCallback ZEError::GetCallBack()
+ZEErrorCallback ZEError::GetCallback()
 {
 	return ErrorCallback;
 }
@@ -128,7 +128,7 @@ ZEErrorCallback ZEError::GetCallBack()
 void ZEError::RaiseError(ZEErrorType Type)
 {
 	static ZELock Lock;
-	Lock.Lock();
+	Lock.LockNested();
 	
 	if (ErrorCallback != NULL)
 		ErrorCallback(Type);

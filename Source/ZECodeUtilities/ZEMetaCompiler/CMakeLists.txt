@@ -62,5 +62,5 @@ ze_add_source(ZEMCRegisterer.cpp						Sources)
 
 ze_add_executable(TARGET ZEMetaCompiler 
 	CONSOLE 
-	SOURCES ${Sources} 
-	LIBS ZEFoundation libClang)
+	SOURCES ${Sources}
+	LIBS ZEFoundationBase libClang)

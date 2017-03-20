@@ -264,6 +264,11 @@ void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 	}
 }
 
+const ZERNMaterial* ZEUITextEditControl::GetCursorMaterial() const
+{
+	return NULL;
+}
+
 ZEUITextEditControl::ZEUITextEditControl()
 {
 	SetFocusable(true);

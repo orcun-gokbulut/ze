@@ -36,7 +36,7 @@
 #include "ZESpawner.h"
 
 #include "ZEError.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZEScene.h"
 
 void ZESpawner::UpdateSpawns(ZESize Index)

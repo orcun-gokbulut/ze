@@ -82,7 +82,7 @@ struct ZEGRSamplerDescription
 											ZEGRSamplerDescription();
 };
 
-class ZEGRSampler : public ZEObject, public ZEReferenceCounted
+class ZEGRSampler : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	private:

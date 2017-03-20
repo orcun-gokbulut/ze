@@ -37,9 +37,9 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZETest/ZETest.h"
 
-ZETestSuite(ZEFlags)
+ZE_TEST(ZEFlags)
 {
-	ZETest("inline bool GetBit(ZESize Index) const")
+	ZE_TEST_ITEM("inline bool GetBit(ZESize Index) const")
 	{
 		ZESize Index = 0;
 		
@@ -47,107 +47,107 @@ ZETestSuite(ZEFlags)
 		Flag.SetBit(Index, true);
 		
 		bool Bit = Flag.GetBit(Index);
-		ZETestCheck(Bit == true);
+		ZE_TEST_CHECK_ERROR(Bit == true);
 
 		Bit = Flag.GetBit(3);
-		ZETestCheck(Bit == false);
+		ZE_TEST_CHECK_ERROR(Bit == false);
 
 	}
-	ZETest("inline bool GetFlags(ZEInt Flags) const")
+	ZE_TEST_ITEM("inline bool GetFlags(ZEInt Flags) const")
 	{
 		ZEFlags Value = 1;
 		ZEInt Flags = 1;
 
 		bool Result = Value.GetFlags(Flags);
-		ZETestCheck(Result == true);
+		ZE_TEST_CHECK_ERROR(Result == true);
 
-		ZETestCase("for false")
+		ZE_TEST_CASE("for false")
 		{
 			Value = 4;
 			Flags = 5;
 
 			Result = Value.GetFlags(Flags);
-			ZETestCheck(Result == false);
+			ZE_TEST_CHECK_ERROR(Result == false);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type> operator&(const Type& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator&(const Type& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		ZEFlagsBase<ZEInt> Result = Flags & Other;
-		ZETestCheckEqual(Result, 4);
+		ZE_TEST_CHECK_EQUAL(Result, 4);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 3;
 			const ZEInt Other = 1;
 
 			ZEFlagsBase<ZEInt> Result = Flags & Other;
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 		}
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 1;
 			const ZEInt Other = 2;
 
 			ZEFlagsBase<ZEInt> Result = Flags & Other;
-			ZETestCheckEqual(Result, 0);
+			ZE_TEST_CHECK_EQUAL(Result, 0);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 1;
 		ZEFlagsBase<ZEInt> Other = 2;
 
 		ZEFlagsBase<ZEInt> Result = Flags & Other;
-		ZETestCheckEqual(Result, 0);
+		ZE_TEST_CHECK_EQUAL(Result, 0);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			Flags = 3;
 			Other = 1;
 
 			Result = Flags & Other;
-			ZETestCheckEqual(Result, 1);
+			ZE_TEST_CHECK_EQUAL(Result, 1);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator&=(const Type& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator&=(const Type& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		Flags &= Other;
-		ZETestCheckEqual(Flags, 4);
+		ZE_TEST_CHECK_EQUAL(Flags, 4);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 1;
 			const ZEInt Other = 2;
 
 			Flags &= Other;
-			ZETestCheckEqual(Flags, 0);
+			ZE_TEST_CHECK_EQUAL(Flags, 0);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator&=(const ZEFlagsBase<Type>& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator&=(const ZEFlagsBase<Type>& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 3;
 		ZEFlagsBase<ZEInt> Other = 3;
 
 		Flags &= Other;
-		ZETestCheckEqual(Flags, 3);
+		ZE_TEST_CHECK_EQUAL(Flags, 3);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 3;
 			ZEFlagsBase<ZEInt> Other = 1;
 
 			Flags &= Other;
-			ZETestCheckEqual(Flags, 1);
+			ZE_TEST_CHECK_EQUAL(Flags, 1);
 		}
 	}
-	ZETest("inline bool operator[](ZESize Index) const")
+	ZE_TEST_ITEM("inline bool operator[](ZESize Index) const")
 	{
 		ZEFlags Flags = 12;
 
@@ -155,307 +155,307 @@ ZETestSuite(ZEFlags)
 		bool Value1 = Flags[1];
 		bool Value2 = Flags[2];
 		bool Value3 = Flags[3];
-		ZETestCheck(Value0 == false);
-		ZETestCheck(Value1 == false);
-		ZETestCheck(Value2 == true);
-		ZETestCheck(Value3 == true);
+		ZE_TEST_CHECK_ERROR(Value0 == false);
+		ZE_TEST_CHECK_ERROR(Value1 == false);
+		ZE_TEST_CHECK_ERROR(Value2 == true);
+		ZE_TEST_CHECK_ERROR(Value3 == true);
 
 	}
-	ZETest("inline ZEFlagsBase<Type> operator^(const Type& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator^(const Type& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		ZEFlagsBase<ZEInt> Result = Flags ^ Other;
-		ZETestCheckEqual(Result, 0);
+		ZE_TEST_CHECK_EQUAL(Result, 0);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 7;
 			const ZEInt Other = 11;
 
 			ZEFlagsBase<ZEInt> Result = Flags ^ Other;
-			ZETestCheckEqual(Result, 12);
+			ZE_TEST_CHECK_EQUAL(Result, 12);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type> operator^(const ZEFlagsBase<Type>& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator^(const ZEFlagsBase<Type>& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		ZEFlagsBase<ZEInt> Other = 4;
 
 		ZEFlagsBase<ZEInt> Result = Flags ^ Other;
-		ZETestCheckEqual(Result, 0);
+		ZE_TEST_CHECK_EQUAL(Result, 0);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			Flags = 1;
 			Other = 5;
 
 			Result = Flags ^ Other;
-			ZETestCheckEqual(Result, 4);
+			ZE_TEST_CHECK_EQUAL(Result, 4);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator^=(const Type& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator^=(const Type& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		Flags ^= Other;
-		ZETestCheckEqual(Flags, 0);
+		ZE_TEST_CHECK_EQUAL(Flags, 0);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 7;
 			const ZEInt Other = 11;
 
 			Flags ^= Other;
-			ZETestCheckEqual(Flags, 12);
+			ZE_TEST_CHECK_EQUAL(Flags, 12);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator^=(const ZEFlagsBase<Type>& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator^=(const ZEFlagsBase<Type>& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		ZEFlagsBase<ZEInt> Other = 4;
 
 		Flags ^= Other;
-		ZETestCheckEqual(Flags, 0);
+		ZE_TEST_CHECK_EQUAL(Flags, 0);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			Flags = 1;
 			Other = 5;
 
 			Flags ^= Other;
-			ZETestCheckEqual(Flags, 4);
+			ZE_TEST_CHECK_EQUAL(Flags, 4);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type> operator|(const Type& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator|(const Type& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		ZEFlagsBase<ZEInt> Result = Flags | Other;
-		ZETestCheckEqual(Result, 4);
+		ZE_TEST_CHECK_EQUAL(Result, 4);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 3;
 			const ZEInt Other = 5;
 
 			ZEFlagsBase<ZEInt> Result = Flags | Other;
-			ZETestCheckEqual(Result, 7);
+			ZE_TEST_CHECK_EQUAL(Result, 7);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type> operator|(const ZEFlagsBase<Type>& Other) const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type> operator|(const ZEFlagsBase<Type>& Other) const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 1;
 		ZEFlagsBase<ZEInt> Other = 1;
 
 		ZEFlagsBase<ZEInt> Result = Flags | Other;
-		ZETestCheckEqual(Result, 1);
+		ZE_TEST_CHECK_EQUAL(Result, 1);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			Flags = 1;
 			Other = 8;
 
 			Result = Flags | Other;
-			ZETestCheckEqual(Result, 9);
+			ZE_TEST_CHECK_EQUAL(Result, 9);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator|=(const Type& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator|=(const Type& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 4;
 		const ZEInt Other = 4;
 
 		Flags |= Other;
-		ZETestCheckEqual(Flags, 4);
+		ZE_TEST_CHECK_EQUAL(Flags, 4);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			ZEFlagsBase<ZEInt> Flags = 3;
 			const ZEInt Other = 5;
 
 			Flags |= Other;
-			ZETestCheckEqual(Flags, 7);
+			ZE_TEST_CHECK_EQUAL(Flags, 7);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator|=(const ZEFlagsBase<Type>& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator|=(const ZEFlagsBase<Type>& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 1;
 		ZEFlagsBase<ZEInt> Other = 1;
 
 		Flags |= Other;
-		ZETestCheckEqual(Flags, 1);
+		ZE_TEST_CHECK_EQUAL(Flags, 1);
 
-		ZETestCase("for different values")
+		ZE_TEST_CASE("for different values")
 		{
 			Flags = 1;
 			Other = 8;
 
 			Flags |= Other;
-			ZETestCheckEqual(Flags, 9);
+			ZE_TEST_CHECK_EQUAL(Flags, 9);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator~() const")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator~() const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 2;
 
 		ZEFlagsBase<ZEInt> Result = ~ Flags.Value;
-		ZETestCheckEqual(Result, -3);
+		ZE_TEST_CHECK_EQUAL(Result, -3);
 
-		ZETestCase("for 0")
+		ZE_TEST_CASE("for 0")
 		{
 			Flags = 0;
 
 			Result = ~ Flags.Value;
-			ZETestCheckEqual(Result, -1);
+			ZE_TEST_CHECK_EQUAL(Result, -1);
 		}
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator=(const Type& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator=(const Type& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 1;
 		const ZEInt Other = 3;
 
 		Flags = Other;
-		ZETestCheckEqual(Flags.Value, 3);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 3);
 	}
-	ZETest("inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)")
+	ZE_TEST_ITEM("inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)")
 	{
 		ZEFlagsBase<ZEInt> Flags = 2;
 		ZEFlagsBase<ZEInt> Other = 4;
 
 		Flags = Other;
-		ZETestCheckEqual(Flags.Value, 4);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 4);
 	}
-	ZETest("inline operator Type() const")
+	ZE_TEST_ITEM("inline operator Type() const")
 	{
 		ZEFlagsBase<ZEInt> Flags = 5;
 		ZEInt Value;
 
 		Value = (ZEInt)Flags;
-		ZETestCheckEqual(Flags.Value, 5);
-		ZETestCheckEqual(Value, 5);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 5);
+		ZE_TEST_CHECK_EQUAL(Value, 5);
 	}
-	ZETest("inline void RaiseBit(ZESize Index)")
+	ZE_TEST_ITEM("inline void RaiseBit(ZESize Index)")
 	{
 		ZEInt Value = 0;
 		ZESize Index = 4;
 		ZEFlags Flag;
 
 		Flag.SetFlags(Value, true);
-		ZETestCheckEqual(Flag.Value, 0);
+		ZE_TEST_CHECK_EQUAL(Flag.Value, 0);
 
 		Flag.RaiseBit(Index);
-		ZETestCheckEqual(Flag.Value, 16);
+		ZE_TEST_CHECK_EQUAL(Flag.Value, 16);
 
-		ZETestCase("for Flag Value different 0")
+		ZE_TEST_CASE("for Flag Value different 0")
 		{
 			Flag = 1;
 			Index = 3;
 
 			Flag.RaiseBit(Index);
-			ZETestCheckEqual(Flag.Value, 9);
+			ZE_TEST_CHECK_EQUAL(Flag.Value, 9);
 		}
 	}
-	ZETest("inline void RaiseFlags(ZEInt Flags)")
+	ZE_TEST_ITEM("inline void RaiseFlags(ZEInt Flags)")
 	{
 		ZEFlags Value = 4;
 		ZEInt Flags = 3;
 
 		Value.RaiseFlags(Flags);
-		ZETestCheckEqual(Value, 7);
+		ZE_TEST_CHECK_EQUAL(Value, 7);
 	}
-	ZETest("inline void SetBit(ZESize Index, bool Raise)")
+	ZE_TEST_ITEM("inline void SetBit(ZESize Index, bool Raise)")
 	{
 		ZEFlags Flag = 0;
 		ZESize Index = 4;
 		bool Raise = true;
 
 		Flag.SetBit(Index, Raise);
-		ZETestCheckEqual(Flag.Value, 16);
+		ZE_TEST_CHECK_EQUAL(Flag.Value, 16);
 
-		ZETestCase("for Flag Value different from 0")
+		ZE_TEST_CASE("for Flag Value different from 0")
 		{
 			Flag = 2;
 			Index = 4;
 			Raise = true;
 
 			Flag.SetBit(Index, Raise);
-			ZETestCheckEqual(Flag.Value, 18);
+			ZE_TEST_CHECK_EQUAL(Flag.Value, 18);
 		}
 
-		ZETestCase("for Raise false")
+		ZE_TEST_CASE("for Raise false")
 		{
 			Flag = 2;
 			Index = 4;
 			Raise = false;
 
 			Flag.SetBit(Index, Raise);
-			ZETestCheckEqual(Flag.Value, 2);
+			ZE_TEST_CHECK_EQUAL(Flag.Value, 2);
 		}
 	}
-	ZETest("inline void SetFlags(ZEInt Flags, bool Raise)")
+	ZE_TEST_ITEM("inline void SetFlags(ZEInt Flags, bool Raise)")
 	{
 		ZEFlags Value = 0;
 		ZEInt Flags = 3;
 		bool Raise = true;
 
 		Value.SetFlags(Flags, Raise);
-		ZETestCheckEqual(Value, 3);
+		ZE_TEST_CHECK_EQUAL(Value, 3);
 
-		ZETestCase("for Raise false")
+		ZE_TEST_CASE("for Raise false")
 		{
 			Value = 0;
 			Flags = 3;
 			Raise = false;
 
 			Value.SetFlags(Flags, Raise);
-			ZETestCheckEqual(Value, 0);
+			ZE_TEST_CHECK_EQUAL(Value, 0);
 		}
 	}
-	ZETest("inline void UnraiseBit(ZESize Index)")
+	ZE_TEST_ITEM("inline void UnraiseBit(ZESize Index)")
 	{
 		ZEFlags Flag = 18;
 		ZESize Index = 4;
 
 		Flag.UnraiseBit(Index);
-		ZETestCheckEqual(Flag.Value, 2);
+		ZE_TEST_CHECK_EQUAL(Flag.Value, 2);
 
-		ZETestCase("for Flag's Index Bit = 0")
+		ZE_TEST_CASE("for Flag's Index Bit = 0")
 		{
 			Flag = 2;
 			Index = 4;
 
 			Flag.UnraiseBit(Index);
-			ZETestCheckEqual(Flag.Value, 2);
+			ZE_TEST_CHECK_EQUAL(Flag.Value, 2);
 		}
 	}
-	ZETest("inline void UnraiseFlags(Type Flags)")
+	ZE_TEST_ITEM("inline void UnraiseFlags(Type Flags)")
 	{
 		ZEFlags Value = 7;
 		ZEInt Flags = 4;
 
 		Value.UnraiseFlags(Flags);
-		ZETestCheckEqual(Value, 3);
+		ZE_TEST_CHECK_EQUAL(Value, 3);
 	}
-	ZETest("inline ZEFlagsBase()")
+	ZE_TEST_ITEM("inline ZEFlagsBase()")
 	{
 		ZEFlagsBase<ZEInt> Flags;
-		ZETestCheckEqual(Flags.Value, 0);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 0);
 	}
-	ZETest("inline ZEFlagsBase(const Type& Value)")
+	ZE_TEST_ITEM("inline ZEFlagsBase(const Type& Value)")
 	{
 		const ZEInt Value = 5;
 
 		ZEFlagsBase<ZEInt> Flags(Value);
-		ZETestCheckEqual(Flags.Value, 5);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 5);
 	}
-	ZETest("inline ZEFlagsBase(const ZEFlagsBase<Type>& Value)")
+	ZE_TEST_ITEM("inline ZEFlagsBase(const ZEFlagsBase<Type>& Value)")
 	{
 		ZEFlagsBase<ZEInt> Value = 3;
 
 		ZEFlagsBase<ZEInt> Flags(Value);
-		ZETestCheckEqual(Flags.Value, 3);
+		ZE_TEST_CHECK_EQUAL(Flags.Value, 3);
 	}
 }

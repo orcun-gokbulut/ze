@@ -35,15 +35,15 @@
 
 #include "ZEEnumerator.h"
 
-ZEMTDeclarationType ZEEnumerator::GetDeclarationType() const
+ZEMTDeclarationType ZEMTEnumerator::GetDeclarationType() const
 {
 	return ZEMT_DT_ENUMURATION;
 }
 
-ZEString ZEEnumerator::ToText(ZEInt Value, const char* Default)
+ZEString ZEMTEnumerator::ToText(ZEInt Value, const char* Default)
 {
 	ZESize Count = GetItemCount();
-	const ZEEnumeratorItem* Items = GetItems();
+	const ZEMTEnumeratorItem* Items = GetItems();
 	for (ZESize I = 0; I < Count; I++)
 	{
 		if (Items[I].Value == Value)

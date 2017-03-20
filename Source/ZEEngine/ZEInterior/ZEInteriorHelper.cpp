@@ -63,7 +63,7 @@ const ZEVector3& ZEInteriorHelper::GetPosition()
 	return Position;
 }
 
-const ZEVector3 ZEInteriorHelper::GetInteriorPosition()
+ZEVector3 ZEInteriorHelper::GetInteriorPosition()
 {
 	ZEVector3 Temp;
 
@@ -80,7 +80,7 @@ const ZEVector3 ZEInteriorHelper::GetInteriorPosition()
 	return Temp;
 }
 
-const ZEVector3 ZEInteriorHelper::GetWorldPosition()
+ZEVector3 ZEInteriorHelper::GetWorldPosition()
 {
 	ZEVector3 Temp;
 
@@ -109,7 +109,7 @@ const ZEQuaternion& ZEInteriorHelper::GetRotation()
 	return Rotation;
 }
 
-const ZEQuaternion ZEInteriorHelper::GetInteriorRotation()
+ZEQuaternion ZEInteriorHelper::GetInteriorRotation()
 {
 	ZEQuaternion Temp;
 
@@ -124,7 +124,7 @@ const ZEQuaternion ZEInteriorHelper::GetInteriorRotation()
 	return Temp;
 }
 
-const ZEQuaternion ZEInteriorHelper::GetWorldRotation()
+ZEQuaternion ZEInteriorHelper::GetWorldRotation()
 {
 	ZEQuaternion Temp;
 
@@ -153,7 +153,7 @@ const ZEVector3& ZEInteriorHelper::GetScale()
 	return Scale;
 }
 
-const ZEVector3 ZEInteriorHelper::GetInteriorScale()
+ZEVector3 ZEInteriorHelper::GetInteriorScale()
 {
 	ZEVector3 Temp;
 
@@ -165,7 +165,7 @@ const ZEVector3 ZEInteriorHelper::GetInteriorScale()
 	return Temp;
 }
 
-const ZEVector3 ZEInteriorHelper::GetWorldScale()
+ZEVector3 ZEInteriorHelper::GetWorldScale()
 {
 	ZEVector3 Temp;
 

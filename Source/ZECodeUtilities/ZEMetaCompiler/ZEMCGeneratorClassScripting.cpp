@@ -44,7 +44,7 @@ void ZEMCGenerator::GenerateClassScriptObject(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassGetSizeOfScriptObject(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetSizeOfScriptObject()\n"
+		"ZESize %sClass::GetSizeOfScriptObject() const\n"
 		"{\n"
 		"\treturn 0;\n"
 		"}\n\n", 
@@ -54,7 +54,7 @@ void ZEMCGenerator::GenerateClassGetSizeOfScriptObject(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassCreateScriptInstance(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZEObject* %sClass::CreateScriptInstance()\n"
+		"ZEObject* %sClass::CreateScriptInstance() const\n"
 		"{\n"
 		"\treturn NULL;\n"
 		"}\n\n", 

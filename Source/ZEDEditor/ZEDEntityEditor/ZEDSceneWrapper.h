@@ -71,4 +71,4 @@ class ZEDSceneWrapper : public ZEDObjectWrapper3D
 
 		static ZEDSceneWrapper*					CreateInstance();
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);

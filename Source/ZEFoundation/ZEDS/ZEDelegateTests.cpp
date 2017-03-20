@@ -107,91 +107,91 @@ const char* SimpleFunction10(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZE
 
 #define SYNTAX const char* (ZEInt)
 
-ZETestSuite(ZEDelegate)
+ZE_TEST(ZEDelegate)
 {
-	ZETest("NULLDelegate")
+	ZE_TEST_ITEM("NULLDelegate")
 	{
 		ZEDelegate<SYNTAX> Delegate;
-		ZETestCheck(Delegate.IsNull());
-		ZETestCheck(Delegate == false);
-		ZETestCheck(!Delegate == true);
+		ZE_TEST_CHECK_ERROR(Delegate.IsNull());
+		ZE_TEST_CHECK_ERROR(Delegate == false);
+		ZE_TEST_CHECK_ERROR(!Delegate == true);
 	}
 
-	ZETest("IsNull")
+	ZE_TEST_ITEM("IsNull")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
-		ZETestCheck(!Delegate.IsNull());
-		ZETestCheck(Delegate == true);
-		ZETestCheck(!Delegate == false);	
+		ZE_TEST_CHECK_ERROR(!Delegate.IsNull());
+		ZE_TEST_CHECK_ERROR(Delegate == true);
+		ZE_TEST_CHECK_ERROR(!Delegate == false);	
 	}
 
-	ZETest("Clean")
+	ZE_TEST_ITEM("Clean")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
 		Delegate.Clear();
-		ZETestCheck(Delegate.IsNull());
-		ZETestCheck(Delegate == false);
-		ZETestCheck(!Delegate == true);
+		ZE_TEST_CHECK_ERROR(Delegate.IsNull());
+		ZE_TEST_CHECK_ERROR(Delegate == false);
+		ZE_TEST_CHECK_ERROR(!Delegate == true);
 	}
 
-	ZETest("GlobalFunctions")
+	ZE_TEST_ITEM("GlobalFunctions")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
-		ZETestCheckString(Delegate(0x1234ABCD), "GlobalFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "GlobalFunction");
 	}
 
-	ZETest("NonInheritedClassFunctions")
+	ZE_TEST_ITEM("NonInheritedClassFunctions")
 	{
 		ZETestBase1 Test;
 
 		ZEDelegate<SYNTAX> Delegate;
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase1, &ZETestBase1::Function>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::Function");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::Function");
 
 		Delegate = ZEDelegate<SYNTAX>::CreateConst<ZETestBase1, &ZETestBase1::ConstFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::ConstFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::ConstFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase1, &ZETestBase1::VirtualFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::VirtualFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::VirtualFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::CreateConst<ZETestBase1, &ZETestBase1::VirtualConstFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::VirtualConstFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::VirtualConstFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase1::StaticFunction>();
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::StaticFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::StaticFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase1, &ZETestBase1::BaseVirtualFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
 	}
 
-	ZETest("InheritedClassFunctions")
+	ZE_TEST_ITEM("InheritedClassFunctions")
 	{
 		ZETestBase3 Test;
 
 		ZEDelegate<SYNTAX> Delegate;
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase3, &ZETestBase3::Function>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::Function");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::Function");
 
 		Delegate = ZEDelegate<SYNTAX>::CreateConst<ZETestBase3, &ZETestBase3::ConstFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::ConstFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::ConstFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase3, &ZETestBase3::VirtualFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::VirtualFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::VirtualFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::CreateConst<ZETestBase3, &ZETestBase3::VirtualConstFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::VirtualConstFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::VirtualConstFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase3, &ZETestBase3::AbstractVirtualFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::AbstractVirtualFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::AbstractVirtualFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::CreateConst<ZETestBase3, &ZETestBase3::AbstractVirtualConstFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase3::AbstractVirtualConstFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase3::AbstractVirtualConstFunction");
 
 		Delegate = ZEDelegate<SYNTAX>::Create<ZETestBase1, &ZETestBase3::BaseVirtualFunction>(&Test);
-		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
 	}
 
-	ZETest("Versions")
+	ZE_TEST_ITEM("Versions")
 	{
 		ZEDelegate<void ()> VoidDelegate0 = ZEDelegate<void ()>::Create<&VoidSimpleFunction0>();
 		VoidDelegate0();
@@ -200,17 +200,17 @@ ZETestSuite(ZEDelegate)
 		VoidDelegate1(1);
 		
 		ZEDelegate<const char* ()> Delegate0 = ZEDelegate<const char* ()>::Create<&SimpleFunction0>();		
-		ZETestCheckString(Delegate0(), "SimpleFunction0");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate0(), "SimpleFunction0");
 		ZEDelegate<const char* (ZEInt)> Delegate1 = ZEDelegate<const char* (ZEInt)>::Create<&SimpleFunction1>();
-		ZETestCheckString(Delegate1(0), "SimpleFunction1");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate1(0), "SimpleFunction1");
 		ZEDelegate<const char* (ZEInt, ZEInt)> Delegate2 = ZEDelegate<const char* (ZEInt, ZEInt)>::Create<&SimpleFunction2>();
-		ZETestCheckString(Delegate2(0, 1), "SimpleFunction2");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate2(0, 1), "SimpleFunction2");
 		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt)> Delegate3 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction3>();
-		ZETestCheckString(Delegate3(0, 1, 2), "SimpleFunction3");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate3(0, 1, 2), "SimpleFunction3");
 		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt)> Delegate4 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction4>();
-		ZETestCheckString(Delegate4(0, 1, 2, 3), "SimpleFunction4");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate4(0, 1, 2, 3), "SimpleFunction4");
 		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt, ZEInt)> Delegate5 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction5>();
-		ZETestCheckString(Delegate5(0, 1, 2, 3, 4), "SimpleFunction5");
+		ZE_TEST_CHECK_STRING_EQUAL(Delegate5(0, 1, 2, 3, 4), "SimpleFunction5");
 	}
 }
 

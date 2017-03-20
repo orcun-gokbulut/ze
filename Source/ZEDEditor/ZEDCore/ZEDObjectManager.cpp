@@ -35,7 +35,7 @@
 
 #include "ZEDObjectManager.h"
 
-#include "ZEMeta\ZEProvider.h"
+#include "ZEMeta\ZEMTProvider.h"
 
 #include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
@@ -51,7 +51,7 @@
 
 void ZEDObjectManager::LoadWrapperClasses()
 {
-	ZEArray<ZEClass*> WrapperClasses = ZEProvider::GetInstance()->GetClasses(ZEDObjectWrapper::Class());
+	ZEArray<ZEClass*> WrapperClasses = ZEMTProvider::GetInstance()->GetClasses(ZEDObjectWrapper::Class());
 	for (ZESize I = 0; I < WrapperClasses.GetCount(); I++)
 	{
 		ZEClass* WrapperClass = WrapperClasses[I];
@@ -177,7 +177,7 @@ void ZEDObjectManager::RegisterWrapperClass(ZEClass* WrapperClass)
 	if (strcmp(TargetClassName, "") == 0)
 		return;
 
-	ZEClass* TargetClass = ZEProvider::GetInstance()->GetClass(TargetClassName);
+	ZEClass* TargetClass = ZEMTProvider::GetInstance()->GetClass(TargetClassName);
 	if (TargetClass == NULL)
 	{
 		zeError("Target class of Wrapper class does not exists. Wrapper Class Name: \"%s\", Target Class Name: \"%s\".", 

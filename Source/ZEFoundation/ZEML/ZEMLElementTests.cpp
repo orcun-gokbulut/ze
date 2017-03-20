@@ -41,14 +41,14 @@
 #include "ZEFile/ZEFile.h"
 
 
-ZETestSuite(ZEMLElement)
+ZE_TEST(ZEMLElement)
 {
-	ZETest("void ZEMLItem::SetType(ZEMLItemType Type)")
+	ZE_TEST_ITEM("void ZEMLItem::SetType(ZEMLItemType Type)")
 	{
 
 	}
 
-	ZETest("ZEMLItemType ZEMItem::GetType() const")
+	ZE_TEST_ITEM("ZEMLItemType ZEMItem::GetType() const")
 	{
 		ZEMLNode Node;
 		ZEInt8 Value = 'z';
@@ -56,20 +56,20 @@ ZETestSuite(ZEMLElement)
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
 
 		ZEMLItemType Type = MLItem->GetType();
-		ZETestCheckEqual(Type, ZEML_IT_INT8);
+		ZE_TEST_CHECK_EQUAL(Type, ZEML_IT_INT8);
 	}
 
-	ZETest("void ZEMLItem::SetName(const ZEString& Name)")
+	ZE_TEST_ITEM("void ZEMLItem::SetName(const ZEString& Name)")
 	{
 		ZEMLNode Node;
 		Node.AddProperty();
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
 
 		MLItem->SetName("MLItem");
-		ZETestCheckString(MLItem->GetName(), "MLItem");
+		ZE_TEST_CHECK_STRING_EQUAL(MLItem->GetName(), "MLItem");
 	}
 
-	ZETest("const ZEString& ZEMLItem::GetName() const")
+	ZE_TEST_ITEM("const ZEString& ZEMLItem::GetName() const")
 	{
 		ZEMLNode Node;
 		Node.AddProperty();
@@ -77,56 +77,56 @@ ZETestSuite(ZEMLElement)
 		MLItem->SetName("MLItem");
 
 		const ZEString Name = MLItem->GetName();
-		ZETestCheckString(Name, "MLItem");
+		ZE_TEST_CHECK_STRING_EQUAL(Name, "MLItem");
 	}
 
-	ZETest("ZEUInt64 ZEMLItem::GetDataSize()")
+	ZE_TEST_ITEM("ZEUInt64 ZEMLItem::GetDataSize()")
 	{
 		ZEMLNode Node;
 		Node.AddProperty("Prop", "Test");
 		ZEMLItem* MLItem = (ZEMLItem*)Node.GetProperties()[0];
 
 		ZEUInt64 DataSize = MLItem->GetDataSize();
-		ZETestCheckEqual(DataSize, 5);
+		ZE_TEST_CHECK_EQUAL(DataSize, 5);
 	}
 
-	ZETest("ZEUInt64 ZEMLItem::GetFilePosition()")
+	ZE_TEST_ITEM("ZEUInt64 ZEMLItem::GetFilePosition()")
 	{
 		ZEMLNode Node("Node");
 		Node.AddProperty("Prop", "Test");
 		ZEMLItem* MLItem1 = Node.GetProperties()[0];
 		ZEUInt64 FilePosition = MLItem1->GetFilePosition();
-		ZETestCheckEqual(FilePosition, 0);
+		ZE_TEST_CHECK_EQUAL(FilePosition, 0);
 
 		void* Data = new char[sizeof(unsigned char)];
 		Node.AddDataProperty("DataProp", Data, sizeof(unsigned char), false);
 		ZEMLItem* MLItem2 = Node.GetProperties()[1];
 		FilePosition = MLItem2->GetFilePosition();
-		ZETestCheckEqual(FilePosition, 0);
+		ZE_TEST_CHECK_EQUAL(FilePosition, 0);
 
 		ZEFile* File = new ZEFile();
 		File->Open("MLItemTests.txt", ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE);
 		bool Written = Node.Write(File);
-		ZETestCheck(Written);
+		ZE_TEST_CHECK_ERROR(Written);
 
 		MLItem1 = Node.GetProperties()[0];
-		ZETestCheckEqual(MLItem1->GetFilePosition(), 0);
+		ZE_TEST_CHECK_EQUAL(MLItem1->GetFilePosition(), 0);
 		MLItem2 = Node.GetProperties()[1];
-		ZETestCheckEqual(MLItem2->GetFilePosition(), 0);
+		ZE_TEST_CHECK_EQUAL(MLItem2->GetFilePosition(), 0);
 
 		File->Flush();
 		File->Seek(-File->GetSize() * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 		bool Read = Node.Read(File, false);
-		ZETestCheck(Read);
+		ZE_TEST_CHECK_ERROR(Read);
 
 		MLItem1 = Node.GetProperties()[0];
-		ZETestCheckEqual(MLItem1->GetFilePosition(), 0);
+		ZE_TEST_CHECK_EQUAL(MLItem1->GetFilePosition(), 0);
 		MLItem2 = Node.GetProperties()[1];
-		ZETestCheckEqual(MLItem2->GetFilePosition(), 0);
+		ZE_TEST_CHECK_EQUAL(MLItem2->GetFilePosition(), 0);
 		ZEMLItem* MLItem3 = Node.GetProperties()[2];
-		ZETestCheckEqual(MLItem3->GetFilePosition(), 24);
+		ZE_TEST_CHECK_EQUAL(MLItem3->GetFilePosition(), 24);
 		ZEMLItem* MLItem4 = Node.GetProperties()[3];
-		ZETestCheckEqual(MLItem4->GetFilePosition(), 45);
+		ZE_TEST_CHECK_EQUAL(MLItem4->GetFilePosition(), 45);
 
 		File->Close();
 		remove("MLItemTests.txt");

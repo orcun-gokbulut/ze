@@ -47,6 +47,7 @@ class ZEFormat
 		static ZEString		FormatInner(const char* Input, const ZEValue** Arguments, ZESize Count);
 
 	public:
+		static ZEString		Format();
 		static ZEString		Format(const char* Format);
 		static ZEString		Format(const char* Format, const ZEValue& Arg0);
 		static ZEString		Format(const char* Format, const ZEValue& Arg0, const ZEValue& Arg1);

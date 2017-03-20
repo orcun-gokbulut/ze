@@ -35,8 +35,8 @@
 
 #pragma once
 
-#include "ZEMethodSignature.h"
-#include "ZEMethodSignatureGenerator.h"
+#include "ZEMTMethodSignature.h"
+#include "ZEMTMethodSignatureGenerator.h"
 
 #ifdef GetObject
 	#undef GetObject
@@ -49,7 +49,7 @@ class ZEEventDelegateBase
 		ZEObject*							Object;
 
 	public:
-		virtual const ZEMethodSignature&	GetSignature() const = 0;
+		virtual const ZEMTMethodSignature&	GetSignature() const = 0;
 		ZEObject*							GetObject();
 		const ZEObject*						GetObject() const;
 		

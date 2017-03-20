@@ -40,7 +40,6 @@
 
 #include "ZEError.h"
 #include "ZEDS/ZEFormat.h"
-#include "ZEDS/ZEFastDelegate.h"
 #include "ZERegEx/ZEWildcard.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
@@ -251,7 +250,7 @@ void ZERSResourceManager::DestroyResource(const ZERSResource* Resource)
 	delete Resource;
 }
 
-static bool CommandSpitAndGlue(ZECommand* Command, const ZECommandParameterList* Parameters)
+bool CommandSpitAndGlue(ZECommand* Command, const ZECommandParameterList* Parameters)
 {
 	ZERSResourceManager* Manager = ZERSResourceManager::GetInstance();
 	ZEConsole* Console = ZEConsole::GetInstance();
@@ -306,11 +305,11 @@ ZERSResourceManager::ZERSResourceManager()
 	memset(MemoryUsageShared, 0, sizeof(MemoryUsageShared));
 
 	Commands.SetName("ResourceManager");
-	Commands.AddCommand(new ZECommand("ShowStats",			&CommandSpitAndGlue));
-	Commands.AddCommand(new ZECommand("ListResources",		&CommandSpitAndGlue));
-	Commands.AddCommand(new ZECommand("ShowResource",		&CommandSpitAndGlue));
-	Commands.AddCommand(new ZECommand("ListResourceGroups", &CommandSpitAndGlue));
-	Commands.AddCommand(new ZECommand("ShowResourceGroup",	&CommandSpitAndGlue));
+	Commands.AddCommand(new ZECommand("ShowStats",			ZECommandCallback::Create<CommandSpitAndGlue>()));
+	Commands.AddCommand(new ZECommand("ListResources",		ZECommandCallback::Create<CommandSpitAndGlue>()));
+	Commands.AddCommand(new ZECommand("ShowResource",		ZECommandCallback::Create<CommandSpitAndGlue>()));
+	Commands.AddCommand(new ZECommand("ListResourceGroups", ZECommandCallback::Create<CommandSpitAndGlue>()));
+	Commands.AddCommand(new ZECommand("ShowResourceGroup",	ZECommandCallback::Create<CommandSpitAndGlue>()));
 	ZECommandManager::GetInstance()->RegisterSection(&Commands);
 }
 
@@ -344,13 +343,13 @@ ZESize ZERSResourceManager::GetSharedResourceCount()
 
 ZESize ZERSResourceManager::GetMemoryUsage(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Enumerator()->ToText(Pool).ToCString());
 	return MemoryUsage[Pool];
 }
 
 ZESize ZERSResourceManager::GetMemoryUsageShared(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Enumerator()->ToText(Pool).ToCString());
 	return MemoryUsageShared[Pool];
 }
 
@@ -575,7 +574,7 @@ ZEString ZERSResourceManager::ListResources(const ZEString& Filter)
 				"RefCount: {3}",
 				Resource->GetIndex(),
 				Resource->GetClass()->GetName(),
-				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				ZERSResourceState_Enumerator()->ToText(Resource->GetState()),
 				Resource->GetReferenceCount());
 
 			if (!Resource->GetGUID().Equals(ZEGUID::Zero))
@@ -627,7 +626,7 @@ ZEString ZERSResourceManager::ShowResource(ZESize Index)
 				Resource->GetGUID().ToString(),
 				Resource->GetFileName(),
 				Resource->GetFileNameHash(),
-				ZERSResourceState_Declaration()->ToText(Resource->GetState()),
+				ZERSResourceState_Enumerator()->ToText(Resource->GetState()),
 				Resource->IsShared(),
 				Resource->GetReferenceCount(),
 				Resource->GetMemoryUsage(ZERS_MP_CPU),

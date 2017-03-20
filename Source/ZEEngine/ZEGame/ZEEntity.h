@@ -59,14 +59,14 @@
 #include "ZEVolumeCast.h"
 #include "ZESpatial/ZEOctree.h"
 
-class ZEScene;
 class ZEDObjectWrapper;
-class ZERNPreRenderParameters;
-class ZERNRenderParameters;
-class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
+ZEMT_FORWARD_DECLARE(ZEScene);
+ZEMT_FORWARD_DECLARE(ZERNPreRenderParameters);
+ZEMT_FORWARD_DECLARE(ZERNRenderParameters);
+ZEMT_FORWARD_DECLARE(ZERNCommand);
 
 typedef ZEFlags ZEEntityFlags;
 ZE_ENUM(ZEEntityFlag)
@@ -237,8 +237,8 @@ class ZEEntity : public ZEObject
 		void									SetEntityId(ZEInt EntityId);
 		ZEInt									GetEntityId() const;
 
-		void									SetName(ZEString NewName);
-		ZEString								GetName() const;
+		void									SetName(const ZEString& NewName);
+		const ZEString&							GetName() const;
 
 		virtual ZEEntityFlags					GetEntityFlags() const final;
 
@@ -264,19 +264,19 @@ class ZEEntity : public ZEObject
 		const ZEVector3&						GetPosition() const;
 
 		void									SetWorldPosition(const ZEVector3& NewPosition);
-		const ZEVector3							GetWorldPosition() const;
+		ZEVector3								GetWorldPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
 
 		void									SetWorldRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion						GetWorldRotation() const;
+		ZEQuaternion							GetWorldRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
 
 		void									SetWorldScale(const ZEVector3& NewScale);
-		const ZEVector3							GetWorldScale() const;
+		ZEVector3								GetWorldScale() const;
 
 		ZEVector3								GetFront() const;
 		ZEVector3								GetRight() const;
@@ -332,20 +332,20 @@ class ZEEntity : public ZEObject
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEEntity.png")
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, true)
-ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, true)
-ZE_META_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)
-ZE_META_ATTRIBUTE_PROPERTY(Transform,			ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldTransform,		ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(InvWorldTransform,	ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEEntity.png")
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, true)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, true)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, true)
+ZEMT_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)
+ZEMT_ATTRIBUTE_PROPERTY(Transform,			ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldTransform,		ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(InvWorldTransform,	ZEDEditor.PropertyEditor.Display, false)
 //ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldRight,			ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldUp,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(WorldFront,			ZEDEditor.PropertyEditor.Display, false);
+ZEMT_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldRight,			ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldUp,				ZEDEditor.PropertyEditor.Display, false)
+ZEMT_ATTRIBUTE_PROPERTY(WorldFront,			ZEDEditor.PropertyEditor.Display, false);

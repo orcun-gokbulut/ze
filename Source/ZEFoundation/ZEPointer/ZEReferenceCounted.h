@@ -35,15 +35,18 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEThread/ZELock.h"
 
-class ZEReferenceCounted
+class ZEReferenceCounted : public ZEObject
 {
+	ZE_OBJECT
 	ZE_COPY_NO_ACTION(ZEReferenceCounted)
 	friend class ZERSResource;
 	friend class ZERSResourceManager;
+	friend class ZEHolderBase;
 	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	private:
 		#ifdef ZE_DEBUG_ENABLE

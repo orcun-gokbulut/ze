@@ -33,43 +33,105 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETestManager.h"
-#include "ZETestSuite.h"
-#include "ZETestItem.h"
-#include "ZEError.h"
 
-#include <stdio.h>
+#include "ZETestManager.h"
+#include "ZEError.h"
+#include "ZELogSession.h"
+
+#include "ZETest.h"
+#include "ZETestItem.h"
+#include "ZETerminalUtils.h"
 
 #ifndef NULL
 #define NULL 0
 #endif
 
-#include <string.h>
-#include "ZELogSession.h"
+void ZETestManager::ReportProblem(const ZETestProblem& Problem)
+{
+	if (MSBuildOutputEnabled)
+	{
+		const char* TypeString;
+		if (Problem.Type == ZE_TPT_ERROR || Problem.Type == ZE_TPT_CRITICAL_ERROR)
+			TypeString = "error";
+		else
+			TypeString = "warning";
 
-void ZETestManager::SetVisualStudioOutput(bool Enabled)
-{
-	VisualStudioOutput = Enabled;
-}
-bool ZETestManager::GetVisualStudioOutput()
-{
-	return VisualStudioOutput;
+		printf("%s(%d): %s ZE0001: Test item failed. Test: \"%s\". Test Item: \"%s\". Problem description: %s.\r\n", 
+			TypeString, Problem.FileName, Problem.Line, Problem.Item->GetName().ToCString(), 
+			Problem.Description.ToCString());
+	}
+
+	if (NormalOutputEnabled)
+	{
+		ZETerminalUtils::Reset();
+
+		switch(Problem.Type)
+		{
+			case ZE_TPT_CRITICAL_ERROR:
+				ZETerminalUtils::SetBold(true);
+				ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+				printf("Critical Error");
+				break;
+
+			case ZE_TPT_ERROR:
+				ZETerminalUtils::SetBold(true);
+				ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+				printf("Error");
+				break;
+
+			case ZE_TPT_WARNING:
+				ZETerminalUtils::SetForgroundColor(ZE_TC_YELLOW);
+				printf("Warning");
+				break;
+
+			default:
+				break;
+		}
+
+		ZETerminalUtils::Reset();
+		printf(": %s\n", Problem.Description.ToCString());
+	}
 }
 
-void ZETestManager::RegisterTestSuite(ZETestSuiteItem* Suite)
+void ZETestManager::SetNormalOutputEnabled(bool Enabled)
 {
-	TestSuites[TestSuiteCount] = Suite;
-	TestSuiteCount++;
+	NormalOutputEnabled = Enabled;
 }
 
-void ZETestManager::SetPackageName(const char* Name)
+bool ZETestManager::GetNormalOutputEnabled() const
 {
-	strncpy(PackageName, Name, 255);
+	return NormalOutputEnabled;
 }
 
-const char* ZETestManager::GetPackageName()
+void ZETestManager::SetMSBuildOutputEnabled(bool Enabled)
 {
-	return PackageName;
+	MSBuildOutputEnabled = Enabled;
+}
+
+bool ZETestManager::GetMSBuildOutputEnabled() const
+{
+	return MSBuildOutputEnabled;
+}
+
+const ZEArray<ZETest*>& ZETestManager::GetTests() const
+{
+	return Tests;
+}
+
+void ZETestManager::RegisterTest(ZETest* Test)
+{
+	zeCheckError(Test == NULL, ZE_VOID, "Cannot register test. Test is NULL.");
+	zeCheckError(Tests.Exists(Test), ZE_VOID, "Cannot register test. Test is already registered.");
+
+	Tests.Add(Test);
+}
+
+void ZETestManager::UngregisterTest(ZETest* Test)
+{
+	zeCheckError(Test == NULL, ZE_VOID, "Cannot unregister test. Test is NULL.");
+	zeCheckError(!Tests.Exists(Test), ZE_VOID, "Cannot unregister test. Test is not registered.");
+
+	Tests.Add(Test);
 }
 
 bool ZETestManager::RunTests()
@@ -83,28 +145,48 @@ bool ZETestManager::RunTests()
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(false);
 
 	bool Result = true;
-	for (ZESize I = 0; I < TestSuiteCount; I++)
+	for (ZESize I = 0; I < Tests.GetCount(); I++)
 	{
-		try
-		{
-			if (!TestSuites[I]->RunTests())
-				Result = false;
-		}
-		catch(...)
-		{
-			printf("%s : error T0004: Exception occurred. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
-
+		Tests[I]->Run();
+		if (Tests[I]->GetResult() != ZE_TR_PASSED)
 			Result = false;
-			break;
-		}
-	}
-	
-	if (!Result)
-	{
-		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
+
+		if (NormalOutputEnabled && I + 1 != Tests.GetCount())
+			printf("\n\n");
 	}
 
 	LogSession.EndSession();
+
+	if (NormalOutputEnabled)
+	{
+		printf("\n\n\n");
+		ZETerminalUtils::Reset();
+		printf(
+			"Test Results:\n"
+			"Test                                                Result     Ratio\n"
+			"-----------------------------------------------------------------------\n");
+
+		for (ZESize I = 0; I < Tests.GetCount(); I++)
+		{
+			ZETerminalUtils::Reset();
+			printf("%-52s", Tests[I]->GetName().ToCString());
+
+			ZETerminalUtils::SetBold(true);
+			if (Tests[I]->GetResult() == ZE_TR_PASSED)
+			{
+				ZETerminalUtils::SetForgroundColor(ZE_TC_GREEN);
+				printf("PASSED    ");
+			}
+			else
+			{
+				ZETerminalUtils::SetForgroundColor(ZE_TC_RED);
+				printf("FAILED    ");
+			}
+
+			ZETerminalUtils::Reset();
+			printf("%llu/%llu\n", Tests[I]->GetPassedItemCount(), Tests[I]->GetItems().GetCount());
+		}
+	}
 
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
@@ -113,52 +195,14 @@ bool ZETestManager::RunTests()
 	return Result;
 }
 
-void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, ZEInt Line)
+ZETestManager::ZETestManager()
 {
-	const char* TypeString;
-
-	switch(Type)
-	{
-		default:
-		case ZE_TPT_ERROR:
-			TypeString = "error";
-			break;
-
-		case ZE_TPT_WARNING:
-			TypeString = "warning";
-			break;
-
-		case ZE_TPT_NOTICE:
-			TypeString = "info";
-			break;
-	}
-
-	if (Type == ZE_TPT_ERROR)
-	{
-		printf("  Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
-		if (VisualStudioOutput)
-			printf("  %s(%d) : warning T0001: Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
-	}
-	else
-	{
-		printf("  Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
-		if (VisualStudioOutput)
-			printf("  %s(%d) : warning T0002: Test gave warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
-	}
+	NormalOutputEnabled = true;
+	MSBuildOutputEnabled = false;
 }
 
 ZETestManager* ZETestManager::GetInstance()
 {
-	static ZETestManager* Instance = NULL;
-	if (Instance == NULL)
-		Instance = new ZETestManager();
-
-	return Instance;
-}
-
-ZETestManager::ZETestManager()
-{
-	VisualStudioOutput = false;
-	TestSuiteCount = 0;
-	PackageName[0] = '\0';
+	static ZETestManager Manager;
+	return &Manager;
 }

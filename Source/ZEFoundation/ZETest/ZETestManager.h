@@ -34,39 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEST_MANAGER_H__
-#define __ZE_TEST_MANAGER_H__
 
-#include "ZETestManager.h"
-#include "ZETestItem.h"
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
-class ZETestSuiteItem;
+class ZETest;
 class ZETestItem;
+class ZETestProblem;
 
 class ZETestManager
 {
 	private:
-		ZETestSuiteItem*		TestSuites[65536];
-		ZESize					TestSuiteCount;
-		char					PackageName[256];
-		bool					VisualStudioOutput;
-
-								ZETestManager();
+		ZEArray<ZETest*>				Tests;
+		
+		bool							NormalOutputEnabled;
+		bool							MSBuildOutputEnabled;
+		
+										ZETestManager();
 
 	public:
-		void					SetVisualStudioOutput(bool Enabled);
-		bool					GetVisualStudioOutput();
+		void							SetNormalOutputEnabled(bool Enabled);
+		bool							GetNormalOutputEnabled() const;
 
-		void					RegisterTestSuite(ZETestSuiteItem* Suite);
+		void							SetMSBuildOutputEnabled(bool Enabled);
+		bool							GetMSBuildOutputEnabled() const;
 
-		void					SetPackageName(const char* Name);
-		const char*				GetPackageName();
+		const ZEArray<ZETest*>&			GetTests() const;
+		void							RegisterTest(ZETest* Test);
+		void							UngregisterTest(ZETest* Test);
 
-		bool					RunTests();
-		void					ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line);
+		void							ReportProblem(const ZETestProblem& Problem);
 
-		static ZETestManager*	GetInstance();
+		bool							RunTests();
+
+		static ZETestManager*			GetInstance();
 };
-
-#endif

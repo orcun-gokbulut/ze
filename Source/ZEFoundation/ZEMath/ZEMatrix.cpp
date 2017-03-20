@@ -339,8 +339,10 @@ void ZEMatrix3x3::TransposeSelf()
 bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix) const
 {
 	for (ZESize I = 0; I < 9; I++)
-		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > ZE_ZERO_THRESHOLD)
+	{
+		if (MA[I] != Matrix.MA[I])
 			return false;
+	}
 
 	return true;
 }
@@ -348,8 +350,10 @@ bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix) const
 bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix, float Threshold)
 {
 	for (ZESize I = 0; I < 9; I++)
+	{
 		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > Threshold)
 			return false;
+	}
 
 	return true;
 }
@@ -1168,8 +1172,10 @@ void ZEMatrix4x4::TransposeSelf()
 bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix) const
 {
 	for (ZESize I = 0; I < 16; I++)
-		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > ZE_ZERO_THRESHOLD)
+	{
+		if (MA[I] != Matrix.MA[I])
 			return false;
+	}
 
 	return true;
 }
@@ -1177,8 +1183,10 @@ bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix) const
 bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix, float Threshold) const
 {
 	for (ZESize I = 0; I < 16; I++)
+	{
 		if (ZEMath::Abs(MA[I] - Matrix.MA[I]) > Threshold)
 			return false;
+	}
 
 	return true;
 }

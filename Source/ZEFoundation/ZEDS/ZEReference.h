@@ -34,18 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_REFERENCE_H__
-#define __ZE_REFERENCE_H__
-
-#pragma warning(push)
-#pragma warning(disable:4482)
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList.h"
-#include "ZEMeta/ZEType.h"
-
+#include "ZEMeta/ZEMTType.h"
 
 class ZEVector2;
 class ZEVector2d;
@@ -58,8 +52,10 @@ class ZEMatrix3x3;
 class ZEMatrix3x3d;
 class ZEMatrix4x4;
 class ZEMatrix4x4d;
-class ZEObject;
 class ZEString;
+class ZEObject;
+class ZEHolderBase;
+class ZEMTCollection;
 
 #define ZE_TEMPLATE template<typename ZEType>
 
@@ -67,26 +63,25 @@ class ZEReference
 {
 	friend class ZEVariant;
 	private:
-		ZEType							ValueType;
+		ZEMTType						ValueType;
 		struct
 		{
 			void*						Pointer;
 		} Value;
 
-		template <typename ZEReturnType, ZETypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		ZEReturnType&					ConvertRef() const;
-		template <typename ZEReturnType, ZETypeType Type>
+		template <typename ZEReturnType, ZEMTBaseType Type>
 		const ZEReturnType&				ConvertConstRef() const;
 
-		void							SetType(const ZEType& Type);
+		void							SetType(const ZEMTType& Type);
 	public:
-		ZEType							GetType() const;
+		ZEMTType						GetType() const;
 		bool							IsNull() const;
 		bool							IsConst() const;
 
 		void							SetNull();
 		void							SetReference(const ZEReference& Value);
-
 		void							SetInt8Ref(ZEInt8& Value);
 		void							SetInt8ConstRef(const ZEInt8& Value);
 		void							SetInt16Ref(ZEInt16& Value);
@@ -95,7 +90,6 @@ class ZEReference
 		void							SetInt32ConstRef(const ZEInt32& Value);
 		void							SetInt64Ref(ZEInt64& Value);
 		void							SetInt64ConstRef(const ZEInt64& Value);
-
 		void							SetUInt8Ref(ZEUInt8& Value);
 		void							SetUInt8ConstRef(const ZEUInt8& Value);
 		void							SetUInt16Ref(ZEUInt16& Value);
@@ -104,15 +98,12 @@ class ZEReference
 		void							SetUInt32ConstRef(const ZEUInt32& Value);
 		void							SetUInt64Ref(ZEUInt64& Value);
 		void							SetUInt64ConstRef(const ZEUInt64& Value);
-		
 		void							SetBooleanRef(bool& Value);
 		void							SetBoolConstRef(const bool& Value);
-
 		void							SetFloatRef(float& Value);
 		void							SetFloatConstRef(const float& Value);
 		void							SetDoubleRef(double& Value);
 		void							SetDoubleConstRef(const double& Value);
-
 		void							SetVector2Ref(ZEVector2& Reference);
 		void							SetVector2ConstRef(const ZEVector2& Reference);
 		void							SetVector2dRef(ZEVector2d& Reference);
@@ -127,7 +118,6 @@ class ZEReference
 		void							SetVector4dConstRef(const ZEVector4d& Reference);
 		void							SetQuaternionRef(ZEQuaternion& Reference);
 		void							SetQuaternionConstRef(const ZEQuaternion& Reference);
-
 		void							SetMatrix3x3Ref(ZEMatrix3x3& Reference);
 		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Reference);
 		void							SetMatrix3x3dRef(ZEMatrix3x3d& Reference);
@@ -136,27 +126,18 @@ class ZEReference
 		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Reference);
 		void							SetMatrix4x4dRef(ZEMatrix4x4d& Reference);
 		void							SetMatrix4x4dConstRef(const ZEMatrix4x4d& Reference);
-
 		void							SetStringRef(ZEString& Value);
 		void							SetStringConstRef(const ZEString& Value);
-
-		void							SetEnumRef(const ZEInt32& Reference);
-
-		template<typename ZEObjectType>
-		void							SetObjectRef(ZEObjectType& Object);
-		template<typename ZEObjectType>
-		void							SetObjectConstRef(const ZEObjectType& Object);
-
+		void							SetObjectRef(ZEObject& Object);
+		void							SetObjectConstRef(const ZEObject& Object);
 		void							SetObjectPtrRef(ZEObject*& Object);
 		void							SetObjectPtrConstRef(const ZEObject*& Object);
-
+		void							SetObjectHolderRef(ZEHolderBase& Object);
+		void							SetObjectHolderConstRef(const ZEHolderBase& Object);
 		void							SetClassRef(ZEClass*& Class);
 		void							SetClassConstRef(const ZEClass*& Class);
-
-		template<typename ZEItemType>
-		void							SetArrayRef(ZEArray<ZEItemType>& Array);
-		template<typename ZEItemType>
-		void							SetArrayConstRef(const ZEArray<ZEItemType>& Array);
+		void							SetCollectionRef(ZEMTCollection& Object);
+		void							SetCollectionConstRef(const ZEMTCollection& Object);
 
 		ZEInt8&							GetInt8Ref() const;
 		const ZEInt8&					GetInt8ConstRef() const;
@@ -166,7 +147,6 @@ class ZEReference
 		const ZEInt32&					GetInt32ConstRef() const;
 		ZEInt64&						GetInt64Ref() const;
 		const ZEInt64&					GetInt64ConstRef() const;
-
 		ZEUInt8&						GetUInt8Ref() const;
 		const ZEUInt8&					GetUInt8ConstRef() const;
 		ZEUInt16&						GetUInt16Ref() const;
@@ -175,16 +155,14 @@ class ZEReference
 		const ZEUInt32&					GetUInt32ConstRef() const;
 		ZEUInt64&						GetUInt64Ref() const;
 		const ZEUInt64&					GetUInt64ConstRef() const;
-		
 		float&							GetFloatRef() const;
 		const float&					GetFloatConstRef() const;
-
 		double&							GetDoubleRef() const;
 		const double&					GetDoubleConstRef() const;
-
 		bool&							GetBoolRef() const;
 		const bool&						GetBoolConstRef() const;
-
+		ZEString&						GetStringRef() const;
+		const ZEString&					GetStringConstRef() const;
 		ZEVector2&						GetVector2Ref() const;
 		const ZEVector2&				GetVector2ConstRef() const;
 		ZEVector2d&						GetVector2dRef() const;
@@ -199,7 +177,6 @@ class ZEReference
 		const ZEVector4d&				GetVector4dConstRef() const;
 		ZEQuaternion&					GetQuaternionRef() const;
 		const ZEQuaternion&				GetQuaternionConstRef() const;
-
 		ZEMatrix3x3&					GetMatrix3x3Ref() const;
 		const ZEMatrix3x3&				GetMatrix3x3ConstRef() const;
 		ZEMatrix3x3d&					GetMatrix3x3dRef() const;
@@ -208,29 +185,18 @@ class ZEReference
 		const ZEMatrix4x4&				GetMatrix4x4ConstRef() const;
 		ZEMatrix4x4d&					GetMatrix4x4dRef() const;
 		const ZEMatrix4x4d&				GetMatrix4x4dConstRef() const;
-
-		ZEString&						GetStringRef() const;
-		const ZEString&					GetStringConstRef() const;
-
+		ZEObject&						GetObjectRef() const;
+		const ZEObject&					GetObjectConstRef() const;
 		ZEObject*&						GetObjectPtrRef() const;
-		ZEObject*const&					GetObjectPtrConstRef() const;
-
+		const ZEObject*&				GetObjectPtrConstRef() const;
+		ZEHolderBase&					GetObjectHolderRef() const;
+		const ZEHolderBase&				GetObjectHolderConstRef() const;
+		ZEMTCollection&					GetCollectionRef() const;
+		const ZEMTCollection&			GetCollectionConstRef() const;
 		ZEClass*&						GetClassRef() const;
-		ZEClass* const& 				GetClassConstRef() const;
-
-		template<typename ZEObjecType>
-		ZEObjecType&					GetObjectRef() const;
-		template<typename ZEObjecType>
-		const ZEObjecType&				GetObjectConstRef() const;		
-
-		template<typename ZEItemType>
-		ZEArray<ZEItemType>&			GetArrayRef() const;
-		template<typename ZEItemType>
-		const ZEArray<ZEItemType>&		GetArrayConstRef() const;
-		
+		const ZEClass*& 				GetClassConstRef() const;
 
 		ZEReference&					operator=(const ZEReference& Value);
-
 		ZEReference&					operator=(ZEInt8& Value);
 		ZEReference&					operator=(ZEInt16& Value);
 		ZEReference&					operator=(ZEInt32& Value);
@@ -242,6 +208,7 @@ class ZEReference
 		ZEReference&					operator=(float& Value);
 		ZEReference&					operator=(double& Value);
 		ZEReference&					operator=(bool& Value);
+		ZEReference&					operator=(ZEString& Value);
 		ZEReference&					operator=(ZEVector2& Value);
 		ZEReference&					operator=(ZEVector2d& Value);
 		ZEReference&					operator=(ZEVector3& Value);
@@ -253,9 +220,10 @@ class ZEReference
 		ZEReference&					operator=(ZEMatrix3x3d& Value);
 		ZEReference&					operator=(ZEMatrix4x4& Value);
 		ZEReference&					operator=(ZEMatrix4x4d& Value);
+		ZEReference&					operator=(ZEObject& Value);
 		ZEReference&					operator=(ZEObject*& Value);
-		ZEReference&					operator=(ZEString& Value);
-
+		ZEReference&					operator=(ZEHolderBase& Value);
+		ZEReference&					operator=(ZEMTCollection& Value);
 		ZEReference&					operator=(const ZEInt8& Value);
 		ZEReference&					operator=(const ZEInt16& Value);
 		ZEReference&					operator=(const ZEInt32& Value);
@@ -267,6 +235,7 @@ class ZEReference
 		ZEReference&					operator=(const float& Value);
 		ZEReference&					operator=(const double& Value);
 		ZEReference&					operator=(const bool& Value);
+		ZEReference&					operator=(const ZEString& Value);
 		ZEReference&					operator=(const ZEVector2& Value);
 		ZEReference&					operator=(const ZEVector2d& Value);
 		ZEReference&					operator=(const ZEVector3& Value);
@@ -278,8 +247,10 @@ class ZEReference
 		ZEReference&					operator=(const ZEMatrix3x3d& Value);
 		ZEReference&					operator=(const ZEMatrix4x4& Value);
 		ZEReference&					operator=(const ZEMatrix4x4d& Value);
+		ZEReference&					operator=(const ZEObject& Value);
 		ZEReference&					operator=(const ZEObject*& Value);
-		ZEReference&					operator=(const ZEString& Value);
+		ZEReference&					operator=(const ZEHolderBase& Value);
+		ZEReference&					operator=(const ZEMTCollection& Value);
 
 										operator ZEInt8&();
 										operator ZEInt16&();
@@ -292,6 +263,7 @@ class ZEReference
 										operator float&();
 										operator double&();
 										operator bool&();
+										operator ZEString&();
 										operator ZEVector2&();
 										operator ZEVector2d&();
 										operator ZEVector3&();
@@ -303,8 +275,10 @@ class ZEReference
 										operator ZEMatrix3x3d&();
 										operator ZEMatrix4x4&();
 										operator ZEMatrix4x4d&();
+										operator ZEObject&();
 										operator ZEObject*&();
-
+										operator ZEHolderBase&();
+										operator ZEMTCollection&();
 										operator const ZEInt8&();
 										operator const ZEInt16&();
 										operator const ZEInt32&();
@@ -316,6 +290,7 @@ class ZEReference
 										operator const float&();
 										operator const double&();
 										operator const bool&();
+										operator const ZEString&();
 										operator const ZEVector2&();
 										operator const ZEVector2d&();
 										operator const ZEVector3&();
@@ -327,11 +302,13 @@ class ZEReference
 										operator const ZEMatrix3x3d&();
 										operator const ZEMatrix4x4&();
 										operator const ZEMatrix4x4d&();
-										operator ZEObject* const&();
+										operator const ZEObject&();
+										operator const ZEObject*&();
+										operator const ZEHolderBase&();
+										operator const ZEMTCollection&();
 
 										ZEReference();
 										ZEReference(const ZEReference& Value);
-
 										ZEReference(ZEInt8& Value);
 										ZEReference(ZEInt16& Value);
 										ZEReference(ZEInt32& Value);
@@ -343,6 +320,7 @@ class ZEReference
 										ZEReference(float& Value);
 										ZEReference(double& Value);
 										ZEReference(bool& Value);
+										ZEReference(ZEString& Value);
 										ZEReference(ZEVector2& Value);
 										ZEReference(ZEVector2d& Value);
 										ZEReference(ZEVector3& Value);
@@ -354,9 +332,10 @@ class ZEReference
 										ZEReference(ZEMatrix3x3d& Value);
 										ZEReference(ZEMatrix4x4& Value);
 										ZEReference(ZEMatrix4x4d& Value);
+										ZEReference(ZEObject& Value);
 										ZEReference(ZEObject*& Value);
-										ZEReference(ZEString& Value);
-
+										ZEReference(ZEHolderBase& Value);
+										ZEReference(ZEMTCollection& Value);
 										ZEReference(const ZEInt8& Value);
 										ZEReference(const ZEInt16& Value);
 										ZEReference(const ZEInt32& Value);
@@ -379,116 +358,10 @@ class ZEReference
 										ZEReference(const ZEMatrix3x3d& Value);
 										ZEReference(const ZEMatrix4x4& Value);
 										ZEReference(const ZEMatrix4x4d& Value);
-										ZEReference(const ZEObject*& Value);
 										ZEReference(const ZEString& Value);
-
+										ZEReference(const ZEObject& Value);
+										ZEReference(const ZEObject*& Value);
+										ZEReference(const ZEHolderBase& Value);
+										ZEReference(const ZEMTCollection& Value);
 										~ZEReference();
 };
-
-
-template<typename ZEItemType>
-void ZEReference::SetArrayRef(ZEArray<ZEItemType>& Array)
-{
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZE_TT_UNDEFINED)
-		return;
-
-	Type.SubType = Type.Type;
-	Type.SubTypeQualifier = Type.TypeQualifier;
-	Type.Type = ZE_TT_ARRAY;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
-
-	SetType(Type);
-	Value.Pointer = &Array;
-}
-
-template<typename ZEItemType>
-void ZEReference::SetArrayConstRef(const ZEArray<ZEItemType>& Array)
-{
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (Type.Type == ZE_TT_UNDEFINED)
-		return;
-
-	Type.SubType = Type.Type;
-	Type.SubTypeQualifier = Type.TypeQualifier;
-	Type.Type = ZE_TT_ARRAY;
-	Type.TypeQualifier = ZE_TQ_REFERENCE;
-
-	SetType(Type);
-	Value.Pointer = const_cast<ZEArray<ZEItemType>*>(&Array);
-}
-
-template<typename ZEObjectType>
-void ZEReference::SetObjectRef(ZEObjectType& Object)
-{
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT;
-	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
-	SetType(Type);
-
-	Value.Pointer = &Object;
-}
-
-template<typename ZEObjectType>
-void ZEReference::SetObjectConstRef(const ZEObjectType& Object)
-{
-	ZEType Type;
-	Type.Type = ZE_TT_OBJECT;
-	Type.Class = (static_cast<ZEObject*>(Object))->GetClass();
-	SetType(Type);
-
-	Value.Pointer = const_cast<ZEObjectType*>(&Object);
-}
-
-template<typename ZEItemType>
-ZEArray<ZEItemType>& ZEReference::GetArrayRef() const
-{
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (ValueType.ContainerType != ZE_CT_ARRAY || ValueType.Type != Type.Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
-		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
-
-	return *(ZEArray<ZEItemType>*)Value.Pointer;
-}
-
-template<typename ZEItemType>
-const ZEArray<ZEItemType>& ZEReference::GetArrayConstRef() const
-{
-	ZEType Type = ZETypeGenerator<ZEItemType>::GetType();
-	if (ValueType.ContainerType != ZE_CT_ARRAY || ValueType.Type != Type.Type)
-		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
-
-	return *(const ZEArray<ZEItemType>*)Value.Pointer;
-}
-
-template<typename ZEObjectType>
-ZEObjectType& ZEReference::GetObjectRef() const
-{
-	if (ValueType.Type != ZE_TT_OBJECT)
-		zeCriticalError("Value of the variant is not object.");
-
-	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObject*)Value.Pointer)->GetClass()))
-		zeCriticalError("Value of the variant is not inherited from Object Type.");
-
-	if (ValueType.TypeQualifier == ZE_TQ_CONST_REFERENCE)
-		zeCriticalError("Value of the variant is const reference.");
-
-	return *(ZEObjectType*)Value.Pointer;
-}
-
-template<typename ZEObjectType>
-const ZEObjectType& ZEReference::GetObjectConstRef() const
-{
-	if (ValueType.Type != ZE_TT_OBJECT)
-		zeCriticalError("Value of the variant is not object.");
-
-	if (!ZEClass::IsDerivedFrom(ZEObjectType::Class(), ((ZEObjectType*)Value.Pointer)->GetClass()))
-		zeCriticalError("Value of the variant is not inherited from Object Type.");
-
-	return *(const ZEObjectType*)Value.Pointer;
-}
-
-#pragma warning(pop)
-#endif

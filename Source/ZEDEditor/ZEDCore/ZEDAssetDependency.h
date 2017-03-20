@@ -38,7 +38,7 @@
 #include "ZEMeta/ZEObject.h"
 
 #include "ZEDS/ZEString.h"
-#include "ZEMeta/ZEEnumurator.h"
+#include "ZEMeta/ZEEnumerator.h"
 
 ZE_ENUM(ZEDAssetDependencyTargetType)
 {

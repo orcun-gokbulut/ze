@@ -82,7 +82,7 @@ void ZEDPropertyEditor::Populate()
 
 	ZEClass* CurrentClass = NULL;
 	QTreeWidgetItem* CurrentClassItem = NULL;
-	const ZEProperty* Properties = BaseClass->GetProperties();
+	const ZEMTProperty* Properties = BaseClass->GetProperties();
 	for (ZESize I = 0; I < BaseClass->GetPropertyCount(); I++)
 	{
 		if (Properties[I].MemberOf != CurrentClass)
@@ -109,28 +109,29 @@ void ZEDPropertyEditor::Populate()
 		if (Properties[I].Access == ZEMT_PA_NONE || Properties[I].Access == ZEMT_PA_WRITE)
 			continue;
 
-		if (Properties[I].Type.ContainerType != ZE_CT_NONE)
+		if (Properties[I].Type.IsCollection())
 			continue;
 
 		if (!Properties[I].CheckAttributeHasValue("ZEDEditor.PropertyEditor.Display", "true"))
 			continue;
 
-		switch (Properties[I].Type.Type)
+		switch (Properties[I].Type.GetBaseType())
 		{
-			case ZE_TT_UNDEFINED:
-			case ZE_TT_VOID:
+			default:
+			case ZEMT_BT_UNDEFINED:
+			case ZEMT_BT_VOID:
 				continue;
 
-			case ZE_TT_INTEGER_8:
-			case ZE_TT_INTEGER_16:
-			case ZE_TT_INTEGER_32:
-			case ZE_TT_INTEGER_64:
-			case ZE_TT_UNSIGNED_INTEGER_8:
-			case ZE_TT_UNSIGNED_INTEGER_16:
-			case ZE_TT_UNSIGNED_INTEGER_32:
-			case ZE_TT_UNSIGNED_INTEGER_64:
-			case ZE_TT_DOUBLE:
-			case ZE_TT_FLOAT:
+			case ZEMT_BT_INTEGER_8:
+			case ZEMT_BT_INTEGER_16:
+			case ZEMT_BT_INTEGER_32:
+			case ZEMT_BT_INTEGER_64:
+			case ZEMT_BT_UNSIGNED_INTEGER_8:
+			case ZEMT_BT_UNSIGNED_INTEGER_16:
+			case ZEMT_BT_UNSIGNED_INTEGER_32:
+			case ZEMT_BT_UNSIGNED_INTEGER_64:
+			case ZEMT_BT_DOUBLE:
+			case ZEMT_BT_FLOAT:
 			{
 				ZEDPropertyEditorItemNumeric* NumericItem = new ZEDPropertyEditorItemNumeric();
 				NumericItem->SetProperty(&Properties[I]);
@@ -140,7 +141,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZE_TT_BOOLEAN:
+			case ZEMT_BT_BOOLEAN:
 			{
 				ZEDPropertyEditorItemBoolean* BooleanItem = new ZEDPropertyEditorItemBoolean();
 				BooleanItem->SetProperty(&Properties[I]);
@@ -150,7 +151,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZE_TT_STRING:
+			case ZEMT_BT_STRING:
 			{
 				ZEDPropertyEditorItemString* StringItem = new ZEDPropertyEditorItemString();
 				StringItem->SetProperty(&Properties[I]);
@@ -160,7 +161,7 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZE_TT_ENUMERATOR:
+			case ZEMT_BT_ENUMERATOR:
 			{
 				ZEDPropertyEditorItemEnumurator* EnumuratorItem = new ZEDPropertyEditorItemEnumurator();
 				EnumuratorItem->SetProperty(&Properties[I]);
@@ -170,17 +171,17 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZE_TT_QUATERNION:
-			case ZE_TT_VECTOR2:
-			case ZE_TT_VECTOR2D:
-			case ZE_TT_VECTOR3:
-			case ZE_TT_VECTOR3D:
-			case ZE_TT_VECTOR4:
-			case ZE_TT_VECTOR4D:
-			case ZE_TT_MATRIX3X3:
-			case ZE_TT_MATRIX3X3D:
-			case ZE_TT_MATRIX4X4:
-			case ZE_TT_MATRIX4X4D:
+			case ZEMT_BT_QUATERNION:
+			case ZEMT_BT_VECTOR2:
+			case ZEMT_BT_VECTOR2D:
+			case ZEMT_BT_VECTOR3:
+			case ZEMT_BT_VECTOR3D:
+			case ZEMT_BT_VECTOR4:
+			case ZEMT_BT_VECTOR4D:
+			case ZEMT_BT_MATRIX3X3:
+			case ZEMT_BT_MATRIX3X3D:
+			case ZEMT_BT_MATRIX4X4:
+			case ZEMT_BT_MATRIX4X4D:
 			{
 				ZEDPropertyEditorItemVector* VectorItem = new ZEDPropertyEditorItemVector();
 				VectorItem->SetProperty(&Properties[I]);
@@ -190,11 +191,12 @@ void ZEDPropertyEditor::Populate()
 				break;
 			}
 
-			case ZE_TT_OBJECT:
-			case ZE_TT_OBJECT_PTR:
+			case ZEMT_BT_OBJECT:
+			case ZEMT_BT_OBJECT_PTR:
+			case ZEMT_BT_OBJECT_HOLDER:
 				continue;
 
-			case ZE_TT_CLASS:
+			case ZEMT_BT_CLASS:
 			{
 				QTreeWidgetItem* Item = new ZEDPropertyEditorItem();
 				Item->setText(0, Properties[I].Name);
@@ -264,13 +266,13 @@ void ZEDPropertyEditor::TickEvent(const ZEDTickEvent* Event)
 	Dirty = false;
 }
 
-void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEVariant& Value)
+void ZEDPropertyEditor::PropertyChanged(const ZEMTProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Value);
 	GetEditor()->GetOperationManager()->DoOperation(Operation);
 }
 
-void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
+void ZEDPropertyEditor::PropertyChanged(const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Values);
 	GetEditor()->GetOperationManager()->DoOperation(Operation);

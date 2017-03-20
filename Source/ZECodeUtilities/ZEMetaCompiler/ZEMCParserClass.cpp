@@ -36,11 +36,13 @@
 #include "ZEMCParser.h"
 #include "ZEMCOptions.h"
 
-bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class, bool& IsReferenceCounted)
 {
 	bool Result = false;
 	if (Class->getName() == "ZEObject")
 		Result = true;
+	else if (Class->getName() == "ZEReferenceCounted")
+		IsReferenceCounted = true;
 
 	if(Class->isCompleteDefinition())
 	{
@@ -49,7 +51,7 @@ bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 			if (!CurrentBaseClass->getType()->isClassType())
 				continue;
 
-			bool SubResult = CheckClassHasDerivedFromZEObject(CurrentBaseClass->getType()->getAsCXXRecordDecl());
+			bool SubResult = CheckClassHasDerivedFromZEObject(CurrentBaseClass->getType()->getAsCXXRecordDecl(), IsReferenceCounted);
 
 			if (CurrentBaseClass->getAccessSpecifier() != AccessSpecifier::AS_public)
 			{
@@ -62,7 +64,9 @@ bool ZEMCParser::CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class)
 				RaiseError(CurrentBaseClass->getType()->getAsCXXRecordDecl()->getLocation(), "Class s\" has inherited ZEObject multiple times in it's inheritance tree. Check it's parents.");
 			}
 			else if (SubResult)
+			{
 				Result = true;
+			}
 		}
 	}
 
@@ -150,9 +154,9 @@ bool ZEMCParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 	return true;
 }
 
-bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
+bool ZEMCParser::CheckClass(CXXRecordDecl* Class, bool& IsReferenceCounted)
 {
-	if (!CheckClassHasDerivedFromZEObject(Class))
+	if (!CheckClassHasDerivedFromZEObject(Class, IsReferenceCounted))
 		return false;
 
 	if (Class->isTemplateDecl())
@@ -194,58 +198,14 @@ bool ZEMCParser::CheckTargetDeclaration(Decl* Declaration)
 	return (CurrentFileID == MainFileId);
 }
 
-bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
-{
-	if (Class->isClass() && !Class->isCompleteDefinition() && Class->hasAttrs())
-	{
-		ZEMCAttribute AttributeData;
-		for (CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-		{
-			if (!AnnotateAttr::classof(*CurrentAttr))
-				continue;
-
-			ParseAttribute(AttributeData, static_cast<AnnotateAttr*>(*CurrentAttr));
-
-			if (AttributeData.Name == "ZEMC.ForwardDeclaration")
-			{
-				bool Found = false;
-				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
-				{
-					if (Context->ForwardDeclarations[I]->ClassName == AttributeData.Values[0])
-					{
-						Found = true;
-						break;
-					}
-				}
-
-				if (!Found)
-				{
-					ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
-
-					ForwardDeclaredClass->ClassName = AttributeData.Values[0].ToCString();
-					ForwardDeclaredClass->HeaderName = AttributeData.Values[1].ToCString();
-
-					Context->ForwardDeclarations.Add(ForwardDeclaredClass);
-
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
 void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 {
-	if (ProcessForwardDeclaration(Class))
-		return;
-
 	if (!Class->isCompleteDefinition())
 		return;
 
+	bool IsReferenceCounted = false;
 	bool FundamentalClass = CheckFundamentalClass(Class);
-	if (!FundamentalClass && !CheckClass(Class))
+	if (!FundamentalClass && !CheckClass(Class, IsReferenceCounted))
 		return;
 	
 	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
@@ -258,18 +218,16 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->Name = Class->getNameAsString();
 	ClassData->MetaName = ClassData->Name + "Class";
 	ClassData->Hash = ClassData->Name.Hash();
-
 	ClassData->HasCreateInstanceMethod = false;
 	ClassData->HasPublicDestroyMethod = false;
-
-	ClassData->HasPublicCopyConstructor = true;
-	ClassData->HasPublicDefaultConstructor = true;
-	ClassData->HasPublicDestructor = true;
-	ClassData->HasPublicAssignmentOperator = true;
-	
+	ClassData->HasPublicCopyConstructor = Class->hasCopyConstructorWithConstParam() | Class->hasTrivialCopyConstructor();
+	ClassData->HasPublicDefaultConstructor = Class->hasDefaultConstructor() | Class->hasUserDeclaredConstructor();
+	ClassData->HasPublicDestructor = (Class->hasSimpleDestructor() | Class->hasUserDeclaredDestructor() | Class->hasTrivialDestructor()) && Class->getDestructor()->getAccess() == AS_public;
+	ClassData->HasPublicAssignmentOperator = Class->hasCopyAssignmentWithConstParam() | Class->hasTrivialCopyAssignment();
 	ClassData->IsAbstract = Class->isAbstract();
 	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;
+	ClassData->IsReferenceCounted = IsReferenceCounted;
 
 	if (!ClassData->IsFundamental && ClassData->Name != "ZEObject")
 	{
@@ -293,6 +251,9 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 
 	ProcessClassAttributes(ClassData, Class);
 
+	if (ClassData->BaseClass != NULL && ClassData->BaseClass->HasPublicDestroyMethod)
+		ClassData->HasPublicDestroyMethod = true;
+
 	// Combine Methods and Properties
 	if (ClassData->BaseClass != NULL)
 	{
@@ -310,7 +271,6 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 			ClassData->Properties.Add(CloneProperty);
 		}
 	}
-
 
 	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
 	{

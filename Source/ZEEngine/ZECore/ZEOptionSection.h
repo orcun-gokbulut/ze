@@ -37,14 +37,14 @@
 #ifndef	__ZE_OPTION_SECTION_H__
 #define __ZE_OPTION_SECTION_H__
 
+#include "ZECommand.h"
+#include "ZECommandSection.h"
+
 #include "ZETypes.h"
 #include "ZEOption.h"
-#include "ZECommand.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZECommandSection.h"
 #include "ZEDS/ZEValue.h"
-#include "ZEDS/ZEFastDelegate.h"
 
 class ZEOptionSection
 {

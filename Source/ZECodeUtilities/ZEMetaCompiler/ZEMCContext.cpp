@@ -45,21 +45,53 @@ bool ZEMCType::operator!=(const ZEMCType& Other) const
 	return !Equal(*this, Other);
 }
 
-
 bool ZEMCType::Equal(const ZEMCType& A, const ZEMCType& B)
 {
-	if (A.BaseType != B.BaseType || A.TypeQualifier != B.TypeQualifier)
+	if (A.BaseType != B.BaseType || A.TypeQualifier != B.TypeQualifier || 
+		A.CollectionType != B.CollectionType || A.CollectionQualifier != B.CollectionQualifier)
+	{
 		return false;
+	}
 
-	if (A.ContainerType != B.ContainerType)
-		return false;
+	if (A.BaseType == ZEMC_BT_OBJECT || A.BaseType == ZEMC_BT_OBJECT_PTR || A.BaseType == ZEMC_BT_OBJECT_HOLDER) 
+	{
+		if (A.Class != B.Class)
+			return false;
+	}
 
-	if (A.BaseType == ZEMC_BT_UNDEFINED)
-		return false;
-	else if ((A.BaseType == ZEMC_BT_OBJECT || A.BaseType == ZEMC_BT_OBJECT_PTR) &&  A.Class != B.Class)
-		return false;
-	else if (A.BaseType == ZEMC_BT_ENUMERATOR && A.Enumurator != B.Enumurator)
-		return false;
+	if (A.BaseType == ZEMC_BT_ENUMERATOR || A.BaseType == ZEMC_BT_FLAGS) 
+	{
+		if (A.Enumerator != B.Enumerator)
+			return false;
+	}
+
+	return true;
+}
+
+bool ZEMCType::Check()
+{
+	if (BaseType == ZEMC_BT_OBJECT || BaseType == ZEMC_BT_OBJECT_PTR || BaseType == ZEMC_BT_OBJECT_HOLDER)
+	{
+		if (Class == NULL)
+			return false;
+	}
+
+	if (BaseType == ZEMC_BT_ENUMERATOR || BaseType == ZEMC_BT_FLAGS)
+	{
+		if (Enumerator == NULL)
+			return false;
+	}
+
+	if (CollectionType == ZEMC_CT_ARRAY)
+	{
+		if (TypeQualifier == ZEMC_TQ_REFERENCE || TypeQualifier == ZEMC_TQ_CONST_REFERENCE)
+			return false;
+	}
+	else
+	{
+		if (CollectionType != ZEMC_CT_NONE)
+			return false;
+	}
 
 	return true;
 }
@@ -68,9 +100,10 @@ ZEMCType::ZEMCType()
 {
 	BaseType = ZEMC_BT_UNDEFINED;
 	TypeQualifier = ZEMC_TQ_VALUE;
-	ContainerType = ZEMC_CT_NONE;
+	CollectionType = ZEMC_CT_NONE;
+	CollectionQualifier = ZEMC_TQ_VALUE;
 	Class = NULL;
-	Enumurator = NULL;
+	Enumerator = NULL;
 }
 
 ZEMCType::~ZEMCType()
@@ -80,7 +113,7 @@ ZEMCType::~ZEMCType()
 
 ZEMCForwardDeclaration::ZEMCForwardDeclaration()
 {
-
+	Type = ZEMC_DT_NONE;
 }
 
 ZEMCForwardDeclaration::~ZEMCForwardDeclaration()
@@ -239,6 +272,7 @@ ZEMCProperty::ZEMCProperty()
 	Setter = NULL;
 	Adder = NULL;
 	Remover = NULL;
+	Counter = NULL;
 }
 
 ZEMCProperty::~ZEMCProperty()
@@ -268,7 +302,7 @@ ZEMCMethod::ZEMCMethod()
 	IsConstructor = false;
 
 	IsOperator = false;
-	OperatorType = ZEMC_MOT_NONE;
+	OperatorType = ZEMC_OT_NONE;
 }
 
 ZEMCMethod::~ZEMCMethod()
@@ -280,11 +314,11 @@ ZEMCClass::ZEMCClass()
 {
 	BaseClass = NULL;
 	HasScriptBase = false;
-	HasPublicDefaultConstructor = false;
-	HasPublicDestructor = true;
+	HasPublicDefaultConstructor = true;
+	HasPublicDestructor = false;
 	HasPublicCopyConstructor = true;
 	HasCreateInstanceMethod = false;
-	HasPublicAssignmentOperator = false;
+	HasPublicAssignmentOperator = true;
 	HasPublicDestroyMethod = false;
 	IsAbstract = false;
 	IsFundamental = false;
@@ -320,6 +354,10 @@ ZEMCContext::~ZEMCContext()
 	for (ZESize I = 0; I < ForwardDeclarations.GetCount(); I++)
 		delete ForwardDeclarations[I];
 	ForwardDeclarations.Clear();
+
+	for (ZESize I = 0; I < Includes.GetCount(); I++)
+		delete Includes[I];
+	Includes.Clear();
 
 	TargetClasses.Clear();
 	TargetEnumerators.Clear();

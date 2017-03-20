@@ -39,7 +39,7 @@
 void ZEMCGenerator::GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZESize %sClass::GetSizeOfObject()\n"
+		"ZESize %sClass::GetSizeOfObject() const\n"
 		"{\n"
 		"\treturn sizeof(%s);\n"
 		"}\n\n", 
@@ -50,7 +50,7 @@ void ZEMCGenerator::GenerateClassGetSizeOfObject(ZEMCClass* CurrentClass)
 void ZEMCGenerator::GenerateClassCreateInstance(ZEMCClass* CurrentClass)
 {
 	WriteToFile(
-		"ZEObject* %sClass::CreateInstance()\n"
+		"ZEObject* %sClass::CreateInstance() const\n"
 		"{\n", 
 		CurrentClass->Name.ToCString());
 
@@ -76,63 +76,16 @@ void ZEMCGenerator::GenerateClassCreateInstance(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
-void ZEMCGenerator::GenerateClassDestroy(ZEMCClass* CurrentClass)
-{
-	WriteToFile( 
-		"bool %sClass::Destroy(ZEObject* Object)\n"
-		"{\n",
-		CurrentClass->Name.ToCString());
-
-	if (CurrentClass->HasPublicDestroyMethod)
-	{
-		WriteToFile("\t((%s*)Object)->Destroy();\n",
-			CurrentClass->Name.ToCString());
-		WriteToFile("\treturn true;\n");
-	}
-	else if (CurrentClass->HasPublicDestroyMethod)
-	{
-		WriteToFile("\tdelete (%s*)Object;\n",
-			CurrentClass->Name.ToCString());
-		WriteToFile("\treturn true;\n");
-	}
-	else
-	{
-		WriteToFile("\treturn false;\n");
-	}
-
-	WriteToFile("}\n\n");
-}
-
-void ZEMCGenerator::GenerateClassDynamicCast(ZEMCClass* CurrentClass)
-{
-	WriteToFile( 
-		"ZEObject* %sClass::DynamicCast(ZEObject* Object)\n"
-		"{\n",
-		CurrentClass->Name.ToCString());
-
-	WriteToFile("\tif (Object == NULL)\n"
-		"\t\treturn NULL;\n\n");
-
-	GenerateCastedObject(CurrentClass);
-
-	if (CurrentClass->IsFundamental)
-		WriteToFile("\treturn reinterpret_cast<ZEObject*>(CastedObject);\n");
-	else 
-		WriteToFile("\treturn CastedObject;\n");
-
-	WriteToFile("}\n\n");
-}
-
 void ZEMCGenerator::GenerateClassClone(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"ZEObject* %sClass::Clone(ZEObject* Object)\n"
+		"ZEObject* %sClass::Clone(const ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
 	if (CurrentClass->HasPublicCopyConstructor && !CurrentClass->IsAbstract)
 	{
-		GenerateCastedObject(CurrentClass);
+		GenerateCastedObjectConst(CurrentClass);
 
 		if (CurrentClass->IsFundamental)
 			WriteToFile("\treturn reinterpret_cast<ZEObject*>(new %s(*CastedObject));\n", CurrentClass->Name.ToCString());
@@ -147,10 +100,41 @@ void ZEMCGenerator::GenerateClassClone(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
+void ZEMCGenerator::GenerateClassDestroy(ZEMCClass* CurrentClass)
+{
+	WriteToFile( 
+		"bool %sClass::Destroy(ZEObject* Object) const\n"
+		"{\n",
+		CurrentClass->Name.ToCString());
+
+	if (CurrentClass->HasPublicDestroyMethod)
+	{
+		GenerateClassTypeCheck(CurrentClass);
+
+		WriteToFile("\t((%s*)Object)->Destroy();\n",
+			CurrentClass->Name.ToCString());
+		WriteToFile("\treturn true;\n");
+	}
+	else if (CurrentClass->HasPublicDestroyMethod)
+	{
+		GenerateClassTypeCheck(CurrentClass);
+
+		WriteToFile("\tdelete (%s*)Object;\n",
+			CurrentClass->Name.ToCString());
+		WriteToFile("\treturn true;\n");
+	}
+	else
+	{
+		WriteToFile("\treturn false;\n");
+	}
+
+	WriteToFile("}\n\n");
+}
+
 void ZEMCGenerator::GenerateClassConstruct(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Construct(ZEObject* Object)\n"
+		"bool %sClass::Construct(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 	
@@ -169,10 +153,33 @@ void ZEMCGenerator::GenerateClassConstruct(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
+void ZEMCGenerator::GenerateClassCopyConstruct(ZEMCClass* CurrentClass)
+{
+	WriteToFile( 
+		"bool %sClass::CopyConstruct(ZEObject* DestinationObject, const ZEObject* SourceObject) const\n"
+		"{\n",
+		CurrentClass->Name.ToCString());
+
+	if (CurrentClass->HasPublicCopyConstructor && !CurrentClass->IsAbstract)
+	{
+		WriteToFile("\t%s* CastedDestinationObject = static_cast<%s*>(DestinationObject);\n\n", CurrentClass->Name.ToCString(), CurrentClass->Name.ToCString());
+		GenerateCastedObjectConst(CurrentClass, "SourceObject", "CastedSourceObject");
+
+		WriteToFile("\tnew(CastedDestinationObject) %s(*CastedSourceObject);\n", CurrentClass->Name.ToCString());
+		WriteToFile("\treturn true;\n");
+	}
+	else
+	{
+		WriteToFile("\treturn false;\n");
+	}
+
+	WriteToFile("}\n\n");
+}
+
 void ZEMCGenerator::GenerateClassDeconstruct(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Deconstruct(ZEObject* Object)\n"
+		"bool %sClass::Deconstruct(ZEObject* Object) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
@@ -191,25 +198,47 @@ void ZEMCGenerator::GenerateClassDeconstruct(ZEMCClass* CurrentClass)
 	WriteToFile("}\n\n");
 }
 
+
 void ZEMCGenerator::GenerateClassAssign(ZEMCClass* CurrentClass)
 {
 	WriteToFile( 
-		"bool %sClass::Assign(ZEObject* Object, ZEObject* Source)\n"
+		"bool %sClass::Assign(ZEObject* DestinationObject, const ZEObject* SourceObject) const\n"
 		"{\n",
 		CurrentClass->Name.ToCString());
 
 	if (CurrentClass->HasPublicAssignmentOperator)
 	{
-		GenerateCastedObject(CurrentClass);
-		GenerateCastedObject(CurrentClass, "Source", "CastedSource");
+		GenerateCastedObject(CurrentClass, "DestinationObject", "CastedDestinationObject", true);
+		GenerateCastedObjectConst(CurrentClass, "SourceObject", "CastedSourceObject");
 
-		WriteToFile("\t*CastedObject = *CastedSource;\n");
+		WriteToFile("\t*CastedDestinationObject = *CastedSourceObject;\n");
 		WriteToFile("\treturn true;\n");
 	}
 	else
 	{
 		WriteToFile("\treturn false;\n");
 	}
+
+	WriteToFile("}\n\n");
+}
+
+
+void ZEMCGenerator::GenerateClassDynamicCast(ZEMCClass* CurrentClass)
+{
+	WriteToFile( 
+		"ZEObject* %sClass::DynamicCast(ZEObject* Object) const\n"
+		"{\n",
+		CurrentClass->Name.ToCString());
+
+	WriteToFile("\tif (Object == NULL)\n"
+		"\t\treturn NULL;\n\n");
+
+	GenerateCastedObject(CurrentClass);
+
+	if (CurrentClass->IsFundamental)
+		WriteToFile("\treturn reinterpret_cast<ZEObject*>(CastedObject);\n");
+	else 
+		WriteToFile("\treturn CastedObject;\n");
 
 	WriteToFile("}\n\n");
 }

@@ -49,22 +49,22 @@ bool ZETestInternalCheckClose(const ZEMatrix3x3& Actual, const ZEMatrix3x3& Expe
 	return(ZETestInternalCheckClose(Actual.M11, Expected.M11, Threshold.M11) && ZETestInternalCheckClose(Actual.M12, Expected.M12, Threshold.M12) && ZETestInternalCheckClose(Actual.M13, Expected.M13, Threshold.M13) && ZETestInternalCheckClose(Actual.M21, Expected.M21, Threshold.M21) && ZETestInternalCheckClose(Actual.M22, Expected.M22, Threshold.M22) && ZETestInternalCheckClose(Actual.M23, Expected.M23, Threshold.M23) && ZETestInternalCheckClose(Actual.M31, Expected.M31, Threshold.M31) && ZETestInternalCheckClose(Actual.M32, Expected.M32, Threshold.M32) && ZETestInternalCheckClose(Actual.M33, Expected.M33, Threshold.M33));
 }
 
-ZETestSuite(ZEMatrix3x3)
+ZE_TEST(ZEMatrix3x3)
 {
-	ZETest("ZEMatrix3x3::ZEMatrix3x3(float M00, float M01, float M02, float M10, float M11, float M12, float M20, float M21, float M22)")
+	ZE_TEST_ITEM("ZEMatrix3x3::ZEMatrix3x3(float M00, float M01, float M02, float M10, float M11, float M12, float M20, float M21, float M22)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 	}
 
-	ZETest("ZEMatrix3x3::ZEMatrix3x3(float M[9])")
+	ZE_TEST_ITEM("ZEMatrix3x3::ZEMatrix3x3(float M[9])")
 	{
 		float M[9]={1.0f, 3.0f, 13.0f, 1.0f, 5.0f, 21.0f, 2.0f,  8.0f,  34.0f};
 		ZEMatrix3x3 Matrix(M);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 	}
 
-	ZETest("inline void ZEMatrix3x3::Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -77,19 +77,19 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 
 		ZEMatrix3x3::Add(Out, A, B);
-		ZETestCheckClose(Out, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Out, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
 	}
 
-	ZETest("inline void ZEMatrix3x3::Create(ZEMatrix3x3& Matrix, float M[9])")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Create(ZEMatrix3x3& Matrix, float M[9])")
 	{
 		ZEMatrix3x3 Matrix;
 		float M[9]={34.0f, 21.0f, 13.0f, 8.0f, 5.0f, 3.0f, 2.0f, 1.0f, 1.0f};
 
 		ZEMatrix3x3::Create(Matrix, M);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(34.0f, 8.0f, 2.0f, 21.0f, 5.0f, 1.0f, 13.0f, 3.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(34.0f, 8.0f, 2.0f, 21.0f, 5.0f, 1.0f, 13.0f, 3.0f, 1.0f));
 	}
 
-	ZETest("inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13, float M21, float M22, float M23, float M31, float M32, float M33)")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13, float M21, float M22, float M23, float M31, float M32, float M33)")
 	{
 		ZEMatrix3x3 Matrix;
 
@@ -97,18 +97,18 @@ ZETestSuite(ZEMatrix3x3)
 			1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
 			13.0f, 21.0f, 34.0f);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::CreateIdentity(ZEMatrix3x3& Matrix)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateIdentity(ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 Matrix;
 		
 		ZEMatrix3x3::CreateIdentity(Matrix);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation, float Angle, const ZEVector2& Scale)")
 	{
 		ZEMatrix3x3 TransformationMatrix;
 		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(5.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 2.0f));
@@ -117,20 +117,20 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEVector2 ResultingVector = TransformationMatrix * SampleVector;
 
-		ZETestCheckClose(ResultingVector.x, 5.0f);
-		ZETestCheckClose(ResultingVector.y, -5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingVector.x, 5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingVector.y, -5.0f);
 	}
 
-	ZETest("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation)")
 	{
 		ZEQuaternion Rotation(ZE_PI_4, ZEVector3::UnitY);
 		ZEMatrix3x3 Matrix;
 
 		ZEMatrix3x3::CreateRotation(Matrix, Rotation);
-		ZETestCheckClose(Matrix, ZEMatrix3x3(0.70710673f, 0.0f, 0.70710680f, 0.0f, 1.0f, 0.0f, -0.70710680f, 0.0f, 0.70710673f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.70710673f, 0.0f, 0.70710680f, 0.0f, 1.0f, 0.0f, -0.70710680f, 0.0f, 0.70710673f));
 	}
 
-	ZETest("static void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)")
 	{
 		ZEMatrix3x3 RotationMatrix;
 		ZEMatrix3x3::CreateRotation2D(RotationMatrix, ZE_PI_2);
@@ -139,102 +139,102 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEVector2 ResultingVector = RotationMatrix * SampleVector;
 
-		ZETestCheckClose(ResultingVector.x, 0.0f);
-		ZETestCheckClose(ResultingVector.y, -5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingVector.x, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultingVector.y, -5.0f);
 	}
 
-	ZETest("void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)")
 	{
 		ZEMatrix3x3 Matrix;
 		float Pitch = ZE_PI_4;
 		
 		ZEMatrix3x3::CreateRotationX(Matrix, Pitch);
-		ZETestCheckClose(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 0.70710677f, -0.70710677f, 0.0f, 0.70710677f, 0.70710677f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 0.70710677f, -0.70710677f, 0.0f, 0.70710677f, 0.70710677f));
 	}
 
-	ZETest("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)")
 	{
 		ZEMatrix3x3 Matrix;
 		float Pitch = ZE_PI;
 		float Yawn = ZE_PI_2;
 		float Roll = ZE_PI_4;
 		
-		ZETestCase("for RotationOrder ZE_RO_XYZ")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_XYZ")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_XYZ;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, 1.0f, -0.70710678f, -0.70710678f, 0.0f, 0.70710678f, -0.70710678f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, 0.0f, 1.0f, -0.70710678f, -0.70710678f, 0.0f, 0.70710678f, -0.70710678f, 0.0f));
 		}
 
-		ZETestCase("for RotationOrder ZE_RO_XZY")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_XZY")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_XZY;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, -0.70710678f, 0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 1.0f, 0.0f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, -0.70710678f, 0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 1.0f, 0.0f, 0.0f));
 		}
 
-		ZETestCase("for RotationOrder ZE_RO_YXZ")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_YXZ")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_YXZ;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, -0.70710678f, -0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, -0.70710678f, -0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 0.0f));
 		}
 
-		ZETestCase("for RotationOrder ZE_RO_YZX")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_YZX")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_YZX;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 0.0f));
 		}
 
-		ZETestCase("for RotationOrder ZE_RO_ZXY")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_ZXY")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_ZXY;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, 0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 1.0f, 0.0f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, 0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 1.0f, 0.0f, 0.0f));
 		}
 
-		ZETestCase("for RotationOrder ZE_RO_ZYX")
+		ZE_TEST_CASE("for RotationOrder ZE_RO_ZYX")
 		{
 			ZERotationOrder RotationOrder = ZE_RO_ZYX;
 
 			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
-			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, -1.0f, 0.0f, 0.0f));
+			ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, -1.0f, 0.0f, 0.0f));
 		}
 	}
 
-	ZETest("void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)")
 	{
 		ZEMatrix3x3 Matrix;
 		float Yawn = ZE_PI_4;
 
 		ZEMatrix3x3::CreateRotationY(Matrix, Yawn);
-		ZETestCheckClose(Matrix, ZEMatrix3x3(0.70710677f, 0.0f, 0.70710677f, 0.0f, 1.0f, 0.0f, -0.70710677f, 0.0f, 0.70710677f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.70710677f, 0.0f, 0.70710677f, 0.0f, 1.0f, 0.0f, -0.70710677f, 0.0f, 0.70710677f));
 	}
 
-	ZETest("void ZEMatrix3x3::CreateRotationZ(ZEMatrix3x3& Matrix, float Roll)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateRotationZ(ZEMatrix3x3& Matrix, float Roll)")
 	{
 		ZEMatrix3x3 Matrix;
 		float Roll = ZE_PI_4;
 
 		ZEMatrix3x3::CreateRotationZ(Matrix, Roll);
-		ZETestCheckClose(Matrix, ZEMatrix3x3(0.70710677f, -0.70710677f, 0.0f, 0.70710677f, 0.70710677f, 0.0f, 0.0f, 0.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(0.70710677f, -0.70710677f, 0.0f, 0.70710677f, 0.70710677f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z)")
 	{
 		ZEMatrix3x3 Matrix;
 		
 		ZEMatrix3x3::CreateScale(Matrix, 1.0f, 2.0f, 3.0f);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f));
 	}
 
-	ZETest("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, float x, float y)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, float x, float y)")
 	{
 		ZEMatrix3x3 ScaleMatrix;
 		ZEMatrix3x3::CreateScale2D(ScaleMatrix, 2.0f, 2.0f);
@@ -242,11 +242,11 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 SampleVector(5.0f, 5.0f);
 		ZEVector2 ResultVector = ScaleMatrix * SampleVector;
 
-		ZETestCheckClose(ResultVector.x, 10.0f);
-		ZETestCheckClose(ResultVector.y, 10.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.x, 10.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.y, 10.0f);
 	}
 
-	ZETest("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::CreateScale2D(ZEMatrix3x3& Matrix, const ZEVector2& Scale)")
 	{
 		ZEMatrix3x3 ScaleMatrix;
 		ZEMatrix3x3::CreateScale2D(ScaleMatrix, ZEVector2(2.0f, 2.0f));
@@ -254,11 +254,11 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 SampleVector(5.0f, 5.0f);
 		ZEVector2 ResultVector = ScaleMatrix * SampleVector;
 
-		ZETestCheckClose(ResultVector.x, 10.0f);
-		ZETestCheckClose(ResultVector.y, 10.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.x, 10.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.y, 10.0f);
 	}
 
-	ZETest("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, float x, float y)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, float x, float y)")
 	{
 		ZEMatrix3x3 TranslationMatrix;
 		ZEMatrix3x3::CreateTranslation2D(TranslationMatrix, 5.0f, 5.0f);
@@ -266,11 +266,11 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 SampleVector(3.0f, 3.0f);
 		ZEVector2 ResultVector = TranslationMatrix * SampleVector;
 
-		ZETestCheckClose(ResultVector.x, 8.0f);
-		ZETestCheckClose(ResultVector.y, 8.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.x, 8.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.y, 8.0f);
 	}
 
-	ZETest("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::CreateTranslation2D(ZEMatrix3x3& Matrix, const ZEVector2& Translation)")
 	{
 		ZEMatrix3x3 TranslationMatrix;
 		ZEMatrix3x3::CreateTranslation2D(TranslationMatrix, ZEVector2(5.0f, 5.0f));
@@ -278,37 +278,37 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 SampleVector(3.0f, 3.0f);
 		ZEVector2 ResultVector = TranslationMatrix * SampleVector;
 
-		ZETestCheckClose(ResultVector.x, 8.0f);
-		ZETestCheckClose(ResultVector.y, 8.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.x, 8.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultVector.y, 8.0f);
 	}
 
-	ZETest("void ZEMatrix3x3::CreateZero(ZEMatrix3x3& Matrix)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::CreateZero(ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 Matrix;
 		
 		ZEMatrix3x3::CreateZero(Matrix);
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
 	}
 
-	ZETest("float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)")
+	ZE_TEST_ITEM("float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
 		
 		float Determinant = ZEMatrix3x3::Determinant(Matrix);
-		ZETestCheckClose(Determinant, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Determinant, 0.0f);
 	}
 
-	ZETest("float ZEMatrix3x3::Determinant() const")
+	ZE_TEST_ITEM("float ZEMatrix3x3::Determinant() const")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 2.0f, -5.0f,
 			4.0f, 2.0f, 1.0f,
 			3.0f, 2.0f, 9.0f);
 
 		float Determinant = Matrix.Determinant();
-		ZETestCheckClose(Determinant, -60.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Determinant, -60.0f);
 	}
 
-	ZETest("bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix) const")
+	ZE_TEST_ITEM("bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix) const")
 	{
 		ZEMatrix3x3 MatrixA(1.0f, 2.0f, -5.0f,
 			4.0f, 2.0f, 1.0f,
@@ -321,13 +321,13 @@ ZETestSuite(ZEMatrix3x3)
 			3.00002f, 2.00002f, 9.00002f);
 
 		bool Equal = MatrixA.Equals(MatrixB);
-		ZETestCheck(Equal);
+		ZE_TEST_CHECK_ERROR(Equal);
 
 		Equal = MatrixA.Equals(MatrixC);
-		ZETestCheck(!Equal);
+		ZE_TEST_CHECK_ERROR(!Equal);
 	}
 
-	ZETest("bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix, float Threshold)")
+	ZE_TEST_ITEM("bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix, float Threshold)")
 	{
 		float Threshold = 0.1f;
 		ZEMatrix3x3 MatrixA(1.11f, 2.11f, -5.11f,
@@ -343,13 +343,13 @@ ZETestSuite(ZEMatrix3x3)
 			3.0f, 2.0f, 9.0f);
 
 		bool Equal = MatrixA.Equals(MatrixB, Threshold);
-		ZETestCheck(Equal);
+		ZE_TEST_CHECK_ERROR(Equal);
 
 		Equal = MatrixA.Equals(MatrixC, Threshold);
-		ZETestCheck(!Equal);
+		ZE_TEST_CHECK_ERROR(!Equal);
 	}
 
-	ZETest("static void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 TransformationMatrix;
 		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
@@ -360,46 +360,46 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEMatrix3x3::Get2DDecomposition(ResultPosition, ResultRotation, ResultScale, TransformationMatrix);
 
-		ZETestCheckClose(ResultPosition.x, 3.0f);
-		ZETestCheckClose(ResultPosition.y, 5.0f);
-		ZETestCheckClose(ResultRotation, ZE_PI_2);
-		ZETestCheckClose(ResultScale.x, 2.0f);
-		ZETestCheckClose(ResultScale.y, 4.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultPosition.x, 3.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultPosition.y, 5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation, ZE_PI_2);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.x, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.y, 4.0f);
 	}
 
-	ZETest("float ZEMatrix3x3::Get2DRotation()")
+	ZE_TEST_ITEM("float ZEMatrix3x3::Get2DRotation()")
 	{
 		ZEMatrix3x3 TransformationMatrix;
 		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
 
 		float ResultRotation = TransformationMatrix.Get2DRotation();
 
-		ZETestCheckClose(ResultRotation, ZE_PI_2);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation, ZE_PI_2);
 	}
 
-	ZETest("ZEVector2 ZEMatrix3x3::Get2DScale()")
+	ZE_TEST_ITEM("ZEVector2 ZEMatrix3x3::Get2DScale()")
 	{
 		ZEMatrix3x3 TransformationMatrix;
 		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
 
 		ZEVector2 ResultScale = TransformationMatrix.Get2DScale();
 
-		ZETestCheckClose(ResultScale.x, 2.0f);
-		ZETestCheckClose(ResultScale.y, 4.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.x, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.y, 4.0f);
 	}
 
-	ZETest("ZEVector2 ZEMatrix3x3::Get2DTranslation()")
+	ZE_TEST_ITEM("ZEVector2 ZEMatrix3x3::Get2DTranslation()")
 	{
 		ZEMatrix3x3 TransformationMatrix;
 		ZEMatrix3x3::CreateOrientation2D(TransformationMatrix, ZEVector2(3.0f, 5.0f), ZE_PI_2, ZEVector2(2.0f, 4.0f));
 
 		ZEVector2 ResultPosition = TransformationMatrix.Get2DTranslation();
 
-		ZETestCheckClose(ResultPosition.x, 3.0f);
-		ZETestCheckClose(ResultPosition.y, 5.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultPosition.x, 3.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultPosition.y, 5.0f);
 	}
 
-	ZETest("static void ZEMatrix3x3::GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix)")
+	ZE_TEST_ITEM("static void ZEMatrix3x3::GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 RotationMatrix;
 		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
@@ -414,18 +414,18 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEMatrix3x3::GetDecomposition(ResultRotation, ResultScale, TransformationMatrix);
 
-		ZETestCheckClose(ResultRotation.w, 0.70710677f);
-		ZETestCheckClose(ResultRotation.x, 0.0f);
-		ZETestCheckClose(ResultRotation.y, 0.70710677f);
-		ZETestCheckClose(ResultRotation.z, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.w, 0.70710677f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.x, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.y, 0.70710677f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.z, 0.0f);
 
-		ZETestCheckClose(ResultScale.x, 2.0f);
-		ZETestCheckClose(ResultScale.y, 3.0f);
-		ZETestCheckClose(ResultScale.z, 4.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.x, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.y, 3.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.z, 4.0f);
 
 	}
 
-	ZETest("ZEQuaternion ZEMatrix3x3::GetRotation()")
+	ZE_TEST_ITEM("ZEQuaternion ZEMatrix3x3::GetRotation()")
 	{
 		ZEMatrix3x3 RotationMatrix;
 		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
@@ -437,13 +437,13 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEQuaternion ResultRotation = TransformationMatrix.GetRotation();
 
-		ZETestCheckClose(ResultRotation.w, 0.70710677f);
-		ZETestCheckClose(ResultRotation.x, 0.0f);
-		ZETestCheckClose(ResultRotation.y, 0.70710677f);
-		ZETestCheckClose(ResultRotation.z, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.w, 0.70710677f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.x, 0.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.y, 0.70710677f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultRotation.z, 0.0f);
 	}
 
-	ZETest("ZEVector3 ZEMatrix3x3::GetScale()")
+	ZE_TEST_ITEM("ZEVector3 ZEMatrix3x3::GetScale()")
 	{
 		ZEMatrix3x3 RotationMatrix;
 		ZEMatrix3x3::CreateRotation(RotationMatrix, ZEQuaternion(ZE_PI_2, ZEVector3::UnitY));
@@ -455,12 +455,12 @@ ZETestSuite(ZEMatrix3x3)
 
 		ZEVector3 ResultScale = TransformationMatrix.GetScale();
 
-		ZETestCheckClose(ResultScale.x, 2.0f);
-		ZETestCheckClose(ResultScale.y, 3.0f);
-		ZETestCheckClose(ResultScale.z, 4.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.x, 2.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.y, 3.0f);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(ResultScale.z, 4.0f);
 	}
 
-	ZETest("bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)")
+	ZE_TEST_ITEM("bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)")
 	{
 		ZEMatrix3x3 Matrix(2.0f, 1.0f, 1.0f,
 			3.0f, 2.0f, 1.0f,
@@ -469,39 +469,39 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 
 		bool Result = ZEMatrix3x3::Inverse(Out, Matrix);
-		ZETestCheck(Result == true);
-		ZETestCheckClose(Out, ZEMatrix3x3(-6.5f, 4.0f, 0.5f, 5.5f, -3.0f, -0.5f, 8.5f, -5.0f, -0.5f));
+		ZE_TEST_CHECK_ERROR(Result == true);
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Out, ZEMatrix3x3(-6.5f, 4.0f, 0.5f, 5.5f, -3.0f, -0.5f, 8.5f, -5.0f, -0.5f));
 		
-		ZETestCase("for Determinant=0")
+		ZE_TEST_CASE("for Determinant=0")
 		{
 			ZEMatrix3x3 Matrix(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
 			ZEMatrix3x3 Out;
 
 			bool Result = ZEMatrix3x3::Inverse(Out, Matrix);
-			ZETestCheck(Result == false);
+			ZE_TEST_CHECK_ERROR(Result == false);
 		}
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::Inverse() const")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::Inverse() const")
 	{
 		ZEMatrix3x3 Matrix;
 		ZEMatrix3x3::CreateIdentity(Matrix);
 		
 		ZEMatrix3x3 Out = Matrix.Inverse();
-		ZETestCheckEqual(Out, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::InverseSelf()")
+	ZE_TEST_ITEM("void ZEMatrix3x3::InverseSelf()")
 	{
 		ZEMatrix3x3 Matrix(2.0f, 1.0f, 1.0f,
 			3.0f, 2.0f, 1.0f,
 			4.0f, -3.0f, 5.0f);
 
 		Matrix.InverseSelf();
-		ZETestCheckClose(Matrix, ZEMatrix3x3(-6.5f, 4.0f, 0.5f, 5.5f, -3.0f, -0.5f, 8.5f, -5.0f, -0.5f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Matrix, ZEMatrix3x3(-6.5f, 4.0f, 0.5f, 5.5f, -3.0f, -0.5f, 8.5f, -5.0f, -0.5f));
 	}
 
-	ZETest("inline void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
 	{
 		ZEMatrix3x3 A(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -514,9 +514,9 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 		
 		ZEMatrix3x3::Multiply(Out, A, B);
-		ZETestCheckClose(Out, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Out, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
 
-		ZETestCase("Multiply by Identity Matrix")
+		ZE_TEST_CASE("Multiply by Identity Matrix")
 		{
 			ZEMatrix3x3 Out;
 			ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f,  9.0f,  9.0f, 10.0f);
@@ -524,11 +524,11 @@ ZETestSuite(ZEMatrix3x3)
 			ZEMatrix3x3::CreateIdentity(Identity);
 
 			ZEMatrix3x3::Multiply(Out, Matrix, Identity);
-			ZETestCheckEqual(Out, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f,  9.0f,  9.0f, 10.0f));
+			ZE_TEST_CHECK_EQUAL(Out, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f,  9.0f,  9.0f, 10.0f));
 		}
 	}
 
-	ZETest("bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const")
+	ZE_TEST_ITEM("bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const")
 	{
 		ZEMatrix3x3 A(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -539,9 +539,9 @@ ZETestSuite(ZEMatrix3x3)
 			13.0f, 21.0f, 34.0f);
 
 		bool Result = (A != B);
-		ZETestCheck(Result == false);
+		ZE_TEST_CHECK_ERROR(Result == false);
 
-		ZETestCase("!= WithMatrixArg for Comparison for Different Matrices")
+		ZE_TEST_CASE("!= WithMatrixArg for Comparison for Different Matrices")
 		{
 			ZEMatrix3x3 A(1.0f, 1.0f, 2.0f,
 				3.0f, 5.0f, 8.0f,
@@ -552,11 +552,11 @@ ZETestSuite(ZEMatrix3x3)
 				13.0f, 21.0f, 3.0f);
 
 			bool Result = (A != B);
-			ZETestCheck(Result == true);
+			ZE_TEST_CHECK_ERROR(Result == true);
 		}
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::operator-(const ZEMatrix3x3 &RightOperand) const")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::operator-(const ZEMatrix3x3 &RightOperand) const")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -569,10 +569,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Result;
 
 		Result = A - B;
-		ZETestCheckClose(Result, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::operator*(const ZEMatrix3x3 &RightOperand) const ")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::operator*(const ZEMatrix3x3 &RightOperand) const ")
 	{
 		ZEMatrix3x3 A(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -583,10 +583,10 @@ ZETestSuite(ZEMatrix3x3)
 			13.0f, 21.0f, 34.0f);
 
 		ZEMatrix3x3 Result = A * B;
-		ZETestCheckClose(Result, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
 	}
 
-	ZETest("ZEVector2 ZEMatrix3x3::operator*(const ZEVector2 &RightOperand) const")
+	ZE_TEST_ITEM("ZEVector2 ZEMatrix3x3::operator*(const ZEVector2 &RightOperand) const")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -595,10 +595,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 Vector(1.0f, 2.0f);
 
 		ZEVector2 Result = Matrix * Vector;
-		ZETestCheckEqual(Result, ZEVector2(97.0f, 41.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector2(97.0f, 41.0f));
 	}
 
-	ZETest("ZEVector3 ZEMatrix3x3::operator*(const ZEVector3 &RightOperand) const")
+	ZE_TEST_ITEM("ZEVector3 ZEMatrix3x3::operator*(const ZEVector3 &RightOperand) const")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -607,10 +607,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		ZEVector3 Result = Matrix * Vector;
-		ZETestCheckEqual(Result, ZEVector3(129.0f, 59.0f, 57.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector3(129.0f, 59.0f, 57.0f));
 	}
 
-	ZETest("ZEVector4 ZEMatrix3x3::operator*(const ZEVector4 &RightOperand) const")
+	ZE_TEST_ITEM("ZEVector4 ZEMatrix3x3::operator*(const ZEVector4 &RightOperand) const")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -619,10 +619,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
 
 		ZEVector4 Result = Matrix * Vector;
-		ZETestCheckEqual(Result, ZEVector4(129.0f, 59.0f, 57.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Result, ZEVector4(129.0f, 59.0f, 57.0f, 1.0f));
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::operator*(float S)")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::operator*(float S)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -631,10 +631,10 @@ ZETestSuite(ZEMatrix3x3)
 		float S = 2.0f;
 
 		ZEMatrix3x3 Result = Matrix * S;
-		ZETestCheckClose(Result, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f));
 	}
 
-	ZETest("ZEMatrix3x3& ZEMatrix3x3::operator *= (const ZEMatrix3x3 &RightOperand)")
+	ZE_TEST_ITEM("ZEMatrix3x3& ZEMatrix3x3::operator *= (const ZEMatrix3x3 &RightOperand)")
 	{
 		ZEMatrix3x3 A(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -645,10 +645,10 @@ ZETestSuite(ZEMatrix3x3)
 			13.0f, 21.0f, 34.0f);
 
 		A *= B;
-		ZETestCheckClose(A, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(A, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
 	}
 
-	ZETest("ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)")
+	ZE_TEST_ITEM("ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)")
 	{
 		ZEMatrix3x3 A(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -657,10 +657,10 @@ ZETestSuite(ZEMatrix3x3)
 		float S = 2.0f;
 
 		A *= S;
-		ZETestCheckClose(A, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(A, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f));
 	}
 
-	ZETest("float& ZEMatrix3x3::operator[](ZESize Index)")
+	ZE_TEST_ITEM("float& ZEMatrix3x3::operator[](ZESize Index)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -669,12 +669,12 @@ ZETestSuite(ZEMatrix3x3)
 		float M11 = Matrix[0];
 		float M21 = Matrix[1];
 		float M31 = Matrix[2];
-		ZETestCheckEqual(M11, 1.0f);
-		ZETestCheckEqual(M21, 3.0f);
-		ZETestCheckEqual(M31, 13.0f);
+		ZE_TEST_CHECK_EQUAL(M11, 1.0f);
+		ZE_TEST_CHECK_EQUAL(M21, 3.0f);
+		ZE_TEST_CHECK_EQUAL(M31, 13.0f);
 	}
 
-	ZETest("float ZEMatrix3x3::operator[](ZESize Index) const")
+	ZE_TEST_ITEM("float ZEMatrix3x3::operator[](ZESize Index) const")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -683,12 +683,12 @@ ZETestSuite(ZEMatrix3x3)
 		float M12 = Matrix[3];
 		float M21 = Matrix[1];
 		float M32 = Matrix[5];
-		ZETestCheckEqual(M12, 1.0f);
-		ZETestCheckEqual(M21, 3.0f);
-		ZETestCheckEqual(M32, 21.0f);
+		ZE_TEST_CHECK_EQUAL(M12, 1.0f);
+		ZE_TEST_CHECK_EQUAL(M21, 3.0f);
+		ZE_TEST_CHECK_EQUAL(M32, 21.0f);
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -699,10 +699,10 @@ ZETestSuite(ZEMatrix3x3)
 			7.0f, 8.0f, 9.0f);
 
 		ZEMatrix3x3 Result = A + B;
-		ZETestCheckClose(Result, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));	
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Result, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));	
 	}
 
-	ZETest("ZEMatrix3x3& ZEMatrix3x3::operator += (const ZEMatrix3x3 &RightOperand)")
+	ZE_TEST_ITEM("ZEMatrix3x3& ZEMatrix3x3::operator += (const ZEMatrix3x3 &RightOperand)")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -713,10 +713,10 @@ ZETestSuite(ZEMatrix3x3)
 			7.0f, 8.0f, 9.0f);
 
 		A += B;
-		ZETestCheckClose(A, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(A, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
 	}
 
-	ZETest("ZEMatrix3x3& ZEMatrix3x3::operator -= (const ZEMatrix3x3 &RightOperand)")
+	ZE_TEST_ITEM("ZEMatrix3x3& ZEMatrix3x3::operator -= (const ZEMatrix3x3 &RightOperand)")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -727,10 +727,10 @@ ZETestSuite(ZEMatrix3x3)
 			7.0f, 8.0f, 9.0f);
 
 		A -= B;
-		ZETestCheckClose(A, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(A, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
 	}
 
-	ZETest("bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const")
+	ZE_TEST_ITEM("bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const")
 	{
 		ZEMatrix3x3 A(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -741,9 +741,9 @@ ZETestSuite(ZEMatrix3x3)
 			13.0f, 21.0f, 34.0f);
 
 		bool Result = (A == B);
-		ZETestCheck(Result == true);
+		ZE_TEST_CHECK_ERROR(Result == true);
 
-		ZETestCase("== WithMatrixArg for Comparison for Different Matrices")
+		ZE_TEST_CASE("== WithMatrixArg for Comparison for Different Matrices")
 		{
 			ZEMatrix3x3 A(1.0f, 1.0f, 2.0f,
 				3.0f, 5.0f, 8.0f,
@@ -754,11 +754,11 @@ ZETestSuite(ZEMatrix3x3)
 				13.0f, 21.0f, 3.0f);
 
 			bool Result = (A == B);
-			ZETestCheck(Result == false);
+			ZE_TEST_CHECK_ERROR(Result == false);
 		}
 	}
 
-	ZETest("inline void ZEMatrix3x3::Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3& A, float s)")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3& A, float s)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 0.0f, 1.5f,
 			3.0f, 5.0f, 8.0f,
@@ -768,10 +768,10 @@ ZETestSuite(ZEMatrix3x3)
 		float s = 2.0f;
 
 		ZEMatrix3x3::Scale(Out, Matrix, s);
-		ZETestCheckClose(Out, ZEMatrix3x3(2.0f, 0.0f, 3.0f, 6.0f, 10.0f, 16.0f, 26.0f, 14.0f, 28.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Out, ZEMatrix3x3(2.0f, 0.0f, 3.0f, 6.0f, 10.0f, 16.0f, 26.0f, 14.0f, 28.0f));
 	}
 
-	ZETest("inline void ZEMatrix3x3::Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
+	ZE_TEST_ITEM("inline void ZEMatrix3x3::Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)")
 	{
 		ZEMatrix3x3 A(34.0f, 21.0f, 13.0f,
 			8.0f, 5.0f, 3.0f,
@@ -784,10 +784,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 
 		ZEMatrix3x3::Sub(Out, A, B);
-		ZETestCheckClose(Out, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
+		ZE_TEST_CHECK_EQUAL_OR_CLOSE(Out, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::Transform(ZEVector2& Out, const ZEMatrix3x3& Matrix, const ZEVector2& Vector)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::Transform(ZEVector2& Out, const ZEMatrix3x3& Matrix, const ZEVector2& Vector)")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -797,10 +797,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector2 Vector(1.0f, 2.0f);
 
 		ZEMatrix3x3::Transform(Out, Matrix, Vector);
-		ZETestCheckEqual(Out, ZEVector2(97.0f, 41.0f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEVector2(97.0f, 41.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEVector3& Vector)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEVector3& Vector)")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -810,10 +810,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 
 		ZEMatrix3x3::Transform(Out, Matrix, Vector);
-		ZETestCheckEqual(Out, ZEVector3(129.0f, 59.0f, 57.0f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEVector3(129.0f, 59.0f, 57.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::Transform(ZEVector4& Out, const ZEMatrix3x3& Matrix, const ZEVector4& Vector)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::Transform(ZEVector4& Out, const ZEMatrix3x3& Matrix, const ZEVector4& Vector)")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -823,10 +823,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
 
 		ZEMatrix3x3::Transform(Out, Matrix, Vector);
-		ZETestCheckEqual(Out, ZEVector4(129.0f, 59.0f, 57.0f, 1.0f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEVector4(129.0f, 59.0f, 57.0f, 1.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)")
+	ZE_TEST_ITEM("void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)")
 	{
 		ZEMatrix3x3 Matrix(1.2f, 1.2f, 2.4f,
 			3.6f, 6.0f, 9.6f,
@@ -835,10 +835,10 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 
 		ZEMatrix3x3::Transpose(Out, Matrix);
-		ZETestCheckEqual(Out, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
 	}
 
-	ZETest("ZEMatrix3x3 ZEMatrix3x3::Transpose() const")
+	ZE_TEST_ITEM("ZEMatrix3x3 ZEMatrix3x3::Transpose() const")
 	{
 		ZEMatrix3x3 Matrix(35.0f, 23.0f, 16.0f,
 			12.0f, 10.0f, 9.0f,
@@ -847,16 +847,16 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3 Out;
 
 		ZEMatrix3x3::Transpose(Out, Matrix);
-		ZETestCheckEqual(Out, ZEMatrix3x3(35.0f, 12.0f, 9.0f, 23.0f, 10.0f, 9.0f, 16.0f, 9.0f, 10.0f));
+		ZE_TEST_CHECK_EQUAL(Out, ZEMatrix3x3(35.0f, 12.0f, 9.0f, 23.0f, 10.0f, 9.0f, 16.0f, 9.0f, 10.0f));
 	}
 
-	ZETest("void ZEMatrix3x3::TransposeSelf()")
+	ZE_TEST_ITEM("void ZEMatrix3x3::TransposeSelf()")
 	{
 		ZEMatrix3x3 Matrix(1.2f, 1.2f, 2.4f,
 			3.6f, 6.0f, 9.6f,
 			15.6f, 25.2f, 40.8f);
 
 		Matrix.TransposeSelf();
-		ZETestCheckEqual(Matrix, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
+		ZE_TEST_CHECK_EQUAL(Matrix, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
 	}
 }

@@ -34,58 +34,53 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_ENUMERATOR_H__
-#define __ZE_ENUMERATOR_H__
 
 #include "ZEMTDeclaration.h"
 
 #include "ZETypes.h"
 #include "ZEGUID.h"
-#include "ZEAttribute.h"
+#include "ZEMTAttribute.h"
 
 #define ZE_ENUM(Name) \
-	ZEEnumerator* Name##_Declaration();\
-	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name
+	ZEMTEnumerator* Name##_Enumerator();\
+	enum ZEMT_ATTRIBUTE(ZEMC.Enumerator) Name
 
 #define ZE_ENUM_TYPED(Name, Type) \
-	ZEEnumerator* Name##_Declaration(); \
-	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name : Type
+	ZEMTEnumerator* Name##_Enumerator(); \
+	enum ZEMT_ATTRIBUTE(ZEMC.Enumerator) Name : Type
 
-#define ZE_META_ENUMERATOR_IMPLEMENTATION(Name) \
-	class Name##Enumerator : public ZEEnumerator \
+#define ZEMT_ENUMERATOR_IMPLEMENTATION(Name) \
+	class Name##Enumerator : public ZEMTEnumerator \
 	{ \
 		public: \
 			virtual const char* GetName() const; \
 			virtual const ZEGUID& GetGUID() const; \
-			virtual const ZEAttribute* GetAttributes() const; \
+			virtual const ZEMTAttribute* GetAttributes() const; \
 			virtual ZESize GetAttributeCount() const; \
-			virtual const ZEEnumeratorItem* GetItems() const; \
+			virtual const ZEMTEnumeratorItem* GetItems() const; \
 			virtual ZESize GetItemCount() const; \
 	};
 
-#define ZE_META_ENUMERATOR_DECLARATION(Name) \
-	ZEEnumerator* Name##_Declaration() \
+#define ZEMT_ENUMERATOR_DECLARATION(Name) \
+	ZEMTEnumerator* Name##_Enumerator() \
 	{ \
 		static Name##Enumerator Enumerator; \
 		return &Enumerator; \
 	}
 
-struct ZEEnumeratorItem
+struct ZEMTEnumeratorItem
 {
 	const char*					Name;
 	ZEUInt32					Value;
 };
 
-class ZEEnumerator : public ZEMTDeclaration
+class ZEMTEnumerator : public ZEMTDeclaration
 {
 	public:
 		virtual ZEMTDeclarationType			GetDeclarationType() const;
 
-		virtual const ZEEnumeratorItem*		GetItems() const = 0;
+		virtual const ZEMTEnumeratorItem*	GetItems() const = 0;
 		virtual ZESize						GetItemCount() const = 0;
 
 		ZEString							ToText(ZEInt Value, const char* Default = NULL);
 };
-
-
-#endif

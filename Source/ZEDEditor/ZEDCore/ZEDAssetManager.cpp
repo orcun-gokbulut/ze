@@ -46,7 +46,7 @@
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEPathTokenizer.h"
-#include "ZEMeta/ZEProvider.h"
+#include "ZEMeta/ZEMTProvider.h"
 #include "ZERegEx/ZERegEx.h"
 
 
@@ -373,7 +373,7 @@ void ZEDAssetManager::SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Catego
 
 void ZEDAssetManager::RegisterAssetTypes()
 {
-	ZEArray<ZEClass*> AssetTypeClasses = ZEProvider::GetInstance()->GetClasses(ZEDAssetType::Class(), true);
+	ZEArray<ZEClass*> AssetTypeClasses = ZEMTProvider::GetInstance()->GetClasses(ZEDAssetType::Class(), true);
 	for (ZESize I = 0; I < AssetTypeClasses.GetCount(); I++)
 	{
 		if (AssetTypeClasses[I]->IsAbstract())
