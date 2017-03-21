@@ -69,6 +69,9 @@ const ZEString ZEString::Empty;
 
 static ZEUInt GetByteLength(const char* MultiByteCharacter)
 {
+	if (MultiByteCharacter == NULL)
+		return 0;
+
 	char LengthByte = MultiByteCharacter[0];
 	ZEUInt Length = 0;
 
