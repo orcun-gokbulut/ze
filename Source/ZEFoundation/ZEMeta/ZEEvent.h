@@ -42,6 +42,12 @@
 
 #define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
 
+struct ZEMTEventStackItem
+{
+	ZEMTEventStackItem* Previous;
+	bool Acquired;
+};
+
 class ZEMTEventBase
 {
 	friend class ZEObject;
@@ -50,6 +56,10 @@ class ZEMTEventBase
 
 		virtual void						CloneConnections(ZEObject* SourceObject, ZEObject* NewObject) = 0;
 
+	protected:
+		static void							BeginDistribution(ZEMTEventStackItem* StackItem);
+		static void							EndDistribution();
+
 	public:
 		virtual const ZEMTMethodSignature&	GetSignature() const = 0;
 
@@ -57,6 +67,10 @@ class ZEMTEventBase
 		bool								GetSuppressed() const;
 
 		virtual void						DisconnectObject(ZEObject* Object) = 0;
+
+		static bool							IsAcquired();
+		static void							Acquire();
+		static void							Unacquire();
 
 											ZEMTEventBase();
 };

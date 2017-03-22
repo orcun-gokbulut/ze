@@ -35,6 +35,21 @@
 
 #include "ZEEvent.h"
 
+static __declspec(thread) ZEMTEventStackItem* CurrentStackItem;
+
+void ZEMTEventBase::BeginDistribution(ZEMTEventStackItem* StackItem)
+{
+	StackItem->Previous = CurrentStackItem;
+	StackItem->Acquired = false;
+	CurrentStackItem = StackItem;
+}
+
+void ZEMTEventBase::EndDistribution()
+{
+	zeDebugCheck(CurrentStackItem == NULL, "There is no event call in the stack.");
+	CurrentStackItem = CurrentStackItem->Previous;
+}
+
 void ZEMTEventBase::SetSuppressed(bool Suppressed)
 {
 	this->Suppressed = Suppressed;
@@ -43,6 +58,24 @@ void ZEMTEventBase::SetSuppressed(bool Suppressed)
 bool ZEMTEventBase::GetSuppressed() const
 {
 	return Suppressed;
+}
+
+bool ZEMTEventBase::IsAcquired()
+{
+	zeDebugCheck(CurrentStackItem == NULL, "There is no event call in the stack.");
+	return CurrentStackItem->Acquired;
+}
+
+void ZEMTEventBase::Acquire()
+{
+	zeDebugCheck(CurrentStackItem == NULL, "There is no event call in the stack.");
+	CurrentStackItem->Acquired = true;
+}
+
+void ZEMTEventBase::Unacquire()
+{
+	zeDebugCheck(CurrentStackItem == NULL, "There is no event call in the stack.");
+	CurrentStackItem->Acquired = true;
 }
 
 ZEMTEventBase::ZEMTEventBase()

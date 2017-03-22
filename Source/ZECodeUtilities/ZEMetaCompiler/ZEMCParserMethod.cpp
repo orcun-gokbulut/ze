@@ -335,7 +335,7 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 		ClassData->Methods.Add(MethodData.Transfer());
 }
 
-bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate)
+bool ZEMCParser::ProcessEventParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate)
 {
 	for(CXXRecordDecl::decl_iterator CurrentDecl = EventTemplate->decls_begin(); CurrentDecl != EventTemplate->decls_end(); CurrentDecl++)
 	{
@@ -360,9 +360,11 @@ bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventT
 			MethodParameter.Type = Type;
 			Method->Parameters.Add(MethodParameter);
 		}
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclaration)
@@ -382,7 +384,7 @@ void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclara
 	if (!MethodData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
 		return;
 
-	if (!ProcessEvenParameters(MethodData, EventDeclaration->getType()->getAsCXXRecordDecl()))
+	if (!ProcessEventParameters(MethodData, EventDeclaration->getType()->getAsCXXRecordDecl()))
 		return;
 
 	ClassData->Methods.Add(MethodData.Transfer());

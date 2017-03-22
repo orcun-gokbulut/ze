@@ -226,8 +226,16 @@ void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::Call(ZE_ARGUMENT_DEFINITIONS) const
 
 	Delegates.LockRead();
 	{
+		ZEMTEventStackItem StackItem;
+		BeginDistribution(&StackItem);
 		for (ZESize I = 0; I < Delegates.GetCount(); I++)
+		{
+			if (IsAcquired())
+				break;
+
 			Delegates[I].Call(ZE_ARGUMENTS);
+		}
+		EndDistribution();
 	}
 	Delegates.UnlockRead();
 }
