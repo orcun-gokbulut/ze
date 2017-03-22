@@ -116,7 +116,7 @@ class ZEMCParser
 		void							ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDeclaration);
 		bool							ProcessMethodParameters(ZEMCMethod* Method, CXXMethodDecl* MethodDecl);
 		void							ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclaration);
-		bool							ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate);
+		bool							ProcessEventParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate);
 		void							ProcessMemberAttributes(ZEMCDeclaration* Declaration, Decl* ClangDeclaration, bool IsMethod, ZEMCDeclaration* Overriden);
 		
 		// Accessors

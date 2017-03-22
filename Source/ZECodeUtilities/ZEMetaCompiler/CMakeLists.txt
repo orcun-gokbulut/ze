@@ -64,3 +64,5 @@ ze_add_executable(TARGET ZEMetaCompiler
 	CONSOLE 
 	SOURCES ${Sources}
 	LIBS ZEFoundationBase libClang)
+
+set_property(TARGET ZEMetaCompiler PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Tool")
