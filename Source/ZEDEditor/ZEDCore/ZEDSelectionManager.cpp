@@ -42,7 +42,6 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectManager.h"
 #include "ZEDTransformationManager.h"
-#include "ZEDEditorEvent.h"
 #include "ZEDUserInterface/ZEDCommandManager.h"
 
 
@@ -60,17 +59,13 @@ void ZEDSelectionManager::UnfrezeeAllInternal(ZEDObjectWrapper* Object)
 		UnfrezeeAllInternal(ChildObjects[I]);
 }
 
-void ZEDSelectionManager::EditorEvent(const ZEDEditorEvent* Event)
-{
-	if (Event->GetType() == ZED_EET_FILE_CLOSED)
-		ClearSelection();
-}
-
 bool ZEDSelectionManager::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
+	GetEditor()->OnClosed.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::Editor_OnClosed>(this);
+	
 	RegisterCommands();
 
 	return true;
@@ -78,7 +73,13 @@ bool ZEDSelectionManager::InitializeInternal()
 
 bool ZEDSelectionManager::DeinitializeInternal()
 {
+	GetEditor()->OnClosed.DisconnectObject(this);
 	return ZEInitializable::DeinitializeInternal();
+}
+
+void ZEDSelectionManager::Editor_OnClosed(ZEDEditor* Editor)
+{
+	ClearSelection();
 }
 
 ZEDSelectionManager::ZEDSelectionManager()

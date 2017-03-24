@@ -112,7 +112,7 @@ void ZEDPropertyEditorItemEnumurator::Update()
 
 	QSignalBlocker Blocker(ComboBox);
 
-	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetObjects());
 
 	ZEVariant Value;
 	for (ZESize I = 0; I < ObjectWrappers.GetCount(); I++)

@@ -256,7 +256,7 @@ void ZEDPropertyEditorItemNumeric::Update()
 	QSignalBlocker Blocker(TextEdit);
 
 	Value.SetUndefined();
-	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetObjects());
 	for (ZESize I = 0; I < ObjectWrappers.GetCount(); I++)
 	{
 		ZEObject* Object = ObjectWrappers[I]->GetObject();

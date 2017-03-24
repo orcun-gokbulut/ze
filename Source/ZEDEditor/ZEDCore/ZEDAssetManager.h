@@ -39,11 +39,11 @@
 
 #include "ZEDAsset.h"
 
-#include "ZEDEvent.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEThread/ZEThread.h"
+#include "ZEMeta/ZEEvent.h"
 #include "ZERegEx/ZERegEx.h"
+#include "ZEThread/ZEThread.h"
 
 class ZEDAsset;
 class ZEDAssetType;
@@ -99,8 +99,6 @@ class ZEDAssetManager : public ZEDComponent
 
 		void									Clear();
 
-		virtual void							TickEvent(const ZEDTickEvent* Event) override;
-
 												ZEDAssetManager();
 		virtual									~ZEDAssetManager();
 
@@ -125,7 +123,24 @@ class ZEDAssetManager : public ZEDComponent
 
 		void									UpdatePath(const ZEString& FilePath); // Parallel
 
-		virtual void							Process();
+		virtual void							Process(float ElapsedTime) override;
+
+		ZE_EVENT(								OnAssetAdding,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetAdded,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetRemoving,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetRemoved,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetMetaChanging,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetMetaChanged,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetModified,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnAssetPreviewChanged,(ZEDAssetManager* Manager, ZEDAsset* Asset));
+		ZE_EVENT(								OnDirectoryAdding,(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory));
+		ZE_EVENT(								OnDirectoryAdded,(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory));
+		ZE_EVENT(								OnDirectoryRemoving,(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory));
+		ZE_EVENT(								OnDirectoryRemoved,(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory));
+		ZE_EVENT(								OnCategoryAdding,(ZEDAssetManager* Manager, ZEDAssetCategory* Category));
+		ZE_EVENT(								OnCategoryAdded,(ZEDAssetManager* Manager, ZEDAssetCategory* Category));
+		ZE_EVENT(								OnCategoryRemoving,(ZEDAssetManager* Manager, ZEDAssetCategory* Category));
+		ZE_EVENT(								OnCategoryRemoved,(ZEDAssetManager* Manager, ZEDAssetCategory* Category));
 
 		static ZEDAssetManager*					CreateInstance();
 };

@@ -94,7 +94,7 @@ void ZEDPropertyEditorItemBoolean::Update()
 
 	QSignalBlocker Blocker(ComboBox);
 
-	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetObjects());
 	bool MultipleValue = false;
 	ZEVariant Value;
 	for (ZESize I = 0; I < ObjectWrappers.GetCount(); I++)

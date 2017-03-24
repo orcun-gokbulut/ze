@@ -80,7 +80,21 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 		bool									FilterBackward(ZEObject* AssetObject) const;
 		bool									FilterHierarchy(ZEObject* AssetObject) const;
 
-		virtual void							AssetEvent(const ZEDAssetEvent* Event) override;
+		void									AssetManager_OnAssetAdding(ZEDAssetManager* Manager, ZEDAsset* Asset);
+		void									AssetManager_OnAssetAdded(ZEDAssetManager* Manager, ZEDAsset* Asset);
+		void									AssetManager_OnAssetRemoving(ZEDAssetManager* Manager, ZEDAsset* Asset);
+		void									AssetManager_OnAssetRemoved(ZEDAssetManager* Manager, ZEDAsset* Asset);
+		void									AssetManager_OnDirectoryAdding(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory);
+		void									AssetManager_OnDirectoryAdded(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory);
+		void									AssetManager_OnDirectoryRemoving(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory);
+		void									AssetManager_OnDirectoryRemoved(ZEDAssetManager* Manager, ZEDAssetDirectory* Directory);
+		void									AssetManager_OnCategoryAdding(ZEDAssetManager* Manager, ZEDAssetCategory* Category);
+		void									AssetManager_OnCategoryAdded(ZEDAssetManager* Manager, ZEDAssetCategory* Category);
+		void									AssetManager_OnCategoryRemoving(ZEDAssetManager* Manager, ZEDAssetCategory* Category);
+		void									AssetManager_OnCategoryRemoved(ZEDAssetManager* Manager, ZEDAssetCategory* Category);
+
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
 
 	public:
 		void									SetMode(ZEDAssetModelMode Mode);
@@ -133,4 +147,5 @@ class ZEDAssetModel : public QAbstractItemModel, public ZEDComponent
 		virtual Qt::DropActions					supportedDragActions() const override;
 
 												ZEDAssetModel();
+												~ZEDAssetModel();
 };

@@ -254,26 +254,6 @@ bool ZEDViewport::DeinitializeInternal()
 	return ZEDComponent::DeinitializeInternal();
 }
 
-void ZEDViewport::TickEvent(const ZEDTickEvent* Event)
-{
-	for (ZESize I = 0; I < KeyboardKeyBuffer.GetCount(); I++)
-	{
-		OnKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
-		if (GetViewportManager() != NULL)
-			GetViewportManager()->OnViewportKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
-	}
-
-	for (ZESize I = 0; I < MouseButtonBuffer.GetCount(); I++)
-	{
-		OnMouseButtonPressing(this, MouseButtonBuffer[I]);
-		if (GetViewportManager() != NULL)
-			GetViewportManager()->OnViewportMouseButtonPressing(this, MouseButtonBuffer[I]);
-	}
-
-	MousePositionDelta = ZEVector2::Zero;
-}
-
-
 QPaintEngine* ZEDViewport::paintEngine() const
 {
 	return NULL;
@@ -502,6 +482,25 @@ const ZEVector2& ZEDViewport::GetMousePosition() const
 const ZEVector2& ZEDViewport::GetMousePositionDelta() const
 {
 	return MousePositionDelta;
+}
+
+void ZEDViewport::Process(float ElapsedTime)
+{
+	for (ZESize I = 0; I < KeyboardKeyBuffer.GetCount(); I++)
+	{
+		OnKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
+	}
+
+	for (ZESize I = 0; I < MouseButtonBuffer.GetCount(); I++)
+	{
+		OnMouseButtonPressing(this, MouseButtonBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportMouseButtonPressing(this, MouseButtonBuffer[I]);
+	}
+
+	MousePositionDelta = ZEVector2::Zero;
 }
 
 bool ZEDViewport::PreRender()

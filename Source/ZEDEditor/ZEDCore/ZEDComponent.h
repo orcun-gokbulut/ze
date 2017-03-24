@@ -40,10 +40,6 @@
 #include "ZEDestroyable.h"
 
 class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDTickEvent;
-class ZEDAssetEvent;
 
 class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
@@ -53,19 +49,11 @@ class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyab
 		ZEDEditor*						Editor;
 
 	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					AssetEvent(const ZEDAssetEvent* Event);
-
-		void							RaiseEvent(const ZEDEvent* Event);
-	
 										ZEDComponent();
 		virtual							~ZEDComponent();
 
 	public:
 		ZEDEditor*						GetEditor() const;
 
-		virtual void					Process();
+		virtual void					Process(float ElapsedTime);
 };

@@ -59,10 +59,10 @@ class ZEDSelectionManager : public ZEDComponent
 		bool								FilterSelection(ZEObject* Object, void* Class);
 		void								UnfrezeeAllInternal(ZEDObjectWrapper* Object);
 
-		virtual void						EditorEvent(const ZEDEditorEvent* Event);
-
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
+
+		virtual void						Editor_OnClosed(ZEDEditor* Editor);
 
 											ZEDSelectionManager();
 		virtual								~ZEDSelectionManager();

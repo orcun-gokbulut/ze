@@ -39,13 +39,11 @@
 #include "ZEDOperation.h"
 #include "ZEDEditor.h"
 #include "ZEDEditorCore.h"
-#include "ZEDEditorEvent.h"
 #include "ZEDUserInterface\ZEDCommandManager.h"
 
-void ZEDOperationManager::EditorEvent(const ZEDEditorEvent* Event)
+void ZEDOperationManager::Editor_OnClosed(ZEDEditor* Editor)
 {
-	if (Event->GetType() == ZED_EET_FILE_CLOSED)
-		Clear();
+	Clear();
 }
 
 bool ZEDOperationManager::InitializeInternal()
@@ -53,9 +51,18 @@ bool ZEDOperationManager::InitializeInternal()
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 
+	GetEditor()->OnClosed.AddDelegate<ZEDOperationManager, &ZEDOperationManager::Editor_OnClosed>(this);
+	
 	RegisterCommands();
 
 	return true;
+}
+
+bool ZEDOperationManager::DeinitializeInternal()
+{
+	GetEditor()->OnClosed.DisconnectObject(this);
+
+	return ZEDComponent::Deinitialize();
 }
 
 ZEDOperationManager::ZEDOperationManager()
@@ -131,6 +138,7 @@ bool ZEDOperationManager::Undo()
 	if (!CanUndo())
 		return false;
 
+	OnUndoing(this, Stack[StackIndex]);
 	if (!Stack[StackIndex]->Undo())
 	{
 		zeError("Cannot undo operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
@@ -144,6 +152,8 @@ bool ZEDOperationManager::Undo()
 
 	UpdateCommands();
 
+	OnUndo(this, Stack[StackIndex]);
+
 	return true;
 }
 
@@ -154,6 +164,7 @@ bool ZEDOperationManager::Redo()
 
 	StackIndex++;	
 
+	OnRedoing(this, Stack[StackIndex]);
 	if (!Stack[StackIndex]->Do())
 	{
 		zeError("Cannot redo operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
@@ -165,15 +176,19 @@ bool ZEDOperationManager::Redo()
 
 	UpdateCommands();
 
+	OnRedo(this, Stack[StackIndex]);
+
 	return true;
 }
 
-bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
+bool ZEDOperationManager::Do(ZEDOperation* Operation)
 {
 	zeCheckError(Operation == NULL, false, "Operation cannot be NULL.");
 	zeCheckError(Operation->GetManager() != NULL, false, "Operation alread associated with another manager.");
 
 	Operation->Manager = this;
+
+	OnDoing(this, Operation);
 
 	if (!Operation->Do())
 	{
@@ -196,6 +211,8 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 	Stack.Add(Operation);
 
 	UpdateCommands();
+
+	OnDo(this, Operation);
 
 	return true;
 }

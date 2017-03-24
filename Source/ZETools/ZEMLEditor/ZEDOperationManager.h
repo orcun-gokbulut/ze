@@ -60,7 +60,7 @@ class ZEDOperationManager
 		bool Redo();
 		void Clear();
 
-		bool DoOperation(ZEDOperation* Operation);
+		bool Do(ZEDOperation* Operation);
 
 		virtual void Destoy();
 

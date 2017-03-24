@@ -36,8 +36,6 @@
 #include "ZEDEditor.h"
 
 #include "ZEDS/ZEDelegate.h"
-#include "ZEDEditorEvent.h"
-#include "ZEDEvent.h"
 #include "ZEDComponent.h"
 #include "ZEDOperationManager.h"
 #include "ZEDSelectionManager.h"
@@ -47,32 +45,18 @@
 #include "ZEDViewPort.h"
 #include "ZEDViewportManager.h"
 #include "ZEDEditorCore.h"
+#include "ZEDAssetManager.h"
+#include "ZEDObjectWrapper3D.h"
 #include "ZEDUserInterface/ZEDMainWindow.h"
+#include "ZEDUserInterface/ZEDCommandManager.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZEUI/ZEUIManager.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
-#include "ZEDUserInterface/ZEDCommandManager.h"
-#include "ZEDAssetManager.h"
-#include "ZEDObjectWrapper3D.h"
 
 
-void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
-{
-	Components.LockRead();
-	{
-		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			if (Event->IsAcquired())
-				break;
-
-			Components[I]->EventReceived(Event);
-		}
-	}
-	Components.UnlockRead();
-}
 
 void ZEDEditor::RegisterCommands()
 {
@@ -135,9 +119,9 @@ void ZEDEditor::RegisterCommands()
 
 void ZEDEditor::UpdateCommands()
 {
-	SaveCommand.SetEnabled(FileState != ZED_ES_NONE);
-	SaveAsCommand.SetEnabled(FileState != ZED_ES_NONE);
-	CloseCommand.SetEnabled(FileState != ZED_ES_NONE);
+	SaveCommand.SetEnabled(State != ZED_ES_NONE);
+	SaveAsCommand.SetEnabled(State != ZED_ES_NONE);
+	CloseCommand.SetEnabled(State != ZED_ES_NONE);
 	RecentFilesCommand.SetEnabled(RecentFilesCommand.GetListItems().GetCount() != 0);
 }
 
@@ -158,7 +142,7 @@ void ZEDEditor::OpenCommand_OnAction(const ZEDCommand* Command)
 
 void ZEDEditor::SaveCommand_OnAction(const ZEDCommand* Command)
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
 
 	if (FileName.IsEmpty())
@@ -179,7 +163,7 @@ void ZEDEditor::SaveCommand_OnAction(const ZEDCommand* Command)
 
 void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
 
 	QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save As", GetFileName().ToCString(), GetExtensions().ToCString(), NULL, QFileDialog::DontResolveSymlinks);
@@ -192,10 +176,10 @@ void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 
 void ZEDEditor::CloseCommand_OnAction(const ZEDCommand* Command)
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
 
-	if (FileState == ZED_ES_MODIFIED)
+	if (Modified)
 	{
 		int Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to close this file ? All of your changes will be gone.", QMessageBox::Yes, QMessageBox::No);
 		if (Result == QMessageBox::No)
@@ -208,7 +192,7 @@ void ZEDEditor::CloseCommand_OnAction(const ZEDCommand* Command)
 void ZEDEditor::ExitCommand_OnAction(const ZEDCommand* Command)
 {
 	int Result;
-	if (FileState == ZED_ES_MODIFIED)
+	if (Modified)
 		Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to exit ? You unsaved changes in this file. All of your changes will be gone.", QMessageBox::Yes, QMessageBox::No);
 	else
 		Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to exit ?", QMessageBox::Yes, QMessageBox::No);
@@ -373,9 +357,9 @@ void ZEDEditor::RemoveComponent(ZEDComponent* Component)
 	Component->Editor = NULL;
 }
 
-ZEDFileState ZEDEditor::GetFileState()
+ZEDEditorState ZEDEditor::GetEditorState()
 {
-	return FileState;
+	return State;
 }
 
 const ZEString& ZEDEditor::GetFileName()
@@ -390,15 +374,10 @@ ZEString ZEDEditor::GetExtensions()
 
 void ZEDEditor::Process(float ElapsedTime)
 {
-	ZEDTickEvent Event;
-	Event.SetElapsedTime(ElapsedTime);
-	DistributeEvent(&Event);
-
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->Process();
+		Components[I]->Process(ElapsedTime);
 
-	if (GetObjectManager() != NULL)
-		GetObjectManager()->Tick(ElapsedTime);
+	OnTick(this, ElapsedTime);
 }
 
 void ZEDEditor::PostProcess(float ElapsedTime)
@@ -428,7 +407,8 @@ void ZEDEditor::New()
 {
 	Close();
 
-	FileState = ZED_ES_UNMODIFIED;
+	State = ZED_ES_NEW;
+	Modified = false;
 	FileName = "";
 
 	if (GetObjectManager()->GetRootWrapper() != NULL)
@@ -436,29 +416,28 @@ void ZEDEditor::New()
 
 	UpdateCommands();
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_NEW_FILE;
-	DistributeEvent(&Event);
+	OnNew(this);
+	OnStateChanged(this, State);
 }
 
 bool ZEDEditor::Save(const ZEString& FileName)
 {
+	OnSaving(this);
+
 	bool Result = GetObjectManager()->GetRootWrapper()->Save(FileName);
 	if (!Result)
 		return false;
 
-	FileState = ZED_ES_UNMODIFIED;
+	State = ZED_ES_OPENED;
+	Modified = false;
 	this->FileName = FileName;
 
 	UpdateCommands();
 
 	RegisterRecentFile(FileName);
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_FILE_SAVED;
-	DistributeEvent(&Event);
+	OnSaved(this);
+	OnStateChanged(this, State);
 
 	return Result;
 }
@@ -467,82 +446,90 @@ bool ZEDEditor::Load(const ZEString& FileName)
 {
 	Close();
 
-	bool Result = GetObjectManager()->GetRootWrapper()->Load(FileName);
-	if (!Result)
-		return false;
-
-	FileState = ZED_ES_UNMODIFIED;
 	this->FileName = FileName;
 
+	OnLoading(this);
+
+	bool Result = GetObjectManager()->GetRootWrapper()->Load(FileName);
+	if (!Result)
+	{
+		this->FileName = "";
+		return false;
+	}
+
+	State = ZED_ES_OPENED;
+	Modified = false;
 	RegisterRecentFile(FileName);
 	UpdateCommands();
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_FILE_LOADED;
-	DistributeEvent(&Event);
+	OnLoaded(this);
+	OnStateChanged(this, State);
 
 	return Result;
 }
 
 void ZEDEditor::Close()
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
+
+	OnClosing(this);
 
 	GetObjectManager()->GetRootWrapper()->Clean();
 
-	FileState = ZED_ES_NONE;
+	State = ZED_ES_NONE;
+	Modified = false;
 	FileName = "";
 	
 	UpdateCommands();
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_FILE_CLOSED;
-	DistributeEvent(&Event);
+	OnClosed(this);
+	OnStateChanged(this, State);
 }
 
 void ZEDEditor::Exit()
 {
+	OnExiting(this);
 	if (GetCore() != NULL)
 		GetCore()->Exit();
 }
 
 void ZEDEditor::MarkDocumentModified()
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
 
-	FileState = ZED_ES_MODIFIED;
+	if (Modified)
+		return;
+
+	Modified = false;
 
 	UpdateCommands();
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_FILE_MODIFIED;
-	DistributeEvent(&Event);
+	OnModified(this);
+	OnStateChanged(this, State);
 }
 
 void ZEDEditor::UnmarkDocumentModified()
 {
-	if (FileState == ZED_ES_NONE)
+	if (State == ZED_ES_NONE)
 		return;
 
-	FileState = ZED_ES_UNMODIFIED;
+	if (!Modified)
+		return;
+
+	Modified = false;
 
 	UpdateCommands();
 
-	ZEDEditorEvent Event;
-	Event.FileName = FileName;
-	Event.Type = ZED_EET_FILE_UNMODIFIED;
-	DistributeEvent(&Event);
+	OnUnmodified(this);
+	OnStateChanged(this, State);
 }
 
 ZEDEditor::ZEDEditor()
 {
 	Core = NULL;
-	FileState = ZED_ES_NONE;
+	State = ZED_ES_NONE;
 
 	ObjectManager = NULL;
 	OperationManager = NULL;
