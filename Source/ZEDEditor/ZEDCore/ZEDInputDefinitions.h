@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEDEvent.h"
+#include "ZEDS/ZEFlags.h"
 
 enum ZEDMouseButton
 {
@@ -56,16 +56,6 @@ enum ZEDMouseButton
 	ZED_VMB_EXTRA_9					= 0x00010000,
 	ZED_VMB_EXTRA_10				= 0x00020000,
 };
-
-enum ZEDKeyModifier
-{
-	ZED_VKM_NONE					= 0x00000000,
-	ZED_VKM_CTRL					= 0x00010000,
-	ZED_VKM_ALT						= 0x00020000,
-	ZED_VKM_SHIFT					= 0x00040000,
-	ZED_VKM_WINDOWS					= 0x00080000,
-};
-typedef ZEFlags ZEDKeyModifiers;
 
 enum ZEDKeyboardKey
 {
@@ -196,3 +186,13 @@ enum ZEDKeyboardKey
 	ZED_VKK_BROKEN_BAR				= 0x000000A6,	 
 	ZED_VKK_SECTION					= 0x000000A7	 
 };
+
+enum ZEDKeyModifier
+{
+	ZED_VKM_NONE					= 0x00000000,
+	ZED_VKM_CTRL					= 0x00010000,
+	ZED_VKM_ALT						= 0x00020000,
+	ZED_VKM_SHIFT					= 0x00040000,
+	ZED_VKM_WINDOWS					= 0x00080000,
+};
+typedef ZEFlags ZEDKeyModifiers;

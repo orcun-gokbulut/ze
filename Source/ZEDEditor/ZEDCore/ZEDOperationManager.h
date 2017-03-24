@@ -45,39 +45,46 @@ class ZEDOperationManager : public ZEDComponent
 {
 	ZE_OBJECT
 	private:
-		ZEArray<ZEDOperation*>			Stack;
-		ZESSize							StackIndex;
-		ZESSize							OperationIndex;
+		ZEArray<ZEDOperation*>					Stack;
+		ZESSize									StackIndex;
+		ZESSize									OperationIndex;
 
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
+		virtual void							Editor_OnClosed(ZEDEditor* Editor);
 
-		virtual bool					InitializeInternal();
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
 
-										ZEDOperationManager();
-										~ZEDOperationManager();
+												ZEDOperationManager();
+												~ZEDOperationManager();
 
 	private: /* COMMANDS */
-		ZEDCommand						UndoCommand;
-		ZEDCommand						RedoCommand;
+		ZEDCommand								UndoCommand;
+		ZEDCommand								RedoCommand;
 
-		void							RegisterCommands();
-		void							UpdateCommands();
+		void									RegisterCommands();
+		void									UpdateCommands();
 
-		void							UndoCommand_OnAction(const ZEDCommand* Command);
-		void							RedoCommand_OnAction(const ZEDCommand* Command);
+		void									UndoCommand_OnAction(const ZEDCommand* Command);
+		void									RedoCommand_OnAction(const ZEDCommand* Command);
 
 	public:
-		const ZEArray<ZEDOperation*>&	GetStack();
-		ZESSize							GetStackIndex();
+		const ZEArray<ZEDOperation*>&			GetStack();
+		ZESSize									GetStackIndex();
 
-		bool							CanUndo();
-		bool							CanRedo();
+		bool									CanUndo();
+		bool									CanRedo();
 
-		bool							Undo();
-		bool							Redo();
-		void							Clear();
+		bool									Do(ZEDOperation* Operation);
+		bool									Undo();
+		bool									Redo();
+		void									Clear();
 
-		bool							DoOperation(ZEDOperation* Operation);
+		ZE_EVENT(								OnDoing,(ZEDOperationManager* Manager, ZEDOperation* Operation));
+		ZE_EVENT(								OnDo,(ZEDOperationManager* Manager, ZEDOperation* Operation));
+		ZE_EVENT(								OnUndoing,(ZEDOperationManager* Manager, ZEDOperation* Operation));
+		ZE_EVENT(								OnUndo,(ZEDOperationManager* Manager, ZEDOperation* Operation));
+		ZE_EVENT(								OnRedoing,(ZEDOperationManager* Manager, ZEDOperation* Operation));
+		ZE_EVENT(								OnRedo,(ZEDOperationManager* Manager, ZEDOperation* Operation));
 
-		static ZEDOperationManager*		CreateInstance();
+		static ZEDOperationManager*				CreateInstance();
 };

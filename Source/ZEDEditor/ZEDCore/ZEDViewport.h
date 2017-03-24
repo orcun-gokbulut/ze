@@ -92,8 +92,6 @@ class ZEDViewport : public QWidget, public ZEDComponent
 		virtual bool						InitializeInternal();
 		virtual bool						DeinitializeInternal();
 
-		virtual void						TickEvent(const ZEDTickEvent* Tick);
-
 		virtual QPaintEngine*				paintEngine() const override;
 		virtual void						paintEvent(QPaintEvent* PaintEvent) override;
 		virtual void						mousePressEvent(QMouseEvent* MouseEvent) override;
@@ -125,6 +123,7 @@ class ZEDViewport : public QWidget, public ZEDComponent
 		const ZEVector2&					GetMousePosition() const;
 		const ZEVector2&					GetMousePositionDelta() const;
 
+		virtual void						Process(float ElapsedTime) override;
 		bool								PreRender();
 		void								Render();
 		void								Present();

@@ -491,7 +491,7 @@ void ZEDPropertyEditorItemVector::TextEdit_editingFinished()
 	if (!ValueChanged)
 		return;
 
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetPropertyEditor()->GetWrappers();
+	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetPropertyEditor()->GetObjects();
 	ZEArray<ZEVariant> Values;
 	Values.SetCount(Wrappers.GetCount());
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
@@ -563,7 +563,7 @@ void ZEDPropertyEditorItemVector::Update()
 
 	ValueChanged = false;
 
-	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetObjects());
 
 	ZEArray<ZEVariant> PropertyValues;
 	PropertyValues.SetCount(Wrappers.GetCount());

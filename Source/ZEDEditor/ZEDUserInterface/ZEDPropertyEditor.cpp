@@ -234,16 +234,14 @@ bool ZEDPropertyEditor::InitializeInternal()
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 
-	GetEditor()->GetSelectionManager()->OnObjectsSelected.AddDelegate<ZEDPropertyEditor, &ZEDPropertyEditor::SelectionManager_OnObjectsSelected>(this);
-	GetEditor()->GetSelectionManager()->OnObjectsDeselected.AddDelegate<ZEDPropertyEditor, &ZEDPropertyEditor::SelectionManager_OnObjectsDeselected>(this);
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.AddDelegate<ZEDPropertyEditor, &ZEDPropertyEditor::SelectionManager_OnSelectionChanged>(this);
 
 	return true;
 }
 
 bool ZEDPropertyEditor::DeinitializeInternal()
 {
-	GetEditor()->GetSelectionManager()->OnObjectsSelected.DisconnectObject(this);
-	GetEditor()->GetSelectionManager()->OnObjectsDeselected.DisconnectObject(this);
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.DisconnectObject(this);
 
 	return ZEDComponent::DeinitializeInternal();
 }
@@ -253,64 +251,56 @@ void ZEDPropertyEditor::Object_OnPropertyChanged(ZEDObjectWrapper* Object, ZEMTP
 	UpdateProperty(Property);
 }
 
-void ZEDPropertyEditor::SelectionManager_OnObjectsSelected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects)
+void ZEDPropertyEditor::SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects)
 {
-	for (ZESize I = 0; I < SelectedObjects.GetCount(); I++)
-		Objects.Add(SelectedObjects[I]);
-
-	Dirty = true;
-}
-
-void ZEDPropertyEditor::SelectionManager_OnObjectsDeselected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedObjects)
-{
-	for (ZESize I = 0; I < DeselectedObjects.GetCount(); I++)
-		Objects.RemoveValue(DeselectedObjects[I]);
-
-	Dirty = true;
-}
-
-void ZEDPropertyEditor::TickEvent(const ZEDTickEvent* Event)
-{
-	if (!Dirty)
-		return;
-
+	SetObjects(SelectedObjects);
 	Populate();
-	Dirty = false;
 }
 
 void ZEDPropertyEditor::PropertyChanged(const ZEMTProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Objects,Property, Value);
-	GetEditor()->GetOperationManager()->DoOperation(Operation);
+	GetEditor()->GetOperationManager()->Do(Operation);
 }
 
 void ZEDPropertyEditor::PropertyChanged(const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Objects,Property, Values);
-	GetEditor()->GetOperationManager()->DoOperation(Operation);
+	GetEditor()->GetOperationManager()->Do(Operation);
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetWrappers() const
+const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetObjects() const
 {
 	return Objects;
 }
 
-void ZEDPropertyEditor::AddWrapper(ZEDObjectWrapper* Object)
+void ZEDPropertyEditor::SetObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
+{
+	for (ZESize I = 0; I < Objects.GetCount(); I++)
+		this->Objects[I]->OnPropertyChanged.DisconnectObject(this);
+
+	this->Objects = Objects;
+
+	for (ZESize I = 0; I <Objects.GetCount(); I++)
+		Objects[I]->OnPropertyChanged.AddDelegate<ZEDPropertyEditor, &ZEDPropertyEditor::Object_OnPropertyChanged>(this);
+
+	Populate();
+}
+
+void ZEDPropertyEditor::AddObject(ZEDObjectWrapper* Object)
 {
 	zeCheckError(Objects.Exists(Object), ZE_VOID, "Object wrapper is already added to list.");
 
 	Objects.Add(Object);
 	Object->OnPropertyChanged.AddDelegate<ZEDPropertyEditor, &ZEDPropertyEditor::Object_OnPropertyChanged>(this);
-
-	Dirty = true;
+	Populate();
 }
 
-void ZEDPropertyEditor::RemoveWrapper(ZEDObjectWrapper* Object)
+void ZEDPropertyEditor::RemoveObject(ZEDObjectWrapper* Object)
 {
 	Objects.RemoveValue(Object);
 	Object->OnPropertyChanged.DisconnectObject(this);
-
-	Dirty = true;
+	Populate();
 }
 
 void ZEDPropertyEditor::UpdateProperty(ZEMTProperty* Property)

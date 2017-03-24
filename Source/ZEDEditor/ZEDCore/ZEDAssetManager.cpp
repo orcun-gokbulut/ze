@@ -37,7 +37,6 @@
 
 #include "ZEDAsset.h"
 #include "ZEDAssetType.h"
-#include "ZEDAssetEvent.h"
 #include "ZEDAssetDirectory.h"
 #include "ZEDAssetCategory.h"
 #include "ZERandom.h"
@@ -216,30 +215,23 @@ ZEDAsset* ZEDAssetManager::CreateAsset(const ZEString& Path)
 	NewAsset->Directory = Directory;
 	NewAsset->Category = Category;
 
-	ZEDAssetEvent Event;
-	Event.SetType(ZED_AET_ASSET_ADDING);
-	Event.SetAsset(NewAsset);
-	Event.SetPath(PathInfo.GetPath());
-	RaiseEvent(&Event);
+	OnAssetAdding(this, NewAsset);
 
 	AssetType->Assets.AddEnd(&NewAsset->TypeLink);
 	Directory->Assets.AddEnd(&NewAsset->DirectoryLink);
 	if (Category != NULL)
 		Category->Assets.AddEnd(&NewAsset->CategoryLink);
 
-	Event.SetType(ZED_AET_ASSET_ADDED);
-	RaiseEvent(&Event);
+	OnAssetAdded(this, NewAsset);
 
 	return NewAsset;
 }
 
 void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
 {
-	ZEDAssetEvent Event;
-	Event.SetType(ZED_AET_ASSET_REMOVING);
-	Event.SetAsset(Asset);
-	Event.SetPath(Asset->GetPath());
-	RaiseEvent(&Event);
+	zeCheckError(Asset->Manager != this, ZE_VOID, "Cannot remove asset. Asset does not belong to this manager.");
+
+	OnAssetRemoving(this, Asset);
 
 	Asset->Directory->Assets.Remove(&Asset->DirectoryLink);
 	Asset->Type->Assets.Remove(&Asset->TypeLink);
@@ -247,8 +239,7 @@ void ZEDAssetManager::RemoveAsset(ZEDAsset* Asset)
 	if (Asset->Category != NULL)
 		Asset->Category->Assets.Remove(&Asset->CategoryLink);
 
-	Event.SetType(ZED_AET_ASSET_REMOVED);
-	RaiseEvent(&Event);
+	OnAssetRemoved(this, Asset);
 
 	Asset->Manager = NULL;
 	Asset->Type = NULL;
@@ -293,15 +284,9 @@ ZEDAssetDirectory* ZEDAssetManager::CreateDirectory(const ZEString& DirectoryPat
 			NewDirectory->SetName(Token);
 			NewDirectory->ParentDirectory = ParentDirectory;
 
-			ZEDAssetEvent Event;
-			Event.SetType(ZED_AET_DIRECTORY_ADDING);
-			Event.SetDirectory(NewDirectory);
-			Event.SetPath(NewDirectory->GetPath());
-			RaiseEvent(&Event);
-
+			OnDirectoryAdding(this, NewDirectory);
 			ParentDirectory->SubDirectories.AddEnd(&NewDirectory->ParentDirectoryLink);
-			Event.SetType(ZED_AET_DIRECTORY_ADDED);
-			RaiseEvent(&Event);
+			OnDirectoryAdded(this, NewDirectory);
 
 			ParentDirectory = NewDirectory;
 		}
@@ -327,18 +312,11 @@ void ZEDAssetManager::RemoveDirectory(ZEDAssetDirectory* Directory)
 		delete Asset;
 	}
 
-	ZEDAssetEvent Event;
-	Event.SetType(ZED_AET_DIRECTORY_REMOVING);
-	Event.SetDirectory(Directory);
-	Event.SetPath(Directory->GetPath());
-	RaiseEvent(&Event);
-
+	OnDirectoryRemoving(this, Directory);
 	Directory->Manager = NULL;
 	Directory->ParentDirectory->SubDirectories.Remove(&Directory->ParentDirectoryLink);
 	Directory->ParentDirectory = NULL;
-	
-	Event.SetType(ZED_AET_DIRECTORY_REMOVED);
-	RaiseEvent(&Event);
+	OnDirectoryRemoved(this, Directory);
 }
 
 ZEDAssetCategory* ZEDAssetManager::CreateCategory(const ZEString& Path)
@@ -353,11 +331,7 @@ void ZEDAssetManager::RemoveCategory(ZEDAssetCategory* Category)
 
 void ZEDAssetManager::SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Category)
 {
-	ZEDAssetEvent Event;
-	Event.SetType(ZED_AET_ASSET_CATEGORY_CHANGING);
-	Event.SetPath(Asset->GetPath());
-	Event.SetAsset(Asset);
-	RaiseEvent(&Event);
+	OnAssetMetaChanging(this, Asset);
 
 	if (Asset->GetCategory() != NULL)
 		Asset->Category->Assets.Remove(&Asset->CategoryLink);
@@ -367,8 +341,7 @@ void ZEDAssetManager::SetAssetCategory(ZEDAsset* Asset, ZEDAssetCategory* Catego
 	if (Category != NULL)
 		Category->Assets.AddEnd(&Asset->CategoryLink);
 
-	Event.SetType(ZED_AET_ASSET_CATEGORY_CHANGED);
-	RaiseEvent(&Event);
+	OnAssetMetaChanged(this, Asset);
 }
 
 void ZEDAssetManager::RegisterAssetTypes()
@@ -428,11 +401,6 @@ void ZEDAssetManager::Clear()
 	Categories.UnlockWrite();
 	Assets.UnlockWrite();*/
 	CrawlLocations.UnlockWrite();
-}
-
-void ZEDAssetManager::TickEvent(const ZEDTickEvent* Event)
-{
-	Crawl();
 }
 
 ZEDAssetManager::ZEDAssetManager()
@@ -659,7 +627,7 @@ void ZEDAssetManager::UpdatePath(const ZEString& Path)
 	AddCrawlLocation(Path);
 }
 
-void ZEDAssetManager::Process()
+void ZEDAssetManager::Process(float ElapsedTime)
 {
 	Crawl();
 }

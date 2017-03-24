@@ -272,13 +272,13 @@ void ZEMLEditorWindow::ConfigureUI()
 
 void ZEMLEditorWindow::NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName)
 {
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationChangeElementName(Element, NewName, OldName));
+	ZEDOperationManager::GetInstance()->Do(new ZEOperationChangeElementName(Element, NewName, OldName));
 }
 
 void ZEMLEditorWindow::ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue)
 {
 	ZEOperationChangePropertyValue* Operation = new ZEOperationChangePropertyValue(Property, OldValue, NewValue);
-	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	ZEDOperationManager::GetInstance()->Do(Operation);
 }
 
 void ZEMLEditorWindow::Select()
@@ -430,7 +430,7 @@ void ZEMLEditorWindow::Cut()
 	ClipBoard = new ZEMLNode();
 
 	ZEOperationCut* Cut = new ZEOperationCut(ClipBoard, Form->trwElementTree->selectedItems());
-	ZEDOperationManager::GetInstance()->DoOperation(Cut);
+	ZEDOperationManager::GetInstance()->Do(Cut);
 	Update();
 }
 
@@ -461,7 +461,7 @@ void ZEMLEditorWindow::Paste()
 		return;
 
 	ZEOperationPaste* Paste = new ZEOperationPaste(ClipBoard, (ZEMLNode*)SelectedElement);
-	ZEDOperationManager::GetInstance()->DoOperation(Paste);
+	ZEDOperationManager::GetInstance()->Do(Paste);
 	Update();
 }
 
@@ -479,7 +479,7 @@ void ZEMLEditorWindow::AddNewNode()
 	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLNode()));
+	ZEDOperationManager::GetInstance()->Do(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLNode()));
 	Update();
 }
 
@@ -492,7 +492,7 @@ void ZEMLEditorWindow::AddNewProperty()
 	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLProperty()));
+	ZEDOperationManager::GetInstance()->Do(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLProperty()));
 	Update();
 }
 
@@ -505,7 +505,7 @@ void ZEMLEditorWindow::AddNewData()
 	if (SelectedElement->GetType() != ZEML_ET_NODE)
 		return;
 
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLData()));
+	ZEDOperationManager::GetInstance()->Do(new ZEOperationAddElement((ZEMLNode*)SelectedElement, new ZEMLData()));
 	Update();
 }
 
@@ -522,7 +522,7 @@ void ZEMLEditorWindow::Delete()
 		Operation->AddDeletedElement(Element);
 	}
 
-	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	ZEDOperationManager::GetInstance()->Do(Operation);
 	Update();
 }
 

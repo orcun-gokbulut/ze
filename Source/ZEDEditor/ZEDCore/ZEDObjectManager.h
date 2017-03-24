@@ -43,6 +43,7 @@ class ZEClass;
 class ZEMTProperty;
 class ZEDObjectWrapper;
 class ZEDSelectionManager;
+enum ZEDEditorState;
 
 class ZEDWrapperRegistration
 {
@@ -64,7 +65,7 @@ class ZEDObjectManager : public ZEDComponent
 		bool									InitializeInternal();
 		bool									DeinitializeInternal();
 
-		virtual void							EditorEvent(const ZEDEditorEvent* Event);
+		virtual void							Editor_OnStateChanged(ZEDEditor* Editor, ZEDEditorState State);
 		virtual void							SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection);
 
 												ZEDObjectManager();
@@ -101,7 +102,7 @@ class ZEDObjectManager : public ZEDComponent
 		void									CloneObject(ZEDObjectWrapper* Wrapper);
 		void									CloneObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
 
-		void									Tick(float ElapsedTime);
+		void									Process(float ElapsedTime);
 
 		ZE_EVENT(								OnObjectCreated,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object));
 		ZE_EVENT(								OnObjectDestroying,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object));

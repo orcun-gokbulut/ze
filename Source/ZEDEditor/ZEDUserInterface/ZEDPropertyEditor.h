@@ -59,18 +59,17 @@ class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 		virtual bool						DeinitializeInternal() override;
 
 		void								Object_OnPropertyChanged(ZEDObjectWrapper* Object, ZEMTProperty* Property);
-		void								SelectionManager_OnObjectsSelected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects);
-		void								SelectionManager_OnObjectsDeselected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedObjects);
-		virtual void						TickEvent(const ZEDTickEvent* Event);
+		void								SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects);
 
 	protected:
 		virtual void						PropertyChanged(const ZEMTProperty* Property, const ZEVariant& Value);
 		virtual void						PropertyChanged(const ZEMTProperty* Property, const ZEArray<ZEVariant>& Values);
 
 	public:
-		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
-		void								AddWrapper(ZEDObjectWrapper* Wrapper);
-		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
+		void								SetObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
+		const ZEArray<ZEDObjectWrapper*>&	GetObjects() const;
+		void								AddObject(ZEDObjectWrapper* Object);
+		void								RemoveObject(ZEDObjectWrapper* Object);
 
 		void								UpdateProperty(ZEMTProperty* Property);
 		void								Update();

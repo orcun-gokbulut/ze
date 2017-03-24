@@ -45,7 +45,6 @@
 class ZEDComponent;
 class ZEDEvent;
 class ZEDEditorCore;
-class ZEDEditorEvent;
 class ZEDObjectManager;
 class ZEDOperationManager;
 class ZEDSelectionManager;
@@ -56,11 +55,11 @@ class ZEUIManager;
 class ZEDAssetManager;
 class ZEDMenu;
 
-enum ZEDFileState
+enum ZEDEditorState
 {
 	ZED_ES_NONE,
-	ZED_ES_UNMODIFIED,
-	ZED_ES_MODIFIED
+	ZED_ES_NEW,
+	ZED_ES_OPENED,
 };
 
 class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
@@ -68,86 +67,98 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 	ZE_OBJECT
 	friend class ZEDEditorCore;
 	private:
-		ZEDEditorCore*						Core;
-		ZEDFileState						FileState;
-		ZEString							FileName;
-		ZEArray<ZEString>					RecentFiles;
+		ZEDEditorCore*								Core;
+		ZEDEditorState								State;
+		ZEString									FileName;
+		ZEArray<ZEString>							RecentFiles;
+		bool										Modified;
 
-		ZEArray<ZEDComponent*>				Components;
-		ZEDObjectManager*					ObjectManager;
-		ZEDOperationManager*				OperationManager;
-		ZEDSelectionManager*				SelectionManager;
-		ZEDTransformationManager*			TransformationManager;
-		ZEDViewportManager*					ViewportManager;
-		ZEDMainWindow*						MainWindow;
-		ZEUIManager*						UIManager;
-		ZEDAssetManager*					AssetManager;
+		ZEArray<ZEDComponent*>						Components;
+		ZEDObjectManager*							ObjectManager;
+		ZEDOperationManager*						OperationManager;
+		ZEDSelectionManager*						SelectionManager;
+		ZEDTransformationManager*					TransformationManager;
+		ZEDViewportManager*							ViewportManager;
+		ZEDMainWindow*								MainWindow;
+		ZEUIManager*								UIManager;
+		ZEDAssetManager*							AssetManager;
 
-		void								PopulateRecentFiles();
-		void								RegisterRecentFile(const ZEString& FileName);
+		void										PopulateRecentFiles();
+		void										RegisterRecentFile(const ZEString& FileName);
 
 	protected:
-		virtual bool						InitializeInternal();
-		virtual bool						DeinitializeInternal();
+		virtual bool								InitializeInternal();
+		virtual bool								DeinitializeInternal();
 
-											ZEDEditor();
-		virtual								~ZEDEditor();
+													ZEDEditor();
+		virtual										~ZEDEditor();
 
 	private: /* COMMANDS */
-		ZEDCommand							NewCommand;
-		ZEDCommand							OpenCommand;
-		ZEDCommand							SaveCommand;
-		ZEDCommand							SaveAsCommand;
-		ZEDCommand							CloseCommand;
-		ZEDCommand							RecentFilesCommand;
-		ZEDCommand							ExitCommand;
+		ZEDCommand									NewCommand;
+		ZEDCommand									OpenCommand;
+		ZEDCommand									SaveCommand;
+		ZEDCommand									SaveAsCommand;
+		ZEDCommand									CloseCommand;
+		ZEDCommand									RecentFilesCommand;
+		ZEDCommand									ExitCommand;
 
-		void								RegisterCommands();
-		void								UpdateCommands();
+		void										RegisterCommands();
+		void										UpdateCommands();
 
-		void								NewCommand_OnAction(const ZEDCommand* Command);
-		void								OpenCommand_OnAction(const ZEDCommand* Command);
-		void								RecentFilesCommand_OnAction(const ZEDCommand* Command);
-		void								SaveCommand_OnAction(const ZEDCommand* Command);
-		void								SaveAsCommand_OnAction(const ZEDCommand* Command);
-		void								CloseCommand_OnAction(const ZEDCommand* Command);
-		void								ExitCommand_OnAction(const ZEDCommand* Command);
+		void										NewCommand_OnAction(const ZEDCommand* Command);
+		void										OpenCommand_OnAction(const ZEDCommand* Command);
+		void										RecentFilesCommand_OnAction(const ZEDCommand* Command);
+		void										SaveCommand_OnAction(const ZEDCommand* Command);
+		void										SaveAsCommand_OnAction(const ZEDCommand* Command);
+		void										CloseCommand_OnAction(const ZEDCommand* Command);
+		void										ExitCommand_OnAction(const ZEDCommand* Command);
 
 	public:
-		ZEDEditorCore*						GetCore();
+		ZEDEditorCore*								GetCore();
 
-		ZEDObjectManager*					GetObjectManager();
-		ZEDOperationManager*				GetOperationManager();
-		ZEDSelectionManager*				GetSelectionManager();
-		ZEDMainWindow*						GetMainWindow();
-		ZEDTransformationManager*			GetTransformationManager();
-		ZEDViewportManager*					GetViewportManager();
-		ZEUIManager*						GetUIManager();
+		ZEDObjectManager*							GetObjectManager();
+		ZEDOperationManager*						GetOperationManager();
+		ZEDSelectionManager*						GetSelectionManager();
+		ZEDMainWindow*								GetMainWindow();
+		ZEDTransformationManager*					GetTransformationManager();
+		ZEDViewportManager*							GetViewportManager();
+		ZEUIManager*								GetUIManager();
 
-		ZEDAssetManager*					GetAssetManager();
+		ZEDAssetManager*							GetAssetManager();
 
-		ZEDComponent*						GetComponent(ZEClass* Class);
-		const ZEArray<ZEDComponent*>&		GetComponents();
-		void								AddComponent(ZEDComponent* Component);
-		void								RemoveComponent(ZEDComponent* Component);
+		ZEDComponent*								GetComponent(ZEClass* Class);
+		const ZEArray<ZEDComponent*>&				GetComponents();
+		void										AddComponent(ZEDComponent* Component);
+		void										RemoveComponent(ZEDComponent* Component);
 
-		ZEDFileState						GetFileState();
-		const ZEString&						GetFileName();
+		ZEDEditorState								GetEditorState();
+		const ZEString&								GetFileName();
 
-		virtual ZEString					GetExtensions();
+		virtual ZEString							GetExtensions();
 
-		virtual void						Process(float ElapsedTime);
-		virtual void						PostProcess(float ElapsedTime);
+		virtual void								Process(float ElapsedTime);
+		virtual void								PostProcess(float ElapsedTime);
 
-		virtual void						New();
-		virtual bool						Save(const ZEString& FileName);
-		virtual bool						Load(const ZEString& FileName);
-		virtual void						Close();
+		virtual void								New();
+		virtual bool								Save(const ZEString& FileName);
+		virtual bool								Load(const ZEString& FileName);
+		virtual void								Close();
 
-		virtual void						Exit();
+		virtual void								Exit();
 
-		void								MarkDocumentModified();
-		void								UnmarkDocumentModified();
+		void										MarkDocumentModified();
+		void										UnmarkDocumentModified();
 
-		void								DistributeEvent(const ZEDEvent* Event);
+		ZE_EVENT(									OnNew,(ZEDEditor* Editor));
+		ZE_EVENT(									OnLoading,(ZEDEditor* Editor));
+		ZE_EVENT(									OnLoaded,(ZEDEditor* Editor));
+		ZE_EVENT(									OnSaving,(ZEDEditor* Editor));
+		ZE_EVENT(									OnSaved,(ZEDEditor* Editor));
+		ZE_EVENT(									OnClosing,(ZEDEditor* Editor));
+		ZE_EVENT(									OnClosed,(ZEDEditor* Editor));
+		ZE_EVENT(									OnModified,(ZEDEditor* Editor));
+		ZE_EVENT(									OnUnmodified,(ZEDEditor* Editor));
+		ZE_EVENT(									OnStateChanged,(ZEDEditor* Editor, ZEDEditorState));
+		ZE_EVENT(									OnExiting,(ZEDEditor* Editor));
+		ZE_EVENT(									OnTick,(ZEDEditor* Editor, float ElapsedTime));
 };

@@ -36,41 +36,6 @@
 #include "ZEDComponent.h"
 
 #include "ZEDEditor.h"
-#include "ZEDEditorEvent.h"
-#include "ZEDAssetEvent.h"
-
-void ZEDComponent::EventReceived(const ZEDEvent* Event)
-{
-	if (ZEClass::IsDerivedFrom(ZEDTickEvent::Class(), Event->GetClass()))
-		TickEvent(static_cast<const ZEDTickEvent*>(Event));
-	else if (ZEClass::IsDerivedFrom(ZEDEditorEvent::Class(), Event->GetClass()))
-		EditorEvent(static_cast<const ZEDEditorEvent*>(Event));
-	else if (ZEClass::IsDerivedFrom(ZEDAssetEvent::Class(), Event->GetClass()))
-		AssetEvent(static_cast<const ZEDAssetEvent*>(Event));
-}
-
-void ZEDComponent::EditorEvent(const ZEDEditorEvent* Event)
-{
-
-}
-
-void ZEDComponent::TickEvent(const ZEDTickEvent* Event)
-{
-
-}
-
-void ZEDComponent::AssetEvent(const ZEDAssetEvent* Event)
-{
-
-}
-
-void ZEDComponent::RaiseEvent(const ZEDEvent* Event)
-{
-	if (Editor == NULL)
-		return;
-
-	Editor->DistributeEvent(Event);
-}
 
 ZEDComponent::ZEDComponent()
 {
@@ -88,7 +53,7 @@ ZEDEditor* ZEDComponent::GetEditor() const
 	return Editor;
 }
 
-void ZEDComponent::Process()
+void ZEDComponent::Process(float ElapsedTime)
 {
 
 }

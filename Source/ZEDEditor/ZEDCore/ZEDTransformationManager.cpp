@@ -289,7 +289,7 @@ void ZEDTransformationManager::EndTransform()
 		return;
 
 	ZEDTransformationOperation* Operation = ZEDTransformationOperation::Create(TransformType, TransformStates);
-	GetEditor()->GetOperationManager()->DoOperation(Operation);
+	GetEditor()->GetOperationManager()->Do(Operation);
 
 	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
 	{
@@ -524,6 +524,7 @@ void ZEDTransformationManager::SelectionManager_OnSelectionChanged(ZEDSelectionM
 {
 	zeDebugCheck(TransformActive, "Selection changed while a transformation is active");
 
+	UpdateCommands();
 	ResetTransform();
 	UpdateTransformStates();
 }
@@ -841,6 +842,11 @@ void ZEDTransformationManager::RegisterCommands()
 
 void ZEDTransformationManager::UpdateCommands()
 {
+	MoveCommand.SetEnabled(TransformStates.GetCount() != 0);
+	RotateCommand.SetEnabled(TransformStates.GetCount() != 0);
+	ScaleCommand.SetEnabled(TransformStates.GetCount() != 0);
+	AxisRotateCommand.SetEnabled(TransformStates.GetCount() != 0);
+
 	SelectCommand.SetValueChecked(GetTransformType() == ZED_TT_NONE);
 	MoveCommand.SetValueChecked(GetTransformType() == ZED_TT_TRANSLATE);
 	RotateCommand.SetValueChecked(GetTransformType() == ZED_TT_ROTATE);

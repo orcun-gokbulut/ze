@@ -144,7 +144,7 @@ void ZEDPropertyEditorItemString::Update()
 
 	QSignalBlocker Blocker(TextEdit);
 
-	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetObjects());
 	bool MultipleValue = false;
 	ZEVariant Value;
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)

@@ -100,7 +100,7 @@ bool ZEDOperationManager::Redo()
 	return true;
 }
 
-bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
+bool ZEDOperationManager::Do(ZEDOperation* Operation)
 {
 	if (Operation == NULL)
 		return false;
