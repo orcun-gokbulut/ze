@@ -42,7 +42,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMeta/ZEEvent.h"
 #include "ZEMeta/ZEEventDelegate.h"
-#include "ZEDCore/ZEDViewportEvent.h"
+#include "ZEDCore/ZEDInputDefinitions.h"
 
 
 ZE_ENUM(ZEDCommandType)
@@ -65,10 +65,10 @@ class ZEDCommandShortcut : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZEDViewportKeyboardKey				Key;
-		ZEDViewportKeyModifiers				Modifier;
+		ZEDKeyboardKey						Key;
+		ZEDKeyModifiers						Modifiers;
 
-											ZEDCommandShortcut(ZEDViewportKeyModifiers Modifier, ZEDViewportKeyboardKey Key);
+											ZEDCommandShortcut(ZEDKeyModifiers Modifiers, ZEDKeyboardKey Key);
 											ZEDCommandShortcut();
 };
 

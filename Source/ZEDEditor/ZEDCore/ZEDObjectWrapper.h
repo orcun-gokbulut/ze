@@ -41,8 +41,8 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
+#include "ZEMeta/ZEEvent.h"
 
-class ZEDObjectEvent;
 class QWidget;
 class QMenu;
 
@@ -62,12 +62,12 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		bool										Frozen;
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
-		
+
 		void										SetManager(ZEDObjectManager* Module);
-
-		void										RaiseEvent(ZEDObjectEvent* Event);
-
+		
 	protected:
+		virtual void								SetParent(ZEDObjectWrapper* Wrapper);
+
 		void										SyncronizeChildWrappers(ZEObject*const* TargetList, ZESize TargetListSize);
 		void										ClearChildWrappers();
 
@@ -83,8 +83,6 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								SetObject(ZEObject* Object);
 		ZEObject*									GetObject() const;
 		ZEClass*									GetObjectClass();
-		
-		virtual void								SetParent(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper*							GetParent() const;
 
 		virtual void								SetId(ZEInt Id);
@@ -132,5 +130,18 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();
+
+		ZE_EVENT(									OnParentChanged,(ZEDObjectWrapper* Object, ZEDObjectWrapper* Parent));
+		ZE_EVENT(									OnPropertyChanged,(ZEDObjectWrapper* Object, ZEMTProperty* Property));
+		ZE_EVENT(									OnSelected,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnDeselected,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnFrozen,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnUnfrozen,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnFocused,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnUnfocused,(ZEDObjectWrapper* Object));
+		ZE_EVENT(									OnChildObjectAdding,(ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(									OnChildObjectAdded,(ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(									OnChildObjectRemoving,(ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(									OnChildObjectRemoved,(ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
 }
 ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEObject);

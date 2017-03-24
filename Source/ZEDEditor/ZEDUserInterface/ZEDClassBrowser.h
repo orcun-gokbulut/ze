@@ -36,9 +36,11 @@
 #pragma once
 
 #include "ZEDWindow.h"
+#include "ZEDS\ZEArray.h"
 
 class ZEDObjectWrapper;
 class ZEDClassModel;
+class ZEDSelectionManager;
 class QItemSelection;
 class Ui_ZEDClassBrowser;
 
@@ -51,9 +53,10 @@ class ZEDClassBrowser : public ZEDWindow
 		ZEDClassModel*						Model;
 		ZEDObjectWrapper*					DestinationWrapper;
 
-		virtual bool						InitializeInternal();
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
 
-		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual void						SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection);
 
 		void								Update();
 

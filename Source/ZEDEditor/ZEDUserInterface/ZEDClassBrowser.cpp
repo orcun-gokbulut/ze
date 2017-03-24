@@ -86,12 +86,21 @@ bool ZEDClassBrowser::InitializeInternal()
 	if (!ZEDWindow::InitializeInternal())
 		return false;
 
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.AddDelegate<ZEDClassBrowser, &ZEDClassBrowser::SelectionManager_OnSelectionChanged>(this);
+
 	Update();
 
 	return true;
 }
 
-void ZEDClassBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
+bool ZEDClassBrowser::DeinitializeInternal()
+{
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.DisconnectObject(this);
+
+	return ZEDComponent::DeinitializeInternal();
+}
+
+void ZEDClassBrowser::SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection)
 {
 	Update();
 }

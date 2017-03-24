@@ -38,9 +38,7 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEDCore/ZEDEditor.h"
-#include "ZEDCore/ZEDSelectionEvent.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
-#include "ZEDCore/ZEDObjectEvent.h"
 #include "ZEDCore/ZEDObjectManager.h"
 
 #include <QIcon>
@@ -315,74 +313,108 @@ ZEDObjectWrapper* ZEDObjectModel::ConvertToWrapper(const QModelIndex& Index) con
 	return static_cast<ZEDObjectWrapper*>(Index.internalPointer());
 }
 
-void ZEDObjectModel::ObjectEvent(const ZEDObjectEvent* Event)
+bool ZEDObjectModel::InitializeInternal()
+{
+	if (!ZEDComponent::InitializeInternal())
+		return false;
+
+	GetEditor()->GetObjectManager()->OnObjectChildObjectAdding.AddDelegate<ZEDObjectModel, &ZEDObjectModel::ObjectManager_OnObjectChildObjectAdding>(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectAdded.AddDelegate<ZEDObjectModel, &ZEDObjectModel::ObjectManager_OnObjectChildObjectAdded>(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectRemoving.AddDelegate<ZEDObjectModel, &ZEDObjectModel::ObjectManager_OnObjectChildObjectRemoving>(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectRemoved.AddDelegate<ZEDObjectModel, &ZEDObjectModel::ObjectManager_OnObjectChildObjectRemoved>(this);
+	GetEditor()->GetObjectManager()->OnObjectPropertyChanged.AddDelegate<ZEDObjectModel, &ZEDObjectModel::ObjectManager_OnObjectPropertyChanged>(this);
+
+	return true;
+}
+
+bool ZEDObjectModel::DeinitializeInternal()
+{
+	GetEditor()->GetObjectManager()->OnObjectChildObjectAdding.DisconnectObject(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectAdded.DisconnectObject(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectRemoving.DisconnectObject(this);
+	GetEditor()->GetObjectManager()->OnObjectChildObjectRemoved.DisconnectObject(this);
+	GetEditor()->GetObjectManager()->OnObjectPropertyChanged.DisconnectObject(this);
+
+	return ZEDComponent::DeinitializeInternal();
+}
+
+void ZEDObjectModel::ObjectManager_OnObjectChildObjectAdding(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject)
 {
 	if (RootWrapper == NULL)
 		return;
 
-	if (Event->GetType() == ZED_OET_ADDING)
+	if (Mode == ZED_OMM_TREE)
 	{
-		if (Mode == ZED_OMM_TREE)
-		{
-			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
-			if (!FilterHierarchy(Wrapper))
-				return;
+		if (!FilterHierarchy(ChildObject))
+			return;
 
-			int Index = (int)Wrapper->GetParent()->GetChildWrappers().GetCount();
-			beginInsertRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
-		}
-		else if (Mode == ZED_OMM_LIST)
-		{
-			beginResetModel();
-		}
+		int Index = (int)Object->GetChildWrappers().GetCount();
+		beginInsertRows(parent(createIndex(0, 0, ChildObject)), Index, Index);
+	}
+	else if (Mode == ZED_OMM_LIST)
+	{
+		beginResetModel();
+	}
+}
 
-	}
-	else if (Event->GetType() == ZED_OET_ADDED)
-	{
-		if (Mode == ZED_OMM_TREE)
-			endInsertRows();
-		else if (Mode == ZED_OMM_LIST)
-			endResetModel();
-	}
-	else if (Event->GetType() == ZED_OET_REMOVING)
-	{
-		if (Mode == ZED_OMM_TREE)
-		{
-			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
-			if (!FilterHierarchy(Wrapper))
-				return;
+void ZEDObjectModel::ObjectManager_OnObjectChildObjectAdded(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject)
+{
+	if (RootWrapper == NULL)
+		return;
 
-			ZESSize Index = Wrapper->GetParent()->GetChildWrappers().FindIndex(Wrapper);
-			beginRemoveRows(parent(createIndex(0, 0, Wrapper)), Index, Index);
-		}
-		else if (Mode == ZED_OMM_LIST)
-		{
-			beginResetModel();
-		}
-	}
-	else if (Event->GetType() == ZED_OET_REMOVED)
-	{
-		if (Mode == ZED_OMM_TREE)
-			endRemoveRows();
-		else if (Mode == ZED_OMM_LIST)
-			endResetModel();
-	}
-	else if (Event->GetType() == ZED_OET_CHANGED)
-	{
-		if (Mode == ZED_OMM_TREE)
-		{
-			ZEDObjectWrapper* Wrapper = Event->GetWrapper();
-			if (!FilterHierarchy(Wrapper))
-				return;
+	if (Mode == ZED_OMM_TREE)
+		endInsertRows();
+	else if (Mode == ZED_OMM_LIST)
+		endResetModel();
+}
 
-			ZESSize Index = Wrapper->GetParent()->GetChildWrappers().FindIndex(Wrapper);
-			dataChanged(createIndex(Index, 0, Wrapper->GetParent()), createIndex(Index, columnCount(), Wrapper->GetParent()));
-		}
-		else if (Mode == ZED_OMM_LIST)
-		{
-			beginResetModel();
-			endResetModel();
-		}
+void ZEDObjectModel::ObjectManager_OnObjectChildObjectRemoving(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject)
+{	
+	if (RootWrapper == NULL)
+	return;
+
+	if (Mode == ZED_OMM_TREE)
+	{
+		if (!FilterHierarchy(ChildObject))
+			return;
+
+		ZESSize Index = Object->GetChildWrappers().FindIndex(ChildObject);
+		beginRemoveRows(parent(createIndex(0, 0, ChildObject)), Index, Index);
+	}
+	else if (Mode == ZED_OMM_LIST)
+	{
+		beginResetModel();
+	}
+}
+
+void ZEDObjectModel::ObjectManager_OnObjectChildObjectRemoved(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject)
+{
+	if (RootWrapper == NULL)
+		return;
+
+	if (Mode == ZED_OMM_TREE)
+		endRemoveRows();
+	else if (Mode == ZED_OMM_LIST)
+		endResetModel();
+}
+
+void ZEDObjectModel::ObjectManager_OnObjectPropertyChanged(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEMTProperty* Property)
+{
+	if (RootWrapper == NULL)
+		return;
+
+	if (Mode == ZED_OMM_TREE)
+	{
+		if (!FilterHierarchy(Object))
+			return;
+
+		ZESSize Index = Object->GetParent()->GetChildWrappers().FindIndex(Object);
+		dataChanged(createIndex(Index, 0, Object->GetParent()), createIndex(Index, columnCount(), Object->GetParent()));
+	}
+	else if (Mode == ZED_OMM_LIST)
+	{
+		beginResetModel();
+		endResetModel();
 	}
 }
 
@@ -790,4 +822,9 @@ ZEDObjectModel::ZEDObjectModel()
 {
 	RootWrapper = NULL;
 	Mode = ZED_OMM_TREE;
+}
+
+ZEDObjectModel::~ZEDObjectModel()
+{
+	Deinitialize();
 }

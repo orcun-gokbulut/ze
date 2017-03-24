@@ -39,7 +39,6 @@
 
 #include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
-#include "ZEDObjectEvent.h"
 
 bool ZEDPropertyOperation::Apply()
 {

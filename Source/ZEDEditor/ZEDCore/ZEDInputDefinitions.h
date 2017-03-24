@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportEvent.h
+ Zinek Engine - ZEDInputDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,16 +37,7 @@
 
 #include "ZEDEvent.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-
-class ZEDViewport;
-class ZERNView;
-class ZERNPreRenderParameters;
-
-enum ZEDIViewportMouseButton
+enum ZEDMouseButton
 {
 	ZED_VMB_NONE					= 0x00000000,
 	ZED_VMB_LEFT					= 0x00000001,
@@ -64,10 +55,9 @@ enum ZEDIViewportMouseButton
 	ZED_VMB_EXTRA_8					= 0x00008000,
 	ZED_VMB_EXTRA_9					= 0x00010000,
 	ZED_VMB_EXTRA_10				= 0x00020000,
-	ZED_VMB_EXTRA_11				= 0x00040000,
 };
 
-enum ZEDViewportKeyModifier
+enum ZEDKeyModifier
 {
 	ZED_VKM_NONE					= 0x00000000,
 	ZED_VKM_CTRL					= 0x00010000,
@@ -75,9 +65,9 @@ enum ZEDViewportKeyModifier
 	ZED_VKM_SHIFT					= 0x00040000,
 	ZED_VKM_WINDOWS					= 0x00080000,
 };
-typedef ZEFlags ZEDViewportKeyModifiers;
+typedef ZEFlags ZEDKeyModifiers;
 
-enum ZEDViewportKeyboardKey
+enum ZEDKeyboardKey
 {
 	ZED_VKK_NONE					= 0x00000000,
 	ZED_VKK_ESCAPE					= 0x01000000,	 
@@ -187,122 +177,22 @@ enum ZEDViewportKeyboardKey
 	ZED_VKK_X						= 0x00000058,	 
 	ZED_VKK_Y						= 0x00000059,	 
 	ZED_VKK_Z						= 0x0000005A,	 
-	ZED_VKK_BRACKET_LEFT			= 0X0000005B,	 
-	ZED_VKK_BACKSLASH				= 0X0000005C,	 
-	ZED_VKK_BRACKET_RIGHT			= 0X0000005D,	 
-	ZED_VKK_ASCII_CIRCUM			= 0X0000005E,	 
-	ZED_VKK_UNDERSCORE				= 0X0000005F,	 
-	ZED_VKK_QUOTE_LEFT				= 0X00000060,	 
-	ZED_VKK_BRACE_LEFT				= 0X0000007B,	 
-	ZED_VKK_BAR						= 0X0000007C,	 
-	ZED_VKK_BRACE_RIGHT				= 0X0000007D,	 
-	ZED_VKK_ASCII_TILDE				= 0X0000007E,	 
-	ZED_VKK_NOBREAKSPACE			= 0X000000A0,	 
-	ZED_VKK_EXCLAM_DOWN				= 0X000000A1,	 
-	ZED_VKK_CENT					= 0X000000A2,	 
-	ZED_VKK_STERLING				= 0X000000A3,	 
-	ZED_VKK_CURRENCY				= 0X000000A4,	 
-	ZED_VKK_YEN						= 0X000000A5,	 
-	ZED_VKK_BROKEN_BAR				= 0X000000A6,	 
-	ZED_VKK_SECTION					= 0X000000A7	 
-};
-
-enum ZEDViewportEventType
-{
-	ZED_VIET_NONE = 0,
-	ZED_VIET_BUTTON_PRESSED,
-	ZED_VIET_BUTTON_PRESSING,
-	ZED_VIET_BUTTON_RELEASED,
-	ZED_VIET_MOUSE_MOVED,
-	ZED_VIET_MOUSE_DOUBLE_CLICKED
-};
-
-class ZEDViewportEvent : public ZEDEvent
-{
-	ZE_OBJECT
-	friend class ZEDViewport;
-	private:
-		ZEDViewport*						Viewport;
-		ZEDViewportEventType				Type;
-
-	protected:
-											ZEDViewportEvent();
-											~ZEDViewportEvent();
-	public:
-		ZEDViewport*						GetViewport() const;
-		ZEDViewportEventType				GetType() const;
-};
-
-class ZEDViewportMouseEvent : public ZEDViewportEvent
-{
-	ZE_OBJECT
-	ZE_ARRAY_FRIEND
-	friend class ZEDViewport;
-	private:
-		ZEVector2							Delta;
-		ZEVector2							Position;
-		ZEUInt								Modifiers;
-		ZEDIViewportMouseButton				Button;
-
-											ZEDViewportMouseEvent();
-											~ZEDViewportMouseEvent();
-
-	public:
-		const ZEVector2&					GetDelta() const;
-		const ZEVector2&					GetPosition() const;
-		ZEUInt								GetModifiers() const;
-		ZEDIViewportMouseButton				GetButton() const;
-
-};
-
-class ZEDViewportKeyboardEvent : public ZEDViewportEvent
-{
-	ZE_OBJECT
-	ZE_ARRAY_FRIEND
-	friend class ZEDViewport;
-	private:
-		ZEDViewportKeyboardKey				Key;
-		ZEUInt								Modifiers;
-		ZEUInt								VirtualKey;
-		ZEString							Text;
-											
-											ZEDViewportKeyboardEvent();
-											~ZEDViewportKeyboardEvent();
-
-	public:
-		ZEDViewportKeyboardKey				GetKey() const;
-		ZEUInt								GetModifiers() const;
-		ZEUInt								GetVirtualKey() const;
-		const ZEString&						GetText() const;
-};
-
-
-class ZEDViewportChangedEvent : public ZEDViewportEvent
-{
-	ZE_OBJECT
-	friend ZEDViewport;
-	private:
-		ZERNView*							View;
-		ZERNView*							OldView;
-
-											ZEDViewportChangedEvent();
-											~ZEDViewportChangedEvent();
-
-	public:
-		const ZERNView&						GetView() const;
-		const ZERNView&						GetOldView() const;
-};
-
-class ZEDViewportRenderEvent : public ZEDViewportEvent
-{
-	ZE_OBJECT
-	friend ZEDViewport;
-	private:
-		ZERNPreRenderParameters*			PreRenderParameters;
-
-											ZEDViewportRenderEvent();
-											~ZEDViewportRenderEvent();
-
-	public:
-		const ZERNPreRenderParameters&		GetPreRenderParameters() const;
+	ZED_VKK_BRACKET_LEFT			= 0x0000005B,	 
+	ZED_VKK_BACKSLASH				= 0x0000005C,	 
+	ZED_VKK_BRACKET_RIGHT			= 0x0000005D,	 
+	ZED_VKK_ASCII_CIRCUM			= 0x0000005E,	 
+	ZED_VKK_UNDERSCORE				= 0x0000005F,	 
+	ZED_VKK_QUOTE_LEFT				= 0x00000060,	 
+	ZED_VKK_BRACE_LEFT				= 0x0000007B,	 
+	ZED_VKK_BAR						= 0x0000007C,	 
+	ZED_VKK_BRACE_RIGHT				= 0x0000007D,	 
+	ZED_VKK_ASCII_TILDE				= 0x0000007E,	 
+	ZED_VKK_NOBREAKSPACE			= 0x000000A0,	 
+	ZED_VKK_EXCLAM_DOWN				= 0x000000A1,	 
+	ZED_VKK_CENT					= 0x000000A2,	 
+	ZED_VKK_STERLING				= 0x000000A3,	 
+	ZED_VKK_CURRENCY				= 0x000000A4,	 
+	ZED_VKK_YEN						= 0x000000A5,	 
+	ZED_VKK_BROKEN_BAR				= 0x000000A6,	 
+	ZED_VKK_SECTION					= 0x000000A7	 
 };

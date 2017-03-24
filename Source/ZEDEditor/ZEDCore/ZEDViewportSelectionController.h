@@ -37,7 +37,7 @@
 
 #include "ZEDComponent.h"
 
-#include "ZEDViewportEvent.h"
+#include "ZEDInputDefinitions.h"
 #include "ZEDUserInterface/ZEDCommand.h"
 
 enum ZEDSelectionShape
@@ -59,8 +59,9 @@ class ZEObject;
 class ZEFrustum;
 class ZEViewVolume;
 class ZEDObjectWrapper;
-class ZEUIFrameControl;
 class ZEDSelectionManager;
+class ZEDViewport;
+class ZEUIFrameControl;
 
 class ZEDViewportSelectionController : public ZEDComponent
 {
@@ -78,8 +79,11 @@ class ZEDViewportSelectionController : public ZEDComponent
 
 		void									CastVolume(ZEArray<ZEDObjectWrapper*>& List, const ZEFrustum& Frustum, ZEDObjectWrapper* Wrapper);
 
-		virtual void							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void							ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		void									Viewport_OnKeyboardKeyPressed(ZEDViewport* Viewport, ZEDKeyboardKey Key);
+		void									Viewport_OnMouseButtonPressed(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void									Viewport_OnMouseMoved(ZEDViewport* Viewport, const ZEVector2& Position);
+		void									Viewport_OnMouseButtonReleased(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void									Viewport_OnFocusLost(ZEDViewport* Viewport);
 
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();

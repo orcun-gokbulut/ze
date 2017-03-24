@@ -40,12 +40,12 @@
 ZEDCommandShortcut::ZEDCommandShortcut()
 {
 	Key = ZED_VKK_NONE;
-	Modifier = ZED_VKM_NONE;
+	Modifiers = ZED_VKM_NONE;
 }
 
-ZEDCommandShortcut::ZEDCommandShortcut(ZEDViewportKeyModifiers Modifier, ZEDViewportKeyboardKey Key)
+ZEDCommandShortcut::ZEDCommandShortcut(ZEDKeyModifiers Modifier, ZEDKeyboardKey Key)
 {
-	this->Modifier = Modifier;
+	this->Modifiers = Modifier;
 	this->Key = Key;
 }
 
@@ -254,7 +254,7 @@ const ZEString& ZEDCommand::GetTooltip() const
 
 void ZEDCommand::SetShortcut(const ZEDCommandShortcut& Shortcut)
 {
-	if (this->Shortcut.Key == Shortcut.Key && this->Shortcut.Modifier == Shortcut.Modifier)
+	if (this->Shortcut.Key == Shortcut.Key && this->Shortcut.Modifiers == Shortcut.Modifiers)
 		return;
 
 	this->Shortcut = Shortcut;

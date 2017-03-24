@@ -37,7 +37,6 @@
 
 #include "ZEDEditor.h"
 #include "ZEDObjectManager.h"
-#include "ZEDObjectEvent.h"
 #include "ZEFile/ZEPathInfo.h"
 
 void ZEDObjectWrapper::SetManager(ZEDObjectManager* Manager)
@@ -49,12 +48,6 @@ void ZEDObjectWrapper::SetManager(ZEDObjectManager* Manager)
 		ChildWrappers[I]->SetManager(Manager);
 
 	this->Manager = Manager;
-}
-
-void ZEDObjectWrapper::RaiseEvent(ZEDObjectEvent* Event)
-{
-	if (Manager != NULL)
-		Manager->RaiseEvent(Event);
 }
 
 bool ZEDObjectWrapper::InitializeInternal()
@@ -182,9 +175,14 @@ ZEClass* ZEDObjectWrapper::GetObjectClass()
 	return Object->GetClass();
 }
 
-void ZEDObjectWrapper::SetParent(ZEDObjectWrapper* Wrapper)
+void ZEDObjectWrapper::SetParent(ZEDObjectWrapper* Parent)
 {
-	Parent = Wrapper;
+	if (this->Parent == Parent)
+		return;
+
+	this->Parent = Parent;
+
+	OnParentChanged(this, Parent);
 }
 
 ZEDObjectWrapper* ZEDObjectWrapper::GetParent() const
@@ -219,9 +217,16 @@ ZEString ZEDObjectWrapper::GetName() const
 
 void ZEDObjectWrapper::SetFrozen(bool Value)
 {
-	Frozen = Value;
+	if (Frozen == Value)
+		return;
 
+	Frozen = Value;
 	UpdateLocal();
+
+	if (Frozen)
+		OnFrozen(this);
+	else
+		OnUnfrozen(this);
 }
 
 bool ZEDObjectWrapper::GetFrozen() const
@@ -231,7 +236,10 @@ bool ZEDObjectWrapper::GetFrozen() const
 
 void ZEDObjectWrapper::SetSelectable(bool Value)
 {
-	this->Selectable = Selectable;
+	if (this->Selectable != Value)
+		return;
+
+	Selectable = Value;
 
 	UpdateLocal();
 }
@@ -243,12 +251,19 @@ bool ZEDObjectWrapper::GetSelectable() const
 
 void ZEDObjectWrapper::SetSelected(bool Selected)
 {
-	this->Selected = Selected;
+	if (this->Selected == Selected)
+		return;
 
 	if (!Selected)
-		Focused = false;
+		SetFocused(false);
 
+	this->Selected = Selected;
 	UpdateLocal();
+
+	if (Selected)
+		OnSelected(this);
+	else
+		OnDeselected(this);
 }
 
 bool ZEDObjectWrapper::GetSelected() const
@@ -258,9 +273,16 @@ bool ZEDObjectWrapper::GetSelected() const
 
 void ZEDObjectWrapper::SetFocused(bool Focused)
 {
-	this->Focused = Focused;
+	if (this->Focused == Focused)
+		return;
 
+	this->Focused = Focused;
 	UpdateLocal();
+
+	if (Focused)
+		OnFocused(this);
+	else
+		OnUnfocused(this);
 }
 
 bool ZEDObjectWrapper::GetFocused() const
@@ -298,59 +320,59 @@ const ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
 	return ChildWrappers;
 }
 
-bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* ChildObject, bool Update)
 {
-	if (Wrapper == NULL)
+	if (ChildObject == NULL)
 		return false;
 
-	if (ChildWrappers.Exists(Wrapper))
+	if (ChildWrappers.Exists(ChildObject))
 		return false;
 
-	Wrapper->SetParent(this);
-	Wrapper->SetManager(Manager);
+	ChildObject->SetParent(this);
+	ChildObject->SetManager(Manager);
 
-	ZEDObjectEvent Event;
-	Event.Wrapper = Wrapper;
-	Event.Type = ZED_OET_ADDING;
-	RaiseEvent(&Event);
+	OnChildObjectAdding(this, ChildObject);
+	if (GetManager() != NULL)
+		GetManager()->OnObjectChildObjectAdding(GetManager(), this, ChildObject);
 
-	ChildWrappers.Add(Wrapper);
+	ChildWrappers.Add(ChildObject);
 
-	Event.Type = ZED_OET_ADDED;
-	RaiseEvent(&Event);
+	OnChildObjectAdded(this, ChildObject);
+	if (GetManager() != NULL)
+		GetManager()->OnObjectChildObjectAdded(GetManager(), this, ChildObject);
 
 	if (IsInitializedOrInitializing())
 	{
-		if (!Wrapper->Initialize())
+		if (!ChildObject->Initialize())
 			return false;
 
-		Wrapper->Update();
+		ChildObject->Update();
 	}
 
 	return true;
 }
 
-bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* ChildObject, bool Update)
 {
-	if (Wrapper == NULL)
+	if (ChildObject == NULL)
 		return false;
 
-	if (!ChildWrappers.Exists(Wrapper))
+	if (!ChildWrappers.Exists(ChildObject))
 		return false;
 
-	ZEDObjectEvent Event;
-	Event.Wrapper = Wrapper;
-	Event.Type = ZED_OET_REMOVING;
-	RaiseEvent(&Event);
+	OnChildObjectRemoving(this, ChildObject);
+	if (GetManager() != NULL)
+		GetManager()->OnObjectChildObjectRemoving(GetManager(), this, ChildObject);
 
-	Wrapper->Deinitialize();
+	ChildObject->Deinitialize();
 
-	ChildWrappers.RemoveValue(Wrapper);
-	Wrapper->SetParent(NULL);
-	Wrapper->SetManager(NULL);
+	ChildWrappers.RemoveValue(ChildObject);
+	ChildObject->SetParent(NULL);
+	ChildObject->SetManager(NULL);
 
-	Event.Type = ZED_OET_REMOVED;
-	RaiseEvent(&Event);
+	OnChildObjectRemoved(this, ChildObject);
+	if (GetManager() != NULL)
+		GetManager()->OnObjectChildObjectRemoved(GetManager(), this, ChildObject);
 
 	return true;
 }
@@ -370,10 +392,9 @@ void ZEDObjectWrapper::SendChangedEvent()
 {
 	Update();
 
-	ZEDObjectEvent Event;
-	Event.Wrapper = this;
-	Event.Type = ZED_OET_CHANGED;
-	RaiseEvent(&Event);
+	OnPropertyChanged(this, NULL);
+	if (GetManager() != NULL)
+		GetManager()->OnObjectPropertyChanged(GetManager(), this, NULL);
 }
 
 void ZEDObjectWrapper::LockWrapper()

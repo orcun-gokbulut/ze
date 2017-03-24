@@ -231,11 +231,11 @@ void ZEDMenuItem::TargetCommand_OnUpdate(const ZEDCommand* Command)
 	Action->setEnabled(TargetCommand->GetEnabled());
 
 	int Squence = 0;
-	if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_CTRL))
+	if (Command->GetShortcut().Modifiers.GetFlags(ZED_VKM_CTRL))
 		Squence += Qt::CTRL;
-	if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_ALT))
+	if (Command->GetShortcut().Modifiers.GetFlags(ZED_VKM_ALT))
 		Squence += Qt::ALT;
-	if (Command->GetShortcut().Modifier.GetFlags(ZED_VKM_SHIFT))
+	if (Command->GetShortcut().Modifiers.GetFlags(ZED_VKM_SHIFT))
 		Squence += Qt::SHIFT;
 
 	Squence += Command->GetShortcut().Key;

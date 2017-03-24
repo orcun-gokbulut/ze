@@ -37,7 +37,6 @@
 
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDSelectionManager.h"
-#include "ZEDCore/ZEDSelectionEvent.h"
 #include "QAbstractItemView"
 
 QModelIndex ZEDObjectSelectionModel::FindIndex(const QModelIndex& Parent, ZEDObjectWrapper* Wrapper, int Column)
@@ -58,66 +57,84 @@ QModelIndex ZEDObjectSelectionModel::FindIndex(const QModelIndex& Parent, ZEDObj
 	return QModelIndex();
 }
 
-void ZEDObjectSelectionModel::SelectionEvent(const ZEDSelectionEvent* Event)
+bool ZEDObjectSelectionModel::InitializeInternal()
+{
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
+	GetEditor()->GetSelectionManager()->OnObjectsSelected.AddDelegate<ZEDObjectSelectionModel, &ZEDObjectSelectionModel::SelectionManager_OnObjectsSelected>(this);
+	GetEditor()->GetSelectionManager()->OnObjectsDeselected.AddDelegate<ZEDObjectSelectionModel, &ZEDObjectSelectionModel::SelectionManager_OnObjectsDeselected>(this);
+
+	return true;
+}
+
+bool ZEDObjectSelectionModel::DeinitializeInternal()
+{
+	GetEditor()->GetSelectionManager()->OnObjectsSelected.DisconnectObject(this);
+	GetEditor()->GetSelectionManager()->OnObjectsDeselected.DisconnectObject(this);
+
+	return ZEInitializable::DeinitializeInternal();
+}
+
+void ZEDObjectSelectionModel::SelectionManager_OnObjectsSelected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedList)
 {
 	if (model() == NULL)
 		return;
 
 	HandlingEvent = true;
-	switch (Event->GetType())
-	{
-		case ZED_SET_SELECTED:
-		{
-			const ZEArray<ZEDObjectWrapper*>& SelectedList = Event->GetAddedlist();
-			for (ZESize I = 0; I < SelectedList.GetCount(); I++)
-			{
-				if (SelectionBehavior == QAbstractItemView::SelectItems)
-				{
-					QModelIndex Index = FindIndex(QModelIndex(), SelectedList[I], 0);
-					if (Index.isValid())
-						select(Index, QItemSelectionModel::Deselect);
-				}
-				else if (SelectionBehavior == QAbstractItemView::SelectRows)
-				{
-					QModelIndex Parent = model()->parent(FindIndex(QModelIndex(), SelectedList[I], 0));
-					int ColumnCount = model()->columnCount(Parent);
-					for (int N = 0; N < ColumnCount; N++)
-					{
-						QModelIndex Index = FindIndex(Parent, SelectedList[I], N);
-						if (Index.isValid())
-							select(Index, QItemSelectionModel::Select);
-					}
-				}
-			}
-			break;
-		}
 
-		case ZED_SET_DESELECTED:
+	for (ZESize I = 0; I < SelectedList.GetCount(); I++)
+	{
+		if (SelectionBehavior == QAbstractItemView::SelectItems)
 		{
-			const ZEArray<ZEDObjectWrapper*>& DeselectedList = Event->GetRemovedlist();
-			for (ZESize I = 0; I < DeselectedList.GetCount(); I++)
+			QModelIndex Index = FindIndex(QModelIndex(), SelectedList[I], 0);
+			if (Index.isValid())
+				select(Index, QItemSelectionModel::Deselect);
+		}
+		else if (SelectionBehavior == QAbstractItemView::SelectRows)
+		{
+			QModelIndex Parent = model()->parent(FindIndex(QModelIndex(), SelectedList[I], 0));
+			int ColumnCount = model()->columnCount(Parent);
+			for (int N = 0; N < ColumnCount; N++)
 			{
-				if (SelectionBehavior == QAbstractItemView::SelectItems)
-				{
-					QModelIndex Index = FindIndex(QModelIndex(), DeselectedList[I], 0);
-					if (Index.isValid())
-						select(Index, QItemSelectionModel::Deselect);
-				}
-				else if (SelectionBehavior == QAbstractItemView::SelectRows)
-				{
-					QModelIndex Parent = model()->parent(FindIndex(QModelIndex(), DeselectedList[I], 0));
-					int ColumnCount = model()->columnCount(Parent);
-					for (int N = 0; N < ColumnCount; N++)
-					{
-						QModelIndex Index = FindIndex(Parent, DeselectedList[I], N);
-						if (Index.isValid())
-							select(Index, QItemSelectionModel::Deselect);
-					}
-				}
+				QModelIndex Index = FindIndex(Parent, SelectedList[I], N);
+				if (Index.isValid())
+					select(Index, QItemSelectionModel::Select);
 			}
-			break;
 		}
 	}
+
+	HandlingEvent = false;
+}
+
+void ZEDObjectSelectionModel::SelectionManager_OnObjectsDeselected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedList)
+{
+	if (model() == NULL)
+		return;
+
+	HandlingEvent = true;
+
+	for (ZESize I = 0; I < DeselectedList.GetCount(); I++)
+	{
+		if (SelectionBehavior == QAbstractItemView::SelectItems)
+		{
+			QModelIndex Index = FindIndex(QModelIndex(), DeselectedList[I], 0);
+			if (Index.isValid())
+				select(Index, QItemSelectionModel::Deselect);
+		}
+		else if (SelectionBehavior == QAbstractItemView::SelectRows)
+		{
+			QModelIndex Parent = model()->parent(FindIndex(QModelIndex(), DeselectedList[I], 0));
+			int ColumnCount = model()->columnCount(Parent);
+			for (int N = 0; N < ColumnCount; N++)
+			{
+				QModelIndex Index = FindIndex(Parent, DeselectedList[I], N);
+				if (Index.isValid())
+					select(Index, QItemSelectionModel::Deselect);
+			}
+		}
+	}
+
 	HandlingEvent = false;
 }
 

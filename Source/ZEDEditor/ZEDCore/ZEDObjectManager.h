@@ -40,7 +40,9 @@
 #include "ZEDUserInterface/ZEDCommand.h"
 
 class ZEClass;
+class ZEMTProperty;
 class ZEDObjectWrapper;
+class ZEDSelectionManager;
 
 class ZEDWrapperRegistration
 {
@@ -63,9 +65,7 @@ class ZEDObjectManager : public ZEDComponent
 		bool									DeinitializeInternal();
 
 		virtual void							EditorEvent(const ZEDEditorEvent* Event);
-		virtual void							SelectionEvent(const ZEDSelectionEvent* Event);
-
-		void									RaiseEvent(const ZEDObjectEvent* Event);
+		virtual void							SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection);
 
 												ZEDObjectManager();
 		virtual									~ZEDObjectManager();
@@ -102,6 +102,15 @@ class ZEDObjectManager : public ZEDComponent
 		void									CloneObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
 
 		void									Tick(float ElapsedTime);
+
+		ZE_EVENT(								OnObjectCreated,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object));
+		ZE_EVENT(								OnObjectDestroying,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object));
+		ZE_EVENT(								OnObjectDestroyed,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object));
+		ZE_EVENT(								OnObjectPropertyChanged,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEMTProperty* Property));
+		ZE_EVENT(								OnObjectChildObjectAdding,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(								OnObjectChildObjectAdded,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(								OnObjectChildObjectRemoving,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
+		ZE_EVENT(								OnObjectChildObjectRemoved,(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject));
 
 		static ZEDObjectManager*				CreateInstance();
 };

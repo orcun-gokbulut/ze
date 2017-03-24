@@ -36,7 +36,6 @@
 #include "ZEDDeleteOperation.h"
 
 #include "ZEDObjectWrapper.h"
-#include "ZEDObjectEvent.h"
 #include "ZEDObjectManager.h"
 
 #include "ZEDEditor.h"

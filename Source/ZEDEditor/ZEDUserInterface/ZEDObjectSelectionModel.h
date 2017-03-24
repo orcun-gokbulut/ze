@@ -39,8 +39,10 @@
 
 #include <QItemSelectionModel>
 #include <QAbstractItemView>
+#include <ZEDS/ZEArray.h>
 
 class ZEDObjectWrapper;
+class ZEDSelectionManager;
 
 class ZEDObjectSelectionModel : public QItemSelectionModel, public ZEDComponent
 {
@@ -48,9 +50,15 @@ class ZEDObjectSelectionModel : public QItemSelectionModel, public ZEDComponent
 	private:
 		bool							HandlingEvent;
 		QAbstractItemView::SelectionBehavior SelectionBehavior;
+
 		QModelIndex						FindIndex(const QModelIndex& Parent, ZEDObjectWrapper* Wrapper, int Column);
-		void							SelectionEvent(const ZEDSelectionEvent* Event) override;
 		void							UpdateSelection();
+
+		virtual bool					InitializeInternal() override;
+		virtual bool					DeinitializeInternal() override;
+
+		void							SelectionManager_OnObjectsSelected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects);
+		void							SelectionManager_OnObjectsDeselected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedObjects);
 
 	private slots:
 		void							this_selectionChanged(const QItemSelection& Selected, const QItemSelection& Deselected);
