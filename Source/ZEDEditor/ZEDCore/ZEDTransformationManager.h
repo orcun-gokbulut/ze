@@ -45,14 +45,15 @@
 
 class ZEDEditor;
 class ZEDGizmo;
+class ZEDObjectWrapper;
 class ZEDObjectWrapper3D;
-class ZEDObjectWrapper3D;
-class ZEDSelectionEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDTransformationToolbar;
+class ZEDSelectionManager;
+class ZEDViewport;
 class ZEDTransformationManager;
+class ZEDSelectionManager;
+class ZERNPreRenderParameters;
+class ZEDObjectManager;
+class ZEMTProperty;
 
 enum ZEDTransformType
 {
@@ -79,6 +80,8 @@ enum ZEDTransformPivot
 	ZED_TP_SELECTION_CENTER,
 	ZED_TP_WORLD
 };
+
+
 
 class ZEDTransformationState
 {
@@ -119,9 +122,6 @@ class ZEDTransformationManager : public ZEDComponent
 		void									UpdateGizmos();
 		void									UpdateTransformStates();
 
-		bool									InitializeInternal();
-		bool									DeinitializeInternal();
-
 		void									StartTransform(ZEDGizmo* TransformGizmo);
 		void									EndTransform();
 		void									ResetTransform();
@@ -134,12 +134,16 @@ class ZEDTransformationManager : public ZEDComponent
 		ZEVector3								GetRotation(bool& Valid);
 		ZEVector3								GetScale(bool& Valid);
 
-		virtual void							ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void							SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void							ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void							ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void							ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
+		bool									InitializeInternal();
+		bool									DeinitializeInternal();
+
+		void									ObjectManager_OnObjectPropertyChanged(ZEDObjectManager* Manager, ZEDObjectWrapper* Object, ZEMTProperty* Property);
+		void									SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection);
+		void									Viewport_OnKeyboardKeyPressed(ZEDViewport* Viewport, ZEDKeyboardKey Key);	
+		void									Viewport_OnMouseButtonPressed(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void									Viewport_OnMouseButtonRelease(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void									Viewport_OnMouseMoved(ZEDViewport* Viewport, const ZEVector2& Position);
+		void									Viewport_OnPreRender(ZEDViewport* Viewport, const ZERNPreRenderParameters& Parameters);
 
 												ZEDTransformationManager();
 		virtual									~ZEDTransformationManager();
@@ -192,6 +196,12 @@ class ZEDTransformationManager : public ZEDComponent
 
 		void									SetZ(float Value);
 		float									GetZ(bool& Valid);
+
+		ZE_EVENT(								OnTransformationStarted,(ZEDTransformationManager* Manager));
+		ZE_EVENT(								OnTransforming,(ZEDTransformationManager* Manager));
+		ZE_EVENT(								OnTransformationEnded,(ZEDTransformationManager* Manager));
+		ZE_EVENT(								OnTransformationReset,(ZEDTransformationManager* Manager));
+		ZE_EVENT(								OnTransformationStateChanged,(ZEDTransformationManager* Manager));
 
 		static ZEDTransformationManager*		CreateInstance();
 };

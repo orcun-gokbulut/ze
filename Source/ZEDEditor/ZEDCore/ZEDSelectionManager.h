@@ -40,7 +40,6 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDUserInterface/ZEDCommand.h"
 
-
 class ZEObject;
 class ZEClass;
 class ZEDEditor;
@@ -110,6 +109,16 @@ class ZEDSelectionManager : public ZEDComponent
 		void								FreezeObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 		void								UnfreezeObject(ZEDObjectWrapper* Object);
 		void								UnfreezeObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
+
+		ZE_EVENT(							OnStateChanged,(ZEDSelectionManager* Manager));
+		ZE_EVENT(							OnSelectionChanged,(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection));
+		ZE_EVENT(							OnSelectionLocked,(ZEDSelectionManager* Manager));
+		ZE_EVENT(							OnSelectionUnlocked,(ZEDSelectionManager* Manager));
+		ZE_EVENT(							OnObjectsSelected,(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects));
+		ZE_EVENT(							OnObjectsDeselected,(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedObjects));
+		ZE_EVENT(							OnObjectsFrozen,(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& FrozenObjects));
+		ZE_EVENT(							OnObjectsUnfrozen,(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& UnfrozenObjects));
+		ZE_EVENT(							OnFocusChanged,(ZEDSelectionManager* Manager, ZEDObjectWrapper* FocusedObject));
 
 		static ZEDSelectionManager*			CreateInstance();
 };

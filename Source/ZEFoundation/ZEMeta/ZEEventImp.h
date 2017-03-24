@@ -64,9 +64,21 @@ class ZEEvent<ZE_TEMPLATE_SPECIALIZATION> : public ZEMTEventBase
 
 		bool								AddDelegate(const ZEEventDelegateBase* Delegate);
 		void								AddDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
+		template<TReturn (*Function)(ZE_TEMPLATE_ARGUMENTS)> 
+		void								AddDelegate();
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)> 
+		void								AddDelegate(TClass* Object);
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const>
+		void								AddDelegateConst(const TClass* Object);
 
 		bool								RemoveDelegate(const ZEEventDelegateBase* Delegate);
 		void								RemoveDelegate(const ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>& Delegate);
+		template<TReturn (*Function)(ZE_TEMPLATE_ARGUMENTS)> 
+		void								RemoveDelegate();
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)> 
+		void								RemoveDelegate(TClass* Object);
+		template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const>
+		void								RemoveDelegateConst(const TClass* Object);
 
 		virtual void						DisconnectObject(ZEObject* Object);
 
@@ -181,6 +193,27 @@ void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(const ZEEventDelegate<ZE_T
 		const_cast<ZEObject*>(Delegate.GetObject())->AddEventConnection(this);
 	}
 	Delegates.UnlockWrite();
+}
+
+ZE_TEMPLATE_KEYWORD
+template<TReturn (*TFunction)(ZE_TEMPLATE_ARGUMENTS)> 
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate()
+{
+	AddDelegate(ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::Create<TFunction>());
+}
+
+ZE_TEMPLATE_KEYWORD
+template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS)> 
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegate(TClass* Object)
+{
+	AddDelegate(ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::Create<TClass, TMethod>(Object));
+}
+
+ZE_TEMPLATE_KEYWORD
+template<typename TClass, TReturn (TClass::*TMethod)(ZE_TEMPLATE_ARGUMENTS) const> 
+void ZEEvent<ZE_TEMPLATE_SPECIALIZATION>::AddDelegateConst(const TClass* Object)
+{
+	AddDelegate(ZEEventDelegate<ZE_TEMPLATE_SPECIALIZATION>::CreateConst<TClass, TMethod>(Object));
 }
 
 ZE_TEMPLATE_KEYWORD

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEEventSuppressor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
-
-
-ZEDObjectEvent::ZEDObjectEvent()
+class ZEMTEventBase;
+class ZEEventSuppressor
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
+	private:
+		ZEMTEventBase*		Event;
+		bool				PreviousSuppressedState;
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
+	public:
+		bool				LoopVariable;
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
+							ZEEventSuppressor(ZEMTEventBase& Event);
+							~ZEEventSuppressor();
+};
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
-
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+#define ZE_SUPPRESS_EVENT(Event) for (ZEEventSuppressor __Suppressor(Event); __Suppressor.LoopVariable; __Suppressor.LoopVariable = false)

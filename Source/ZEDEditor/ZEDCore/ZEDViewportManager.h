@@ -39,24 +39,47 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEMeta/ZEEvent.h"
 
+enum ZEDKeyboardKey;
+enum ZEDMouseButton;
 class ZEDViewport;
+class ZERNPreRenderParameters;
+class ZERNView;
 
 class ZEDViewportManager : public ZEDComponent
 {
 	ZE_OBJECT
 	private:
-		ZEArray<ZEDViewport*>			Viewports;
+		ZEArray<ZEDViewport*>				Viewports;
 
-										ZEDViewportManager();
-										~ZEDViewportManager();
+											ZEDViewportManager();
+											~ZEDViewportManager();
 
 	public:
-		const ZEArray<ZEDViewport*>		GetViewports();
-		void							RegisterViewport(ZEDViewport* Viewport);
-		void							UnregisterViewport(ZEDViewport* Viewport);
+		const ZEArray<ZEDViewport*>			GetViewports();
+		void								RegisterViewport(ZEDViewport* Viewport);
+		void								UnregisterViewport(ZEDViewport* Viewport);
 
-		void							Render();
 
-		static ZEDViewportManager*		CreateInstance();
+		void								Render();
+
+		ZE_EVENT(							OnViewportFocusGained,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnViewportFocusLost,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnViewportDestroying,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnViewportDestroyed,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnViewportViewChangedEvent,(ZEDViewport* Viewport, const ZERNView& View));
+		ZE_EVENT(							OnViewportKeyboardKeyPressed,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnViewportKeyboardKeyPressing,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnViewportKeyboardKeyReleased,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnViewportMouseClick,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnViewportMouseDoubleClick,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnViewportMouseMoved,(ZEDViewport* Viewport, const ZEVector2& Position));
+		ZE_EVENT(							OnViewportMouseWheelMoved,(ZEDViewport* Viewport, ZEInt Value));
+		ZE_EVENT(							OnViewportMouseButtonPressed,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnViewportMouseButtonPressing,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnViewportMouseButtonReleased,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnViewportPreRender,(ZEDViewport* Viewport, const ZERNPreRenderParameters& Parameters));
+
+		static ZEDViewportManager*			CreateInstance();
 };

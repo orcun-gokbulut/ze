@@ -49,7 +49,6 @@ class ZEGRViewport : public ZEObject
 			ZEVector2			Size;
 			float				MinDepth;
 			float				MaxDepth;
-
 		} StateData;
 
 	public:

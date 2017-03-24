@@ -38,7 +38,8 @@
 #include "ZEDComponent.h"
 
 #include "ZETypes.h"
-#include "ZEDViewportEvent.h"
+#include "ZEMeta/ZEEvent.h"
+#include "ZEDInputDefinitions.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
@@ -49,9 +50,10 @@
 #include <QFocusEvent>
 #include <QTimer>
 
-
-class ZEDGrid;
 class ZEDViewportManager;
+class ZEDGrid;
+enum ZEDKeyboardKey;
+enum ZEDMouseButton;
 
 class ZEDViewport : public QWidget, public ZEDComponent
 {
@@ -73,14 +75,15 @@ class ZEDViewport : public QWidget, public ZEDComponent
 		ZEGRWindow*							Window;
 		ZERNRenderer						Renderer;
 
-		ZEVector2							MouseDelta;
+		ZEUInt								Modifiers;
+		ZEArray<ZEDKeyboardKey>				KeyboardKeyBuffer;
+		ZEArray<ZEDMouseButton>				MouseButtonBuffer;
+
+		ZEVector2							MousePositionDelta;
 		ZEVector2							LastMousePosition;
 
 		ZEDGrid*							Grid;
 
-		ZEUInt								Modifiers;
-		ZEArray<ZEDViewportKeyboardEvent>	KeyboardEvents;
-		ZEArray<ZEDViewportMouseEvent>		MouseEvents;
 
 		bool								UpdateView();
 		bool								UpdateRenderTarget();
@@ -91,37 +94,58 @@ class ZEDViewport : public QWidget, public ZEDComponent
 
 		virtual void						TickEvent(const ZEDTickEvent* Tick);
 
-		virtual void						paintEvent(QPaintEvent* PaintEvent);
-		virtual void						mousePressEvent(QMouseEvent* MouseEvent);
-		virtual void						mouseMoveEvent(QMouseEvent* MouseEvent);
-		virtual void						mouseReleaseEvent(QMouseEvent* MouseEvent);
-		virtual void						enterEvent(QEvent* MouseEvent);
-		virtual void						leaveEvent(QEvent* MouseEvent);
-		virtual void						keyPressEvent(QKeyEvent* KeyEvent);
-		virtual void						keyReleaseEvent(QKeyEvent* KeyEvent);
-		virtual void						resizeEvent(QResizeEvent* ResizeEvent);
-		virtual void						focusInEvent(QFocusEvent* Event);
-		virtual void						focusOutEvent(QFocusEvent* Event);
+		virtual QPaintEngine*				paintEngine() const override;
+		virtual void						paintEvent(QPaintEvent* PaintEvent) override;
+		virtual void						mousePressEvent(QMouseEvent* MouseEvent) override;
+		virtual void						mouseReleaseEvent(QMouseEvent* MouseEvent) override;
+		virtual void						mouseMoveEvent(QMouseEvent* MouseEvent) override;
+		virtual void						enterEvent(QEvent* MouseEvent) override;
+		virtual void						leaveEvent(QEvent* MouseEvent) override;
+		virtual void						keyPressEvent(QKeyEvent* KeyEvent) override;
+		virtual void						keyReleaseEvent(QKeyEvent* KeyEvent) override;
+		virtual void						resizeEvent(QResizeEvent* ResizeEvent) override;
+		virtual void						focusInEvent(QFocusEvent* Event) override;
+		virtual void						focusOutEvent(QFocusEvent* Event) override;
 
 	public:
-		ZEDViewportManager*					GetViewportManager();
-		ZERNRenderer*						GetRenderer();
-		const ZERNView&						GetView();
+		ZEDViewportManager*					GetViewportManager() const;
+		ZERNRenderer*						GetRenderer() const;
+		const ZERNView&						GetView() const;
 
 		void								SetPosition(const ZEVector3& Position);
-		const ZEVector3&					GetPosition();
+		const ZEVector3&					GetPosition() const;
 
 		void								SetRotation(const ZEQuaternion& Quaternion);
-		const ZEQuaternion&					GetRotation();
+		const ZEQuaternion&					GetRotation() const;
 
 		void								SetVerticalFOV(float FOV);
-		float								GetVerticalFOV();
+		float								GetVerticalFOV() const;
+
+		ZEDKeyModifiers						GetKeyModifiers() const;
+		const ZEVector2&					GetMousePosition() const;
+		const ZEVector2&					GetMousePositionDelta() const;
 
 		bool								PreRender();
 		void								Render();
 		void								Present();
-		
-		virtual QPaintEngine*				paintEngine() const;
+
+		ZE_EVENT(							OnFocusGained,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnFocusLost,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnDestroying,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnDestroyed,(ZEDViewport* Viewport));
+		ZE_EVENT(							OnViewChangedEvent,(ZEDViewport* Viewport, const ZERNView& View));
+		ZE_EVENT(							OnKeyboardKeyPressed,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnKeyboardKeyPressing,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnKeyboardKeyReleased,(ZEDViewport* Viewport, ZEDKeyboardKey Key));
+		ZE_EVENT(							OnMouseClick,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnMouseDoubleClick,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnMouseMoved,(ZEDViewport* Viewport, const ZEVector2& Position));
+		ZE_EVENT(							OnMouseWheelMoved,(ZEDViewport* Viewport, ZEInt Value));
+		ZE_EVENT(							OnMouseButtonPressed,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnMouseButtonPressing,(ZEDViewport* Viewport, ZEDMouseButton Button));
+		ZE_EVENT(							OnMouseButtonReleased,(ZEDViewport* Viewport, ZEDMouseButton Button));
+
+		ZE_EVENT(							OnPreRender,(ZEDViewport* Viewport, const ZERNPreRenderParameters& Parameters));
 
 											ZEDViewport(QWidget* Parent = NULL);
 		virtual								~ZEDViewport();

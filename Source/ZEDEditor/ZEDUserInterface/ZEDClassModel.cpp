@@ -40,7 +40,6 @@
 #include "ZEMeta/ZEMTProvider.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEFile/ZEPathInfo.h"
-#include "ZEDCore/ZEDObjectEvent.h"
 
 #include <QtGui/QIcon>
 #include <QtCore/QMimeData>

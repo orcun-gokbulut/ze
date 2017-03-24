@@ -51,6 +51,8 @@ ZE_ENUM(ZEDObjectModelMode)
 
 class ZEClass;
 class ZEDObjectWrapper;
+class ZEDObjectManager;
+class ZEMTProperty;
 
 class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 {
@@ -93,8 +95,15 @@ class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 
 		ZEDObjectWrapper*				ConvertToWrapper(const QModelIndex& Index) const;
 
+		virtual bool					InitializeInternal() override;
+		virtual bool					DeinitializeInternal() override;
+
 	private: /* Events */
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
+		void							ObjectManager_OnObjectChildObjectAdding(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject);
+		void							ObjectManager_OnObjectChildObjectAdded(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject);
+		void							ObjectManager_OnObjectChildObjectRemoving(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject);
+		void							ObjectManager_OnObjectChildObjectRemoved(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject);
+		void							ObjectManager_OnObjectPropertyChanged(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEMTProperty* Property);
 
 	private: /* QAbstractItemModel */
 		ZEDObjectWrapper*				indexList(ZEDObjectWrapper* Target, int Row, int& Index) const;
@@ -118,4 +127,5 @@ class ZEDObjectModel : public QAbstractItemModel, public ZEDComponent
 		virtual Qt::DropActions			supportedDragActions() const override;
 
 										ZEDObjectModel();
+		virtual							~ZEDObjectModel();
 };

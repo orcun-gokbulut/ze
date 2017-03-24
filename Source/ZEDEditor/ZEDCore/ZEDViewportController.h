@@ -37,6 +37,10 @@
 
 #include "ZEDCore/ZEDComponent.h"
 
+enum ZEDKeyboardKey;
+enum ZEDMouseButton;
+class ZEVector2;
+class ZEDViewport;
 class ZEDViewportMouseEvent;
 class ZEDViewportKeyboardEvent;
 
@@ -50,8 +54,13 @@ class ZEDViewportController : public ZEDComponent
 		bool								Active;
 		float								Rx, Ry, Rz;
 
-		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void						ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		void								Viewport_OnKeyboardKeyPressing(ZEDViewport* Viewport, ZEDKeyboardKey Key);
+		void								Viewport_OnMouseButtonPressed(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void								Viewport_OnMouseButtonReleased(ZEDViewport* Viewport, ZEDMouseButton Button);
+		void								Viewport_OnMouseMoved(ZEDViewport* Viewport, const ZEVector2& Position);
+
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
 
 											ZEDViewportController();
 		virtual								~ZEDViewportController();

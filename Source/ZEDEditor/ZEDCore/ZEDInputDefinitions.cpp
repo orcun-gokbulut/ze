@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationEvent.cpp
+ Zinek Engine - ZEDInputDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationEvent.h"
-
-ZEDTransformationEvent::ZEDTransformationEvent()
-{
-	Type = ZED_TET_NONE;
-	Manager = NULL;
-	TransformationStates = NULL;
-}
-
-ZEDTransformationEventType ZEDTransformationEvent::GetType() const
-{
-	return Type;
-}
-
-ZEDTransformationManager* ZEDTransformationEvent::GetManager() const
-{
-	return Manager;
-}
-
-const ZEArray<ZEDTransformationState>& ZEDTransformationEvent::GetTransformationStates() const
-{
-	return *TransformationStates;
-}
+#include "ZEDInputDefinitions.h"

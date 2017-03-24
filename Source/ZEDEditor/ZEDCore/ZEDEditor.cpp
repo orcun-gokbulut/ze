@@ -268,26 +268,20 @@ bool ZEDEditor::InitializeInternal()
 	MainWindow = ZEDMainWindow::CreateInstance();
 
 	AssetManager = ZEDAssetManager::CreateInstance();
-	AddComponent(AssetManager);
-
 	ViewportManager = ZEDViewportManager::CreateInstance();
-	AddComponent(ViewportManager);
-
-	UIManager = ZEUIManager::CreateInstance();
-	UIManager->Initialize();
-
 	ObjectManager = ZEDObjectManager::CreateInstance();
-	AddComponent(ObjectManager);
-
-	TransformationManager = ZEDTransformationManager::CreateInstance();
-	AddComponent(TransformationManager);
-
 	SelectionManager = ZEDSelectionManager::CreateInstance();
-	AddComponent(SelectionManager);
-
+	TransformationManager = ZEDTransformationManager::CreateInstance();
 	OperationManager = ZEDOperationManager::CreateInstance();
-	AddComponent(OperationManager);
+	UIManager = ZEUIManager::CreateInstance();
 
+	AddComponent(AssetManager);
+	AddComponent(ViewportManager);
+	UIManager->Initialize();
+	AddComponent(ObjectManager);
+	AddComponent(TransformationManager);
+	AddComponent(SelectionManager);
+	AddComponent(OperationManager);
 	AddComponent(MainWindow);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)

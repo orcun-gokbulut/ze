@@ -37,7 +37,6 @@
 
 #include "ZEDEditor.h"
 #include "ZEDObjectWrapper3D.h"
-#include "ZEDObjectEvent.h"
 
 bool ZEDTransformationOperation::Apply()
 {

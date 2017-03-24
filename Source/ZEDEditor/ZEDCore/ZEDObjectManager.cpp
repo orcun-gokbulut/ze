@@ -39,7 +39,6 @@
 
 #include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
-#include "ZEDObjectEvent.h"
 #include "ZEDOperationManager.h"
 #include "ZEDCreateOperation.h"
 #include "ZEDDeleteOperation.h"
@@ -67,6 +66,8 @@ bool ZEDObjectManager::InitializeInternal()
 	RegisterCommands();
 	LoadWrapperClasses();
 	
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.AddDelegate<ZEDObjectManager, &ZEDObjectManager::SelectionManager_OnSelectionChanged>(this);
+
 	if (RootWrapper != NULL)
 	{
 		RootWrapper->Initialize();
@@ -78,6 +79,8 @@ bool ZEDObjectManager::InitializeInternal()
 
 bool ZEDObjectManager::DeinitializeInternal()
 {
+	GetEditor()->GetSelectionManager()->OnSelectionChanged.DisconnectObject(this);
+
 	if (RootWrapper != NULL)
 		RootWrapper->Deinitialize();
 
@@ -89,15 +92,9 @@ void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)
 	UpdateCommands();
 }
 
-void ZEDObjectManager::SelectionEvent(const ZEDSelectionEvent* Event)
+void ZEDObjectManager::SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection)
 {
 	UpdateCommands();
-}
-
-void ZEDObjectManager::RaiseEvent(const ZEDObjectEvent* Event)
-{
-	if (GetEditor() != NULL && IsInitialized())
-		GetEditor()->DistributeEvent(Event);
 }
 
 ZEDObjectManager::ZEDObjectManager()

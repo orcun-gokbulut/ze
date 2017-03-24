@@ -38,7 +38,7 @@
 #include "ZEDEditorCore.h"
 #include "ZEDEditor.h"
 #include "ZEDViewportManager.h"
-#include "ZEDViewportEvent.h"
+#include "ZEDInputDefinitions.h"
 
 #include "ZEError.h"
 #include "ZEMath\ZEAngle.h"
@@ -115,12 +115,7 @@ bool ZEDViewport::UpdateView()
 
 	DirtyFlags.UnraiseFlags(ZED_VDF_VIEW);
 
-	ZEDViewportChangedEvent Event;
-	Event.Viewport = this;
-	Event.OldView = &OldView;
-	Event.View = &View;
-
-	RaiseEvent(&Event);
+	OnViewChangedEvent(this, View);
 
 	return true;
 }
@@ -248,7 +243,6 @@ bool ZEDViewport::InitializeInternal()
 	return true;
 }
 
-
 bool ZEDViewport::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
@@ -262,90 +256,66 @@ bool ZEDViewport::DeinitializeInternal()
 
 void ZEDViewport::TickEvent(const ZEDTickEvent* Event)
 {
-	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+	for (ZESize I = 0; I < KeyboardKeyBuffer.GetCount(); I++)
 	{
-		KeyboardEvents[I].Modifiers = Modifiers;
-		KeyboardEvents[I].Unacuqire();
-		RaiseEvent(&KeyboardEvents[I]);
+		OnKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportKeyboardKeyPressing(this, KeyboardKeyBuffer[I]);
 	}
 
-	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
+	for (ZESize I = 0; I < MouseButtonBuffer.GetCount(); I++)
 	{
-		MouseEvents[I].Delta = MouseDelta;
-		MouseEvents[I].Modifiers = Modifiers;
-		MouseEvents[I].Unacuqire();
-		RaiseEvent(&MouseEvents[I]);
+		OnMouseButtonPressing(this, MouseButtonBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportMouseButtonPressing(this, MouseButtonBuffer[I]);
 	}
 
-	MouseDelta = ZEVector2::Zero;
+	MousePositionDelta = ZEVector2::Zero;
+}
+
+
+QPaintEngine* ZEDViewport::paintEngine() const
+{
+	return NULL;
 }
 
 void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 {
-	ZEDViewportMouseEvent MouseEvent;
-	MouseEvent.Viewport = this;
-	MouseEvent.Position.x = Event->pos().x();// = LastMousePosition;
-	MouseEvent.Position.y = Event->pos().y();
-	MouseEvent.Delta = ZEVector2::Zero;
-	MouseEvent.Button = (ZEDIViewportMouseButton)Event->button();
-	MouseEvent.Modifiers = Modifiers;
-	MouseEvent.Type = ZED_VIET_BUTTON_PRESSING;
-	MouseEvents.Add(MouseEvent);
-	MouseEvent.Type = ZED_VIET_BUTTON_PRESSED;
+	OnMouseButtonPressed(this, (ZEDMouseButton)Event->button());
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportMouseButtonPressed(this, (ZEDMouseButton)Event->button());
 
-	RaiseEvent(&MouseEvent);
+	MouseButtonBuffer.Add((ZEDMouseButton)Event->button());
 
 	QWidget::mousePressEvent(Event);
 }
 
-void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
-{
-	ZEDViewportMouseEvent MouseEvent;
-	MouseEvent.Type = ZED_VIET_MOUSE_MOVED;
-	MouseEvent.Viewport = this;
-	MouseEvent.Position.x = Event->pos().x();
-	MouseEvent.Position.y = Event->pos().y();
-
-	if (LastMousePosition.x == -1)
-	{
-		MouseDelta = ZEVector2::Zero;
-	}
-	else
-	{
-		MouseDelta = MouseEvent.Position - LastMousePosition;
-	}
-
-	MouseEvent.Button = (ZEDIViewportMouseButton)Event->button();
-	MouseEvent.Modifiers = Modifiers;
-	MouseEvent.Delta = MouseDelta;
-
-	LastMousePosition = MouseEvent.Position;
-
-	RaiseEvent(&MouseEvent);
-
-	QWidget::mouseMoveEvent(Event);
-}
-
 void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
 {
-	ZEDViewportMouseEvent MouseEvent;
-	MouseEvent.Type = ZED_VIET_BUTTON_RELEASED;
-	MouseEvent.Viewport = this;
-	MouseEvent.Position = LastMousePosition;
-	MouseEvent.Delta = MouseDelta;
-	MouseEvent.Button = (ZEDIViewportMouseButton)Event->button();
-	MouseEvent.Modifiers = Modifiers;
+	MouseButtonBuffer.RemoveValue((ZEDMouseButton)Event->button());
+	
+	OnMouseButtonReleased(this, (ZEDMouseButton)Event->button());
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportMouseButtonReleased(this, (ZEDMouseButton)Event->button());
 
-	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
-	{
-		if (MouseEvents[I].Button == MouseEvent.Button)
-		{
-			MouseEvents.Remove(I);
-			break;
-		}
-	}
+	QWidget::mouseReleaseEvent(Event);
+}
 
-	RaiseEvent(&MouseEvent);
+void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
+{
+
+	ZEVector2 Position(Event->pos().x(), Event->pos().y());
+
+	if (LastMousePosition.x == -1)
+		MousePositionDelta = ZEVector2::Zero;
+	else
+		MousePositionDelta = Position - LastMousePosition;
+
+	LastMousePosition = Position;
+
+	OnMouseMoved(this, Position);
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportMouseMoved(this, Position);
 
 	QWidget::mouseMoveEvent(Event);
 }
@@ -382,17 +352,11 @@ void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 	if (Event->key() == Qt::Key_Meta)
 		Modifiers |= ZED_VKM_WINDOWS;
 
-	ZEDViewportKeyboardEvent KeyboardEvent;
-	KeyboardEvent.Viewport = this;
-	KeyboardEvent.Key = (ZEDViewportKeyboardKey)Event->key();
-	KeyboardEvent.VirtualKey = Event->nativeVirtualKey();
-	KeyboardEvent.Text = Event->text().toUtf8().begin();
-	KeyboardEvent.Modifiers = Modifiers;
-	KeyboardEvent.Type = ZED_VIET_BUTTON_PRESSING;
-	KeyboardEvents.Add(KeyboardEvent);
-	KeyboardEvent.Type = ZED_VIET_BUTTON_PRESSED;
+	KeyboardKeyBuffer.Add((ZEDKeyboardKey)Event->key());
 
-	RaiseEvent(&KeyboardEvent);
+	OnKeyboardKeyPressed(this, (ZEDKeyboardKey)Event->key());
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportKeyboardKeyPressed(this, (ZEDKeyboardKey)Event->key());
 
 	QWidget::keyPressEvent(Event);
 }
@@ -405,25 +369,12 @@ void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
 		return;
 	}
 
-	ZEDViewportKeyboardEvent KeyboardEvent;
-	KeyboardEvent.Viewport = this;
-	KeyboardEvent.Type = ZED_VIET_BUTTON_RELEASED;
-	KeyboardEvent.Key = (ZEDViewportKeyboardKey)Event->key();
-	KeyboardEvent.VirtualKey = Event->nativeVirtualKey();
-	KeyboardEvent.Text = Event->text().toUtf8().begin();
-	KeyboardEvent.Modifiers = Modifiers;
+	KeyboardKeyBuffer.RemoveValue((ZEDKeyboardKey)Event->key());
 
-	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
-	{
-		if (KeyboardEvents[I].Key == KeyboardEvent.Key)
-		{
-			KeyboardEvents.Remove(I);
-			break;
-		}
-	}
+	OnKeyboardKeyReleased(this, (ZEDKeyboardKey)Event->key());
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportKeyboardKeyReleased(this, (ZEDKeyboardKey)Event->key());
 
-	RaiseEvent(&KeyboardEvent);
-	
 	if (Event->key() == Qt::Key_Shift)
 		Modifiers &= ~ZED_VKM_SHIFT;
 
@@ -451,44 +402,53 @@ void ZEDViewport::resizeEvent(QResizeEvent* Event)
 
 void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
+	OnFocusGained(this);
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportFocusGained(this);
+
 	QWidget::focusInEvent(Event);
 }
 
 void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 {
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
-	MouseDelta = ZEVector2::Zero;
+	MousePositionDelta = ZEVector2::Zero;
 	Modifiers = ZED_VKM_NONE;
 
-	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+	for (ZESize I = 0; I < KeyboardKeyBuffer.GetCount(); I++)
 	{
-		KeyboardEvents[I].Type = ZED_VIET_BUTTON_RELEASED;
-		RaiseEvent(&KeyboardEvents[I]);
+		OnKeyboardKeyReleased(this, KeyboardKeyBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportKeyboardKeyReleased(this, KeyboardKeyBuffer[I]);
 	}
-	KeyboardEvents.Clear();
+	KeyboardKeyBuffer.Clear();
 
-	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
+	for (ZESize I = 0; I < MouseButtonBuffer.GetCount(); I++)
 	{
-		MouseEvents[I].Type = ZED_VIET_BUTTON_RELEASED;
-		RaiseEvent(&MouseEvents[I]);
+		OnMouseButtonReleased(this, MouseButtonBuffer[I]);
+		if (GetViewportManager() != NULL)
+			GetViewportManager()->OnViewportMouseButtonReleased(this, MouseButtonBuffer[I]);
 	}
+	MouseButtonBuffer.Clear();
 
-	MouseEvents.Clear();
+	OnFocusLost(this);
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportFocusLost(this);
 
 	QWidget::focusOutEvent(Event);
 }
 
-ZEDViewportManager* ZEDViewport::GetViewportManager()
+ZEDViewportManager* ZEDViewport::GetViewportManager() const
 {
 	return ViewportManager;
 }
 
-ZERNRenderer* ZEDViewport::GetRenderer()
+ZERNRenderer* ZEDViewport::GetRenderer() const
 {
-	return &Renderer;
+	return const_cast<ZERNRenderer*>(&Renderer);
 }
 
-const ZERNView& ZEDViewport::GetView()
+const ZERNView& ZEDViewport::GetView() const
 {
 	return View;
 }
@@ -500,7 +460,7 @@ void ZEDViewport::SetPosition(const ZEVector3& Position)
 	Update();
 }
 
-const ZEVector3& ZEDViewport::GetPosition()
+const ZEVector3& ZEDViewport::GetPosition() const
 {
 	return Position;
 }
@@ -512,7 +472,7 @@ void ZEDViewport::SetRotation(const ZEQuaternion& Quaternion)
 	Update();
 }
 
-const ZEQuaternion& ZEDViewport::GetRotation()
+const ZEQuaternion& ZEDViewport::GetRotation() const
 {
 	return Rotation;
 }
@@ -524,9 +484,24 @@ void ZEDViewport::SetVerticalFOV(float FOV)
 	Update();
 }
 
-float ZEDViewport::GetVerticalFOV()
+float ZEDViewport::GetVerticalFOV() const
 {
 	return VerticalFOV;
+}
+
+ZEDKeyModifiers ZEDViewport::GetKeyModifiers() const
+{
+	return Modifiers;
+}
+
+const ZEVector2& ZEDViewport::GetMousePosition() const
+{
+	return LastMousePosition;
+}
+
+const ZEVector2& ZEDViewport::GetMousePositionDelta() const
+{
+	return MousePositionDelta;
 }
 
 bool ZEDViewport::PreRender()
@@ -542,12 +517,10 @@ bool ZEDViewport::PreRender()
 	Parameters.View = &View;
 
 	Grid->PreRender(&Parameters);
-
-	ZEDViewportRenderEvent Event;
-	Event.Viewport = this;
-	Event.PreRenderParameters = &Parameters;
-
-	RaiseEvent(&Event);
+	
+	OnPreRender(this, Parameters);
+	if (GetViewportManager() != NULL)
+		GetViewportManager()->OnViewportPreRender(this, Parameters);
 
 	return true;
 }
@@ -569,11 +542,6 @@ void ZEDViewport::Present()
 	Output->Present();
 }
 
-QPaintEngine* ZEDViewport::paintEngine() const
-{
-	return NULL;
-}
-
 ZEDViewport::ZEDViewport(QWidget* Parent) : QWidget(Parent)
 {
 	setAttribute(Qt::WA_PaintOnScreen, true);
@@ -587,7 +555,7 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QWidget(Parent)
 	Modifiers = ZED_VKM_NONE;
 	VerticalFOV = ZE_PI_3;
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
-	MouseDelta = ZEVector2::Zero;
+	MousePositionDelta = ZEVector2::Zero;
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
 }

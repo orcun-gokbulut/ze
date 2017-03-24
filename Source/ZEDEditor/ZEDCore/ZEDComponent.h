@@ -42,14 +42,7 @@
 class ZEDEditor;
 class ZEDEditorEvent;
 class ZEDEvent;
-class ZEDObjectEvent;
 class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
 class ZEDAssetEvent;
 
 class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
@@ -63,14 +56,7 @@ class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyab
 		virtual void					EventReceived(const ZEDEvent* Event);
 	
 		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
 		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
 		virtual void					AssetEvent(const ZEDAssetEvent* Event);
 
 		void							RaiseEvent(const ZEDEvent* Event);

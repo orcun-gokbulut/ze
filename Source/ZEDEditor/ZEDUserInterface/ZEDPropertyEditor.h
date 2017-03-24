@@ -43,19 +43,24 @@
 #include <QTreeWidget>
 
 class ZEDObjectWrapper;
+class ZEDSelectionManager;
 
 class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 {
 	friend class ZEDPropertyEditorItem;
 	private:
 		ZEClass*							BaseClass;
-		ZEArray<ZEDObjectWrapper*>			Wrappers;
+		ZEArray<ZEDObjectWrapper*>			Objects;
 		bool								Dirty;
 
 		void								Populate();
 
-		virtual void						ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
+
+		void								Object_OnPropertyChanged(ZEDObjectWrapper* Object, ZEMTProperty* Property);
+		void								SelectionManager_OnObjectsSelected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& SelectedObjects);
+		void								SelectionManager_OnObjectsDeselected(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& DeselectedObjects);
 		virtual void						TickEvent(const ZEDTickEvent* Event);
 
 	protected:
@@ -67,6 +72,7 @@ class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 		void								AddWrapper(ZEDObjectWrapper* Wrapper);
 		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
 
+		void								UpdateProperty(ZEMTProperty* Property);
 		void								Update();
 
 											ZEDPropertyEditor(QWidget* Parent = 0);
