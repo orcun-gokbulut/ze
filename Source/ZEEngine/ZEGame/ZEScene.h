@@ -78,6 +78,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool									SpatialDatabase;
 		ZEEntityState							EntityState;
 		ZEList2<ZEEntity>						TickList;
+		ZEEntity*								TickCurrentEntity;
 		ZEList2<ZEEntity>						RenderList;
 		ZEOctree<ZEEntity*>						RenderListOctree;
 

@@ -223,6 +223,9 @@ void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 			return;
 		}
 
+		if (Entity == TickCurrentEntity)
+			TickCurrentEntity = Entity->TickListLink.GetNextItem();
+
 		TickList.Remove(&Entity->TickListLink);
 	}
 	TickList.UnlockWrite();
@@ -673,23 +676,35 @@ void ZEScene::Tick(float ElapsedTime)
 
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("SceneTick");
 	
-	ZEArray<ZEEntity*> LocalTickList;
-	ZESize Index = 0;
 	TickList.LockRead();
 	{
-		LocalTickList.SetCount(TickList.GetCount());
-
-		ze_for_each(Entity, TickList)
-		{
-			LocalTickList[Index] = Entity.GetPointer();
-			Index++;
-		}
+		TickCurrentEntity = TickList.GetFirstItem();
 	}
 	TickList.UnlockRead();
 
-	ze_for_each(Entity, LocalTickList)
-		TickEntity(Entity.GetItem(), ElapsedTime);
+	ZEEntity* LocalCurrentEntity;
+	while (true)
+	{
+		TickList.LockRead();
+		{
+			LocalCurrentEntity = TickCurrentEntity;
+		}
+		TickList.UnlockRead();
 
+		if (LocalCurrentEntity == NULL)
+			break;
+
+		LocalCurrentEntity->Tick(ElapsedTime);
+
+		TickList.LockRead();
+		{
+			if (LocalCurrentEntity == TickCurrentEntity)
+				TickCurrentEntity = TickCurrentEntity->TickListLink.GetNextItem();
+		}
+		TickList.UnlockRead();
+	}
+
+	TickCurrentEntity = NULL;
 
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->EndEvent();
 }
@@ -942,6 +957,7 @@ ZEScene::ZEScene()
 	AmbientFactor = 0.1f;
 	SpatialDatabase = false;
 	EntityState = ZE_ES_NONE;
+	TickCurrentEntity = NULL;
 
 	Constants.AmbientColor = ZEVector3::Zero;
 

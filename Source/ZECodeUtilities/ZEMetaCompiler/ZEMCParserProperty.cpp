@@ -135,6 +135,7 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
 		Accessor.Type = ZEMC_AT_SETTER;
 		Accessor.PropertyType = MethodData->Parameters[0].Type;
+		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
 		Accessor.Method = MethodData;
 		Accessors.Add(Accessor);
 
@@ -154,6 +155,7 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
 		Accessor.Type = ZEMC_AT_GETTER;
 		Accessor.PropertyType = MethodData->ReturnValue;
+		Accessor.PropertyType.TypeQualifier = ZEMC_TQ_VALUE;
 		Accessor.Method = MethodData;
 		Accessors.Add(Accessor);
 	}

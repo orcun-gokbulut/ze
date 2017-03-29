@@ -73,8 +73,11 @@ class ZEList2
 
 		ZELink<ZEItemType>*					GetFirst();
 		const ZELink<ZEItemType>*			GetFirst() const;
+		ZEItemType*							GetFirstItem() const;
+
 		ZELink<ZEItemType>*					GetLast();
 		const ZELink<ZEItemType>*			GetLast() const;
+		ZEItemType*							GetLastItem() const;
 
 		ZEItemType*							GetItem(ZESize Index) const;
 		ZELink<ZEItemType>*					GetLink(ZESize Index);
@@ -227,6 +230,14 @@ const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetFirst() const
 }
 
 ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZEItemType, ZELockType>::GetFirstItem() const
+{
+	if (First == NULL)
+		return NULL;
+	else
+		return First->Item;
+}
+ZE_LIST_TEMPLATE
 ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLast()
 {
 	return Last;
@@ -238,6 +249,14 @@ const ZELink<ZEItemType>* ZEList2<ZE_LIST_SPECIALIZATION>::GetLast() const
 	return Last;
 }
 
+ZE_LIST_TEMPLATE
+ZEItemType* ZEList2<ZEItemType, ZELockType>::GetLastItem() const
+{
+	if (Last == NULL)
+		return NULL;
+	else
+		return Last->Item;
+}
 
 ZE_LIST_TEMPLATE
 ZESize ZEList2<ZE_LIST_SPECIALIZATION>::GetCount() const
