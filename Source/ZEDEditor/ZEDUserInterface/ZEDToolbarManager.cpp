@@ -36,9 +36,31 @@
 #include "ZEDToolbarManager.h"
 
 #include "ZEDToolbar.h"
-
+#include "ZEDToolbarOptionsPage.h"
+#include "ZEDOptionsManager.h"
+#include "ZEDCore/ZEDEditor.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
+
+bool ZEDToolbarManager::InitializeInternal()
+{
+	if (!ZEDComponent::InitializeInternal())
+		return false;
+
+	ToolbarOptionsPage = new ZEDToolbarOptionsPage();
+	GetEditor()->GetOptionsManager()->RegisterOptionsPage(ToolbarOptionsPage);
+
+	return true;
+}
+
+bool ZEDToolbarManager::DeinitializeInternal()
+{
+	GetEditor()->GetOptionsManager()->UnregisterOptionsPage(ToolbarOptionsPage);
+	delete ToolbarOptionsPage;
+	ToolbarOptionsPage = NULL;
+
+	return ZEDComponent::DeinitializeInternal();
+}
 
 ZEDToolbarManager::ZEDToolbarManager()
 {
@@ -50,6 +72,8 @@ ZEDToolbarManager::~ZEDToolbarManager()
 	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 		Toolbars[I]->Destroy();
 	Toolbars.Clear();
+
+	Deinitialize();
 }
 
 const ZEArray<ZEDToolbar*>& ZEDToolbarManager::GetToolbars()
@@ -180,11 +204,6 @@ void ZEDToolbarManager::Update()
 {
 	for (ZESize I = 0; I < Toolbars.GetCount(); I++)
 		Toolbars[I]->Setup();
-}
-
-void ZEDToolbarManager::Destroy()
-{
-	delete this;
 }
 
 ZEDToolbarManager* ZEDToolbarManager::CreateInstance()

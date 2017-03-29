@@ -49,13 +49,13 @@
 #include "ZEDObjectWrapper3D.h"
 #include "ZEDUserInterface/ZEDMainWindow.h"
 #include "ZEDUserInterface/ZEDCommandManager.h"
+#include "ZEDUserInterface/ZEDOptionsManager.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZEUI/ZEUIManager.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
-
 
 
 void ZEDEditor::RegisterCommands()
@@ -65,7 +65,7 @@ void ZEDEditor::RegisterCommands()
 	NewCommand.SetCategory("File");
 	NewCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/New.png");
 	NewCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_N));
-	NewCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::NewCommand_OnAction>(this);
+	NewCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::NewCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&NewCommand);
 
 	OpenCommand.SetName("ZEDEditor::OpenCommand");
@@ -73,14 +73,14 @@ void ZEDEditor::RegisterCommands()
 	OpenCommand.SetCategory("File");
 	OpenCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_O));
 	OpenCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Open.png");
-	OpenCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::OpenCommand_OnAction>(this);
+	OpenCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::OpenCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&OpenCommand);
 
 	RecentFilesCommand.SetName("ZEDEditor::RecentFilesCommand");
 	RecentFilesCommand.SetText("Recent Files");
 	RecentFilesCommand.SetCategory("File");
 	RecentFilesCommand.SetType(ZED_CT_LIST_COMMAND);
-	RecentFilesCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::RecentFilesCommand_OnAction>(this);
+	RecentFilesCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::RecentFilesCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&RecentFilesCommand);
 
 	SaveCommand.SetName("ZEDEditor::SaveCommand");
@@ -89,7 +89,7 @@ void ZEDEditor::RegisterCommands()
 	SaveCommand.SetIcon("#R:/ZEEngine/ZEGUI/Textures/SemiChecked.png");
 	SaveCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_S));
 	SaveCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Save.png");
-	SaveCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveCommand_OnAction>(this);
+	SaveCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::SaveCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveCommand);
 
 	SaveAsCommand.SetName("ZEDEditor::SaveAsCommand");
@@ -97,20 +97,20 @@ void ZEDEditor::RegisterCommands()
 	SaveAsCommand.SetCategory("File");
 	SaveAsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL | ZED_VKM_SHIFT, ZED_VKK_S));
 	SaveAsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/SaveAs.png");
-	SaveAsCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::SaveAsCommand_OnAction>(this);
+	SaveAsCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::SaveAsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SaveAsCommand);
 
 	CloseCommand.SetName("ZEDEditor::CloseCommand");
 	CloseCommand.SetText("Close");
 	CloseCommand.SetCategory("File");
 	CloseCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Close.png");
-	CloseCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
+	CloseCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::CloseCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloseCommand);
 
 	ExitCommand.SetName("ZEDEditor::ExitCommand");
 	ExitCommand.SetText("Exit");
 	ExitCommand.SetCategory("Application");
-	ExitCommand.OnAction += ZEDCommandDelegate::Create<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);
+	ExitCommand.OnAction.AddDelegate<ZEDEditor, &ZEDEditor::ExitCommand_OnAction>(this);
 	ExitCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Exit.png");
 	ZEDCommandManager::GetInstance()->RegisterCommand(&ExitCommand);
 
@@ -249,8 +249,8 @@ bool ZEDEditor::InitializeInternal()
 
 	RegisterCommands();
 
+	OptionsManager = ZEDOptionsManager::CreateInstance();
 	MainWindow = ZEDMainWindow::CreateInstance();
-
 	AssetManager = ZEDAssetManager::CreateInstance();
 	ViewportManager = ZEDViewportManager::CreateInstance();
 	ObjectManager = ZEDObjectManager::CreateInstance();
@@ -259,6 +259,7 @@ bool ZEDEditor::InitializeInternal()
 	OperationManager = ZEDOperationManager::CreateInstance();
 	UIManager = ZEUIManager::CreateInstance();
 
+	AddComponent(OptionsManager);
 	AddComponent(AssetManager);
 	AddComponent(ViewportManager);
 	UIManager->Initialize();
@@ -335,6 +336,11 @@ ZEUIManager* ZEDEditor::GetUIManager()
 ZEDAssetManager* ZEDEditor::GetAssetManager()
 {
 	return AssetManager;
+}
+
+ZEDOptionsManager* ZEDEditor::GetOptionsManager()
+{
+	return OptionsManager;
 }
 
 void ZEDEditor::AddComponent(ZEDComponent* Component)

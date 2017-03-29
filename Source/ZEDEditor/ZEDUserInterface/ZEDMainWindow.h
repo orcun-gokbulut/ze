@@ -39,8 +39,6 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
-#include "ZEDCommand.h"
-#include "ZEDMenuManager.h"
 #include "ZEDWindow.h"
 
 #include <QMainWindow>
@@ -85,15 +83,13 @@ typedef ZEFlags ZEDToolbarDefaults;
 class ZEDMainWindow : public QObject, public ZEDComponent
 {
 	Q_OBJECT
-	friend class ZEDCustomizeUIWindow;
+	friend class ZEDMenuOptionsPageWidget;
+	friend class ZEDToolbarOptionsPageWidget;
 	private:
 		Ui_ZEDMainWindow*					Form;
 		QMainWindow*						MainWindowNative;
-		ZEDViewport*						Viewport;
-
 		ZEArray<ZEDToolbar*>				Toolbars;
 		ZEArray<ZEDWindow*>					Windows;
-
 		ZEDMenuManager*						MenuManager;
 		ZEDToolbarManager*					ToolbarManager;
 
@@ -104,15 +100,10 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 
 		virtual bool						InitializeInternal();
 
+		void								MainMenu_OnUpdated(const ZEDMenu* Menu);
+
 											ZEDMainWindow();
 											~ZEDMainWindow();
-	private:
-		ZEDCommand							CustomizeUICommand;
-
-		void								RegisterCommands();
-
-		void								MainMenu_OnUpdated(const ZEDMenu* Menu);
-		void								CustomizeUICommand_OnAction(const ZEDCommand* Command);
 
 	public:
 		QMainWindow*						GetMainWindow();
@@ -122,11 +113,6 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		const ZEArray<ZEDWindow*>&			GetWindows();
 		void								AddWindow(ZEDWindow* Widget, ZEDWindowDefaults = ZED_WD_VISIBLE);
 		void								RemoveWindow(ZEDWindow* Widget);
-
-		void								SetViewport(ZEDViewport* Viewport);
-		ZEDViewport*						GetViewport();
-
-		void								Configure();
 
 		static ZEDMainWindow*				CreateInstance();
 };

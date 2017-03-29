@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDMenuOptionsPage.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,39 +35,70 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ZETypes.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include <QDialog>
+#include "ZEDOptionsPage.h"
 
+class Ui_ZEDMenuOptionsPageWidget;
 class ZEDMenu;
+class ZEDMainWindow;
 class ZEDMenuOptionsPage;
 
-class ZEDMenuManager : public ZEDComponent
+class ZEDMenuOptionsPageWidget : public QWidget
 {
-	ZE_OBJECT
+	Q_OBJECT
 	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+		Ui_ZEDMenuOptionsPageWidget*		Form;
+		ZEDMenuOptionsPage*					Page;
+		ZEDMainWindow*						MainWindow;
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
+		void								UpdateElements();
+		void								UpdateElement();
+		void								UpdateElementItems();
+		void								UpdateItems();
+		void								UpdateItemCategories();
+		void								UpdateUI();
 
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
+		ZEDMenu*							GetMenu();
+		ZEInt								GetElementItemSelectionIndex();
+
+		void								MarkAsModified();
+		void								UnmarkAsModified();
+
+	private slots:
+		void								btnElementNew_clicked();
+		void								btnElementDelete_clicked();
+		void								cmbElements_currentIndexChanged(int);
+		void								txtElementName_textChanged(const QString&);
+		void								txtElementText_textChanged(const QString&);
+		void								btnElementItemAdd_clicked();
+		void								btnElementItemRemove_clicked();
+		void								btnElementItemUp_clicked();
+		void								btnElementItemDown_clicked();
+		void								lstElementItems_itemSelectionChanged();
+		void								radItemType_toggled(bool);
+		void								cmbItemCategory_currentIndexChanged(int);
+		void								lstItems_itemSelectionChanged();
 
 	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
-		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+		void								Default();
+		void								Save();
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
+											ZEDMenuOptionsPageWidget(QWidget* Parent, ZEDMainWindow* MainWindow, ZEDMenuOptionsPage* Page);
+											~ZEDMenuOptionsPageWidget();
+};
 
-		void							Setup();
+class ZEDMenuOptionsPage : public ZEDOptionsPage
+{
+	public:
+		virtual const char*					GetName() const override;
+		virtual const char*					GetText() const override;
+		virtual const char*					GetPath() const override;
 
-		static ZEDMenuManager*			CreateInstance();
+		virtual QWidget*					CreateWidget(QWidget* Parent) override;
+
+		virtual void						Save(QWidget* Widget) override;
+		virtual void						Default(QWidget* Widget) override;
+		virtual void						Close(QWidget* Widget) override;
 };

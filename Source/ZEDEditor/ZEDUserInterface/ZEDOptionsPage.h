@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDOptionsPage.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEMeta/ZEObject.h"
 
-#include "ZEDCore/ZEDComponent.h"
+class ZEDOptionsManager;
+class QWidget;
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-
-class ZEDMenu;
-class ZEDMenuOptionsPage;
-
-class ZEDMenuManager : public ZEDComponent
+class ZEDOptionsPage : public ZEObject
 {
 	ZE_OBJECT
+	friend class ZEDOptionsManager;
 	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+		ZEDOptionsManager*					Manager;
+		bool								Modified;
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
-
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
-
-	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
+	protected:
+											ZEDOptionsPage();
+		virtual								~ZEDOptionsPage();
 		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+	public:
+		ZEDOptionsManager*					GetManager() const;
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
+		virtual const char*					GetName() const = 0;
+		virtual const char*					GetText() const = 0;
+		virtual const char*					GetPath() const = 0;
+		virtual const char*					GetIcon() const;
+		virtual const char*					GetDescription() const;
+		bool								IsModified() const;
 
-		void							Setup();
+		virtual QWidget*					CreateWidget(QWidget* Parent) = 0;
 
-		static ZEDMenuManager*			CreateInstance();
+		virtual void						Save(QWidget* Widget);
+		virtual void						Default(QWidget* Widget);
+		virtual void						Close(QWidget* Widget);
+		
+		void								MarkAsModified();
 };

@@ -83,7 +83,7 @@ void ZEDOperationManager::RegisterCommands()
 	UndoCommand.SetText("Undo");
 	UndoCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Undo.png");
 	UndoCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Z));
-	UndoCommand.OnAction += ZEDCommandDelegate::Create<ZEDOperationManager, &ZEDOperationManager::UndoCommand_OnAction>(this);
+	UndoCommand.OnAction.AddDelegate<ZEDOperationManager, &ZEDOperationManager::UndoCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&UndoCommand);
 
 	RedoCommand.SetName("ZEDTransformationManager::RedoCommand");
@@ -91,7 +91,7 @@ void ZEDOperationManager::RegisterCommands()
 	RedoCommand.SetText("Redo");
 	RedoCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Redo.png");
 	RedoCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Y));
-	RedoCommand.OnAction += ZEDCommandDelegate::Create<ZEDOperationManager, &ZEDOperationManager::RedoCommand_OnAction>(this);
+	RedoCommand.OnAction.AddDelegate<ZEDOperationManager, &ZEDOperationManager::RedoCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&RedoCommand);
 
 	UpdateCommands();
@@ -152,7 +152,7 @@ bool ZEDOperationManager::Undo()
 
 	UpdateCommands();
 
-	OnUndo(this, Stack[StackIndex]);
+	OnUndo(this, Stack[StackIndex + 1]);
 
 	return true;
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDOptionsWindowSingle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,39 +35,29 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include <QDialog>
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
-class ZEDMenu;
-class ZEDMenuOptionsPage;
+class Ui_ZEDOptionsWindowSingle;
+class ZEDOptionsPage;
 
-class ZEDMenuManager : public ZEDComponent
+class ZEDOptionsWindowSingle : public QDialog
 {
-	ZE_OBJECT
+	Q_OBJECT
 	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+		Ui_ZEDOptionsWindowSingle*			Form;
+		ZEDOptionsPage*						OptionsPage;
+		QWidget*							OptionsPageWidget;
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
-
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
+	private slots:
+		void								btnDefault_clicked();
+		void								btnSave_clicked();
+		void								btnClose_clicked();
 
 	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
-		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+		void								Setup(ZEDOptionsPage* Page);
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
-
-		void							Setup();
-
-		static ZEDMenuManager*			CreateInstance();
+											ZEDOptionsWindowSingle(QWidget* Parent);
+											~ZEDOptionsWindowSingle();
 };

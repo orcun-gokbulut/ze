@@ -276,7 +276,7 @@ const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetObjects() const
 
 void ZEDPropertyEditor::SetObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
 {
-	for (ZESize I = 0; I < Objects.GetCount(); I++)
+	for (ZESize I = 0; I < this->Objects.GetCount(); I++)
 		this->Objects[I]->OnPropertyChanged.DisconnectObject(this);
 
 	this->Objects = Objects;

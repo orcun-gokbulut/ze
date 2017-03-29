@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCustomizeUIWindow.h
+ Zinek Engine - ZEDOptionsWindowMultiple.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,51 +38,27 @@
 #include <QDialog>
 
 #include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
 
-class Ui_ZEDCustomizeUIWindow;
-class ZEDMenu;
-class ZEDToolbar;
-class ZEDMainWindow;
+class Ui_ZEDOptionsWindowMultiple;
+class ZEDOptionsPage;
 
-class ZEDCustomizeUIWindow : public QDialog
+class ZEDOptionsWindowMultiple : public QDialog
 {
 	Q_OBJECT
 	private:
-		Ui_ZEDCustomizeUIWindow*			Form;
-		ZEDMainWindow*						MainWindow;
-
-		void								UpdateElements();
-		void								UpdateElement();
-		void								UpdateElementItems();
-		void								UpdateItems();
-		void								UpdateItemCategories();
-		void								UpdateUI();
-
-		bool								IsElementTypeMenu();
-		ZEDMenu*							GetMenu();
-		ZEDToolbar*							GetToolbar();
-		ZEInt								GetElementItemSelectionIndex();
+		Ui_ZEDOptionsWindowMultiple*		Form;
+		ZEArray<ZEDOptionsPage*>			OptionsPages;
+		ZEArray<QWidget*>					OptionsPageWidgets;
 
 	private slots:
-		void								radElementType_toggled(bool);
-		void								btnElementNew_clicked();
-		void								btnElementDelete_clicked();
-		void								cmbElements_currentIndexChanged(int);
-		void								txtElementName_textChanged(const QString&);
-		void								txtElementText_textChanged(const QString&);
-		void								chkElementVisible_toggled(bool);
-		void								btnElementItemAdd_clicked();
-		void								btnElementItemRemove_clicked();
-		void								btnElementItemUp_clicked();
-		void								btnElementItemDown_clicked();
-		void								lstElementItems_itemSelectionChanged();
-		void								radItemType_toggled(bool);
-		void								cmbItemCategory_currentIndexChanged(int);
-		void								lstItems_itemSelectionChanged();
 		void								btnDefault_clicked();
 		void								btnSave_clicked();
+		void								btnClose_clicked();
 
 	public:
-											ZEDCustomizeUIWindow(ZEDMainWindow* Window);
-											~ZEDCustomizeUIWindow();
+		void								Setup(const ZEArray<ZEDOptionsPage*>& Pages);
+
+											ZEDOptionsWindowMultiple(QWidget* Parent);
+											~ZEDOptionsWindowMultiple();
 };
