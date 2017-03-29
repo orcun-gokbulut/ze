@@ -59,8 +59,12 @@ class ZELink
 		bool								GetInUse() const;
 		ZELink*								GetPrev();
 		const ZELink*						GetPrev() const;
+		ZEItemType*							GetPrevItem() const;
+
 		ZELink*								GetNext();
 		const ZELink*						GetNext() const;
+		ZEItemType*							GetNextItem() const;
+
 		ZEItemType*							GetItem() const;
 
 		// ZE_COPY_NO_ACTION
@@ -71,7 +75,6 @@ class ZELink
 											ZELink(ZEItemType* Object);
 											~ZELink();
 };
-
 
 // ZELink
 /////////////////////////////////////////////////////////////////////////////
@@ -95,6 +98,15 @@ const ZELink<ZEItemType>* ZELink<ZEItemType>::GetPrev() const
 }
 
 template<typename ZEItemType>
+ZEItemType* ZELink<ZEItemType>::GetPrevItem() const
+{
+	if (Prev == NULL)
+		return NULL;
+	else
+		return Prev->Item;
+}
+
+template<typename ZEItemType>
 ZELink<ZEItemType>* ZELink<ZEItemType>::GetNext()
 {
 	return Next;
@@ -104,6 +116,15 @@ template<typename ZEItemType>
 const ZELink<ZEItemType>* ZELink<ZEItemType>::GetNext() const
 {
 	return Next;
+}
+
+template<typename ZEItemType>
+ZEItemType* ZELink<ZEItemType>::GetNextItem() const
+{
+	if (Next == NULL)
+		return NULL;
+	else
+		return Next->Item;
 }
 
 template<typename ZEItemType>
