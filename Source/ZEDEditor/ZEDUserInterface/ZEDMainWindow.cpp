@@ -50,11 +50,13 @@
 #include "ZEDCommandManager.h"
 #include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDViewPort.h"
-#include "ZEDCustomizeUIWindow.h"
+#include "ZEDMenuManager.h"
+#include "ZEDOptionsManager.h"
 
 #include <QDockWidget>
 #include <QToolBar>
 #include <QMessageBox>
+
 
 ZEInt ToolbarSortOperator(ZEDToolbar*const& A, ZEDToolbar*const& B)
 {
@@ -175,8 +177,7 @@ bool ZEDMainWindow::InitializeInternal()
 	if (!ZEDComponent::InitializeInternal())
 		return false;
 
-	RegisterCommands();
-
+	GetEditor()->AddComponent(MenuManager);
 	if (ZEPathInfo("#S:/Configurations/ZEDEditor/Menu.ZEDConfig").IsExists())
 	{
 		if (!MenuManager->Load("#S:/Configurations/ZEDEditor/Menu.ZEDConfig"))
@@ -186,10 +187,9 @@ bool ZEDMainWindow::InitializeInternal()
 	{
 		MenuManager->Load("#R:/ZEDEditor/Configurations/MenuDefault.ZEDConfig");
 	}
-
 	UpdateMainMenu();
 
-
+	GetEditor()->AddComponent(ToolbarManager);
 	if (ZEPathInfo("#S:/Configurations/ZEDEditor/Toolbar.ZEDConfig").IsExists())
 	{
 		if (!ToolbarManager->Load("#S:/Configurations/ZEDEditor/Toolbar.ZEDConfig"))
@@ -199,7 +199,6 @@ bool ZEDMainWindow::InitializeInternal()
 	{
 		ToolbarManager->Load("#R:/ZEDEditor/Configurations/ToolbarDefault.ZEDConfig");
 	}
-
 	UpdateToolbars();
 
 	return true;
@@ -226,16 +225,6 @@ ZEDMainWindow::~ZEDMainWindow()
 	ToolbarManager->Destroy();
 }
 
-void ZEDMainWindow::RegisterCommands()
-{
-	CustomizeUICommand.SetCategory("User Interface");
-	CustomizeUICommand.SetName("ZEDEditor::CustomizeUICommand");
-	CustomizeUICommand.SetText("Customize UI");
-	CustomizeUICommand.OnAction += ZEDCommandDelegate::Create<ZEDMainWindow, &ZEDMainWindow::CustomizeUICommand_OnAction>(this);
-	ZEDCommandManager::GetInstance()->RegisterCommand(&CustomizeUICommand);
-}
-
-
 void ZEDMainWindow::MainMenu_OnUpdated(const ZEDMenu* Menu)
 {
 	QMenu* NativeMenu = const_cast<ZEDMenu*>(Menu)->GetNativeMenu();
@@ -249,11 +238,6 @@ void ZEDMainWindow::MainMenu_OnUpdated(const ZEDMenu* Menu)
 
 		MainWindowNative->menuBar()->addAction(Actions[I]);
 	}
-}
-
-void ZEDMainWindow::CustomizeUICommand_OnAction(const ZEDCommand* Command)
-{
-	Configure();
 }
 
 QMainWindow* ZEDMainWindow::GetMainWindow()
@@ -333,23 +317,6 @@ void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)
 
 	Window->Deinitialize();
 	Windows.RemoveValue(Window);
-}
-
-void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)
-{
-	this->Viewport = Viewport;
-	MainWindowNative->setCentralWidget(Viewport);
-}
-
-ZEDViewport* ZEDMainWindow::GetViewport()
-{
-	return Viewport;
-}
-
-void ZEDMainWindow::Configure()
-{
-	ZEDCustomizeUIWindow* Customize = new ZEDCustomizeUIWindow(this);
-	Customize->show();
 }
 
 ZEDMainWindow* ZEDMainWindow::CreateInstance()

@@ -118,7 +118,7 @@ void ZEDObjectManager::RegisterCommands()
 	CloneCommand.SetText("Clone");
 	CloneCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Copy.png");
 	CloneCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_C));
-	CloneCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::CloneCommand_OnAction>(this);
+	CloneCommand.OnAction.AddDelegate<ZEDObjectManager, &ZEDObjectManager::CloneCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&CloneCommand);
 
 	DeleteCommand.SetName("ZEDObjects::DeleteCommand");
@@ -126,7 +126,7 @@ void ZEDObjectManager::RegisterCommands()
 	DeleteCommand.SetText("Delete");
 	DeleteCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Delete.png");
 	DeleteCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_DELETE));
-	DeleteCommand.OnAction += ZEDCommandDelegate::Create<ZEDObjectManager, &ZEDObjectManager::DeleteCommand_OnAction>(this);
+	DeleteCommand.OnAction.AddDelegate<ZEDObjectManager, &ZEDObjectManager::DeleteCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&DeleteCommand);
 
 	UpdateCommands();

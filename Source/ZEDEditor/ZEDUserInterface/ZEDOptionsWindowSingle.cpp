@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDOptionsWindowSingle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDOptionsWindowSingle.h"
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ZEDOptionsPage.h"
+#include "ui_ZEDOptionsWindowSingle.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include <QMessageBox>
 
-class ZEDMenu;
-class ZEDMenuOptionsPage;
-
-class ZEDMenuManager : public ZEDComponent
+void ZEDOptionsWindowSingle::btnDefault_clicked()
 {
-	ZE_OBJECT
-	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+	OptionsPage->Default(OptionsPageWidget);
+}
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
+void ZEDOptionsWindowSingle::btnSave_clicked()
+{
+	OptionsPage->Save(OptionsPageWidget);
+}
 
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
+void ZEDOptionsWindowSingle::btnClose_clicked()
+{
+	if (OptionsPage->IsModified())
+	{
+		int Result = QMessageBox::question(this, "Options",
+			"There are some unsaved modifications in the options.\n"
+			"Are you sure you want to close without saving them ?");
 
-	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
-		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+		if (Result == QMessageBox::No)
+			return;
+	}
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
+	OptionsPage->Close(OptionsPageWidget);
+	close();
+}
 
-		void							Setup();
+void ZEDOptionsWindowSingle::Setup(ZEDOptionsPage* Page)
+{
+	OptionsPage = Page;
+	OptionsPageWidget = Page->CreateWidget(Form->widOptionsPage);
+	QVBoxLayout* Layout = new QVBoxLayout(Form->widOptionsPage);
+	Layout->setMargin(0);
+	Layout->addWidget(OptionsPageWidget);
+	setLayout(Layout);
+}
 
-		static ZEDMenuManager*			CreateInstance();
-};
+ZEDOptionsWindowSingle::ZEDOptionsWindowSingle(QWidget* Parent) : QDialog(Parent)
+{
+	Form = new Ui_ZEDOptionsWindowSingle();
+	Form->setupUi(this);
+
+	OptionsPage = NULL;
+	OptionsPageWidget = NULL;
+
+	connect(Form->btnDefault, SIGNAL(clicked()), this, SLOT(btnDefault_clicked()));
+	connect(Form->btnSave, SIGNAL(clicked()), this, SLOT(btnSave_clicked()));
+	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(btnClose_clicked()));
+}
+
+ZEDOptionsWindowSingle::~ZEDOptionsWindowSingle()
+{
+	delete Form;
+}

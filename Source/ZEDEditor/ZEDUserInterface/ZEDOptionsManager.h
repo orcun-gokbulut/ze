@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDOptionsManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
 #include "ZEDCore/ZEDComponent.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include "ZEDUserInterface/ZEDCommand.h"
 
-class ZEDMenu;
-class ZEDMenuOptionsPage;
+class ZEDOptionsPage;
 
-class ZEDMenuManager : public ZEDComponent
+class ZEDOptionsManager : public ZEDComponent
 {
 	ZE_OBJECT
 	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+		ZEArray<ZEDOptionsPage*>			OptionsPages;
+		ZEDCommand							OptionsCommand;
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
+		void								RegisterCommands();
+		void								OptionsCommand_OnAction(const ZEDCommand* Command);
 
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
+		virtual bool						InitializeInternal() override;
+		virtual bool						DeinitializeInternal() override;
+
+											ZEDOptionsManager();
+		virtual								~ZEDOptionsManager() override;
 
 	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
-		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+		const ZEArray<ZEDOptionsPage*>&		GetOptionsPages() const;
+		bool								RegisterOptionsPage(ZEDOptionsPage* Options);
+		bool								UnregisterOptionsPage(ZEDOptionsPage* Options);
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
+		void								ShowOptionsDialog(ZEDOptionsPage* SelectedOption = NULL);
+		void								ShowSingleOptions(ZEDOptionsPage* Options);
+		void								ShowMultipleOptions(const ZEArray<ZEDOptionsPage*> Options);
 
-		void							Setup();
-
-		static ZEDMenuManager*			CreateInstance();
+		static ZEDOptionsManager*			CreateInstance();
 };

@@ -35,19 +35,23 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
+#include "ZEDCore/ZEDComponent.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
 class ZEDToolbar;
+class ZEDToolbarOptionsPage;
 
-class ZEDToolbarManager : public ZEObject
+class ZEDToolbarManager : public ZEDComponent
 {
 	ZE_OBJECT
 	private:
 		ZEArray<ZEDToolbar*>			Toolbars;
+		ZEDToolbarOptionsPage*			ToolbarOptionsPage;
 
+		virtual bool					InitializeInternal() override;
+		virtual bool					DeinitializeInternal() override;
 
 										ZEDToolbarManager();
 		virtual							~ZEDToolbarManager();
@@ -64,8 +68,6 @@ class ZEDToolbarManager : public ZEObject
 		bool							Save(const ZEString& ConfigurationFile);
 
 		void							Update();
-
-		virtual void					Destroy();
 
 		static ZEDToolbarManager*		CreateInstance();
 };

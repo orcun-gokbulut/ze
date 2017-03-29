@@ -51,9 +51,9 @@ class ZEDSelectionManager;
 class ZEDTransformationManager;
 class ZEDViewportManager;
 class ZEDMainWindow;
-class ZEUIManager;
 class ZEDAssetManager;
-class ZEDMenu;
+class ZEDOptionsManager;
+class ZEUIManager;
 
 enum ZEDEditorState
 {
@@ -80,8 +80,9 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDTransformationManager*					TransformationManager;
 		ZEDViewportManager*							ViewportManager;
 		ZEDMainWindow*								MainWindow;
-		ZEUIManager*								UIManager;
 		ZEDAssetManager*							AssetManager;
+		ZEDOptionsManager*							OptionsManager;
+		ZEUIManager*								UIManager;
 
 		void										PopulateRecentFiles();
 		void										RegisterRecentFile(const ZEString& FileName);
@@ -122,9 +123,9 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEDMainWindow*								GetMainWindow();
 		ZEDTransformationManager*					GetTransformationManager();
 		ZEDViewportManager*							GetViewportManager();
-		ZEUIManager*								GetUIManager();
-
 		ZEDAssetManager*							GetAssetManager();
+		ZEDOptionsManager*							GetOptionsManager();
+		ZEUIManager*								GetUIManager();
 
 		ZEDComponent*								GetComponent(ZEClass* Class);
 		const ZEArray<ZEDComponent*>&				GetComponents();

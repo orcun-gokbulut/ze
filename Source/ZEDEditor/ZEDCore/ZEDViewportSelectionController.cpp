@@ -316,7 +316,7 @@ void ZEDViewportSelectionController::RegisterCommands()
 	SelectionModeCommand.SetName("ZEDViewportSelectionController::SelectionModeCommand");
 	SelectionModeCommand.SetText("Intersects");
 	SelectionModeCommand.SetType(ZED_CT_TOGGLE);
-	SelectionModeCommand.OnAction += ZEDCommandDelegate::Create<ZEDViewportSelectionController, &ZEDViewportSelectionController::SelectionModeCommand_OnAction>(this);
+	SelectionModeCommand.OnAction.AddDelegate<ZEDViewportSelectionController, &ZEDViewportSelectionController::SelectionModeCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionModeCommand);
 
 	SelectionShapeCommand.SetCategory("Selection");
@@ -329,7 +329,7 @@ void ZEDViewportSelectionController::RegisterCommands()
 	Items.Add("Brush");
 	SelectionShapeCommand.SetListItems(Items);
 	SelectionShapeCommand.SetValueIndex(0);
-	SelectionShapeCommand.OnAction += ZEDCommandDelegate::Create<ZEDViewportSelectionController, &ZEDViewportSelectionController::SelectionShapeCommand_OnAction>(this);
+	SelectionShapeCommand.OnAction.AddDelegate<ZEDViewportSelectionController, &ZEDViewportSelectionController::SelectionShapeCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectionShapeCommand);
 }
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMenuManager.h
+ Zinek Engine - ZEDOptionsPage.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDOptionsPage.h"
 
-#include "ZEDCore/ZEDComponent.h"
-
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-
-class ZEDMenu;
-class ZEDMenuOptionsPage;
-
-class ZEDMenuManager : public ZEDComponent
+ZEDOptionsPage::ZEDOptionsPage()
 {
-	ZE_OBJECT
-	private:
-		ZEArray<ZEDMenu*>				Menus;
-		ZEDMenuOptionsPage*				MenuOptionsPage;
+	Manager = NULL;
+	Modified = false;
+}
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
+ZEDOptionsPage::~ZEDOptionsPage()
+{
+	zeDebugCheck(Manager != NULL, "Page is still registered to options manager.");
+}
 
-										ZEDMenuManager();
-		virtual							~ZEDMenuManager();
+ZEDOptionsManager* ZEDOptionsPage::GetManager() const
+{
+	return Manager;
+}
 
-	public:
-		const ZEArray<ZEDMenu*>&		GetMenus();
-		ZEDMenu*						GetMenu(const ZEString& Name);
-		
-		bool							AddMenu(ZEDMenu* Menu);
-		bool							RemoveMenu(ZEDMenu* Menu);
-		void							ClearMenus();
+const char* ZEDOptionsPage::GetIcon() const
+{
+	return "";
+}
 
-		bool							Load(const ZEString& ConfigurationFile);
-		bool							Save(const ZEString& ConfigurationFile);
+const char* ZEDOptionsPage::GetDescription() const
+{
+	return "";
+}
 
-		void							Setup();
+bool ZEDOptionsPage::IsModified() const
+{
+	return Modified;
+}
 
-		static ZEDMenuManager*			CreateInstance();
-};
+void ZEDOptionsPage::Save(QWidget* Widget)
+{
+	Modified = false;
+}
+
+void ZEDOptionsPage::Default(QWidget* Widget)
+{
+	Modified = false;
+}
+
+void ZEDOptionsPage::Close(QWidget* Widget)
+{
+
+}
+
+void ZEDOptionsPage::MarkAsModified()
+{
+	Modified = true;
+}

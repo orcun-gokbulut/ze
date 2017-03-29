@@ -35,9 +35,32 @@
 
 #include "ZEDMenuManager.h"
 
-#include "ZEDMenu.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
+#include "ZEDMenu.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDMenuOptionsPage.h"
+#include "ZEDOptionsManager.h"
+
+bool ZEDMenuManager::InitializeInternal()
+{
+	if (!ZEDComponent::InitializeInternal())
+		return false;
+
+	MenuOptionsPage = new ZEDMenuOptionsPage();
+	GetEditor()->GetOptionsManager()->RegisterOptionsPage(MenuOptionsPage);
+
+	return true;
+}
+
+bool ZEDMenuManager::DeinitializeInternal()
+{
+	GetEditor()->GetOptionsManager()->UnregisterOptionsPage(MenuOptionsPage);
+	delete MenuOptionsPage;
+	MenuOptionsPage = NULL;
+
+	return ZEDComponent::DeinitializeInternal();
+}
 
 ZEDMenuManager::ZEDMenuManager()
 {
@@ -46,6 +69,8 @@ ZEDMenuManager::ZEDMenuManager()
 
 ZEDMenuManager::~ZEDMenuManager()
 {
+	Deinitialize();
+
 	for (ZESize I = 0; I < Menus.GetCount(); I++)
 		Menus[I]->Destroy();
 	Menus.Clear();
@@ -181,11 +206,6 @@ bool ZEDMenuManager::Save(const ZEString& ConfigurationFile)
 	Writer.Close();
 
 	return true;
-}
-
-void ZEDMenuManager::Destroy()
-{
-	delete this;
 }
 
 ZEDMenuManager* ZEDMenuManager::CreateInstance()
