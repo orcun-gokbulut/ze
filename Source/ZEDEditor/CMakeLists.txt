@@ -51,8 +51,8 @@ ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEDEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZETrainIG-Module ZinekIG-CombatVR-Module)
+	LIBS ZEEngine ZEDEntityEditor ZETrainIG-Module)
 
 qt5_use_modules(ZEDEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIG-Module ZinekIG-CombatVR-Module)
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIG-Module)
