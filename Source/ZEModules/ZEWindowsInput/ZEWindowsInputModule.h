@@ -84,7 +84,7 @@ class ZEWindowsInputModule : public ZEInputDeviceModule
 		virtual								~ZEWindowsInputModule();
 
 	public:
-		virtual void						Process();
+		virtual void						Process(const ZETimeParameters* Parameters);
 
 		static ZEWindowsInputModule*		CreateInstance();
 

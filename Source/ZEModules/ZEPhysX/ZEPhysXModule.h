@@ -67,7 +67,7 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxPhysicsSDK*							GetPhysicsSDK();
 		NxCookingInterface*						GetCookingInterface();
 
-		virtual	void							Process(float ElapsedTime);
+		virtual	void							Process(const ZETimeParameters* Parameters);
 		virtual void							UpdateWorlds();
 
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld();

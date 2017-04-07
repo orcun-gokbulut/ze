@@ -38,7 +38,7 @@
 #include "ZERandom.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZECore/ZECore.h"
-
+#include "ZECore/ZETimeParameters.h"
 #include "ZEParticleEffect.h"
 #include "ZEParticleModifier.h"
 #include "ZEGame/ZEScene.h"
@@ -690,7 +690,7 @@ bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 		return false;
 
 	if (Effect->GetState() != ZE_PES_RUNNING)
-		UpdateParticles(zeCore->GetElapsedTime());
+		UpdateParticles(Parameters->TimeParameters->FrameTimeDelta);
 
 	if (GetAliveParticleCount() == 0)
 		return false;

@@ -53,14 +53,6 @@ ZEInputModule::~ZEInputModule()
 	Deinitialize();
 }
 
-void ZEInputModule::BaseInitialize()
-{
-}
-
-void ZEInputModule::BaseDeinitialize()
-{
-}
-
 const ZEArray<ZEInputDeviceModule*>& ZEInputModule::GetDeviceModules()
 {
 	return DeviceModules;
@@ -113,6 +105,7 @@ bool ZEInputModule::InitializeInternal()
 			continue;
 		}
 
+		zeCore->AddModule(DeviceModule);
 		bool Result = DeviceModule->Initialize();
 		if (!Result)
 		{
@@ -150,8 +143,8 @@ void ZEInputModule::Process()
 		return;
 
 	Acquired = false;
-	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
-		DeviceModules[I]->Process();
+	/*for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
+		DeviceModules[I]->Process();*/
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

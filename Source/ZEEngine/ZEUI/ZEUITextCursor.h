@@ -40,19 +40,20 @@
 #include "ZECore/ZETimer.h"
 
 ZEMT_FORWARD_DECLARE(ZERNMaterial);
+class ZETimeParameters;
 
 class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
 	ZE_OBJECT
 	private:
-		ZETimer*					Timer;
+		ZETimer						Timer;
 		float						BlinkTime;
 		bool						IsVisible;
 
 		ZEInt32						Width;
 		ZEInt32						Height;
 
-		void						Blink(float Time);
+		void						Blink(ZETimeParameters* Time);
 		void						Update();
 
 	public:

@@ -57,9 +57,6 @@ class ZEInputModule : public ZEModule
 		virtual								~ZEInputModule();
 
 	public:
-		static void							BaseInitialize();
-		static void							BaseDeinitialize();
-
 		const
 		ZEArray<ZEInputDeviceModule*>&		GetDeviceModules();
 

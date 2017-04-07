@@ -52,18 +52,20 @@ enum ZEGRWindowType : ZEUInt8
 };
 
 class ZEGROutput;
+struct ZEGRWindowData;
+struct ZEGRWindowMessage;
 
 class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRWindow)
 	private:
+		ZEGRWindowData*					Data;
 		ZEUInt							Id;
 		static ZEUInt					WindowCount;
 		static ZEGRWindow*				LastCursorLock;
 
 		ZEHolder<ZEGROutput>			Output;
-		void*							Handle;
 
 		ZEUInt							Width;
 		ZEUInt							Height;
@@ -125,6 +127,7 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 	public:
 		ZEUInt							GetId() const;
 		void*							GetHandle() const;
+		static ZEUInt					GetWindowCount();
 		
 		void							SetPosition(ZEInt Left, ZEInt Top);
 
@@ -211,11 +214,10 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void							Maximize();
 		void							Restore();
 
-		void							WrapperResized(ZEUInt Width, ZEUInt Height);
-
-		static ZEUInt					GetWindowCount();
-		virtual ZESSize					HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);
+		virtual void					HandleMessage(ZEGRWindowMessage* Message);
 
 		static ZEGRWindow*				WrapHandle(void* ExistingHandle);
+		void							WrapperResized(ZEUInt Width, ZEUInt Height);
+
 		static ZEGRWindow*				CreateInstance();
 };

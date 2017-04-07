@@ -127,11 +127,6 @@ ZEUInt ZEGRWindow::GetId() const
 	return Id;
 }
 
-void* ZEGRWindow::GetHandle() const
-{
-	return Handle;
-}
-
 void ZEGRWindow::SetLeft(ZEInt Left)
 {
 	SetPosition(Left, Top);
@@ -385,7 +380,7 @@ bool ZEGRWindow::GetMinimized() const
 ZEGRWindow::ZEGRWindow()
 {
 	Id = NextWindowId++;
-	Handle = NULL;
+	Data = NULL;
 
 	Width = 800;
 	Height = 600;

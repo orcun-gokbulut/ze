@@ -38,10 +38,11 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZECore/ZECore.h"
-#include "ZEDViewPort.h"
-#include "ZEDEditor.h"
+#include "ZECore/ZETimeManager.h"
 #include "ZEDViewportManager.h"
+#include "ZEDViewport.h"
+#include "ZEDEditor.h"
+
 
 void ZEDViewportController::Viewport_OnKeyboardKeyPressing(ZEDViewport* Viewport, ZEDKeyboardKey Key)
 {
@@ -50,7 +51,7 @@ void ZEDViewportController::Viewport_OnKeyboardKeyPressing(ZEDViewport* Viewport
 	ZEVector3 PositionChange;
 	ZEQuaternion RotationChange;
 
-	float ElapsedTime = zeCore->GetElapsedTime();
+	float ElapsedTime = ZETimeManager::GetInstance()->GetFrameTimeDelta();
 
 	float ModStepSize = StepSize;
 	if (Viewport->GetKeyModifiers().GetFlags(ZED_VKM_SHIFT))

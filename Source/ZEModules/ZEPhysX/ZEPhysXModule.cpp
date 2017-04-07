@@ -38,6 +38,7 @@
 
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
+#include "ZECore/ZETimeParameters.h"
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalMesh.h"
@@ -129,14 +130,19 @@ bool ZEPhysXModule::DeinitializeInternal()
 	return ZEPhysicsModule::DeinitializeInternal();
 }
 
-void ZEPhysXModule::Process(float ElapsedTime)
+void ZEPhysXModule::Process(const ZETimeParameters* Parameters)
 {
 	if (!GetEnabled())
 		return;
 
+	if (Parameters->FrameType != ZE_TT_NORMAL && Parameters->FrameType != ZE_TT_DROPPED)
+		return;
+
 	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
+	{
 		if (PhysicalWorlds[I]->GetEnabled())
-			PhysicalWorlds[I]->Process(ElapsedTime);
+			PhysicalWorlds[I]->Process(Parameters->FrameTimeDelta);
+	}
 }
 
 void ZEPhysXModule::UpdateWorlds()
@@ -145,8 +151,10 @@ void ZEPhysXModule::UpdateWorlds()
 		return;
 
 	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
+	{
 		if (PhysicalWorlds[I]->GetEnabled())
 			PhysicalWorlds[I]->Update();
+	}
 }
 
 ZEPhysicalWorld* ZEPhysXModule::CreatePhysicalWorld()

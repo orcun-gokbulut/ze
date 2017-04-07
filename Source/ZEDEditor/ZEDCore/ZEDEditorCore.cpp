@@ -68,7 +68,7 @@ bool ZEDEditorCore::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())
 		return false;
-
+/*
 	ZEInt argc = 0;
 	char** argv = NULL;
 	Application = new QApplication(argc, argv);
@@ -88,10 +88,10 @@ bool ZEDEditorCore::InitializeInternal()
 		return false;
 	}
 
-	EngineCore->SetCoreState(ZE_CS_RUNNING);
+	EngineCore->SetState(ZE_CS_RUNNING);
 
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
-		Editors[I]->Initialize();
+		Editors[I]->Initialize();*/
 
 	return true;
 }
@@ -139,9 +139,9 @@ void ZEDEditorCore::ExecuteEditor(ZEDEditor* Editor)
 
 void ZEDEditorCore::Execute()
 {
-	while(!ExitFlag)
+	/*while(!ExitFlag)
 	{
-		ZECoreState State = EngineCore->GetCoreState();
+		ZECoreState State = EngineCore->GetState();
 
 		if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
 			DeinitializeInternal();
@@ -155,7 +155,7 @@ void ZEDEditorCore::Execute()
 			Editors[I]->PostProcess(EngineCore->GetElapsedTime());
 
 		Application->processEvents();
-	}
+	}*/
 }
 
 void ZEDEditorCore::Exit()

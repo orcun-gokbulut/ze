@@ -136,7 +136,6 @@ class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 		const ZEString&								GetFileName();
 
 		virtual ZEString							GetExtensions();
-
 		virtual void								Process(float ElapsedTime);
 		virtual void								PostProcess(float ElapsedTime);
 

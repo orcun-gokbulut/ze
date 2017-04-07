@@ -66,10 +66,26 @@ ZEArray<ZEClass*> ZEMTProvider::GetClasses(ZEClass* ParentClass, bool ExcludePar
 
 ZEClass* ZEMTProvider::GetClass(const char* ClassName)
 {
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if (strcmp(Classes[I]->GetName(), ClassName) == 0)
+			return Classes[I];
+	}
+
+	return NULL;
+}
+
+ZEClass* ZEMTProvider::GetClass(ZEClass* ParentClass, const char* ClassName)
+{
 	for(ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		if(strcmp(Classes[I]->GetName(), ClassName) == 0)
-			return Classes[I];
+		if (strcmp(Classes[I]->GetName(), ClassName) == 0)
+		{
+			if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+				return Classes[I];
+			else
+				return NULL;
+		}
 	}
 
 	return NULL;
@@ -102,9 +118,9 @@ const ZEArray<ZEMTEnumerator*>& ZEMTProvider::GetEnumerators()
 
 ZEMTEnumerator* ZEMTProvider::GetEnumerator(const char* EnumeratorName)
 {
-	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
+	for (ZESize I = 0; I < Enumerators.GetCount(); I++)
 	{
-		if(Enumerators[I]->GetName() == EnumeratorName)
+		if (Enumerators[I]->GetName() == EnumeratorName)
 			return Enumerators[I];
 	}
 

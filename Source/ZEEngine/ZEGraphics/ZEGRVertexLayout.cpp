@@ -38,7 +38,6 @@
 #include "ZEError.h"
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEDefinitions.h"
 #include "ZEGRShader.h"
 #include "ZEGRBuffer.h"
 #include "ZEGRGraphicsModule.h"

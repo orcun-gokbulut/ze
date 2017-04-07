@@ -59,7 +59,4 @@ class ZEInputDeviceModule : public ZEModule
 
 		virtual void						Acquire();
 		virtual void						UnAcquire();
-
-		virtual void						Process() = 0;
-
 };

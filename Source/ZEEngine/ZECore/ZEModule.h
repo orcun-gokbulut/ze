@@ -39,7 +39,12 @@
 #include "ZEInitializable.h"
 #include "ZEDestroyable.h"
 
+#include "ZEDS/ZELink.h"
+
 class ZECore;
+class ZETimeParameters;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
 class ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
@@ -47,21 +52,45 @@ class ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
 	friend class ZECore;
 	private:
 		ZECore*							Core;
+		ZELink<ZEModule>				CoreLink;
 		bool							Enabled;
+		ZEString						ConfigurationFileName;
+
+		void							FindConfigurationFileName();
 
 	protected:
+		void							SetConfigurationFileName(const ZEString& FileName);
+
 		virtual void					RegisterClasses();
 		virtual void					UnregisterClasses();
 
+		virtual bool					InitializeInternal() override;
+		virtual bool					DeinitializeInternal() override;
+
 										ZEModule();
-		virtual							~ZEModule();
+		virtual							~ZEModule() override;
 
 	public:
-		ZECore*							GetCore();
+		ZECore*							GetCore() const;
+		virtual ZEClass*				GetBaseModule() const;
+		const ZEString&					GetConfigurationFileName() const;
 
-		virtual bool					GetEnabled();
+		virtual bool					GetEnabled() const;
 		virtual void					SetEnabled(bool Enabled);
 
-		virtual void					PreProcess();
-		virtual void					PostProcess();
-};
+		virtual void					PreProcess(const ZETimeParameters* Parameters);
+		virtual void					Process(const ZETimeParameters* Parameters);
+		virtual void					PostProcess(const ZETimeParameters* Parameters);
+
+		bool							LoadConfiguration();
+		bool							LoadConfiguration(const ZEString& FileName);
+		virtual bool					LoadConfiguration(const ZEMLReaderNode& ConfigNode);
+
+		bool							SaveConfiguration();
+		bool							SaveConfiguration(const ZEString& FileName);
+		virtual bool					SaveConfiguration(ZEMLWriterNode& ConfigNode);
+
+}
+ZEMT_ATTRIBUTE(ZEModule.Dependencies)
+ZEMT_ATTRIBUTE(ZEModule.MultiInstance, false)
+ZEMT_ATTRIBUTE(ZEModule.MultiThreaded, true);

@@ -44,6 +44,7 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZECore/ZETimeParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRBuffer.h"
 #include "ZERenderer/ZERNView.h"
@@ -822,7 +823,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (LODTransitionPlaying)
 	{
-		LODTransitionElapsedTime += Parameters->ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
+		LODTransitionElapsedTime += Parameters->TimeParameters->FrameTimeDelta * LODTransitionSpeed * LODTransitionDirection;
 
 		if (LODTransitionElapsedTime > 0.0f && LODTransitionElapsedTime < LODTransitionTime)
 		{

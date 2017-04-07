@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETimer.h"
-#include "ZETimerManager.h"
 
-ZETimer::ZETimer()
+#include "ZETimeManager.h"
+
+ZETimer::ZETimer() : ManagerLink(this)
 {
-	Enabled = false;
-	Triggered = false;
+	Running = false;
 	Repeating = false;
 	Temporary = false;
 
@@ -48,7 +48,7 @@ ZETimer::ZETimer()
 
 ZETimer::~ZETimer()
 {
-	ZETimerManager::GetInstance()->UnregisterTimer(this);
+	ZETimeManager::GetInstance()->UnregisterTimer(this);
 }
 
 void ZETimer::SetRepeating(bool Value)
@@ -56,7 +56,7 @@ void ZETimer::SetRepeating(bool Value)
 	Repeating = Value;
 }
 
-bool ZETimer::GetRepeating()
+bool ZETimer::GetRepeating() const
 {
 	return Repeating;
 }
@@ -66,54 +66,50 @@ void ZETimer::SetIntervalTime(float Secs)
 	IntervalTime = Secs;
 }
 
-float ZETimer::GetIntervalTime()
+float ZETimer::GetIntervalTime() const
 {
 	return IntervalTime;
 }
 
-void ZETimer::SetTimerEvent(const ZETimerEvent& Event)
-{
-	TimerEvent = Event;
-}
-
-const ZETimerEvent& ZETimer::GetTimerEvent()
-{
-	return TimerEvent;
-}
-
 void ZETimer::Start()
 {
-	Enabled = true;
-	StartTime = ZETimerManager::GetInstance()->CurrentTime;
+	if (Running)
+		return;
+
+	Running = true;
+	RemainingIntervalTime = IntervalTime;
+
+	ZETimeManager::GetInstance()->RegisterTimer(this);
+}
+
+void ZETimer::Pause()
+{
+	Running = false;
 }
 
 void ZETimer::Stop()
 {
-	Enabled = false;
+	ZETimeManager::GetInstance()->UnregisterTimer(this);
+	Running = false;
+	RemainingIntervalTime = IntervalTime;
 }
 
-bool ZETimer::GetDone()
+void ZETimer::Reset()
 {
-	return Triggered;
+	RemainingIntervalTime = IntervalTime;
 }
 
-ZETimer* ZETimer::CreateInstance()
+bool ZETimer::IsTriggered() const
 {
-	ZETimer* Timer = new ZETimer();
-	ZETimerManager::GetInstance()->RegisterTimer(Timer);
-
-	return Timer;
+	return RemainingIntervalTime <= 0.0f;
 }
 
-void ZETimer::CreateAutoTimer(float Interval, const ZETimerEvent& Event)
+void ZETimer::CreateAutoTimer(float Interval, const ZEEventDelegate<void (ZETimeParameters*)>& EventDelegate)
 {
 	ZETimer* TempTimer = new ZETimer();
 
 	TempTimer->Temporary = true;
 	TempTimer->SetIntervalTime(Interval);
-	TempTimer->SetTimerEvent(Event);
-
-	ZETimerManager::GetInstance()->RegisterTimer(TempTimer);
+	TempTimer->OnTime += EventDelegate;
 	TempTimer->Start();
-
 }

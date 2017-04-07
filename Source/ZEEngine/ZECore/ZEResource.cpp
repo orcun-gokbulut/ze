@@ -36,7 +36,7 @@
 #include "ZEResource.h"
 #include "ZEResourceManager.h"
 #include "ZEError.h"
-#include "ZEDefinitions.h"
+
 #include <string.h>
 
 #pragma warning(push)

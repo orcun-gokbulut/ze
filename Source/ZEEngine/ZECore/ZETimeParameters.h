@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESDK.cpp
+ Zinek Engine - ZETimeParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESDK.h"
-#include "ZECore/ZECore.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
+#pragma once
 
-#define WINDOWS_MEAN_AND_LEAN
-#include <windows.h>
+#include "ZEMeta/ZEObject.h"
 
-extern HINSTANCE ApplicationInstance;
-
-bool zeInitialize(void* Instance, void* WindowHandle)
+ZE_ENUM(ZETickMode)
 {
-	//_set_SSE2_enable(1);
-	ApplicationInstance = *((HINSTANCE*)Instance);
-	return zeCore->StartUp(WindowHandle);
-}
+	ZE_TM_NONE,
+	ZE_TM_VARIABLE_INTERVAL,
+	ZE_TM_FIXED_INTERVAL,
+	ZE_TM_EVENT_BASED
+};
 
-void zeMainLoop()
+ZE_ENUM(ZEFrameType)
 {
-	//if (zeCore->GetGraphicsModule()->IsReady())
-	zeCore->MainLoop();
-}
+	ZE_TT_NORMAL,
+	ZE_TT_INTERMEDIATE,
+	ZE_TT_DROPPED
+};
 
-void zeTerminate()
+class ZETimeParameters : public ZEObject
 {
-	zeCore->ShutDown();
-}
+	ZE_OBJECT
+	public:
+		ZETickMode								Mode;
 
-ZECore* zeGetCore()
-{
-	return zeCore;
-}
+		ZEUInt64								CycleId;
+		double									CycleTime;
+		double									CycleTimeDelta;
+
+		ZEFrameType								FrameType;
+		ZEUInt64								FrameId;
+		double									FrameTime;
+		double									FrameTimeDelta;
+		double									FrameTimeInterval;
+};

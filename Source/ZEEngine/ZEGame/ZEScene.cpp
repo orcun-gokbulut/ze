@@ -46,6 +46,7 @@
 #include "ZEEntity.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
+#include "ZECore/ZETimeParameters.h"
 #include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRContext.h"
@@ -669,9 +670,12 @@ bool ZEScene::IsEntitiesInitialized()
 	return true;
 }
 
-void ZEScene::Tick(float ElapsedTime)
+void ZEScene::Tick(const ZETimeParameters* Parameters)
 {
 	if (!Enabled)
+		return;
+
+	if (Parameters->FrameType != ZE_TT_NORMAL && Parameters->FrameType != ZE_TT_DROPPED)
 		return;
 
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("SceneTick");
@@ -694,7 +698,7 @@ void ZEScene::Tick(float ElapsedTime)
 		if (LocalCurrentEntity == NULL)
 			break;
 
-		LocalCurrentEntity->Tick(ElapsedTime);
+		LocalCurrentEntity->Tick(Parameters->FrameTimeDelta);
 
 		TickList.LockRead();
 		{
@@ -711,6 +715,9 @@ void ZEScene::Tick(float ElapsedTime)
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
+	if (Parameters->TimeParameters->FrameType == ZE_TT_DROPPED)
+		return;
+
 	ZEGRGraphicsModule::GetInstance()->GetMainContext()->BeginEvent("ScenePreRender");
 
 	Parameters->Renderer->BeginScene(this);

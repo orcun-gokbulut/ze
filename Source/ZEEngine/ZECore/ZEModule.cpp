@@ -35,30 +35,61 @@
 
 #include "ZEModule.h"
 
-ZECore* ZEModule::GetCore()
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEPathInfo.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZECore.h"
+#include "ZEApplicationModule.h"
+
+void ZEModule::FindConfigurationFileName()
 {
-	return Core;
+	const ZEUInt PathPatternCount = 20;
+	const char* PathPatterns[PathPatternCount] = 
+	{
+		"#S:/Configurations/{1}/{0}/{0}.ZEConfig",
+		"#S:/Configurations/{1}/{0}.ZEConfig",
+		"#S:/Configurations/{0}/{0}.ZEConfig",
+		"#S:/Configurations/{0}.ZEConfig",
+		"#S:/Configurations/{1}/{2}/{2}.ZEConfig",
+		"#S:/Configurations/{1}/{2}.ZEConfig",
+		"#S:/Configurations/{2}/{2}.ZEConfig",
+		"#S:/Configurations/{2}.ZEConfig",
+
+		"#R:/Configurations/{1}/{0}/{0}.ZEConfig",
+		"#R:/Configurations/{1}/{0}.ZEConfig",
+		"#R:/Configurations/{0}/{0}.ZEConfig",
+		"#R:/Configurations/{0}.ZEConfig",
+		"#R:/Configurations/{1}/{2}/{2}.ZEConfig",
+		"#R:/Configurations/{1}/{2}.ZEConfig",
+		"#R:/Configurations/{2}/{2}.ZEConfig",
+		"#R:/Configurations/{2}.ZEConfig",
+
+		"#E:/Configurations/{0}/{0}.ZEConfig",
+		"#E:/Configurations/{0}.ZEConfig",
+		"#E:/Configurations/{2}/{2}.ZEConfig",
+		"#E:/Configurations/{2}.ZEConfig"
+	};
+
+	const char* ApplicationName = "";
+	if (GetCore()->GetApplicationModule() != NULL)
+		ApplicationName = GetCore()->GetApplicationModule()->GetApplicationName();
+
+	for (ZEUInt I = 0; I < PathPatternCount; I++)
+	{
+		ZEPathInfo PathInfo(ZEFormat::Format(PathPatterns[I], GetClass()->GetName(), ApplicationName, GetBaseModule()->GetName()));
+		if (PathInfo.IsExists())
+		{
+			ConfigurationFileName = PathInfo.GetPath();
+			break;
+		}
+	}
 }
 
-bool ZEModule::GetEnabled()
+void ZEModule::SetConfigurationFileName(const ZEString& FileName)
 {
-	return Enabled;
+	ConfigurationFileName = FileName;
 }
-void ZEModule::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-void ZEModule::PreProcess()
-{
-
-}
-
-void ZEModule::PostProcess()
-{
-
-}
-
 
 void ZEModule::RegisterClasses()
 {
@@ -70,7 +101,25 @@ void ZEModule::UnregisterClasses()
 
 }
 
-ZEModule::ZEModule()
+bool ZEModule::InitializeInternal()
+{
+	if (!ZEInitializable::InitializeInternal())
+		return false;
+
+	RegisterClasses();
+	LoadConfiguration();
+
+	return true;
+}
+
+bool ZEModule::DeinitializeInternal()
+{
+	UnregisterClasses();
+
+	return ZEInitializable::DeinitializeInternal();
+}
+
+ZEModule::ZEModule() : CoreLink(this)
 {
 	Core = NULL;
 	Enabled = true;
@@ -78,5 +127,118 @@ ZEModule::ZEModule()
 
 ZEModule::~ZEModule()
 {
+	Deinitialize();
+	if (Core != NULL)
+		Core->RemoveModule(this);
+}
 
+ZECore* ZEModule::GetCore() const
+{
+	return Core;
+}
+
+ZEClass* ZEModule::GetBaseModule() const
+{
+	return GetClass();
+}
+
+const ZEString& ZEModule::GetConfigurationFileName() const
+{
+	return ConfigurationFileName;
+}
+
+void ZEModule::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEModule::GetEnabled() const
+{
+	return Enabled;
+}
+
+void ZEModule::PreProcess(const ZETimeParameters* Parameters)
+{
+
+}
+
+void ZEModule::Process(const ZETimeParameters* Parameters)
+{
+
+}
+
+void ZEModule::PostProcess(const ZETimeParameters* Parameters)
+{
+
+}
+
+bool ZEModule::LoadConfiguration()
+{
+	if (ConfigurationFileName.IsEmpty())
+		FindConfigurationFileName();
+
+	if (ConfigurationFileName.IsEmpty())
+		return false;
+
+	return LoadConfiguration(ConfigurationFileName);
+}
+
+bool ZEModule::LoadConfiguration(const ZEString& ConfigurationFileName)
+{
+	ZEMLReader Reader;
+	if (!Reader.Open(ConfigurationFileName))
+	{
+		zeError("Cannot load configuration. Cannot open configuration file. Module Name: %s, Configuration File Name: %s.", GetClass()->GetName(), ConfigurationFileName.ToCString());
+		return false;
+	}
+
+	ZEMLReaderNode RootNode = Reader.GetRootNode();
+	if (RootNode.GetName() != "ZEConfig")
+	{
+		zeError("Cannot load configuration. Unknown root node name. Module Name: %s, Configuration File Name: %s.", GetClass()->GetName(), ConfigurationFileName.ToCString());
+		return false;
+	}
+
+	this->ConfigurationFileName = ConfigurationFileName;
+
+	return LoadConfiguration(RootNode);
+}
+
+bool ZEModule::LoadConfiguration(const ZEMLReaderNode& ConfigNode)
+{
+	return GetClass()->Unserialize(this, ConfigNode);
+}
+
+bool ZEModule::SaveConfiguration()
+{
+	if (ConfigurationFileName.IsEmpty())
+		return false;
+
+	return LoadConfiguration(ConfigurationFileName);
+}
+
+bool ZEModule::SaveConfiguration(const ZEString& ConfigNode)
+{
+	ZEMLWriter Writer;
+	if (!Writer.Open(ConfigurationFileName))
+	{
+		zeError("Cannot save configuration. Cannot open configuration file. Module Name: %s, Configuration File Name: %s.", GetClass()->GetName(), ConfigurationFileName.ToCString());
+		return false;
+	}
+
+	ZEMLWriterNode RootNode;
+	if (!Writer.OpenRootNode("ZEConfig", RootNode))
+	{
+		zeError("Cannot save configuration. Cannot write root node to configuration file. Module Name: %s, Configuration File Name: %s.", GetClass()->GetName(), ConfigurationFileName.ToCString());
+		return false;
+	}
+
+	this->ConfigurationFileName = ConfigurationFileName;
+
+	return SaveConfiguration(RootNode);
+}
+
+bool ZEModule::SaveConfiguration(ZEMLWriterNode& ConfigNode)
+{
+	return GetClass()->Serialize(this, ConfigNode);
 }

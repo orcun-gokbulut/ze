@@ -36,16 +36,16 @@
 #include "ZEError.h"
 #include "ZETexture/ZETextureCacheDataIdentifier.h"
 
+#define ZE_MAX_FILE_NAME_SIZE 2048
 
 ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( )
 {
 	/* Empty */
 }
 
-ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset )
+ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier(const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset )
 {
-	sprintf_s(this->ItemName, sizeof(char) * ZE_MAX_FILE_NAME_SIZE, "%s", ItemName);
-
+	this->ItemName = ItemName;
 	this->TextureOptions = TextureOptions;
 	this->Offset = Offset;
 }
@@ -62,18 +62,7 @@ ZEUInt64 ZETextureCacheDataIdentifier::GetDataSize()const
 
 ZEUInt64 ZETextureCacheDataIdentifier::GetHash() const
 {
-	ZEUInt Hash = 0;
-	ZEUInt I = 0;	
-	ZEInt Char = 0;
-
-	while (I < ZE_MAX_FILE_NAME_SIZE)
-	{
-		Char = ItemName[I];
-		Hash = Char + (Hash << 6) + (Hash << 16) - Hash;
-		I++;
-	}
-
-	return (ZEUInt64)Hash;
+	return (ZEUInt64)ItemName.Hash();
 }
 
 // Returns total bytes written
@@ -86,7 +75,8 @@ ZEUInt64 ZETextureCacheDataIdentifier::Write(ZEFile* File) const
 	ZEUInt64 BytesWritten = 0;
 	ZEUInt64 WriteCount = 0;
 
-	WriteCount = File->Write(ItemName, (ZEUInt64)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
+	
+	WriteCount = File->Write(ItemName.GetValue(), (ZEUInt64)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
 	if (WriteCount != ZE_MAX_FILE_NAME_SIZE)
 	{
 		return 0;

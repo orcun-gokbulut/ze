@@ -59,11 +59,7 @@ add_subdirectory(ZEUI)
 #add_subdirectory(ZETerrain)
 add_subdirectory(ZEResource)
 
-ze_add_source(ZEAPI.h 						Sources Headers)
-ze_add_source(ZECompileOptions.h 			Sources Headers)
-ze_add_source(ZEDefinitions.h 				Sources Headers)
-ze_add_source(ZESDK.h 						Sources Headers)
-ze_add_source(ZESDK.cpp 					Sources)
+ze_add_source(ZEDummy.cpp				Sources)
 
 ze_add_library(TARGET ZEEngine 
 	SOURCES ${Sources}

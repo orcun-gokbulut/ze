@@ -89,6 +89,8 @@ bool ZEALModule::InitializeInternal()
 	if (!ZESoundModule::InitializeInternal())
 		return false;
 
+	ZESoundModule::BaseInitialize();
+
 	Device = alcOpenDevice(NULL);
 	if (Device == NULL) 
 	{

@@ -43,7 +43,6 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEAABBox.h"
-#include "ZEDefinitions.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
 
@@ -97,7 +96,7 @@ struct ZEInteriorResourcePhysicalMesh
 
 struct ZEInteriorResourceRoom
 {
-	char											Name[ZE_MAX_NAME_SIZE];
+	ZEString										Name;
 	ZEAABBox										BoundingBox;
 	ZEVector3										Position;
 	ZEQuaternion									Rotation;
@@ -114,7 +113,7 @@ struct ZEInteriorResourceRoom
 
 struct ZEInteriorResourceDoor
 {
-	char											Name[ZE_MAX_NAME_SIZE];
+	ZEString										Name;
 	bool											IsOpen;
 	float											Width;
 	float											Length;
@@ -129,7 +128,7 @@ struct ZEInteriorResourceDoor
 
 struct ZEInteriorResourceHelper
 {
-	char											Name[ZE_MAX_NAME_SIZE];
+	ZEString										Name;
 	ZEInteriorResourceHelperOwnerType				OwnerType;
 	ZEInt32											OwnerIndex;
 	ZEInteriorResourceRoom*							OwnerRoom;

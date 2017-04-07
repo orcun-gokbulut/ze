@@ -37,57 +37,33 @@
 
 #include "ZEFile/ZEPathManager.h"
 
-ZEData* ZEApplicationModule::GetLoadingScreen()
+
+const char* ZEApplicationModule::GetApplicationName() const
 {
-	return NULL;
+	return GetClass()->GetName();
 }
 
-ZEUInt32 ZEApplicationModule::GetLoadingScreenColor()
+bool ZEApplicationModule::PreStartup()
 {
-	return 0x00000000;
+	return true;
 }
 
-void ZEApplicationModule::PreProcess()
+bool ZEApplicationModule::StartUp()
 {
-
+	return true;
 }
 
-void ZEApplicationModule::Process(float ElapsedTime)
-{
-
-}
-
-void ZEApplicationModule::PostProcess(float ElapsedTime)
+void ZEApplicationModule::PostStartup()
 {
 
 }
 
-void ZEApplicationModule::StartUp()
+void ZEApplicationModule::PreShutdown()
 {
 
 }
 
 void ZEApplicationModule::ShutDown()
-{
-
-}
-
-void ZEApplicationModule::Start()
-{
-
-}
-
-void ZEApplicationModule::Stop()
-{
-
-}
-
-void ZEApplicationModule::Tick(float ElapsedTime)
-{
-
-}
-
-void ZEApplicationModule::Render(float ElapsedTime)
 {
 
 }

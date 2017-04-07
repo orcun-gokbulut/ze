@@ -151,7 +151,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void									LoadEntities();
 		void									UnloadEntities();
 
-		void									Tick(float ElapsedTime);
+		void									Tick(const ZETimeParameters* Parameters);
 		void									PreRender(const ZERNPreRenderParameters* Parameters);
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

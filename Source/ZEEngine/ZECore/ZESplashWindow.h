@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateScreen.h
+ Zinek Engine - ZESplashWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
-#include "ZETypes.h"
-#include "ZEEntity.h"
-#include "ZEUI/ZEUILabel.h"
+struct ZESplashWindowData;
+struct ZESplashWindowMessage;
 
-class ZERNMaterial;
-class ZEGRBuffer;
-class ZEUIFontTrueType;
-class ZEUIManager;
-
-class ZEStateScreen : public ZEEntity
+class ZESplashWindow : public ZEInitializable, public ZEDestroyable
 {
-	ZE_OBJECT
 	private:
-		ZEUIManager*						Manager;
+		ZESplashWindowData*			Data;
+		ZEString					StatusText;
 
-		ZEArray<ZEUILabel*>					ConsoleLines;
-		ZEUILabel*							LoadingLabel;
+		virtual bool				InitializeInternal() override;
+		virtual bool				DeinitializeInternal() override;
 
-		ZEUIFrameControl*					LoadingIndicatorFrame;
-		ZEHolder<const ZEUIFontTrueType>	Font;
-
-		ZEUInt								LoadingPercentage;
-		ZEUInt								LastLoadingPercentage;
-		ZESize								LastOutputBufferCount;
-
-		virtual ZEEntityResult				LoadInternal();
-		virtual ZEEntityResult				UnloadInternal();
-
-											ZEStateScreen();
-		virtual								~ZEStateScreen();
+									ZESplashWindow();
+		virtual						~ZESplashWindow() override;
 
 	public:
-		void								SetManager(ZEUIManager* Manager);
-		ZEUIManager*						GetManager();
+		void						SetStatusText(const ZEString& Name);
+		const ZEString&				GetStatusText() const;
 
-		virtual void						Tick(float ElapsedTime);
-		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
+		void						Show();
+		void						Hide();
 
-		static ZEStateScreen*				CreateInstance();
+		void						HandleMessage(ZESplashWindowMessage* Message);
+
+		static ZESplashWindow*		CreateInstance();
 };

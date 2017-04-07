@@ -61,13 +61,7 @@ ZEInt ZECommand::GetAccessLevel()
 
 bool ZECommand::Execute(ZEArray<ZEValue>* ParamList)
 {
-	if (zeCore->GetUserLevel() >= this->AccessLevel)																			    
-		return Callback(this, ParamList);
-	else
-	{
-		zeOutput("Invalid Command.\r\n");
-		return false;
-	}
+	return Callback(this, ParamList);
 }
 
 void ZECommand::SetCallback(ZECommandCallback NewCallback)

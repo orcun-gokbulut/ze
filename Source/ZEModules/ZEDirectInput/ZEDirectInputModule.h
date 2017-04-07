@@ -56,7 +56,7 @@ class ZEDirectInputModule : public ZEInputDeviceModule
 	public:
 		LPDIRECTINPUT8						DirectInput;
 
-		virtual void						Process();
+		virtual void						Process(const ZETimeParameters* Parameters);
 
 		static ZEDirectInputModule*			CreateInstance();
 };

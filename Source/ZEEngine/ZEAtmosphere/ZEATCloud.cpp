@@ -36,6 +36,7 @@
 #include "ZEATCloud.h"
 
 #include "ZEMath/ZEMath.h"
+#include "ZECore/ZETimeParameters.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRBuffer.h"
@@ -379,7 +380,7 @@ bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 		return false;
 
 	static ZEVector2 Translation = ZEVector2::Zero;
-	Translation += Parameters->ElapsedTime * ZEVector2(0.0001f, 0.0003f);
+	Translation += Parameters->TimeParameters->FrameTimeDelta * ZEVector2(0.0001f, 0.0003f);
 
 	if (Translation.x > 1.0f)
 		Translation.x = 0.0f;

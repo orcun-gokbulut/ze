@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECompileOptions.h
+ Zinek Engine - ZECoreModules.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_COMPILE_OPTIONS_H__
-#define __ZE_COMPILE_OPTIONS_H__
+/*
+ZE_CORE_MODULE(ZECrashHandler,					CrashHandler)
+ZE_CORE_MODULE(ZEErrorManager,					ErrorManager)
+ZE_CORE_MODULE(ZEOptionManager,					OptionManager)
+ZE_CORE_MODULE(ZECommandManager,				CommandManager)
+ZE_CORE_MODULE(ZEResourceManager,				ResourceManager)
+ZE_CORE_MODULE(ZESystemMessageManager,			SystemMessageManager)
+ZE_CORE_MODULE(ZESystemMessageHandler,			SystemMessageHandler)	
+ZE_CORE_MODULE(ZEConsole,						Console)
+ZE_CORE_MODULE(ZEProfiler,						Profiler)
+*/
 
-// CMake provides !!!
-
+#ifdef ZE_CORE_MODULE_INCLUDES
+#include "ZETimeManager.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEInput/ZEInputModule.h"
+#include "ZEPhysics/ZEPhysicsModule.h"
+#include "ZESound/ZESoundModule.h"
+#include "ZEApplicationModule.h"
+#else
+ZE_CORE_MODULE(ZETimeManager,					TimeManager)
+ZE_CORE_MODULE(ZEGRGraphicsModule,				GraphicsModule)
+ZE_CORE_MODULE(ZESoundModule,					SoundModule)
+ZE_CORE_MODULE(ZEInputModule,					InputModule)
+ZE_CORE_MODULE(ZEPhysicsModule,					PhysicsModule)
+ZE_CORE_MODULE(ZEApplicationModule,				ApplicationModule)
 #endif

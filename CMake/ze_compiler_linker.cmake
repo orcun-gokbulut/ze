@@ -37,6 +37,7 @@ macro (ze_compiler_linker_msvc)
 	message(STATUS "[ZEBuild] Microsoft Visual C++ compiler detected. Adjusting compiler and linker parameters.")
 
 	# /EH Exception Handling
+	# /EHsc- Disable C++ Exceptions
 	# /GL Whole Program Optimization
 	# /GS Security Checks
 	# /GR Runtime Type Information
@@ -60,13 +61,16 @@ macro (ze_compiler_linker_msvc)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
 	endif()
 
-	string(REPLACE "/GR" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	string(REPLACE "/GS" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	string(REPLACE "/GT" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-	string(REPLACE "/GR" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	string(REPLACE "/GS" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-	string(REPLACE "/GT" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+	string(REPLACE "/GR" 	"" CMAKE_C_FLAGS 	"${CMAKE_C_FLAGS}")
+	string(REPLACE "/GS" 	"" CMAKE_C_FLAGS 	"${CMAKE_C_FLAGS}")
+	string(REPLACE "/GT" 	"" CMAKE_C_FLAGS 	"${CMAKE_C_FLAGS}")
+	string(REPLACE "/GR" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
+	string(REPLACE "/GS" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
+	string(REPLACE "/GT" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
+	string(REPLACE "/EHsc" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
 
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc-")
+	
 	set(ZEBUID_COMPILER_FLAGS_RELEASE "/fp:fast /GL /GT- /GS- /GR- /Zi /d2Zi+ /Ox /Ob2 /Oi /Ot /Oy /Gs /GF /Gy")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${ZEBUID_COMPILER_FLAGS_RELEASE}")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${ZEBUID_COMPILER_FLAGS_RELEASE}")

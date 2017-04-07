@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERealTimeClock.cpp
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERealTimeClock.h"
-
-#include "ZECore.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
-#ifdef GetCurrentTime
-#undef GetCurrentTime
-#endif
-
-
-ZERealTimeClock::ZERealTimeClock()
-{
-	ResetTime();
-}
-
-ZERealTimeClock::~ZERealTimeClock()
-{
-
-}
-
-ZEUInt64 ZERealTimeClock::GetCurrentTime()
-{
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	return ((FrameTick - StartTick) * 1000000) / Frequency;
-}
-
-ZEUInt64 ZERealTimeClock::GetFrameTime()
-{
-	return ((FrameTick - StartTick) * 1000000) / Frequency;
-}
-
-ZEUInt64 ZERealTimeClock::GetFrameDeltaTime()
-{
-	return ((FrameTick - OldFrameTick) * 1000000) / Frequency;
-}
-
-void ZERealTimeClock::ResetFrameTime()
-{
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	FrameTick = CurrentTick.QuadPart;
-	OldFrameTick = CurrentTick.QuadPart;
-}
-
-void ZERealTimeClock::ResetTime()
-{
-	LARGE_INTEGER Freq;
-	QueryPerformanceFrequency(&Freq);
-	Frequency = Freq.QuadPart;
-
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-
-	OldFrameTick = CurrentTick.QuadPart;
-	FrameTick = CurrentTick.QuadPart;
-	StartTick = CurrentTick.QuadPart;
-}
-
-void ZERealTimeClock::UpdateFrameTime()
-{
-	LARGE_INTEGER Freq;
-	QueryPerformanceFrequency(&Freq);
-	Frequency = Freq.QuadPart;
-
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	OldFrameTick = FrameTick;
-	FrameTick = CurrentTick.QuadPart;
-}
-
-ZERealTimeClock* ZERealTimeClock::GetInstance()
-{
-	return ZECore::GetInstance()->GetRealTimeClock();
-}

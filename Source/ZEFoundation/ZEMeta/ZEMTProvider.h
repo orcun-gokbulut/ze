@@ -53,6 +53,7 @@ class ZEMTProvider
 		const ZEArray<ZEClass*>&		GetClasses();
 		ZEArray<ZEClass*>				GetClasses(ZEClass* ParentClass, bool ExcludeParentClass = false);
 		ZEClass*						GetClass(const char* ClassName);
+		ZEClass*						GetClass(ZEClass* ParentClass, const char* ClassName);
 		bool							RegisterClass(ZEClass* Class);
 		void							UnregisterClass(ZEClass* Class);
 

@@ -40,7 +40,6 @@
 
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEDefinitions.h"
 #include "ZEFile/ZEFileCache.h"
 #include "ZETextureOptions.h"
 
@@ -49,7 +48,7 @@
 class ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
 {
 	public:
-		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
+		ZEString				ItemName;
 		ZETextureOptions		TextureOptions;
 		ZEUInt64				Offset;
 

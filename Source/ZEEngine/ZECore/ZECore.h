@@ -35,156 +35,111 @@
 
 #pragma once
 
-#include "ZEAPI.h"
+#include "ZEMeta/ZEObject.h"
+
 #include "ZETypes.h"
 #include "ZEOption.h"
-
+#include "ZEDS/ZEList2.h"
 
 #define zeCore ZECore::GetInstance()
-
-enum ZEUserLevel
-{
-	ZE_UL_PLAYER,
-	ZE_UL_CHEATER,
-	ZE_UL_ADMINISTRATOR,
-	ZE_UL_DEVELOPPER
-};
-
-enum ZECoreState
-{
-	ZE_CS_UNKNOWN,
-	ZE_CS_RUNNING,
-	ZE_CS_PAUSED,
-	ZE_CS_STARTUP,
-	ZE_CS_SHUTDOWN,
-	ZE_CS_TERMINATE,
-	ZE_CS_CRITICAL_ERROR
-};
 
 class ZEModule;
 class ZEErrorManager;
 class ZEOptionManager;
 class ZEResourceManager;
 class ZECommandManager;
-class ZEConsole;
-class ZEGRGraphicsModule;
-class ZESoundModule;
-class ZEInputModule;
-class ZEPhysicsModule;
-class ZENetworkModule;
-class ZEApplicationModule;
-class ZESystemMessageManager;
-class ZESystemMessageHandler;
 class ZERealTimeClock;
 class ZEProfiler;
-class ZETimerManager;
 class ZECrashHandler;
+class ZEConsole;
+class ZESystemMessageManager;
+class ZESystemMessageHandler;
 
-class ZECore
+#define ZE_CORE_MODULE(Type, Variable) class Type;
+#include "ZECoreModules.h"
+#undef ZE_CORE_MODULE
+
+enum ZECoreState
 {
+	ZE_CS_NONE,
+	ZE_CS_STARTING_UP,
+	ZE_CS_RUNNING,
+	ZE_CS_PAUSED,
+	ZE_CS_SHUTTING_DOWN,
+	ZE_CS_SHUTTED_DOWN,
+	ZE_CS_TERMINATING,
+	ZE_CS_TERMINATED,
+	ZE_CS_CRITICAL_ERROR
+};
+
+class ZECore : public ZEObject
+{
+	ZE_OBJECT
 	private:
-		ZECoreState						CoreState;
-		ZEUserLevel						UserLevel;
-		ZESize							FrameId;
-		float							RunningTime;
-		bool							DebugMode;
+		ZECoreState									State;
+		ZEList2<ZEModule>							Modules;
+		ZECrashHandler*								CrashHandler;
+		ZEErrorManager*								ErrorManager;
+		ZEOptionManager*							OptionManager;
+		ZECommandManager*							CommandManager;
+		ZEResourceManager*							ResourceManager;
+		ZEConsole*									Console;
+		ZEProfiler*									Profiler;
+		ZESystemMessageManager*						SystemMessageManager;
+		ZESystemMessageHandler*						SystemMessageHandler;	
 
-		char							ResourceDirectory;
+		void										SetState(ZECoreState CoreState);
 
-		ZERealTimeClock*				RealTimeClock;
-		ZEProfiler*						Profiler;
-		float							ElapsedTime;
+		void										RegisterClasses();
+		void										UnregisterClasses();
 
-		ZECrashHandler*					CrashHandler;
-		ZEApplicationModule*			Application;
-		ZEErrorManager*					ErrorManager;
-		ZEOptionManager*				OptionManager;
-		ZEResourceManager*				ResourceManager;
-		ZECommandManager*				CommandManager;
-		ZETimerManager*					TimerManager;
-		ZEConsole*						Console;
-		
-		ZEGRGraphicsModule*				GraphicsModule;
-		ZESoundModule*					SoundModule;
-		ZEInputModule*					InputModule;
-		ZEPhysicsModule*				PhysicsModule;
-		ZENetworkModule*				NetworkModule;
+		ZEModule*									FindModule(ZEClass* Class, const char* Name);
+		bool										InitializeModule(ZEModule* Module);
+		void										DeInitializeModule(ZEModule** Module);
+		bool										InitializeModules();
+		void										DeinitializeModules();
 
-		ZESystemMessageManager*			SystemMessageManager;
-		ZESystemMessageHandler*			SystemMessageHandler;
-		
-	public:
-		void							RegisterClasses();
-
-		ZEModule*						FindModule(ZEClass* Class, const char* Name);
-		bool							InitializeModule(ZEModule* Module);
-		void							DeInitializeModule(ZEModule** Module);
-
-										ZECore();
-										~ZECore();
+													ZECore();
+													~ZECore();
 
 	public:
-		static ZEOptionSection			CoreOptions;
-
-		ZEErrorManager*					GetError();
-		ZEOptionManager*				GetOptions();
-		ZEResourceManager*				GetResourceManager();
-		ZECommandManager*				GetCommands();
-		ZEConsole*						GetConsole();
-		ZESystemMessageManager*			GetSystemMessageManager();
-		ZETimerManager*					GetTimerManager();
-		ZERealTimeClock*				GetRealTimeClock();
-		ZEProfiler*						GetProfiler();
-		ZECrashHandler*					GetCrashHandler();
-
-		void							SetResourceDirector(const char* Directory);
-		const char*						GetResourceDirectory();
-
-		bool							SetGraphicsModule(ZEGRGraphicsModule* Module);
-		ZEGRGraphicsModule*				GetGraphicsModule();
-
-		bool							SetSoundModule(ZESoundModule* Module);
-		ZESoundModule*					GetSoundModule();
-
-		bool							SetInputModule(ZEInputModule* Module);
-		ZEInputModule*					GetInputModule();
-
-		bool							SetPhysicsModule(ZEPhysicsModule* Module);
-		ZEPhysicsModule*				GetPhysicsModule();
-
-		bool							SetNetworkModule(ZENetworkModule* Module);
-		ZENetworkModule*				GetNetworkModule();
-
-		void							SetApplicationModule(ZEApplicationModule* Module);
-		ZEApplicationModule*			GetApplicationModule();
-
-		ZESize							GetFrameId();
-		float							GetElapsedTime();
-		float							GetRuningTime();
+		static ZEOptionSection						CoreOptions;
 		
-		void							SetDebugMode(bool Enabled);
-		bool							GetDebugMode();
+		ZECoreState									GetState();
+		bool										IsStarted();
+		bool										IsStartedOrStartingUp();
 
-		void*							GetApplicationInstance();
+		ZEErrorManager*								GetError();
+		ZEOptionManager*							GetOptions();
+		ZECommandManager*							GetCommands();
+		ZECrashHandler*								GetCrashHandler();
+		ZEProfiler*									GetProfiler();
+		ZEConsole*									GetConsole();
+		ZEResourceManager*							GetResourceManager();
+		ZESystemMessageManager*						GetSystemMessageManager();
+		void*										GetApplicationInstance();
 
-		ZECoreState						GetCoreState();
-		void							SetCoreState(ZECoreState CoreState);
+		ZEModule*									GetModule(ZEClass* ModuleClass) const;
+		const ZEList2<ZEModule>&					GetModules() const;
+		bool										AddModule(ZEModule* Module);
+		bool										RemoveModule(ZEModule* Module);
 
-		ZEUserLevel						GetUserLevel();
-		void							SetUserLevel(ZEUserLevel UserLevel);
+		bool										StartUp();
+		void										Terminate();
+		void										ShutDown();
 
-		bool							InitializeModules();
-		void							DeinitializeModules();
+		void										Run();
+		void										Pause();
+		void										MainLoop();
 
-		void							Terminate();
-		bool							StartUp(void* WindowHandle = 0);
-		void							ShutDown();
+		void										Execute();
 
-		void							Run();
-		void							Stop();
-		void							Pause();
+		bool										LoadConfiguration();
+		bool										SaveConfiguration();
 
-		void							MainLoop();
+		static ZECore*								GetInstance();
 
-		ZEAPI static ZECore*			GetInstance();
+		#define ZE_CORE_MODULE(Type, Variable) private: Type* Variable; public: Type* Get##Variable() const;
+		#include "ZECoreModules.h"
+		#undef ZE_CORE_MODULE
 };

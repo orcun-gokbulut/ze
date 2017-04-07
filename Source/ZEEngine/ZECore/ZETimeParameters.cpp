@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETimerManager.h
+ Zinek Engine - ZETimeParameters.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TIMER_MANAGER_H__
-#define __ZE_TIMER_MANAGER_H__
+#include "ZETimeParameters.h"
+#include "ZECommon.h"
 
-#include "ZETimer.h"
-#include "ZEDS/ZEArray.h"
-#include "ZERealTimeClock.h"
-
-class ZETimerManager
-{
-	friend class ZECore;
-	friend class ZETimer;
-
-	private:
-		ZEArray<ZETimer*>		TimerList;
-		float					CurrentTime;
-
-								ZETimerManager();
-		virtual					~ZETimerManager();
-
-	protected:
-		void					RegisterTimer(ZETimer* Timer);
-		void					UnregisterTimer(ZETimer* Timer);
-
-	public:
-		void					Tick(float ElapsedTime);
-
-		static ZETimerManager*	GetInstance();
-};
-
-
-#endif
+ZE_SUPPRESS_LNK4221

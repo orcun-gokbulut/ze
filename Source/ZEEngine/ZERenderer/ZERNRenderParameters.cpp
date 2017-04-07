@@ -35,25 +35,22 @@
 
 #include "ZERNRenderParameters.h"
 
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZETimeManager.h"
 
 void ZERNPreRenderParameters::UpdateTime()
 {
 	ZECore* Core = ZECore::GetInstance();
-
-	FrameId = Core->GetFrameId();
-	ElapsedTime = Core->GetElapsedTime();
-	Time = Core->GetRuningTime();
+	TimeParameters = Core->GetTimeManager()->GetParameters();
 }
 
 ZERNPreRenderParameters::ZERNPreRenderParameters()
 {
-	FrameId = 0;
-	ElapsedTime = 0.0f;
-	Time = 0.0f;
 	View = NULL;
 	Renderer = NULL;
 	Type = ZERN_RT_COLOR;
+	Flags = 0;
+	TimeParameters = NULL;
 
 	UpdateTime();
 }
@@ -61,17 +58,12 @@ ZERNPreRenderParameters::ZERNPreRenderParameters()
 void ZERNRenderParameters::UpdateTime()
 {
 	ZECore* Core = ZECore::GetInstance();
-
-	FrameId = Core->GetFrameId();
-	ElapsedTime = Core->GetElapsedTime();
-	Time = Core->GetRuningTime();
+	TimeParameters = Core->GetTimeManager()->GetParameters();
 }
 
 ZERNRenderParameters::ZERNRenderParameters()
 {
-	FrameId = 0;
-	ElapsedTime = 0.0f;
-	Time = 0.0f;
+	TimeParameters = NULL;
 	Context = NULL;
 	Type = ZERN_RT_COLOR;
 	View = NULL;

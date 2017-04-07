@@ -44,6 +44,7 @@ ZEMT_FORWARD_DECLARE(ZERNRenderer);
 ZEMT_FORWARD_DECLARE(ZERNStage);
 ZEMT_FORWARD_DECLARE(ZERNCommand);
 ZEMT_FORWARD_DECLARE(ZERNView);
+ZEMT_FORWARD_DECLARE(ZETimeParameters);
 
 ZE_ENUM(ZERNRenderType)
 {
@@ -75,13 +76,11 @@ class ZERNPreRenderParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZEUInt64					FrameId;
-		float						ElapsedTime;
-		float						Time;
 		ZERNRenderer*				Renderer;
 		const ZERNView*				View;
 		ZERNRenderType				Type;
 		ZERNRenderFlags				Flags;
+		const ZETimeParameters*		TimeParameters;
 
 		void						UpdateTime();
 
@@ -92,17 +91,14 @@ class ZERNRenderParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZEUInt64					FrameId;
-		float						ElapsedTime;
-		float						Time;
 		ZEGRContext*				Context;
 		ZERNRenderType				Type;
 		ZERNRenderFlags				Flags;
-
 		ZERNRenderer*				Renderer;
 		const ZERNView*				View;
 		const ZERNStage*			Stage;
 		const ZERNCommand*			Command;
+		const ZETimeParameters*		TimeParameters;
 
 		void						UpdateTime();
 

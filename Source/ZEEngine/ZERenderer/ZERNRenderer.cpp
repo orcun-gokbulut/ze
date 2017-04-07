@@ -41,19 +41,20 @@
 #include "ZERNShaderSlots.h"
 #include "ZERNRenderParameters.h"
 
-#include "ZECore\ZECore.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZEGraphics\ZEGRShader.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRViewport.h"
-#include "ZEGraphics\ZEGRBuffer.h"
-#include "ZEGraphics\ZEGRTexture.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRRenderTarget.h"
-#include "ZEGraphics\ZEGRGraphicsModule.h"
-#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics\ZEGRSampler.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZETimeManager.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRBuffer.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRSampler.h"
 #include "ZERNStageAntiAliasing.h"
 
 ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
@@ -146,6 +147,8 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 	PrevViewProjectionTransform = View.ViewProjectionTransform;
 
+	ZETimeManager* TimeManager = ZECore::GetInstance()->GetTimeManager();
+
 	ZERNStageAntiAliasing* StageAA = static_cast<ZERNStageAntiAliasing*>(GetStage(ZERN_STAGE_ANTI_ALIASING));
 	if (OutputTexture != NULL && StageAA != NULL && StageAA->GetEnabled() && StageAA->GetTemporalEnabled())
 	{
@@ -157,8 +160,8 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 		ZEMatrix4x4 TranslationMatrix;
 		ZEMatrix4x4::CreateTranslation(TranslationMatrix, 
-			2.0f * Jitters[ZECore::GetInstance()->GetFrameId() % 2].x / (float)OutputTexture->GetWidth(), 
-			2.0f * Jitters[ZECore::GetInstance()->GetFrameId() % 2].y / (float)OutputTexture->GetHeight(), 
+			2.0f * Jitters[TimeManager->GetFrameId() % 2].x / (float)OutputTexture->GetWidth(), 
+			2.0f * Jitters[TimeManager->GetFrameId() % 2].y / (float)OutputTexture->GetHeight(), 
 			0.0f);
 		Buffer->ViewProjectionTransform = TranslationMatrix * Buffer->ViewProjectionTransform;
 		Buffer->PrevViewProjectionTransform = TranslationMatrix * Buffer->PrevViewProjectionTransform;
@@ -188,9 +191,9 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 	ViewConstantBuffer->Unmap();
 
-	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
-	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
-	RendererConstants.FrameId = (ZEUInt32)ZECore::GetInstance()->GetFrameId();
+	RendererConstants.Time = TimeManager->GetFrameTime();
+	RendererConstants.Elapsedtime = TimeManager->GetFrameTimeDelta();
+	RendererConstants.FrameId = (ZEUInt32)TimeManager->GetFrameId();
 	if (OutputTexture != NULL)
 	{
 		RendererConstants.OutputSize = ZEVector2((float)OutputTexture->GetWidth(), (float)OutputTexture->GetHeight());
@@ -235,9 +238,7 @@ void ZERNRenderer::RenderStages()
 		Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 
 	ZERNRenderParameters Parameters;
-	Parameters.FrameId = 0;
-	Parameters.ElapsedTime = RendererConstants.Elapsedtime;
-	Parameters.Time = 0;
+	Parameters.UpdateTime();
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;

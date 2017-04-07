@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDefinitions.h
+ Zinek Engine - ZELoadingScreen.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEFINITIONS_H__
-#define __ZE_DEFINITIONS_H__
+#pragma once
 
-#ifndef NULL
-#define NULL 0
-#endif
+#include "ZETypes.h"
+#include "ZEEntity.h"
+#include "ZEUI/ZEUILabel.h"
 
-#define ZE_MAX_NAME_SIZE			128
-#define ZE_MAX_FILE_NAME_SIZE		256
+class ZERNMaterial;
+class ZEGRBuffer;
+class ZEUIFontTrueType;
+class ZEUIManager;
 
-#endif
+class ZELoadingScreen : public ZEEntity
+{
+	ZE_OBJECT
+	private:
+		ZEUIManager*						Manager;
+
+		ZEArray<ZEUILabel*>					ConsoleLines;
+		ZEUILabel*							LoadingLabel;
+
+		ZEUIFrameControl*					LoadingIndicatorFrame;
+		ZEHolder<const ZEUIFontTrueType>	Font;
+
+		ZEUInt								LoadingPercentage;
+		ZEUInt								LastLoadingPercentage;
+		ZESize								LastOutputBufferCount;
+
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
+
+											ZELoadingScreen();
+		virtual								~ZELoadingScreen();
+
+	public:
+		void								SetManager(ZEUIManager* Manager);
+		ZEUIManager*						GetManager();
+
+		void								SetLoadingStageCount(ZEUInt Count);
+		ZEUInt								GetLoadingStageCount() const;
+
+		void								SetLoadingStageIndex(ZEUInt Index);
+		ZEUInt								GetLoadingStageIndex() const;
+
+		void								ShowStartupScreen();
+		void								HideStartupScreen();
+
+		void								ShowLoadingScreen();
+		void								HideLoadingScreen();
+
+		virtual void						Tick(float ElapsedTime);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
+
+		static ZELoadingScreen*				CreateInstance();
+};

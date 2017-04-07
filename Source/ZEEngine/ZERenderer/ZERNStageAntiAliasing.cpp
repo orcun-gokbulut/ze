@@ -35,6 +35,8 @@
 
 #include "ZERNStageAntiAliasing.h"
 
+#include "ZECore/ZECore.h"
+#include "ZECore/ZETimeManager.h"
 #include "ZEGraphics/ZEGRBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRShader.h"
@@ -48,7 +50,6 @@
 #include "ZERNStageID.h"
 #include "ZERNStageSMAAAreaTexture.h"
 #include "ZERNStageSMAASearchTexture.h"
-#include "ZECore/ZECore.h"
 
 #define ZERN_AADF_CONSTANT_BUFFER	1
 #define ZERN_AADF_SHADER			2
@@ -261,7 +262,7 @@ void ZERNStageAntiAliasing::DoBlendingWeightCalculation(ZEGRContext* Context)
 			ZEVector4(2.0f, 2.0f, 2.0f, 0.0f)
 		};
 
-		Constants.SubsampleIndices = Indices[(ZECore::GetInstance()->GetFrameId() % 2)];
+		Constants.SubsampleIndices = Indices[(ZETimeManager::GetInstance()->GetFrameId() % 2)];
 		ConstantBuffer->SetData(&Constants);
 	}
 	else
@@ -281,7 +282,8 @@ void ZERNStageAntiAliasing::DoNeighborhoodBlending(ZEGRContext* Context)
 {
 	if (TemporalEnabled)
 	{
-		ZESize CurrIndex = (ZECore::GetInstance()->GetFrameId() + 1) % 2;
+		ZETimeManager* TimeManager = ZECore::GetInstance()->GetTimeManager();
+		ZESize CurrIndex = (TimeManager->GetFrameId() + 1) % 2;
 
 		const ZEGRRenderTarget* RenderTarget = ColorTextures[CurrIndex]->GetRenderTarget();
 
@@ -320,8 +322,10 @@ void ZERNStageAntiAliasing::DoReprojection(ZEGRContext* Context)
 {
 	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
 
-	ZESize PrevIndex = ZECore::GetInstance()->GetFrameId() % 2;
-	ZESize CurrIndex = (ZECore::GetInstance()->GetFrameId() + 1) % 2;
+	ZETimeManager* TimeManager = ZECore::GetInstance()->GetTimeManager();
+
+	ZESize PrevIndex = TimeManager->GetFrameId() % 2;
+	ZESize CurrIndex = (TimeManager->GetFrameId() + 1) % 2;
 
 	const ZEGRTexture* Textures[] = {ColorTextures[CurrIndex], ColorTextures[PrevIndex]};
 	Context->SetTextures(ZEGR_ST_PIXEL, 10, 2, Textures);

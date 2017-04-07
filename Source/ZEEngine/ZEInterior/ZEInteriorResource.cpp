@@ -178,7 +178,7 @@ bool ZEInteriorResource::ReadDoors(ZEMLReaderNode* DoorsNode)
 
 		ZEInteriorResourceDoor* Door = &Doors[I];
 
-		strncpy(Door->Name, DoorNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
+		Door->Name = DoorNode.ReadString("Name");
 		Door->IsOpen = DoorNode.ReadBoolean("IsOpen");
 
 		Door->Width = DoorNode.ReadFloat("Width");
@@ -241,7 +241,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 
 		ZEInteriorResourceRoom* Room = &Rooms[I];
 
-		strncpy(Room->Name, RoomNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
+		Room->Name = RoomNode.ReadString("Name");
 		Room->Position = RoomNode.ReadVector3("Position");
 		Room->Rotation = RoomNode.ReadQuaternion("Rotation");
 		Room->Scale = RoomNode.ReadVector3("Scale");
@@ -372,9 +372,7 @@ bool ZEInteriorResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 			return false;
 
 		ZEInteriorResourceHelper* Helper = &Helpers[I];
-		
-		strncpy(Helper->Name, HelperNode.ReadString("Name").ToCString(), ZE_MAX_NAME_SIZE);
-		
+		Helper->Name = HelperNode.ReadString("Name");
 		Helper->Position = HelperNode.ReadVector3("Position");
 		Helper->Rotation = HelperNode.ReadQuaternion("Rotation");
 		Helper->Scale = HelperNode.ReadVector3("Scale");

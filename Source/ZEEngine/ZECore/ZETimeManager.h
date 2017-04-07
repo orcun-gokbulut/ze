@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETimer.h
+ Zinek Engine - ZETimeManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,44 +35,77 @@
 
 #pragma once
 
-#include "ZEDS/ZELink.h"
+#include "ZEModule.h"
+
+#include "ZEDS/ZEList2.h"
 #include "ZEMeta/ZEEvent.h"
 
-class ZETimeManager;
-struct ZETimeParameters;
+#include "ZETimeCounter.h"
+#include "ZETimeParameters.h"
 
-class ZETimer : public ZEObject
+class ZETimer;
+
+class ZETimeManager : public ZEModule
 {
 	ZE_OBJECT
-	friend class ZETimeManager;
+	friend class ZETimer;
 	private:
-		ZELink<ZETimer>						ManagerLink;
+		ZETimeParameters						Parameters;
+		ZETickMode								TickMode;
+		ZEList2<ZETimer>						TimerList;
+		ZETimeCounter							TimeCounter;
+		float									FrameTimeInterval;
+		double									FrameTimeRemainder;
+		double									LastMeasuredTime;
+		bool									Running;
+		bool									AdvanceFrame;
 
-		bool								Running;
-		bool								Repeating;
-		bool								Temporary;
+		void									FireTimers(bool PostTick);
 
-		float								IntervalTime;
-		float								RemainingIntervalTime;
+		void									UpdateFrameFixedInterval();
+		void									UpdateFrameVariableInterval();
+		void									UpdateFrameEventBased();
 
+		virtual bool							InitializeInternal() override;
+		virtual bool							DeinitializeInternal() override;
+
+												ZETimeManager();
+		virtual									~ZETimeManager() override;
+	
 	public:
-		void								SetRepeating(bool Value);
-		bool								GetRepeating() const;
+		ZEUInt64								GetCycleId() const;
+		double									GetCycleTime() const;
+		double									GetCycleTimeDelta() const;
 
-		void								SetIntervalTime(float Secs);
-		float								GetIntervalTime() const;
+		ZEFrameType								GetFrameType() const;
+		ZEUInt64								GetFrameId() const;
+		double									GetFrameTime() const;
+		double									GetFrameTimeDelta() const;
 
-		bool								IsTriggered() const;
+		const ZETimeParameters*					GetParameters() const;
 
-		void								Start();
-		void								Pause();
-		void								Stop();
-		void								Reset();
+		void									SetTickMode(ZETickMode Mode);
+		ZETickMode								GetTickMode() const;
 
-		ZE_EVENT(							OnTime,(ZETimeParameters* Parameters));
+		void									SetFrameTimeInterval(float Interval);
+		float									GetFrameTimeInterval() const;
+			
+		const ZEList2<ZETimer>					GetTimers() const;
+		void									RegisterTimer(ZETimer* Timer);
+		void									UnregisterTimer(ZETimer* Timer);
 
-											ZETimer();
-		virtual								~ZETimer();
+		void									Start();
+		void									Pause();
+		void									Reset();
 
-		static void							CreateAutoTimer(float Interval, const ZEEventDelegate<void (ZETimeParameters*)>& EventDelegate);
+		virtual void							PreProcess(const ZETimeParameters* Parameters) override;
+		virtual void							Process(const ZETimeParameters* Parameters) override;
+		virtual void							PostProcess(const ZETimeParameters* Parameters) override;
+
+		ZE_EVENT(								OnTick,(const ZETimeParameters* Parameters));
+
+		void									AdvanceFrameEvent();
+
+		static ZETimeManager*					GetInstance();
+		static ZETimeManager*					CreateInstance();
 };

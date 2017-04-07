@@ -127,7 +127,7 @@ bool ZEWindowsInputModule::DeinitializeInternal()
 	return ZEInputDeviceModule::DeinitializeInternal();
 }
 
-void ZEWindowsInputModule::Process()
+void ZEWindowsInputModule::Process(const ZETimeParameters* Parameters)
 {
 	MouseDevice->Process(Messages, MessageCount);
 	KeyboardDevice->Process(Messages, MessageCount);

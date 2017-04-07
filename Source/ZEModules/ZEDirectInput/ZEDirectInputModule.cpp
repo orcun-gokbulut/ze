@@ -104,9 +104,9 @@ ZEDirectInputModule::~ZEDirectInputModule()
 	Deinitialize();
 }
 
-void ZEDirectInputModule::Process()
+void ZEDirectInputModule::Process(const ZETimeParameters* Parameters)
 {
-	const ZEArray<ZEInputDevice*> Devices = GetDevices();
+	const ZEArray<ZEInputDevice*>& Devices = GetDevices();
 	for (ZESize I = 0; I < Devices.GetSize(); I++)
 		((ZEDirectInputDevice*)Devices[I])->Process();
 

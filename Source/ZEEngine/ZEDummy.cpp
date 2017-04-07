@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETimerManager.cpp
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETimerManager.h"
-#include "ZECore.h"
-
-ZETimerManager::ZETimerManager()
-{
-	CurrentTime = (float)ZERealTimeClock::GetInstance()->GetCurrentTime();
-}
-
-ZETimerManager::~ZETimerManager()
-{
-	for (ZESize I = 0; I < TimerList.GetCount(); I++)
-	{
-		delete TimerList[I];
-	}
-}
-
-void ZETimerManager::RegisterTimer(ZETimer* Timer)
-{
-	if(TimerList.Exists(Timer))
-		return;
-
-	TimerList.Add(Timer);
-}
-
-void ZETimerManager::UnregisterTimer(ZETimer* Timer)
-{
-	TimerList.RemoveValue(Timer);
-}
-
-void ZETimerManager::Tick(float ElapsedTime)
-{
-	CurrentTime = (float)ZERealTimeClock::GetInstance()->GetCurrentTime() / 1000000.0f;
-
-	for (ZESize I = 0; I < TimerList.GetCount(); I++)
-	{
-		if(!TimerList[I]->Enabled)
-			continue;
-
-		if((ElapsedTime >= TimerList[I]->GetIntervalTime()) || (TimerList[I]->StartTime + TimerList[I]->GetIntervalTime() <= CurrentTime))
-		{
-			if(TimerList[I]->TimerEvent != NULL)
-				TimerList[I]->TimerEvent(TimerList[I]->GetIntervalTime());
-
-			TimerList[I]->Triggered = true;
-
-			TimerList[I]->Stop();
-
-			if(TimerList[I]->GetRepeating())
-				TimerList[I]->Start();
-
-			if(TimerList[I]->Temporary)
-			{
-				ZETimer* Temp = TimerList[I];
-				UnregisterTimer(Temp);
-				delete Temp;
-				I--;
-			}
-		}
-	}
-}
-
-ZETimerManager* ZETimerManager::GetInstance()
-{
-	return ZECore::GetInstance()->GetTimerManager();
-}

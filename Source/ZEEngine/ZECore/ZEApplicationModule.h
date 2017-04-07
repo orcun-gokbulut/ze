@@ -44,22 +44,15 @@ class ZEApplicationModule : public ZEModule
 {
 	ZE_OBJECT
 	public:
-		virtual ZEData*		GetLoadingScreen();
-		virtual ZEUInt32	GetLoadingScreenColor();
+		virtual const char*				GetApplicationName() const;
 
-		virtual void		PreProcess();
-		virtual void		Process(float ElapsedTime);
-		virtual void		PostProcess(float ElapsedTime);
-		
-		virtual void		StartUp();
-		virtual void		ShutDown();
+		virtual bool					PreStartup();
+		virtual bool					StartUp();
+		virtual void					PostStartup();
 
-		virtual void		Start();
-		virtual void		Stop();
+		virtual void					PreShutdown();
+		virtual void					ShutDown();
 
-		virtual void		Tick(float ElapsedTime);
-		virtual void		Render(float ElapsedTime);
-
-							ZEApplicationModule();
-		virtual				~ZEApplicationModule();
+										ZEApplicationModule();
+		virtual							~ZEApplicationModule();
 };

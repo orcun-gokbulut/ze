@@ -33,41 +33,86 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECompileOptions.h"
 #include "ZECore.h"
+
+#include "ZEMeta/ZEMTProvider.h"
+#include "ZEMeta/ZEClass.h"
 #include "ZEErrorManager.h"
 #include "ZEModule.h"
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
-#include "ZEResourceManager.h"
-#include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
-#include "ZERealTimeClock.h"
 #include "ZEProfiler.h"
-#include "ZETimerManager.h"
-
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEInput/ZEInputModule.h"
-#include "ZEPhysics/ZEPhysicsModule.h"
-#include "ZESound/ZESoundModule.h"
 #include "ZECrashHandler.h"
+#include "ZESplashWindow.h"
+#include "ZEResourceManager.h"
 
-#include "ZEMeta/ZEMTProvider.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <time.h>
-#include "ZEMeta/ZEClass.h"
-
+#define ZE_CORE_MODULE_INCLUDES
+#include "ZECoreModules.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
+#undef ZE_CORE_MODULE_INCLUDES
 
 ZEOptionSection ZECore::CoreOptions; 
-
 HINSTANCE ApplicationInstance;
-LARGE_INTEGER PerformanceCounterFreq;
-LARGE_INTEGER PerformanceCount, OldPerformanceCount, StartPerformanceCount;
+
+static ZEInt StartedCoreInstanceCount = 0;
+
+void ZECore_AtExit()
+{
+	if (StartedCoreInstanceCount != 0)
+		zeCriticalError("Unhandled exit function call detected. You cannot exit until core is shutdown. Terminating the core. This can cause huge problems.");
+
+	ZECore::GetInstance()->Terminate();
+}
+
+void ZECore::SetState(ZECoreState CoreState)
+{
+	this->State = CoreState;
+
+	const char* CoreStateText;
+
+	switch(CoreState)
+	{
+		default:
+			CoreStateText = "UNKNOWN";
+			break;
+
+		case ZE_CS_STARTING_UP:
+			CoreStateText = "StartUp";
+			break;
+
+		case ZE_CS_RUNNING:
+			CoreStateText = "Running";
+			break;
+
+		case ZE_CS_PAUSED:
+			CoreStateText = "Paused";
+			break;
+
+		case ZE_CS_TERMINATING:
+			CoreStateText = "Terminating";
+			break;
+
+		case ZE_CS_TERMINATED:
+			CoreStateText = "Terminated";
+			break;
+
+
+		case ZE_CS_SHUTTING_DOWN:
+			CoreStateText = "Shutting Down";
+			break;
+
+		case ZE_CS_SHUTTED_DOWN:
+			CoreStateText = "Shut Down";
+			break;
+	}
+
+	zeLog("Core state changed to \"%s\".", CoreStateText);
+}
 
 class ZECoreSystemMessageHandler : public ZESystemMessageHandler
 {
@@ -118,16 +163,6 @@ ZESystemMessageManager* ZECore::GetSystemMessageManager()
 	return SystemMessageManager;
 }
 
-ZETimerManager* ZECore::GetTimerManager()
-{
-	return TimerManager;
-}
-
-ZERealTimeClock* ZECore::GetRealTimeClock()
-{
-	return RealTimeClock;
-}
-
 ZEProfiler* ZECore::GetProfiler()
 {
 	return Profiler;
@@ -137,193 +172,31 @@ ZECrashHandler* ZECore::GetCrashHandler()
 {
 	return CrashHandler;
 }
-		
-bool ZECore::SetGraphicsModule(ZEGRGraphicsModule* Module)
-{
-	GraphicsModule = Module;
-	return true;
-}
-
-ZEGRGraphicsModule* ZECore::GetGraphicsModule()
-{
-	return GraphicsModule;
-}
-
-bool ZECore::SetSoundModule(ZESoundModule* Module)
-{
-	SoundModule = Module;
-	return true;
-}
-
-ZESoundModule* ZECore::GetSoundModule()
-{
-	return SoundModule;
-}
-
-bool ZECore::SetInputModule(ZEInputModule* Module)
-{
-	InputModule = Module;
-	return true;
-}
-
-
-ZEInputModule* ZECore::GetInputModule()
-{
-	return InputModule;
-}
-
-bool ZECore::SetPhysicsModule(ZEPhysicsModule* Module)
-{
-	PhysicsModule = Module;
-	return true;
-}
-
-ZEPhysicsModule* ZECore::GetPhysicsModule()
-{
-	return PhysicsModule;
-}
-
-bool ZECore::SetNetworkModule(ZENetworkModule* Module)
-{
-	//Network = Module;
-	return true;
-}
-
-ZENetworkModule* ZECore::GetNetworkModule()
-{
-	return NetworkModule;
-}
-
-void ZECore::SetApplicationModule(ZEApplicationModule* Module)
-{
-	Application = Module;
-}
-
-ZEApplicationModule* ZECore::GetApplicationModule()
-{
-	return Application;
-}
-
-ZESize ZECore::GetFrameId()
-{
-	return FrameId;
-}
-
-float ZECore::GetRuningTime()
-{
-	QueryPerformanceCounter(&PerformanceCount);
-	return (float)((PerformanceCount.QuadPart - StartPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart);
-}
-
-float ZECore::GetElapsedTime()
-{
-	return ElapsedTime;
-}
-
-void ZECore::SetDebugMode(bool Enabled)
-{
-	DebugMode = Enabled;
-}
-
-bool ZECore::GetDebugMode()
-{
-	#ifdef ZE_DEBUG_ENABLE
-		return DebugMode;
-	#else
-		return false;
-	#endif
-}
 
 void* ZECore::GetApplicationInstance()
 {
 	return ApplicationInstance;
 }
 
-ZECoreState ZECore::GetCoreState()
+ZECoreState ZECore::GetState()
 {
-	return this->CoreState;
+	return State;
 }
 
-void ZECore::SetCoreState(ZECoreState CoreState)
+bool ZECore::IsStarted()
 {
-	this->CoreState = CoreState;
-	
-	const char* CoreStateText;
-
-	switch(CoreState)
-	{
-		default:
-		case ZE_CS_CRITICAL_ERROR:
-			CoreStateText = "Critical Error";
-			break;
-
-		case ZE_CS_PAUSED:
-			CoreStateText = "Paused";
-			break;
-
-		case ZE_CS_RUNNING:
-			CoreStateText = "Running";
-			break;
-
-		case ZE_CS_SHUTDOWN:
-			CoreStateText = "Shutdown";
-			break;
-
-		case ZE_CS_STARTUP:
-			CoreStateText = "StartUp";
-			break;
-
-		case ZE_CS_TERMINATE:
-			CoreStateText = "Terminate";
-			break;
-
-		case ZE_CS_UNKNOWN:
-			CoreStateText = "Unknown";
-			break;
-	}
-
-	zeLog("Core state changed to \"%s\".", CoreStateText);
+	return (State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
 }
 
-ZEUserLevel ZECore::GetUserLevel()
+bool ZECore::IsStartedOrStartingUp()
 {
-	return this->UserLevel;
-}
-
-void ZECore::SetUserLevel(ZEUserLevel UserLevel)
-{
-	this->UserLevel = UserLevel;
-
-	const char* UserLevelText;
-	switch(UserLevel)
-	{
-		case ZE_UL_DEVELOPPER:
-			UserLevelText = "Developer";
-			break;
-
-		case ZE_UL_ADMINISTRATOR:
-			UserLevelText = "Administrator";
-			break;
-
-		case ZE_UL_CHEATER:
-			UserLevelText = "Cheater";
-			break;
-
-		case ZE_UL_PLAYER:
-			UserLevelText = "Player";
-			break;
-
-		default:
-			UserLevelText = "Unknown";
-			break;
-	}
-
-	zeLog("User level changed to \"%s\".", UserLevelText);
+	return (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
 }
 
 void ZECore::Terminate()
 {
-	SetCoreState(ZE_CS_TERMINATE);
+	SetState(ZE_CS_TERMINATING);
+	abort();
 }
 
 bool ZECore::InitializeModule(ZEModule* Module)
@@ -360,95 +233,34 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 
 bool ZECore::InitializeModules()
 {
-	zeLog("Initializing modules.");
-
-	if (GraphicsModule == NULL)
-		SetGraphicsModule(static_cast<ZEGRGraphicsModule*>(FindModule(ZEGRGraphicsModule::Class(), OptionManager->GetOption("ZECore", "ZEGRGraphicsModule")->GetValue())));
-	
-	if (SoundModule == NULL)
-		SetSoundModule(static_cast<ZESoundModule*>(FindModule(ZESoundModule::Class(), OptionManager->GetOption("ZECore", "ZESoundModule")->GetValue())));
-
-	if (InputModule == NULL)
-		SetInputModule(static_cast<ZEInputModule*>(FindModule(ZEInputModule::Class(), OptionManager->GetOption("ZECore", "ZEInputModule")->GetValue())));
-
-	if (PhysicsModule == NULL)
-		SetPhysicsModule(static_cast<ZEPhysicsModule*>(FindModule(ZEPhysicsModule::Class(), OptionManager->GetOption("ZECore", "ZEPhysicsModule")->GetValue())));
-
-	// Graphics module !
-	zeLog("Initializing graphics module.");	
-	if (!InitializeModule(GraphicsModule))
+	zeLog("Initializing Modules.");
+	ze_for_each(Module, Modules)
 	{
-		zeError("Can not initialize graphics module.");
-		return false;
+		if (Module->IsInitialized())
+			continue;
+
+		zeLog("Initializing module. Module Name: \"%s\".", Module->GetClass()->GetName());
+		if (!Module->Initialize())
+		{
+			zeError("Cannot initialize module. Module Name: \"%s\".", Module->GetClass()->GetName());
+			return false;
+		}
 	}
-
-	// Physics module !
-	zeLog("Initializing physics module.");
-	if (!InitializeModule(PhysicsModule))
-	{
-		zeError("Can not initialize physics module.");
-		return false;
-	}
-
-	// Sound module !
-	zeLog("Initializing sound module.");	
-	if (!InitializeModule(SoundModule))
-	{
-		zeError("Can not initialize sound module.");
-		return false;
-	}
-
-	// Input module !
-	zeLog("Initializing Input Module.");	
-	if (!InitializeModule(InputModule))
-	{
-		zeError("Can not initialize input module.");
-		return false;
-	}
-
-	// Application module !
-	zeLog("Initializing Application Module.");	
-	if (Application != NULL && !InitializeModule(Application))
-	{
-		zeError("Can not initialize application module.");
-		return false;
-	}
-
-	QueryPerformanceFrequency(&PerformanceCounterFreq);
-
-	zeLog("Modules initialized.");
 
 	return true;
 }
 
 void ZECore::DeinitializeModules()
 {
-	if (GraphicsModule != NULL)
+	zeLog("Deinitializing Modules.");
+	ze_for_each(Module, Modules)
 	{
-		zeLog("Deinitializing Graphic module.");
-		GraphicsModule->Deinitialize();
-		GraphicsModule = NULL;
-	}
+		if (!Module->IsInitialized())
+			continue;
 
-	if (PhysicsModule != NULL)
-	{
-		zeLog("Deinitializing Physics module.");
-		PhysicsModule->Deinitialize();
-		PhysicsModule = NULL;
-	}
-
-	if (SoundModule != NULL)
-	{
-		zeLog("Deinitializing Sound module.");
-		SoundModule->Deinitialize();
-		SoundModule = NULL;
-	}
-
-	if (InputModule != NULL)
-	{
-		zeLog("Deinitializing Input module.");
-		InputModule->Deinitialize();
-		InputModule = NULL;
+		zeLog("Initializing module. Module Name: \"%s\".", Module->GetClass()->GetName());
+		if (!Module->Deinitialize())
+			zeError("Cannot deinitialize module. Module Name: \"%s\".", Module->GetClass()->GetName());
 	}
 }
 
@@ -464,83 +276,150 @@ void ZECore::RegisterClasses()
 	#undef ZEMT_REGISTER_CLASS
 }
 
-ZEModule* ZECore::FindModule(ZEClass* BaseClass, const char* Name)
+void ZECore::UnregisterClasses()
 {
-	ZEClass* Class = ZEMTProvider::GetInstance()->GetClass(Name);
-	if (Class == NULL)
-	{
-		zeError("Cannot find required module. Module Name: \"%s\".", Name);
-		return NULL;
-	}
+	#undef UnregisterClass
 
-	if (!ZEClass::IsDerivedFrom(BaseClass, Class))
-	{
-		zeError("Module class is not derived from expected class. Module Name: \"%s\", Expected Base Class: \"%s\".", Name, BaseClass->GetName());
-		return NULL;
-	}
-
-	ZEObject* Module = Class->CreateInstance();
-	if (Module == NULL)
-	{
-		zeError("Cannot create instance of module. Module Name: \"%s\".", Name);
-		return false;
-	}
-
-	return static_cast<ZEModule*>(Module);
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
+	#include "../ZEMetaRegister.h"
+	#include "../../ZEModules/ZEMetaRegister.h"
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 }
 
-bool ZECore::StartUp(void* WindowHandle)
+ZEModule* ZECore::GetModule(ZEClass* Class) const
 {
+	ze_for_each(Module, Modules)
+	{
+		if (ZEClass::IsDerivedFrom(Class, Module->GetClass()))
+			return Module.GetPointer();
+	}
+
+	return NULL;
+}
+
+const ZEList2<ZEModule>& ZECore::GetModules() const
+{
+	return Modules;
+}
+
+bool ZECore::AddModule(ZEModule* Module)
+{
+	zeCheckError(Module == NULL, false, "Cannot add module. Module is NULL.");
+	zeCheckError(Module->Core == this, false, "Cannot add module. Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
+	
+	if (IsStarted())
+		zeWarning("Adding new module to core while is already started. Not a good idea ! Module Name: \"%s\".", Module->GetClass()->GetName());
+
+	ze_for_each(CurrentModule, Modules)
+	{
+		// Check MultiInstance
+		if (Module->GetClass()->CheckAttributeHasValue("MultiInstance", "false"))
+		{
+			if (ZEClass::IsDerivedFrom(CurrentModule->GetClass(), Module))
+			{
+				zeError(
+					"Cannot add module. There is an already added module with same/derived class that does not allow MultiInstance."
+					"Already Registred Module Name: \"%s\", Module Name: \"%s\".\n",
+					CurrentModule->GetClass()->GetName(), Module->GetClass()->GetName());
+
+				return false;
+			}
+		}
+	}
+
+	#define ZE_CORE_MODULE(Type, Variable) if (ZEClass::IsDerivedFrom(Type::Class(), Module)) Variable = static_cast<Type*>(Module);
+	#include "ZECoreModules.h"
+	#undef ZE_CORE_MODULE
+
+	Module->Core = this;
+	Modules.AddEnd(&Module->CoreLink);
+	Module->RegisterClasses();
+	if (IsStartedOrStartingUp())
+		Module->Initialize();
+
+	return true;
+}
+
+bool ZECore::RemoveModule(ZEModule* Module)
+{
+	zeCheckError(Module == NULL, false, "Module is NULL.");
+	zeCheckError(Module->Core == this, false, "Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
+	
+	if (IsStarted())
+		zeWarning("Removing a module from core while is already started. Not a good idea ! Module Name: \"%s\".", Module->GetClass()->GetName());
+
+	#define ZE_CORE_MODULE(Type, Variable) if (Variable == NULL) Variable = NULL;
+	#include "ZECoreModules.h"
+	#undef  ZE_CORE_MODULE
+
+	Module->Deinitialize();
+	Module->Core = NULL;
+	Modules.Remove(&Module->CoreLink);
+	Module->UnregisterClasses();
+
+	return true;
+}
+
+bool ZECore::StartUp()
+{
+	SetState(ZE_CS_STARTING_UP);
+
+	ZESplashWindow* SplashWindow = ZESplashWindow::CreateInstance();
+	SplashWindow->Show();
+
+	zeLog("Loading classes.");
+	RegisterClasses();
+
+	zeLog("Loading ZECore configuration.");
+	LoadConfiguration();
+
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PreStartup();
+
 	CrashHandler->Initialize();
-
-	FrameId = 0;
-
 	Console->Initialize();
 	Console->DisableInput();
 	
-	DebugMode = true;
-	SetCoreState(ZE_CS_STARTUP);
-	SetUserLevel(ZE_UL_DEVELOPPER);
-
 	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString().ToCString());
 	zeLog("Initializing core...");
-
-	zeLog("Loading ZEMeta classes.");
-	RegisterClasses();
-
-	if (Application != NULL)
-		Application->StartUp();
 
 	zeLog("Initializing Modules...");
 	if (!InitializeModules())
 		zeCriticalError("Can not initialize modules.");
 	zeLog("Modules initialized.");
 
+	if (ApplicationModule != NULL)
+		ApplicationModule->StartUp();
+
 	Console->EnableInput();
 
-	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core initialized.");
+
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PostStartup();
+
+	SplashWindow->Destroy();
+	SplashWindow = NULL;
+
+	SetState(ZE_CS_PAUSED);
+
+	StartedCoreInstanceCount--;
 
 	return true;
 }
 
 void ZECore::ShutDown()
 {
+	SetState(ZE_CS_SHUTTING_DOWN);
 	zeLog("Deinitializing Core.");
-	SetCoreState(ZE_CS_SHUTDOWN);
 
-	zeLog("Deinitializing application module.");
-	
-	if (Application != NULL)
-	{
-		Application->Deinitialize();
-		Application->ShutDown();
-		Application->Destroy();
-		Application = NULL;
-	}
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PreShutdown();
 
 	zeLog("Saving options.");
-	if (CoreState == ZE_CS_CRITICAL_ERROR)
+	if (State == ZE_CS_CRITICAL_ERROR)
 		zeLog("Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	OptionManager->Save("#E:/options.ini");
 
@@ -549,91 +428,131 @@ void ZECore::ShutDown()
 
 	zeLog("Releasing cached resources.");
 	ResourceManager->UncacheAllResources();
-
-	if (InputModule != NULL)
-	{
-		zeLog("Destroying Input Module.");
-		InputModule->Destroy();
-		InputModule = NULL;
-	}
-
-	if (SoundModule != NULL)
-	{
-		zeLog("Destroying Sound Module.");
-		SoundModule->Destroy();
-		SoundModule = NULL;
-	}
-
-	if (GraphicsModule != NULL)
-	{
-		zeLog("Destroying Graphics Module.");
-		GraphicsModule->Destroy();
-		GraphicsModule = NULL;
-	}
-
-	if (PhysicsModule != NULL)
-	{
-		zeLog("Destroying Physics Module.");
-		PhysicsModule->Destroy();
-		PhysicsModule = NULL;
-	}
-
+	
 	zeLog("Core deinitialized.");
 	zeLog("Terminating engine.");
 
 	Console->Deinitialize();
 	CrashHandler->Deinitialize();
-}
 
+	SetState(ZE_CS_NONE);
+	StartedCoreInstanceCount--;
+}
 #include "ZEPhysics/ZEPhysicalWorld.h"
+
 void ZECore::MainLoop()
 {
-	if (Application != NULL)
-		Application->PreProcess();
+	if (GetState() != ZE_CS_RUNNING)
+		return;
 
-	RealTimeClock->UpdateFrameTime();
-	ElapsedTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
-
-	if (ElapsedTime > 5.0f)
-		ElapsedTime = 0.01f;
-
-	FrameId++;
-
-	TimerManager->Tick(ElapsedTime);
-	
+	const ZETimeParameters* Parameters = GetTimeManager()->GetParameters();
 	GetConsole()->Process();
 	SystemMessageManager->ProcessMessages();
 
-	if (GetCoreState() == ZE_CS_SHUTDOWN)
-		return;
+	ze_for_each(Module, Modules)
+		Module->PreProcess(Parameters);
 
-	// Game Logic
-	InputModule->Process();
+	ze_for_each(Module, Modules)
+		Module->Process(Parameters);
 
-	if (Application != NULL)
-		Application->Process(ElapsedTime);
+	ze_for_each(Module, Modules)
+		Module->PostProcess(Parameters);
+}
 
-	// Engine Logic
-	PhysicsModule->Process(ElapsedTime);
-	SoundModule->ProcessSound(ElapsedTime);
-	PhysicsModule->UpdateWorlds();
+void ZECore::Execute()
+{
+	StartUp();
 
-	if (Application != NULL)
-		Application->PostProcess(ElapsedTime);
+	while (State == ZE_CS_RUNNING)
+		MainLoop();
+
+	ShutDown();
+}
+
+bool ZECore::LoadConfiguration()
+{
+	ZEMLReader Reader;
+	if (!Reader.Open("#E:/Configurations/ZECore.ZEConfig"))
+	{
+		zeError("Cannot load configuration. Cannot open configuration file. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
+		return false;
+	}
+
+	ZEMLReaderNode RootNode = Reader.GetRootNode();
+	if (!RootNode.IsValid() || RootNode.GetName() != "ZEConfig")
+	{
+		zeError("Cannot load configuration. Invalid configuration file root node. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
+		return false;
+	}
+
+	ZEString Class = RootNode.ReadString("Class");
+	if (Class != GetClass()->GetName())
+	{
+		zeError("Cannot load configuration. Configuration file class is different then ZECore class. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
+		return false;
+	}
+	
+	ZEMLReaderNode ModulesNode = RootNode.GetNode("Modules");
+	ZESize ModuleCount = ModulesNode.GetNodeCount("Module");
+
+	for (ZESize I = 0; I < ModuleCount; I++)
+	{
+		ZEMLReaderNode ModuleNode = ModulesNode.GetNode("Module", I);
+		ZEString ClassName = ModuleNode.ReadString("Class");
+		ZEClass* ModuleClass = ZEMTProvider::GetInstance()->GetClass(ZEModule::Class(), ClassName);
+		if (ModuleClass == NULL)
+		{
+			zeError("Cannot load configuration. Cannot find module class. Class Name: \"%s\".", ClassName.ToCString());
+			continue;
+		}
+
+		AddModule(static_cast<ZEModule*>(ModuleClass->CreateInstance()));
+	}
+}
+
+bool ZECore::SaveConfiguration()
+{
+	ZEMLWriter Writer;
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
+
+	if (!Writer.Open("#E:/Configurations/ZECore.ZEConfig"))
+	{
+		zeError("Cannot save configuration. Cannot open configuration file. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
+		return false;
+	}
+
+	ZEMLWriterNode RootNode;
+	Writer.OpenRootNode("ZEConfig", RootNode);
+	RootNode.WriteString("Class", GetClass()->GetName());
+
+	ZEMLWriterNode ModulesNode;
+	RootNode.OpenNode("Modules", ModulesNode);
+	for (ZESize I = 0; I < Modules.GetCount(); I++)
+	{
+		ZEMLWriterNode ModuleNode;
+		ModulesNode.OpenNode("Module", ModuleNode);
+		ModuleNode.WriteString("Class", Modules[I]->GetClass()->GetName());
+		ModuleNode.CloseNode();
+	}
+	ModulesNode.CloseNode();
+	RootNode.CloseNode();
+	Writer.Close();
+
+	return true;
 }
 
 void ZECore::Run()
 {
-	SetCoreState(ZE_CS_RUNNING);
-	
-	RealTimeClock->ResetFrameTime();
-	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
+	zeCheckError(State != ZE_CS_PAUSED, ZE_VOID, "Cannot run the core. Core is not started up or paused.");
+	SetState(ZE_CS_RUNNING);
+	while (State == ZE_CS_RUNNING)
 		MainLoop();
+}
 
-	if (Application != NULL)
-		Application->Deinitialize();
-
-	ShutDown();
+void ZECore::Pause()
+{
+	zeCheckError(State != ZE_CS_PAUSED, ZE_VOID, "Cannot pause the core. Core is not running.");
+	SetState(ZE_CS_PAUSED);
 }
 
 ZECore* ZECore::GetInstance()
@@ -644,14 +563,9 @@ ZECore* ZECore::GetInstance()
 
 ZECore::ZECore() 
 {
-	PerformanceCounterFreq.QuadPart = 0;
-	PerformanceCount.QuadPart = 0;
-	OldPerformanceCount.QuadPart = 0;
+	atexit(ZECore_AtExit);
 
-	Application				= NULL;
 	CrashHandler			= new ZECrashHandler();
-	RealTimeClock			= new ZERealTimeClock();
-	TimerManager			= new ZETimerManager();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
 	SystemMessageHandler	= new ZECoreSystemMessageHandler();
@@ -660,13 +574,15 @@ ZECore::ZECore()
 	OptionManager			= new ZEOptionManager();
 	ErrorManager			= new ZEErrorManager();
 	ResourceManager			= new ZEResourceManager();
-	
-	ElapsedTime				= 0.0f;
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
-	ZESoundModule::BaseInitialize();
-	ZEInputModule::BaseInitialize();
+	#define ZE_CORE_MODULE(Type, Variable) Variable = NULL;
+	#include "ZECoreModules.h"
+	#undef ZE_CORE_MODULE
+
+	/*ZESoundModule::BaseInitialize();
+	ZEInputModule::BaseInitialize();*/
 	
 	static ZEOptionSection CoreOptions;
 	CoreOptions.SetName("ZECore");
@@ -681,19 +597,21 @@ ZECore::ZECore()
 
 ZECore::~ZECore()
 {
-	ZESoundModule::BaseDeinitialize();
-	ZEInputModule::BaseDeinitialize();
+	/*ZESoundModule::BaseDeinitialize();
+	ZEInputModule::BaseDeinitialize();*/
 
 	delete ResourceManager;
 	delete ErrorManager;
 	delete OptionManager;
 	delete CommandManager;
 	delete Console;
-	delete TimerManager;
 	delete Profiler;
-	delete RealTimeClock;
 	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
 	delete SystemMessageHandler;
 	delete SystemMessageManager;
 	delete CrashHandler;
 }
+
+#define ZE_CORE_MODULE(Type, Variable) Type* ZECore::Get##Variable() const {return Variable;}
+#include "ZECoreModules.h"
+#undef ZE_CORE_MODULE

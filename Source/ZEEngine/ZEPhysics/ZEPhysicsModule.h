@@ -69,7 +69,6 @@ class ZEPhysicsModule : public ZEModule
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController() = 0;
 		virtual ZEPhysicalMaterial*				CreatePhysicalMaterial() = 0;
 
-		virtual	void							Process(float ElapsedTime) = 0;
 		virtual void							UpdateWorlds() = 0;
 
 		virtual void							ConnectToVisualDebugger(const char* Adress, ZEInt Port) = 0;

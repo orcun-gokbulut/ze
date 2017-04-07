@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateScreen.cpp
+ Zinek Engine - ZELoadingScreen.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEStateScreen.h"
+#include "ZELoadingScreen.h"
 
 #include "ZEScene.h"
 #include "ZEUI/ZEUIFontTrueType.h"
@@ -44,7 +44,7 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEDS/ZEFormat.h"
 
-ZEEntityResult ZEStateScreen::LoadInternal()
+ZEEntityResult ZELoadingScreen::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
@@ -66,7 +66,7 @@ ZEEntityResult ZEStateScreen::LoadInternal()
 	return ZE_ER_DONE;
 }
 
-ZEEntityResult ZEStateScreen::UnloadInternal()
+ZEEntityResult ZELoadingScreen::UnloadInternal()
 {
 	for (ZESize I = 0; I < ConsoleLines.GetCount(); I++)
 	{
@@ -82,7 +82,7 @@ ZEEntityResult ZEStateScreen::UnloadInternal()
 	return ZE_ER_DONE;
 }
 
-ZEStateScreen::ZEStateScreen()
+ZELoadingScreen::ZELoadingScreen()
 {
 	LastLoadingPercentage = -1;
 	LastOutputBufferCount = 0;
@@ -90,12 +90,12 @@ ZEStateScreen::ZEStateScreen()
 	SetEntityFlags(ZE_EF_RENDERABLE_CUSTOM | ZE_EF_TICKABLE_CUSTOM);
 }
 
-ZEStateScreen::~ZEStateScreen()
+ZELoadingScreen::~ZELoadingScreen()
 {
 	
 }
 
-void ZEStateScreen::SetManager(ZEUIManager* Manager)
+void ZELoadingScreen::SetManager(ZEUIManager* Manager)
 {
 	if (this->Manager == Manager)
 		return;
@@ -106,17 +106,57 @@ void ZEStateScreen::SetManager(ZEUIManager* Manager)
 		Reload();
 }
 
-ZEUIManager* ZEStateScreen::GetManager()
+ZEUIManager* ZELoadingScreen::GetManager()
 {
 	return Manager;
 }
 
-void ZEStateScreen::Tick(float ElapsedTime)
+void ZELoadingScreen::SetLoadingStageCount(ZEUInt Count)
+{
+
+}
+
+ZEUInt ZELoadingScreen::GetLoadingStageCount() const
+{
+	return 0;
+}
+
+void ZELoadingScreen::SetLoadingStageIndex(ZEUInt Index)
+{
+
+}
+
+ZEUInt ZELoadingScreen::GetLoadingStageIndex() const
+{
+	return 0;
+}
+
+void ZELoadingScreen::ShowStartupScreen()
+{
+
+}
+
+void ZELoadingScreen::HideStartupScreen()
+{
+
+}
+
+void ZELoadingScreen::ShowLoadingScreen()
+{
+
+}
+
+void ZELoadingScreen::HideLoadingScreen()
+{
+
+}
+
+void ZELoadingScreen::Tick(float ElapsedTime)
 {
 //	LoadingPercentage = GetScene()->GetLoadingPercentage();
 }
 
-bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
+bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (LoadingPercentage == 100)
 	{
@@ -137,7 +177,7 @@ bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 	return false;
 }
 
-ZEStateScreen* ZEStateScreen::CreateInstance()
+ZELoadingScreen* ZELoadingScreen::CreateInstance()
 {
-	return new ZEStateScreen();
+	return new ZELoadingScreen();
 }

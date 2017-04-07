@@ -118,18 +118,6 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 		{
 			Cmd = Sec->GetCommand(I);	
 			zeOutput(" %-30s", Cmd->GetName().ToCString());
-			switch(Cmd->GetAccessLevel())
-			{
-				case ZE_UL_DEVELOPPER:
-					zeOutput(" Developer\r\n");
-					break;
-				case ZE_UL_PLAYER:
-					zeOutput(" Player\r\n");
-					break;
-				case ZE_UL_CHEATER:
-					zeOutput("Cheater\r\n");
-					break;
-			}
 		}
 		return true;
 	}

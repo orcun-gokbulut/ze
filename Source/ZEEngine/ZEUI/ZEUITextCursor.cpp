@@ -43,11 +43,10 @@ ZEUITextCursor::ZEUITextCursor()
 	Height = 20;
 	Positions.LeftUp = ZEVector2::Zero;
 
-	Timer = ZETimer::CreateInstance();
 	SetBlinkTime(BlinkTime);
-	Timer->SetRepeating(true);
-	Timer->SetTimerEvent(ZEDelegate<void (float)>::Create<ZEUITextCursor, &ZEUITextCursor::Blink>(this));
-	Timer->Start();
+	Timer.SetRepeating(true);
+	Timer.OnTime.AddDelegate<ZEUITextCursor, &ZEUITextCursor::Blink>(this);
+	Timer.Start();
 
 	SetWidth(Width);
 	SetHeight(Height);
@@ -57,12 +56,9 @@ ZEUITextCursor::ZEUITextCursor()
 
 ZEUITextCursor::~ZEUITextCursor()
 {
-	Timer->Stop();
-	Timer->Destroy();
-	Timer = NULL;
 }
 
-void ZEUITextCursor::Blink(float Time)
+void ZEUITextCursor::Blink(ZETimeParameters* Time)
 {
 	if(IsVisible)
 		IsVisible = false;
@@ -73,7 +69,7 @@ void ZEUITextCursor::Blink(float Time)
 void ZEUITextCursor::SetBlinkTime(float Time)
 {
 	BlinkTime = Time;
-	Timer->SetIntervalTime(Time);
+	Timer.SetIntervalTime(Time);
 }
 
 float ZEUITextCursor::GetBlinkTime()

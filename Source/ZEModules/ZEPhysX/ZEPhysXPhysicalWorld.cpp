@@ -176,9 +176,8 @@ bool ZEPhysXPhysicalWorld::GetEnabled()
 
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
-	Scene->simulate(ElapsedTime);
-
-	Scene->flushStream();
+	/*Scene->simulate(ElapsedTime);
+	Scene->flushStream();*/
 }
 
 void ZEPhysXPhysicalWorld::Update()
