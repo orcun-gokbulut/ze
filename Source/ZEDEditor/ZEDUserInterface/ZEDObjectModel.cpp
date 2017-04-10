@@ -371,7 +371,7 @@ void ZEDObjectModel::ObjectManager_OnObjectChildObjectAdded(ZEDObjectManager* Ma
 void ZEDObjectModel::ObjectManager_OnObjectChildObjectRemoving(ZEDObjectManager* Manger, ZEDObjectWrapper* Object, ZEDObjectWrapper* ChildObject)
 {	
 	if (RootWrapper == NULL)
-	return;
+		return;
 
 	if (Mode == ZED_OMM_TREE)
 	{

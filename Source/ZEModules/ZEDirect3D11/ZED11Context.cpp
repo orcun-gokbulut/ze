@@ -527,6 +527,7 @@ void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 		ZEUInt Slot = Index + I;
 
 		const ZEGRResource* Resource = static_cast<const ZEGRTexture*>(ShaderResources[ShaderIndex][Slot]);
+
 		if (Resource == NULL)
 			continue;
 

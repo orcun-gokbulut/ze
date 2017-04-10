@@ -169,6 +169,12 @@ bool ZEDSceneWrapper::Save(const ZEString& FileName)
 
 void ZEDSceneWrapper::Clean()
 {
+	for (ZESize I = 0; I < GetChildWrappers().GetCount(); I++)
+	{
+		RemoveChildWrapper(GetChildWrappers()[I]);
+		I--;
+	}
+
 	GetScene()->ClearEntities();
 	Update();
 }

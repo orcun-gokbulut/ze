@@ -238,7 +238,7 @@ void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZE
 	bool LastTextured = false;
 	ze_for_each(Batch, Batches)
 	{
-		if (Batch->Texture != NULL)
+		if (Batch->Texture != NULL && Batch->Texture->IsLoaded())
 		{
 			if (!LastTextured)
 				Context->SetRenderState(RenderStateData);

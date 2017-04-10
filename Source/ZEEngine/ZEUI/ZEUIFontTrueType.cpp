@@ -250,6 +250,9 @@ ZEUIFontCharacter ZEUIFontTrueType::GetCharacter(char Character, char PreviousCh
 		DestRect.Height = FTBitmap.rows;
 		Textures[LastTextureId]->Update(Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32), 0, 0, 0, &DestRect);
 
+		if (!Textures[LastTextureId]->IsLoadedOrLoading())
+			Textures[LastTextureId]->Load();
+
 		FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
 		FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();
 
