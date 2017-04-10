@@ -93,6 +93,7 @@ bool ZEDEntityEditor::InitializeInternal()
 
 	Viewport = new ZEDViewport();
 	GetViewportManager()->RegisterViewport(Viewport);
+	GetMainWindow()->GetMainWindow()->setCentralWidget(Viewport);
 
 	Scene = ZEScene::CreateInstance();
 	Scene->Initialize();
