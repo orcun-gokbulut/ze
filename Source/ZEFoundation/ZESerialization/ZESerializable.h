@@ -37,10 +37,12 @@
 #ifndef __ZE_SERIALIZABLE_H__
 #define __ZE_SERIALIZABLE_H__
 
+#include "ZEExport.ZEFoundation.h"
+
 class ZESerializer;
 class ZEUnserializer;
 
-class ZESerializable
+class ZE_EXPORT_ZEFOUNDATION ZESerializable
 {
 	public:
 		virtual bool				Serialize(ZESerializer* Serializer) = 0;

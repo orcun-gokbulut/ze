@@ -39,6 +39,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 typedef ZEFlags ZERegExFlags;
 #define ZE_REF_NONE						0x00
@@ -63,7 +64,7 @@ struct ZERegExMatch
 	ZEArray<ZERegExSubMatch>	SubMatches;
 };
 
-class ZERegEx
+class ZE_EXPORT_ZEFOUNDATION ZERegEx
 {
 	private:
 		void*			Code;

@@ -44,6 +44,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
@@ -55,7 +56,7 @@ enum ZEMDResourceHelperParentType
 	ZE_MRHPT_BONE	= 2
 };
 
-class ZEMDResourceHelper : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEMDResourceHelper : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceHelper)

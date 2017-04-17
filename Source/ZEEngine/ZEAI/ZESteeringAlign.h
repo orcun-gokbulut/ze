@@ -38,8 +38,9 @@
 #define __ZE_STEERING_ALIGN_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringAlign : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringAlign : public ZESteering
 {
 	private:
 		float						SlowRadius;

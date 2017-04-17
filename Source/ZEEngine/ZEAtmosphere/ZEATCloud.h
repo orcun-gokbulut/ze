@@ -42,6 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -52,7 +53,7 @@ class ZEGRDepthStencilBuffer;
 class ZEGRRenderTarget;
 class ZEGRTexture;
 
-class ZEATCloud : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATCloud : public ZEEntity
 {
 	ZE_OBJECT
 	private:

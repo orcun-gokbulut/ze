@@ -46,6 +46,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRFormat.h"
 #include "ZEGraphics/ZEGRResource.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRContext;
 class ZEGRResource;
@@ -53,7 +54,7 @@ class ZEGRRenderState;
 class ZERNRenderer;
 class ZERNCommand;
 
-ZE_ENUM(ZERNStageResourceUsageType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNStageResourceUsageType)
 {
 	ZERN_SRUT_NONE			= 0,
 	ZERN_SRUT_READ			= 1,
@@ -61,7 +62,7 @@ ZE_ENUM(ZERNStageResourceUsageType)
 	ZERN_SRUT_READ_WRITE	= 3
 };
 
-ZE_ENUM(ZERNStageResourceCreationFlag)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNStageResourceCreationFlag)
 {
 	ZERN_SRCF_NONE			= 0,
 	ZERN_SRCF_GET_FROM_PREV	= 1,
@@ -72,7 +73,7 @@ ZE_ENUM(ZERNStageResourceCreationFlag)
 
 typedef ZEFlags ZERNStageResourceCreationFlags;
 
-class ZERNStageResource
+class ZE_EXPORT_ZEENGINE  ZERNStageResource
 {
 	public:
 		ZEHolder<const ZEGRResource>*		Resource;
@@ -81,7 +82,7 @@ class ZERNStageResource
 		ZERNStageResourceCreationFlags		CreationFlags;
 };
 
-class ZERNStage : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE  ZERNStage : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNRenderer;

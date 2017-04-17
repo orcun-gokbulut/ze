@@ -37,14 +37,20 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZETest)
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
+ze_add_source(ZETestMain.cpp		Sources)
+ze_add_source(ZETest.cpp			Sources)
+ze_add_source(ZETest.h				Sources Headers)
+ze_add_source(ZETestItem.cpp		Sources)
+ze_add_source(ZETestItem.h			Sources Headers)
+ze_add_source(ZETestManager.cpp		Sources)
+ze_add_source(ZETestManager.h		Sources Headers)
+ze_add_source(ZETestCheck.cpp		Sources)
+ze_add_source(ZETestCheck.h			Sources Headers)
 
-ze_add_library(TARGET ZETest SOURCES ${Source})
+ze_add_component(COMPONENT ZETest 
+	TARGET ZEFoundation
+	SOURCES ${Sources} ${Headers})
+
+ze_add_component(COMPONENT ZETest 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} ${Headers})

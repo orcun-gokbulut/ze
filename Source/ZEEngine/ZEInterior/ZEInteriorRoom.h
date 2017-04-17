@@ -42,6 +42,7 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEInterior);
 ZEMT_FORWARD_DECLARE(ZEInteriorDoor);
@@ -64,7 +65,7 @@ struct ZEInteriorRoomDraw
 	ZERNCommand									RenderCommand;
 };
 
-class ZEInteriorRoom : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEInteriorRoom : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEInteriorDoor;

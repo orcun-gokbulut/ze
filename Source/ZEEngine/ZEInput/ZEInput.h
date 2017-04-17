@@ -42,6 +42,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEInputButtonState
 {
@@ -99,7 +100,7 @@ class ZEInputValue
 
 class ZEInputDevice;
 
-class ZEInput
+class ZE_EXPORT_ZEENGINE ZEInput
 {
 	private:
 		ZEInputDevice*			Device;

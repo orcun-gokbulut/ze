@@ -48,7 +48,7 @@
 #include "ZEGRState.h"
 
 
-ZE_ENUM_TYPED(ZEGRTextureAddressing, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRTextureAddressing, ZEUInt8)
 {
 	ZEGR_TAM_WRAP						= 0,
 	ZEGR_TAM_MIRROR						= 1,
@@ -56,14 +56,14 @@ ZE_ENUM_TYPED(ZEGRTextureAddressing, ZEUInt8)
 	ZEGR_TAM_BORDER						= 3
 };
 
-ZE_ENUM_TYPED(ZEGRTextureFilter, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRTextureFilter, ZEUInt8)
 {
 	ZEGR_TFM_POINT						= 0,
 	ZEGR_TFM_LINEAR						= 1,
 	ZEGR_TFM_ANISOTROPIC				= 2
 };
 
-struct ZEGRSamplerDescription
+struct ZE_EXPORT_ZEENGINE ZEGRSamplerDescription
 {
 	ZEGRTextureAddressing					AddressU;
 	ZEGRTextureAddressing					AddressV;
@@ -82,7 +82,7 @@ struct ZEGRSamplerDescription
 											ZEGRSamplerDescription();
 };
 
-class ZEGRSampler : public ZEReferenceCounted
+class ZE_EXPORT_ZEENGINE ZEGRSampler : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	private:

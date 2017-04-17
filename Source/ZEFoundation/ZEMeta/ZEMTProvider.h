@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEFoundation.h"
 #undef RegisterClass
 
 class ZEClass;
@@ -43,7 +44,7 @@ class ZEObject;
 class ZEMTEnumerator;
 class ZEMLReaderNode;
 
-class ZEMTProvider
+class ZE_EXPORT_ZEFOUNDATION ZEMTProvider
 {
 	private:
 		ZEArray<ZEClass*>				Classes;
@@ -61,6 +62,9 @@ class ZEMTProvider
 		ZEMTEnumerator*					GetEnumerator(const char* EnumeratorName);
 		bool							RegisterEnumerator(ZEMTEnumerator* Enumerator);
 		void							UnregisterEnumerator(ZEMTEnumerator* Enumerator);
+
+		bool							RegisterDeclaration(ZEMTDeclaration* Declaration);
+		void							UnregisterDeclaration(ZEMTDeclaration* Declaration);
 
 		ZEObject*						CreateInstance(const char* ClassName);
 		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName);

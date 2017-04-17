@@ -39,10 +39,11 @@
 
 #include "ZEResource.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 #define zeResources ZEResourceManager::GetInstance()
 
-class ZEResourceManager
+class ZE_EXPORT_ZEENGINE ZEResourceManager
 {
 	private:
 		friend ZEResource;

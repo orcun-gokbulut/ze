@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEOption.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEExport.ZEEngine.h"
 
 #define zeCore ZECore::GetInstance()
 
@@ -54,6 +55,7 @@ class ZECrashHandler;
 class ZEConsole;
 class ZESystemMessageManager;
 class ZESystemMessageHandler;
+class ZEPlugin;
 
 #define ZE_CORE_MODULE(Type, Variable) class Type;
 #include "ZECoreModules.h"
@@ -72,11 +74,12 @@ enum ZECoreState
 	ZE_CS_CRITICAL_ERROR
 };
 
-class ZECore : public ZEObject
+class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 {
 	ZE_OBJECT
 	private:
 		ZECoreState									State;
+		ZEList2<ZEPlugin>							Plugins;
 		ZEList2<ZEModule>							Modules;
 		ZECrashHandler*								CrashHandler;
 		ZEErrorManager*								ErrorManager;
@@ -98,6 +101,12 @@ class ZECore : public ZEObject
 		void										DeInitializeModule(ZEModule** Module);
 		bool										InitializeModules();
 		void										DeinitializeModules();
+
+		ZEPlugin*									LoadPlugin(const ZEString& Path);
+		void										UnloadPlugin(ZEPlugin* Plugin);
+
+		void										LoadPlugins();
+		void										UnloadPlugins();
 
 													ZECore();
 													~ZECore();

@@ -42,9 +42,9 @@
 #include "ZEPointer\ZEPointer.h"
 #include "ZERegEx\ZERegEx.h"
 #include "ZEError.h"
+#include "ZEFile\ZEFileInfo.h"
 
 #include <tinyxml.h>
-#include "ZEFile\ZEFileInfo.h"
 
 #define FormatError(Text) zeError(Text##" File Name: \"%s\", Element: \"%s\".", File->GetPath().ToCString(), CurrentNode->Attribute("Name") != NULL ? CurrentNode->Attribute("Name") : "Unknown")
 

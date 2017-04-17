@@ -39,11 +39,12 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZERNFilter;
 
-class ZERNStagePostProcess : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStagePostProcess : public ZERNStage
 {
 	ZE_OBJECT
 	private:

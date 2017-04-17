@@ -41,6 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZESound/ZESoundSource.h"
+#include "ZEExport.ZEOpenAL.h"
 
 class ZEALSoundSource;
 class ZEALListener;
@@ -50,7 +51,7 @@ struct ALCcontext_struct;
 enum ZESoundSourceType;
 
 #undef PlaySound
-class ZEALModule : public ZESoundModule
+class ZE_EXPORT_ZEOPENAL ZEALModule : public ZESoundModule
 {
 	ZE_OBJECT
 	friend class ZEALSoundListener;

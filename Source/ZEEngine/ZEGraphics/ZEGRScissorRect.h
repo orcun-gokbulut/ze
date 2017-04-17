@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEGRScissorRect
+class ZE_EXPORT_ZEENGINE ZEGRScissorRect
 {
 	public:
 		struct ZEScissorRectangleData

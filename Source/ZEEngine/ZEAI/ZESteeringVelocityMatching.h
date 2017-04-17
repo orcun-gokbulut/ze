@@ -38,8 +38,9 @@
 #define __ZE_STEERING_VELOCITY_MATHCING_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringVelocityMatching : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringVelocityMatching : public ZESteering
 {
 	public:
 		float TimeToTarget;

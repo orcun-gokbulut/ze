@@ -37,12 +37,13 @@ function(ze_copy_headers)
 	parse_arguments(PARAMETER "TARGET;HEADERS;${ze_check_parameters}" "" ${ARGV})
 
 	foreach(CURRENT_FILE ${PARAMETER_HEADERS})
-		get_filename_component(MODIFIED_FILENAME ${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE} NAME)
+		get_filename_component(FILENAME_ABSOLUTE "${CURRENT_FILE}" ABSOLUTE)
+		file(RELATIVE_PATH FILENAME_RELATIVE "${CMAKE_SOURCE_DIR}" "${CURRENT_FILE}")
 		add_custom_command(
 			TARGET ${PARAMETER_TARGET}
 			POST_BUILD			
 			COMMAND ${CMAKE_COMMAND} 
-			ARGS -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CURRENT_FILE}" "${CMAKE_SOURCE_DIR}/Output/Include/${MODIFIED_FILENAME}")
+			ARGS -E copy_if_different "${CURRENT_FILE}" "${CMAKE_SOURCE_DIR}/Output/Include/${FILENAME_RELATIVE}")
 	endforeach()
 endfunction()
 	

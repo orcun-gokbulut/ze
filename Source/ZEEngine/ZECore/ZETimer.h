@@ -37,11 +37,12 @@
 
 #include "ZEDS/ZELink.h"
 #include "ZEMeta/ZEEvent.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZETimeManager;
 struct ZETimeParameters;
 
-class ZETimer : public ZEObject
+class ZE_EXPORT_ZEENGINE ZETimer : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZETimeManager;

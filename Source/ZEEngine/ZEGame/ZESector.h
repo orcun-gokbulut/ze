@@ -46,7 +46,7 @@ struct ZESectorLink
 	ZEUInt32	Depth;
 };
 
-class ZESector : public ZEGeographicEntity
+class ZE_EXPORT_ZEENGINE ZESector : public ZEGeographicEntity
 {
 	friend class ZESectorManager;
 	ZE_OBJECT

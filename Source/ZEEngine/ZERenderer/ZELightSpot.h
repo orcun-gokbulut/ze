@@ -38,8 +38,9 @@
 #include "ZELight.h"
 
 #include "ZEMath/ZEFrustum.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNCommandSpotLight : public ZERNCommand
+class ZE_EXPORT_ZEENGINE ZERNCommandSpotLight : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
@@ -52,7 +53,7 @@ class ZERNCommandSpotLight : public ZERNCommand
 		float							OuterConeAngle;
 };
 
-class ZERNCommandSpotLightShadow : public ZERNCommandSpotLight
+class ZE_EXPORT_ZEENGINE ZERNCommandSpotLightShadow : public ZERNCommandSpotLight
 {
 	ZE_OBJECT
 	public:

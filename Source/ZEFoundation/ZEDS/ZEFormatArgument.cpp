@@ -40,18 +40,18 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
-#include "ZERegEx/TRE/config.h"
 #include "ZEPlatform.h"
 
 #include <stdio.h>
+#include <string.h>
+
 #ifdef ZE_PLATFORM_UNIX
-    #define sprintf_s snprintf
+    #define snprintf sprintf_s
 #endif
 
 #ifdef ZE_PLATFORM_WINDOWS
-	#define _sprintf snprintf
+	#define snprintf _snprintf 
 #endif
-
 
 static bool ParseArgumentFormat(const char* ArgumentFormat, char** Parameters, ZESize Count)
 {

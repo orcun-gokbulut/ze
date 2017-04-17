@@ -43,12 +43,381 @@
 #include "ZEGRDepthStencilBuffer.h"
 #include "ZEGRRenderTarget.h"
 #include "ZEResource/ZERSTemplates.h"
-#include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
 #include <DirectXTex.h>
 
 using namespace DirectX;
 
+
+static DXGI_FORMAT ConvertFormat(ZEGRFormat Format)
+{
+	switch (Format)
+	{
+		default:
+		case ZEGR_TF_NONE:
+			return DXGI_FORMAT_UNKNOWN;
+
+		case ZEGR_TF_R8_SINT:
+			return DXGI_FORMAT_R8_SINT;
+
+		case ZEGR_TF_R8_UINT:
+			return DXGI_FORMAT_R8_UINT;
+
+		case ZEGR_TF_R8_UNORM:
+			return DXGI_FORMAT_R8_UNORM;
+
+		case ZEGR_TF_R8_SNORM:
+			return DXGI_FORMAT_R8_SNORM;
+
+
+
+		case ZEGR_TF_R8G8_UINT:
+			return DXGI_FORMAT_R8G8_UINT;
+
+		case ZEGR_TF_R8G8_SINT:
+			return DXGI_FORMAT_R8G8_SINT;
+
+		case ZEGR_TF_R8G8_UNORM:
+			return DXGI_FORMAT_R8G8_UNORM;
+
+		case ZEGR_TF_R8G8_SNORM:
+			return DXGI_FORMAT_R8G8_SNORM;
+
+
+
+		case ZEGR_TF_R8G8B8A8_UINT:
+			return DXGI_FORMAT_R8G8B8A8_UINT;
+
+		case ZEGR_TF_R8G8B8A8_SINT:
+			return DXGI_FORMAT_R8G8B8A8_SINT;
+
+		case ZEGR_TF_R8G8B8A8_UNORM:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		case ZEGR_TF_R8G8B8A8_UNORM_SRGB:
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+		case ZEGR_TF_R8G8B8A8_SNORM:
+			return DXGI_FORMAT_R8G8B8A8_SNORM;
+
+
+
+		case ZEGR_TF_R16_UINT:
+			return DXGI_FORMAT_R16_UINT;
+
+		case ZEGR_TF_R16_SINT:
+			return DXGI_FORMAT_R16_SINT;
+
+		case ZEGR_TF_R16_UNORM:
+			return DXGI_FORMAT_R16_UNORM;
+
+		case ZEGR_TF_R16_SNORM:
+			return DXGI_FORMAT_R16_SNORM;
+
+		case ZEGR_TF_R16_FLOAT:
+			return DXGI_FORMAT_R16_FLOAT;
+
+
+		case ZEGR_TF_R16G16_UINT:
+			return DXGI_FORMAT_R16G16_UINT;
+
+		case ZEGR_TF_R16G16_SINT:
+			return DXGI_FORMAT_R16G16_SINT;
+
+		case ZEGR_TF_R16G16_UNORM:
+			return DXGI_FORMAT_R16G16_UNORM;
+
+		case ZEGR_TF_R16G16_SNORM:
+			return DXGI_FORMAT_R16G16_SNORM;
+
+		case ZEGR_TF_R16G16_FLOAT:
+			return DXGI_FORMAT_R16G16_FLOAT;
+
+
+
+		case ZEGR_TF_R16G16B16A16_UINT:
+			return DXGI_FORMAT_R16G16B16A16_UINT;
+
+		case ZEGR_TF_R16G16B16A16_SINT:
+			return DXGI_FORMAT_R16G16B16A16_SINT;
+
+		case ZEGR_TF_R16G16B16A16_UNORM:
+			return DXGI_FORMAT_R16G16B16A16_UNORM;
+
+		case ZEGR_TF_R16G16B16A16_SNORM:
+			return DXGI_FORMAT_R16G16B16A16_SNORM;
+
+		case ZEGR_TF_R16G16B16A16_FLOAT:
+			return DXGI_FORMAT_R16G16B16A16_FLOAT;
+
+
+		case ZEGR_TF_R32_FLOAT:
+			return DXGI_FORMAT_R32_FLOAT;
+
+		case ZEGR_TF_R32_SINT:
+			return DXGI_FORMAT_R32_SINT;
+
+		case ZEGR_TF_R32_UINT:
+			return DXGI_FORMAT_R32_UINT;
+
+
+		case ZEGR_TF_R32G32_FLOAT:
+			return DXGI_FORMAT_R32G32_FLOAT;
+
+		case ZEGR_TF_R32G32_SINT:
+			return DXGI_FORMAT_R32G32_SINT;
+
+		case ZEGR_TF_R32G32_UINT:
+			return DXGI_FORMAT_R32G32_UINT;
+
+
+		case ZEGR_TF_R32G32B32A32_SINT:
+			return DXGI_FORMAT_R32G32B32A32_SINT;
+
+		case ZEGR_TF_R32G32B32A32_UINT:
+			return DXGI_FORMAT_R32G32B32A32_UINT;
+
+		case ZEGR_TF_R32G32B32A32_FLOAT:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+
+
+		case ZEGR_TF_R10G10B10A2_UINT:
+			return DXGI_FORMAT_R10G10B10A2_UINT;
+
+		case ZEGR_TF_R10G10B10A2_UNORM:
+			return DXGI_FORMAT_R10G10B10A2_UNORM;
+
+		case ZEGR_TF_R11G11B10_FLOAT:
+			return DXGI_FORMAT_R11G11B10_FLOAT;
+
+
+
+		case ZEGR_TF_BC1_UNORM:
+			return DXGI_FORMAT_BC1_UNORM;
+
+		case ZEGR_TF_BC1_UNORM_SRGB:
+			return DXGI_FORMAT_BC1_UNORM_SRGB;
+
+		case ZEGR_TF_BC3_UNORM:
+			return DXGI_FORMAT_BC3_UNORM;
+
+		case ZEGR_TF_BC3_UNORM_SRGB:
+			return DXGI_FORMAT_BC3_UNORM_SRGB;
+
+		case ZEGR_TF_BC4_UNORM:
+			return DXGI_FORMAT_BC4_UNORM;
+
+		case ZEGR_TF_BC4_SNORM:
+			return DXGI_FORMAT_BC4_SNORM;
+
+		case ZEGR_TF_BC5_UNORM:
+			return DXGI_FORMAT_BC5_UNORM;
+
+		case ZEGR_TF_BC5_SNORM:
+			return DXGI_FORMAT_BC5_SNORM;
+
+		case ZEGR_TF_BC7_UNORM:
+			return DXGI_FORMAT_BC7_UNORM;
+
+		case ZEGR_TF_BC7_UNORM_SRGB:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
+
+		case ZEGR_TF_D16_UNORM:
+			return DXGI_FORMAT_D16_UNORM;
+
+		case ZEGR_TF_D24_UNORM_S8_UINT:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		case ZEGR_TF_D32_FLOAT:
+			return DXGI_FORMAT_D32_FLOAT;
+
+		case ZEGR_TF_D32_FLOAT_S8X24_UINT:
+			return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+
+		case ZEGR_TF_R24_UNORM_X8:
+			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+
+		case ZEGR_TF_X24_G8_UINT:
+			return DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+	}
+}
+
+static ZEGRFormat ConvertDXGIFormat(DXGI_FORMAT Format)
+{
+	switch (Format)
+	{
+		default:
+		case DXGI_FORMAT_UNKNOWN:
+			return ZEGR_TF_NONE;
+
+		case DXGI_FORMAT_R8_SINT:
+			return ZEGR_TF_R8_SINT;
+
+		case DXGI_FORMAT_R8_UINT:
+			return ZEGR_TF_R8_UINT;
+
+		case DXGI_FORMAT_R8_UNORM:
+			return ZEGR_TF_R8_UNORM;
+
+		case DXGI_FORMAT_R8_SNORM:
+			return ZEGR_TF_R8_SNORM;
+
+
+
+		case DXGI_FORMAT_R8G8_UINT:
+			return ZEGR_TF_R8G8_UINT;
+
+		case DXGI_FORMAT_R8G8_SINT:
+			return ZEGR_TF_R8G8_SINT;
+
+		case DXGI_FORMAT_R8G8_UNORM:
+			return ZEGR_TF_R8G8_UNORM;
+
+		case DXGI_FORMAT_R8G8_SNORM:
+			return ZEGR_TF_R8G8_SNORM;
+
+
+
+		case DXGI_FORMAT_R8G8B8A8_UINT:
+			return ZEGR_TF_R8G8B8A8_UINT;
+
+		case DXGI_FORMAT_R8G8B8A8_SINT:
+			return ZEGR_TF_R8G8B8A8_SINT;
+
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			return ZEGR_TF_R8G8B8A8_UNORM;
+
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+			return ZEGR_TF_R8G8B8A8_UNORM_SRGB;
+
+		case DXGI_FORMAT_R8G8B8A8_SNORM:
+			return ZEGR_TF_R8G8B8A8_SNORM;
+
+
+
+		case DXGI_FORMAT_R16_UINT:
+			return ZEGR_TF_R16_UINT;
+
+		case DXGI_FORMAT_R16_SINT:
+			return ZEGR_TF_R16_SINT;
+
+		case DXGI_FORMAT_R16_UNORM:
+			return ZEGR_TF_R16_UNORM;
+
+		case DXGI_FORMAT_R16_SNORM:
+			return ZEGR_TF_R16_SNORM;
+
+		case DXGI_FORMAT_R16_FLOAT:
+			return ZEGR_TF_R16_FLOAT;
+
+
+		case DXGI_FORMAT_R16G16_UINT:
+			return ZEGR_TF_R16G16_UINT;
+
+		case DXGI_FORMAT_R16G16_SINT:
+			return ZEGR_TF_R16G16_SINT;
+
+		case DXGI_FORMAT_R16G16_UNORM:
+			return ZEGR_TF_R16G16_UNORM;
+
+		case DXGI_FORMAT_R16G16_SNORM:
+			return ZEGR_TF_R16G16_SNORM;
+
+		case DXGI_FORMAT_R16G16_FLOAT:
+			return ZEGR_TF_R16G16_FLOAT;
+
+
+
+		case DXGI_FORMAT_R16G16B16A16_UINT:
+			return ZEGR_TF_R16G16B16A16_UINT;
+
+		case DXGI_FORMAT_R16G16B16A16_SINT:
+			return ZEGR_TF_R16G16B16A16_SINT;
+
+		case DXGI_FORMAT_R16G16B16A16_UNORM:
+			return ZEGR_TF_R16G16B16A16_UNORM;
+
+		case DXGI_FORMAT_R16G16B16A16_SNORM:
+			return ZEGR_TF_R16G16B16A16_SNORM;
+
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			return ZEGR_TF_R16G16B16A16_FLOAT;
+
+
+		case DXGI_FORMAT_R32_FLOAT:
+			return ZEGR_TF_R32_FLOAT;
+
+		case DXGI_FORMAT_R32_SINT:
+			return ZEGR_TF_R32_SINT;
+
+		case DXGI_FORMAT_R32_UINT:
+			return ZEGR_TF_R32_UINT;
+
+
+		case DXGI_FORMAT_R32G32_FLOAT:
+			return ZEGR_TF_R32G32_FLOAT;
+
+		case DXGI_FORMAT_R32G32_SINT:
+			return ZEGR_TF_R32G32_SINT;
+
+		case DXGI_FORMAT_R32G32_UINT:
+			return ZEGR_TF_R32G32_UINT;
+
+
+		case DXGI_FORMAT_R32G32B32A32_SINT:
+			return ZEGR_TF_R32G32B32A32_SINT;
+
+		case DXGI_FORMAT_R32G32B32A32_UINT:
+			return ZEGR_TF_R32G32B32A32_UINT;
+
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:
+			return ZEGR_TF_R32G32B32A32_FLOAT;
+
+
+
+		case DXGI_FORMAT_R10G10B10A2_UINT:
+			return ZEGR_TF_R10G10B10A2_UINT;
+
+		case DXGI_FORMAT_R10G10B10A2_UNORM:
+			return ZEGR_TF_R10G10B10A2_UNORM;
+
+		case DXGI_FORMAT_R11G11B10_FLOAT:
+			return ZEGR_TF_R11G11B10_FLOAT;
+
+
+
+		case DXGI_FORMAT_BC1_UNORM:
+			return ZEGR_TF_BC1_UNORM;
+
+		case DXGI_FORMAT_BC1_UNORM_SRGB:
+			return ZEGR_TF_BC1_UNORM_SRGB;
+
+		case DXGI_FORMAT_BC3_UNORM:
+			return ZEGR_TF_BC3_UNORM;
+
+		case DXGI_FORMAT_BC3_UNORM_SRGB:
+			return ZEGR_TF_BC3_UNORM_SRGB;
+
+		case DXGI_FORMAT_BC4_UNORM:
+			return ZEGR_TF_BC4_UNORM;
+
+		case DXGI_FORMAT_BC4_SNORM:
+			return ZEGR_TF_BC4_SNORM;
+
+		case DXGI_FORMAT_BC5_UNORM:
+			return ZEGR_TF_BC5_UNORM;
+
+		case DXGI_FORMAT_BC5_SNORM:
+			return ZEGR_TF_BC5_SNORM;
+
+		case DXGI_FORMAT_BC7_UNORM:
+			return ZEGR_TF_BC7_UNORM;
+
+		case DXGI_FORMAT_BC7_UNORM_SRGB:
+			return ZEGR_TF_BC7_UNORM_SRGB;
+	}
+}
 ZEGRTextureOptions::ZEGRTextureOptions()
 {
 	Type = ZEGR_TT_NONE;
@@ -351,7 +720,7 @@ ZETaskResult ZEGRTexture::LoadInternal()
 			const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(TextureOptions.CompressionFormat);
 			if (FormatInfo->Compressed)
 			{
-				DXGI_FORMAT CompressionFormat = ZED11ComponentBase::ConvertFormat(FormatInfo->Format);
+				DXGI_FORMAT CompressionFormat = ConvertFormat(FormatInfo->Format);
 				DWORD CompressionFlags = TEX_COMPRESS_DEFAULT;
 
 				if (FormatInfo->Type == ZEGR_FT_UNORM_SRGB)
@@ -388,7 +757,7 @@ ZETaskResult ZEGRTexture::LoadInternal()
 		(ZEUInt)FinalMetaData.width, 
 		(ZEUInt)FinalMetaData.height, 
 		(ZEUInt)FinalMetaData.mipLevels, 
-		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
+		ConvertDXGIFormat(FinalMetaData.format), 
 		ZEGR_RU_IMMUTABLE, 
 		ZEGR_RBF_SHADER_RESOURCE, 
 		(TextureOptions.Type != ZEGR_TT_3D) ? (ZEUInt)FinalMetaData.arraySize : (ZEUInt)FinalMetaData.depth, 

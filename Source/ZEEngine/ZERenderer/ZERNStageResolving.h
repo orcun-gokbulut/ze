@@ -39,6 +39,7 @@
 
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -55,7 +56,7 @@ enum ZERNResolveFilterType
 	ZERN_FILTER_BOX
 };
 
-class ZERNStageResolving : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageResolving : public ZERNStage
 {
 	ZE_OBJECT
 	private:

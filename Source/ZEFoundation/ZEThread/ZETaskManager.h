@@ -37,13 +37,14 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEThread;
 class ZETask;
 class ZETaskPool;
 class ZETaskThread;
 
-class ZETaskManager
+class ZE_EXPORT_ZEFOUNDATION ZETaskManager
 {
 	friend ZETask;
 	private:

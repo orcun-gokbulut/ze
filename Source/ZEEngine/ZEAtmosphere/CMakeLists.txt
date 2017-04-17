@@ -54,8 +54,8 @@ ze_add_source(ZEATCloud.h					Sources Headers ZEMC)
 ze_add_source(ZEATSkyBox.cpp				Sources)
 ze_add_source(ZEATSkyBox.h					Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEAtmosphere 
-	ZEMC ${ZEMC}
+ze_add_component(COMPONENT ZEAtmosphere 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	ZEMC ${ZEMC})

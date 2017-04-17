@@ -35,11 +35,12 @@
 
 #include "ZEInitializable.h"
 #include "ZEDestroyable.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZESplashWindowData;
 struct ZESplashWindowMessage;
 
-class ZESplashWindow : public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZESplashWindow : public ZEInitializable, public ZEDestroyable
 {
 	private:
 		ZESplashWindowData*			Data;

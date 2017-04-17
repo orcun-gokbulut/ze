@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEPlugin.h"
+
+#include "ZEError.h"
+#include "ZEVersion.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEMeta/ZEMTProvider.h"
+#include "ZEMeta/ZEMTDeclaration.h"
+#include "ZEFile/ZEDirectoryInfo.h"
+#include "ZEFile/ZEFileInfo.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+
+ZEPlugin::ZEPlugin() : CoreLink(this)
+{
+	Data = NULL;
+}
+
+ZEPlugin::~ZEPlugin()
+{
+
+}
+
+const char* ZEPlugin::GetName() const
+{
+	return "";
+}
+
+ZEVersion ZEPlugin::GetVersion() const
+{
+	return ZEVersion(1, 0, 0);
+}
+
+ZEVersion ZEPlugin::GetEngineVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+const ZEString& ZEPlugin::GetFileName() const
+{
+	return FileName;
+}
+
+ZESharedLibraryData* ZEPlugin::GetData() const
+{
+	return Data;
+}
+
+ZEMTDeclaration* const* ZEPlugin::GetDeclarations() const
+{
+	return NULL;
+}
+
+ZESize ZEPlugin::GetDeclarationCount() const
+{
+	return 0;
+}
+
+void ZEPlugin::Destroy()
+{
+	delete this;
+}

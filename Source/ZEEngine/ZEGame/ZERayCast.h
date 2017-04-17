@@ -48,7 +48,7 @@
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEPhysics/ZEPhysicalJoint.h"
-
+#include "ZEExport.ZEEngine.h"
 
 typedef ZEFlags ZERayCastReportComponents;
 #define ZE_RCRE_ALL					0xFFFFFFFF
@@ -58,7 +58,7 @@ typedef ZEFlags ZERayCastReportComponents;
 #define ZE_RCRE_BOUNDING_BOX_EXIT	0x4
 #define ZE_RCRE_POLYGONS			0x8
 
-ZE_ENUM(ZERayCastCollisionType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERayCastCollisionType)
 {
 	ZE_RCCT_NONE = 0,
 	ZE_RCCT_BOUNDING_BOX,
@@ -67,7 +67,7 @@ ZE_ENUM(ZERayCastCollisionType)
 	ZE_RCCT_POLGON,
 };
 
-ZE_ENUM(ZERayCastMatch)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERayCastMatch)
 {
 	ZE_RCM_NONE = 0,
 	ZE_RCM_FIRST,
@@ -81,7 +81,7 @@ class ZERayCastCollision;
 typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
 typedef ZEDelegate<bool (ZERayCastCollision&, const void*)> ZERayCastModifierFunction;
 
-class ZERayCastParameters : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERayCastParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -109,7 +109,7 @@ class ZERayCastParameters : public ZEObject
 											ZERayCastParameters();
 };
 
-class ZERayCastCollision : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERayCastCollision : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -127,7 +127,7 @@ class ZERayCastCollision : public ZEObject
 											ZERayCastCollision();
 };
 
-class ZERayCastReport : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERayCastReport : public ZEObject
 {
 	ZE_OBJECT
 	private:
@@ -166,7 +166,7 @@ class ZERayCastReport : public ZEObject
 };
 
 
-class ZERayCastHelper : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERayCastHelper : public ZEObject
 {
 	ZE_OBJECT
 	private:

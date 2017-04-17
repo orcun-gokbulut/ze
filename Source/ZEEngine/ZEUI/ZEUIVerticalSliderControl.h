@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEUIControl.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEUIVerticalSliderControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUIVerticalSliderControl : public ZEUIControl
 {
 	ZE_OBJECT
 	private:

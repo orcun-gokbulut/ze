@@ -35,62 +35,6 @@
 
 #include "ZEInputDevice.h"
 
-ZEUInt ZEInputDeviceIndexes::KeyboardIndex = 0;
-ZEUInt ZEInputDeviceIndexes::MouseIndex = 0;
-ZEUInt ZEInputDeviceIndexes::JoystickIndex = 0;
-ZEUInt ZEInputDeviceIndexes::GamepadIndex = 0;
-ZEUInt ZEInputDeviceIndexes::WheelIndex = 0;
-ZEUInt ZEInputDeviceIndexes::SensorIndex = 0;
-ZEUInt ZEInputDeviceIndexes::OtherIndex = 0;
-
-ZEUInt ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
-{
-	ZEUInt Index;
-	switch(Type)
-	{
-		case ZE_IDT_KEYBOARD:
-			Index = KeyboardIndex;
-			KeyboardIndex++;
-			break;
-
-		case ZE_IDT_MOUSE:
-			Index = MouseIndex;
-			MouseIndex++;
-			break;
-
-		case ZE_IDT_JOYSTICK:
-			Index = JoystickIndex;
-			JoystickIndex++;
-			break;
-
-		case ZE_IDT_GAMEPAD:
-			Index = GamepadIndex;
-			GamepadIndex++;
-			break;
-
-		case ZE_IDT_WHEEL:
-			Index = WheelIndex;
-			WheelIndex++;
-			break;
-
-		case ZE_IDT_SENSOR:
-			Index = SensorIndex;
-			SensorIndex++;
-			break;
-
-		case ZE_IDT_OTHER:
-			Index = OtherIndex;
-			OtherIndex++;
-			break;
-
-		default:
-			Index = 0;
-			break;
-	}
-
-	return Index;
-}
-
 bool ZEInputDevice::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())

@@ -46,7 +46,7 @@
 
 class ZEGRShaderMeta;
 
-ZE_ENUM(ZEGRVertexElementType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRVertexElementType)
 {
 	ZEGR_VET_NONE				= 0,
 
@@ -98,13 +98,13 @@ ZE_ENUM(ZEGRVertexElementType)
 		ZEGR_VET_UINT32_4			= 40,
 };
 
-ZE_ENUM(ZEGRVertexUsage)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRVertexUsage)
 {
 	ZEGR_VU_PER_VERTEX			= 0,
 	ZEGR_VU_PER_INSTANCE		= 1
 };
 
-ZE_ENUM(ZEGRVertexElementSemantic)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRVertexElementSemantic)
 {
 	ZEGR_VES_UNKNOWN			= 0,
 	ZEGR_VES_POSITION			= 1,
@@ -130,7 +130,7 @@ struct ZEGRVertexElement
 	ZEUInt16						InstanceCount;
 };
 
-class ZEGRVertexLayout : public ZEGRState
+class ZE_EXPORT_ZEENGINE ZEGRVertexLayout : public ZEGRState
 {
 	ZE_OBJECT
 	private:

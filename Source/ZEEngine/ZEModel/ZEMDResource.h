@@ -42,6 +42,7 @@
 #include "ZEResource/ZERSHolder.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
 #include "ZEMDVertex.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEMDResourceMesh);
 ZEMT_FORWARD_DECLARE(ZEMDResourceBone);
@@ -49,7 +50,7 @@ ZEMT_FORWARD_DECLARE(ZEMDResourceAnimation);
 ZEMT_FORWARD_DECLARE(ZEMDResourceHelper);
 ZEMT_FORWARD_DECLARE(ZEGRBuffer);
 
-class ZEMDResource : public ZERSResource
+class ZE_EXPORT_ZEENGINE ZEMDResource : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResource)

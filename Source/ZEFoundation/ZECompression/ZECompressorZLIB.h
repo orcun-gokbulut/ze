@@ -41,8 +41,9 @@
 #include "ZECompressor.h"
 #include "ZEFile\ZEFile.h"
 #include "zlib.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZECompressorZLIB : public ZECompressor
+class ZE_EXPORT_ZEFOUNDATION ZECompressorZLIB : public ZECompressor
 {
 	protected:
 		z_stream				ZStream;

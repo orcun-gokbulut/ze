@@ -41,6 +41,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEResource/ZERSHolder.h"
+#include "ZEMeta/ZEEnumerator.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEGRFormat;
 class ZEGRRenderStateData;
@@ -51,7 +53,7 @@ class ZEGRTexture;
 class ZEMLReaderNode;
 class ZEGRShaderCompileOptions;
 
-enum ZERNHeightMapTechnique : ZEUInt8
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZERNHeightMapTechnique, ZEUInt8)
 {
 	ZERN_HMT_NONE					= 0,
 	ZERN_HMT_PARALLAX				= 1,
@@ -60,7 +62,7 @@ enum ZERNHeightMapTechnique : ZEUInt8
 	ZERN_HMT_TESSELLATION			= 4
 };
 
-enum ZERNTransparencyMode : ZEUInt8
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZERNTransparencyMode, ZEUInt8)
 {
 	ZERN_TM_NONE					= 0,
 	ZERN_TM_ORDERED					= 1,
@@ -68,7 +70,7 @@ enum ZERNTransparencyMode : ZEUInt8
 	ZERN_TM_DITHERING				= 3
 };
 
-class ZERNStandardMaterial : public ZERNMaterial
+class ZE_EXPORT_ZEENGINE ZERNStandardMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNStandardMaterial)

@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#include "ZEExport.ZEEngine.h"
 #ifndef __ZE_TEXTURE_FILE_H__
 #define __ZE_TEXTURE_FILE_H__
 
@@ -41,7 +42,7 @@ class ZEFile;
 class ZETextureData;
 struct ZETextureDataInfo;
 
-class ZETextureFile
+class ZE_EXPORT_ZEENGINE ZETextureFile
 {
 	public:
 		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File) = 0;

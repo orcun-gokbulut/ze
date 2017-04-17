@@ -43,8 +43,9 @@
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEPointer/ZEPointer.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEMLWriterNode
+class ZE_EXPORT_ZEFOUNDATION ZEMLWriterNode
 {
 	friend class ZEMLWriter;
 	private:
@@ -91,7 +92,7 @@ class ZEMLWriterNode
 							~ZEMLWriterNode();
 };
 
-class ZEMLWriter
+class ZE_EXPORT_ZEFOUNDATION ZEMLWriter
 {
 	private:
 		ZEFile					OwnedFile;

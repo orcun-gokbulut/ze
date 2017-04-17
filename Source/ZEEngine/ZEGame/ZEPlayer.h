@@ -40,6 +40,7 @@
 #include "ZEAI/ZEActor.h"
 #include "ZEInput/ZEInputMap.h"
 #include "ZEAI/ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZESteeringPlayerFree : public ZESteering
 {
@@ -63,7 +64,7 @@ class ZELightProjective;
 class ZECamera;
 class ZEModelIKChain;
 
-class ZEPlayer : public ZEActor
+class ZE_EXPORT_ZEENGINE ZEPlayer : public ZEActor
 {
 	ZE_OBJECT
 

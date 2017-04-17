@@ -42,7 +42,7 @@
 
 class ZEGRTexture;
 
-class ZEGRDepthStencilBuffer : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGRDepthStencilBuffer : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRDepthStencilBuffer)

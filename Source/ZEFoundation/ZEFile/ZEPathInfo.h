@@ -43,6 +43,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEPathTokenizer;
 
@@ -56,7 +57,7 @@ enum ZEPathOperationElement
 
 typedef ZEDelegate<bool (const char*, ZEPathOperationElement, void*)> ZEPathOperationFunction;
 
-class ZEPathInfo
+class ZE_EXPORT_ZEFOUNDATION ZEPathInfo
 {
 	private:
 		ZEString					Path;

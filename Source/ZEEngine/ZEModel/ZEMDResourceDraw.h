@@ -39,13 +39,14 @@
 
 #include "ZETypes.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNMaterial;
 class ZEMDResourceLOD;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourceDraw : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEMDResourceDraw : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEMDResourceLOD;

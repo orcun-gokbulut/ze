@@ -44,6 +44,7 @@
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEPointer/ZEPointer.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEMLReaderProperty
 {
@@ -68,7 +69,7 @@ class ZEMLReaderSubNode
 										ZEMLReaderSubNode();
 };
 
-class ZEMLReaderNode
+class ZE_EXPORT_ZEFOUNDATION ZEMLReaderNode
 {
 	friend class ZEMLReader;
 	private:
@@ -132,7 +133,7 @@ class ZEMLReaderNode
 										ZEMLReaderNode();
 };
 
-class ZEMLReader
+class ZE_EXPORT_ZEFOUNDATION ZEMLReader
 {
 	private:
 		ZEFile							OwnedFile;

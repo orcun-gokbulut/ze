@@ -37,8 +37,9 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNFilterColorMatrix
+class ZE_EXPORT_ZEENGINE ZERNFilterColorMatrix
 {
 	public:
 		static const ZEMatrix4x4		Normal;

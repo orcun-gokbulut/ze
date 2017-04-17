@@ -66,12 +66,17 @@ ze_add_source(ZESocketTCPServerListener.h				Sources Headers)
 #ze_add_source(ZEIPAddressTests_Windows.cpp				Tests PLATFORMS Windows)
 #ze_add_source(ZESocketTests_Windows.cpp				Tests PLATFORMS Windows)
 
-ze_add_library(TARGET ZESocket 
+ze_add_component(COMPONENT ZESocket
+	TARGET ZEFoundation
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-    LIBS ZEDS)
+	HEADERS ${Headers})
 
-ze_link(TARGET ZESocket LIBS ws2_32.lib PLATFORMS Windows)
+ze_add_component(COMPONENT ZESocket
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZESocket TARGET ZEFoundation LIBS ws2_32.lib PLATFORMS Windows)
 
 #ze_add_test(TARGET ZESocketTests
 #	SOURCES ${Tests}

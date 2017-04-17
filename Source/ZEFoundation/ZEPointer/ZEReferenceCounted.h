@@ -39,8 +39,9 @@
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEThread/ZELock.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEReferenceCounted : public ZEObject
+class ZE_EXPORT_ZEFOUNDATION ZEReferenceCounted : public ZEObject
 {
 	ZE_OBJECT
 	ZE_COPY_NO_ACTION(ZEReferenceCounted)

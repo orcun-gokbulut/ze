@@ -38,8 +38,9 @@
 
 #include "ZEMeta\ZEObject.h"
 #include "ZEMeta\ZEEnumerator.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEGRFormatStructure)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRFormatStructure)
 {
 	ZEGR_FS_NONE,
 	ZEGR_FS_R8,
@@ -64,7 +65,7 @@ ZE_ENUM(ZEGRFormatStructure)
 	ZEGR_FS_D32_S8X24
 };
 
-ZE_ENUM(ZEGRFormatType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRFormatType)
 {
 	ZEGR_FT_NONE,
 	ZEGR_FT_SINT,
@@ -77,14 +78,14 @@ ZE_ENUM(ZEGRFormatType)
 	ZEGR_FT_FLOAT_UINT
 };
 
-ZE_ENUM(ZEGRFormatEncoding)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRFormatEncoding)
 {
 	ZEGR_FE_NONE,
 	ZEGR_FE_PIXEL,
 	ZEGR_FE_BLOCK
 };
 
-ZE_ENUM(ZEGRFormat)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRFormat)
 {
 	ZEGR_TF_NONE = 0,
 
@@ -165,7 +166,7 @@ ZE_ENUM(ZEGRFormat)
 	ZEGR_TF_RESERVED
 };
 
-class ZEGRFormatDefinition
+class ZE_EXPORT_ZEENGINE ZEGRFormatDefinition
 {
 	public:
 		ZEGRFormat							Format;

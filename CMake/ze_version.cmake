@@ -96,7 +96,7 @@ macro(ze_version_generate_zeversiondata_h)
 		"#define ZE_VERSION_BRANCH \"${ZEBUILD_VERSION_BRANCH}\"")
 endmacro()
 
-macro(ze_version_generate_zeversion_rc PARAMETER_TARGET PARAMETER_EXTENSION PARAMETER_DESCRIPTION PARAMETER_SOURCES)
+macro(ze_version_generate_version_info PARAMETER_TARGET PARAMETER_EXTENSION PARAMETER_DESCRIPTION)
 	if(ZEBUILD_PLATFORM_WINDOWS)
 		if ("${CMAKE_BINARY_DIR}/LastRevision.txt" IS_NEWER_THAN "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
 			message(STATUS "[ZEBuild] Generating ZEVersion.rc for ${PARAMETER_TARGET}.")
@@ -104,7 +104,7 @@ macro(ze_version_generate_zeversion_rc PARAMETER_TARGET PARAMETER_EXTENSION PARA
 				"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
 				"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
 				@ONLY)
-			set(${PARAMETER_SOURCES} ${${PARAMETER_SOURCES}} "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+			target_sources(${PARAMETER_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
 			source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
 		endif()
 	endif()

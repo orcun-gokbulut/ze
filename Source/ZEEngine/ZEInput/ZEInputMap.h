@@ -40,10 +40,11 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEInputEvent.h"
+#include "ZEExport.ZEEngine.h"
 
 #define ZE_INPUT_MAP_MAX_INPUT_ACTION_COUNT 50
 
-class ZEInputMap
+class ZE_EXPORT_ZEENGINE ZEInputMap
 {
 	friend class ZEInputModule;
 	private:

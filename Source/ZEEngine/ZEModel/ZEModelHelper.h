@@ -41,9 +41,9 @@
 #include "ZEModelMesh.h"
 #include "ZEModelBone.h"
 #include "ZEResource/ZERSResource.h"
-
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEModel);
 ZEMT_FORWARD_DECLARE(ZEModelMesh);
@@ -56,7 +56,7 @@ enum ZEModelHelperParentType
 	ZE_MHPT_BONE			= 2
 };
 
-class ZEModelHelper : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModelHelper : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;

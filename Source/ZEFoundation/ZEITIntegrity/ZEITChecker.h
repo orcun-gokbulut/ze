@@ -37,8 +37,9 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEITRecord.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEITChecker
+class ZE_EXPORT_ZEFOUNDATION ZEITChecker
 {
 	private:
 		ZEArray<ZEITRecord>					Records;

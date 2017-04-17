@@ -43,13 +43,14 @@
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRBuffer;
 class ZELightDirectional;
 
-class ZEATSun : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATSun : public ZEEntity
 {
 	ZE_OBJECT
 	private:

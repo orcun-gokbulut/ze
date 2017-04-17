@@ -37,8 +37,9 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEATCommon.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEATAstronomy
+class ZE_EXPORT_ZEENGINE ZEATAstronomy
 {
 	public:
 		static ZEVector3	GetSunDirection(const ZEATObserver& Observer);

@@ -48,8 +48,9 @@ ze_add_source(ZERSHolder.h						Sources Headers)
 ze_add_source(ZERSTemplates.cpp					Sources)
 ze_add_source(ZERSTemplates.h					Sources Headers)
 
-ze_add_library(TARGET ZEResource
-	ZEMC ${ZEMC}
+ze_add_component(COMPONENT ZEResource
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation)

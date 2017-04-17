@@ -35,14 +35,13 @@
 
 #include "ZERegEx.h"
 
-#include "TRE/regex.h"
-
+#include <tre.h>
 
 bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 {
 	if (Code != NULL)
 	{
-		regfree(static_cast<regex_t*>(Code));
+		tre_regfree(static_cast<regex_t*>(Code));
 		delete Code;
 		Code = NULL;
 	}
@@ -55,7 +54,7 @@ bool ZERegEx::Compile(const ZEString& RegEx, ZERegExFlags Flags)
 		NativeFlags |= REG_ICASE;
 
 	regex_t Temp;
-	if (regcomp(&Temp, RegEx, NativeFlags) != REG_OK)
+	if (tre_regcomp(&Temp, RegEx, NativeFlags) != REG_OK)
 		return false;
 
 	Code = new regex_t;
@@ -74,7 +73,7 @@ bool ZERegEx::Match(const ZEString& String) const
 	if (Code == NULL)
 		return false;
 	
-	return (regexec(static_cast<regex_t*>(Code), String.ToCString(), 0, NULL, 0) == REG_OK);
+	return (tre_regexec(static_cast<regex_t*>(Code), String.ToCString(), 0, NULL, 0) == REG_OK);
 }
 
 bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Flags, ZERegExMatch* OldMatch) const
@@ -89,7 +88,7 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 		OldOffset = OldMatch->Offset + OldMatch->Size;
 
 	int Result = 
-		regexec(static_cast<regex_t*>(Code), 
+		tre_regexec(static_cast<regex_t*>(Code), 
 			String.ToCString() + OldOffset, 
 			(static_cast<regex_t*>(Code))->re_nsub + 1, 
 			NativeMatches, 
@@ -135,7 +134,7 @@ ZERegEx::~ZERegEx()
 {
 	if (Code != NULL)
 	{
-		regfree(static_cast<regex_t*>(Code));
+		tre_regfree(static_cast<regex_t*>(Code));
 		delete Code;
 	}
 }

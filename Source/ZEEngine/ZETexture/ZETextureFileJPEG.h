@@ -40,10 +40,11 @@
 
 #include "ZETypes.h"
 #include "ZETextureFile.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZETextureData;
 
-class ZETextureFileJpeg : public ZETextureFile
+class ZE_EXPORT_ZEENGINE ZETextureFileJpeg : public ZETextureFile
 {
 	private:
 

@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEGRTexture);
 
@@ -78,7 +79,7 @@ class ZEUIFontCharacter : public ZEObject
 		ZERectangle							CoordinateRectangle;
 };
 
-class ZEUIFont : public ZERSResource
+class ZE_EXPORT_ZEENGINE ZEUIFont : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEUIFont)

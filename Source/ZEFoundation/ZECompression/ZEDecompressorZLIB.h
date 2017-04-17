@@ -39,9 +39,11 @@
 #define __ZE_DECOMPRESSORZLIB_H__
 
 #include "ZEDecompressor.h"
-#include "zlib.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEDecompressorZLIB : public ZEDecompressor
+#include <zlib.h>
+
+class ZE_EXPORT_ZEFOUNDATION ZEDecompressorZLIB : public ZEDecompressor
 {
 	protected:
 		z_stream				ZStream;

@@ -39,6 +39,7 @@
 #define __ZE_DECOMPRESSOR_LZW_H__
 
 #include "ZEDecompressor.h"
+#include "ZEExport.ZEFoundation.h"
 
 struct ZEDictionaryEntryLZW
 {
@@ -46,7 +47,7 @@ struct ZEDictionaryEntryLZW
 	void*							Data;
 };
 
-class ZEDecompressorLZW : public ZEDecompressor
+class ZE_EXPORT_ZEFOUNDATION ZEDecompressorLZW : public ZEDecompressor
 {
 	private:
 		ZESize						InputPosition;

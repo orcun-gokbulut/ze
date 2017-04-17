@@ -38,8 +38,9 @@
 #define __ZE_STEERING_COLLISION_AVOIDANCE_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringCollisionAvoidance : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringCollisionAvoidance : public ZESteering
 {
 	public:
 		ZEArray<ZEActor*>			AvoidedActors;

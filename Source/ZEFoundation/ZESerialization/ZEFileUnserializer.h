@@ -39,8 +39,9 @@
 
 #include "ZETypes.h"
 #include "ZEUnserializer.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEFileUnserializer : public ZEUnserializer
+class ZE_EXPORT_ZEFOUNDATION ZEFileUnserializer : public ZEUnserializer
 {
 	private:
 		void*					File;

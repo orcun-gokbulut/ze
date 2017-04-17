@@ -39,6 +39,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZERNMultiplexerSubMaterial
 {
@@ -46,7 +47,7 @@ struct ZERNMultiplexerSubMaterial
 	ZEHolder<const ZERNMaterial>						Material;
 };
 
-class ZERNMultiplexerMaterial : public ZERNMaterial
+class ZE_EXPORT_ZEENGINE ZERNMultiplexerMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNMultiplexerMaterial)

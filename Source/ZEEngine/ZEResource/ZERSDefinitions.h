@@ -36,23 +36,24 @@
 #pragma  once
 
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEExport.ZEEngine.h"
 
 #define ZERS_MEMORY_POOL_COUNT 2
 
-ZE_ENUM(ZERSMemoryPool)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERSMemoryPool)
 {
 	ZERS_MP_CPU,
 	ZERS_MP_GPU
 };
 
-ZE_ENUM( ZERSResourceType)
+ZE_EXPORT_ZEENGINE ZE_ENUM( ZERSResourceType)
 {
 	ZERS_RT_NONE,
 	ZERS_RT_NORMAL,
 	ZERS_RT_LOADABLE
 };
 
-ZE_ENUM(ZERSResourceState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERSResourceState)
 {
 	ZERS_RS_ERROR_UNLOADING		= -3,
 	ZERS_RS_ERROR_LOADING		= -2,

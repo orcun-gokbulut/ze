@@ -79,8 +79,8 @@ ze_add_source(ZEMDResourceAnimation.h		Sources Headers ZEMC)
 ze_add_source(ZEMDResourceHelper.cpp		Sources)
 ze_add_source(ZEMDResourceHelper.h			Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEModel 
-	ZEMC ${ZEMC} 
+ze_add_component(COMPONENT ZEModel 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	ZEMC ${ZEMC})

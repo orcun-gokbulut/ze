@@ -43,10 +43,11 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEThread/ZELock.h"
+#include "ZEExport.ZEEngine.h"
 
 #define zeOutput(...) ZEConsole::GetInstance()->Output(__VA_ARGS__)
 
-class ZEConsoleInterface
+class ZE_EXPORT_ZEENGINE ZEConsoleInterface
 {
 	public:
 		virtual bool			Initialize() = 0;
@@ -66,7 +67,7 @@ class ZEConsoleInterface
 		virtual					~ZEConsoleInterface();
 };
 
-class ZEConsole : public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZEConsole : public ZEInitializable
 {	
 	friend class ZECore;
 	private:

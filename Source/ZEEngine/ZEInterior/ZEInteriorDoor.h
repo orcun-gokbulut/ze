@@ -40,6 +40,7 @@
 #include "ZEMath/ZERectangle3D.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEGraphics/ZEGRCanvas.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEInterior);
 ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
@@ -47,7 +48,7 @@ ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
 class ZERNCommand;
 struct ZEInteriorResourceDoor;
 
-class ZEInteriorDoor : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEInteriorDoor : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEInterior;

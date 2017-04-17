@@ -40,6 +40,8 @@
 #include "ZEGRRenderState.h"
 #include "ZEGRViewport.h"
 #include "ZEGRScissorRect.h"
+#include "ZEExport.ZEEngine.h"
+
 
 class ZEGRResource;
 class ZEGRBuffer;
@@ -49,7 +51,7 @@ class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 class ZEGRTextureView;
 
-class ZEGRContext : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRContext : public ZEObject
 {
 	ZE_OBJECT
 	protected:

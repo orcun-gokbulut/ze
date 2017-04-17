@@ -38,13 +38,14 @@
 #include "ZETextureResource.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEFile;
 class ZEGRTexture;
 
 struct ZETextureOptions;
 
-class ZETexture3DResource : public ZETextureResource
+class ZE_EXPORT_ZEENGINE ZETexture3DResource : public ZETextureResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZETexture3DResource)

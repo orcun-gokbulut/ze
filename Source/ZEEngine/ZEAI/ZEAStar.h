@@ -37,10 +37,11 @@
 #include "ZEDS/ZEGraph.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEMinHeap.h"
+#include "ZEExport.ZEEngine.h"
 
 
 template <typename Type>
-class ZEAStarNode
+class ZE_EXPORT_ZEENGINE ZEAStarNode
 {
 	public:
 		ZESize ActualNodeIndex;

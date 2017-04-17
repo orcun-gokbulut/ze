@@ -55,7 +55,7 @@ ZEMT_FORWARD_DECLARE(ZEGRShader);
 ZEMT_FORWARD_DECLARE(ZEGRContext);
 ZEMT_FORWARD_DECLARE(ZEGRRenderState);
 
-class ZEGRRenderStateData : public ZEReferenceCounted
+class ZE_EXPORT_ZEENGINE ZEGRRenderStateData : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRRenderStateData)
@@ -69,7 +69,7 @@ class ZEGRRenderStateData : public ZEReferenceCounted
 		static ZEGRRenderStateData*				Create(const ZEGRRenderState& RenderState);
 };
 
-class ZEGRRenderState : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRRenderState : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEGRContext;
@@ -121,7 +121,7 @@ class ZEGRRenderState : public ZEObject
 		virtual									~ZEGRRenderState();
 };
 
-class ZEGRComputeRenderStateData : public ZEReferenceCounted
+class ZE_EXPORT_ZEENGINE ZEGRComputeRenderStateData : public ZEReferenceCounted
 {
 	friend class ZEGRComputeRenderState;
 
@@ -132,7 +132,7 @@ class ZEGRComputeRenderStateData : public ZEReferenceCounted
 		static ZEGRComputeRenderStateData*		Create(const ZEGRComputeRenderState& RenderState);
 };
 
-class ZEGRComputeRenderState
+class ZE_EXPORT_ZEENGINE ZEGRComputeRenderState
 {
 	private:
 		ZEHolder<ZEGRShader>					ComputeShader;

@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZESocketDefinitions.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZESocketTCPStatus
 {
@@ -47,7 +48,7 @@ enum ZESocketTCPStatus
 	ZE_STCS_CONNECTED
 };
 
-class ZESocketTCPServer
+class ZE_EXPORT_ZEFOUNDATION ZESocketTCPServer
 {
 	friend class ZESocketTCPServerListener;
 	private:

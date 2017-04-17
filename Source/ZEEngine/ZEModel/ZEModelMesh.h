@@ -47,6 +47,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNPreRenderParameters;
 class ZEGRBuffer;
@@ -55,7 +56,7 @@ class ZERayCastReport;
 
 ZEMT_FORWARD_DECLARE(ZEModel);
 
-class ZEModelMesh : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModelMesh : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEModelMesh)

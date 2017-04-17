@@ -43,6 +43,7 @@
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -50,7 +51,7 @@ class ZEGRBuffer;
 class ZEGRTexture;
 class ZELightDirectional;
 
-class ZEATMoon : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATMoon : public ZEEntity
 {
 	ZE_OBJECT
 	private:

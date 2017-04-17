@@ -42,11 +42,12 @@
 #include "ZEPointer\ZEHolder.h"
 #include "ZEUI\ZEUIRectangle.h"
 #include "ZEGraphics\ZEGRTexture.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZEFreeType;
 class ZEUIFontTrueType;
 
-class ZEUIFontTrueTypeIdentifier : public ZERSResourceIdentifier
+class ZE_EXPORT_ZEENGINE ZEUIFontTrueTypeIdentifier : public ZERSResourceIdentifier
 {
 	friend class ZEUIFontTrueType;
 	private:
@@ -58,7 +59,7 @@ class ZEUIFontTrueTypeIdentifier : public ZERSResourceIdentifier
 		virtual ZEString					ToString() const;
 };
 
-class ZEUIFontTrueType : public ZEUIFont
+class ZE_EXPORT_ZEENGINE ZEUIFontTrueType : public ZEUIFont
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEUIFontTrueType)

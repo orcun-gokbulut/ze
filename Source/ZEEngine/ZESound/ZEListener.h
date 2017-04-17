@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEGame/ZEEntity.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEListener: public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEListener: public ZEEntity
 {
 	ZE_OBJECT
 	protected:

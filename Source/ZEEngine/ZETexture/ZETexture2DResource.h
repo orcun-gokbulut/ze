@@ -38,10 +38,11 @@
 #include "ZETextureResource.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEGRTexture);
 
-class ZETexture2DResource : public ZETextureResource
+class ZE_EXPORT_ZEENGINE ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZETexture2DResource)

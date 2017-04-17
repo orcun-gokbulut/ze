@@ -42,8 +42,9 @@
 #include "ZETypes.h"
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEFileInfo : public ZEPathInfo
+class ZE_EXPORT_ZEFOUNDATION ZEFileInfo : public ZEPathInfo
 {
 	public:
 		ZEInt64					GetSize() const;

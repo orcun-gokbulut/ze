@@ -46,6 +46,7 @@
 #include "ZEDS/ZEDelegate.h"
 #include "ZETypes.h"
 #include "ZEDestroyable.h"
+#include "ZEExport.ZEEngine.h"
 
 #define ZE_PCCF_ON_TOUCH			1
 #define ZE_PCCF_ON_START_TOUCH		2
@@ -57,7 +58,7 @@ class ZEPhysicalWorld;
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, ZEVector3, float)> ZEPhysicalCollisionEvent;
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)> ZEPhysicalTransformChangeEvent;
 
-ZE_ENUM(ZEPhysicalObjectType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalObjectType)
 {
 	ZE_POT_STATIC_OBJECT,
 	ZE_POT_STATIC_MESH,
@@ -70,7 +71,7 @@ ZE_ENUM(ZEPhysicalObjectType)
 	ZE_POT_FORCE_FIELD,
 };
 
-class ZEPhysicalObject : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEPhysicalObject : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	protected:

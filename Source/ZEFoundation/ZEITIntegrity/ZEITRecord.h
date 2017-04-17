@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEFile;
 class ZEMLReaderNode;
@@ -64,7 +65,7 @@ enum ZEITCheckProblem
 	ZEIT_CP_CHECKSUM
 };
 
-class ZEITRecord
+class ZE_EXPORT_ZEFOUNDATION ZEITRecord
 {
 	private:
 		ZEString						Path;

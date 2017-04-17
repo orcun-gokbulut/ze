@@ -39,6 +39,7 @@
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZEDestroyableState
 {
@@ -49,7 +50,7 @@ enum ZEDestroyableState
 
 class ZEClass;
 
-class ZEDestroyable
+class ZE_EXPORT_ZEFOUNDATION ZEDestroyable
 {
 	friend class ZEDestroyableCollector;
 	private:

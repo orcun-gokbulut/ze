@@ -45,11 +45,12 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourceBone : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEMDResourceBone : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceBone)

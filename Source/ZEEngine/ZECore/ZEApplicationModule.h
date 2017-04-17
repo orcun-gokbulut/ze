@@ -37,10 +37,11 @@
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEData;
 
-class ZEApplicationModule : public ZEModule
+class ZE_EXPORT_ZEENGINE ZEApplicationModule : public ZEModule
 {
 	ZE_OBJECT
 	public:

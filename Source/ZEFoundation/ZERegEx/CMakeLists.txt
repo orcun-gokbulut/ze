@@ -35,14 +35,19 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory(TRE)
-
 ze_add_source(ZERegEx.h 			Sources Headers)
 ze_add_source(ZERegEx.cpp 			Sources)
 ze_add_source(ZEWildcard.h 			Sources Headers)
 ze_add_source(ZEWildcard.cpp 		Sources)
 
-ze_add_library(TARGET ZERegEx 
+ze_add_component(COMPONENT ZERegEx
+	TARGET ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS TRE)
+	LIBS libTRE)
+
+ze_add_component(COMPONENT ZERegEx
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS libTRE)

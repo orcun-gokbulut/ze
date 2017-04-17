@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELCEncryption.h
+ Zinek Engine - ZEEncryption.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,9 +36,10 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZELCEncryption
+class ZE_EXPORT_ZEFOUNDATION ZELCEncryption
 {
 	public:
 		static void			AESPasskey(void* OutputKey, ZESize KeySize, const ZEString& Passkey);

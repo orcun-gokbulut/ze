@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLL.cpp
+ Zinek Engine - ZEExport.ZEFoundation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLL.h"
+#include "ZEExport.ZEFoundation.h"
 
 #include "ZECommon.h"
 ZE_SUPPRESS_LNK4221

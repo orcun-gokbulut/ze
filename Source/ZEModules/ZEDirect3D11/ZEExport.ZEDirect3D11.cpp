@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEExport.ZEDirect3D11.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,10 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEExport.ZEDirect3D11.h"
 
-ze_add_source(regcomp.c 				Sources)
-ze_add_source(regerror.c 				Sources)
-ze_add_source(regex.h 					Sources)
-ze_add_source(regexec.c 				Sources)
-ze_add_source(tre-ast.c 				Sources)
-ze_add_source(tre-ast.h 				Sources)
-ze_add_source(tre-compile.c 			Sources)
-ze_add_source(tre-compile.h 			Sources)
-ze_add_source(tre-config.h.in 			Sources)
-ze_add_source(tre-internal.h 			Sources)
-ze_add_source(tre-match-approx.c 		Sources)
-ze_add_source(tre-match-backtrack.c 	Sources)
-ze_add_source(tre-match-parallel.c 		Sources)
-ze_add_source(tre-match-utils.h 		Sources)
-ze_add_source(tre-mem.c 				Sources)
-ze_add_source(tre-mem.h 				Sources)
-ze_add_source(tre-parse.c 				Sources)
-ze_add_source(tre-parse.h 				Sources)
-ze_add_source(tre-stack.c 				Sources)
-ze_add_source(tre-stack.h 				Sources)
-ze_add_source(tre.h 					Sources)
-ze_add_source(xmalloc.c 				Sources)
-ze_add_source(xmalloc.h 				Sources)
-
-set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS HAVE_CONFIG_H)
-
-ze_add_library(TARGET TRE SOURCES ${Sources})
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

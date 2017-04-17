@@ -43,8 +43,9 @@
 
 #include "ZEInputDefinitions.h"
 #include "ZEInputDeviceDescription.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEInputDeviceState
+class ZE_EXPORT_ZEENGINE ZEInputDeviceState
 {
 	public:
 		struct  

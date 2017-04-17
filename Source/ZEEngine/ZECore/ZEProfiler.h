@@ -39,10 +39,11 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEProfilerCounter;
 
-class ZEProfiler
+class ZE_EXPORT_ZEENGINE ZEProfiler
 {
 	friend class ZECore;
 	friend class ZEProfilerCounter;

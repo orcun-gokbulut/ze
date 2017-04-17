@@ -39,17 +39,18 @@
 
 #include "ZEPhysicalObject.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEPhysicalShape;
 
-ZE_ENUM(ZEPhysicalBodyType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalBodyType)
 {
 	ZE_PBT_DYNAMIC		= 0,
 	ZE_PBT_KINEMATIC	= 1,
 	ZE_PBT_STATIC		= 2
 };
 
-ZE_ENUM(ZEPhysicalForceMode)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalForceMode)
 {
 	ZE_PFM_FORCE					= 0,                 
 	ZE_PFM_IMPULSE					= 1,               
@@ -59,7 +60,7 @@ ZE_ENUM(ZEPhysicalForceMode)
 	ZE_PFM_ACCELERATION				= 5				
 };
 
-class ZEPhysicalRigidBody : public ZEPhysicalObject
+class ZE_EXPORT_ZEENGINE ZEPhysicalRigidBody : public ZEPhysicalObject
 {
 	ZE_OBJECT
 	protected:

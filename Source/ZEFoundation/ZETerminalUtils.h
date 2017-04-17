@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZETerminalColor
 {
@@ -60,7 +61,7 @@ enum ZETerminalColor
 
 };
 
-class ZETerminalUtils
+class ZE_EXPORT_ZEFOUNDATION ZETerminalUtils
 {
 	public:
 		static void							SetBold(bool Enabled);

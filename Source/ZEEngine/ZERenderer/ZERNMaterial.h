@@ -36,12 +36,13 @@
 #pragma once
 
 #include "ZEResource/ZERSResource.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRContext;
 class ZERNStage;
 class ZERNCommand;
 
-class ZERNMaterial : public ZERSResource
+class ZE_EXPORT_ZEENGINE ZERNMaterial : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNMaterial)

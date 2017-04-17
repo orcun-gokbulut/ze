@@ -39,15 +39,16 @@
 
 #include "ZERandom.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEParticleState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEParticleState)
 {
 	ZE_PAS_NEW,
 	ZE_PAS_ALIVE,
 	ZE_PAS_DEAD
 };
 
-class ZEParticle : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEParticle : public ZEObject
 {
 	ZE_OBJECT
 	public:

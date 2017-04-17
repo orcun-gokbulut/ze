@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZETimeCounterState
 {
@@ -44,7 +45,7 @@ enum ZETimeCounterState
 	ZE_TCS_PAUSED
 };
 
-class ZETimeCounter
+class ZE_EXPORT_ZEFOUNDATION ZETimeCounter
 {
 	private:
 		ZETimeCounterState			State;

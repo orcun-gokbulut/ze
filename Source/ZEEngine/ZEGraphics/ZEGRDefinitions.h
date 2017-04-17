@@ -37,12 +37,13 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEExport.ZEEngine.h"
 
 //#define ZE_GRAPHIC_LOG_ENABLE
 //#define ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
 //#define ZE_GRAPHICS_CONTENT_PROTECTION
 
-ZE_ENUM_TYPED(ZEGRShaderModel, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRShaderModel, ZEUInt8)
 {
 	ZEGR_SM_3_0		= 0,
 	ZEGR_SM_4_0		= 1,
@@ -50,7 +51,7 @@ ZE_ENUM_TYPED(ZEGRShaderModel, ZEUInt8)
 	ZEGR_SM_5_0		= 3
 };
 
-ZE_ENUM_TYPED(ZEGRShaderType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRShaderType, ZEUInt8)
 {
 	ZEGR_ST_VERTEX		= 0,
 	ZEGR_ST_PIXEL		= 1,

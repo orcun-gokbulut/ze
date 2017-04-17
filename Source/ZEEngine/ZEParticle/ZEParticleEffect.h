@@ -40,17 +40,18 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNPreRenderParameters;
 
-ZE_ENUM(ZEParticleEffectState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEParticleEffectState)
 {
 	ZE_PES_STOPPED,
 	ZE_PES_RUNNING,
 	ZE_PES_PAUSED
 };
 
-class ZEParticleEffect : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEParticleEffect : public ZEEntity
 {
 	ZE_OBJECT
 	friend class ZEParticleEmitter;

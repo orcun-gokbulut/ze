@@ -39,8 +39,9 @@
 
 #include "ZEMLElement.h"
 #include "ZEDS/ZEValue.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEMLProperty : public ZEMLElement
+class ZE_EXPORT_ZEFOUNDATION ZEMLProperty : public ZEMLElement
 {
 	friend class ZEMLNode;
 	private:

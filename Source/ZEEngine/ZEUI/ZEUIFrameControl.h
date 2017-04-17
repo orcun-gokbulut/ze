@@ -37,10 +37,11 @@
 
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZETexture2DResource;
 
-class ZEUIFrameControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUIFrameControl : public ZEUIControl
 {
 	ZE_OBJECT
 	public:

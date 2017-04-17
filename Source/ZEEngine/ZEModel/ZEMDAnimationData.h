@@ -38,12 +38,13 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEMDAnimationKey;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDAnimationDataMapping
+class ZE_EXPORT_ZEENGINE ZEMDAnimationDataMapping
 {
 	private:
 		ZEString									Name;

@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_RANDOM_H__
-#define __ZE_RANDOM_H__
+#pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZERandom
+class ZE_EXPORT_ZEFOUNDATION ZERandom
 {
 	public:
 		static float		GetFloat();
@@ -62,5 +62,3 @@ class ZERandom
 		static void			Reset();
 		static void			SetSeed(ZEUInt Seed);
 };
-
-#endif

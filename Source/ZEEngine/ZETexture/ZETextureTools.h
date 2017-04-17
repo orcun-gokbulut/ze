@@ -43,10 +43,11 @@
 #include "ZETexture/ZETextureResource.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureLoader.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 
-class ZETextureTools
+class ZE_EXPORT_ZEENGINE ZETextureTools
 {
 	private:
 									ZETextureTools();

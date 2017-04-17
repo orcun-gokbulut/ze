@@ -43,7 +43,7 @@
 
 class ZEGRTexture;
 
-class ZEGRRenderTarget : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGRRenderTarget : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRRenderTarget)

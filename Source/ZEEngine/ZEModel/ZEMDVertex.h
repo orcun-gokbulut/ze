@@ -39,8 +39,8 @@
 #include "ZEPacking.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-
 #include "ZEGraphics/ZEGRVertexElementType.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRVertexLayout;
 
@@ -60,7 +60,7 @@ enum ZEMDVertexIndexType			: ZEUInt8
 };
 
 ZEPackStruct(
-struct ZEMDVertex
+struct ZE_EXPORT_ZEENGINE ZEMDVertex
 {
 	ZEVector3						Position;
 	float							Reserved0;
@@ -72,7 +72,7 @@ struct ZEMDVertex
 });
 
 ZEPackStruct(
-struct ZEMDVertexInstance
+struct ZE_EXPORT_ZEENGINE ZEMDVertexInstance
 {
 	ZEVector3						Position;
 	float							Reserved0;
@@ -90,7 +90,7 @@ struct ZEMDVertexInstance
 });
 
 ZEPackStruct(
-struct ZEMDVertexSkin
+struct ZE_EXPORT_ZEENGINE ZEMDVertexSkin
 {
 	ZEVector3						Position;
 	ZEUInt8_4						Indices;

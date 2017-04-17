@@ -44,6 +44,7 @@
 #include "ZEGUID.h"
 #include "ZEEnumerator.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZEMT_CLASS_DEFINITION(ClassName) \
 	class ClassName##Class : public ZEClass \
@@ -117,7 +118,7 @@ struct ZEClassSortedData
 	const char*		Name;
 };
 
-class ZEClass : public ZEMTDeclaration
+class ZE_EXPORT_ZEFOUNDATION ZEClass : public ZEMTDeclaration
 {
 	protected:
 		static ZESSize							Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString& Name);
@@ -195,7 +196,7 @@ class ZEClass : public ZEMTDeclaration
 		bool									CallMethod(ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23, const ZEReference& Parameters24) const;
 
 		virtual bool							CallMethodConst(const ZEObject* Object, ZESize MethodId, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const;
-		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const;
+		/*bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference** Parameters, ZESize ParameterCount) const;
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue) const;
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0) const;
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1) const;
@@ -222,7 +223,7 @@ class ZEClass : public ZEMTDeclaration
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22) const;
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23) const;
 		bool									CallMethodConst(const ZEObject* Object, const ZEString& MethodName, ZEVariant& ReturnValue, const ZEReference& Parameters0, const ZEReference& Parameters1, const ZEReference& Parameters2, const ZEReference& Parameters3, const ZEReference& Parameters4, const ZEReference& Parameters5, const ZEReference& Parameters6, const ZEReference& Parameters7, const ZEReference& Parameters8, const ZEReference& Parameters9, const ZEReference& Parameters10, const ZEReference& Parameters11, const ZEReference& Parameters12, const ZEReference& Parameters13, const ZEReference& Parameters14, const ZEReference& Parameters15, const ZEReference& Parameters16, const ZEReference& Parameters17, const ZEReference& Parameters18, const ZEReference& Parameters19, const ZEReference& Parameters20, const ZEReference& Parameters21, const ZEReference& Parameters22, const ZEReference& Parameters23, const ZEReference& Parameters24) const;
-
+		*/
 		// Events
 		virtual bool							AddEventDelegate(ZEObject* Target, ZESize EventId, ZEEventDelegateBase* Delegate) const;
 		bool									AddEventDelegate(ZEObject* Target, const ZEString& EventName, ZEEventDelegateBase* Delegate) const;

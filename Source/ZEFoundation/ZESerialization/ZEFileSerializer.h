@@ -39,8 +39,9 @@
 
 #include "ZESerializer.h"
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEFileSerializer : public ZESerializer
+class ZE_EXPORT_ZEFOUNDATION ZEFileSerializer : public ZESerializer
 {
 	private:
 		void*				File;

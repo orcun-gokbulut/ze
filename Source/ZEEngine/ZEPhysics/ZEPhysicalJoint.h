@@ -45,11 +45,12 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEPlane.h"
+#include "ZEExport.ZEEngine.h"
 
 class	ZEPhysicalWorld;
 class	ZEPhysicalObject;		
 
-ZE_ENUM(ZEPhysicalJointType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointType)
 {
 	ZE_PJT_NONE					= 0,
 	ZE_PJT_SPHERICAL			= 1,
@@ -64,41 +65,41 @@ ZE_ENUM(ZEPhysicalJointType)
 	ZE_PJT_FREE					= 10,
 };
 
-ZE_ENUM(ZEPhysicalJointState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointState)
 {
 	ZE_PJS_UNBOUND				= 0,
 	ZE_PJS_SIMULATING			= 1,
 	ZE_PJS_BROKEN				= 2,
 };
 
-ZE_ENUM(ZEPhysicalJointMotion)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointMotion)
 {
 	ZE_PJMOTION_FREE			= 1,
 	ZE_PJMOTION_LIMITED			= 2,
 	ZE_PJMOTION_LOCKED			= 3,
 };
 
-ZE_ENUM(ZEPhysicalJointProjectionMode)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointProjectionMode)
 {
 	ZE_PJPM_NONE				= 0,
 	ZE_PJPM_POINT_MINDIST		= 1,
 	ZE_PJPM_LINEAR_MINDIST		= 2,
 };
 
-ZE_ENUM(ZEPhysicalJointFlags)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointFlags)
 {
 	ZE_PJF_COLLISION_ENABLED	= 0,
 	ZE_PJF_VISUALIZATION		= 1,
 };
 
-ZE_ENUM(ZEPhysicalJointVisualizations)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointVisualizations)
 {
 	ZE_PJV_LOCAL_AXES			= 0,
 	ZE_PJV_WORLD_AXES			= 1,
 	ZE_PJV_LIMITS				= 2,
 };
 
-ZE_ENUM(ZEPhysicalJointMotorType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalJointMotorType)
 {
 	ZE_PJMT_NONE				= 0,
 	ZE_PJMT_POSITION			= 1,
@@ -112,7 +113,7 @@ struct ZEPhysicalLimitPlane : ZEPlane
 	float Restitution;
 };
 
-class ZEPhysicalJoint : public ZEPhysicalObject
+class ZE_EXPORT_ZEENGINE ZEPhysicalJoint : public ZEPhysicalObject
 {
 	ZE_OBJECT
 	protected:

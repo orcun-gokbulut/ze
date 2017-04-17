@@ -44,7 +44,6 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
-
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
@@ -53,6 +52,7 @@
 #include "ZEPointer/ZEPointer.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEGraphics/ZEGRCanvas.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
@@ -61,7 +61,7 @@ class ZERNDrawParameters;
 class ZERNStandardMaterial;
 class ZERNSimpleMaterial;
 
-class ZEModel : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEModel : public ZEEntity
 {	
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEModel)

@@ -42,6 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRCanvas.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRBuffer;
@@ -49,7 +50,7 @@ class ZEGRTexture;
 class ZEGRRenderStateData;
 class ZEEntity;
 
-class ZERNStageDebug : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageDebug : public ZERNStage
 {
 	ZE_OBJECT
 	private:

@@ -64,10 +64,17 @@ ze_add_source(ZEMLReader.cpp				Sources)
 ze_add_source(ZEMLWriter.h 					Sources Headers)
 ze_add_source(ZEMLWriter.cpp 				Sources)
 
-ze_add_library(TARGET ZEML 
+ze_add_component(COMPONENT ZEML 
+	TARGET ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS ZEMath libTinyXML)
+	LIBS libTinyXML)
+
+ze_add_component(COMPONENT ZEML 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS libTinyXML)
 
 ze_add_test(TARGET ZEMLTests
 	SOURCES ${Tests}

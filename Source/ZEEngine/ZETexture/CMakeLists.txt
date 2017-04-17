@@ -135,11 +135,12 @@ ze_add_source(ZEPixel.h									Sources Headers)
 ze_add_source(ZETextureTestUtils.cpp					Sources)
 ze_add_source(ZETextureTestUtils.h						Sources Headers)
 
-ze_add_library(TARGET ZETexture 
+ze_add_component(COMPONENT ZETexture
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libFreeImage libATICompress)
+	LIBS libFreeImage libATICompress)
 
 ze_add_test(TARGET ZETextureTests 
 	SOURCES ${Tests}

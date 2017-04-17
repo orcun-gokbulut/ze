@@ -42,8 +42,9 @@
 #include "ZESteeringArrive.h"
 #include "ZESteeringFaceVelocity.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringPathFollowing : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringPathFollowing : public ZESteering
 {
 	private:
 

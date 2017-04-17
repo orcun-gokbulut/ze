@@ -39,6 +39,7 @@
 #include "ZEPacking.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEBitmapPixelFormat
 {
@@ -124,7 +125,7 @@ struct ZEBitmapSamplingOptions : public ZEBitmapAddressingOptions
 	ZEVector4								BorderColor;
 };
 
-class ZEBitmap
+class ZE_EXPORT_ZEENGINE ZEBitmap
 {
 	private:
 		ZESize								Width;

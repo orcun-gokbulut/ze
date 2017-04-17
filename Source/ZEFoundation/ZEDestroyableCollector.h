@@ -36,11 +36,12 @@
 #pragma once
 
 #include "ZEDS/ZEList2.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEDestroyable;
 class ZEClass;
 
-class ZEDestroyableCollector
+class ZE_EXPORT_ZEFOUNDATION ZEDestroyableCollector
 {
 	friend class ZEDestroyable;
 	private:

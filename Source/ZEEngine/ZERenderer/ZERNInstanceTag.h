@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNInstanceTag : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNInstanceTag : public ZEObject
 {
 	ZE_OBJECT
 	public:

@@ -38,8 +38,9 @@
 #define __ZE_PARTIAL_FILE_H__
 
 #include "ZEFile.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEPartialFile : public ZEFile
+class ZE_EXPORT_ZEFOUNDATION ZEPartialFile : public ZEFile
 {
 	protected:
 		bool					EoF;

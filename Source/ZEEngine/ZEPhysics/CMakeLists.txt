@@ -56,8 +56,8 @@ ze_add_source(ZEPhysicalWorld.h					Sources Headers ZEMC)
 ze_add_source(ZEPhysicsModule.cpp				Sources)
 ze_add_source(ZEPhysicsModule.h					Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEPhysics 
+ze_add_component(COMPONENT ZEPhysics 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC}
-	LIBS ZEFoundation)
+	ZEMC ${ZEMC})

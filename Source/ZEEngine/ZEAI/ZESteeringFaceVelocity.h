@@ -38,8 +38,9 @@
 #define __ZE_STEERING_FACE_VELOCITY_H__
 
 #include "ZESteeringFace.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringFaceVelocity : public ZESteeringFace
+class ZE_EXPORT_ZEENGINE ZESteeringFaceVelocity : public ZESteeringFace
 {
 	public:
 		virtual ZESteeringOutput	Process(float ElapsedTime);

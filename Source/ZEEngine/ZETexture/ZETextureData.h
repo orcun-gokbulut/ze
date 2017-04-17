@@ -40,6 +40,7 @@
 #include "ZEPacking.h"
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZETextureData;
 class ZETextureSurface;
@@ -55,7 +56,7 @@ struct ZETextureDataInfo
 	ZEGRTextureType					Type;
 };
 
-class ZETextureLevel
+class ZE_EXPORT_ZEENGINE ZETextureLevel
 {
 	friend class ZETextureSurface;
 	friend class ZETextureData;	

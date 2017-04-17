@@ -40,6 +40,7 @@
 #include "ZEDirectInputDevice.h"
 #include "ZEDirectInputModule.h"
 #include "ZEDS/ZEHashGenerator.h"
+#include "ZEInput/ZEInputDeviceIndexes.h"
 
 static BOOL FAR PASCAL ConfigureAxisRanges(LPCDIDEVICEOBJECTINSTANCE ObjectInstance, LPVOID Device)
 {

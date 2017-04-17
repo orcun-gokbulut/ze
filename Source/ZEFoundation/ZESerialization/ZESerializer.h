@@ -38,8 +38,9 @@
 #define __ZE_SERIALIZER_H__
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZESerializer
+class ZE_EXPORT_ZEFOUNDATION ZESerializer
 {
 	public:
 		virtual ZESize		Write(const void* Buffer, const ZESize Size, const ZESize Count) = 0;

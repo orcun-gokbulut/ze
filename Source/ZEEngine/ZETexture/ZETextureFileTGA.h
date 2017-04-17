@@ -39,8 +39,9 @@
 #define __ZE_TEXTURE_FILE_TGA_H__
 
 #include "ZETextureFile.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZETextureFileTGA : public ZETextureFile
+class ZE_EXPORT_ZEENGINE ZETextureFileTGA : public ZETextureFile
 {
 	public:
 		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);

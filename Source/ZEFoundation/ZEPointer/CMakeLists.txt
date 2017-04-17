@@ -48,17 +48,28 @@ ze_add_source(ZEWeakPointer.h			Sources Headers)
 ze_add_source(ZEWeakPointerTests.cpp	Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
-ze_add_source(ZEReferenceCounted.cpp	Sources)
-ze_add_source(ZEReferenceCounted.h		Sources Headers ZEMC)
 ze_add_source(ZEHolder.cpp				Sources)
 ze_add_source(ZEHolder.h				Sources Headers)
 
-ze_add_library(TARGET ZEPointer 
-	SOURCES ${Sources} 
+ze_add_source(ZEReferenceCounted.cpp	SourcesShared)
+ze_add_source(ZEReferenceCounted.h		HeadersShared ZEMC)
+
+ze_add_component(COMPONENT ZEPointer
+	TARGET ZEFoundation
+	SOURCES ${SourcesShared}
+	HEADERS ${HeadersShared}
+	ZEMC ${ZEMC})
+
+ze_add_component(COMPONENT ZEPointer
+	TARGET ZEFoundationBase
+	SOURCES ${Sources}
 	HEADERS ${Headers})
-	
+
+ze_add_component(COMPONENT ZEPointer
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} ${SourcesShared}
+	HEADERS ${Headers})
+
 ze_add_test(TARGET ZEPointerTests 
 	SOURCES ${Tests}
 	TEST_TARGET ZEPointer)
-
-ze_add_foundation_zemc(${ZEMC})

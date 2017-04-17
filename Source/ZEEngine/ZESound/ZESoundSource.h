@@ -43,7 +43,7 @@
 
 #define ZE_SS_MAX_TYPE 6
 
-ZE_ENUM(ZESoundSourceType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZESoundSourceType)
 {
 	ZE_SST_NONE					= 0,
 	ZE_SST_EFFECT				= 1,
@@ -53,7 +53,7 @@ ZE_ENUM(ZESoundSourceType)
 	ZE_SST_PLAYER_COMM			= 5
 };
 
-ZE_ENUM(ZESoundSourceState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZESoundSourceState)
 {
 	ZE_SSS_NONE,
 	ZE_SSS_PLAYING,
@@ -63,7 +63,7 @@ ZE_ENUM(ZESoundSourceState)
 
 class ZESoundSourceEffect;
 
-class ZESoundSource : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZESoundSource : public ZEEntity
 {
 	ZE_OBJECT
 	private:

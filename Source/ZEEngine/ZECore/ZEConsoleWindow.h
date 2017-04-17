@@ -38,8 +38,9 @@
 #define __ZE_WIN32_CONSOLE_H__
 
 #include "ZECore/ZEConsole.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEConsoleWindow : public ZEConsoleInterface
+class ZE_EXPORT_ZEENGINE ZEConsoleWindow : public ZEConsoleInterface
 {
 	private:
 		void*					Handle;

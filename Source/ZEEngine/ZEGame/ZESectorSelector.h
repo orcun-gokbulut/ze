@@ -37,10 +37,9 @@
 
 #include "ZEGame/ZEGeographicEntity.h"
 
-class ZESectorSelector : public ZEGeographicEntity
+class ZE_EXPORT_ZEENGINE ZESectorSelector : public ZEGeographicEntity
 {
 	ZE_OBJECT;
-
 	public:
 		static ZESectorSelector* CreateInstance();
 };

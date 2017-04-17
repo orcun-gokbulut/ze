@@ -40,13 +40,14 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERNRenderer.h"
 #include "ZELight.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZERNCommandDirectionalLight;
 class ZERNCommandSpotLightShadow;
 class ZERNCommandProjectiveLight;
 
-class ZERNStageShadowing : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageShadowing : public ZERNStage
 {
 	ZE_OBJECT
 	private:

@@ -47,7 +47,7 @@ class ZERSResource;
 class ZERSResourceGroup;
 class ZERSResourceIdentifier;
 
-class ZERSResourceManager : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERSResourceManager : public ZEObject
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERSResourceManager)

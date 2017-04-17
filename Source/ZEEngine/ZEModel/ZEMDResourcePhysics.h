@@ -42,6 +42,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEMDResourcePhysicalShapeType
 {
@@ -68,7 +69,7 @@ struct ZEModelResourcePhysicalPolygon
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourcePhysicalShape : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEMDResourcePhysicalShape : public ZEObject
 {
 	ZE_OBJECT
 	private:
@@ -135,7 +136,7 @@ class ZEMDResourcePhysicalShape : public ZEObject
 };
 
 
-class ZEMDResourcePhysicalBody : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEMDResourcePhysicalBody : public ZEObject
 {
 	ZE_OBJECT
 	private:
@@ -189,7 +190,7 @@ class ZEMDResourcePhysicalBody : public ZEObject
 };
 
 
-struct ZEMDResourcePhysicalJoint : public ZEObject
+struct ZE_EXPORT_ZEENGINE ZEMDResourcePhysicalJoint : public ZEObject
 {
 	ZE_OBJECT
 	private:

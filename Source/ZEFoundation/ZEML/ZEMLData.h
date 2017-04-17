@@ -39,10 +39,11 @@
 
 #include "ZEMLElement.h"
 #include "ZEPointer/ZEPointer.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEFile;
 
-class ZEMLData : public ZEMLElement
+class ZE_EXPORT_ZEFOUNDATION ZEMLData : public ZEMLElement
 {
 	friend class ZEMLNode;
 	private:

@@ -38,8 +38,9 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZERNStageMultiplexerMode)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNStageMultiplexerMode)
 {
 	ZERN_SMM_NONE,
 	ZERN_SMM_SINGLE,
@@ -54,7 +55,7 @@ class ZEGRRenderStateData;
 class ZEGRRenderTarget;
 class ZERNStageDisplay;
 
-class ZERNStageMultiplexer : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageMultiplexer : public ZERNStage
 {
 	ZE_OBJECT
 	private:

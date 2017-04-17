@@ -39,6 +39,7 @@
 
 #include "ZEPhysicalObject.h"
 #include "ZEPhysicalMaterial.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZEPhysicalTriangle
 {
@@ -46,7 +47,7 @@ struct ZEPhysicalTriangle
 	ZEUInt MaterialIndex;
 };
 
-class ZEPhysicalMesh : public ZEPhysicalObject
+class ZE_EXPORT_ZEENGINE ZEPhysicalMesh : public ZEPhysicalObject
 {
 	ZE_OBJECT
 	public:

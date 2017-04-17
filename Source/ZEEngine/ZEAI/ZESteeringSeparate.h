@@ -39,8 +39,9 @@
 
 #include "ZESteering.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringSeparate : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringSeparate : public ZESteering
 {
 	public:
 		ZEArray<ZEActor*>			AvoidedActors;

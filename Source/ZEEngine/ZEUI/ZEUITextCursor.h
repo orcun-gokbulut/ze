@@ -38,11 +38,12 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEUIRectangle.h"
 #include "ZECore/ZETimer.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZERNMaterial);
 class ZETimeParameters;
 
-class ZEUITextCursor : public ZEUIRectangle, public ZEObject
+class ZE_EXPORT_ZEENGINE ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
 	ZE_OBJECT
 	private:

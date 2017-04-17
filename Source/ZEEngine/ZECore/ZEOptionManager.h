@@ -44,8 +44,9 @@
 #include "ZEOptionSection.h"
 #include "ZECommand.h"
 #include "ZECommandSection.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEOptionManager
+class ZE_EXPORT_ZEENGINE ZEOptionManager
 {
 	friend class ZECore;
 	private:

@@ -38,8 +38,9 @@
 #include "ZEGRResource.h"
 
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM_TYPED(ZEGRBufferType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRBufferType, ZEUInt8)
 {
 	ZEGR_BT_NONE,
 	ZEGR_BT_VERTEX_BUFFER,
@@ -50,7 +51,7 @@ ZE_ENUM_TYPED(ZEGRBufferType, ZEUInt8)
 	ZEGR_BT_BUFFER
 };
 
-class ZEGRBuffer : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGRBuffer : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRBuffer)

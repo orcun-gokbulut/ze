@@ -40,10 +40,11 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEFrustum.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 
-class ZERNCommandProjectiveLight : public ZERNCommand
+class ZE_EXPORT_ZEENGINE ZERNCommandProjectiveLight : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
@@ -62,7 +63,7 @@ class ZERNCommandProjectiveLight : public ZERNCommand
 		float							ShadowNormalBias;
 };
 
-class ZELightProjective : public ZELight
+class ZE_EXPORT_ZEENGINE ZELightProjective : public ZELight
 {
 	ZE_OBJECT
 	private:

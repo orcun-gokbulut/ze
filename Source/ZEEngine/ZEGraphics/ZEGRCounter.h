@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEThread/ZELock.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZEGRDrawStatistics
 {
@@ -47,7 +48,7 @@ struct ZEGRDrawStatistics
 	ZESize		StateChanges;
 };
 
-class ZEGRCounter
+class ZE_EXPORT_ZEENGINE ZEGRCounter
 {
 	//ZE_DISALLOW_COPY(ZEGRCounter);
 

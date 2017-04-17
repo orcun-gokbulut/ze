@@ -38,6 +38,7 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEInterior);
 ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
@@ -50,7 +51,7 @@ enum ZEInteriorHelperOwnerType
 	ZE_IHOT_ROOM			= 1
 };
 
-class ZEInteriorHelper : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEInteriorHelper : public ZEObject
 {
 	ZE_OBJECT
 	private:

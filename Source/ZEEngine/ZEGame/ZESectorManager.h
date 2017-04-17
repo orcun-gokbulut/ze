@@ -42,7 +42,7 @@ class ZESectorSelector;
 class ZEGeographicEntity;
 class ZEScene;
 
-class ZESectorManager : public ZEObject
+class ZE_EXPORT_ZEENGINE ZESectorManager : public ZEObject
 {
 	ZE_OBJECT;
 

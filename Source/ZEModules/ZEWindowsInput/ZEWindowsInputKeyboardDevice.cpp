@@ -42,6 +42,7 @@
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
+#include "ZEInput/ZEInputDeviceIndexes.h"
 
 void ZEWindowsInputKeyboardDevice::UnAcquire()
 {

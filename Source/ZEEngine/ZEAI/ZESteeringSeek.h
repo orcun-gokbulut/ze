@@ -38,8 +38,9 @@
 #define __ZE_STEERING_SEEK_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringSeek : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringSeek : public ZESteering
 {	
 	public:
 		ZESteeringOutput			Seek(const ZEVector3& TargetPosition);

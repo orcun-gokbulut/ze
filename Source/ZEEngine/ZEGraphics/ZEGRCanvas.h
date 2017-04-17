@@ -41,6 +41,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRVertexLayout;
 class ZEFile;
@@ -59,7 +60,7 @@ class ZECanvasVertex
 		static ZEGRVertexLayout*		GetVertexLayout();
 };
 
-class ZEGRCanvas
+class ZE_EXPORT_ZEENGINE ZEGRCanvas
 {
 	private:
 		ZESmartArray<ZECanvasVertex>	Vertices;

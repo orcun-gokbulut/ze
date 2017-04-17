@@ -38,6 +38,7 @@
 #include "ZEUIControl.h"
 #include "ZEUIFrameControl.h"
 #include "ZEUIFont.h"
+#include "ZEExport.ZEEngine.h"
 
 #define	ZEUI_BFC_EL_MAINAREA		1
 #define	ZEUI_BFC_EL_LEFTUPCORNER	2
@@ -50,7 +51,7 @@
 #define	ZEUI_BFC_EL_RIGHTEDGE		256
 #define	ZEUI_BFC_EL_ALL				512
 
-struct ZEUIControlStyle
+struct ZE_EXPORT_ZEENGINE ZEUIControlStyle
 {
 	bool							BorderVisibility;
 	ZEInt32							BorderWidth;
@@ -138,7 +139,7 @@ struct ZEUIControlStyle
 	}
 };
 
-class ZEUIBorderedFrameControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUIBorderedFrameControl : public ZEUIControl
 {
 	ZE_OBJECT
 
@@ -167,6 +168,4 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 		void						SetBorderThickness(float Thickness);
 
 									ZEUIBorderedFrameControl();
-
-
 };

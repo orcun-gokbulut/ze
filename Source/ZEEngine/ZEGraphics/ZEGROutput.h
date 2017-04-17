@@ -42,7 +42,7 @@
 class ZEGRWindow;
 class ZEGRTexture;
 
-class ZEGROutput : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGROutput : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGROutput)

@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEExport.ZEEngine.h"
 
 #define ZERN_MAX_COMMAND_LINK 8
 
@@ -51,7 +52,7 @@ class ZEScene;
 
 typedef ZEDelegate<void (const ZERNRenderParameters*, const ZERNCommand*)> ZERNCommandCallback;
 
-class ZERNCommand : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNCommand : public ZEObject
 {
 	ZE_OBJECT
 	//ZE_DISALLOW_COPY(ZERNCommand);

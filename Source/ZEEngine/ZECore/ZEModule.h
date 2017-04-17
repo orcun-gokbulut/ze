@@ -40,13 +40,14 @@
 #include "ZEDestroyable.h"
 
 #include "ZEDS/ZELink.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZECore;
 class ZETimeParameters;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZECore;

@@ -39,8 +39,9 @@
 
 #include "ZESteering.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringFlee : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringFlee : public ZESteering
 {	
 	public:
 		ZESteeringOutput			Flee(const ZEVector3& TargetPosition);

@@ -38,8 +38,9 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEBase64
+class ZE_EXPORT_ZEFOUNDATION ZEBase64
 {
 	public:
 		static bool						IsBase64(ZEBYTE Character);

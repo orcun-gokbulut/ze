@@ -39,10 +39,11 @@
 #include "ZEInitializable.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNStage;
 
-class ZERNStageManager : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZERNStageManager : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	private:

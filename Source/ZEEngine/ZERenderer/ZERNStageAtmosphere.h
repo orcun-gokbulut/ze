@@ -38,11 +38,12 @@
 #include "ZERNStage.h"
 
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZEGRBuffer;
 
-class ZERNStageAtmosphere : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageAtmosphere : public ZERNStage
 {
 	ZE_OBJECT
 	private:

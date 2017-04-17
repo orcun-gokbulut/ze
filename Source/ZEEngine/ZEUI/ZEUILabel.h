@@ -41,6 +41,7 @@
 #include "ZEUIFont.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEUITextAlignment
 {
@@ -58,10 +59,9 @@ struct ZEUITextCharacter
 	bool				IsSelected;
 };
 
-class ZEUILabel : public ZEUIFrameControl
+class ZE_EXPORT_ZEENGINE ZEUILabel : public ZEUIFrameControl
 {
 	ZE_OBJECT
-
 	protected:
 		ZEString							Text;
 		ZEArray<ZEUITextCharacter>			Characters;

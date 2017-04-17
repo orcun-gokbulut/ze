@@ -43,6 +43,7 @@
 #include "ZERenderer/ZERNCommand.h"
 
 #include "ZEUIRectangle.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRBuffer;
 class ZEGRRenderStateData;
@@ -58,7 +59,7 @@ struct ZEUIVertex
 	ZEVector4			Color;
 };
 
-class ZEUIRendererBatch
+class ZE_EXPORT_ZEENGINE ZEUIRendererBatch
 {
 	public:
 		ZEUInt								Offset;
@@ -69,7 +70,7 @@ class ZEUIRendererBatch
 											ZEUIRendererBatch();
 };
 
-class ZEUIRenderer : public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZEUIRenderer : public ZEInitializable
 {
 	private:
 		ZERNCommand							Command;

@@ -47,7 +47,7 @@
 class ZEGRAdapter;
 class ZEGRMonitor;
 
-class ZEGRRefreshRate : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRRefreshRate : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -55,7 +55,7 @@ class ZEGRRefreshRate : public ZEObject
 		ZEUInt									Denominator;
 };
 
-class ZEGRMonitorMode : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRMonitorMode : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -76,7 +76,7 @@ class ZEGRMonitorMode : public ZEObject
 
 };
 
-class ZEGRMonitor : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRMonitor : public ZEObject
 {
 	ZE_OBJECT
 	protected:
@@ -97,7 +97,7 @@ class ZEGRMonitor : public ZEObject
 		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() const = 0;
 };
 
-class ZEGRAdapter : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRAdapter : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEGRGraphicsModule;

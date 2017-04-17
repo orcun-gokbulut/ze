@@ -40,6 +40,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZEGRShader;
@@ -47,7 +48,7 @@ class ZEGRRenderStateData;
 class ZEGRBuffer;
 class ZEGRSampler;
 
-class ZEATSkyBox : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATSkyBox : public ZEEntity
 {
 	ZE_OBJECT
 	private:

@@ -38,6 +38,7 @@
 #ifndef __ZE_COMPRESSOR_H__
 #define __ZE_COMPRESSOR_H__
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZECompressorState
 {
@@ -48,7 +49,7 @@ enum ZECompressorState
 	ZE_CS_DONE
 };
 
-class ZECompressor
+class ZE_EXPORT_ZEFOUNDATION ZECompressor
 {
 	protected:		
 		void*					Input;

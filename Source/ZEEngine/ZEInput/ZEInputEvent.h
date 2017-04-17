@@ -41,6 +41,7 @@
 #include "ZEInput.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEInputEvent;
 
@@ -53,7 +54,7 @@ class ZEInputAction : public ZEInputValue
 
 typedef ZEDelegate<void (const ZEInputAction&)> ZEInputCallback;
 
-class ZEInputEvent
+class ZE_EXPORT_ZEENGINE ZEInputEvent
 {
 	private:
 		bool						Processed;

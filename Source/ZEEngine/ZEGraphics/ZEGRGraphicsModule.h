@@ -55,7 +55,7 @@ class ZEGRRenderState;
 class ZEGRVertexLayout;
 class ZEGRShaderCompiler;
 
-class ZEGRGraphicsModule : public ZEModule
+class ZE_EXPORT_ZEENGINE ZEGRGraphicsModule : public ZEModule
 {
 	ZE_OBJECT
 	friend class ZEGRContext;

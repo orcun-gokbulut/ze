@@ -43,8 +43,9 @@
 #include "ZERNRenderer.h"
 #include "ZERNView.h"
 #include "ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM_TYPED(ZELightType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZELightType, ZEUInt8)
 {
 	ZE_LT_NONE				= 0,
 	ZE_LT_POINT				= 1,
@@ -54,7 +55,7 @@ ZE_ENUM_TYPED(ZELightType, ZEUInt8)
 	ZE_LT_SPOT				= 5
 };
 
-ZE_ENUM_TYPED(ZERNLightShadowResolution, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZERNLightShadowResolution, ZEUInt8)
 {
 		ZERN_LSR_LOW		= 0,
 		ZERN_LSR_MEDIUM		= 1,
@@ -62,7 +63,7 @@ ZE_ENUM_TYPED(ZERNLightShadowResolution, ZEUInt8)
 		ZERN_LSR_VERY_HIGH	= 3
 };
 
-ZE_ENUM_TYPED(ZERNLightShadowSampleCount, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZERNLightShadowSampleCount, ZEUInt8)
 {
 		ZERN_LSC_LOW		= 0,
 		ZERN_LSC_MEDIUM		= 1,
@@ -72,7 +73,7 @@ ZE_ENUM_TYPED(ZERNLightShadowSampleCount, ZEUInt8)
 
 class ZEGRTexture;
 
-class ZELight : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZELight : public ZEEntity
 {
 	ZE_OBJECT
 	private:

@@ -38,8 +38,9 @@
 #include "ZEMeta\ZEObject.h"
 #include "ZETypes.h"
 #include "ZEMath\ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEGRViewport : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRViewport : public ZEObject
 {
 	ZE_OBJECT
 	public:

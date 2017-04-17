@@ -60,9 +60,12 @@ ze_add_source(ZEMCParser.h								Sources)
 ze_add_source(ZEMCRegisterer.h							Sources)
 ze_add_source(ZEMCRegisterer.cpp						Sources)
 
+add_definitions(-D ZE_FOUNDATION_STATIC)
 ze_add_executable(TARGET ZEMetaCompiler 
 	CONSOLE 
-	SOURCES ${Sources}
-	LIBS ZEFoundationBase libClang)
+	SOURCES ${Sources} ${DependencySources}
+	LIBS ZEFoundationStatic libClang)
+
+source_group("Dependencies" FILES ${DependencySources})
 
 set_property(TARGET ZEMetaCompiler PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Tool")

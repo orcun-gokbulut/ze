@@ -52,14 +52,14 @@
 class ZERSResourceManager;
 class ZERSResourceGroup;
 
-class ZERSResourceIdentifier
+class ZE_EXPORT_ZEENGINE ZERSResourceIdentifier
 {
 	public:
 		virtual bool							Equals(const ZERSResourceIdentifier* Identifier) const = 0;
 		virtual ZEString						ToString() const;
 };
 
-class ZERSResource : public ZEReferenceCounted
+class ZE_EXPORT_ZEENGINE ZERSResource : public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERSResource)

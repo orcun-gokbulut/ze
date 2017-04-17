@@ -40,6 +40,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEOptionAttribute
 {
@@ -61,7 +62,7 @@ typedef ZEDelegate<void (ZEOption*, bool&)> ZEOptionsChangingEvent;
 typedef ZEDelegate<void (ZEOption*)> ZEOptionsChangedEvent;
 
 class ZEOptionSection;
-class ZEOption
+class ZE_EXPORT_ZEENGINE ZEOption
 {
 	friend ZEOptionSection;
 	protected:

@@ -40,11 +40,12 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 struct ZEUIVertex;
 class ZEGRTexture;
 
-class ZEUIRectangle
+class ZE_EXPORT_ZEENGINE ZEUIRectangle
 {
 	friend class ZEUIRenderer;
 	private:

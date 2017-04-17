@@ -38,8 +38,9 @@
 
 #include "ZETypes.h"
 #include "ZEGRDefinitions.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEGRBlend)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRBlend)
 {	
 	ZEGR_BO_ZERO				= 1,
 	ZEGR_BO_ONE					= 2,
@@ -60,7 +61,7 @@ ZE_ENUM(ZEGRBlend)
 	ZEGR_BO_INV_SRC1_ALPHA		= 19
 };
 
-ZE_ENUM(ZEGRBlendOperation)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRBlendOperation)
 {
 	ZEGR_BE_ADD					= 1,
 	ZEGR_BE_SUBTRACT			= 2,
@@ -69,7 +70,7 @@ ZE_ENUM(ZEGRBlendOperation)
 	ZEGR_BE_MAX					= 5 
 };
 
-class ZEGRBlendRenderTarget : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRBlendRenderTarget : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEGRBlendState;
@@ -118,7 +119,7 @@ class ZEGRBlendRenderTarget : public ZEObject
 };
 
 
-class ZEGRBlendState : public ZEGRState
+class ZE_EXPORT_ZEENGINE ZEGRBlendState : public ZEGRState
 {
 	ZE_OBJECT
 	private:

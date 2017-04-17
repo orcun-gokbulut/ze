@@ -38,6 +38,7 @@
 #include "ZEMLCommon.h"
 #include "ZEDS\ZEFlags.h"
 #include "ZEDS\ZEValue.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEFile;
 class ZEMLFormat;
@@ -54,7 +55,7 @@ enum ZEMLFormatType
 	ZEML_FT_XML_SIMPLIFIED
 };
 
-class ZEMLFormatElement
+class ZE_EXPORT_ZEFOUNDATION ZEMLFormatElement
 {
 	public:
 		ZEMLElementType					ElementType;
@@ -69,7 +70,7 @@ class ZEMLFormatElement
 										ZEMLFormatElement();
 };
 
-class ZEMLFormatDescription
+class ZE_EXPORT_ZEFOUNDATION ZEMLFormatDescription
 {
 	public:
 		virtual const char*				GetName() const = 0;
@@ -81,7 +82,7 @@ class ZEMLFormatDescription
 		virtual ZEMLFormat*				CreateInstance() = 0;
 };
 
-class ZEMLFormat
+class ZE_EXPORT_ZEFOUNDATION ZEMLFormat
 {
 	public:
 		virtual ZEMLFormatDescription*	GetDescription() const = 0;

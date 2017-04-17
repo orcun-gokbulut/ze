@@ -45,6 +45,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNMaterial;
 class ZEMLReaderNode;
@@ -140,7 +141,7 @@ struct ZEInteriorResourceHelper
 
 class ZEFile;
 
-class ZEInteriorResource : public ZEResource
+class ZE_EXPORT_ZEENGINE ZEInteriorResource : public ZEResource
 {
 	private:
 		ZEArray<ZEHolder<ZEGRTexture>>					TextureResources;

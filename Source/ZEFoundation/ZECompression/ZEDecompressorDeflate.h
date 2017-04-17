@@ -39,8 +39,9 @@
 #define __ZE_DECOMPRESSOR_DEFLATE_H__
 
 #include "ZEDecompressor.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEDecompressorDeflate : public ZEDecompressor
+class ZE_EXPORT_ZEFOUNDATION ZEDecompressorDeflate : public ZEDecompressor
 {
 	public:
 		virtual void				Decompress();

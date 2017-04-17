@@ -40,15 +40,14 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGRTexture.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEFile;
 class ZETextureData;
 struct ZETextureDataInfo;
 
-class ZETextureLoader
+class ZE_EXPORT_ZEENGINE ZETextureLoader
 {
-	protected:
-
 	private:
 							ZETextureLoader();
 		virtual				~ZETextureLoader();

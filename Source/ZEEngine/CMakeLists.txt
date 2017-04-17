@@ -41,6 +41,8 @@ ze_set_project_folder("ZEEngine")
 
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS ZE_ZINEK_ENGINE)
 
+ze_begin_components(TARGET ZEEngine)
+
 add_subdirectory(ZEAI)
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
@@ -59,17 +61,22 @@ add_subdirectory(ZEUI)
 #add_subdirectory(ZETerrain)
 add_subdirectory(ZEResource)
 
-ze_add_source(ZEDummy.cpp				Sources)
+ze_add_source(ZEEngine.cpp					Sources)
+ze_add_source(ZEExport.ZEEngine.cpp			Sources Headers)
+ze_add_source(ZEExport.ZEEngine.h			Sources Headers)
 
-ze_add_library(TARGET ZEEngine 
+ze_add_library(TARGET ZEEngine DLL
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere ZEResource ZEUI)
+	LIBS ZEFoundation ZEFoundationBase)
 
 ze_add_executable(TARGET ZE 
-	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
+	SOURCES ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine
 	INSTALL)
+
+
+ze_end_components(TARGET ZEEngine)
 
 ze_meta_register(LIBS ZECore ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETerrain ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere ZEResource ZEUI)
 

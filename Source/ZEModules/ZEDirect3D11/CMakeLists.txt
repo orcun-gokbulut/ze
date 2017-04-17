@@ -35,17 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_D3D10_DEBUG_SHADERS ZE_DEBUG_D3D10_ENABLE_PERFHUD)
+set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "$<$<CONFIG:Debug>:ZE_DEBUG_D3D10_DEBUG_SHADERS ZE_DEBUG_D3D10_ENABLE_PERFHUD>")
 
 set(ZEBUILD_D3D10_ENABLE_PERFHUD FALSE CACHE BOOL "AT RELEASE CONFIGURATION; Enable PerfHud device in release mode.")
 if(ZEBUILD_D3D10_ENABLE_PERFHUD)
-	set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D10_ENABLE_PERFHUD)
+	set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "$<$<CONFIG:Release>:ZE_DEBUG_D3D10_ENABLE_PERFHUD>")
 endif()
 
 set(ZEBUILD_D3D10_DEBUG_SHADERS_RELEASE TRUE CACHE BOOL "AT RELEASE CONFIGURATION; Compile shaders with debug mode.")
 if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
-	set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D10_DEBUG_SHADERS)
+	set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS "$<$<CONFIG:Release>:ZE_DEBUG_D3D10_DEBUG_SHADERS>")
 endif()
+
+ze_add_source(ZEExport.ZEDirect3D11.cpp					Sources)
+ze_add_source(ZEExport.ZEDirect3D11.h					Sources Headers)
 
 ze_add_source(ZED11Module.cpp							Sources)
 ze_add_source(ZED11Module.h								Sources ZEMC)
@@ -91,7 +94,7 @@ ze_add_source(ZED11Buffer.h								Sources)
 ze_add_source(ZED11Texture.cpp							Sources)
 ze_add_source(ZED11Texture.h							Sources)
 
-ze_add_library(TARGET ZEDirect3D11
+ze_add_plugin(TARGET ZEDirect3D11
 	SOURCES ${Sources}
 	ZEMC ${ZEMC}
-	LIBS d3d11 dxguid dxgi d3dcompiler)
+	LIBS ZEEngine d3d11 dxguid dxgi d3dcompiler)

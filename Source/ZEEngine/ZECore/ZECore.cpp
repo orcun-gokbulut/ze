@@ -49,15 +49,19 @@
 #include "ZECrashHandler.h"
 #include "ZESplashWindow.h"
 #include "ZEResourceManager.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEPlugin.h"
 
 #define ZE_CORE_MODULE_INCLUDES
 #include "ZECoreModules.h"
-#include "ZEML/ZEMLReader.h"
-#include "ZEML/ZEMLWriter.h"
+#include "ZEFile/ZEDirectoryInfo.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEDS/ZEFormat.h"
 #undef ZE_CORE_MODULE_INCLUDES
 
 ZEOptionSection ZECore::CoreOptions; 
-HINSTANCE ApplicationInstance;
+static HINSTANCE ApplicationInstance;
 
 static ZEInt StartedCoreInstanceCount = 0;
 
@@ -68,6 +72,27 @@ void ZECore_AtExit()
 
 	ZECore::GetInstance()->Terminate();
 }
+
+
+class ZECoreSystemMessageHandler : public ZESystemMessageHandler
+{
+	public:
+		bool Callback(MSG* Message);
+};
+
+bool ZECoreSystemMessageHandler::Callback(MSG* Message)
+{
+	switch (Message->message)
+	{
+		case WM_QUIT:
+			ZECore::GetInstance()->ShutDown();
+			return true;
+
+		default:
+			return false;
+	}
+}
+
 
 void ZECore::SetState(ZECoreState CoreState)
 {
@@ -114,89 +139,26 @@ void ZECore::SetState(ZECoreState CoreState)
 	zeLog("Core state changed to \"%s\".", CoreStateText);
 }
 
-class ZECoreSystemMessageHandler : public ZESystemMessageHandler
+void ZECore::RegisterClasses()
 {
-	public:
-		bool Callback(MSG* Message);
-};
+	#undef RegisterClass
 
-bool ZECoreSystemMessageHandler::Callback(MSG* Message)
-{
-	switch (Message->message)
-	{
-		case WM_QUIT:
-			ZECore::GetInstance()->ShutDown();
-			return true;
-
-		default:
-			return false;
-	}
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#include "ZEEngine.ZEMetaRegister.h"
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 }
 
-ZEErrorManager* ZECore::GetError()
+void ZECore::UnregisterClasses()
 {
-	return ErrorManager;
-}
+	#undef UnregisterClass
 
-ZEOptionManager* ZECore::GetOptions()
-{
-	return OptionManager;
-}
-
-ZEResourceManager* ZECore::GetResourceManager()
-{
-	return ResourceManager;
-}
-
-ZECommandManager* ZECore::GetCommands()
-{
-	return CommandManager;
-}
-
-ZEConsole* ZECore::GetConsole()
-{
-	return Console;
-}
-
-ZESystemMessageManager* ZECore::GetSystemMessageManager()
-{
-	return SystemMessageManager;
-}
-
-ZEProfiler* ZECore::GetProfiler()
-{
-	return Profiler;
-}
-
-ZECrashHandler* ZECore::GetCrashHandler()
-{
-	return CrashHandler;
-}
-
-void* ZECore::GetApplicationInstance()
-{
-	return ApplicationInstance;
-}
-
-ZECoreState ZECore::GetState()
-{
-	return State;
-}
-
-bool ZECore::IsStarted()
-{
-	return (State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
-}
-
-bool ZECore::IsStartedOrStartingUp()
-{
-	return (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
-}
-
-void ZECore::Terminate()
-{
-	SetState(ZE_CS_TERMINATING);
-	abort();
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
+	#include "ZEEngine.ZEMetaRegister.h"
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
 }
 
 bool ZECore::InitializeModule(ZEModule* Module)
@@ -264,28 +226,211 @@ void ZECore::DeinitializeModules()
 	}
 }
 
-void ZECore::RegisterClasses()
+ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 {
-	#undef RegisterClass
+	ZEFileInfo FileInfo(Path);
 
-	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
-	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
-	#include "../ZEMetaRegister.h"
-	#include "../../ZEModules/ZEMetaRegister.h"
-	#undef ZEMT_REGISTER_ENUM
-	#undef ZEMT_REGISTER_CLASS
+	zeLog("Loading plugin. Plugin Path: \"%s\".", FileInfo.Normalize());
+
+	SetDllDirectory(FileInfo.GetParentDirectory());
+	SetDllDirectory(ZEFormat::Format("{0}\\Dependencies", FileInfo.GetParentDirectory()));
+	HMODULE Module = LoadLibrary(FileInfo.GetRealPath().Path);
+	SetDllDirectory(NULL);
+
+	if (Module == NULL)
+	{
+		zeError("Cannot load plugin. Plugin file is not a plugin. Plugin Path: \"%s\".", FileInfo.Normalize());
+		return NULL;
+	}
+
+	zeCreatePluginInstance CreatePluginInstance = reinterpret_cast<zeCreatePluginInstance>(GetProcAddress(Module, "zeCreatePluginInstance()"));
+	if (CreatePluginInstance == NULL)
+	{
+		zeError("Cannot load plugin. Plugin does not have zeCreatePluginInstance() procedure. Plugin Path: \"%s\".", FileInfo.Normalize());
+		return NULL;
+	}
+
+	ZEPlugin* Plugin = CreatePluginInstance();
+	if (Plugin == NULL)
+	{
+		zeError("Cannot load plugin. zeCreatePluginInstance() returned NULL. Plugin Path: \"%s\".", FileInfo.Normalize());
+		return NULL;
+	}
+
+	ZEVersion EngineVersion = ZEVersion::GetZinekVersion();
+	ZEVersion PluginEngineVersion = Plugin->GetEngineVersion();
+	if (PluginEngineVersion.Major != EngineVersion.Major ||
+		PluginEngineVersion.Minor != EngineVersion.Minor)
+	{
+		zeError("Cannot load plugin. Plugin's engine version does not match with this engine version. "
+			"Plugin Path: \"%s\", "
+			"Plugin's Engine Version: %d.%d.", FileInfo.Normalize(), PluginEngineVersion.Major, PluginEngineVersion.Minor);
+
+		Plugin->Destroy();
+		return NULL;
+	}
+
+	Plugins.AddEnd(&Plugin->CoreLink);
+
+	#undef RegisterClass
+	ZESize DeclarationCount = Plugin->GetDeclarationCount();
+	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
+	for (ZESize I = 0; I < DeclarationCount; I++)
+		ZEMTProvider::GetInstance()->RegisterDeclaration(Declarations[I]);
+
+	zeLog("Plugin loaded. Plugin Name: \"%s\". Plugin Version: \"%s\".", Plugin->GetName(), Plugin->GetVersion().GetShortString().ToCString());
+
+	return Plugin;
 }
 
-void ZECore::UnregisterClasses()
+void ZECore::UnloadPlugin(ZEPlugin* Plugin)
 {
-	#undef UnregisterClass
+	ZESize DeclarationCount = Plugin->GetDeclarationCount();
+	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
+	for (ZESize I = 0; I < DeclarationCount; I++)
+		ZEMTProvider::GetInstance()->UnregisterDeclaration(Declarations[I]);
 
-	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
-	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
-	#include "../ZEMetaRegister.h"
-	#include "../../ZEModules/ZEMetaRegister.h"
-	#undef ZEMT_REGISTER_ENUM
-	#undef ZEMT_REGISTER_CLASS
+	Plugins.Remove(&Plugin->CoreLink);
+
+	FreeLibrary((HMODULE)Plugin->GetData());
+	Plugin->Destroy();
+}
+
+void ZECore::LoadPlugins()
+{
+	ZEDirectoryInfo Info("#E:/Plugins");
+	ZEArray<ZEString> FileNames = Info.GetFiles();
+	for (ZESize I = 0; I < FileNames.GetCount(); I++)
+	{
+		ZEFileInfo FileInfo(FileNames[I]);
+
+		if (!FileInfo.GetExtension().EqualsIncase(".ZEPlugin"))
+			continue;
+
+		LoadPlugin(FileInfo.GetPath());
+	}
+}
+
+void ZECore::UnloadPlugins()
+{
+
+}
+
+ZECore::ZECore() 
+{
+	atexit(ZECore_AtExit);
+
+	CrashHandler			= new ZECrashHandler();
+	Profiler				= new ZEProfiler();
+	SystemMessageManager	= new ZESystemMessageManager();
+	SystemMessageHandler	= new ZECoreSystemMessageHandler();
+	Console					= new ZEConsole();
+	CommandManager			= new ZECommandManager();
+	OptionManager			= new ZEOptionManager();
+	ErrorManager			= new ZEErrorManager();
+	ResourceManager			= new ZEResourceManager();
+
+	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
+
+	#define ZE_CORE_MODULE(Type, Variable) Variable = NULL;
+	#include "ZECoreModules.h"
+	#undef ZE_CORE_MODULE
+
+	/*ZESoundModule::BaseInitialize();
+	ZEInputModule::BaseInitialize();*/
+	
+	static ZEOptionSection CoreOptions;
+	CoreOptions.SetName("ZECore");
+	CoreOptions.AddOption(new ZEOption("ZEGRGraphicsModule", "ZED11Module", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEPhysicsModule", "ZEPhysXModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEGameModule", "ZETestGame", ZE_OA_NORMAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&CoreOptions);
+}
+
+ZECore::~ZECore()
+{
+	/*ZESoundModule::BaseDeinitialize();
+	ZEInputModule::BaseDeinitialize();*/
+
+	delete ResourceManager;
+	delete ErrorManager;
+	delete OptionManager;
+	delete CommandManager;
+	delete Console;
+	delete Profiler;
+	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
+	delete SystemMessageHandler;
+	delete SystemMessageManager;
+	delete CrashHandler;
+}
+
+ZEErrorManager* ZECore::GetError()
+{
+	return ErrorManager;
+}
+
+ZEOptionManager* ZECore::GetOptions()
+{
+	return OptionManager;
+}
+
+ZEResourceManager* ZECore::GetResourceManager()
+{
+	return ResourceManager;
+}
+
+ZECommandManager* ZECore::GetCommands()
+{
+	return CommandManager;
+}
+
+ZEConsole* ZECore::GetConsole()
+{
+	return Console;
+}
+
+ZESystemMessageManager* ZECore::GetSystemMessageManager()
+{
+	return SystemMessageManager;
+}
+
+ZEProfiler* ZECore::GetProfiler()
+{
+	return Profiler;
+}
+
+ZECrashHandler* ZECore::GetCrashHandler()
+{
+	return CrashHandler;
+}
+
+void* ZECore::GetApplicationInstance()
+{
+	return ApplicationInstance;
+}
+
+ZECoreState ZECore::GetState()
+{
+	return State;
+}
+
+bool ZECore::IsStarted()
+{
+	return (State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
+}
+
+bool ZECore::IsStartedOrStartingUp()
+{
+	return (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
+}
+
+void ZECore::Terminate()
+{
+	SetState(ZE_CS_TERMINATING);
+	abort();
 }
 
 ZEModule* ZECore::GetModule(ZEClass* Class) const
@@ -364,6 +509,8 @@ bool ZECore::RemoveModule(ZEModule* Module)
 
 bool ZECore::StartUp()
 {
+	ApplicationInstance = GetModuleHandle(NULL);
+
 	SetState(ZE_CS_STARTING_UP);
 
 	ZESplashWindow* SplashWindow = ZESplashWindow::CreateInstance();
@@ -508,6 +655,8 @@ bool ZECore::LoadConfiguration()
 
 		AddModule(static_cast<ZEModule*>(ModuleClass->CreateInstance()));
 	}
+
+	return true;
 }
 
 bool ZECore::SaveConfiguration()
@@ -559,57 +708,6 @@ ZECore* ZECore::GetInstance()
 {	
 	static ZECore Engine;
 	return &Engine;
-}
-
-ZECore::ZECore() 
-{
-	atexit(ZECore_AtExit);
-
-	CrashHandler			= new ZECrashHandler();
-	Profiler				= new ZEProfiler();
-	SystemMessageManager	= new ZESystemMessageManager();
-	SystemMessageHandler	= new ZECoreSystemMessageHandler();
-	Console					= new ZEConsole();
-	CommandManager			= new ZECommandManager();
-	OptionManager			= new ZEOptionManager();
-	ErrorManager			= new ZEErrorManager();
-	ResourceManager			= new ZEResourceManager();
-
-	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
-
-	#define ZE_CORE_MODULE(Type, Variable) Variable = NULL;
-	#include "ZECoreModules.h"
-	#undef ZE_CORE_MODULE
-
-	/*ZESoundModule::BaseInitialize();
-	ZEInputModule::BaseInitialize();*/
-	
-	static ZEOptionSection CoreOptions;
-	CoreOptions.SetName("ZECore");
-	CoreOptions.AddOption(new ZEOption("ZEGRGraphicsModule", "ZED11Module", ZE_OA_NORMAL));
-	CoreOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
-	CoreOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
-	CoreOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));
-	CoreOptions.AddOption(new ZEOption("ZEPhysicsModule", "ZEPhysXModule", ZE_OA_NORMAL));
-	CoreOptions.AddOption(new ZEOption("ZEGameModule", "ZETestGame", ZE_OA_NORMAL));
-	ZEOptionManager::GetInstance()->RegisterSection(&CoreOptions);
-}
-
-ZECore::~ZECore()
-{
-	/*ZESoundModule::BaseDeinitialize();
-	ZEInputModule::BaseDeinitialize();*/
-
-	delete ResourceManager;
-	delete ErrorManager;
-	delete OptionManager;
-	delete CommandManager;
-	delete Console;
-	delete Profiler;
-	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
-	delete SystemMessageHandler;
-	delete SystemMessageManager;
-	delete CrashHandler;
 }
 
 #define ZE_CORE_MODULE(Type, Variable) Type* ZECore::Get##Variable() const {return Variable;}

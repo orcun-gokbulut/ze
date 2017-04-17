@@ -40,7 +40,12 @@ ze_add_source(ZESerialPort.cpp				Sources)
 ze_add_source(ZESerialPort_Windows.cpp		Sources PLATFORMS Windows)
 ze_add_source(ZESerialPort_Unix.cpp			Sources PLATFORMS Unix)
 
-ze_add_library(TARGET ZESerialPort 
+ze_add_component(COMPONENT ZESerialPort 
+	TARGET ZEFoundation
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS)
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZESerialPort 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers})

@@ -38,8 +38,9 @@
 #define __ZE_STEERING_WANDER_H__
 
 #include "ZESteeringFaceVelocity.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringWander : public ZESteeringFaceVelocity
+class ZE_EXPORT_ZEENGINE ZESteeringWander : public ZESteeringFaceVelocity
 {
 	public:
 		float WanderRate;	

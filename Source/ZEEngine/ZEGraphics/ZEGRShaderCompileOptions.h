@@ -42,7 +42,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEGRDefinitions.h"
 
-class ZEGRShaderDefinition : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderDefinition : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -53,7 +53,7 @@ class ZEGRShaderDefinition : public ZEObject
 										ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
 };
 
-class ZEGRShaderCompileOptions : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderCompileOptions : public ZEObject
 {
 	ZE_OBJECT
 	public:

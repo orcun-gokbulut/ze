@@ -37,7 +37,7 @@
 
 #include "ZEResource/ZERSResource.h"
 
-ZE_ENUM(ZESoundFileFormat)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZESoundFileFormat)
 {
 	ZE_SFF_NONE,
 	ZE_SFF_WAVE,
@@ -45,7 +45,7 @@ ZE_ENUM(ZESoundFileFormat)
 	ZE_SFF_MP3
 };
 
-class ZESoundResource : public ZERSResource
+class ZE_EXPORT_ZEENGINE ZESoundResource : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZESoundResource)

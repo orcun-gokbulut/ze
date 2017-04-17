@@ -43,9 +43,10 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPhysicalMaterial.h"
+#include "ZEExport.ZEEngine.h"
 
 
-ZE_ENUM(ZEPhysicalShapeType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalShapeType)
 {
 	ZE_PST_BOX			= 0,
 	ZE_PST_SPHERE		= 1,
@@ -56,7 +57,7 @@ ZE_ENUM(ZEPhysicalShapeType)
 
 class ZEPhysicalObject;
 
-class ZEPhysicalShape : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEPhysicalShape : public ZEObject
 {
 	ZE_OBJECT
 	private:
@@ -85,7 +86,7 @@ class ZEPhysicalShape : public ZEObject
 		virtual							~ZEPhysicalShape();
 };
 
-class ZEPhysicalBoxShape : public  ZEPhysicalShape
+class ZE_EXPORT_ZEENGINE ZEPhysicalBoxShape : public  ZEPhysicalShape
 {
 	ZE_OBJECT
 	private:
@@ -108,7 +109,7 @@ class ZEPhysicalBoxShape : public  ZEPhysicalShape
 										ZEPhysicalBoxShape();
 };
 
-class  ZEPhysicalSphereShape : public  ZEPhysicalShape
+class ZE_EXPORT_ZEENGINE ZEPhysicalSphereShape : public  ZEPhysicalShape
 {
 	ZE_OBJECT
 	private:
@@ -123,7 +124,7 @@ class  ZEPhysicalSphereShape : public  ZEPhysicalShape
 										ZEPhysicalSphereShape();
 };
 
-class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
+class ZE_EXPORT_ZEENGINE ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 {
 	ZE_OBJECT
 	private:
@@ -142,7 +143,7 @@ class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 										ZEPhysicalCapsuleShape();
 };
 
-class ZEPhysicalCylinderShape : public  ZEPhysicalShape
+class ZE_EXPORT_ZEENGINE ZEPhysicalCylinderShape : public  ZEPhysicalShape
 {
 	ZE_OBJECT
 	private:
@@ -161,7 +162,7 @@ class ZEPhysicalCylinderShape : public  ZEPhysicalShape
 										ZEPhysicalCylinderShape();
 };
 
-class  ZEPhysicalConvexShape : public  ZEPhysicalShape
+class ZE_EXPORT_ZEENGINE ZEPhysicalConvexShape : public  ZEPhysicalShape
 {
 	ZE_OBJECT
 	private:

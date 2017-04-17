@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
 struct ZEMTAttribute;
 class ZEGUID;
@@ -49,7 +50,7 @@ enum ZEMTDeclarationType
 	ZEMT_DT_METHOD
 };
 
-class ZEMTDeclaration
+class ZE_EXPORT_ZEFOUNDATION ZEMTDeclaration
 {
 	public:
 		virtual ZEMTDeclarationType			GetDeclarationType() const = 0;
@@ -59,7 +60,7 @@ class ZEMTDeclaration
 		virtual const ZEMTAttribute*		GetAttributes() const = 0;
 		virtual ZESize						GetAttributeCount() const = 0;
 
-		const ZEMTAttribute*					GetAttribute(const char* Name) const;
+		const ZEMTAttribute*				GetAttribute(const char* Name) const;
 		const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;
 
 		bool								CheckAttribute(const char* Name) const;

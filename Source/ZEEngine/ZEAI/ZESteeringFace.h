@@ -38,8 +38,9 @@
 #define __ZE_STEERING_FACE_H__
 
 #include "ZESteeringAlign.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringFace : public ZESteeringAlign
+class ZE_EXPORT_ZEENGINE ZESteeringFace : public ZESteeringAlign
 {
 	public:
 		ZESteeringOutput			Face(const ZEVector3& TargetDirection, const ZEVector3& Up = ZEVector3::UnitY);

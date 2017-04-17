@@ -53,6 +53,12 @@ ze_add_source(ZELCKeysData.cpp						Sources)
 ze_add_source(ZELCUtils.cpp							Sources)
 ze_add_source(ZELCUtils.h							Sources)
 
-ze_add_library(TARGET ZEProtect
+ze_add_component(COMPONENT ZEProtect
+	TARGET ZEFoundation
+	SOURCES ${Sources} 
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZEProtect
+	TARGET ZEFoundationStatic
 	SOURCES ${Sources} 
 	HEADERS ${Headers})

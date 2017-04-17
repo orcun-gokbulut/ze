@@ -44,8 +44,9 @@
 #include "ZETextureOptions.h"
 
 #include <stdio.h>
+#include "ZEExport.ZEEngine.h"
 
-class ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
+class ZE_EXPORT_ZEENGINE ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
 {
 	public:
 		ZEString				ItemName;

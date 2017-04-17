@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLL.h
+ Zinek Engine - ZEExport.ZEOpenAL.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DLL_H__
-#define __ZE_DLL_H__
+#include "ZEExport.ZEOpenAL.h"
 
-#include "ZEPlatform.h"
-
-#ifdef ZE_PLATFORM_COMPILER_MSVC
-	#ifdef ZE_PLUGIN
-		#define ZE_ENGINE_EXPORT __declspec(dllimport)
-		#define ZE_PLUGIN_EXPORT __declspec(dllexport)
-	#else
-		#define ZE_ENGINE_EXPORT __declspec(dllexport)
-		#define ZE_PLUGIN_EXPORT __declspec(dllimport)
-	#endif
-#else
-	#define ZE_ENGINE_EXPORT
-	#define ZE_PLUGIN_EXPORT
-#endif
-
-#endif
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

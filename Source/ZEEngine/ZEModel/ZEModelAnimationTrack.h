@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEModel);
 
@@ -50,7 +51,7 @@ enum ZEModelAnimationBlendMode
 	ZE_MABM_OVERWRITE	= 3,
 };
 
-class ZEModelAnimationTrack : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModelAnimationTrack : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;

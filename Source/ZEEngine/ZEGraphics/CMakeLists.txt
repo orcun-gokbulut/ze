@@ -112,8 +112,9 @@ ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 ze_add_source(ZEGRCanvas.cpp 				Sources)
 ze_add_source(ZEGRCanvas.h 					Sources Headers)
 
-ze_add_library(TARGET ZEGraphics 
+ze_add_component(COMPONENT ZEGraphics
+	TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libFreeImage libDirectXTex)
+	LIBS libFreeImage libDirectXTex)

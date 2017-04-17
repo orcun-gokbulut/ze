@@ -45,8 +45,9 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEOptionSection
+class ZE_EXPORT_ZEENGINE ZEOptionSection
 {
 	friend class ZEOption;
 	private:

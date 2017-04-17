@@ -42,6 +42,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNInstanceTag.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEModel;
 class ZEModelMesh;
@@ -52,7 +53,7 @@ class ZEGRBuffer;
 
 ZEMT_FORWARD_DECLARE(ZERNMaterial);
 
-class ZERNCommandDraw : public ZERNCommand
+class ZE_EXPORT_ZEENGINE ZERNCommandDraw : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
@@ -70,7 +71,7 @@ class ZERNCommandDraw : public ZERNCommand
 		bool					DirtyTransform;
 };
 
-class ZEMDInstanceTag : public ZERNInstanceTag
+class ZE_EXPORT_ZEENGINE ZEMDInstanceTag : public ZERNInstanceTag
 {
 	ZE_OBJECT
 	friend class ZEModelDraw;
@@ -84,7 +85,7 @@ class ZEMDInstanceTag : public ZERNInstanceTag
 		virtual bool								Check(const ZERNInstanceTag* Other) const;
 };
 
-class ZEModelDraw : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEModelDraw : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEModelMesh;

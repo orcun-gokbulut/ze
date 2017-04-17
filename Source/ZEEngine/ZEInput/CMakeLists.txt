@@ -56,8 +56,8 @@ ze_add_source(ZEInputDeviceIndexes.h					Sources Headers)
 ze_add_source(ZEInputModule.cpp							Sources)
 ze_add_source(ZEInputModule.h							Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEInput 
+ze_add_component(COMPONENT ZEInput
+	TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC}
-	LIBS ZEFoundation)
+	ZEMC ${ZEMC})

@@ -47,11 +47,12 @@
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEObject;
 
 typedef ZEFlags ZEVolumeCastReportComponents;
-ZE_ENUM(ZEVolumeCastReportComponent)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEVolumeCastReportComponent)
 {
 	ZE_VCRE_ALL					= 0xFFFFFFFF,
 	ZE_VCRE_NONE				= 0x0,
@@ -61,7 +62,7 @@ ZE_ENUM(ZEVolumeCastReportComponent)
 	ZE_VCRE_POLYGONS			= 0x8
 };
 
-ZE_ENUM(ZEVolumeCastCollisionType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEVolumeCastCollisionType)
 {
 	ZE_VCCT_NONE				= 0,
 	ZE_VCCT_BOUNDING_BOX		= 1,
@@ -70,7 +71,7 @@ ZE_ENUM(ZEVolumeCastCollisionType)
 	ZE_VCCT_POLGON				= 3,
 };
 
-enum ZEVolumeCastMatch
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEVolumeCastMatch)
 {
 	ZE_VCM_NONE					= 0,
 	ZE_VCM_FIRST				= 1,
@@ -83,7 +84,7 @@ class ZEVolumeCastCollision;
 typedef ZEDelegate<bool (ZEObject*, void*)> ZEVolumeCastFilterFunction;
 typedef ZEDelegate<bool (ZEVolumeCastCollision&, const void*)> ZEVolumeCastModifierFunction;
 
-class ZEVolumeCastParameters : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEVolumeCastParameters : public ZEObject
 {
 	public:
 		ZERay									Ray;
@@ -110,7 +111,7 @@ class ZEVolumeCastParameters : public ZEObject
 												ZEVolumeCastParameters();
 };
 
-class ZEVolumeCastCollision : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEVolumeCastCollision : public ZEObject
 {
 	public:
 		ZEVolumeCastCollisionType				Type;
@@ -127,7 +128,7 @@ class ZEVolumeCastCollision : public ZEObject
 												ZEVolumeCastCollision();
 };
 
-class ZEVolumeCastReport : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEVolumeCastReport : public ZEObject
 {
 	private:
 		const ZEVolumeCastParameters*			Parameters;
@@ -165,7 +166,7 @@ class ZEVolumeCastReport : public ZEObject
 };
 
 
-class ZEVolumeCastHelper : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEVolumeCastHelper : public ZEObject
 {
 	private:
 		mutable bool							Dirty;

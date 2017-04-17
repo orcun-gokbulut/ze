@@ -38,8 +38,9 @@
 #define __ZE_DIRECTORY_INFO_H__
 
 #include "ZEPathInfo.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEDirectoryInfo : public ZEPathInfo
+class ZE_EXPORT_ZEFOUNDATION ZEDirectoryInfo : public ZEPathInfo
 {
 	public:
 		ZEArray<ZEString>		GetSubDirectories() const;

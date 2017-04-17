@@ -39,8 +39,9 @@
 #include "ZEMeta\ZEObject.h"
 
 #include "ZETypes.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM_TYPED(ZEGRComparisonFunction, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRComparisonFunction, ZEUInt8)
 { 
 	ZEGR_CF_NEVER			= 0,
 	ZEGR_CF_LESS			= 1,
@@ -52,7 +53,7 @@ ZE_ENUM_TYPED(ZEGRComparisonFunction, ZEUInt8)
 	ZEGR_CF_ALWAYS			= 7 
 };
 
-ZE_ENUM_TYPED(ZEGRStateType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRStateType, ZEUInt8)
 {
 	ZEGR_ST_VERTEX_LAYOUT	= 0,
 	ZEGR_ST_RASTERIZER		= 1,
@@ -60,7 +61,7 @@ ZE_ENUM_TYPED(ZEGRStateType, ZEUInt8)
 	ZEGR_ST_BLEND			= 3
 };
 
-class ZEGRState : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRState : public ZEObject
 {
 	ZE_OBJECT
 	private:

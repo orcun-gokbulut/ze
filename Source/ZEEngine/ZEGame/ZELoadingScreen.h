@@ -38,13 +38,14 @@
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZEUI/ZEUILabel.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNMaterial;
 class ZEGRBuffer;
 class ZEUIFontTrueType;
 class ZEUIManager;
 
-class ZELoadingScreen : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 {
 	ZE_OBJECT
 	private:

@@ -39,11 +39,12 @@
 
 #include "ZEEntity.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZESeaMaterial;
 class ZEGRTexture2D;
 
-class ZESea : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZESea : public ZEEntity
 {
 	ZE_OBJECT
 	private:

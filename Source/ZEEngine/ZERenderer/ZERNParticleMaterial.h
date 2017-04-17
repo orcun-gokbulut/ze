@@ -45,13 +45,14 @@
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZERNStandardMaterial.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRBuffer;
 class ZEGRShader;
 class ZEGRSampler;
 class ZEGRRenderStateData;
 
-class ZERNParticleMaterial : public ZERNMaterial
+class ZE_EXPORT_ZEENGINE ZERNParticleMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNParticleMaterial)

@@ -39,6 +39,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZETexture/ZEPixel.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEMDAnimationKeyType
 {
@@ -56,7 +57,7 @@ enum ZEMDAnimationKeyChannel
 #pragma pack(push)
 #pragma pack(1)
 
-class ZEMDAnimationKey
+class ZE_EXPORT_ZEENGINE ZEMDAnimationKey
 {
 	private:
 		struct 
@@ -87,7 +88,7 @@ class ZEMDAnimationKey
 
 };
 
-class ZEMDAnimationKeyRaw : public ZEMDAnimationKey
+class ZE_EXPORT_ZEENGINE ZEMDAnimationKeyRaw : public ZEMDAnimationKey
 {
 	private:
 		float							Data[4];
@@ -105,7 +106,7 @@ class ZEMDAnimationKeyRaw : public ZEMDAnimationKey
 										ZEMDAnimationKeyRaw();
 };
 
-class ZEMDAnimationKeyQuantized : public ZEMDAnimationKey
+class ZE_EXPORT_ZEENGINE ZEMDAnimationKeyQuantized : public ZEMDAnimationKey
 {
 	private:
 		ZEUInt16						Data[3];

@@ -40,15 +40,15 @@
 
 #include "ZEMDVertex.h"
 #include "ZEMDResourceDraw.h"
-
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceLOD)

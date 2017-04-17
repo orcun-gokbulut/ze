@@ -35,10 +35,10 @@
 
 #pragma once
 #include "ZETypes.h"
-
 #include "ZETimeCounter.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZE_TEST_ITEM_INTERNAL(Name, Identifier) \
 	class Identifier : public ZETestItem \
@@ -87,7 +87,7 @@ class ZETestProblem
 };
 
 
-class ZETestItem
+class ZE_EXPORT_ZEFOUNDATION ZETestItem
 {
 	friend class ZETest;
 	private:

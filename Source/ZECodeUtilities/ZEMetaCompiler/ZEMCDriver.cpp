@@ -105,7 +105,8 @@ static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.IncludeDirectories.Add(Argv[I]);
+			if (strcmp(Argv[I], "") != 0 && strcmp(Argv[I], "\"\"") != 0)
+				Options.IncludeDirectories.Add(Argv[I]);
 		}
 		else if (strncmp(Argv[I], "-D", 2) == 0)
 		{
@@ -113,7 +114,8 @@ static void ParseParameters(int Argc, const char** Argv, ZEMCOptions& Options)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.Definitions.Add(Argv[I]);
+			if (strcmp(Argv[I], "") != 0 && strcmp(Argv[I], "\"\"") != 0)
+				Options.Definitions.Add(Argv[I]);
 		}
 		else if (strncmp(Argv[I], "-o", 2) == 0)
 		{

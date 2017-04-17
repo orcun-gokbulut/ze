@@ -36,15 +36,21 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEState.cpp						Sources)
-ze_add_source(ZEState.h							Sources Headers ZEMC)
+ze_add_source(ZEState.h							Headers ZEMC)
 ze_add_source(ZEStateTransition.cpp				Sources)
-ze_add_source(ZEStateTransition.h				Sources Headers ZEMC)
+ze_add_source(ZEStateTransition.h				Headers ZEMC)
 ze_add_source(ZEStateMachine.cpp				Sources)
-ze_add_source(ZEStateMachine.h					Sources Headers ZEMC)
+ze_add_source(ZEStateMachine.h					Headers ZEMC)
 
-ze_add_library(TARGET ZEStateMachine
-	SOURCES ${Sources} 
+ze_add_component(COMPONENT ZEStateMachine
+	TARGET ZEFoundation
 	HEADERS ${Headers}
-	LIBS ZEDS)
+	ZEMC ${ZEMC})
 
-ze_add_foundation_zemc(${ZEMC})
+ze_add_component(COMPONENT ZEStateMachine
+	TARGET ZEFoundationBase
+	SOURCES ${Sources})
+
+ze_add_component(COMPONENT ZEStateMachine
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources})

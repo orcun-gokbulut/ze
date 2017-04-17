@@ -35,7 +35,9 @@
 
 #pragma once
 
-class ZEGRTracerEvent
+#include "ZEExport.ZEEngine.h"
+
+class ZE_EXPORT_ZEENGINE ZEGRTracerEvent
 {
 	private:
 		const char*			Name;

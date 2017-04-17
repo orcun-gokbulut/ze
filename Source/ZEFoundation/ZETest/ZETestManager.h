@@ -37,12 +37,13 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZETest;
 class ZETestItem;
 class ZETestProblem;
 
-class ZETestManager
+class ZE_EXPORT_ZEFOUNDATION ZETestManager
 {
 	private:
 		ZEArray<ZETest*>				Tests;

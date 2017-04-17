@@ -48,7 +48,7 @@ struct ZESpawn
 	bool								Spawned;
 };
 
-class ZESpawner : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZESpawner : public ZEEntity
 {
 	ZE_OBJECT
 	private:

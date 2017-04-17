@@ -38,6 +38,7 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEVersion.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZECrashDumpType
 {
@@ -57,7 +58,7 @@ struct ZECrashReportParameters
 	char					LogFilePath[256];
 };
 
-class ZECrashHandler
+class ZE_EXPORT_ZEENGINE ZECrashHandler
 {
 	friend class ZECore;
 	private:

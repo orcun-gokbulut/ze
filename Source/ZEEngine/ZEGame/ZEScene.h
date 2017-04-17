@@ -40,11 +40,10 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEPointer/ZEHolder.h"
-#include "ZESpatial/ZEOctree.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEThread/ZETask.h"
-
+#include "ZESpatial/ZEOctree.h"
 #include "ZERayCast.h"
 
 ZEMT_FORWARD_DECLARE(ZEEntity);
@@ -57,9 +56,7 @@ class ZEPhysicalWorld;
 class ZEGRBuffer;
 enum ZEEntityState;
 
-ZEMT_INCLUDE("Test.h");
-
-class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEEntity;

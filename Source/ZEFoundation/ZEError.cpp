@@ -45,12 +45,22 @@
 #include <windows.h>
 #endif
 
-ZELock ZE_BREAK_LOCK_INTERNAL;
+static ZELock BreakLock;
 
 static void DefaultErrorCallback(ZEErrorType Level)
 {
 	if (Level >= ZE_ET_CRITICAL_ERROR)
 		exit(EXIT_FAILURE);
+}
+
+void zeBreakLock()
+{
+	BreakLock.Lock();
+}
+
+void zeBreakUnlock()
+{
+	BreakLock.Unlock();
 }
 
 ZEError::ZEError()

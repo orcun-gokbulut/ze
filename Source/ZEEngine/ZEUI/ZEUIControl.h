@@ -42,10 +42,11 @@
 
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEUIRenderer;
 
-class ZEUIControl : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEUIControl : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEUIManager;

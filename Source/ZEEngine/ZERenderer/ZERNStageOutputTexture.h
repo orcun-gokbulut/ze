@@ -38,10 +38,11 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer\ZEHolder.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 
-class ZERNStageOutputTexture : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageOutputTexture : public ZERNStage
 {
 	ZE_OBJECT
 	private:

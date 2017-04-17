@@ -38,8 +38,9 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZETextureData.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZETextureTestUtils
+class ZE_EXPORT_ZEENGINE ZETextureTestUtils
 {
 	public:
 		static void			DumpAsTGA(const char* FileName, ZETextureData* Data);

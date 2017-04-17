@@ -38,8 +38,9 @@
 #define __ZE_STEERING_ARRIVE_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringArrive : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringArrive : public ZESteering
 {
 	private:
 		float						SlowRadius;

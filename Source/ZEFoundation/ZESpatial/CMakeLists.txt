@@ -42,7 +42,12 @@ ze_add_source(ZEOctree.h				Sources Headers)
 ze_add_source(ZEOctreeIterator.cpp		Sources)
 ze_add_source(ZEOctreeIterator.h		Sources Headers)
 
-ze_add_library(TARGET ZESpatial 
+ze_add_component(COMPONENT ZESpatial 
+	TARGET ZEFoundationBase
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath)
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZESpatial 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers})

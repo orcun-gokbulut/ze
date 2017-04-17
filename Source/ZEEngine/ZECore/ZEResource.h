@@ -40,10 +40,11 @@
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEResourceManager);
 
-class ZEResource : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEResource : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEResourceManager;

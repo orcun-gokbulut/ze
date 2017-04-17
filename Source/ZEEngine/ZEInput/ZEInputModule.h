@@ -39,11 +39,12 @@
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEInputDevice;
 class ZEInputDeviceModule;
 
-class ZEInputModule : public ZEModule 
+class ZE_EXPORT_ZEENGINE ZEInputModule : public ZEModule 
 {
 	ZE_OBJECT
 	private:

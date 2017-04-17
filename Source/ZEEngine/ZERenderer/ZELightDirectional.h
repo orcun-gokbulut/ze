@@ -40,6 +40,7 @@
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZEGRBuffer;
@@ -58,7 +59,7 @@ struct ZERNCascade
 											ZERNCascade();
 };
 
-class ZERNCommandDirectionalLight : public ZERNCommand
+class ZE_EXPORT_ZEENGINE ZERNCommandDirectionalLight : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
@@ -68,7 +69,7 @@ class ZERNCommandDirectionalLight : public ZERNCommand
 		ZEArray<ZERNCascade>				Cascades;
 };
 
-class ZELightDirectional : public ZELight
+class ZE_EXPORT_ZEENGINE ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
 	private:

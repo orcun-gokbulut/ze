@@ -38,8 +38,9 @@
 #define __ZE_STEERING_STOPPER_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZESteeringStopper : public ZESteering
+class ZE_EXPORT_ZEENGINE ZESteeringStopper : public ZESteering
 {
 	private:
 		float						Amount;

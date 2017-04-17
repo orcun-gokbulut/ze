@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZERNStage.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNStageOutput : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageOutput : public ZERNStage
 {
 	ZE_OBJECT
 	public:

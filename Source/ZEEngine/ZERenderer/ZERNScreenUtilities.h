@@ -37,10 +37,11 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERay.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNView;
 
-class ZERNScreenUtilities
+class ZE_EXPORT_ZEENGINE ZERNScreenUtilities
 {
 	public:
 		static ZERay					ScreenToWorld(const ZERNView& View, const ZEVector2& ScreenCoords);

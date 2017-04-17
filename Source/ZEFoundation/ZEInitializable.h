@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta\ZEEnumerator.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZEInitializationState
 {
@@ -49,7 +50,7 @@ enum ZEInitializationState
 
 class ZEClass;
 
-class ZEInitializable
+class ZE_EXPORT_ZEFOUNDATION ZEInitializable
 {
 	private:
 		ZEInitializationState		InitializationState;

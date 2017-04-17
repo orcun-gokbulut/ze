@@ -51,7 +51,7 @@ class ZEGRRenderStateData;
 class ZERNRenderer;
 class ZEGRRenderTarget;
 
-ZE_ENUM(ZERNHDRToneMapOperator)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNHDRToneMapOperator)
 {
 	ZERN_HTMO_LOGARITMIC			= 0,
 	ZERN_HTMO_EXPONENTIAL			= 1,
@@ -61,14 +61,14 @@ ZE_ENUM(ZERNHDRToneMapOperator)
 	ZERN_HTMO_UNCHARTED				= 5
 };
 
-ZE_ENUM(ZERNHDRBlurTextureSize)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNHDRBlurTextureSize)
 {
 	ZERN_HBTS_EXACT					= 0,
 	ZERN_HBTS_HALF					= 1,
 	ZERN_HBTS_QUARTER				= 2
 };
 
-class ZERNStageHDR : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageHDR : public ZERNStage
 {
 	ZE_OBJECT
 	private:

@@ -43,6 +43,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEInput/ZEInputMap.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
 
 typedef ZEFlags ZESteeringElements;
@@ -50,7 +51,7 @@ typedef ZEFlags ZESteeringElements;
 #define ZE_SE_KINEMATIC		2
 #define ZE_SE_DYNAMIC		4
 
-struct ZESteeringOutput
+struct ZE_EXPORT_ZEENGINE ZESteeringOutput
 {
 	ZEVector3						LinearAcceleration;
 	ZEQuaternion					AngularAcceleration;
@@ -60,7 +61,7 @@ struct ZESteeringOutput
 
 class ZEActor;
 
-class ZESteering
+class ZE_EXPORT_ZEENGINE ZESteering
 {
 	friend class ZEActor;
 	private:

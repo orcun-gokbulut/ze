@@ -43,6 +43,7 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEDestroyable.h"
 #include "ZEInitializable.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEPhysicsWorldInfo;
 class ZEPhysicsCollision;
@@ -58,14 +59,14 @@ struct ZERayCastResultDetails
 	float	  ImpactDistance;
 };
 
-ZE_ENUM(ZEPhysicsRayCastFilterShapeType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicsRayCastFilterShapeType)
 {
 	ZE_PRCFST_STATIC_SHAPES		= 1,
 	ZE_PRCFST_DYNAMIC_SHAPES	= 2,
 	ZE_PRCFST_ALL_SHAPES		= 3,
 };
 
-class ZEPhysicalWorld : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEPhysicalWorld : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	protected:

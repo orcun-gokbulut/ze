@@ -46,8 +46,9 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMDResourcePhysics.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEMDResourceMesh : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEMDResourceMesh : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceMesh)

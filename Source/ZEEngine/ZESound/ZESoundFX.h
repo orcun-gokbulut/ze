@@ -45,7 +45,7 @@ enum ZESoundFXType
 	ZE_SFXT_NOISY_SUPRESSOR
 };
 
-class ZESoundFX
+class ZE_EXPORT_ZEENGINE ZESoundFX
 {
 	private:
 		bool						Enabled;
@@ -59,7 +59,7 @@ class ZESoundFX
 		void						Update();
 };
 
-class ZEChorusFX : public ZESoundFX
+class ZE_EXPORT_ZEENGINE ZEChorusFX : public ZESoundFX
 {
 	private:
 		float		WetDryMix;
@@ -75,7 +75,7 @@ class ZEChorusFX : public ZESoundFX
 		float		GetWetDryMix();
 };
 
-class ZEEnvironmentalReverbFX : public ZESoundFX 
+class ZE_EXPORT_ZEENGINE ZEEnvironmentalReverbFX : public ZESoundFX 
 {
 	private:
 		ZEInt		Room;
@@ -92,7 +92,7 @@ class ZEEnvironmentalReverbFX : public ZESoundFX
 		float		HFReference;
 };
 
-class DSFXDistortion : public ZESoundFX
+class ZE_EXPORT_ZEENGINE DSFXDistortion : public ZESoundFX
 {
     ZEUInt	Gain;
     ZEUInt	Edge;
@@ -101,7 +101,7 @@ class DSFXDistortion : public ZESoundFX
     ZEUInt	PreLowpassCutoff;
 } ;
 
-class DSFXEcho : public ZESoundFX
+class ZE_EXPORT_ZEENGINE DSFXEcho : public ZESoundFX
 {
     float WetDryMix;
     float Feedback;
@@ -110,7 +110,7 @@ class DSFXEcho : public ZESoundFX
     ZEInt PanDelay;
 } ;
 
-class DSFXFlanger : public ZESoundFX
+class ZE_EXPORT_ZEENGINE DSFXFlanger : public ZESoundFX
 {
     float WetDryMix;
     float Depth;
@@ -127,7 +127,7 @@ class DSFXGargle : public ZESoundFX
     ZEUInt dwWaveShape;
 };
 
-class DSFXReverb : public ZESoundFX 
+class ZE_EXPORT_ZEENGINE DSFXReverb : public ZESoundFX 
 {
     float fInGain;
     float fReverbMix;
@@ -135,13 +135,13 @@ class DSFXReverb : public ZESoundFX
     float fHighFreqRTRatio;
 };
 
-class DSFXParamEq : public ZESoundFX
+class ZE_EXPORT_ZEENGINE DSFXParamEq : public ZESoundFX
 {
     float fCenter;
     float fBandwidth;
     float fGain;
 };
 
-class ZENoiseSupressorFX : public ZESoundFX
+class ZE_EXPORT_ZEENGINE ZENoiseSupressorFX : public ZESoundFX
 {
 };

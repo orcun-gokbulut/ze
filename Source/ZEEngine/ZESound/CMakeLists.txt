@@ -51,8 +51,9 @@ ze_add_source(ZESoundResourceWAV.h			Sources)
 ze_add_source(ZESoundSource.cpp				Sources)
 ze_add_source(ZESoundSource.h				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZESound 
+ze_add_component(COMPONENT ZESound 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libmpg123 libOGG libVorbis)
+	LIBS libmpg123 libOGG libVorbis)

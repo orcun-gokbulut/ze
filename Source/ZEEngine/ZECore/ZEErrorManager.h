@@ -38,12 +38,13 @@
 
 #include "ZEError.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEOptionSection;
 class ZEOption;
 class ZETypedValue;
 
-class ZEErrorManager
+class ZE_EXPORT_ZEENGINE ZEErrorManager
 {
 	friend class					ZECore;
 	private:

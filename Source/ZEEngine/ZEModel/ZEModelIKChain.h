@@ -43,10 +43,11 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEModelIKChainNode.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEModel;
 
-class ZEModelIKChain
+class ZE_EXPORT_ZEENGINE ZEModelIKChain
 {
 	friend class ZEModel;
 	private:

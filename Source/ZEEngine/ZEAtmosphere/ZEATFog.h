@@ -41,12 +41,13 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRBuffer;
 
-class ZEATFog : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATFog : public ZEEntity
 {
 	ZE_OBJECT
 	private:

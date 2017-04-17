@@ -41,10 +41,11 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
+#include "ZEExport.ZEEngine.h"
 
 
 class ZECommand;
-class ZECommandSection
+class ZE_EXPORT_ZEENGINE ZECommandSection
 {
 	private:
 		ZEString					Name;

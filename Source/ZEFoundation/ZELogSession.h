@@ -37,10 +37,11 @@
 
 #include "ZELog.h"
 #include "ZEDS/ZELink.h"
+#include "ZEExport.ZEFoundation.h"
 
 typedef void (*ZELogCallback)(const ZELogSession*, const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 
-class ZELogSession
+class ZE_EXPORT_ZEFOUNDATION ZELogSession
 {
 	friend class ZELog;
 	private:

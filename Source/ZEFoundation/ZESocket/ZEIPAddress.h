@@ -40,8 +40,9 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEIPAddress
+class ZE_EXPORT_ZEFOUNDATION ZEIPAddress
 {
 	public:
 		static const ZEIPAddress		Any;

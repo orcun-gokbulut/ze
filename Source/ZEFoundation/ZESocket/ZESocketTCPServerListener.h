@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZESocketDefinitions.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZESocketTCPServer;
 
@@ -48,7 +49,7 @@ enum ZESocketTCPServerListenerStatus
 	ZE_STSLS_LISTENING,
 };
 
-class ZESocketTCPServerListener
+class ZE_EXPORT_ZEFOUNDATION ZESocketTCPServerListener
 {
 	friend class ZESocketTCPListener;
 	private:

@@ -38,14 +38,9 @@ cmake_minimum_required (VERSION 2.8)
 project (ZEFoundation)
 
 ze_set_project_folder("ZEFoundation")
-
-set(FoundationMetaHeaders)
-macro(ze_add_foundation_zemc)
-	foreach (VARIABLE_FILE ${ARGN})
-		set(TEMP_LIST ${TEMP_LIST} "${CMAKE_CURRENT_SOURCE_DIR}/${VARIABLE_FILE}")
-	endforeach()
-	set(FoundationMetaHeaders ${FoundationMetaHeaders} ${TEMP_LIST} PARENT_SCOPE)
-endmacro()
+ze_begin_components(TARGET ZEFoundation)
+ze_begin_components(TARGET ZEFoundationBase)
+ze_begin_components(TARGET ZEFoundationStatic)
 
 add_subdirectory(ZEDS)
 add_subdirectory(ZEMath)
@@ -68,14 +63,8 @@ add_subdirectory(ZEITIntegrity)
 
 ze_add_source(ZEData.h 							Sources Headers)
 ze_add_source(ZEData.cpp 						Sources)
-ze_add_source(ZEDLL.h 							Sources Headers)
-ze_add_source(ZEDLL.cpp 						Sources)
 ze_add_source(ZECommon.h 						Sources Headers)
 ze_add_source(ZECommon.cpp 						Sources)
-ze_add_source(ZEDestroyable.cpp					Sources Headers)
-ze_add_source(ZEDestroyable.h					Sources)
-ze_add_source(ZEDestroyableCollector.cpp		Sources Headers)
-ze_add_source(ZEDestroyableCollector.h			Sources)
 ze_add_source(ZEGUID.h 							Sources Headers)
 ze_add_source(ZEGUID.cpp 						Sources)
 ze_add_source(ZEGUIDTests.cpp					Tests)
@@ -86,55 +75,64 @@ ze_add_source(ZEEndian.cpp 						Sources)
 ze_add_source(ZEEndianTests.cpp					Tests)
 ze_add_source(ZESwap.h 							Sources Headers)
 ze_add_source(ZESwap.cpp 						Sources)
-ze_add_source(ZEError.h 						Sources Headers)
-ze_add_source(ZEError.cpp 						Sources)
-ze_add_source(ZELog.h							Sources Headers)
-ze_add_source(ZELog.cpp							Sources)
-ze_add_source(ZELogSession.h					Sources Headers)
-ze_add_source(ZELogSession.cpp					Sources)
-ze_add_source(ZETerminalUtils.h					Sources Headers)
-ze_add_source(ZETerminalUtils.cpp				Sources)
 ze_add_source(ZEPacking.h 						Sources Headers)
 ze_add_source(ZEPacking.cpp 					Sources)
-ze_add_source(ZERandom.h 						Sources Headers)
-ze_add_source(ZERandom.cpp 						Sources)
-ze_add_source(ZERandomTests.cpp					Tests)
-ze_add_source(ZETimeCounter.h					Headers)
-ze_add_source(ZETimeCounter.cpp					Sources)
-ze_add_source(ZETimeCounterTests.cpp			Tests)
-ze_add_source(ZETimeStamp.h						Headers)
-ze_add_source(ZETimeStamp.cpp					Sources)
-ze_add_source(ZEBase64.h						Sources Headers)
-ze_add_source(ZEBase64.cpp						Sources)
 ze_add_source(ZEVersion.cpp						Sources)
 ze_add_source(ZEVersion.h						Sources Headers)
-ze_add_source(ZEInitializable.cpp				Sources)
-ze_add_source(ZEInitializable.h					Sources Headers)
-ze_add_source(ZEEncryption.cpp					Sources)
-ze_add_source(ZEEncryption.h					Sources Headers)
 
-ze_add_source(ZEAutoExp.txt						FoundationSources FoundationHeaders)
-ze_add_source(ZE.natvis							FoundationSources FoundationHeaders)
-	
+ze_add_source(ZEFoundation.cpp					SourcesShared)
+ze_add_source(ZEExport.ZEFoundation.cpp			SourcesShared)
+ze_add_source(ZEExport.ZEFoundation.h			SourcesShared HeadersShared)
+ze_add_source(ZEBase64.cpp						SourcesShared)
+ze_add_source(ZEBase64.h						SourcesShared HeadersShared)
+ze_add_source(ZEEncryption.cpp					SourcesShared)
+ze_add_source(ZEEncryption.h					SourcesShared HeadersShared)
+ze_add_source(ZERandom.cpp 						SourcesShared)
+ze_add_source(ZERandom.h 						SourcesShared HeadersShared)
+ze_add_source(ZERandomTests.cpp					Tests)
+ze_add_source(ZETimeCounter.cpp					SourcesShared)
+ze_add_source(ZETimeCounter.h					SourcesShared HeadersShared)
+ze_add_source(ZETimeCounterTests.cpp			Tests)
+ze_add_source(ZETimeStamp.cpp					SourcesShared)
+ze_add_source(ZETimeStamp.h						SourcesShared HeadersShared)
+ze_add_source(ZEError.cpp 						SourcesShared)
+ze_add_source(ZEError.h 						SourcesShared HeadersShared)
+ze_add_source(ZELog.cpp							SourcesShared)
+ze_add_source(ZELog.h							SourcesShared HeadersShared)
+ze_add_source(ZELogSession.cpp					SourcesShared)
+ze_add_source(ZELogSession.h					SourcesShared HeadersShared)
+ze_add_source(ZEDestroyable.cpp					SourcesShared HeadersShared)
+ze_add_source(ZEDestroyable.h					SourcesShared)
+ze_add_source(ZEDestroyableCollector.cpp		SourcesShared HeadersShared)
+ze_add_source(ZEDestroyableCollector.h			SourcesShared)
+ze_add_source(ZEInitializable.cpp				SourcesShared)
+ze_add_source(ZEInitializable.h					SourcesShared HeadersShared)
+ze_add_source(ZETerminalUtils.h					SourcesShared HeadersShared)
+ze_add_source(ZETerminalUtils.cpp				SourcesShared)
+
+ze_add_source(ZEAutoExp.txt						Sources Headers)
+ze_add_source(ZE.natvis							Sources Headers)
+
 ze_add_library(TARGET ZEFoundationBase
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	COMBINE
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta libCryptopp)
+	HEADERS ${Headers})
 
-ze_add_library(TARGET ZEFoundationMeta
-	SOURCES ${FoundationMetaHeaders}
-	ZEMC ${FoundationMetaHeaders})
+ze_add_library(TARGET ZEFoundation DLL
+	SOURCES ${SourcesShared}
+	HEADERS ${HeadersShared}
+	LIBS ZEFoundationBase)
 
-ze_add_library(TARGET ZEFoundation
-	SOURCES ${FoundationSources} ZEFoundation.cpp
-	HEADERS ${FoundationHeaders}
-	COMBINE
-	LIBS ZEFoundationBase ZEFoundationMeta)
+ze_add_library(TARGET ZEFoundationStatic
+	SOURCES ${Sources} ${SourcesShared}
+	HEADERS ${Headers} ${HeadersShared})
 
 ze_add_test(TARGET ZEFoundationTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
 	TEST_TARGET ZEFoundation)
+
+ze_end_components(TARGET ZEFoundationStatic)
+ze_end_components(TARGET ZEFoundationBase)
+ze_end_components(TARGET ZEFoundation)
 
 ze_link(ZEFoundation LIBS rt PLATFORMS Unix)

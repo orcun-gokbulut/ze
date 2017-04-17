@@ -40,10 +40,12 @@
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
 #include "ZESignal.h"
+#include "ZEExport.ZEFoundation.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
 #endif
+
 
 enum ZEThreadStatus
 {
@@ -58,7 +60,7 @@ class ZEThread;
 
 typedef ZEDelegate<void (ZEThread*, void*)> ZEThreadFunction;
 
-class ZEThread
+class ZE_EXPORT_ZEFOUNDATION ZEThread
 {
 	ZE_COPY_NO_ACTION(ZEThread)
     private:

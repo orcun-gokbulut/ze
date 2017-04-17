@@ -39,11 +39,12 @@
 
 #include "ZEUILabel.h"
 #include "ZEUITextCursor.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZERNMaterial);
 ZEMT_FORWARD_DECLARE(ZEUIRectangle);
 
-class ZEUITextEditControl : public ZEUILabel
+class ZE_EXPORT_ZEENGINE ZEUITextEditControl : public ZEUILabel
 {
 	ZE_OBJECT
 	private:

@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEInputDeviceType
 {
@@ -50,7 +51,7 @@ enum ZEInputDeviceType
 	ZE_IDT_OTHER
 };
 
-class ZEInputDeviceDescription
+class ZE_EXPORT_ZEENGINE ZEInputDeviceDescription
 {
 	public:
 		ZEString								Name;

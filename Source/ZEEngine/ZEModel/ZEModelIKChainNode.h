@@ -38,10 +38,11 @@
 #define __ZE_MODEL_IK_CHAIN_NODE_H__
 
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEModelBone;
 
-class ZEModelIKChainNode
+class ZE_EXPORT_ZEENGINE ZEModelIKChainNode
 {
 	public:
 		ZEModelBone*						Bone;

@@ -45,7 +45,7 @@
 
 class ZETimer;
 
-class ZETimeManager : public ZEModule
+class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 {
 	ZE_OBJECT
 	friend class ZETimer;

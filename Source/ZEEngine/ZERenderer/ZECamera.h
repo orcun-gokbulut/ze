@@ -48,6 +48,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZEExport.ZEEngine.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
@@ -58,7 +59,7 @@ enum ZECameraFOVAxis
 	ZE_CFA_VERTICAL
 };
 
-class ZECamera : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZECamera : public ZEEntity
 {
 	ZE_OBJECT
 	private:

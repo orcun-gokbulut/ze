@@ -38,10 +38,11 @@
 #include "ZELight.h"
 
 #include "ZEMath/ZEBSphere.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 
-class ZELightOmniProjective : public ZELight
+class ZE_EXPORT_ZEENGINE ZELightOmniProjective : public ZELight
 {
 	ZE_OBJECT
 	private:

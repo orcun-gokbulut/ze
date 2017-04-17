@@ -39,8 +39,9 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZESerialPort
+class ZE_EXPORT_ZEFOUNDATION ZESerialPort
 {
 	private:
 		union{

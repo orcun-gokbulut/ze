@@ -50,37 +50,55 @@ ze_add_source(ZESignal_Unix.cpp   		Sources PLATFORMS Unix)
 ze_add_source(ZESignal_Windows.cpp  	Sources PLATFORMS Windows)
 ze_add_source(ZESignal.h    	 		Sources Headers)
 ze_add_source(ZESignalTests.cpp			Tests)
-ze_add_source(ZEThread.cpp       		Sources)
-ze_add_source(ZEThread_Unix.cpp 		Sources PLATFORMS Unix)
-ze_add_source(ZEThread_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEThread.h				Sources Headers)
-ze_add_source(ZEThreadTests.cpp			Tests)
 ze_add_source(ZETask.cpp         		Sources)
 ze_add_source(ZETask.h           		Sources Headers)
 ze_add_source(ZETaskThread.cpp         	Sources)
 ze_add_source(ZETaskThread.h           	Sources Headers)
 ze_add_source(ZETaskPool.cpp       		Sources)
 ze_add_source(ZETaskPool.h         		Sources Headers)
-ze_add_source(ZETaskManager.cpp   		Sources)
-ze_add_source(ZETaskManager.h     		Sources Headers)
 
+ze_add_source(ZETaskManager.cpp   		SourcesShared)
+ze_add_source(ZETaskManager.h     		SourcesShared HeadersShared)
+ze_add_source(ZEThread.cpp       		SourcesShared)
+ze_add_source(ZEThread_Unix.cpp 		SourcesShared PLATFORMS Unix)
+ze_add_source(ZEThread_Windows.cpp		SourcesShared PLATFORMS Windows)
+ze_add_source(ZEThread.h				SourcesShared HeadersShared)
+ze_add_source(ZEThreadTests.cpp			Tests)
+
+set(LIBS)
 set(ZEBUILD_VTUNE_ENABLED FALSE CACHE BOOL "Enable VTune notify API for better VTune results")
 if (ZEBUILD_VTUNE_ENABLED)
 	find_package(VTune REQUIRED)
 	if (VTUNE_FOUND)
 		add_definitions(-DZE_VTUNE_ENABLED)
 		include_directories(${VTune_INCLUDE_DIRS})
+		set(LIBS ${LIBS} ${VTune_LIBRARIES})
 	endif()
 endif()
 
-ze_add_library(TARGET ZEThread
+if (ZE_PLATFORM_UNIX)
+	set(LIBS ${LIBS} "pthread")
+endif()
+
+ze_add_component(COMPONENT ZEThread
+	TARGET ZEFoundation
+	SOURCES ${SourcesShared}
+	HEADERS ${HeadersShared}
+	LIBS ${LIBS})
+
+ze_add_component(COMPONENT ZEThread
+	TARGET ZEFoundationBase
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS "${VTune_LIBRARIES}")
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZEThread
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} ${SourcesShared}
+	HEADERS ${Headers} ${HeadersShared}
+	LIBS ${LIBS})
 
 ze_add_test(TARGET ZEThreadTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
-	TEST_TARGET ZEThread)
+	TEST_TARGET ZEFoundation)
 
-ze_link(ZEThread PLATFORMS Unix LIBS pthread)

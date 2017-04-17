@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZEEngine.h"
 
 ZE_ENUM(ZETickMode)
 {
@@ -52,7 +53,7 @@ ZE_ENUM(ZEFrameType)
 	ZE_TT_DROPPED
 };
 
-class ZETimeParameters : public ZEObject
+class ZE_EXPORT_ZEENGINE ZETimeParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:

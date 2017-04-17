@@ -38,10 +38,11 @@
 #define __ZE_UI_BUTTON_CONTROL__
 
 #include "ZEUIFrameControl.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEUILabel);
 
-class ZEUIButtonControl : public ZEUIFrameControl
+class ZE_EXPORT_ZEENGINE ZEUIButtonControl : public ZEUIFrameControl
 {
 	friend class ZEUIManager;
 	friend class ZEUICheckBoxControl;

@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEParticleModifier.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEParticleUVModifier : public ZEParticleModifier
+class ZE_EXPORT_ZEENGINE ZEParticleUVModifier : public ZEParticleModifier
 {
 	ZE_OBJECT
 	private:

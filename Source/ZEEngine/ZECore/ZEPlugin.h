@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEPlugin.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
+#include "ZECommon.h"
+#include "ZEExport.ZEEngine.h"
+
+class ZEPlugin;
+class ZEVersion;
+class ZEMTDeclaration;
+struct ZESharedLibraryData;
+
+typedef ZEPlugin* (*zeCreatePluginInstance)();
+
+class ZE_EXPORT_ZEENGINE ZEPlugin
+{
+	ZE_DISALLOW_COPY(ZEPlugin)
+	friend class ZECore;
+	private:
+		ZELink<ZEPlugin>						CoreLink;
+		ZEString								FileName;
+		ZESharedLibraryData*					Data;
+
+	protected:
+												ZEPlugin();
+		virtual									~ZEPlugin();
+
+	public:
+		virtual const char*						GetName() const;
+		virtual ZEVersion						GetVersion() const;
+		virtual ZEVersion						GetEngineVersion() const;
+		virtual const ZEString&					GetFileName() const;
+		virtual ZESharedLibraryData*			GetData() const;
+
+		virtual ZEMTDeclaration* const*			GetDeclarations() const;
+		virtual ZESize							GetDeclarationCount() const;
+
+		virtual void							Destroy();
+};
+
+void LoadPlugins();

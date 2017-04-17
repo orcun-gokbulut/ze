@@ -39,13 +39,8 @@
 #include "ZEDS/ZEString.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEInteriorCullMode)
-{
-	ZE_ICM_NONE,
-	ZE_ICM_VIEW,
-	ZE_ICM_FULL
-};
 
 class ZERay;
 class ZEViewVolume;
@@ -56,7 +51,14 @@ ZEMT_FORWARD_DECLARE(ZEInteriorRoom);
 ZEMT_FORWARD_DECLARE(ZEInteriorDoor);
 ZEMT_FORWARD_DECLARE(ZEInteriorHelper);
 
-class ZEInterior : public ZEEntity
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEInteriorCullMode)
+{
+	ZE_ICM_NONE,
+	ZE_ICM_VIEW,
+	ZE_ICM_FULL
+};
+
+class ZE_EXPORT_ZEENGINE ZEInterior : public ZEEntity
 {
 	ZE_OBJECT
 	friend class ZEInteriorDoor;

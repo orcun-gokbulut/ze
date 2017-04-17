@@ -42,9 +42,9 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPolygon.h"
 #include "ZENavigationMesh.h"
+#include "ZEExport.ZEEngine.h"
 
-
-class ZENavigationMeshGeneratorOptions 
+class ZE_EXPORT_ZEENGINE ZENavigationMeshGeneratorOptions 
 {
 	public:
 		ZEVector3	UpDirection;

@@ -35,10 +35,10 @@
 
 #pragma once
 
-#include "ZEDLL.h"
 #include "ZEPlatform.h"
 #include "ZEDS/ZEString.h"
 #include "ZEThread/ZELock.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZELogType
 {
@@ -75,7 +75,7 @@ enum ZELogType
 class ZELogSession;
 template <typename ZEItemType, typename ZELockType> class ZEList2;
 
-class ZELog
+class ZE_EXPORT_ZEFOUNDATION ZELog
 {
 	friend ZELogSession;
 	private:
@@ -101,7 +101,6 @@ class ZELog
 		void								Log(const char* Module, const char* Format, ...);
 		void								Log(const char* Module, ZELogType Type, const char* Format, ...);
 
-		ZE_ENGINE_EXPORT 
 		static ZELog*						GetInstance();
 
 		static void							GetModuleName(char* Output, const char* FileName, const char* Function);

@@ -46,15 +46,16 @@
 #include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEClothVertexAttachmentStatus)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEClothVertexAttachmentStatus)
 {
 	ZE_PCVA_NONE	= 0,
 	ZE_PCVA_GLOBAL	= 1,
 	ZE_PCVA_SHAPE	= 2,
 };
 
-class ZEClothVertexAttachment : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEClothVertexAttachment : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -64,7 +65,7 @@ class ZEClothVertexAttachment : public ZEObject
 		ZEVector3								AttachmentPosition;
 };
 
-class ZEPhysicalCloth : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEPhysicalCloth : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	public:

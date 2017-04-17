@@ -37,10 +37,12 @@
 #ifndef __ZE_SYSTEM_MESSAGE_HANDLER__
 #define __ZE_SYSTEM_MESSAGE_HANDLER__
 
+#include "ZEExport.ZEEngine.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-class ZESystemMessageHandler
+class ZE_EXPORT_ZEENGINE ZESystemMessageHandler
 {
 	public:
 		HWND					TargetWindow;

@@ -34,11 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZE_PATH_TOKENIZER_BUFFER_SIZE 4096
 #define ZE_PATH_TOKENIZER_TOKEN_LIST_SIZE 256
 
-class ZEPathTokenizer
+class ZE_EXPORT_ZEFOUNDATION ZEPathTokenizer
 {
 	private:
 		char			Buffer[ZE_PATH_TOKENIZER_BUFFER_SIZE];

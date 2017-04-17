@@ -32,6 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZEExport.ZEEngine.h"
 
 #ifndef __ZE_TEXTURE_QUALITY_MANAGER_H__
 #define __ZE_TEXTURE_QUALITY_MANAGER_H__
@@ -40,7 +41,7 @@ class ZEFile;
 class ZETextureData;
 struct ZETextureOptions;
 
-class ZETextureQualityManager
+class ZE_EXPORT_ZEENGINE ZETextureQualityManager
 {
 	protected:
 						ZETextureQualityManager();

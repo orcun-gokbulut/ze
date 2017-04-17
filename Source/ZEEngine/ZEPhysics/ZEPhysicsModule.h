@@ -38,6 +38,7 @@
 #define __ZE_PHYSICS_MODULE_H__
 
 #include "ZECore/ZEModule.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEPhysicalWorld;
 class ZEPhysicalRigidBody;
@@ -52,7 +53,7 @@ class ZEPhysicalVehicle;
 class ZEPhysicalCharacterController;
 class ZEPhysicalMaterial;
 
-class ZEPhysicsModule : public ZEModule
+class ZE_EXPORT_ZEENGINE ZEPhysicsModule : public ZEModule
 {
 	ZE_OBJECT
 	public:

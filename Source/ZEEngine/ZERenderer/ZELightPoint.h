@@ -38,8 +38,9 @@
 #include "ZELight.h"
 
 #include "ZEMath/ZEBSphere.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNCommandPointLight : public ZERNCommand
+class ZE_EXPORT_ZEENGINE ZERNCommandPointLight : public ZERNCommand
 {
 	ZE_OBJECT
 	public:
@@ -49,7 +50,7 @@ class ZERNCommandPointLight : public ZERNCommand
 		float						FalloffExponent;
 };
 
-class ZELightPoint : public ZELight
+class ZE_EXPORT_ZEENGINE ZELightPoint : public ZELight
 {
 	ZE_OBJECT
 	private:

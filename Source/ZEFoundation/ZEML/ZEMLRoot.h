@@ -38,11 +38,12 @@
 #define __ZEML_ROOT_H__
 
 #include "ZEMLNode.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEFile;
 struct ZEMLFormatDescription;
 
-class ZEMLRoot
+class ZE_EXPORT_ZEFOUNDATION ZEMLRoot
 {
 	private:
 		ZEMLNode*					RootNode;

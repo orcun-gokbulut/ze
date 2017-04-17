@@ -44,18 +44,13 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEPointer/ZEHolder.h"
-
-enum ZEGRWindowType : ZEUInt8
-{
-	ZEGR_WT_NORMAL		= 0,
-	ZEGR_WT_POPUP		= 1
-};
+#include "ZEExport.ZEEngine.h"
 
 class ZEGROutput;
 struct ZEGRWindowData;
 struct ZEGRWindowMessage;
 
-class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRWindow)

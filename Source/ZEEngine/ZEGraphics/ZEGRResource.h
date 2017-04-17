@@ -45,7 +45,7 @@
 #include "ZEGRFormat.h"
 
 
-ZE_ENUM_TYPED(ZEGRResourceType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRResourceType, ZEUInt8)
 {
 	ZEGR_RT_NONE						= 0,
 	ZEGR_RT_BUFFER						= 1,
@@ -56,7 +56,7 @@ ZE_ENUM_TYPED(ZEGRResourceType, ZEUInt8)
 	ZEGR_RT_OUTPUT						= 6
 };
 
-ZE_ENUM_TYPED(ZEGRResourceUsage, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRResourceUsage, ZEUInt8)
 {
 	ZEGR_RU_IMMUTABLE					= 0,
 	ZEGR_RU_STATIC						= 1,
@@ -64,7 +64,7 @@ ZE_ENUM_TYPED(ZEGRResourceUsage, ZEUInt8)
 	ZEGR_RU_STAGING						= 3
 };
 
-ZE_ENUM_TYPED(ZEGRResourceBindFlag, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRResourceBindFlag, ZEUInt8)
 {
 	ZEGR_RBF_NONE						= 0,
 	ZEGR_RBF_SHADER_RESOURCE			= 1,
@@ -77,7 +77,7 @@ ZE_ENUM_TYPED(ZEGRResourceBindFlag, ZEUInt8)
 	ZEGR_RBF_INDIRECT_ARGS				= 128
 };
 
-ZE_ENUM_TYPED(ZEGRResourceMapType, ZEUInt8)
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRResourceMapType, ZEUInt8)
 {
 	ZEGR_RMT_READ						= 0, 
 	ZEGR_RMT_WRITE						= 1, 
@@ -88,7 +88,7 @@ ZE_ENUM_TYPED(ZEGRResourceMapType, ZEUInt8)
 
 typedef ZEFlags ZEGRResourceBindFlags;
 
-class ZEGRResource : public ZERSResource
+class ZE_EXPORT_ZEENGINE ZEGRResource : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRResource)

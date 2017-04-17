@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEWildcard
+class ZE_EXPORT_ZEFOUNDATION ZEWildcard
 {
 	private:
 		ZEString					Pattern;

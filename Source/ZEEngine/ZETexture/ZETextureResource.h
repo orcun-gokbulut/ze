@@ -41,15 +41,9 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZETextureOptions.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEFileCacheManager
-{
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
-
-class ZETextureResource : public ZEResource
+class ZE_EXPORT_ZEENGINE ZETextureResource : public ZEResource
 {
 	ZE_OBJECT
 	public:

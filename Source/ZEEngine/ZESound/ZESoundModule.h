@@ -40,6 +40,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEOptionSection.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZESoundSource;
 class ZEListener;
@@ -73,7 +74,7 @@ struct ZESoundDevice
 };
 
 
-class ZESoundModule : public ZEModule
+class ZE_EXPORT_ZEENGINE ZESoundModule : public ZEModule
 {
 	ZE_OBJECT
 	protected:

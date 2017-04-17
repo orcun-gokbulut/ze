@@ -38,8 +38,9 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEMath/ZEVectord.h"
 #include "ZEMath/ZEMatrixd.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEGeographicEntity : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEGeographicEntity : public ZEEntity
 {
 	friend class ZESectorManager;
 	ZE_OBJECT;

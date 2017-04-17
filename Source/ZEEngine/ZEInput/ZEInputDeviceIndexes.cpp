@@ -35,13 +35,13 @@
 
 #include "ZEInputDeviceIndexes.h"
 
-ZEUInt ZEInputDeviceIndexes::KeyboardIndex = 0;
-ZEUInt ZEInputDeviceIndexes::MouseIndex = 0;
-ZEUInt ZEInputDeviceIndexes::JoystickIndex = 0;
-ZEUInt ZEInputDeviceIndexes::GamepadIndex = 0;
-ZEUInt ZEInputDeviceIndexes::WheelIndex = 0;
-ZEUInt ZEInputDeviceIndexes::SensorIndex = 0;
-ZEUInt ZEInputDeviceIndexes::OtherIndex = 0;
+static ZEUInt KeyboardIndex = 0;
+static ZEUInt MouseIndex = 0;
+static ZEUInt JoystickIndex = 0;
+static ZEUInt GamepadIndex = 0;
+static ZEUInt WheelIndex = 0;
+static ZEUInt SensorIndex = 0;
+static ZEUInt OtherIndex = 0;
 
 ZEUInt ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
 {

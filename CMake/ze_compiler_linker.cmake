@@ -56,6 +56,8 @@ macro (ze_compiler_linker_msvc)
 	# /ZI Debug Information Format (PDB with Edit and Continue)
 	# /d2Zi+ Debug Optimized Code (Also /Zo in VS2013 Update3+)
 	# /IGNORE:4099 Ignore PDB file not found problem
+	# /wd4251 Ignore Member Variable DLL Interface Problem
+	# /MP Multi-Processor compilation
 	
 	if (ZEBUILD_PLATFORM_ARCHITECTURE_X86)
 		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")	
@@ -69,7 +71,8 @@ macro (ze_compiler_linker_msvc)
 	string(REPLACE "/GT" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
 	string(REPLACE "/EHsc" 	"" CMAKE_CXX_FLAGS 	"${CMAKE_CXX_FLAGS}")
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc-")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP /wd4251")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /EHsc- /wd4251")
 	
 	set(ZEBUID_COMPILER_FLAGS_RELEASE "/fp:fast /GL /GT- /GS- /GR- /Zi /d2Zi+ /Ox /Ob2 /Oi /Ot /Oy /Gs /GF /Gy")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${ZEBUID_COMPILER_FLAGS_RELEASE}")

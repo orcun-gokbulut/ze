@@ -40,10 +40,11 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 
-class ZERNStage2D : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStage2D : public ZERNStage
 {
 	ZE_OBJECT
 	private:

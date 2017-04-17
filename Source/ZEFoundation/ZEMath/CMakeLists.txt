@@ -123,7 +123,13 @@ set(BuildIn ${BuildIn}
 	ZEMath/ZEMatrixd.h
 	PARENT_SCOPE)
 
-ze_add_library(TARGET ZEMath 
+ze_add_component(COMPONENT ZEMath
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZEMath
+	TARGET ZEFoundationBase
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 	

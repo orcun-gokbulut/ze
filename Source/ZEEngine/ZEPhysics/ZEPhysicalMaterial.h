@@ -40,10 +40,11 @@
 #include "ZEMeta\ZEObject.h"
 #include "ZEInitializable.h"
 #include "ZEDestroyable.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEPhysicalWorld;
 
-class ZEPhysicalMaterial : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEPhysicalMaterial : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	protected:

@@ -39,11 +39,12 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZEGRBuffer;
 
-class ZERNStageParticleRendering : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageParticleRendering : public ZERNStage
 {
 	ZE_OBJECT
 	private:

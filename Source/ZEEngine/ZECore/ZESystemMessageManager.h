@@ -38,10 +38,11 @@
 #define __ZE_SYSTEM_MESSAGE_MANAGER__
 
 #include <ZEDS/ZEArray.h>
+#include "ZEExport.ZEEngine.h"
 
 class ZESystemMessageHandler;
 
-class ZESystemMessageManager
+class ZE_EXPORT_ZEENGINE ZESystemMessageManager
 {
 	friend class ZECore;
 	private:

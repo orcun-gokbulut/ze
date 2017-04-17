@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZEParticleUVModifier.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
 {
 	ZE_OBJECT
 	private:

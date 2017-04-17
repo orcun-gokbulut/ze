@@ -44,13 +44,13 @@ class	ZEPhysicalWorld;
 class	ZEPhysicalObject;
 class	ZEPhysicalShape;
 
-ZE_ENUM(ZEPhysicalTriggerType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalTriggerType)
 {
 	ZE_PTT_DYNAMIC			= 0,
 	ZE_PTT_KINEMATIC		= 1
 };
 
-ZE_ENUM(ZEPhysicalTriggerActivationType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEPhysicalTriggerActivationType)
 {
 	ZE_PTAT_ON_ENTER		= 0,
 	ZE_PTAT_ON_LEAVE		= 1,
@@ -59,7 +59,7 @@ ZE_ENUM(ZEPhysicalTriggerActivationType)
 
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, bool, bool)> ZEPhysicalTriggerEvent;
 
-class ZEPhysicalTrigger: public ZEPhysicalObject
+class ZE_EXPORT_ZEENGINE ZEPhysicalTrigger: public ZEPhysicalObject
 {
 	ZE_OBJECT
 	protected:

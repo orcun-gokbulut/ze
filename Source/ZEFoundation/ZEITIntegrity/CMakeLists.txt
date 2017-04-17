@@ -48,6 +48,12 @@ ze_add_source(ZEITGenerator.h				Sources Headers)
 ze_add_source(ZEITRecord.cpp				Sources)
 ze_add_source(ZEITRecord.h					Sources Headers)
 
-ze_add_library(TARGET ZEITIntegrity 
+ze_add_component(COMPONENT ZEITIntegrity 
+	TARGET ZEFoundation
 	SOURCES ${Sources}
-	LIBS ZEFoundation libCryptopp)
+	LIBS libCryptopp)
+
+ze_add_component(COMPONENT ZEITIntegrity 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources}
+	LIBS libCryptopp)

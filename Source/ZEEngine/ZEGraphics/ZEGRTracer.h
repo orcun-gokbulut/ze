@@ -36,8 +36,9 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEGRTracer
+class ZE_EXPORT_ZEENGINE ZEGRTracer
 {
 	friend class ZED11Module;
 	

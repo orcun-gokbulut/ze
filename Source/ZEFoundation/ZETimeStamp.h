@@ -38,9 +38,10 @@
 #include "ZETypes.h"
 #include <time.h>
 #include "ZEDS\ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZE_INVALID_TIME ((ZEInt64)-1)
-class ZETimeStamp
+class ZE_EXPORT_ZEFOUNDATION ZETimeStamp
 {
 	public:
 		ZEInt64					Value;

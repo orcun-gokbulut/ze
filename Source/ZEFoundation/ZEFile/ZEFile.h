@@ -41,6 +41,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
+#include "ZEExport.ZEFoundation.h"
 
 
 enum ZESeekFrom
@@ -74,7 +75,7 @@ enum ZEFileCreationMode
 };
 
 
-class ZEFile : public ZESerializer, public ZEUnserializer
+class ZE_EXPORT_ZEFOUNDATION ZEFile : public ZESerializer, public ZEUnserializer
 {
 	protected:
 		void*					File;

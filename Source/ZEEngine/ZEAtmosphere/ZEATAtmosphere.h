@@ -41,6 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEATCommon.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZELightDirectional;
 class ZEGRRenderStateData;
@@ -55,7 +56,7 @@ class ZEATFog;
 class ZEATCloud;
 class ZEATSkyBox;
 
-class ZEATAtmosphere : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEATAtmosphere : public ZEEntity
 {
 	ZE_OBJECT
 	private:

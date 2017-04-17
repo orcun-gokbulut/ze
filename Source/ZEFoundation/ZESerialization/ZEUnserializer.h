@@ -38,8 +38,9 @@
 #define __ZE_UNSERIALIZER_H__
 
 #include "ZETypes.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEUnserializer
+class ZE_EXPORT_ZEFOUNDATION ZEUnserializer
 {
 	public:
 		virtual ZESize		Read(void* Buffer, const ZESize Size, const ZESize Count) = 0;

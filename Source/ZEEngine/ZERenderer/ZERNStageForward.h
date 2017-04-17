@@ -47,7 +47,7 @@ class ZEGRTexture;
 class ZEGRBuffer;
 class ZEGRComputeRenderStateData;
 
-class ZERNStageForward : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageForward : public ZERNStage
 {
 	ZE_OBJECT
 	protected:
@@ -80,7 +80,7 @@ class ZERNStageForward : public ZERNStage
 		static ZEGRRenderState					GetRenderState();
 };
 
-class ZERNStageForwardTransparent : public ZERNStageForward
+class ZE_EXPORT_ZEENGINE ZERNStageForwardTransparent : public ZERNStageForward
 {
 	ZE_OBJECT
 	private:
@@ -99,7 +99,7 @@ class ZERNStageForwardTransparent : public ZERNStageForward
 		static ZEGRRenderState					GetRenderState();
 };
 
-class ZERNStageForwardPostHDR : public ZERNStageForward
+class ZE_EXPORT_ZEENGINE ZERNStageForwardPostHDR : public ZERNStageForward
 {
 	ZE_OBJECT
 	public:

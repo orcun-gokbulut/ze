@@ -34,14 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_ERROR_H__
-#define __ZE_ERROR_H__
 
 #include "ZETypes.h"
 #include "ZELog.h"
-#include "ZEDLL.h"
 #include "ZEPlatform.h"
-#include "ZEDS\ZEDelegate.h"
+#include "ZEExport.ZEFoundation.h"
+#include "ZEDS/ZEDelegate.h"
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_COMPILER_MSVC)
 	#include <intrin.h>
@@ -62,9 +60,10 @@ enum ZEErrorType
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#include <crtdbg.h>
-	extern ZELock ZE_BREAK_LOCK_INTERNAL;
+	ZE_EXPORT_ZEFOUNDATION void zeBreakLock();
+	ZE_EXPORT_ZEFOUNDATION void zeBreakUnlock();
 	#define ZE_BREAK_INTERNAL __debugbreak()
-	#define ZE_BREAK_DIALOG_INTERNAL(...) ZE_BREAK_LOCK_INTERNAL.Lock(); int Result = 0; Result = _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); ZE_BREAK_LOCK_INTERNAL.Unlock(); if (Result ==  1) zeBreak(true); 
+	#define ZE_BREAK_DIALOG_INTERNAL(...) zeBreakLock(); int Result = 0; Result = _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); zeBreakUnlock(); if (Result ==  1) zeBreak(true); 
 	#define ZE_MEMORY_CHECK_INTERNAL !_CrtCheckMemory()
 #else
 	#define ZE_BREAK_INTERNAL abort()
@@ -116,7 +115,7 @@ enum ZEErrorType
 #endif
 typedef ZEDelegate<void (ZEErrorType)> ZEErrorCallback;
 
-class ZEError
+class ZE_EXPORT_ZEFOUNDATION ZEError
 {
 	private:
 		bool								BreakOnAssertEnabled;
@@ -143,8 +142,5 @@ class ZEError
 
 		void								RaiseError(ZEErrorType Type);
 
-		ZE_ENGINE_EXPORT 
 		static ZEError*						GetInstance();
 };
-
-#endif

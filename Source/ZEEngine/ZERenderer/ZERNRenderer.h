@@ -44,6 +44,7 @@
 #include "ZERNView.h"
 #include "ZERNStageID.h"
 #include "ZEModel/ZEMDVertex.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEScene);
 ZEMT_FORWARD_DECLARE(ZERNStage);
@@ -64,7 +65,7 @@ struct ZERNInstanceData
 	ZEUInt32_4	DrawLODTransition;
 };
 
-class ZERNRenderer : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStage;

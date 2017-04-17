@@ -46,8 +46,8 @@ ze_add_source(ZEInteriorHelper.h			Sources Headers ZEMC)
 ze_add_source(ZEInteriorResource.cpp		Sources)
 ze_add_source(ZEInteriorResource.h			Sources Headers)
 
-ze_add_library(TARGET ZEInterior 
+ze_add_component(COMPONENT ZEInterior 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC}
-	LIBS ZEFoundation)
+	ZEMC ${ZEMC})

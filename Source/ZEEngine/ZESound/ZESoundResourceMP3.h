@@ -56,7 +56,7 @@ class ZESoundResourceMP3 : public ZESoundResource
 		ZETaskResult								LoadInternal();
 		ZETaskResult								UnloadInternal();
 
-		ZESoundResourceMP3();
+													ZESoundResourceMP3();
 		virtual										~ZESoundResourceMP3();
 
 		static volatile int							LastResourceIndex;

@@ -42,6 +42,7 @@
 #include "ZEUIEvents.h"
 #include "ZEUIFont.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEExport.ZEEngine.h"
 
 enum ZEUIInputKey
 {
@@ -174,7 +175,7 @@ enum ZEUIMouseKey;
 ZEMT_FORWARD_DECLARE(ZEUIControl);
 ZEMT_FORWARD_DECLARE(ZEUICursorControl);
 
-class ZEUIManager : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZEUIManager : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	private:

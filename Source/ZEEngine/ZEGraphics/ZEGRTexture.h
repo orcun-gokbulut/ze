@@ -41,7 +41,11 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 
-ZE_ENUM_TYPED(ZEGRTextureType, ZEUInt8)
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+class ZEGRTexture;
+
+ZE_EXPORT_ZEENGINE ZE_ENUM_TYPED(ZEGRTextureType, ZEUInt8)
 {
 	ZEGR_TT_NONE	= 0,
 	ZEGR_TT_2D		= 1,
@@ -55,7 +59,7 @@ struct ZERect
 	ZEInt Width, Height;
 };
 
-class ZEGRTextureOptions : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRTextureOptions : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -70,11 +74,7 @@ class ZEGRTextureOptions : public ZEObject
 									ZEGRTextureOptions();
 };
 
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-class ZEGRTexture;
-
-class ZEGRTextureView : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRTextureView : public ZEObject
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTextureView)
@@ -99,7 +99,7 @@ class ZEGRTextureView : public ZEObject
 		ZEUInt					GetLayerCount() const;
 };
 
-class ZEGRTexture : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGRTexture : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTexture)

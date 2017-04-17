@@ -52,7 +52,14 @@ ze_add_source(ZECompressorZLIB.cpp						Sources)
 ze_add_source(ZEDecompressorZLIB.h						Sources)
 ze_add_source(ZEDecompressorZLIB.cpp					Sources)
 
-ze_add_library(TARGET ZECompression
+ze_add_component(COMPONENT ZECompression
+	TARGET ZEFoundation
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS libZLib)
+	LIBS libZLib)
+
+ze_add_component(COMPONENT ZECompression
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS libZLib)

@@ -64,7 +64,8 @@ ze_add_source(ZELoadingScreen.h			Sources Headers ZEMC)
 ze_add_source(ZESpawner.cpp				Sources)
 ze_add_source(ZESpawner.h				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEGame 
-	ZEMC ${ZEMC}
+ze_add_component(COMPONENT ZEGame
+	TARGET ZEEngine  
 	SOURCES ${Sources}
-	HEADERS ${Headers})
+	HEADERS ${Headers}
+	ZEMC ${ZEMC})

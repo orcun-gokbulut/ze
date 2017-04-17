@@ -38,8 +38,9 @@
 #define __ZE_STEERING_USER_TANK_CONTROL_H__
 
 #include "ZESteering.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEStreeringUserTankControl : public ZESteering
+class ZE_EXPORT_ZEENGINE ZEStreeringUserTankControl : public ZESteering
 {
 	private:
 		ZEInputMap	InputMap;

@@ -42,8 +42,9 @@
 #include "ZED11StatePool.h"
 #include "ZED11Tracer.h"
 #include "ZED11Context.h"
+#include "ZEExport.ZEDirect3D11.h"
 
-class ZED11Module : public ZEGRGraphicsModule
+class ZE_EXPORT_ZEDIRECT3D11 ZED11Module : public ZEGRGraphicsModule
 {
 	ZE_OBJECT
 	protected:

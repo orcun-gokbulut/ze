@@ -35,16 +35,23 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEClass.cpp							Sources)
-ze_add_source(ZEClass.h 							Sources Headers)
-ze_add_source(ZEClassOverloads.cpp					Sources)
-ze_add_source(ZEObject.cpp							Sources)
-ze_add_source(ZEObject.h							Sources Headers)
+ze_add_source(ZEClass.cpp							SourcesShared)
+ze_add_source(ZEClass.h 							SourcesShared HeadersShared)
+ze_add_source(ZEClassOverloads.cpp					SourcesShared)
+ze_add_source(ZEObject.cpp							SourcesShared)
+ze_add_source(ZEObject.h							SourcesShared HeadersShared)
+ze_add_source(ZEEvent.cpp							SourcesShared)
+ze_add_source(ZEEvent.h								SourcesShared HeadersShared)
+ze_add_source(ZEMTProvider.cpp						SourcesShared)
+ze_add_source(ZEMTProvider.h						SourcesShared HeadersShared)
+ze_add_source(ZEMTDeclaration.cpp					SourcesShared)
+ze_add_source(ZEMTDeclaration.h 					SourcesShared HeadersShared)
+
+ze_add_source(ZEMTExport.cpp						Sources)
+ze_add_source(ZEMTExport.h							Sources Headers)
 ze_add_source(ZEEventDelegate.cpp					Sources)
 ze_add_source(ZEEventDelegate.h						Sources Headers)
 ze_add_source(ZEEventDelegateImp.h					Sources Headers)
-ze_add_source(ZEEvent.cpp							Sources)
-ze_add_source(ZEEvent.h								Sources Headers)
 ze_add_source(ZEEventImp.h							Sources Headers)
 ze_add_source(ZEEventSuppressor.cpp					Sources)
 ze_add_source(ZEEventSuppressor.h					Sources Headers)
@@ -54,8 +61,6 @@ ze_add_source(ZEMTCollection.cpp					Sources)
 ze_add_source(ZEMTCollection.h						Sources Headers)
 ze_add_source(ZEMTFundamental.cpp					Sources)
 ze_add_source(ZEMTFundamental.h						Sources Headers)
-ze_add_source(ZEMTDeclaration.cpp					Sources)
-ze_add_source(ZEMTDeclaration.h 					Sources Headers)
 ze_add_source(ZEMTAttribute.cpp						Sources)
 ze_add_source(ZEMTAttribute.h						Sources Headers)
 ze_add_source(ZEMTProperty.cpp						Sources)
@@ -71,8 +76,6 @@ ze_add_source(ZEMTMethodSignature.h					Sources Headers)
 ze_add_source(ZEMTMethodSignatureGenerator.cpp		Sources)
 ze_add_source(ZEMTMethodSignatureGenerator.h		Sources Headers)
 ze_add_source(ZEMTMethodSignatureGeneratorImp.h		Sources Headers)
-ze_add_source(ZEMTProvider.cpp						Sources)
-ze_add_source(ZEMTProvider.h						Sources Headers)
 ze_add_source(ZEMTType.cpp							Sources)
 ze_add_source(ZEMTType.h							Sources Headers)
 ze_add_source(ZEMTTypeGenerator.cpp					Sources)
@@ -89,11 +92,21 @@ ze_add_source(ZEMTTypeTestTable.h					Sources)
 ze_add_source(ZEMTTestObject.h						Tests ZEMC)
 ze_add_source(ZEMTTestObject.cpp					Tests)
 
-ze_add_library(TARGET ZEMeta 
+ze_add_component(COMPONENT ZEMeta
+	TARGET ZEFoundation
+	SOURCES ${SourcesShared}
+	HEADERS ${HeadersShared})
+
+ze_add_component(COMPONENT ZEMeta
+	TARGET ZEFoundationBase
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEDS)
-	
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZEMeta
+	TARGET ZEFoundationStatic 
+	SOURCES ${Sources} ${SourcesShared}
+	HEADERS ${Headers} ${HeadersShared})
+
 ze_add_test(TARGET ZEMetaTests
 	SOURCES ${Tests} ZEVariantTest.cpp
 	ZEMC ${ZEMC}

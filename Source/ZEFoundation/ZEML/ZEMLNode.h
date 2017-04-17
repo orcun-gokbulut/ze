@@ -40,13 +40,14 @@
 #include "ZEMLElement.h"
 #include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEMLProperty;
 class ZEMLData;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMLNode : public ZEMLElement
+class ZE_EXPORT_ZEFOUNDATION ZEMLNode : public ZEMLElement
 {
 	friend class ZEMLRoot;
 	private:

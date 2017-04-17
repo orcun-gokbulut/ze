@@ -45,6 +45,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERNShading.h"
 #include "ZEMath/ZEBSphere.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -59,7 +60,7 @@ class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
-class ZERNStageLighting : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageLighting : public ZERNStage
 {
 	ZE_OBJECT
 	friend class ZERNStageForward;

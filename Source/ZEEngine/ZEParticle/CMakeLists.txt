@@ -52,8 +52,8 @@ ze_add_source(ZEParticleUVModifier.cpp					Sources)
 ze_add_source(ZEParticleUVModifier.h					Sources Headers ZEMC)
 ze_add_source(ZEParticleGrowModifier.cpp				Sources)
 ze_add_source(ZEParticleGrowModifier.h					Sources Headers ZEMC)
-ze_add_source(ZEParticleDisplacementModifier.h			Sources)
-ze_add_source(ZEParticleDisplacementModifier.cpp		Sources Headers ZEMC)
+ze_add_source(ZEParticleDisplacementModifier.cpp		Sources)
+ze_add_source(ZEParticleDisplacementModifier.h			Sources Headers ZEMC)
 ze_add_source(ZEParticleVelocityOverLifeModifier.cpp	Sources)
 ze_add_source(ZEParticleVelocityOverLifeModifier.h		Sources Headers ZEMC)
 ze_add_source(ZEParticleColorOverLifeModifier.cpp		Sources)
@@ -62,8 +62,8 @@ ze_add_source(ZEParticleRandomAccelerationModifier.cpp	Sources)
 ze_add_source(ZEParticleRandomAccelerationModifier.h	Sources Headers ZEMC)
 
 
-ze_add_library(TARGET ZEParticle 
+ze_add_component(COMPONENT ZEParticle 
+	TARGET ZEEngine
 	ZEMC ${ZEMC}
 	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	HEADERS ${Headers})

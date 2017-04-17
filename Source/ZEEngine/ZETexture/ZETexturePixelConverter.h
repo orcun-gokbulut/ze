@@ -40,8 +40,9 @@
 
 #include "ZETypes.h"
 #include "ZEPixel.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZETexturePixelConverter
+class ZE_EXPORT_ZEENGINE ZETexturePixelConverter
 {
 	public:
 		static void ConvertIndexed(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette);

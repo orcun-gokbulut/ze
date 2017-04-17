@@ -45,8 +45,6 @@ extern HINSTANCE ApplicationInstance;
 
 ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
 {
-	ApplicationInstance = hInstance;
-
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
 	ZEConsoleWindow ConsoleWindow;

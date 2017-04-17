@@ -41,7 +41,7 @@
 
 class ZEGRShaderMeta;
 
-class ZEGRShaderCompiler : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderCompiler : public ZEObject
 {
 	ZE_OBJECT
 	public:

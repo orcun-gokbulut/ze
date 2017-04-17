@@ -42,6 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -51,14 +52,14 @@ class ZEGRBuffer;
 class ZEGRRenderStateData;
 class ZEGRDepthStencilBuffer;
 
-ZE_ENUM(ZERNSSAOSampleCount)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNSSAOSampleCount)
 {
 	ZERN_AOSC_LOW		= 0,
 	ZERN_AOSC_MEDIUM	= 1,
 	ZERN_AOSC_HIGH		= 2
 };
 
-class ZERNStageAO : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageAO : public ZERNStage
 {
 	ZE_OBJECT
 	private:

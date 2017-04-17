@@ -41,10 +41,11 @@
 #include "ZEMLCommon.h"
 #include "ZEDS/ZEList.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 class ZEMLNode;
 
-class ZEMLElement : public ZEListItem
+class ZE_EXPORT_ZEFOUNDATION ZEMLElement : public ZEListItem
 {
 	friend ZEMLNode;
 	private:

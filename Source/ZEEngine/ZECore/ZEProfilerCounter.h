@@ -40,11 +40,12 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEEngine.h"
 
 
 class ZEProfiler;
 
-class ZEProfilerCounter
+class ZE_EXPORT_ZEENGINE ZEProfilerCounter
 {
 	protected:
 		ZEString					Name;

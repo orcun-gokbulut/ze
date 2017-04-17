@@ -38,11 +38,12 @@
 #include "ZEParticle.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEParticleEmitter;
 class ZEParticleEffect;
 
-class ZEParticleModifier : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEParticleModifier : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEParticleEmitter;

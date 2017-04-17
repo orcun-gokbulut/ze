@@ -41,9 +41,10 @@
 #include "ZECommand.h"
 #include "ZEDS/ZEArray.h"
 #include "ZECommandSection.h"
+#include "ZEExport.ZEEngine.h"
 
 
-class ZECommandManager 
+class ZE_EXPORT_ZEENGINE ZECommandManager 
 {
 	friend class ZECore;
 	private:

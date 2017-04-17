@@ -36,14 +36,16 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEEnumerator.h"
 #include "ZEInitializable.h"
 
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZERNStageDisplayScaleMode)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNStageDisplayScaleMode)
 {
 	ZERN_SDSM_NONE,
 	ZERN_SDSM_FILL,
@@ -52,7 +54,7 @@ ZE_ENUM(ZERNStageDisplayScaleMode)
 	ZERN_SDSM_FIT_VERTICAL
 };
 
-ZE_ENUM(ZERNStageDisplayFlipMode)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNStageDisplayFlipMode)
 {
 	ZERN_SDMF_NONE,
 	ZERN_SDMF_VERTICAL,
@@ -66,7 +68,7 @@ class ZEGRBuffer;
 class ZEGRRenderTarget;
 class ZERNStageMultiplexer;
 
-class ZERNStageDisplay : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZERNStageDisplay : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStageMultiplexer;

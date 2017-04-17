@@ -48,6 +48,7 @@
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
+#include "ZEInput/ZEInputDeviceIndexes.h"
 
 
 void ZEWindowsInputMouseDevice::UnAcquire()

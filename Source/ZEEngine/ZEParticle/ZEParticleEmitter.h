@@ -46,8 +46,9 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEParticle.h"
+#include "ZEExport.ZEEngine.h"
 
-ZE_ENUM(ZEParticleEmitterType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEParticleEmitterType)
 {
 	ZE_PET_POINT,
 	ZE_PET_PLANE,
@@ -56,14 +57,14 @@ ZE_ENUM(ZEParticleEmitterType)
 	ZE_PET_SPHERE
 };
 
-ZE_ENUM(ZEParticleBillboardType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEParticleBillboardType)
 {
 	ZE_PBT_AXIS_ORIENTED,
 	ZE_PBT_VELOCITY_ORIENTED,
 	ZE_PBT_VIEW_POINT_ORIENTED
 };
 
-ZE_ENUM(ZEParticleAxisOrientation)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEParticleAxisOrientation)
 {
 	ZE_PAO_X,
 	ZE_PAO_Y,
@@ -81,7 +82,7 @@ class ZERNParticleMaterial;
 class ZERNRenderParameters;
 class ZERNPreRenderParameters;
 
-class ZEParticleEmitter : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZEParticleEmitter : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZEParticleModifier;

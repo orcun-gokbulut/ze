@@ -40,23 +40,9 @@
 
 #include "ZEInputDeviceState.h"
 #include "ZEInputDeviceDescription.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEInputDeviceIndexes
-{
-	private:
-		static ZEUInt							KeyboardIndex;
-		static ZEUInt							MouseIndex;
-		static ZEUInt							JoystickIndex;
-		static ZEUInt							GamepadIndex;
-		static ZEUInt							WheelIndex;
-		static ZEUInt							SensorIndex;
-		static ZEUInt							OtherIndex;
-
-	public:
-		static ZEUInt							GetNewDeviceIndex(ZEInputDeviceType Type);
-};
-
-class ZEInputDevice : public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEInputDevice : public ZEInitializable, public ZEDestroyable
 {
 	private:
 		bool									Enabled;

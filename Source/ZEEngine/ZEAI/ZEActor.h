@@ -40,13 +40,13 @@
 #include "ZEDS\ZEString.h"
 #include "ZEMath\ZEVector.h"
 #include "ZEGame\ZEEntity.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZESteering;
 
-class ZEActor : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZEActor : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		ZEVector3					LinearVelocity;
 		ZEQuaternion				AngularVelocity;

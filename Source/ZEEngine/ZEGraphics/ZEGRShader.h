@@ -41,7 +41,7 @@
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
 
-class ZEGRShader : public ZEGRResource
+class ZE_EXPORT_ZEENGINE ZEGRShader : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRShader)

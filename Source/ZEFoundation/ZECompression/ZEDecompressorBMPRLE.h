@@ -39,8 +39,9 @@
 #define __ZE_DECOMPRESSOR_BMP_RLE_H__
 
 #include "ZEDecompressor.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEDecompressorBMPRLE : public ZEDecompressor
+class ZE_EXPORT_ZEFOUNDATION ZEDecompressorBMPRLE : public ZEDecompressor
 {
 	private:
 		ZEInt					Mode;

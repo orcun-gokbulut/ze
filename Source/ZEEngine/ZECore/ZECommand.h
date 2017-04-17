@@ -41,12 +41,13 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEDelegate.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZECommand;
 typedef ZEArray<ZEValue> ZECommandParameterList;
 typedef ZEDelegate<bool (ZECommand*, const ZECommandParameterList*)> ZECommandCallback;
 
-class ZECommand
+class ZE_EXPORT_ZEENGINE ZECommand
 {
 	private:
 		ZEString					Name;

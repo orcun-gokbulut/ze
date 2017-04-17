@@ -42,6 +42,7 @@
 #include "ZETypes.h"
 #include "ZEPartialFile.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))
@@ -83,7 +84,7 @@ class ZECacheDataIdentifier
 };
 
 
-class ZEFileCache
+class ZE_EXPORT_ZEFOUNDATION ZEFileCache
 {
 	private:
 		ZEFile					File;

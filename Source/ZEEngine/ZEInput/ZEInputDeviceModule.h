@@ -38,8 +38,9 @@
 #include "ZECore/ZEModule.h"
 
 #include "ZEInputDevice.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEInputDeviceModule : public ZEModule
+class ZE_EXPORT_ZEENGINE ZEInputDeviceModule : public ZEModule
 {
 	ZE_OBJECT
 	private:

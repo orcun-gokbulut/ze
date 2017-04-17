@@ -38,15 +38,14 @@
 #define __ZE_UI_HORIZONTAL_SLIDER_CONTROL__
 
 #include "ZEUIControl.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEUIMaterial;
 
-class ZEUIHorizontalSliderControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUIHorizontalSliderControl : public ZEUIControl
 {
 	ZE_OBJECT
-
 	private:
-
 		ZEUIRectangle	SliderButton;
 		ZEUIRectangle	SliderLine;
 
@@ -60,13 +59,11 @@ class ZEUIHorizontalSliderControl : public ZEUIControl
 		bool			IsButtonPressed;
 
 	protected:
-
 		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual	void	MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void	MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 
 	public:
-
 		virtual void	Draw(ZEUIRenderer* Renderer);
 
 		void			SetValue(float NewValue);

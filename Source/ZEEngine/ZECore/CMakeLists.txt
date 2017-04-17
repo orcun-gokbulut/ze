@@ -84,8 +84,8 @@ ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 ze_add_source(ZESplashWindow.cpp					Sources)
 ze_add_source(ZESplashWindow.h						Sources)
 
-ze_add_library(TARGET ZECore
-	ZEMC ${ZEMC}
+ze_add_component(COMPONENT ZECore
+	TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libPhysX2)
+	ZEMC ${ZEMC})

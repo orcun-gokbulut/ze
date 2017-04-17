@@ -40,8 +40,9 @@
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZEUICursorControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUICursorControl : public ZEUIControl
 {
 	ZE_OBJECT
 	private:

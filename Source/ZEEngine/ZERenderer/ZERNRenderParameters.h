@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRContext;
 ZEMT_FORWARD_DECLARE(ZEScene);
@@ -46,7 +47,7 @@ ZEMT_FORWARD_DECLARE(ZERNCommand);
 ZEMT_FORWARD_DECLARE(ZERNView);
 ZEMT_FORWARD_DECLARE(ZETimeParameters);
 
-ZE_ENUM(ZERNRenderType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNRenderType)
 {
 	ZERN_RT_COLOR,
 	ZERN_RT_SHADOW,
@@ -54,7 +55,7 @@ ZE_ENUM(ZERNRenderType)
 	ZERN_RT_OTHER
 };
 
-ZE_ENUM(ZERNRenderFlag)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNRenderFlag)
 {
 	ZERN_RF_NONE				= 0x00,
 	ZERN_RF_STERIO				= 0x10,
@@ -72,7 +73,7 @@ ZE_ENUM(ZERNRenderFlag)
 };
 typedef ZEFlags ZERNRenderFlags;
 
-class ZERNPreRenderParameters : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNPreRenderParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -87,7 +88,7 @@ class ZERNPreRenderParameters : public ZEObject
 									ZERNPreRenderParameters();
 };
 
-class ZERNRenderParameters : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNRenderParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:

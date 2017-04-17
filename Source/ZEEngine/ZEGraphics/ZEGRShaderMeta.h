@@ -46,7 +46,7 @@
 
 typedef ZEGRColorMask	ZEShaderRegisterMask;
 
-ZE_ENUM(ZEGRShaderRegisterType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRShaderRegisterType)
 {
 	ZEGR_SRT_FLOAT_32			= 0,
 	ZEGR_SRT_UNSIGNED_INT_32	= 1,
@@ -54,7 +54,7 @@ ZE_ENUM(ZEGRShaderRegisterType)
 	ZEGR_SRT_NONE				= 3,
 };
 
-ZE_ENUM(ZEGRShaderSystemSemantic)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRShaderSystemSemantic)
 {
 	ZEGR_SSS_NONE						= 0,
 	ZEGR_SSS_POSITION					= 1,
@@ -72,14 +72,14 @@ ZE_ENUM(ZEGRShaderSystemSemantic)
 	ZEGR_SSS_COVERAGE					= 13
 };
 
-ZE_ENUM(ZEGRShaderConstantBufferType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRShaderConstantBufferType)
 {
 	ZEGR_SCBT_NONE		= 0,
 	ZEGR_SCBT_C_BUFFER	= 1,
 	ZEGR_SCBT_T_BUFFER	= 2
 };
 
-ZE_ENUM(ZEGRShaderConstantType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRShaderConstantType)
 {
 	ZEGR_SCDT_VOID		= 0,
     ZEGR_SCDT_BOOL		= 1,
@@ -88,7 +88,7 @@ ZE_ENUM(ZEGRShaderConstantType)
 	ZEGR_SCDT_FLOAT		= 4
 };
 
-ZE_ENUM(ZEGRShaderSamplerType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRShaderSamplerType)
 {
 	ZEGR_SSRT_NONE					= 0,
 	ZEGR_SSRT_UNSIGNED_NORMALIZED	= 1,
@@ -100,7 +100,7 @@ ZE_ENUM(ZEGRShaderSamplerType)
 	ZEGR_SSRT_MIXED					= 7
 };
 
-class ZEGRShaderInput : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderInput : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -114,7 +114,7 @@ class ZEGRShaderInput : public ZEObject
 		ZEGRShaderRegisterType			RegisterType;
 };
 
-class ZEGRShaderConstant : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderConstant : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -127,7 +127,7 @@ class ZEGRShaderConstant : public ZEObject
 		ZEUInt							ColumnCount;
 };
 
-class ZEGRShaderConstantBuffer : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderConstantBuffer : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -140,7 +140,7 @@ class ZEGRShaderConstantBuffer : public ZEObject
 		ZEArray<ZEGRShaderConstant>		Constants;
 };
 
-class ZEGRShaderSampler : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderSampler : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -152,7 +152,7 @@ class ZEGRShaderSampler : public ZEObject
 		ZEGRShaderSamplerType			SamplerReturnType;
 };
 
-class ZEGRShaderTexture : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderTexture : public ZEObject
 {
 	ZE_OBJECT
 	public:
@@ -164,7 +164,7 @@ class ZEGRShaderTexture : public ZEObject
 		ZEGRTextureType					Type;
 };
 
-class ZEGRShaderMeta : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEGRShaderMeta : public ZEObject
 {
 	ZE_OBJECT
 	public:

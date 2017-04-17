@@ -46,6 +46,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERNFilterCommon.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -57,7 +58,7 @@ class ZEGRComputeRenderStateData;
 class ZEGRRenderTarget;
 enum ZEGRFormat;
 
-class ZERNFilter : public ZEObject, public ZEInitializable
+class ZE_EXPORT_ZEENGINE ZERNFilter : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStagePostProcess;

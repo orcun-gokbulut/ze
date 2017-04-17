@@ -42,7 +42,7 @@
 #include "ZEDS/ZEGraph.h"
 #include "ZEMath/ZEPolygon.h"
 #include "ZESpatial/ZEOctree.h"
-
+#include "ZEExport.ZEEngine.h"
 
 class ZENavigationMeshPolygon
 {
@@ -54,7 +54,7 @@ class ZENavigationMeshPolygon
 
 typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
 
-class ZENavigationMesh
+class ZE_EXPORT_ZEENGINE ZENavigationMesh
 {
 	public:
 		ZENavigationMeshOctree		Octree;

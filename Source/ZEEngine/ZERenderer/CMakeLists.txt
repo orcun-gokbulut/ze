@@ -130,8 +130,9 @@ ze_add_source(ZERNStageRenderDepth.h 				Sources Headers ZEMC)
 ze_add_source(ZERNStageAtmosphere.cpp				Sources)
 ze_add_source(ZERNStageAtmosphere.h 				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZERenderer 
+ze_add_component(COMPONENT ZERenderer 
+	TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libFreeImage)
+	LIBS libFreeImage)

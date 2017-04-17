@@ -41,8 +41,9 @@
 #include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
 #include "ZEInitializable.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEPathManager : public ZEInitializable
+class ZE_EXPORT_ZEFOUNDATION ZEPathManager : public ZEInitializable
 {
 	private:
 		bool					AccessControl;

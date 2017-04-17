@@ -37,8 +37,8 @@
 
 #include "ZEMTMethodSignatureGenerator.h"
 #include "ZEEventDelegate.h"
-
 #include "ZEObject.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZE_EVENT(Name, Parameters) ZEEvent<void Parameters> Name; 
 
@@ -48,7 +48,7 @@ struct ZEMTEventStackItem
 	bool Acquired;
 };
 
-class ZEMTEventBase
+class ZE_EXPORT_ZEFOUNDATION ZEMTEventBase
 {
 	friend class ZEObject;
 	private:

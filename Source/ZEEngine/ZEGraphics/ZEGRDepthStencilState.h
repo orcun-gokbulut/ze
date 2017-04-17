@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-enum ZEGRStencilOperation 
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEGRStencilOperation) 
 { 
 	ZEGR_SO_KEEP				= 0,
 	ZEGR_SO_ZERO				= 1,
@@ -51,7 +51,7 @@ enum ZEGRStencilOperation
 	ZEGR_SO_DECREASE			= 7 
 };
 
-class ZEGRDepthStencilState : public ZEGRState
+class ZE_EXPORT_ZEENGINE ZEGRDepthStencilState : public ZEGRState
 {
 	ZE_OBJECT
 	private:

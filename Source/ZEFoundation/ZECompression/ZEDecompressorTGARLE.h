@@ -39,8 +39,9 @@
 #define __ZE_DECOMPRESSOR_TGA_RLE_H__
 
 #include "ZEDecompressor.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEDecompressorTGARLE : public ZEDecompressor
+class ZE_EXPORT_ZEFOUNDATION ZEDecompressorTGARLE : public ZEDecompressor
 {
 	private:
 		ZEInt				Mode;

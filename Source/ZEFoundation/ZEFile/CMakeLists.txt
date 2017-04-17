@@ -64,12 +64,17 @@ ze_add_source(ZEPathManagerTests.cpp		Tests)
 ze_add_source(ZEFileCommon.cpp				Sources)
 ze_add_source(ZEFileCommon.h				Sources Headers)
 
-ze_add_library(TARGET ZEFile 
+ze_add_component(COMPONENT ZEFile 
+	TARGET ZEFoundation 
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS)
+	HEADERS ${Headers})
+
+ze_add_component(COMPONENT ZEFile 
+	TARGET ZEFoundationStatic
+	SOURCES ${Sources} 
+	HEADERS ${Headers})
 
 ze_add_test(TARGET ZEFileTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES
-	TEST_TARGET ZEFile)
+	TEST_TARGET ZEFoundation)

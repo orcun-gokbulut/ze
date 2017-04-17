@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZEFoundation.h"
 
 enum ZEPathAccess
 {
@@ -57,7 +58,7 @@ enum ZEPathRoot
 	ZE_PR_INTERNAL,
 };
 
-class ZERealPath
+class ZE_EXPORT_ZEFOUNDATION ZERealPath
 {
 	public:
 		ZEString Path;

@@ -39,10 +39,10 @@
 
 #include "ZEInput/ZEInputDeviceModule.h"
 #include "ZECore/ZESystemMessageHandler.h"
+#include "ZEExport.ZEWindowsInput.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 
 #define ZE_MAX_RAW_INPUT_COUNT 256
 
@@ -65,7 +65,7 @@ class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
 };
 
 
-class ZEWindowsInputModule : public ZEInputDeviceModule
+class ZE_EXPORT_ZEWINDOWSINPUT ZEWindowsInputModule : public ZEInputDeviceModule
 {
 	ZE_OBJECT
 	friend class ZEWindowsInputModule;

@@ -145,6 +145,30 @@ void ZEMTProvider::UnregisterEnumerator(ZEMTEnumerator* Enumerator)
 	Enumerators.RemoveValue(Enumerator);
 }
 
+bool ZEMTProvider::RegisterDeclaration(ZEMTDeclaration* Declaration)
+{
+	if (Declaration == NULL)
+		return false;
+
+	if (Declaration->GetDeclarationType() == ZEMT_DT_CLASS)
+		return RegisterClass(static_cast<ZEClass*>(Declaration));
+	else if (Declaration->GetDeclarationType() == ZEMT_DT_ENUMURATION)
+		return RegisterEnumerator(static_cast<ZEMTEnumerator*>(Declaration));
+
+	return false;
+}
+
+void ZEMTProvider::UnregisterDeclaration(ZEMTDeclaration* Declaration)
+{
+	if (Declaration == NULL)
+		return;
+
+	if (Declaration->GetDeclarationType() == ZEMT_DT_CLASS)
+		return UnregisterClass(static_cast<ZEClass*>(Declaration));
+	else if (Declaration->GetDeclarationType() == ZEMT_DT_ENUMURATION)
+		return UnregisterEnumerator(static_cast<ZEMTEnumerator*>(Declaration));
+}
+
 ZEObject* ZEMTProvider::CreateInstance(const char* ClassName)
 {
 	ZEClass* Class = GetClass(ClassName);

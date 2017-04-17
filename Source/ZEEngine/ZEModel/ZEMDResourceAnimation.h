@@ -44,6 +44,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
@@ -62,7 +63,7 @@ struct ZEMDResourceAnimationFrame
 	ZEArray<ZEMDResourceAnimationKey>		MeshKeys;
 };
 
-class ZEMDResourceAnimation : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEMDResourceAnimation : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceAnimation)

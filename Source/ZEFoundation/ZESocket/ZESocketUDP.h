@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZESocketDefinitions.h"
+#include "ZEExport.ZEFoundation.h"
 
 #define ZE_MAX_UDP_PACKET_SIZE	65507
 enum ZESocketUDPStatus
@@ -47,7 +48,7 @@ enum ZESocketUDPStatus
 	ZE_SUS_OPEN
 };
 
-class ZESocketUDP
+class ZE_EXPORT_ZEFOUNDATION ZESocketUDP
 {
 	friend class ZESocketTCPListener;
 	private:

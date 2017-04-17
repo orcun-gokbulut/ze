@@ -47,13 +47,14 @@
 
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEMath/ZERay.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEEntity;
 class ZEViewVolume;
 
 ZEMT_FORWARD_DECLARE(ZEGRViewport);
 
-ZE_ENUM(ZERNViewType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNViewType)
 {
 	ZERN_VT_NONE,
 	ZERN_VT_CAMERA,
@@ -62,7 +63,7 @@ ZE_ENUM(ZERNViewType)
 	ZERN_VT_VIEWPORT
 };
 
-ZE_ENUM(ZERNProjectionType)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZERNProjectionType)
 {
 	ZERN_PT_NONE,
 	ZERN_PT_PERSPECTIVE,
@@ -101,7 +102,7 @@ struct ZERNViewConstantBuffer
 	float							FarZ;
 };
 
-class ZERNView : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNView : public ZEObject
 {
 	ZE_OBJECT
 	public:

@@ -57,6 +57,7 @@
 #include "ZERayCast.h"
 #include "ZEVolumeCast.h"
 #include "ZESpatial/ZEOctree.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZEDObjectWrapper;
 class ZEMLWriterNode;
@@ -68,7 +69,7 @@ ZEMT_FORWARD_DECLARE(ZERNRenderParameters);
 ZEMT_FORWARD_DECLARE(ZERNCommand);
 
 typedef ZEFlags ZEEntityFlags;
-ZE_ENUM(ZEEntityFlag)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEEntityFlag)
 {
 	ZE_EF_NONE						= 0x000,
 	ZE_EF_TICKABLE					= 0x001,
@@ -83,7 +84,7 @@ ZE_ENUM(ZEEntityFlag)
 	ZE_EF_VOLUME_CASTABLE_CUSTOM	= 0x200
 };
 
-ZE_ENUM(ZEEntityResult)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEEntityResult)
 {
 	ZE_ER_DONE,
 	ZE_ER_WAIT,
@@ -91,7 +92,7 @@ ZE_ENUM(ZEEntityResult)
 	ZE_ER_FAILED_CLEANUP
 };
 
-ZE_ENUM(ZEEntityState)
+ZE_EXPORT_ZEENGINE ZE_ENUM(ZEEntityState)
 {
 	ZE_ES_ERROR_DESTRUCTION				= -5,
 	ZE_ES_ERROR_DEINITIALIZATION		= -4,
@@ -117,7 +118,7 @@ class ZEEntityLoadingScore
 		ZESize Count;
 };
 
-class ZEEntity : public ZEObject
+class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEScene;

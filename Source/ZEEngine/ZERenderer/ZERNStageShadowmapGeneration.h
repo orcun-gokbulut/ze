@@ -38,8 +38,9 @@
 #include "ZERNStage.h"
 
 #include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZERNStageShadowmapGeneration : public ZERNStage
+class ZE_EXPORT_ZEENGINE ZERNStageShadowmapGeneration : public ZERNStage
 {
 	ZE_OBJECT
 	public:

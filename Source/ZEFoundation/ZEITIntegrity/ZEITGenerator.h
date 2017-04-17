@@ -38,8 +38,9 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEITRecord.h"
 #include "ZEThread/ZELock.h"
+#include "ZEExport.ZEFoundation.h"
 
-class ZEITScannerEntry
+class ZE_EXPORT_ZEFOUNDATION ZEITScannerEntry
 {
 	private:
 		ZEString							Path;

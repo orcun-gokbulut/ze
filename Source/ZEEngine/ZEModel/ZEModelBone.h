@@ -45,11 +45,12 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZEExport.ZEEngine.h"
 
 ZEMT_FORWARD_DECLARE(ZEModel);
 ZEMT_FORWARD_DECLARE(ZEAABBox);
 
-class ZEModelBone : public ZEObject, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModelBone : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;

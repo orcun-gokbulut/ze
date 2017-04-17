@@ -135,11 +135,11 @@ void ZEMCGenerator::GenerateForwardDeclaration()
 		switch (Context->ForwardDeclarations[I]->Type)
 		{
 			case ZEMC_DT_CLASS:
-				WriteToFile("ZEClass* %s_Class();\n", Context->ForwardDeclarations[I]->Name.ToCString());
+				WriteToFile("ZEMT_IMPORT ZEClass* %s_Class();\n", Context->ForwardDeclarations[I]->Name.ToCString());
 				break;
 
 			case ZEMC_DT_ENUMERATOR:
-				WriteToFile("ZEClass* %s_Enumerator();\n", Context->ForwardDeclarations[I]->Name.ToCString());
+				WriteToFile("ZEMT_IMPORT ZEClass* %s_Enumerator();\n", Context->ForwardDeclarations[I]->Name.ToCString());
 				break;
 
 			case ZEMC_DT_FLAGS:
@@ -176,6 +176,7 @@ void ZEMCGenerator::GenerateHeading()
 	WriteToFile("#include \"ZEDS/ZEReference.h\"\n");
 	WriteToFile("#include \"ZEMeta/ZEClass.h\"\n");
 	WriteToFile("#include \"ZEMeta/ZEMTFundamental.h\"\n");
+	WriteToFile("#include \"ZEMeta/ZEMTExport.h\"\n");
 	WriteToFile("\n");
 
 	WriteToFile("#include <stddef.h>\n");

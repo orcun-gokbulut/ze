@@ -47,7 +47,7 @@ ZEMT_FORWARD_DECLARE(ZEUILabel);
 ZEMT_FORWARD_DECLARE(ZEUIRectangle);
 ZEMT_FORWARD_DECLARE(ZEUIMaterial);
 
-class ZEUICheckBoxControl : public ZEUIControl
+class ZE_EXPORT_ZEENGINE ZEUICheckBoxControl : public ZEUIControl
 {
 	ZE_OBJECT
 	friend class ZEUIManager;

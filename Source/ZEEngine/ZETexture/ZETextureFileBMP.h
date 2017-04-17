@@ -39,8 +39,9 @@
 #define __ZE_TEXTURE_FILE_BMP_H__
 
 #include "ZETextureFile.h"
+#include "ZEExport.ZEEngine.h"
 
-class ZETextureFileBMP : public ZETextureFile
+class ZE_EXPORT_ZEENGINE ZETextureFileBMP : public ZETextureFile
 {
 	public:
 		virtual bool				LoadInfo(ZETextureDataInfo* Info, ZEFile* File);

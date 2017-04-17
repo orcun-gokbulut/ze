@@ -60,7 +60,7 @@
 	namespace
 #define ZE_TEST(Name) ZE_TEST_INTERNAL(Name, ZE_MACRO_CONCAT(ZE_MACRO_CONCAT(ZETest, __COUNTER__), __LINE__))
 
-class ZETest
+class ZE_EXPORT_ZEFOUNDATION ZETest
 {
 	private:
 		ZEString						Name;

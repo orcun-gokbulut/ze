@@ -40,15 +40,15 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRCanvas.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEExport.ZEEngine.h"
 
 class ZERNMaterial;
 class ZEGRBuffer;
 class ZEGRRenderStateData;
 
-class ZECanvasBrush : public ZEEntity
+class ZE_EXPORT_ZEENGINE ZECanvasBrush : public ZEEntity
 {
 	ZE_OBJECT
-	
 	private:
 		ZERNCommand						RenderCommand;
 		ZESize							OldVertexCount;

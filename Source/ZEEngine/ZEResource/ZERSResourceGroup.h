@@ -41,7 +41,7 @@
 #include "ZEDS/ZEList2.h"
 #include "ZEDS/ZEArray.h"
 
-class ZERSResourceGroup : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERSResourceGroup : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZERSResourceManager;
