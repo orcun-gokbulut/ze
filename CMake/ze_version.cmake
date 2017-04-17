@@ -104,9 +104,9 @@ macro(ze_version_generate_version_info PARAMETER_TARGET PARAMETER_EXTENSION PARA
 				"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
 				"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
 				@ONLY)
-			target_sources(${PARAMETER_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
-			source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
 		endif()
+		target_sources(${PARAMETER_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+		source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
 	endif()
 endmacro()
 
