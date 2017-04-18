@@ -39,11 +39,10 @@
 
 #include "ZEInput/ZEInputDeviceModule.h"
 #include "ZEDirectInputDevice.h"
-#include "ZEExport.ZEDirectInput.h"
 
 #include <dinput.h>
 
-class ZE_EXPORT_ZEDIRECTINPUT ZEDirectInputModule : public ZEInputDeviceModule
+class ZEDirectInputModule : public ZEInputDeviceModule
 {
 	ZE_OBJECT
 	friend BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceDescription, LPVOID Ref);

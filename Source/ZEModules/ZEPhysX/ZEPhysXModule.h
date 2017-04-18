@@ -41,14 +41,13 @@
 #include "ZEPhysics/ZEPhysicsModule.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEExport.ZEPhysX.h"
 
 class NxPhysicsSDK;
 class NxCookingInterface;
 class ZEPhysXPhysicalWorld;
 class ZEPhysXUserOutputStream;
 
-class ZE_EXPORT_ZEPHYSX ZEPhysXModule : public ZEPhysicsModule
+class ZEPhysXModule : public ZEPhysicsModule
 {
 	ZE_OBJECT
 	friend class ZEPhysXPhysicalWorld;

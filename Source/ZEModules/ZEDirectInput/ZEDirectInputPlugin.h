@@ -42,7 +42,7 @@ extern "C"
 	ZE_EXPORT_ZEDIRECTINPUT ZEPlugin* zeCreatePluginInstance();
 };
 
-class ZE_EXPORT_ZEDIRECTINPUT ZEDirectInputPlugin : public ZEPlugin
+class  ZEDirectInputPlugin : public ZEPlugin
 {
 	ZE_DISALLOW_COPY(ZEDirectInputPlugin)
 	friend ZEPlugin* zeCreatePluginInstance();
