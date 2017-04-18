@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputModuleDescription.cpp
+ Zinek Engine - ZEDirectInputPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,83 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEWindowsInputModuleDescription.h"
-#include "ZEWindowsInputModule.h"
+#include "ZEDirectInputPlugin.h"
 
-ZEModuleDescription* ZEWindowsInputModuleDescription::GetBaseModuleDescription()
+#include "ZEVersion.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEEnumerator.h"
+
+ZEDirectInputPlugin::ZEDirectInputPlugin()
 {
-	return ZEInputModule::ModuleDescription();
+
 }
 
-ZEModuleAttribute ZEWindowsInputModuleDescription::GetAttributes()
+ZEDirectInputPlugin::~ZEDirectInputPlugin()
 {
-	return ZE_MA_DEBUG;
+
 }
 
-int ZEWindowsInputModuleDescription::GetRequiredZinekEngineVersion()
+const char* ZEDirectInputPlugin::GetName() const
 {
-	return 0;
+	return "ZEDirectInputPlugin";
 }
 
-int ZEWindowsInputModuleDescription::GetMajorVersion()
+ZEVersion ZEDirectInputPlugin::GetVersion() const
 {
-	return 0;
+	return ZEVersion::GetZinekVersion();
 }
 
-int ZEWindowsInputModuleDescription::GetMinorVersion()
+ZEVersion ZEDirectInputPlugin::GetEngineVersion() const
 {
-	return 4;
+	return ZEVersion::GetZinekVersion();
 }
 
-const char* ZEWindowsInputModuleDescription::GetCopyright()
+ZEMTDeclaration* const* ZEDirectInputPlugin::GetDeclarations() const
 {
-	return "Copyright (c) 2007-2008, Zinek Engine Group. All rights reserved.";
+	static ZEArray<ZEMTDeclaration*> Declarations;
+	static bool Populated = false;
+	
+	if (!Populated)
+	{
+		#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); Declarations.Add(Name ## _Enumerator());
+		#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); Declarations.Add(Name ## _Class());
+		#include "ZEDirectInput.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+
+		Populated = true;
+	}
+
+	return Declarations.GetConstCArray();
 }
 
-const char* ZEWindowsInputModuleDescription::GetName()
+ZESize ZEDirectInputPlugin::GetDeclarationCount() const
 {
-	return "WindowsInput";
+	static ZESSize DeclarationCount = -1;
+
+	if (DeclarationCount == -1)
+	{
+		DeclarationCount = 0;
+
+		#define ZEMT_COUNT_DECLARATION(Name) DeclarationCount++;
+		#define ZEMT_REGISTER_ENUM ZEMT_COUNT_DECLARATION
+		#define ZEMT_REGISTER_CLASS ZEMT_COUNT_DECLARATION
+		#include "ZEDirectInput.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+		#undef ZEMT_COUNT_DECLARATION
+	}
+
+	return (ZESize)DeclarationCount;
 }
 
-ZEOptionSection* ZEWindowsInputModuleDescription::GetOptions()
+void ZEDirectInputPlugin::Destroy()
 {
-	return NULL;
+	delete this;
 }
 
-
-ZEModule* ZEWindowsInputModuleDescription::CreateModuleInstance()
+ZEPlugin* zeCreatePluginInstance()
 {
-	return new ZEWindowsInputModule();
-}
-
-bool ZEWindowsInputModuleDescription::CheckCompatible()
-{
-	return true;
+	return new ZEDirectInputPlugin();
 }

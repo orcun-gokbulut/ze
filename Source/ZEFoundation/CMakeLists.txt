@@ -80,6 +80,7 @@ ze_add_source(ZEPacking.cpp 					Sources)
 ze_add_source(ZEVersion.cpp						Sources)
 ze_add_source(ZEVersion.h						Sources Headers)
 
+ze_add_source(ZEFoundation.h					SourcesShared)
 ze_add_source(ZEFoundation.cpp					SourcesShared)
 ze_add_source(ZEExport.ZEFoundation.cpp			SourcesShared)
 ze_add_source(ZEExport.ZEFoundation.h			SourcesShared HeadersShared)

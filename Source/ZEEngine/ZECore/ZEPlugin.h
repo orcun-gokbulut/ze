@@ -35,6 +35,8 @@
 
 #include "ZETypes.h"
 #include "ZECommon.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEString.h"
 #include "ZEExport.ZEEngine.h"
 
 class ZEPlugin;
@@ -42,7 +44,7 @@ class ZEVersion;
 class ZEMTDeclaration;
 struct ZESharedLibraryData;
 
-typedef ZEPlugin* (*zeCreatePluginInstance)();
+typedef ZEPlugin* (*ZECreatePluginInstance)();
 
 class ZE_EXPORT_ZEENGINE ZEPlugin
 {
@@ -61,13 +63,11 @@ class ZE_EXPORT_ZEENGINE ZEPlugin
 		virtual const char*						GetName() const;
 		virtual ZEVersion						GetVersion() const;
 		virtual ZEVersion						GetEngineVersion() const;
-		virtual const ZEString&					GetFileName() const;
 		virtual ZESharedLibraryData*			GetData() const;
+		const ZEString&							GetFileName() const;
 
 		virtual ZEMTDeclaration* const*			GetDeclarations() const;
 		virtual ZESize							GetDeclarationCount() const;
 
 		virtual void							Destroy();
 };
-
-void LoadPlugins();

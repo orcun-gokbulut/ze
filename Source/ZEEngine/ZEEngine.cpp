@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEEngine.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEEngine.h"
+
+#include "ZEMeta/ZEMTProvider.h"
+
+static bool DeclarationsRegistered = false;
+
+void ZEEngine_RegisterDeclarations()
+{
+	if (DeclarationsRegistered)
+		return;
+
+	DeclarationsRegistered = true;
+
+	#undef RegisterClass
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#include "ZEEngine.ZEMetaRegister.h"
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
+}
+
+void ZEEngine_UnregisterDeclarations()
+{
+	if (!DeclarationsRegistered)
+		return;
+
+	DeclarationsRegistered = false;
+
+	#undef UnregisterClass
+	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
+	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
+	#include "ZEEngine.ZEMetaRegister.h"
+	#undef ZEMT_REGISTER_ENUM
+	#undef ZEMT_REGISTER_CLASS
+}

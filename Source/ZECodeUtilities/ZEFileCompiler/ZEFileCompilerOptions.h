@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_COMPILER_OPTIONS_H__
-#define __ZE_META_COMPILER_OPTIONS_H__
 
 #include "ZEDS/ZEString.h"
 
@@ -47,5 +45,3 @@ struct ZEFileCompilerOptions
 	ZEString	OutputHeaderFileName;
 	bool		Quiet;
 };
-
-#endif

@@ -58,6 +58,8 @@
 #include "ZEFile/ZEDirectoryInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEFoundation.h"
+#include "ZEEngine.h"
 #undef ZE_CORE_MODULE_INCLUDES
 
 ZEOptionSection ZECore::CoreOptions; 
@@ -139,28 +141,6 @@ void ZECore::SetState(ZECoreState CoreState)
 	zeLog("Core state changed to \"%s\".", CoreStateText);
 }
 
-void ZECore::RegisterClasses()
-{
-	#undef RegisterClass
-
-	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
-	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
-	#include "ZEEngine.ZEMetaRegister.h"
-	#undef ZEMT_REGISTER_ENUM
-	#undef ZEMT_REGISTER_CLASS
-}
-
-void ZECore::UnregisterClasses()
-{
-	#undef UnregisterClass
-
-	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
-	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
-	#include "ZEEngine.ZEMetaRegister.h"
-	#undef ZEMT_REGISTER_ENUM
-	#undef ZEMT_REGISTER_CLASS
-}
-
 bool ZECore::InitializeModule(ZEModule* Module)
 {
 	if (Module == NULL)
@@ -229,6 +209,7 @@ void ZECore::DeinitializeModules()
 ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 {
 	ZEFileInfo FileInfo(Path);
+	FileInfo.SetPath(FileInfo.GetRealPath().Path);
 
 	zeLog("Loading plugin. Plugin Path: \"%s\".", FileInfo.Normalize());
 
@@ -243,7 +224,7 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 		return NULL;
 	}
 
-	zeCreatePluginInstance CreatePluginInstance = reinterpret_cast<zeCreatePluginInstance>(GetProcAddress(Module, "zeCreatePluginInstance()"));
+	ZECreatePluginInstance CreatePluginInstance = reinterpret_cast<ZECreatePluginInstance>(GetProcAddress(Module, "zeCreatePluginInstance"));
 	if (CreatePluginInstance == NULL)
 	{
 		zeError("Cannot load plugin. Plugin does not have zeCreatePluginInstance() procedure. Plugin Path: \"%s\".", FileInfo.Normalize());
@@ -516,9 +497,10 @@ bool ZECore::StartUp()
 	ZESplashWindow* SplashWindow = ZESplashWindow::CreateInstance();
 	SplashWindow->Show();
 
-	zeLog("Loading classes.");
-	RegisterClasses();
-
+	zeLog("Loading declarations.");
+	ZEFoundation_RegisterDeclarations();
+	ZEEngine_RegisterDeclarations();
+	
 	zeLog("Loading ZECore configuration.");
 	LoadConfiguration();
 
@@ -582,6 +564,9 @@ void ZECore::ShutDown()
 	Console->Deinitialize();
 	CrashHandler->Deinitialize();
 
+	ZEEngine_UnregisterDeclarations();
+	ZEFoundation_UnregisterDeclarations();
+
 	SetState(ZE_CS_NONE);
 	StartedCoreInstanceCount--;
 }
@@ -638,10 +623,23 @@ bool ZECore::LoadConfiguration()
 		zeError("Cannot load configuration. Configuration file class is different then ZECore class. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
 		return false;
 	}
-	
+
+	ZEMLReaderNode PluginsNode = RootNode.GetNode("Plugins");
+	ZESize PluginCount = PluginsNode.GetNodeCount("Plugin");
+	for (ZESize I = 0; I < PluginCount; I++)
+	{
+		ZEMLReaderNode PluginNode = PluginsNode.GetNode("Plugin", I);
+		ZEString FileName = PluginNode.ReadString("FileName");
+		ZEPlugin* Plugin = LoadPlugin(FileName);
+		if (Plugin == NULL)
+		{
+			zeError("Cannot load configuration. Cannot load plugin. File Name: \"%s\".", FileName.ToCString());
+			continue;
+		}
+	}
+
 	ZEMLReaderNode ModulesNode = RootNode.GetNode("Modules");
 	ZESize ModuleCount = ModulesNode.GetNodeCount("Module");
-
 	for (ZESize I = 0; I < ModuleCount; I++)
 	{
 		ZEMLReaderNode ModuleNode = ModulesNode.GetNode("Module", I);

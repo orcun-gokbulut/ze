@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - ze_modules.cmake
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEWindowsInputPlugin.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,33 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-macro (ze_modules_init)
-	include(External/parse_arguments)
-	include(ze_check)
-	include(ze_dependency)
-	include(ze_utility)
-	include(ze_meta)
-	include(ze_file_compiler)
-	include(ze_target)
-	include(ze_platform)
-	include(ze_version)
-	include(ze_compiler_linker)
-	include(ze_external)
-	include(ze_debugging)
-	include(ze_static_check)
-	include(ze_unit_test)
-	include(ze_symbol_server)
-endmacro()
+#include "ZECore/ZEPlugin.h"
+
+#include "ZEExport.ZEWindowsInput.h"
+
+extern "C"
+{
+	ZE_EXPORT_ZEWINDOWSINPUT ZEPlugin* zeCreatePluginInstance();
+};
+
+class ZE_EXPORT_ZEWINDOWSINPUT ZEWindowsInputPlugin : public ZEPlugin
+{
+	ZE_DISALLOW_COPY(ZEWindowsInputPlugin)
+	friend ZEPlugin* zeCreatePluginInstance();
+	private:
+												ZEWindowsInputPlugin();
+		virtual									~ZEWindowsInputPlugin() override;
+
+	public:
+		virtual const char*						GetName() const override;
+		virtual ZEVersion						GetVersion() const override;
+		virtual ZEVersion						GetEngineVersion() const override;
+
+		virtual ZEMTDeclaration* const*			GetDeclarations() const override;
+		virtual ZESize							GetDeclarationCount() const override;
+
+		virtual void							Destroy() override;
+};

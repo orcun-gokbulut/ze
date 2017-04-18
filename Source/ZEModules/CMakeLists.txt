@@ -44,12 +44,5 @@ ze_add_module(ZEWindowsInput		Modules OPTIONAL DEFAULT PLATFORMS Windows)
 ze_add_module(ZEOpenAL				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX BSD)
 
-ze_add_source(ZEModules.h			Sources Headers)
-ze_add_source(ZEModules.cpp			Sources)
 ze_add_source(CMakeLists.txt		Sources)
-
-ze_add_library(TARGET ZEModules 
-	SOURCES ${Sources}
-	LIBS ${Modules})
-
-ze_meta_register(LIBS ZEDirect3D11 ZEDirectInput ZEVirtualInput ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX)
+ze_add_cmake_project(ZEModules SOURCES ${Sources})

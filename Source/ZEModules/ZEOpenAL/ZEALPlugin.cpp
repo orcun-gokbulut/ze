@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZEALPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,83 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEConsoleWindow.h"
-#include "ZECore/ZEOptionManager.h"
-#include "ZEProtect/ZELCLicenseManager.h"
-#include "ZEThread/ZETask.h"
-#include "ZEThread/ZETaskPool.h"
-#include "ZEThread/ZETaskManager.h"
+#include "ZEALPlugin.h"
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "ZEVersion.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEEnumerator.h"
 
-ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
+ZEALPlugin::ZEALPlugin()
 {
-	ZETaskPool* RealTimePool = new ZETaskPool();
-	RealTimePool->SetId(ZE_TPI_REAL_TIME);
-	RealTimePool->SetName("RealTime Pool");
-	RealTimePool->SetSchedulingPolicy(ZE_TSP_ALWAYS_FIRST);
-	RealTimePool->SetReservedThreadCount(1);
-	ZETaskManager::GetInstance()->RegisterPool(RealTimePool);
 
-	ZETaskPool* ConcurrentPool = new ZETaskPool();
-	ConcurrentPool->SetId(ZE_TPI_CONCURENT);
-	ConcurrentPool->SetName("Concurrent Pool");
-	ZETaskManager::GetInstance()->RegisterPool(ConcurrentPool);
-	ZETaskManager::GetInstance()->SetThreadCount(3);
+}
 
-	ZEConsoleWindow ConsoleWindow;
-	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-	zeCore->GetConsole()->ShowConsole();
+ZEALPlugin::~ZEALPlugin()
+{
 
-	ZELCLicenseManager Manager;
-	Manager.LoadLicenses();
-	const ZELCLicense* License = Manager.RequestLicense("ZETrainIG", 0);
+}
 
-	if (zeCore->StartUp())
-	{
-		/*if (License == NULL)
-			return EXIT_SUCCESS;*/
+const char* ZEALPlugin::GetName() const
+{
+	return "ZEOpenAL";
+}
 
-		zeCore->Run(); 
-	}
+ZEVersion ZEALPlugin::GetVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEVersion ZEALPlugin::GetEngineVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEMTDeclaration* const* ZEALPlugin::GetDeclarations() const
+{
+	static ZEArray<ZEMTDeclaration*> Declarations;
+	static bool Populated = false;
 	
-	return EXIT_SUCCESS;
+	if (!Populated)
+	{
+		#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); Declarations.Add(Name ## _Enumerator());
+		#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); Declarations.Add(Name ## _Class());
+		#include "ZEOpenAL.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+
+		Populated = true;
+	}
+
+	return Declarations.GetConstCArray();
+}
+
+ZESize ZEALPlugin::GetDeclarationCount() const
+{
+	static ZESSize DeclarationCount = -1;
+
+	if (DeclarationCount == -1)
+	{
+		DeclarationCount = 0;
+
+		#define ZEMT_COUNT_DECLARATION(Name) DeclarationCount++;
+		#define ZEMT_REGISTER_ENUM ZEMT_COUNT_DECLARATION
+		#define ZEMT_REGISTER_CLASS ZEMT_COUNT_DECLARATION
+		#include "ZEOpenAL.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+		#undef ZEMT_COUNT_DECLARATION
+	}
+
+	return (ZESize)DeclarationCount;
+}
+
+void ZEALPlugin::Destroy()
+{
+	delete this;
+}
+
+ZEPlugin* zeCreatePluginInstance()
+{
+	return new ZEALPlugin();
 }

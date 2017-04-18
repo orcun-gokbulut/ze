@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEExport.ZEEngine.h"
 
 #define EARTH_RADIUS			6360000.0f
 #define ATMOSPHERE_HEIGHT		80000.0f
@@ -46,7 +47,7 @@
 static const ZEVector3 ZEATRayleighScatteringFactor	= ZEVector3(5.8e-6f, 13.5e-6f, 33.1e-6f);
 static const ZEVector3 ZEATMieScatteringFactor		= ZEVector3(2.0e-5f, 2.0e-5f, 2.0e-5f);
 
-struct ZEATObserver
+struct ZE_EXPORT_ZEENGINE ZEATObserver
 {
 	struct
 	{

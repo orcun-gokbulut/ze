@@ -37,7 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEExport.ZEPhysX.cpp				Sources)
 ze_add_source(ZEExport.ZEPhysX.h				Sources Headers)
-
+ze_add_source(ZEPhysXPlugin.cpp					Sources)
+ze_add_source(ZEPhysXPlugin.h					Sources)
 ze_add_source(ZEPhysXModule.cpp					Sources)
 ze_add_source(ZEPhysXModule.h					Sources ZEMC)
 ze_add_source(ZEPhysXCollisionManager.cpp		Sources)

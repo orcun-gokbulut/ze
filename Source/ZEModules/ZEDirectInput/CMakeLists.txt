@@ -37,7 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEExport.ZEDirectInput.cpp		Sources)
 ze_add_source(ZEExport.ZEDirectInput.h			Sources Headers)
-
+ze_add_source(ZEDirectInputPlugin.cpp			Sources)
+ze_add_source(ZEDirectInputPlugin.h				Sources)
 ze_add_source(ZEDirectInputModule.cpp			Sources)
 ze_add_source(ZEDirectInputModule.h				Sources ZEMC)
 ze_add_source(ZEDirectInputDevice.cpp			Sources)

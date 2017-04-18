@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysXModuleDescription.cpp
+ Zinek Engine - ZEALPlugin.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysXModuleDescription.h"
-#include "ZEPhysXModule.h"
+#include "ZECore/ZEPlugin.h"
 
-ZEModuleDescription* ZEPhysXModuleDescription::GetBaseModuleDescription()
-{
-	return ZEPhysicsModule::ModuleDescription();
-}
+#include "ZEExport.ZEOpenAL.h"
 
-ZEModuleAttribute ZEPhysXModuleDescription::GetAttributes()
+extern "C"
 {
-	return ZE_MA_INTERNAL;
-}
+	ZE_EXPORT_ZEOPENAL ZEPlugin* zeCreatePluginInstance();
+};
 
-int ZEPhysXModuleDescription::GetRequiredZinekEngineVersion()
+class ZE_EXPORT_ZEOPENAL ZEALPlugin : public ZEPlugin
 {
-	return 0;
-}
+	ZE_DISALLOW_COPY(ZEALPlugin)
+	friend ZEPlugin* zeCreatePluginInstance();
+	private:
+												ZEALPlugin();
+		virtual									~ZEALPlugin() override;
 
-int ZEPhysXModuleDescription::GetMajorVersion()
-{
-	return 0;
-}
+	public:
+		virtual const char*						GetName() const override;
+		virtual ZEVersion						GetVersion() const override;
+		virtual ZEVersion						GetEngineVersion() const override;
 
-int ZEPhysXModuleDescription::GetMinorVersion()
-{
-	return 1;
-}
+		virtual ZEMTDeclaration* const*			GetDeclarations() const override;
+		virtual ZESize							GetDeclarationCount() const override;
 
-const char* ZEPhysXModuleDescription::GetCopyright()
-{
-	return "Copyright (c) 2007-2009, Zinek Engine Group. All rights reserved.";
-}
-
-const char* ZEPhysXModuleDescription::GetName()
-{
-	return "PhysX";
-}
-
-ZEOptionSection* ZEPhysXModuleDescription::GetOptions()
-{
-	return NULL;
-}
-
-ZEModule* ZEPhysXModuleDescription::CreateModuleInstance()
-{
-	return new ZEPhysXModule();
-}
-
-bool ZEPhysXModuleDescription::CheckCompatible()
-{
-	return true;
-}
+		virtual void							Destroy() override;
+};

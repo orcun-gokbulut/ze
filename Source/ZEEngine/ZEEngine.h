@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - ze_modules.cmake
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEEngine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,10 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-macro (ze_modules_init)
-	include(External/parse_arguments)
-	include(ze_check)
-	include(ze_dependency)
-	include(ze_utility)
-	include(ze_meta)
-	include(ze_file_compiler)
-	include(ze_target)
-	include(ze_platform)
-	include(ze_version)
-	include(ze_compiler_linker)
-	include(ze_external)
-	include(ze_debugging)
-	include(ze_static_check)
-	include(ze_unit_test)
-	include(ze_symbol_server)
-endmacro()
+#include "ZEExport.ZEEngine.h"
+
+ZE_EXPORT_ZEENGINE void ZEEngine_RegisterDeclarations();
+ZE_EXPORT_ZEENGINE void ZEEngine_UnregisterDeclarations();

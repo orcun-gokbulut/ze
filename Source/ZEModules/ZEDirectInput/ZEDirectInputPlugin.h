@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEALModuleDescription.h
+ Zinek Engine - ZEDirectInputPlugin.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_AL_MODULE_DESCRIPTION_H__
-#define __ZE_AL_MODULE_DESCRIPTION_H__
+#include "ZECore/ZEPlugin.h"
 
-#include "ZECore/ZEModuleDescription.h"
+#include "ZEExport.ZEDirectInput.h"
 
-class ZEOptionSection;
-class ZEALModuleDescription : public ZEModuleDescription
+extern "C"
 {
-	public:
-		virtual ZEModuleDescription*	GetBaseModuleDescription();
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
-		virtual ZEOptionSection*		GetOptions();
-
-		virtual ZEModule*				CreateModuleInstance();
-		virtual bool					CheckCompatible();
+	ZE_EXPORT_ZEDIRECTINPUT ZEPlugin* zeCreatePluginInstance();
 };
 
-#endif
+class ZE_EXPORT_ZEDIRECTINPUT ZEDirectInputPlugin : public ZEPlugin
+{
+	ZE_DISALLOW_COPY(ZEDirectInputPlugin)
+	friend ZEPlugin* zeCreatePluginInstance();
+	private:
+												ZEDirectInputPlugin();
+		virtual									~ZEDirectInputPlugin() override;
+
+	public:
+		virtual const char*						GetName() const override;
+		virtual ZEVersion						GetVersion() const override;
+		virtual ZEVersion						GetEngineVersion() const override;
+
+		virtual ZEMTDeclaration* const*			GetDeclarations() const override;
+		virtual ZESize							GetDeclarationCount() const override;
+
+		virtual void							Destroy() override;
+};

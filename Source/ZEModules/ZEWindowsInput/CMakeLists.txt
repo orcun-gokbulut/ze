@@ -37,7 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEExport.ZEWindowsInput.cpp			Sources)
 ze_add_source(ZEExport.ZEWindowsInput.h				Sources Headers)
-
+ze_add_source(ZEWindowsInputPlugin.cpp				Sources)
+ze_add_source(ZEWindowsInputPlugin.h				Sources)
 ze_add_source(ZEWindowsInputModule.cpp				Sources)
 ze_add_source(ZEWindowsInputModule.h				Sources ZEMC)
 ze_add_source(ZEWindowsInputKeyboardDevice.cpp		Sources)

@@ -35,22 +35,24 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ze_modules.cmake					Sources)
+ze_add_source(ze_check.cmake					Sources)
+ze_add_source(ze_debugging.cmake				Sources)
+ze_add_source(ze_dependency.cmake				Sources)
+ze_add_source(ze_external.cmake					Sources)
+ze_add_source(ze_meta.cmake						Sources)
+ze_add_source(ze_file_compiler.cmake			Sources)
+ze_add_source(ze_platform.cmake					Sources)
+ze_add_source(ze_static_check.cmake				Sources)
+ze_add_source(ze_symbol_server.cmake			Sources)
+ze_add_source(ze_target.cmake					Sources)
+ze_add_source(ze_unit_test.cmake				Sources)
+ze_add_source(ze_utility.cmake					Sources)
+ze_add_source(ze_version.cmake					Sources)
+ze_add_source(ze_version.rc.in					Sources)
+ze_add_source(ze_compiler_linker.cmake			Sources)
+
 ze_add_cmake_project(CMakeScripts
-	SOURCES	
-		ze_modules.cmake
-		ze_check.cmake
-		ze_debugging.cmake
-		ze_dependency.cmake
-		ze_external.cmake
-		ze_merge_libraries.cmake
-		ze_merge_libraries_unix.cmake.in
-		ze_meta.cmake
-		ze_file_compiler.cmake
-		ze_platform.cmake
-		ze_static_check.cmake
-		ze_symbol_server.cmake
-		ze_target.cmake
-		ze_unit_test.cmake
-		ze_utility.cmake
-		ze_version.cmake
-		ze_compiler_linker.cmake)
+	SOURCES	${Sources})
+
+source_group("" FILES ${Sources})

@@ -172,7 +172,7 @@ ZEArray<ZELCLicense> ZELCLicenseManager::LoadLicenseFile(const ZEString& FileNam
 bool ZELCLicenseManager::SaveLicenseFile(const ZEString& FileName, const ZEArray<ZELCLicense>& Licenses)
 {
 	ZEMLWriter Writer;
-	Writer.SetFormat(new ZEMLFormatXMLV1());
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
 	if (!Writer.Open(FileName))
 		return false;
 

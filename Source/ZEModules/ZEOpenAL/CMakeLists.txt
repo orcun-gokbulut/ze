@@ -37,7 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEExport.ZEOpenAL.cpp				Sources)
 ze_add_source(ZEExport.ZEOpenAL.h				Sources Headers)
-
+ze_add_source(ZEALPlugin.cpp					Sources)
+ze_add_source(ZEALPlugin.h						Sources)
 ze_add_source(ZEALModule.cpp					Sources)
 ze_add_source(ZEALModule.h						Sources ZEMC)
 ze_add_source(ZEALComponentBase.cpp				Sources)

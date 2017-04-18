@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEALModuleDescription.cpp
+ Zinek Engine - ZEWindowsInputPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,83 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEALModuleDescription.h"
-#include "ZEALModule.h"
+#include "ZEWindowsInputPlugin.h"
 
-ZEModuleDescription* ZEALModuleDescription::GetBaseModuleDescription()
+#include "ZEVersion.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEEnumerator.h"
+
+ZEWindowsInputPlugin::ZEWindowsInputPlugin()
 {
-	return ZESoundModule::ModuleDescription();
+
 }
 
-ZEModuleAttribute ZEALModuleDescription::GetAttributes()
+ZEWindowsInputPlugin::~ZEWindowsInputPlugin()
 {
-	return ZE_MA_DEBUG;
+
 }
 
-int ZEALModuleDescription::GetRequiredZinekEngineVersion()
+const char* ZEWindowsInputPlugin::GetName() const
 {
-	return 0;
+	return "ZEWindowsInput";
 }
 
-int ZEALModuleDescription::GetMajorVersion()
+ZEVersion ZEWindowsInputPlugin::GetVersion() const
 {
-	return 0;
+	return ZEVersion::GetZinekVersion();
 }
 
-int ZEALModuleDescription::GetMinorVersion()
+ZEVersion ZEWindowsInputPlugin::GetEngineVersion() const
 {
-	return 4;
+	return ZEVersion::GetZinekVersion();
 }
 
-const char* ZEALModuleDescription::GetCopyright()
+ZEMTDeclaration* const* ZEWindowsInputPlugin::GetDeclarations() const
 {
-	return "Copyright(c) 2007-2008, Zinek Engine Group. All rights reserved.";
+	static ZEArray<ZEMTDeclaration*> Declarations;
+	static bool Populated = false;
+	
+	if (!Populated)
+	{
+		#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); Declarations.Add(Name ## _Enumerator());
+		#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); Declarations.Add(Name ## _Class());
+		#include "ZEWindowsInput.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+
+		Populated = true;
+	}
+
+	return Declarations.GetConstCArray();
 }
 
-const char* ZEALModuleDescription::GetName()
+ZESize ZEWindowsInputPlugin::GetDeclarationCount() const
 {
-	return "OpenAL";
+	static ZESSize DeclarationCount = -1;
+
+	if (DeclarationCount == -1)
+	{
+		DeclarationCount = 0;
+
+		#define ZEMT_COUNT_DECLARATION(Name) DeclarationCount++;
+		#define ZEMT_REGISTER_ENUM ZEMT_COUNT_DECLARATION
+		#define ZEMT_REGISTER_CLASS ZEMT_COUNT_DECLARATION
+		#include "ZEWindowsInput.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+		#undef ZEMT_COUNT_DECLARATION
+	}
+
+	return (ZESize)DeclarationCount;
 }
 
-ZEOptionSection* ZEALModuleDescription::GetOptions()
+void ZEWindowsInputPlugin::Destroy()
 {
-	return NULL;
+	delete this;
 }
 
-ZEModule* ZEALModuleDescription::CreateModuleInstance()
+ZEPlugin* zeCreatePluginInstance()
 {
-	return new ZEALModule();
-}
-
-bool ZEALModuleDescription::CheckCompatible()
-{
-	return true;
+	return new ZEWindowsInputPlugin();
 }

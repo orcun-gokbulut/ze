@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputModuleDescription.h
+ Zinek Engine - ZEPhysXPlugin.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,83 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_WINDOWS_INPUT_MODULE_DESCRIPTION_H__
-#define __ZE_WINDOWS_INPUT_MODULE_DESCRIPTION_H__
+#include "ZEPhysXPlugin.h"
 
-#include "ZECore/ZEModuleDescription.h"
+#include "ZEVersion.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEEnumerator.h"
 
-class ZEWindowsInputModuleDescription : public ZEModuleDescription
+ZEPhysXPlugin::ZEPhysXPlugin()
 {
-	public:
-		virtual ZEModuleDescription*	GetBaseModuleDescription();
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
-		virtual ZEOptionSection*		GetOptions();
 
-		virtual ZEModule*				CreateModuleInstance();
-		virtual bool					CheckCompatible();
-};
+}
 
-#endif
+ZEPhysXPlugin::~ZEPhysXPlugin()
+{
+
+}
+
+const char* ZEPhysXPlugin::GetName() const
+{
+	return "ZEPhysX";
+}
+
+ZEVersion ZEPhysXPlugin::GetVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEVersion ZEPhysXPlugin::GetEngineVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZEMTDeclaration* const* ZEPhysXPlugin::GetDeclarations() const
+{
+	static ZEArray<ZEMTDeclaration*> Declarations;
+	static bool Populated = false;
+	
+	if (!Populated)
+	{
+		#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); Declarations.Add(Name ## _Enumerator());
+		#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); Declarations.Add(Name ## _Class());
+		#include "ZEPhysX.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+
+		Populated = true;
+	}
+
+	return Declarations.GetConstCArray();
+}
+
+ZESize ZEPhysXPlugin::GetDeclarationCount() const
+{
+	static ZESSize DeclarationCount = -1;
+
+	if (DeclarationCount == -1)
+	{
+		DeclarationCount = 0;
+
+		#define ZEMT_COUNT_DECLARATION(Name) DeclarationCount++;
+		#define ZEMT_REGISTER_ENUM ZEMT_COUNT_DECLARATION
+		#define ZEMT_REGISTER_CLASS ZEMT_COUNT_DECLARATION
+		#include "ZEPhysX.ZEMetaRegister.h"
+		#undef ZEMT_REGISTER_ENUM
+		#undef ZEMT_REGISTER_CLASS
+		#undef ZEMT_COUNT_DECLARATION
+	}
+
+	return (ZESize)DeclarationCount;
+}
+
+void ZEPhysXPlugin::Destroy()
+{
+	delete this;
+}
+
+ZEPlugin* zeCreatePluginInstance()
+{
+	return new ZEPhysXPlugin();
+}

@@ -93,9 +93,6 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 
 		void										SetState(ZECoreState CoreState);
 
-		void										RegisterClasses();
-		void										UnregisterClasses();
-
 		ZEModule*									FindModule(ZEClass* Class, const char* Name);
 		bool										InitializeModule(ZEModule* Module);
 		void										DeInitializeModule(ZEModule** Module);

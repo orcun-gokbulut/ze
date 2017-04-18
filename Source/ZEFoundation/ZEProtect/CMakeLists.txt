@@ -54,7 +54,7 @@ ze_add_source(ZELCUtils.cpp							Sources)
 ze_add_source(ZELCUtils.h							Sources)
 
 ze_add_component(COMPONENT ZEProtect
-	TARGET ZEFoundation
+	TARGET ZEFoundationBase
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 
