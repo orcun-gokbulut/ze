@@ -273,8 +273,6 @@ bool ZERNStageLighting::UpdateRenderState()
 	zeCheckError(DeferredPointLightRenderStatePerSample == NULL, false, "Cannot set render state.");
 
 	GraphicsRenderState.SetRasterizerState(ZEGRRasterizerState());
-	GraphicsRenderState.SetBlendState(BlendStateAdditive);
-	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessTestStencil);
 	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 
 	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, TiledDeferredPixelShader);
@@ -506,7 +504,7 @@ bool ZERNStageLighting::SetupLights(ZEGRContext* Context)
 	Constants.SpotLightCount = (ZEUInt)SpotLights.GetCount();
 	Constants.ProjectiveLightCount = (ZEUInt)ProjectiveLights.GetCount();
 	
-	Constants.TileCountX = ((ZEUInt)Viewport.GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
+	Constants.TileCountX = ((ZEUInt)Viewport.GetWidth() + TILE_LIGHT_DIMENSION - 1) / TILE_LIGHT_DIMENSION;
 
 	ZEUInt ConstantCount = 0;
 	ZEBYTE* DestBuffer;
@@ -745,10 +743,10 @@ void ZERNStageLighting::CreateOutput(const ZEString& Name)
 			ZEUInt Width = GetRenderer()->GetOutputTexture()->GetWidth();
 			ZEUInt Height = GetRenderer()->GetOutputTexture()->GetHeight();
 
-			ZEUInt TileCountX = (Width + TILE_DIMENSION - 1) / TILE_DIMENSION;
-			ZEUInt TileCountY = (Height + TILE_DIMENSION - 1) / TILE_DIMENSION;
+			ZEUInt TileCountX = (Width + TILE_LIGHT_DIMENSION - 1) / TILE_LIGHT_DIMENSION;
+			ZEUInt TileCountY = (Height + TILE_LIGHT_DIMENSION - 1) / TILE_LIGHT_DIMENSION;
 
-			TileLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, TileCountX * TileCountY * (MAX_TILED_LIGHT + 2) * sizeof(ZEUInt), sizeof(ZEUInt), ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
+			TileLightStructuredBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_STRUCTURED_BUFFER, TileCountX * TileCountY * TILE_LIGHT_TOTAL_COUNT * sizeof(ZEUInt), sizeof(ZEUInt), ZEGR_RU_STATIC, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 			
 			DirtyFlags.UnraiseFlags(ZERN_SLDF_OUTPUT);
 		}
@@ -860,15 +858,19 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 		return false;
 
 	ZERNStage* StageForwardTransparent = GetRenderer()->GetStage(ZERN_STAGE_FORWARD_TRANSPARENT);
-	bool TransparencyEnabled = (StageForwardTransparent != NULL && StageForwardTransparent->GetEnabled() && StageForwardTransparent->GetCommands().GetCount() > 0);
+	ZERNStage* StageParticleRendering = GetRenderer()->GetStage(ZERN_STAGE_PARTICLE_RENDERING);	
+	bool ForwardTransparencyEnabled = (StageForwardTransparent != NULL && StageForwardTransparent->GetEnabled() && StageForwardTransparent->GetCommands().GetCount() > 0);
+	bool ParticleRenderingEnabled = (StageParticleRendering != NULL && StageParticleRendering->GetEnabled() && StageParticleRendering->GetCommands().GetCount() > 0);
 
+	bool TransparencyEnabled = ForwardTransparencyEnabled || ParticleRenderingEnabled;
+	
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, LightsConstantBuffer, &CommonParamsRange.Offset, &CommonParamsRange.Count);
 	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, LightsConstantBuffer, &CommonParamsRange.Offset, &CommonParamsRange.Count);
-
+	
 	const ZEGRTexture* GBuffers[] = {GBufferEmissive, GBufferDiffuse, GBufferNormal, DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, GBuffers);
 	Context->SetTextures(ZEGR_ST_COMPUTE, 1, 4, GBuffers);
-
+	
 	const ZEGRTexture* ShadowTextures[] = {DirectionalShadowMaps, SpotShadowMaps, ProjectiveShadowMaps, RandomVectorsTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 11, 4, ShadowTextures);
 
@@ -893,50 +895,43 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 			}
 
 			Context->SetComputeRenderState(TiledDeferredTransparencyComputeRenderState);
-			Context->SetRenderTargets(0, NULL, NULL);
-			Context->SetTextureView(ZEGR_ST_COMPUTE, 5, DepthTexture->GetView(ZEGR_TF_X24_G8_UINT));
 		}
 		else
 		{
 			Context->SetComputeRenderState(TiledDeferredComputeRenderState);
 		}
-
+	
 		const ZEGRBuffer* Buffers[] = {PointLightsBoundingSpheresStructuredBuffer, SpotLightsBoundingSpheresStructuredBuffer};
 		Context->SetBuffers(ZEGR_ST_COMPUTE, 6, 2, Buffers);
-
+	
 		Context->SetRWBuffer(0, TileLightStructuredBuffer);
-		
-		ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
-		ZEUInt TileCountY = (AccumulationTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 
+		ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_LIGHT_DIMENSION - 1) / TILE_LIGHT_DIMENSION;
+		ZEUInt TileCountY = (AccumulationTexture->GetHeight() + TILE_LIGHT_DIMENSION - 1) / TILE_LIGHT_DIMENSION;
+	
 		Context->Dispatch(TileCountX, TileCountY, 1);
 		
-		Context->SetBuffer(ZEGR_ST_PIXEL, 17, TileLightStructuredBuffer);
-		if (TransparencyEnabled)
-		{
-			Context->SetTexture(ZEGR_ST_COMPUTE, 5, AccumulationTexture);
-		}
+		Context->SetBuffer(ZEGR_ST_PIXEL, 15, TileLightStructuredBuffer);
 	}
 	
 	ZERNStage* StageGBuffer = GetRenderer()->GetStage(ZERN_STAGE_GBUFFER);
 	if (StageGBuffer == NULL || !StageGBuffer->GetEnabled() || StageGBuffer->GetCommands().GetCount() == 0)
 		return false;
-
+	
 	Viewport.SetWidth((float)AccumulationTexture->GetWidth());
 	Viewport.SetHeight((float)AccumulationTexture->GetHeight());
-
+	
 	Context->SetViewports(1, &Viewport);
-
+	
 	if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
 	{
-		Context->ClearDepthStencilBuffer(DepthTexture->GetDepthStencilBuffer(true), false, true, 0.0f, 0x00);
 		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, EdgeDetectionConstantBuffer);
 		Context->SetRenderState(EdgeDetectionRenderState);
 		Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer(true));
-
+	
 		Context->SetStencilRef(1);
 		Context->Draw(3, 0);
-
+	
 		if (ShowMSAAEdges)
 		{
 			Context->SetRenderState(DebugEdgeDetectionRenderState);
@@ -946,14 +941,14 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 			Context->Draw(3, 0);
 		}
 	}
-
+	
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetVertexBuffer(0, DeferredLightsVertexBuffer);
-
+	
 	Context->SetStencilRef(0);
 	DrawLights(Context, false);
-
+	
 	if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
 	{
 		Context->SetStencilRef(1);

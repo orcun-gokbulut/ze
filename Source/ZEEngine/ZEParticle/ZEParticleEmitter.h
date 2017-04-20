@@ -47,6 +47,21 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEParticle.h"
 
+#define ZE_PEF_LIGHT_RECEIVER						0x1
+#define ZE_PEF_RENDER_STREAKS						0x2
+#define ZE_PEF_BILLBOARD_VIEW						0x4
+#define ZE_PEF_BILLBOARD_AXIS						0x8
+#define ZE_PEF_TILED_RENDERING						0x10
+#define ZE_PEF_VELOCITY_PER_PARTICLE				0x20
+#define ZE_PEF_ACCELERATION_PER_PARTICLE			0x40
+#define ZE_PEF_SIZE_PER_PARTICLE					0x80
+#define ZE_PEF_COLOR_PER_PARTICLE					0x100
+#define ZE_PEF_TEXCOORDS_PER_PARTICLE				0x200
+#define ZE_PEF_ROTATION_PER_PARTICLE				0x400
+#define ZE_PEF_ANGULAR_ACCELERATION_PER_PARTICLE	0x800
+#define ZE_PEF_ANGULAR_VELOCITY_PER_PARTICLE		0x1000
+#define ZE_PEF_TOTAL_LIFE_PER_PARTICLE				0x2000
+
 ZE_ENUM(ZEParticleEmitterType)
 {
 	ZE_PET_POINT,
@@ -80,6 +95,44 @@ class ZERNView;
 class ZERNParticleMaterial;
 class ZERNRenderParameters;
 class ZERNPreRenderParameters;
+class ZERNMaterial;
+
+struct ZEParticlePool
+{
+	ZESize				Count;
+	ZEArray<ZEVector3>	Positions;
+	ZEArray<ZEVector3>	Velocities;
+	ZEArray<ZEVector3>	Accelerations;
+	ZEArray<ZEVector2>	Sizes;
+	ZEArray<ZEVector4>	Colors;
+	ZEArray<ZEVector4>	TexCoords;
+	ZEArray<float>		Rotations;
+	ZEArray<float>		AngularVelocities;
+	ZEArray<float>		AngularAccelerations;
+	ZEArray<float>		Lifes;
+	ZEArray<float>		TotalLifes;
+};
+
+typedef ZEFlags			ZEParticleEmitterFlags;
+
+class ZERNCommandParticleEmitter : public ZERNCommand
+{
+	ZE_OBJECT
+	public:
+		ZEHolder<const ZERNMaterial>	Material;
+
+		ZEVector3						Axis;
+		ZEParticleEmitterFlags			Flags;
+
+		ZEVector4						ParticleTexCoords;
+		ZEVector4						ParticleColor;
+		ZEVector2						ParticleSize;
+		float							ParticleRotation;
+		ZEUInt							ParticleCount;
+
+		void*							Data;
+		ZESize							DataSize;
+};
 
 class ZEParticleEmitter : public ZEObject, public ZEInitializable
 {
@@ -91,15 +144,24 @@ class ZEParticleEmitter : public ZEObject, public ZEInitializable
 		ZEParticleEffect*					Effect;
 		ZEString							Name;
 
+		ZEParticleEmitterFlags				Flags;
+
+		ZEUInt								LastSpawnedParticleCount;
 		ZESize								AliveParticleCount;
-		ZEArray<ZEParticle>					ParticlePool;
-		ZEArray<ZEParticle>					SortArray;
+		ZESize								DeadParticleStartIndex;
+		ZESize								DeadParticleCount;
 		ZEArray<ZEParticleModifier*>		Modifiers;
 
+		ZEParticlePool						ParticlePool;
+		ZEArray<ZEUInt>						AliveParticleIndices;
+		ZEArray<ZEUInt>						DeadParticleIndices;
+		ZEArray<ZEUInt>						SortedAliveParticleIndices;
+
 		ZEParticleAxisOrientation			AxisOrientation;
-		ZEUInt								ParticlesPerSecondMin;
-		ZEUInt								ParticlesPerSecondMax;
-		float								ParticlesAccumulation;
+		ZEUInt								EmissionRateMin;
+		ZEUInt								EmissionRateMax;
+		float								CurrentTime;
+		float								TotalTime;
 
 		bool								SortingEnabled;
 		bool								ParticleFixedAspectRatio;
@@ -109,51 +171,35 @@ class ZEParticleEmitter : public ZEObject, public ZEInitializable
 		ZEVector3							Position;
 		ZEParticleEmitterType				Type;
 		ZEParticleBillboardType				BillboardType;
+		bool								LightReceiver;
+		bool								TiledRendering;
 
 		ZEVector3							BoxSize;
 		float								SphereRadius;
 		ZEVector2							TorusSize;
 		ZEVector2							PlaneSize;
 
-		ZEVector4							ParticleColorMin;
-		ZEVector4							ParticleColorMax;
-		ZEVector2							ParticleSizeMin;
-		ZEVector2							ParticleSizeMax;
+		ZEVector4							ParticleColor;
+		ZEVector2							ParticleSize;
+		ZEVector4							ParticleTexCoords;
+		float								ParticleRotation;
 		float								ParticleLifeMin;
 		float								ParticleLifeMax;
 		bool								ParticleImmortal;
 		bool								ParticleLocalSpace;
 
-		ZERNCommand							RenderCommand;
-
+		ZERNCommandParticleEmitter			RenderCommand;
+		
 		ZEHolder<ZERNParticleMaterial>		Material;
-		ZEHolder<ZEGRBuffer>				InstanceBuffer;
-		ZEHolder<ZEGRBuffer>				ConstantBuffer;
-
-		struct
-		{
-			ZEVector3						Axis;
-			ZEUInt							BillboardType;
-		} Constants;
-
-		struct InstanceAttributes
-		{
-			ZEVector3						Position;
-			float							Reserved;
-			ZEVector2						Size;
-			ZEVector2						Cos_NegSin;
-			ZEVector4						Color;
-		};
-
+		
 		virtual bool						InitializeInternal() override;
 		virtual bool						DeinitializeInternal() override;
-
-		void								UpdateConstantBuffer();
 
 		void								LocalTransformChanged();
 		void								EffectTransformChanged();
 
-		void								GenerateParticle(ZEParticle &Particle);
+		void								UpdateParticlePool();
+		void								GenerateParticle(ZEUInt ParticleIndex);
 		void								UpdateParticles(float ElapsedTime);
 		void								SortParticles(const ZERNView& View);
 
@@ -189,13 +235,31 @@ class ZEParticleEmitter : public ZEObject, public ZEInitializable
 		void								SetLocalSpace(bool LocalSpace);
 		bool								GetLocalSpace() const;
 
+		void								SetEmissionRate(ZEUInt Rate);
+		ZEUInt								GetEmissionRate() const;
+
+		void								SetEmissionRateMin(ZEUInt Rate);
+		ZEUInt								GetEmissionRateMin() const;
+
+		void								SetEmissionRateMax(ZEUInt Rate);
+		ZEUInt								GetEmissionRateMax() const;
+
+		void								SetEmissionDuration(float Duration);
+		float								GetEmissionDuration() const;
 		// Particle Pool
-		const ZEArray<ZEParticle>&			GetPool() const;
+		const ZEParticlePool&				GetParticlePool() const;
 
-		void								SetPoolSize(ZESize Value);
-		ZESize								GetPoolSize() const;
+		const ZEArray<ZEUInt>&				GetAliveParticleIndices() const;
+		const ZEArray<ZEUInt>&				GetDeadParticleIndices() const;
+
 		ZEUInt								GetAliveParticleCount() const;
+		ZEUInt								GetDeadParticleStartIndex() const;
+		ZEUInt								GetDeadParticleCount() const;
+		ZEUInt								GetLastSpawnedParticleCount() const;
 
+		void								SetPoolSize(ZESize Size);
+		ZESize								GetPoolSize() const;
+		
 		void								SetSortingEnabled(bool SortingEnabled);
 		bool								GetSortingEnabled() const;
 
@@ -203,32 +267,26 @@ class ZEParticleEmitter : public ZEObject, public ZEInitializable
 		void								SetParticleLocalSpace(bool ParticleLocalSpace);
 		bool								GetParticleLocalSpace() const;
 
-		void								SetParticlesPerSecond(ZEUInt ParticlesPerSecond);
-		ZEUInt								GetParticlesPerSecond() const;
+		void								SetParticleLifeMin(float Life);
+		float								GetParticleLifeMin() const;
 
-		void								SetParticlesPerSecondMin(ZEUInt ParticlesPerSecond);
-		ZEUInt								GetParticlesPerSecondMin() const;
+		void								SetParticleLifeMax(float Life);
+		float								GetParticleLifeMax() const;
 
-		void								SetParticlesPerSecondMax(ZEUInt ParticlesPerSecond);
-		ZEUInt								GetParticlesPerSecondMax() const;
-		
+		void								SetParticleColor(const ZEVector4& Color);
+		const ZEVector4&					GetParticleColor() const;
+
+		void								SetParticleSize(const ZEVector2& Size);
+		const ZEVector2&					GetParticleSize() const;
+
+		void								SetParticleTexCoords(const ZEVector4& TexCoords);
+		const ZEVector4&					GetParticleTexCoords() const;
+
+		void								SetParticleRotation(float Rotation);
+		float								GetParticleRotation() const;
+
 		void								SetParticleImmortal(bool Enabled);
 		bool								GetParticleImmortal() const;
-
-		void 								SetParticleLifeMin(float Life);
-		float 								GetParticleLifeMin() const;
-		void 								SetParticleLifeMax(float Life);
-		float 								GetParticleLifeMax() const;
-
-		void								SetParticleSizeMin(const ZEVector2& Size);
-		const ZEVector2&					GetParticleSizeMin() const;
-		void 								SetParticleSizeMax(const ZEVector2& Size);
-		const ZEVector2&					GetParticleSizeMax() const;
-
-		void 								SetParticleColorMin(const ZEVector4& Color);
-		const ZEVector4&					GetParticleColorMin() const;
-		void 								SetParticleColorMax(const ZEVector4& Color);
-		const ZEVector4&					GetParticleColorMax() const;
 
 		void								SetParticleFixedAspectRatio(bool ParticleFixedAspectRatio);
 		bool								GetParticleFixedAspectRatio() const;
@@ -248,17 +306,18 @@ class ZEParticleEmitter : public ZEObject, public ZEInitializable
 		void								SetAxisOrientation(ZEParticleAxisOrientation AxisOrientation);
 		ZEParticleAxisOrientation			GetAxisOrientation() const;
 
+		void								SetLightReceiver(bool LightReceiver);
+		bool								GetLightReceiver() const;
+
+		void								SetTiledRendering(bool TiledRendering);
+		bool								GetTiledRendering() const;
+
 		void								SetMaterial(ZEHolder<ZERNParticleMaterial> Material);
 		ZEHolder<ZERNParticleMaterial>		GetMaterial() const;
 
-
-		// Functions
-		void								GeneratePool();
 		void								ResetPool();
-
 		void								Tick(float ElapsedTime);
 		bool								PreRender(const ZERNPreRenderParameters* Parameters);
-		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEParticleEmitter*			CreateInstance();
 };

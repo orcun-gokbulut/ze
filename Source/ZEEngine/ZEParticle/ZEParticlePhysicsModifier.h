@@ -50,6 +50,8 @@ class ZEParticlePhysicsModifier : public ZEParticleModifier
 		ZEVector3							MinVelocity;
 		ZEVector3							MaxVelocity;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
 		void								SetRadialMovement(bool Enabled);
 		void								SetRadialSpeed(float Max, float Min);

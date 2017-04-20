@@ -35,10 +35,26 @@
 
 #include "ZEParticleColorOverLifeModifier.h"
 
+#include "ZEMath/ZEMath.h"
 
-void ZEParticleColorOverLifeModifier::SetToColor(const ZEVector4& ToColor)
+ZEUInt ZEParticleColorOverLifeModifier::GetFlags() const
 {
-	this->ToColor = ToColor;
+	return ZE_PEF_COLOR_PER_PARTICLE | ZE_PEF_TOTAL_LIFE_PER_PARTICLE;
+}
+
+void ZEParticleColorOverLifeModifier::SetFromColor(const ZEVector4& Color)
+{
+	this->FromColor = Color;
+}
+
+const ZEVector4& ZEParticleColorOverLifeModifier::GetFromColor() const
+{
+	return FromColor;
+}
+
+void ZEParticleColorOverLifeModifier::SetToColor(const ZEVector4& Color)
+{
+	this->ToColor = Color;
 }
 
 const ZEVector4& ZEParticleColorOverLifeModifier::GetToColor() const
@@ -48,28 +64,25 @@ const ZEVector4& ZEParticleColorOverLifeModifier::GetToColor() const
 
 void ZEParticleColorOverLifeModifier::Tick(float ElapsedTime)
 {
-	ZESize ParticleCount = GetPool().GetCount();
-	ZEArray<ZEParticle>& Particles =  GetPool();
-
-	for (ZESize I = 0; I < ParticleCount; I++)
+	ZEParticlePool& ParticlePool = GetPool();
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
+	
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		ZEParticle* CurrentParticle = &Particles[I];
+		ZEUInt Index = AliveParticleIndices[I];
+		float Weight = 1.0f - (ParticlePool.Lifes[Index] / ParticlePool.TotalLifes[Index]);
 
-		if (CurrentParticle->State == ZE_PAS_ALIVE)
-		{
-			float TotalLife_Life = CurrentParticle->Life / CurrentParticle->TotalLife;
-			float LerpFactor = 1.0f - TotalLife_Life;
-
-			CurrentParticle->Color.x = CurrentParticle->InitialColor.x + (ToColor.x - CurrentParticle->InitialColor.x) * LerpFactor;
-			CurrentParticle->Color.y = CurrentParticle->InitialColor.y + (ToColor.y - CurrentParticle->InitialColor.y) * LerpFactor;
-			CurrentParticle->Color.z = CurrentParticle->InitialColor.z + (ToColor.z - CurrentParticle->InitialColor.z) * LerpFactor;
-			CurrentParticle->Color.w = CurrentParticle->InitialColor.w + (ToColor.w - CurrentParticle->InitialColor.w) * LerpFactor;
-		}
+		ParticlePool.Colors[Index].x = ZEMath::Lerp(FromColor.x, ToColor.x, Weight);
+		ParticlePool.Colors[Index].y = ZEMath::Lerp(FromColor.y, ToColor.y, Weight);
+		ParticlePool.Colors[Index].z = ZEMath::Lerp(FromColor.z, ToColor.z, Weight);
+		ParticlePool.Colors[Index].w = ZEMath::Lerp(FromColor.w, ToColor.w, Weight);
 	}
 }
 
 ZEParticleColorOverLifeModifier::ZEParticleColorOverLifeModifier()
 {
+	FromColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
 	ToColor = ZEVector4::One;
 }
 

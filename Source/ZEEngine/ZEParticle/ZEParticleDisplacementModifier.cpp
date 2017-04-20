@@ -47,17 +47,7 @@ ZEVector3 ZEParticleDisplacementModifier::GetDisplacement()
 
 void ZEParticleDisplacementModifier::Tick(float ElapsedTime)
 {
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticleCount = Particles.GetCount();
 
-	for (ZESize I = 0; I < ParticleCount; I++)
-	{
-		ZEVector3 RandomedDisplacement;
-		RandomedDisplacement.x = ZERandom::GetFloatRange(Displacement.x * 0.9f, Displacement.x * 1.1f);
-		RandomedDisplacement.y = ZERandom::GetFloatRange(Displacement.y * 0.9f, Displacement.y * 1.1f);
-		RandomedDisplacement.z = ZERandom::GetFloatRange(Displacement.z * 0.9f, Displacement.z * 1.1f);
-		Particles[I].Position += RandomedDisplacement * ElapsedTime;
-	}
 }
 
 ZEParticleDisplacementModifier::ZEParticleDisplacementModifier()

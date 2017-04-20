@@ -50,36 +50,56 @@ const ZEAABBox ZEParticleConfineModifier::GetBoundingBox() const
 
 void ZEParticleConfineModifier::Tick(float ElapsedTime)
 {
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticleCount = Particles.GetCount();
+	ZEParticlePool& ParticlePool = GetPool();
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
 
-	ZEVector3 Displacement = GetBoundingBox().Max - GetBoundingBox().Min;
-	for (ZESize I = 0; I < ParticleCount; I++)
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		if (Particles[I].State != ZE_PAS_ALIVE)
-			continue;
+		ZEUInt Index = AliveParticleIndices[I];
+		
+		ZEVector3 Position = ParticlePool.Positions[Index];
+
+		if (!GetEmitter()->GetParticleLocalSpace())
+			Position -= GetEmitter()->GetPosition();
 
 		if (!GetEmitter()->GetLocalSpace())
-			Particles[I].Position = GetEffect()->GetInvWorldTransform() * Particles[I].Position;
+			Position = GetEmitter()->GetEffect()->GetInvWorldTransform() * Position;
 
-		if (Particles[I].Position.x < BoundingBox.Min.x)
-			Particles[I].Position.x += Displacement.x;
-		else if (Particles[I].Position.x > BoundingBox.Max.x)
-			Particles[I].Position.x -= Displacement.x;
-
-		if (Particles[I].Position.y < BoundingBox.Min.y)
-			Particles[I].Position.y += Displacement.y;
-		else if (Particles[I].Position.y > BoundingBox.Max.y)
-			Particles[I].Position.y -= Displacement.y;
-
-		if (Particles[I].Position.z < BoundingBox.Min.z)
-			Particles[I].Position.z += Displacement.z;
-		else if (Particles[I].Position.z > BoundingBox.Max.z)
-			Particles[I].Position.z -= Displacement.z;
-
-		if (!GetEmitter()->GetLocalSpace())
-			Particles[I].Position = GetEffect()->GetWorldTransform() * Particles[I].Position;
+		if (!ZEAABBox::IntersectionTest(BoundingBox, Position))
+			ParticlePool.Lifes[Index] = 0.0f;
 	}
+
+	//ZEArray<ZEParticle>& Particles = GetPool();
+	//ZESize ParticleCount = Particles.GetCount();
+	//
+	//ZEVector3 Displacement = GetBoundingBox().Max - GetBoundingBox().Min;
+	//for (ZESize I = 0; I < ParticleCount; I++)
+	//{
+	//	if (Particles[I].State != ZE_PAS_ALIVE)
+	//		continue;
+	//
+	//	if (!GetEmitter()->GetLocalSpace())
+	//		Particles[I].Position = GetEffect()->GetInvWorldTransform() * Particles[I].Position;
+	//
+	//	if (Particles[I].Position.x < BoundingBox.Min.x)
+	//		Particles[I].Position.x += Displacement.x;
+	//	else if (Particles[I].Position.x > BoundingBox.Max.x)
+	//		Particles[I].Position.x -= Displacement.x;
+	//
+	//	if (Particles[I].Position.y < BoundingBox.Min.y)
+	//		Particles[I].Position.y += Displacement.y;
+	//	else if (Particles[I].Position.y > BoundingBox.Max.y)
+	//		Particles[I].Position.y -= Displacement.y;
+	//
+	//	if (Particles[I].Position.z < BoundingBox.Min.z)
+	//		Particles[I].Position.z += Displacement.z;
+	//	else if (Particles[I].Position.z > BoundingBox.Max.z)
+	//		Particles[I].Position.z -= Displacement.z;
+	//
+	//	if (!GetEmitter()->GetLocalSpace())
+	//		Particles[I].Position = GetEffect()->GetWorldTransform() * Particles[I].Position;
+	//}
 }
 
 

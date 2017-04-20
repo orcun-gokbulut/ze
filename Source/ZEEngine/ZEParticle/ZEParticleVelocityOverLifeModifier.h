@@ -41,10 +41,16 @@ class ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
 {
 	ZE_OBJECT
 	private:
+		ZEVector3							FromVelocity;
 		ZEVector3							ToVelocity;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
-		void								SetToVelocity(const ZEVector3& Factor);
+		void								SetFromVelocity(const ZEVector3& Velocity);
+		const ZEVector3&					GetFromVelocity() const;
+
+		void								SetToVelocity(const ZEVector3& Velocity);
 		const ZEVector3&					GetToVelocity() const;
 
 		virtual	void						Tick(float ElapsedTime) override;

@@ -60,7 +60,8 @@ ze_add_source(ZEParticleColorOverLifeModifier.cpp		Sources)
 ze_add_source(ZEParticleColorOverLifeModifier.h			Sources Headers ZEMC)
 ze_add_source(ZEParticleRandomAccelerationModifier.cpp	Sources)
 ze_add_source(ZEParticleRandomAccelerationModifier.h	Sources Headers ZEMC)
-
+ze_add_source(ZEParticleConfineModifier.cpp				Sources)
+ze_add_source(ZEParticleConfineModifier.h				Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEParticle 
 	ZEMC ${ZEMC}

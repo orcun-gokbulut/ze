@@ -63,6 +63,7 @@ class ZERNStageLighting : public ZERNStage
 {
 	ZE_OBJECT
 	friend class ZERNStageForward;
+	friend class ZERNStageParticleRendering;
 	private:
 		ZEFlags										DirtyFlags;
 		ZEGRViewport								Viewport;

@@ -41,34 +41,35 @@
 #include "ZERNScene.hlsl"
 #include "ZERNShading.hlsl"
 #include "ZERNRenderer.hlsl"
+#include "ZERNScreenCover.hlsl"
 
-#define ZE_PBT_AXIS_ORIENTED		0
-#define ZE_PBT_VELOCITY_ORIENTED	1
-#define ZE_PBT_VIEW_POINT_ORIENTED	2
-	
-struct ZERNParticleMaterial_Instance_Attributes
-{
-	float3										PositionWorld;
-	float										Reserved;
-	float2										Size;
-	float2										Cos_NegSin;
-	float4										Color;
-};
+#define ZE_PEF_LIGHT_RECEIVER						0x1
+#define ZE_PEF_RENDER_STREAKS						0x2
+#define ZE_PEF_BILLBOARD_VIEW						0x4
+#define ZE_PEF_BILLBOARD_AXIS						0x8
+#define ZE_PEF_TILED_RENDERING						0x10
+#define ZE_PEF_VELOCITY_PER_PARTICLE				0x20
+#define ZE_PEF_ACCELERATION_PER_PARTICLE			0x40
+#define ZE_PEF_SIZE_PER_PARTICLE					0x80
+#define ZE_PEF_COLOR_PER_PARTICLE					0x100
+#define ZE_PEF_TEXCOORDS_PER_PARTICLE				0x200
+#define ZE_PEF_ROTATION_PER_PARTICLE				0x400
+#define ZE_PEF_ANGULAR_ACCELERATION_PER_PARTICLE	0x800
+#define ZE_PEF_ANGULAR_VELOCITY_PER_PARTICLE		0x1000
+#define ZE_PEF_TOTAL_LIFE_PER_PARTICLE				0x2000
 
 struct ZERNParticleMaterial_VertexShader_Output
 {
 	float4										Position									: SV_Position;
-	float2										Texcoord									: TEXCOORD0;
-	nointerpolation float4						Color										: COLOR0;
-	float										DepthView									: TEXCOORD1;
-};                                                                      					
+	float2										TexCoord									: TEXCOORD0;
+	uint										ParticleGlobalIndex							: TEXCOORD1;
+};
 
 struct ZERNParticleMaterial_PixelShader_Input
 {
 	float4										PositionViewport							: SV_Position;
-	float2										Texcoord									: TEXCOORD0;
-	nointerpolation float4						Color										: COLOR0;
-	float										DepthView									: TEXCOORD1;
+	float2										TexCoord									: TEXCOORD0;
+	uint										ParticleGlobalIndex							: TEXCOORD1;
 };
 
 cbuffer ZERNParticleMaterial_Constants_Material												: register(ZERN_SHADER_CONSTANT_MATERIAL)
@@ -88,17 +89,6 @@ cbuffer ZERNParticleMaterial_Constants_Material												: register(ZERN_SHADE
 	float										ZERNParticleMaterial_Reserved0;
 };
 
-cbuffer ZERNParticleMaterial_Constants_Emitter												: register(b9)
-{	
-	float3										ZERNParticleMaterial_Axis;
-	uint										ZERNParticleMaterial_BillboardType;
-};
-
-cbuffer ZERNParticleMaterial_ParticleConstants												: register(b10)
-{
-	ZERNParticleMaterial_Instance_Attributes	Instances[1000];
-};
-
 SamplerState									ZERNParticleMaterial_Sampler				: register(s0);
 
 Texture2D<float4>								ZERNParticleMaterial_DiffuseMap			 	: register(t5);
@@ -106,57 +96,23 @@ Texture2D<float3>								ZERNParticleMaterial_EmissiveMap			: register(t6);
 Texture2D<float3>								ZERNParticleMaterial_NormalMap				: register(t7);
 Texture2D<float>								ZERNParticleMaterial_OpacityMap				: register(t8);
 
-ZERNParticleMaterial_VertexShader_Output ZERNParticleMaterial_VertexShader_Main(uint VertexID : SV_VertexID, uint InstanceID : SV_InstanceID)
+ZERNShading_Surface ZERNParticleMaterial_GetSurfaceFromResources(ZERNShading_Particle Particle, float3 PositionView, float2 TexCoord, float2 PositionViewport)
 {
-	float2 Vertex = ((uint2(VertexID + 2, VertexID) & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
-	
-	float2 VertexTransformed;
-	VertexTransformed.x = dot(Vertex, float2(Instances[InstanceID].Cos_NegSin));
-	VertexTransformed.y = dot(Vertex, float2(-Instances[InstanceID].Cos_NegSin.y, Instances[InstanceID].Cos_NegSin.x));
-	
-	VertexTransformed.xy *= Instances[InstanceID].Size;
-	
-	float3 FrontWorld = normalize(ZERNView_Position - Instances[InstanceID].PositionWorld);
-	float3 VertexWorld = float3(0.0f, 0.0f, 0.0f);
-	if (ZERNParticleMaterial_BillboardType == ZE_PBT_VIEW_POINT_ORIENTED)
-	{
-		float3 RightWorld = normalize(cross(float3(0.0f, 1.0f, 0.0f), FrontWorld));
-		float3 UpWorld = cross(FrontWorld, RightWorld);
-		
-		VertexWorld = VertexTransformed.x * RightWorld + VertexTransformed.y * UpWorld;
-	}
-	else if (ZERNParticleMaterial_BillboardType == ZE_PBT_AXIS_ORIENTED)
-	{
-		float3 RightWorld = normalize(cross(ZERNParticleMaterial_Axis, FrontWorld));
-		VertexWorld = VertexTransformed.x * RightWorld + VertexTransformed.y * ZERNParticleMaterial_Axis;
-	}
-	
-	ZERNParticleMaterial_VertexShader_Output Output;
-	Output.Position = ZERNTransformations_WorldToProjection(float4(Instances[InstanceID].PositionWorld + VertexWorld, 1.0f));
-	Output.Texcoord = (uint2(VertexID, VertexID + 1) & uint2(2, 1)) >> uint2(1, 0);
-	Output.Color = Instances[InstanceID].Color;
-	Output.DepthView = Output.Position.w;
-	
-	return Output;
-}
-
-float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_Input Input) : SV_Target0
-{
-	float Alpha = ZERNParticleMaterial_Opacity * Input.Color.a;
+	float Alpha = ZERNParticleMaterial_Opacity * Particle.Color.a;
 	
 	#ifdef ZERN_PM_OPACITY_MAP
-		Alpha *= ZERNParticleMaterial_OpacityMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord);
+		Alpha *= ZERNParticleMaterial_OpacityMap.Sample(ZERNParticleMaterial_Sampler, TexCoord);
 	#elif defined ZERN_PM_DIFFUSE_MAP
-		Alpha *= ZERNParticleMaterial_DiffuseMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord).w;
+		Alpha *= ZERNParticleMaterial_DiffuseMap.SampleLevel(ZERNParticleMaterial_Sampler, TexCoord, 0).w;
 	#endif
 	
 	#ifdef ZERN_PM_ALPHA_CULL
 		clip(Alpha - ZERNParticleMaterial_AlphaCullLimit);
 	#endif
 	
-	float3 BaseColor = Input.Color.rgb;
+	float3 BaseColor = Particle.Color.rgb;
 	#ifdef ZERN_PM_DIFFUSE_MAP
-		BaseColor *= ZERNParticleMaterial_DiffuseMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord).rgb;	
+		BaseColor *= ZERNParticleMaterial_DiffuseMap.SampleLevel(ZERNParticleMaterial_Sampler, TexCoord, 0).rgb;	
 	#endif
 	
 	float3 AmbientColor = BaseColor * (ZERNParticleMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNParticleMaterial_AmbientColor);
@@ -164,27 +120,197 @@ float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_In
 	float3 EmissiveColor = ZERNParticleMaterial_EmissiveColor;
 	
 	#ifdef ZERN_PM_EMISSIVE_MAP
-		EmissiveColor *= ZERNParticleMaterial_EmissiveMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord).rgb;
+		EmissiveColor *= ZERNParticleMaterial_EmissiveMap.Sample(ZERNParticleMaterial_Sampler, TexCoord).rgb;
 	#endif
 	
 	if (ZERNParticleMaterial_SoftParticle)
 	{
-		float DestDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(Input.PositionViewport.xy));
-		
-		float DistanceDepth = DestDepthView - Input.DepthView;
-		if (DistanceDepth < 0.001f)
-			discard;
-		
+		float DestDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport));
+
+		float DistanceDepth = DestDepthView - PositionView.z;
+
 		float DepthNormalized = saturate(DistanceDepth / ZERNParticleMaterial_DistanceMax);
 		Alpha *= pow(DepthNormalized, ZERNParticleMaterial_ContrastPower);
 	}
 	
-	float3 ResultColor = AmbientColor + EmissiveColor + DiffuseColor;
+	ZERNShading_Surface Surface;
+	Surface.PositionView = PositionView;
+	Surface.NormalView = normalize(-PositionView);
+	Surface.Diffuse = DiffuseColor;
+	Surface.SubsurfaceScattering = 0.0f;
+	Surface.Specular = 0.0f;
+	Surface.SpecularPower = 1.0f;
+	Surface.Ambient = AmbientColor;
+	Surface.Opacity = Alpha;
+	Surface.Emissive = EmissiveColor;
 	
-	float4 FogColor = ZERNShading_CalculateFogColor(ZERNTransformations_ViewportToView2(Input.PositionViewport.xy, ZERNRenderer_OutputSize, Input.DepthView));
-	ResultColor = lerp(ResultColor, FogColor.rgb, FogColor.a);
+	return Surface;
+}
+
+float4 ZERNParticleMaterial_Shade(ZERNShading_Particle Particle, float3 PositionView, float2 TexCoord, float2 PositionViewport)
+{
+	ZERNShading_Surface Surface = ZERNParticleMaterial_GetSurfaceFromResources(Particle, PositionView, TexCoord, PositionViewport);
+	
+	if (Particle.LightReceiver)
+		return float4(ZERNShading_Shade(PositionViewport, Surface), Surface.Opacity);
+	else
+		return float4(Surface.Ambient + Surface.Emissive + Surface.Diffuse, Surface.Opacity);
+}
+
+ZERNParticleMaterial_VertexShader_Output ZERNParticleMaterial_VertexShader_Main(uint VertexID : SV_VertexID, uint InstanceID : SV_InstanceID)
+{
+	float2 Vertex = ((uint2(VertexID + 2, VertexID) & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
+	
+	ZERNShading_Emitter Emitter = ZERNShading_Emitters[0];
+	uint ParticleGlobalIndex = Emitter.StartOffset + InstanceID;
+	ZERNShading_Particle Particle;
+	Particle.Position = ZERNShading_ParticlePool[ParticleGlobalIndex].xyz;
+	Particle.Size = Emitter.Size;
+	Particle.Rotation = Emitter.Rotation;
+	
+	if ((Emitter.Flags & ZE_PEF_SIZE_PER_PARTICLE) == ZE_PEF_SIZE_PER_PARTICLE)
+		Particle.Size *= ZERNShading_ParticlePool[ParticleGlobalIndex += Emitter.ParticleCount].xy;
+	
+	if ((Emitter.Flags & ZE_PEF_ROTATION_PER_PARTICLE) == ZE_PEF_ROTATION_PER_PARTICLE)
+		Particle.Rotation += ZERNShading_ParticlePool[ParticleGlobalIndex += Emitter.ParticleCount].x;
+	
+	float Sin, Cos;
+	sincos(Particle.Rotation, Sin, Cos);
 		
-	return float4(ResultColor, Alpha);
+	float2 VertexTransformed;
+	VertexTransformed.x = dot(Vertex, float2(Cos, -Sin));
+	VertexTransformed.y = dot(Vertex, float2(Sin, Cos));
+	
+	VertexTransformed.xy *= Particle.Size;
+	
+	float3 FrontWorld = normalize(ZERNView_Position - Particle.Position);
+	float3 VertexWorld = float3(0.0f, 0.0f, 0.0f);
+	if (Emitter.Flags & ZE_PEF_BILLBOARD_VIEW)
+	{
+		float3 RightWorld = normalize(cross(float3(0.0f, 1.0f, 0.0f), FrontWorld));
+		float3 UpWorld = cross(FrontWorld, RightWorld);
+		
+		VertexWorld = VertexTransformed.x * RightWorld + VertexTransformed.y * UpWorld;
+	}
+	else if (Emitter.Flags & ZE_PEF_BILLBOARD_AXIS)
+	{
+		float3 Axis = (float3)(uint3(Emitter.Axis >> 16, Emitter.Axis >> 8, Emitter.Axis) & 0xff);
+		float3 RightWorld = normalize(cross(Axis, FrontWorld));
+		VertexWorld = VertexTransformed.x * RightWorld + VertexTransformed.y * Axis;
+	}
+	
+	ZERNParticleMaterial_VertexShader_Output Output;
+	Output.Position = ZERNTransformations_WorldToProjection(float4(Particle.Position + VertexWorld, 1.0f));
+	Output.TexCoord = (uint2(VertexID, VertexID + 1) & uint2(2, 1)) >> uint2(1, 0);
+	
+	Output.TexCoord = Emitter.TexCoords.xy + (Emitter.TexCoords.zw - Emitter.TexCoords.xy) * Output.TexCoord;
+	
+	if ((Emitter.Flags & ZE_PEF_TEXCOORDS_PER_PARTICLE) == ZE_PEF_TEXCOORDS_PER_PARTICLE)
+	{
+		float4 MinMaxTexCoords = ZERNShading_ParticlePool[ParticleGlobalIndex += Emitter.ParticleCount];
+		Output.TexCoord = MinMaxTexCoords.xy + (MinMaxTexCoords.zw - MinMaxTexCoords.xy) * Output.TexCoord;
+	}
+	
+	Output.ParticleGlobalIndex = ParticleGlobalIndex + Emitter.ParticleCount;
+	
+	return Output;
+}
+
+float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_Input Input) : SV_Target0
+{
+	ZERNShading_Emitter Emitter = ZERNShading_Emitters[0];
+	ZERNShading_Particle Particle;
+	Particle.Color = Emitter.Color;
+
+	if ((Emitter.Flags & ZE_PEF_COLOR_PER_PARTICLE) == ZE_PEF_COLOR_PER_PARTICLE)
+		Particle.Color *= ZERNShading_ParticlePool[Input.ParticleGlobalIndex];
+	
+	Particle.LightReceiver = (Emitter.Flags & ZE_PEF_LIGHT_RECEIVER) == ZE_PEF_LIGHT_RECEIVER;
+	float3 PositionView = ZERNTransformations_ViewportToView(Input.PositionViewport.xy, ZERNGBuffer_GetDimensions(), Input.PositionViewport.z);
+
+	return ZERNParticleMaterial_Shade(Particle, PositionView, Input.TexCoord, Input.PositionViewport.xy);
+}
+
+float4 ZERNParticleMaterial_Tiled_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
+	uint2 TileId = floor(PositionViewport.xy) / TILE_PARTICLE_DIM;
+	uint TileIndex = TileId.y * (GBufferDimensions.x / TILE_PARTICLE_DIM) + TileId.x;
+	uint TileStartOffset = TileIndex * TILE_PARTICLE_TOTAL_COUNT;
+	uint TileParticleCount = ZERNShading_TileParticleIndices[TileStartOffset];
+	
+	float4 ResultColor = 0.0f;
+	
+	for (uint I = 0; I < TileParticleCount; I++)
+	{
+		uint ParticleIndex = ZERNShading_TileParticleIndices[TileStartOffset + TILE_PARTICLE_HEADER_COUNT + I];
+		
+		uint EmitterId = ParticleIndex >> 20;
+		uint ParticleGlobalIndex = ParticleIndex & 0xfffff;
+		
+		ZERNShading_Emitter Emitter = ZERNShading_Emitters[EmitterId];
+		float4 PositionRadius = ZERNShading_ParticlePool[ParticleGlobalIndex];
+		ParticleGlobalIndex += Emitter.ParticleCount;
+
+		ZERNShading_Particle Particle;
+		Particle.Position = PositionRadius.xyz;
+		Particle.Radius = PositionRadius.w;
+		Particle.Color = Emitter.Color;
+		Particle.Size = Emitter.Size;
+		Particle.Rotation = Emitter.Rotation;
+		Particle.LightReceiver = (Emitter.Flags & ZE_PEF_LIGHT_RECEIVER) == ZE_PEF_LIGHT_RECEIVER;
+		
+		if ((Emitter.Flags & ZE_PEF_SIZE_PER_PARTICLE) == ZE_PEF_SIZE_PER_PARTICLE)
+		{
+			Particle.Size *= ZERNShading_ParticlePool[ParticleGlobalIndex].xy;
+			ParticleGlobalIndex += Emitter.ParticleCount;
+		}
+		
+		if ((Emitter.Flags & ZE_PEF_ROTATION_PER_PARTICLE) == ZE_PEF_ROTATION_PER_PARTICLE)
+		{
+			Particle.Rotation += ZERNShading_ParticlePool[ParticleGlobalIndex].x;
+			ParticleGlobalIndex += Emitter.ParticleCount;
+		}
+		
+		float3 RayDirectionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, ZERNGBuffer_GetDepth(PositionViewport.xy));
+		RayDirectionView = normalize(RayDirectionView);
+		
+		float3 ParticlePointView = (Particle.Position.z / RayDirectionView.z) * RayDirectionView;
+		float2 VectorToPoint = (ParticlePointView.xy - Particle.Position.xy) / Particle.Size;
+		
+		float Sin, Cos;
+		sincos(Particle.Rotation, Sin, Cos);
+		
+		float2 VectorToPointRotated;
+		VectorToPointRotated.x = dot(VectorToPoint.xy, float2(Cos, -Sin));
+		VectorToPointRotated.y = dot(VectorToPoint.xy, float2(Sin, Cos));
+		
+		float2 TexCoord = VectorToPointRotated * 0.5f + 0.5f;
+		TexCoord = Emitter.TexCoords.xy + (Emitter.TexCoords.zw - Emitter.TexCoords.xy) * TexCoord;
+
+		if ((Emitter.Flags & ZE_PEF_TEXCOORDS_PER_PARTICLE) == ZE_PEF_TEXCOORDS_PER_PARTICLE)
+		{
+			float4 MinMaxTexCoords = ZERNShading_ParticlePool[ParticleGlobalIndex];
+			TexCoord = MinMaxTexCoords.xy + (MinMaxTexCoords.zw - MinMaxTexCoords.xy) * TexCoord;
+			ParticleGlobalIndex += Emitter.ParticleCount;
+		}
+		
+		if ((Emitter.Flags & ZE_PEF_COLOR_PER_PARTICLE) == ZE_PEF_COLOR_PER_PARTICLE)
+		{
+			Particle.Color *= ZERNShading_ParticlePool[ParticleGlobalIndex];
+			ParticleGlobalIndex += Emitter.ParticleCount;
+		}
+		
+		if (all(TexCoord >= 0.0f && TexCoord <= 1.0f))
+		{
+			float4 Color = ZERNParticleMaterial_Shade(Particle, ParticlePointView, TexCoord, PositionViewport.xy);
+			
+			ResultColor.rgb = (1.0f - ResultColor.a) * (Color.rgb * Color.a) + ResultColor.rgb;
+			ResultColor.a = Color.a + (1.0f - Color.a) * ResultColor.a;
+		}
+	}
+	
+	return ResultColor;
 }
 
 #endif

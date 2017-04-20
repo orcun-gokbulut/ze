@@ -39,13 +39,34 @@
 #include "ZERNShading.hlsl"
 #include "ZERNIntersections.hlsl"
 
-groupshared uint								TileMinDepth;
-groupshared uint								TileMaxDepth;
-#if defined ZERN_TILED_TRANSPARENT
-	groupshared  uint							TileTransparent;
+#if defined ZERN_TILED_PARTICLE
+	#define ZERN_TILED_THREAD_WORK_DIM			uint2(2, 1)
+	#define ZERN_TILED_THREAD_DIM				uint2(128, 1)
+	#define ZERN_TILED_TILE_DIM					TILE_PARTICLE_DIM
+#else
+	#define ZERN_TILED_THREAD_WORK_DIM			uint2(4, 1)
+	#define ZERN_TILED_THREAD_DIM				uint2(256, 1)
+	#define ZERN_TILED_TILE_DIM					TILE_LIGHT_DIM
 #endif
 
+#define ZERN_TILED_THREAD_WORK_SIZE				(ZERN_TILED_THREAD_WORK_DIM.x * ZERN_TILED_THREAD_WORK_DIM.y)
+#define ZERN_TILED_THREAD_SIZE					(ZERN_TILED_THREAD_DIM.x * ZERN_TILED_THREAD_DIM.y)
+#define ZERN_TILED_WARP_DIM						uint2(8, 4)
+#define ZERN_TILED_WARP_SIZE					(ZERN_TILED_WARP_DIM.x * ZERN_TILED_WARP_DIM.y)
+#define ZERN_TILED_WARP_WORK_DIM				(ZERN_TILED_WARP_DIM * ZERN_TILED_THREAD_WORK_DIM)
+#define ZERN_TILED_WARP_WORK_SIZE				(ZERN_TILED_WARP_WORK_DIM.x * ZERN_TILED_WARP_WORK_DIM.y)
+#define ZERN_TILED_WARP_COUNT_X					(ZERN_TILED_TILE_DIM / ZERN_TILED_WARP_WORK_DIM.x)
+
+#define SURFACE_COUNT							(SAMPLE_COUNT * ZERN_TILED_THREAD_WORK_SIZE)
+
+groupshared uint								TileMinDepth;
+groupshared uint								TileMaxDepth;
+
 groupshared uint								TileLightCount;
+
+#if defined ZERN_TILED_TRANSPARENT
+	groupshared uint							TileLightCountTransparent;
+#endif
 groupshared uint								TileLightIndices[MAX_TILED_LIGHT];
 
 StructuredBuffer<ZERNInterSections_Sphere>		PointLightsBoundingSpheres					: register(t6);
@@ -53,55 +74,62 @@ StructuredBuffer<ZERNInterSections_Sphere>		SpotLightsBoundingSpheres					: regi
 
 RWStructuredBuffer<uint>						OutputTileLightIndices						: register(u0);
 
-[numthreads(TILE_DIMENSION, TILE_DIMENSION, 1)]
+#if defined ZERN_TILED_PARTICLE
+	groupshared uint							TileParticleCount;
+	RWStructuredBuffer<uint>					OutputTileParticleIndices					: register(u1);
+#endif
+
+[numthreads(ZERN_TILED_THREAD_DIM.x, ZERN_TILED_THREAD_DIM.y, 1)]
 void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_GroupID,
 														uint3 DispatchThreadId				: SV_DispatchThreadID,
 														uint3 GroupThreadId					: SV_GroupThreadID)
 {
-	uint GroupIndex = GroupThreadId.y * TILE_DIMENSION + GroupThreadId.x;
-	float2 PixelCoord = DispatchThreadId.xy;
+	uint GroupThreadIndex = GroupThreadId.y * ZERN_TILED_THREAD_DIM.x + GroupThreadId.x;
+	uint WarpThreadIndex = GroupThreadIndex % ZERN_TILED_WARP_SIZE;
+	uint WarpIndex = GroupThreadIndex / ZERN_TILED_WARP_SIZE;
+	
+	uint2 WarpPixelCoord = GroupId.xy * ZERN_TILED_TILE_DIM + uint2(WarpIndex % ZERN_TILED_WARP_COUNT_X, WarpIndex / ZERN_TILED_WARP_COUNT_X) * ZERN_TILED_WARP_WORK_DIM;
+
 	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
 	
-	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
-	#if defined ZERN_TILED_TRANSPARENT
-		uint PixelTransparent = 0;
-	#endif
-	[unroll]
-	for (uint I = 0; I < SAMPLE_COUNT; I++)
-	{
-		Surfaces[I] = ZERNShading_GetSurfaceFromGBuffers(PixelCoord, I);
-		#if defined ZERN_TILED_TRANSPARENT
-			uint Stencil = ZERNGBuffer_GetStencil(PixelCoord, I);
-			PixelTransparent |= Stencil;
-		#endif
-	}
+	ZERNShading_Surface Surfaces[SURFACE_COUNT];
 	
+	[unroll]
+	for (uint W = 0; W < ZERN_TILED_THREAD_WORK_SIZE; W++)
+	{
+		uint2 WorkId = uint2(W % ZERN_TILED_THREAD_WORK_DIM.x, W / ZERN_TILED_THREAD_WORK_DIM.x);
+		float2 PixelCoord = WarpPixelCoord + WorkId * ZERN_TILED_WARP_DIM;
+		
+		[unroll]
+		for (uint S = 0; S < SAMPLE_COUNT; S++)
+			Surfaces[W * SAMPLE_COUNT + S] = ZERNShading_GetSurfaceFromGBuffers(PixelCoord + float2((WarpThreadIndex / SAMPLE_COUNT) + ((S % 2) * 4), S / 2), (WarpThreadIndex % SAMPLE_COUNT));
+	}
+
 	float MinDepth = ZERNView_FarZ;
 	float MaxDepth = ZERNView_NearZ;
 	
 	[unroll]
-	for (uint S = 0; S < SAMPLE_COUNT; S++)
+	for (uint S = 0; S < SURFACE_COUNT; S++)
 	{
 		MinDepth = min(MinDepth, Surfaces[S].PositionView.z);
 		MaxDepth = max(MaxDepth, Surfaces[S].PositionView.z);
 	}
 	
-	if (GroupIndex == 0)
+	if (GroupThreadIndex == 0)
 	{
-		TileLightCount = 0;
 		TileMinDepth = 0x7F7FFFFF;	// Max float
 		TileMaxDepth = 0;
-		
+		TileLightCount = 0;
 		#if defined ZERN_TILED_TRANSPARENT
-			TileTransparent = 0;
+			TileLightCountTransparent = 0;
+		#endif
+		
+		#if defined ZERN_TILED_PARTICLE
+			TileParticleCount = 0;
 		#endif
 	}
 	
 	GroupMemoryBarrierWithGroupSync();
-	
-	#if defined ZERN_TILED_TRANSPARENT
-		InterlockedOr(TileTransparent, PixelTransparent);
-	#endif
 	
 	if (MaxDepth >= MinDepth)
 	{
@@ -110,11 +138,10 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	}
 	
 	GroupMemoryBarrierWithGroupSync();
-	
 	float TileMinZ = asfloat(TileMinDepth);
 	float TileMaxZ = asfloat(TileMaxDepth);
 	
-	float2 TileScale = GBufferDimensions * rcp(2.0f * TILE_DIMENSION);
+	float2 TileScale = GBufferDimensions * rcp(2.0f * ZERN_TILED_TILE_DIM);
 	float2 TileBias = TileScale - float2(GroupId.xy);
 	
 	float4 ProjectionMatrixColumn0 = float4(ZERNView_ProjectionTransform._11 * TileScale.x, 0.0f, ZERNView_ProjectionTransform._13 * TileScale.x + TileBias.x, 0.0f);
@@ -133,42 +160,77 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 
 	[unroll]
 	for (uint I = 0; I < 4; I++)
-		TileFrustumPlanes[I].Normal *= rcp(length(TileFrustumPlanes[I].Normal.xyz));
-	
+		TileFrustumPlanes[I].Normal *= rcp(length(TileFrustumPlanes[I].Normal));
 
-	for (uint PointLightIndex = GroupIndex; PointLightIndex < ZERNShading_PointLightCount; PointLightIndex += TILE_SIZE)
+	#if defined ZERN_TILED_PARTICLE
+		uint TileIndex = GroupId.y * (GBufferDimensions.x / ZERN_TILED_TILE_DIM) + GroupId.x;
+		uint TileStartOffset = TileIndex * TILE_PARTICLE_TOTAL_COUNT;
+		
+		for (uint EmitterIndex = 0; EmitterIndex < 1; EmitterIndex++)
+		{
+			uint StartOffset = ZERNShading_Emitters[EmitterIndex].StartOffset;
+			uint ParticleCount = ZERNShading_Emitters[EmitterIndex].ParticleCount;
+			for (uint ParticleIndex = StartOffset + GroupThreadIndex; ParticleIndex < (StartOffset + ParticleCount)/*ZERNShading_ParticleCount*/; ParticleIndex += ZERN_TILED_THREAD_SIZE)
+			{
+				bool InsideFrustum = true;
+				ZERNInterSections_Sphere BoundingSphere = {ZERNShading_ParticlePool[ParticleIndex].xyz, ZERNShading_ParticlePool[ParticleIndex].w};
+				
+				[unroll]
+				for (uint I = 0; I < 5; I++)
+					InsideFrustum = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[I], BoundingSphere);
+				
+				if (InsideFrustum)
+				{
+					uint Index;
+					InterlockedAdd(TileParticleCount, 1, Index);
+					OutputTileParticleIndices[TileStartOffset + TILE_PARTICLE_HEADER_COUNT + Index] = (EmitterIndex << 20) | ParticleIndex;
+				}
+			}
+		}
+		GroupMemoryBarrierWithGroupSync();
+		
+		if (GroupThreadIndex == 0)
+			OutputTileParticleIndices[TileStartOffset] = TileParticleCount;
+	#else
+	
+	for (uint PointLightIndex = GroupThreadIndex; PointLightIndex < ZERNShading_PointLightCount; PointLightIndex += ZERN_TILED_THREAD_SIZE)
 	{
 		bool InsideFrustum = true;
 		ZERNInterSections_Sphere BoundingSphere = PointLightsBoundingSpheres[PointLightIndex];
 		
 		[unroll]
-		for (uint I = 0; I < 4; I++)
+		for (uint I = 0; I < 5; I++)
 			InsideFrustum = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[I], BoundingSphere);
-
-		bool Visible = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[4], BoundingSphere);
-		InsideFrustum = Visible && ZERNInterSections_PlaneSphere(TileFrustumPlanes[5], BoundingSphere);
 		
-		if (InsideFrustum
-		#if defined ZERN_TILED_TRANSPARENT
-			|| (TileTransparent != 0 && Visible)
-		#endif
-		)
+		bool Visible = InsideFrustum;
+		
+		InsideFrustum = InsideFrustum && ZERNInterSections_PlaneSphere(TileFrustumPlanes[5], BoundingSphere);
+		
+		if (InsideFrustum)
 		{
 			uint Index;
 			InterlockedAdd(TileLightCount, 1, Index);
 			TileLightIndices[Index] = PointLightIndex;
 		}
+	#if defined ZERN_TILED_TRANSPARENT
+		else if (Visible)
+		{
+			uint Index;
+			InterlockedAdd(TileLightCountTransparent, 1, Index);
+			TileLightIndices[(MAX_TILED_LIGHT - 1) - Index] = PointLightIndex;
+		}
+	#endif
 	}
-	
 	GroupMemoryBarrierWithGroupSync();
 	
 	uint TilePointLightCount = TileLightCount;
 	
 	#if defined ZERN_TILED_TRANSPARENT
-		for (uint SpotLightIndex = GroupIndex; SpotLightIndex < ZERNShading_SpotLightCount; SpotLightIndex += TILE_SIZE)
+		uint TilePointLightCountTransparent = TileLightCountTransparent;
+		
+		for (uint SpotLightIndex = GroupThreadIndex; SpotLightIndex < ZERNShading_SpotLightCount; SpotLightIndex += ZERN_TILED_THREAD_SIZE)
 		{
 			bool InsideFrustum = true;
-			
 			ZERNInterSections_Sphere BoundingSphere = SpotLightsBoundingSpheres[SpotLightIndex];
 			
 			[unroll]
@@ -178,36 +240,36 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 			if (InsideFrustum)
 			{
 				uint Index;
-				InterlockedAdd(TileLightCount, 1, Index);
-				TileLightIndices[Index] = SpotLightIndex;
+				InterlockedAdd(TileLightCountTransparent, 1, Index);
+				TileLightIndices[(MAX_TILED_LIGHT - 1) - Index] = SpotLightIndex;
 			}
 		}
 		
 		GroupMemoryBarrierWithGroupSync();
 		
-		uint TileTotalLightCount = TileLightCount;
+		uint TileTotalLightCountTransparent = TileLightCountTransparent;
 	#endif
 
 	uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
-	uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
+	uint TileStartOffset = TileIndex * TILE_LIGHT_TOTAL_COUNT;
 
-	for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)
-		OutputTileLightIndices[TileStartOffset + 2 + M] = TileLightIndices[M];
+	for (uint M = GroupThreadIndex; M < TilePointLightCount; M += ZERN_TILED_THREAD_SIZE)
+		OutputTileLightIndices[TileStartOffset + TILE_LIGHT_HEADER_COUNT + M] = TileLightIndices[M];
 
 	#if defined ZERN_TILED_TRANSPARENT
-		for (uint N = (GroupIndex + TilePointLightCount); N < TileTotalLightCount; N += TILE_SIZE)
-			OutputTileLightIndices[TileStartOffset + 2 + N] = TileLightIndices[N];
+		for (int N = ((MAX_TILED_LIGHT - 1) - GroupThreadIndex); N >= int(MAX_TILED_LIGHT - TileTotalLightCountTransparent); N -= ZERN_TILED_THREAD_SIZE)
+			OutputTileLightIndices[TileStartOffset + TILE_LIGHT_HEADER_COUNT + TilePointLightCount + ((MAX_TILED_LIGHT - 1) - N)] = TileLightIndices[N];
 	#endif
 	
-	if (GroupIndex == 0)
+	if (GroupThreadIndex == 0)
 	{
 		OutputTileLightIndices[TileStartOffset] = TilePointLightCount;
 		#if defined ZERN_TILED_TRANSPARENT
-			OutputTileLightIndices[TileStartOffset + 1] = TileTotalLightCount;
-		#else
-			OutputTileLightIndices[TileStartOffset + 1] = TilePointLightCount;
+			OutputTileLightIndices[TileStartOffset + 1] = TilePointLightCountTransparent;
+			OutputTileLightIndices[TileStartOffset + 2] = TileTotalLightCountTransparent - TilePointLightCountTransparent;
 		#endif
 	}
+	#endif
 }
 
 #endif

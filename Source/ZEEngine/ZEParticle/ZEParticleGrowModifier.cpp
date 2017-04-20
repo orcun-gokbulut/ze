@@ -35,6 +35,10 @@
 
 #include "ZEParticleGrowModifier.h"
 
+ZEUInt ZEParticleGrowModifier::GetFlags() const
+{
+	return ZE_PEF_SIZE_PER_PARTICLE;
+}
 
 void ZEParticleGrowModifier::SetGrowFactor(float Factor)
 {
@@ -48,14 +52,14 @@ float ZEParticleGrowModifier::GetGrowFactor() const
 
 void ZEParticleGrowModifier::Tick(float ElapsedTime)
 {
-	ZESize ParticleCount = GetPool().GetCount();
-	ZEArray<ZEParticle>& Particles =  GetPool();
+	ZEParticlePool& ParticlePool = GetPool();
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
 
-	float GrowAmount = GrowFactor * ElapsedTime;
-
-	for (ZESize I = 0; I < ParticleCount; I++)
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		Particles[I].Size2D += (Particles[I].Size2D * GrowAmount);
+		ZEUInt Index = AliveParticleIndices[I];
+		ParticlePool.Sizes[Index] *= GrowFactor;
 	}
 }
 

@@ -125,7 +125,10 @@ void ZERNStandardMaterial::UpdateGBufferForwardPixelShaderDefinitions(ZEGRShader
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DETAIL_NORMAL_MAP"));
 
 	if (TransparencyEnabled)
+	{
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_FORWARD"));
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_SHADING_TRANSPARENT"));
+	}
 	else
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
 }
@@ -536,6 +539,7 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 
 	UseInteriorVertexLayout = false;
 
+	MaxTextureLOD = 0;
 	ShadowCaster = true;
 	TwoSided = false;
 	Wireframe = false;
@@ -632,6 +636,16 @@ void ZERNStandardMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
 const ZEHolder<ZEGRSampler>& ZERNStandardMaterial::GetSampler() const
 {
 	return Sampler;
+}
+
+void ZERNStandardMaterial::SetMaxTextureLOD(ZEUInt8 MaxTextureLOD)
+{
+	this->MaxTextureLOD = MaxTextureLOD;
+}
+
+ZEUInt8 ZERNStandardMaterial::GetMaxTextureLOD() const
+{
+	return MaxTextureLOD;
 }
 
 void ZERNStandardMaterial::SetShadowCaster(bool ShadowCaster)
@@ -902,8 +916,8 @@ void ZERNStandardMaterial::SetBaseMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(BaseMap);
@@ -1348,8 +1362,8 @@ void ZERNStandardMaterial::SetNormalMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = false;
 
 		UnregisterExternalResource(NormalMap);
@@ -1525,8 +1539,8 @@ void ZERNStandardMaterial::SetOpacityMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(OpacityMap);
@@ -2177,6 +2191,8 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	
 	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
 
+	SetMaxTextureLOD(PropertiesNode.ReadUInt8("MaxTextureLOD", 0));
+	
 	SetGUID(ZEGUID::FromString(MaterialNode->ReadString("GUID")));
 	SetName(PropertiesNode.ReadString("Name"));
 	SetShadowCaster(PropertiesNode.ReadBoolean("ShadowCaster", false));

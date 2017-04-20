@@ -39,7 +39,7 @@
 #include "ZEMath/ZEVector.h"
 
 #define MAX_DEFERRED_LIGHT				1024
-#define MAX_TILED_LIGHT					1024
+#define MAX_TILED_LIGHT					1021
 #define MAX_POINT_LIGHT_SHADOW			2
 #define MAX_SPOT_LIGHT_SHADOW			4
 #define MAX_PROJECTIVE_LIGHT			8
@@ -48,8 +48,18 @@
 #define MAX_DIRECTIONAL_LIGHT_SHADOW	1
 #define MAX_CASCADE						4
 
-#define TILE_DIMENSION					32
-#define TILE_SIZE						(TILE_DIMENSION * TILE_DIMENSION)
+#define TILE_LIGHT_HEADER_COUNT			3
+#define TILE_LIGHT_TOTAL_COUNT			(TILE_LIGHT_HEADER_COUNT + MAX_TILED_LIGHT)
+
+#define TILE_PARTICLE_HEADER_COUNT		1
+#define TILE_PARTICLE_COUNT				1023
+#define TILE_PARTICLE_TOTAL_COUNT		(TILE_PARTICLE_HEADER_COUNT + TILE_PARTICLE_COUNT)
+
+#define TILE_PARTICLE_DIMENSION			16
+#define TILE_PARTICLE_SIZE				(TILE_PARTICLE_DIMENSION * TILE_PARTICLE_DIMENSION)
+
+#define TILE_LIGHT_DIMENSION			32
+#define TILE_LIGHT_SIZE					(TILE_LIGHT_DIMENSION * TILE_LIGHT_DIMENSION)
 
 struct ZERNShading_PointLight
 {
@@ -149,4 +159,18 @@ struct ZERNShading_EdgeDetectionConstants
 	float								DepthThreshold;
 	float								NormalThreshold;
 	ZEVector2							Reserved;
+};
+
+struct ZERNShading_ParticleEmitter
+{
+	ZEUInt								Axis;
+	ZEUInt								Flags;
+	ZEUInt								StartOffset;
+	ZEUInt								ParticleCount;
+
+	ZEUInt								ColorStartOffset;
+	ZEVector2							ParticleSize;
+	float								ParticleRotation;
+	ZEVector4							ParticleTexCoords;
+	ZEVector4							ParticleColor;
 };

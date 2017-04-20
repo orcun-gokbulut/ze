@@ -756,6 +756,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
+	if (PrecomputedMultipleScatteringBuffer == NULL || !PrecomputedMultipleScatteringBuffer->IsLoaded())
+		return false;
+
 	if (GetSunLight() != NULL)
 	{
 		ZELightDirectional* SunLight = GetSunLight();
@@ -808,6 +811,8 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRTexture* DepthTexture = static_cast<const ZEGRTexture*>(Stage->GetInput("DepthTexture"));
+	if (DepthTexture == NULL)
+		return;
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);

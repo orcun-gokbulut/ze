@@ -35,9 +35,9 @@
 
 #pragma once
 
-#include "ZEParticle.h"
-
 #include "ZEDS/ZEArray.h"
+
+#include "ZEParticleEmitter.h"
 
 class ZEParticleEmitter;
 class ZEParticleEffect;
@@ -51,8 +51,11 @@ class ZEParticleModifier : public ZEObject
 		ZEParticleEmitter*					Emitter;
 		bool								Enabled;
 
+
 	protected: 
-		ZEArray<ZEParticle>&				GetPool();
+		ZEParticlePool&						GetPool();
+		
+		virtual ZEUInt						GetFlags() const;
 
 	public:
 		ZEParticleEffect*					GetEffect();
