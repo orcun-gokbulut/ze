@@ -39,37 +39,73 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNShading.h"
 
 class ZEGRTexture;
 class ZEGRBuffer;
+class ZERNMaterial;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRComputeRenderStateData;
 
 class ZERNStageParticleRendering : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEFlags							DirtyFlags;
-		ZEGRViewport					Viewport;
+		ZEFlags									DirtyFlags;
+		ZEGRViewport							Viewport;
 
-		ZEHolder<const ZEGRTexture>		AccumulationTexture;
-		ZEHolder<const ZEGRTexture>		DepthTexture;
-		ZEHolder<const ZEGRBuffer>		FogConstantBuffer;
+		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
+		ZEHolder<ZEGRShader>					TiledPixelShader;
+		ZEHolder<ZEGRShader>					TiledCullingComputeShader;
 
-		virtual bool					InitializeInternal();
-		virtual bool					DeinitializeInternal();
+		ZEHolder<ZEGRRenderStateData>			TiledRenderStateData;
+		ZEHolder<ZEGRComputeRenderStateData>	TiledCullingRenderStateData;
 
-		virtual void					CreateOutput(const ZEString& Name);
+		ZEHolder<ZEGRBuffer>					EmittersConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ParticlePoolBuffer;
+		ZEHolder<ZEGRBuffer>					TileParticleStructuredBuffer;
+
+		ZEHolder<const ZEGRTexture>				AccumulationTexture;
+		ZEHolder<const ZEGRTexture>				DepthTexture;
+		ZEHolder<const ZEGRBuffer>				FogConstantBuffer;
+		ZEHolder<const ZEGRBuffer>				TileLightStructuredBuffer;
+		ZEHolder<const ZEGRBuffer>				LightsConstantBuffer;
+
+		struct MaterialInstanced
+		{
+			ZEHolder<const ZERNMaterial>		Material;
+			ZEUInt								InstanceCount;
+			ZEUInt								FirstConstant;
+			ZEUInt								ConstantCount;
+		};
+
+		ZESmartArray<MaterialInstanced>			Instances;
+		ZESmartArray<MaterialInstanced>			TiledInstances;
+		ZEChunkArray<ZEBYTE, 256>				Emitters;
+		ZEChunkArray<ZEBYTE, 65536>				ParticlePool;
+
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
+
+		virtual void							CreateOutput(const ZEString& Name);
+
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateBuffers();
+		bool									Update();
 
 	public:
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 
-		virtual void					Resized(ZEUInt Width, ZEUInt Height);
+		virtual void							Resized(ZEUInt Width, ZEUInt Height);
 
-		virtual bool					Setup(ZEGRContext* Context);
-		virtual void					CleanUp(ZEGRContext* Context);
+		virtual bool							Setup(ZEGRContext* Context);
+		virtual void							CleanUp(ZEGRContext* Context);
 
-										ZERNStageParticleRendering();
-		virtual 						~ZERNStageParticleRendering();
+												ZERNStageParticleRendering();
+		virtual 								~ZERNStageParticleRendering();
 
-		static ZEGRRenderState			GetRenderState();
+		static ZEGRRenderState					GetRenderState();
 };

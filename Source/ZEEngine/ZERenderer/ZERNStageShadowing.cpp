@@ -378,9 +378,9 @@ ZERNStageShadowing::ZERNStageShadowing()
 	SpotShadowMapsResolution = ZERN_LSR_MEDIUM;
 	ProjectiveShadowMapsResolution = ZERN_LSR_MEDIUM;
 
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DirectionalShadowMaps), "DirectionalShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&SpotShadowMaps), "SpotShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
-	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DirectionalShadowMaps), "DirectionalShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&SpotShadowMaps), "SpotShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
+	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&ProjectiveShadowMaps), "ProjectiveShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);
 }
 
 ZERNStageShadowing::~ZERNStageShadowing()

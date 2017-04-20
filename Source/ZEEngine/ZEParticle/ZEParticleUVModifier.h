@@ -41,7 +41,6 @@ class ZEParticleUVModifier : public ZEParticleModifier
 {
 	ZE_OBJECT
 	private:
-		bool								DoOnce;
 		ZEVector2							UVFrameSize;
 		ZEInt								CurrentUVFrame;
 
@@ -49,8 +48,10 @@ class ZEParticleUVModifier : public ZEParticleModifier
 		ZEInt								RowCount;
 		ZEInt								ColumnCount;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
-		void								SetTextureSize(ZEVector2 TextureSize);
+		void								SetTextureSize(const ZEVector2& TextureSize);
 		const ZEVector2&					GetTextureSize() const;
 
 		void								SetRowCount(ZEInt RowCount);

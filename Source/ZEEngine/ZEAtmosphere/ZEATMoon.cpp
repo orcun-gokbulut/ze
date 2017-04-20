@@ -268,6 +268,9 @@ bool ZEATMoon::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
+	if (PhaseTexture == NULL || !PhaseTexture->IsLoaded())
+		return false;
+
 	const ZERNView& View = *Parameters->View;
 
 	ZEVector2 MoonPositionScreen;

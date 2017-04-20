@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEParticleModifier.h"
+
 #include "ZEMath/ZEAABBox.h"
 
 class ZEParticleConfineModifier : public ZEParticleModifier

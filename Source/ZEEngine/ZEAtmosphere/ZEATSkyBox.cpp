@@ -264,10 +264,10 @@ const ZEVector3& ZEATSkyBox::GetColor() const
 
 bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (SkyTexture == NULL || !SkyTexture->IsLoaded())
-		return false;
-
 	if (!ZEEntity::PreRender(Parameters))
+		return false;
+	
+	if (SkyTexture == NULL || !SkyTexture->IsLoaded())
 		return false;
 
 	Parameters->Renderer->AddCommand(&SkyRenderCommand);

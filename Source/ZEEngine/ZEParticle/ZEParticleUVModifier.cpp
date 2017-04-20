@@ -35,7 +35,12 @@
 
 #include "ZEParticleUVModifier.h"
 
-void ZEParticleUVModifier::SetTextureSize(ZEVector2 TextureSize)
+ZEUInt ZEParticleUVModifier::GetFlags() const
+{
+	return ZE_PEF_TEXCOORDS_PER_PARTICLE;
+}
+
+void ZEParticleUVModifier::SetTextureSize(const ZEVector2& TextureSize)
 {
 	this->TextureSize = TextureSize;
 }
@@ -48,6 +53,8 @@ const ZEVector2& ZEParticleUVModifier::GetTextureSize() const
 void ZEParticleUVModifier::SetRowCount(ZEInt RowCount)
 {
 	this->RowCount = RowCount;
+
+	UVFrameSize.y = 1.0f / RowCount;
 }
 
 ZEInt ZEParticleUVModifier::GetRowCount() const
@@ -58,6 +65,8 @@ ZEInt ZEParticleUVModifier::GetRowCount() const
 void ZEParticleUVModifier::SetColumnCount(ZEInt ColumnCount)
 {
 	this->ColumnCount = ColumnCount;
+
+	UVFrameSize.x = 1.0f / ColumnCount;
 }
 
 ZEInt ZEParticleUVModifier::GetColumnCount() const
@@ -67,42 +76,44 @@ ZEInt ZEParticleUVModifier::GetColumnCount() const
 
 void ZEParticleUVModifier::Tick(float ElapsedTime)
 {
-	if (!DoOnce)
+	ZEParticlePool& ParticlePool = GetPool();
+	
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	const ZEArray<ZEUInt>& DeadParticleIndices = GetEmitter()->GetDeadParticleIndices();
+
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
+	ZEUInt DeadParticleStartIndex = GetEmitter()->GetDeadParticleStartIndex();
+	ZEUInt DeadParticleCount = GetEmitter()->GetDeadParticleCount();
+	ZEUInt SpawnedParticleCount = GetEmitter()->GetLastSpawnedParticleCount();
+
+	for (ZEUInt I = DeadParticleStartIndex; I < (DeadParticleStartIndex + SpawnedParticleCount); I++)
 	{
-		UVFrameSize.x = 1.0f / (float)ColumnCount;
-		UVFrameSize.y = 1.0f / (float)RowCount;
-		DoOnce = true;
+		ZEUInt Index = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
+		ParticlePool.TexCoords[Index].x = 0.0f;
+		ParticlePool.TexCoords[Index].y = 0.0f;
+		ParticlePool.TexCoords[Index].z = UVFrameSize.x;
+		ParticlePool.TexCoords[Index].w = UVFrameSize.y;
 	}
 
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticleCount = Particles.GetCount();
-
-	for (ZESize I = 0; I < ParticleCount; I++)
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		switch (Particles[I].State)
-		{
-			case ZE_PAS_NEW:
-				Particles[I].MinTexCoord = ZEVector2::Zero;
-				Particles[I].MaxTexCoord = UVFrameSize;
-				break;
+		ZEUInt Index = AliveParticleIndices[I];
 
-			case ZE_PAS_ALIVE:
-				CurrentUVFrame = (Particles[I].TotalLife - Particles[I].Life) * (((float)RowCount * (float)ColumnCount) / Particles[I].TotalLife);
-				Particles[I].MinTexCoord.x = (CurrentUVFrame % ColumnCount) * UVFrameSize.x;
-				Particles[I].MinTexCoord.y = (CurrentUVFrame / ColumnCount) * UVFrameSize.y;
-				Particles[I].MaxTexCoord.x = ((CurrentUVFrame % ColumnCount) + 1) * UVFrameSize.x;
-				Particles[I].MaxTexCoord.y = ((CurrentUVFrame / ColumnCount) + 1) * UVFrameSize.y;
-				break;
-
-			case ZE_PAS_DEAD:
-				break;
-		}
+		CurrentUVFrame = (ParticlePool.TotalLifes[Index] - ParticlePool.Lifes[Index]) * (((float)RowCount * (float)ColumnCount) / ParticlePool.TotalLifes[Index]);
+		
+		ParticlePool.TexCoords[Index].x = (CurrentUVFrame % ColumnCount) * UVFrameSize.x;
+		ParticlePool.TexCoords[Index].y = (CurrentUVFrame / ColumnCount) * UVFrameSize.y;
+		ParticlePool.TexCoords[Index].z = ((CurrentUVFrame % ColumnCount) + 1) * UVFrameSize.x;
+		ParticlePool.TexCoords[Index].w = ((CurrentUVFrame / ColumnCount) + 1) * UVFrameSize.y;
 	}
 }
 
 ZEParticleUVModifier::ZEParticleUVModifier()
 {
-	DoOnce = false;
+	ColumnCount = 1;
+	RowCount = 1;
+	UVFrameSize = ZEVector2::One;
+	CurrentUVFrame = 0;
 }
 
 ZEParticleUVModifier::~ZEParticleUVModifier()

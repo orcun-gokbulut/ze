@@ -123,9 +123,6 @@ bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 	ze_for_each(Command, OpaqueCommands)
 		Command.GetItem()->Execute(&Parameters);
 
-	Context->SetStencilRef(1);
-	ze_for_each(Command, TransparentCommands)
-		Command.GetItem()->Execute(&Parameters);
 
 	return false;
 }

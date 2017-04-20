@@ -39,6 +39,11 @@
 #include "ZEParticleEffect.h"
 #include "ZEParticleEmitter.h"
 
+ZEUInt ZEParticlePhysicsModifier::GetFlags() const
+{
+	return ZE_PEF_VELOCITY_PER_PARTICLE | ZE_PEF_ACCELERATION_PER_PARTICLE;
+}
+
 void ZEParticlePhysicsModifier::SetRadialMovement(bool Enabled)
 {
 	IsRadialMovement = Enabled;
@@ -96,10 +101,10 @@ ZEParticlePhysicsModifier::ZEParticlePhysicsModifier()
 	MaxRadialSpeed = 0.0f;
 	MinRadialSpeed = 0.0f;
 
-	MinAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
-	MaxAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
-	MinVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
-	MaxVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
+	MinAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);
+	MaxAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);
+	MinVelocity = ZEVector3(0.0f, 0.0f, 0.0f);
+	MaxVelocity = ZEVector3(0.0f, 0.0f, 0.0f);
 }
 
 ZEParticlePhysicsModifier::~ZEParticlePhysicsModifier()
@@ -109,52 +114,32 @@ ZEParticlePhysicsModifier::~ZEParticlePhysicsModifier()
 
 void ZEParticlePhysicsModifier::Tick(float ElapsedTime)
 {
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticleCount = Particles.GetCount();
-	ZEVector3 EmitterWorldPosition = GetEmitter()->GetEffect()->GetWorldPosition() + GetEmitter()->GetPosition();
-	ZEVector3 EmitterUp = GetEmitter()->GetEffect()->GetWorldRotation() * -ZEVector3::UnitZ;
-	ZEParticleEmitterType EmitterType = GetEmitter()->GetType();
+	ZEParticlePool& ParticlePool = GetPool();
 
-	for (ZESize I = 0; I < ParticleCount; I++)
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
+	ZEArray<ZEUInt> AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEArray<ZEUInt> DeadParticleIndices = GetEmitter()->GetDeadParticleIndices();
+
+	ZEUInt DeadParticleStartIndex = GetEmitter()->GetDeadParticleStartIndex();
+	ZEUInt SpawnedParticleCount = GetEmitter()->GetLastSpawnedParticleCount();
+	for (ZEUInt I = DeadParticleStartIndex; I < (DeadParticleStartIndex + SpawnedParticleCount); I++)
 	{
-		switch (Particles[I].State)
-		{
-			case ZE_PAS_NEW:
-				if (IsRadialMovement)
-				{
-					Particles[I].InitialVelocity = ((Particles[I].Position - EmitterWorldPosition).Normalize()) * ZERandom::GetFloatRange(MinRadialSpeed, MaxRadialSpeed);
-				
-					if (EmitterType == ZE_PET_TORUS)
-					{
-						Particles[I].InitialVelocity.x -= ZEMath::Abs(EmitterUp.x) * Particles[I].InitialVelocity.x;
-						Particles[I].InitialVelocity.y -= ZEMath::Abs(EmitterUp.y) * Particles[I].InitialVelocity.y;
-						Particles[I].InitialVelocity.z -= ZEMath::Abs(EmitterUp.z) * Particles[I].InitialVelocity.z;
-					}
-				}
-				else
-				{
-					Particles[I].InitialVelocity.x = ZERandom::GetFloatRange(MinVelocity.x, MaxVelocity.x);
-					Particles[I].InitialVelocity.y = ZERandom::GetFloatRange(MinVelocity.y, MaxVelocity.y);
-					Particles[I].InitialVelocity.z = ZERandom::GetFloatRange(MinVelocity.z, MaxVelocity.z);
-				}
+		ZEUInt Index = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
 
-				Particles[I].Acceleration.x = ZERandom::GetFloatRange(MinAcceleration.x, MaxAcceleration.x);
-				Particles[I].Acceleration.y = ZERandom::GetFloatRange(MinAcceleration.y, MaxAcceleration.y);
-				Particles[I].Acceleration.z = ZERandom::GetFloatRange(MinAcceleration.z, MaxAcceleration.z);
-				Particles[I].Velocity = Particles[I].InitialVelocity;
-				break;
+		ParticlePool.Accelerations[Index].x = ZERandom::GetFloatRange(MinAcceleration.x, MaxAcceleration.x);
+		ParticlePool.Accelerations[Index].y = ZERandom::GetFloatRange(MinAcceleration.y, MaxAcceleration.y);
+		ParticlePool.Accelerations[Index].z = ZERandom::GetFloatRange(MinAcceleration.z, MaxAcceleration.z);
 
-			case ZE_PAS_ALIVE:
-				{
-					float TotalElapsedTime = Particles[I].TotalLife - Particles[I].Life;
-					Particles[I].Velocity = Particles[I].InitialVelocity + Particles[I].Acceleration * TotalElapsedTime;
-					Particles[I].Position = Particles[I].InitialPositionWorld + ((Particles[I].InitialVelocity + Particles[I].Velocity) / 2) * TotalElapsedTime;
-					
-					break;
-				}
+		ParticlePool.Velocities[Index].x = ZERandom::GetFloatRange(MinVelocity.x, MaxVelocity.x);
+		ParticlePool.Velocities[Index].y = ZERandom::GetFloatRange(MinVelocity.y, MaxVelocity.y);
+		ParticlePool.Velocities[Index].z = ZERandom::GetFloatRange(MinVelocity.z, MaxVelocity.z);
+	}
 
-			case ZE_PAS_DEAD:
-				break;
-		}
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
+	{
+		ZEUInt Index = AliveParticleIndices[I];
+		ZEVector3 OldVelocity = ParticlePool.Velocities[Index];
+		ParticlePool.Velocities[Index] += ParticlePool.Accelerations[Index] * ElapsedTime;
+		ParticlePool.Positions[Index] += ((OldVelocity + ParticlePool.Velocities[Index]) / 2.0f) * ElapsedTime;
 	}
 }

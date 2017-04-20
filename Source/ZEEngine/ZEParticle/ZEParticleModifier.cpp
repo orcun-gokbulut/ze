@@ -75,9 +75,14 @@ void ZEParticleModifier::PoolSizeChanged(ZESize NewSize)
 
 }
 
-ZEArray<ZEParticle>& ZEParticleModifier::GetPool()
+ZEParticlePool& ZEParticleModifier::GetPool()
 {
 	return Emitter->ParticlePool;
+}
+
+ZEUInt ZEParticleModifier::GetFlags() const
+{
+	return 0;
 }
 
 ZEParticleModifier::ZEParticleModifier()

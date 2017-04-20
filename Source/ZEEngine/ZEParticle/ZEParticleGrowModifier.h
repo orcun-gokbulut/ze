@@ -43,6 +43,8 @@ class ZEParticleGrowModifier : public ZEParticleModifier
 	private:
 		float								GrowFactor;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
 		void								SetGrowFactor(float Factor);
 		float								GetGrowFactor() const;
