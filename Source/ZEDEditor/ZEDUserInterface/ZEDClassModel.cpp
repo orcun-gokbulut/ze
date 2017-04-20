@@ -53,25 +53,35 @@ bool ZEDClassModel::Filter(ZEClass* Class) const
 	if (!SearchPattern.GetPattern().IsEmpty() && !SearchPattern.Match(Class->GetName()))
 		return false;
 
+	bool IncludeResult = false;
+
 	if (IncludeFilter.GetCount() != 0)
 	{
 		for (ZESize I = 0; I < IncludeFilter.GetCount(); I++)
 		{
-			if (!ZEClass::IsDerivedFrom(IncludeFilter[I], Class))
-				return false;
+			if (ZEClass::IsDerivedFrom(IncludeFilter[I], Class))
+			{
+				IncludeResult = true;
+				break;
+			}
 		}
 	}
+
+	bool ExcludeResult = true;
 
 	if (ExcludeFilter.GetCount() != 0)
 	{
 		for (ZESize I = 0; I < ExcludeFilter.GetCount(); I++)
 		{
 			if (ZEClass::IsDerivedFrom(ExcludeFilter[I], Class))
-				return false;
+			{
+				ExcludeResult = false;
+				break;
+			}
 		}
 	}
 
-	return true;
+	return (IncludeResult && ExcludeResult);
 }
 
 bool ZEDClassModel::FilterForward(ZEClass* Class) const

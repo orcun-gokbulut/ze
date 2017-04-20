@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDTIVegetationWrapper.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,30 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEDTIVegetationWrapper.h"
+#include "ZEApplications\ZETrainIG\ZETIVegetation.h"
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
+void ZEDTIVegetationWrapper::SetObject(ZEObject* Object)
+{
+	if (this->GetObject() == Object)
+		return;
 
-find_package(Qt5 COMPONENTS Widgets)
+	if (!ZEClass::IsDerivedFrom(ZETIVegetation::Class(), Object->GetClass()))
+		return;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+	ZEDEntityWrapper::SetObject(Object);
+}
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-add_subdirectory(ZEDTrainIGEditor)
+ZETIVegetation* ZEDTIVegetationWrapper::GetVegetation() const
+{
+	return static_cast<ZETIVegetation*>(GetObject());
+}
 
-ze_add_source(ZEDMain.cpp		Sources)
-
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
-
-qt5_use_modules(ZEDEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)
+ZEDTIVegetationWrapper* ZEDTIVegetationWrapper::CreateInstance()
+{
+	return new ZEDTIVegetationWrapper();
+}

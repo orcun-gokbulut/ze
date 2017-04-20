@@ -33,27 +33,24 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
+ze_add_source(ZEDTIEditor.cpp							Sources)
+ze_add_source(ZEDTIEditor.h								Sources ZEMC)
+ze_add_source(ZEDSceneWrapper.cpp						Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
+ze_add_source(ZEDEntityWrapper.cpp						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
+ze_add_source(ZEDTISectorWrapper.cpp					Sources)
+ze_add_source(ZEDTISectorWrapper.h						Sources ZEMC)
+ze_add_source(ZEDTIVegetationWrapper.cpp				Sources)
+ze_add_source(ZEDTIVegetationWrapper.h					Sources ZEMC)
 
-find_package(Qt5 COMPONENTS Widgets)
+ze_add_library(TARGET ZEDTrainIGEditor 
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	LIBS ZEFoundation ZEDCore ZEDUserInterface ZETrainIG-Module)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ze_meta_register(LIBS ZETrainIG-Module)
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-add_subdirectory(ZEDTrainIGEditor)
-
-ze_add_source(ZEDMain.cpp		Sources)
-
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
-
-qt5_use_modules(ZEDEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

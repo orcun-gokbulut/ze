@@ -37,6 +37,7 @@
 
 #include "ZEDCore/ZEDEditorCore.h"
 #include "ZEDEntityEditor/ZEDEntityEditor.h"
+#include "ZEDTrainIGEditor/ZEDTIEditor.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEThread/ZETaskPool.h"
 #include "ZEThread/ZETaskManager.h"
@@ -70,7 +71,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	if (!Core->Initialize())
 		return EXIT_FAILURE;
 
-	Core->ExecuteEditor(ZEDEntityEditor::CreateInstance());
+	Core->ExecuteEditor(ZEDTIEditor::CreateInstance());
 	Core->Execute();
 
 	Core->Deinitialize();

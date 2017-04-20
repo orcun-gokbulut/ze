@@ -408,7 +408,11 @@ void ZEDObjectModel::ObjectManager_OnObjectPropertyChanged(ZEDObjectManager* Man
 		if (!FilterHierarchy(Object))
 			return;
 
-		ZESSize Index = Object->GetParent()->GetChildWrappers().FindIndex(Object);
+		ZESSize Index = 0;
+
+		if (Object->GetParent() != NULL)
+			Index = Object->GetParent()->GetChildWrappers().FindIndex(Object);
+
 		dataChanged(createIndex(Index, 0, Object->GetParent()), createIndex(Index, columnCount(), Object->GetParent()));
 	}
 	else if (Mode == ZED_OMM_LIST)
@@ -601,6 +605,10 @@ QModelIndex ZEDObjectModel::parent(const QModelIndex& Child) const
 			return QModelIndex();
 
 		ZEDObjectWrapper* ChildWrapper = ConvertToWrapper(Child);
+
+		if (ChildWrapper == NULL)
+			return QModelIndex();
+
 		if (ChildWrapper == RootWrapper)
 			return QModelIndex();
 

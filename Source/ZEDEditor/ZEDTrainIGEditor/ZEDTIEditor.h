@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDTIEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,30 +30,48 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
+#include "ZEDCore/ZEDEditor.h"
 
-find_package(Qt5 COMPONENTS Widgets)
+class ZEDViewport;
+class ZEDViewportController;
+class ZEDViewportSelectionController;
+class ZEDObjectBrowser;
+class ZEDClassBrowser;
+class ZEDAssetBrowser;
+class ZEDPropertyWindow;
+class ZEScene;
+class ZESectorManager;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+class ZEDTIEditor : public ZEDEditor
+{
+	ZE_OBJECT
+	private:
+		ZEDViewport*						Viewport;
+		ZEDViewportController*				ViewportController;
+		ZEDViewportSelectionController*		ViewportSelectionController;
+		ZEDObjectBrowser*					ObjectBrowser;
+		ZEDClassBrowser*					ClassBrowser;
+		ZEDAssetBrowser*					AssetBrowser;
+		ZEDPropertyWindow*					PropertyWindow;
+		ZEScene*							Scene;
+		ZESectorManager*					SectorManager;
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-add_subdirectory(ZEDTrainIGEditor)
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
-ze_add_source(ZEDMain.cpp		Sources)
+		void								Editor_OnNew(ZEDEditor* Editor);
 
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
+											ZEDTIEditor();
+		virtual								~ZEDTIEditor();
 
-qt5_use_modules(ZEDEditor Widgets)
+	public:
+		virtual ZEString					GetExtensions();
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)
+		static ZEDTIEditor*					CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZESector");
