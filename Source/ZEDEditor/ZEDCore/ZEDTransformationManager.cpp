@@ -173,22 +173,44 @@ void ZEDTransformationManager::UpdateTransformStates()
 	TransformStates.Clear();
 	TransformFocused = NULL;
 
-	TransformStates.SetCount(Selection.GetCount());
-	for (ZESize I = 0; I < Selection.GetCount(); I++)
+	ZESize TransformableCount = 0;
+
+	ze_for_each(Item, Selection)
 	{
-		zeDebugCheck(!ZEClass::IsDerivedFrom(ZEDObjectWrapper3D::Class(), Selection[I]->GetClass()), "Wrapper is not derived from ZEDObjectWrapper3D");
+		zeDebugCheck(!ZEClass::IsDerivedFrom(ZEDObjectWrapper3D::Class(), Item.GetItem()->GetClass()), "Wrapper is not derived from ZEDObjectWrapper3D");
 
-		TransformStates[I].Wrapper = static_cast<ZEDObjectWrapper3D*>(Selection[I]);
-		TransformStates[I].OriginalPosition = TransformStates[I].Wrapper->GetPosition();
-		TransformStates[I].OriginalRotation = TransformStates[I].Wrapper->GetRotation();
-		TransformStates[I].OriginalScale = TransformStates[I].Wrapper->GetScale();
+		ZEDObjectWrapper3D* CurrentWrapper = static_cast<ZEDObjectWrapper3D*>(Item.GetItem());
 
-		if (TransformStates[I].Wrapper->GetFocused())
-			TransformFocused = &TransformStates[I];
+		if (CurrentWrapper->GetTransformable())
+			TransformableCount++;
 	}
+
+	TransformStates.SetCount(TransformableCount);
 
 	if (TransformStates.GetCount() != 0)
 	{
+		ZESize TransformStateIndex = 0;
+
+		for (ZESize I = 0; I < Selection.GetCount(); I++)
+		{
+			zeDebugCheck(!ZEClass::IsDerivedFrom(ZEDObjectWrapper3D::Class(), Selection[I]->GetClass()), "Wrapper is not derived from ZEDObjectWrapper3D");
+
+			ZEDObjectWrapper3D* CurrentWrapper = static_cast<ZEDObjectWrapper3D*>(Selection[I]);
+
+			if (!CurrentWrapper->GetTransformable())
+				continue;
+
+			TransformStates[TransformStateIndex].Wrapper = static_cast<ZEDObjectWrapper3D*>(Selection[I]);
+			TransformStates[TransformStateIndex].OriginalPosition = TransformStates[TransformStateIndex].Wrapper->GetPosition();
+			TransformStates[TransformStateIndex].OriginalRotation = TransformStates[TransformStateIndex].Wrapper->GetRotation();
+			TransformStates[TransformStateIndex].OriginalScale = TransformStates[TransformStateIndex].Wrapper->GetScale();
+
+			if (TransformStates[TransformStateIndex].Wrapper->GetFocused())
+				TransformFocused = &TransformStates[TransformStateIndex];
+
+			TransformStateIndex++;
+		}
+
 		if (TransformPivot == ZED_TP_OBJECT)
 		{
 			for (ZESize I = 0; I < TransformStates.GetCount(); I++)

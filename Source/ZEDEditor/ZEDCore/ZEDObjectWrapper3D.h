@@ -62,6 +62,7 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 	friend class ZEDObjectManager;
 	private:
 		bool										Pickable;
+		bool										Transformable;
 		bool										BoundingBoxVisible;
 		bool										NameplateVisible;
 
@@ -124,6 +125,9 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 
 		void										SetPickable(bool Pickable);
 		bool										GetPickable() const;
+
+		void										SetTransformable(bool Transformable);
+		bool										GetTransformable() const;
 
 		virtual void								SetNameplateVisible(bool Visible);
 		bool										GetNameplateVisible() const;

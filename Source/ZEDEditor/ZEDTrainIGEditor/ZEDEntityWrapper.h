@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDClassBrowser.h
+ Zinek Engine - ZEDEntityWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,42 +35,58 @@
 
 #pragma once
 
-#include "ZEDWindow.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDCore/ZEDObjectWrapper3D.h"
 
-class ZEDObjectWrapper;
-class ZEDClassModel;
-class ZEDSelectionManager;
-class QItemSelection;
-class Ui_ZEDClassBrowser;
+class ZERayCastCollision;
 
-class ZEDClassBrowser : public ZEDWindow
+class ZEDEntityWrapper : public ZEDObjectWrapper3D
 {
-	Q_OBJECT
+	ZE_OBJECT
 	private:
-		QWidget*							Widget;
-		Ui_ZEDClassBrowser*					Form;	
-		ZEDClassModel*						Model;
-		ZEDObjectWrapper*					DestinationWrapper;
+		bool								AlterRaycast(ZERayCastCollision& Collision);
+		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity, bool& BoundingBoxAvailable) const;
 
-		virtual bool						InitializeInternal() override;
-		virtual bool						DeinitializeInternal() override;
-
-		virtual void						SelectionManager_OnSelectionChanged(ZEDSelectionManager* Manager, const ZEArray<ZEDObjectWrapper*>& Selection);
-
-		void								Update();
-
-	private slots:
-		void								txtSearch_textChanged(const QString& Text);
-		
-		void								trwClasses_itemSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-		void								btnMode_toggled(bool Checked);
-		void								btnAdd_clicked();
+	protected:
+		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
 
 	public:
-		void								SetClassModel(ZEDClassModel* Model);
-		ZEDClassModel*						GetClassModel() const;
+		virtual void						SetObject(ZEObject* Object);
+		ZEEntity*							GetEntity() const;
 
-											ZEDClassBrowser();
-		virtual								~ZEDClassBrowser();
-};
+		virtual void						SetId(ZEInt Id);
+		virtual ZEInt						GetId() const;
+
+		virtual void						SetName(const ZEString& Name);
+		virtual ZEString					GetName() const;
+
+		virtual ZEAABBox					GetBoundingBox() const;
+		virtual ZEMatrix4x4					GetWorldTransform() const;
+
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition() const;
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation() const;
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale() const;
+
+		virtual void						SetVisible(bool Value);
+		virtual bool						GetVisible() const;
+
+		virtual bool						CheckChildrenClass(ZEClass* Class);
+
+		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool						RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+
+		virtual void						Tick(float ElapsedTime);
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual void						Update();
+
+		virtual void						Clean();
+
+		virtual void						LockWrapper();
+		virtual void						UnlockWrapper();
+
+		static ZEDEntityWrapper*			CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);

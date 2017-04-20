@@ -85,6 +85,7 @@ class ZESector : public ZEGeographicEntity
 		bool							RemoveLink(const ZEGUID& SectorId);
 		
 		bool							Save();
+		bool							Save(const ZEString& FileName);
 
 		virtual bool					Serialize(ZEMLWriterNode* Serializer);
 		virtual bool					Unserialize(ZEMLReaderNode* Unserializer);

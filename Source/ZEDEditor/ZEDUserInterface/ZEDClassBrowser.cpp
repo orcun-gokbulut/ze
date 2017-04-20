@@ -126,6 +126,28 @@ void ZEDClassBrowser::btnAdd_clicked()
 	GetEditor()->GetObjectManager()->CreateObject(DestinationWrapper,  Model->ConvertToClass(SelectedIndexes[0]));
 }
 
+void ZEDClassBrowser::SetClassModel(ZEDClassModel* Model)
+{
+	if (this->Model == Model)
+		return;
+
+	this->Model = Model;
+	Form->trwClasses->setModel(Model);
+
+	if (Model != NULL)
+	{
+		Form->btnMode->setChecked(Model->GetMode() == ZED_CMM_TREE);
+		Form->trwClasses->setExpanded(Model->index(0, 0, QModelIndex()), true);
+	}
+
+	Update();
+}
+
+ZEDClassModel* ZEDClassBrowser::GetClassModel() const
+{
+	return Model;
+}
+
 ZEDClassBrowser::ZEDClassBrowser()
 {
 	SetName("Class Browser");

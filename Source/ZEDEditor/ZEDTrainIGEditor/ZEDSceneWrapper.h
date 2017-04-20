@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDSceneWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,30 +30,45 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
+#include "ZEDCore/ZEDObjectWrapper3D.h"
 
-find_package(Qt5 COMPONENTS Widgets)
+class ZEScene;
+class ZEDEntityWrapper;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+class ZEDSceneWrapper : public ZEDObjectWrapper3D
+{
+	ZE_OBJECT
+	private:
+		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-add_subdirectory(ZEDTrainIGEditor)
+	public:
+		virtual void							SetObject(ZEObject* Object);
+		virtual ZEString						GetName() const;
+		
+		ZEScene*								GetScene();
 
-ze_add_source(ZEDMain.cpp		Sources)
+		virtual bool							CheckChildrenClass(ZEClass* Class);
+		virtual bool							AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
+		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-qt5_use_modules(ZEDEditor Widgets)
+		virtual void							LockWrapper();
+		virtual void							UnlockWrapper();
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)
+		virtual bool							Load(const ZEString& FileName);
+		virtual bool							Save(const ZEString& FileName);
+		virtual void							Clean();
+
+		virtual void							Update();
+
+		static ZEDSceneWrapper*					CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);
