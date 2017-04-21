@@ -299,8 +299,6 @@ void ZECore::UnloadPlugins()
 
 ZECore::ZECore() 
 {
-	atexit(ZECore_AtExit);
-
 	CrashHandler			= new ZECrashHandler();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
@@ -490,6 +488,9 @@ bool ZECore::RemoveModule(ZEModule* Module)
 
 bool ZECore::StartUp()
 {
+	atexit(ZECore_AtExit);
+	StartedCoreInstanceCount++;
+
 	ApplicationInstance = GetModuleHandle(NULL);
 
 	SetState(ZE_CS_STARTING_UP);
@@ -533,8 +534,6 @@ bool ZECore::StartUp()
 	SplashWindow = NULL;
 
 	SetState(ZE_CS_PAUSED);
-
-	StartedCoreInstanceCount--;
 
 	return true;
 }

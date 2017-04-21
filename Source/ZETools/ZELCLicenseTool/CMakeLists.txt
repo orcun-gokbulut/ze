@@ -50,7 +50,7 @@ source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZELCLicensingTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect Qt5::WinMain)
+	LIBS ZEFoundationStatic Qt5::WinMain)
 	
 qt5_use_modules(ZELCLicensingTool Widgets)
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

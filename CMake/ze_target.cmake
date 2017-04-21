@@ -250,8 +250,7 @@ function (ze_add_library)
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 
 	ze_process_sources()
-	#ze_generate_export_h(TARGET ${PARAMETER_TARGET})
-	
+
 	if (NOT PARAMETER_DLL)
 		message(STATUS "[ZEBuild] Library \"${PARAMETER_TARGET}\" project has been added.")
 	else()

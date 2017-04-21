@@ -65,7 +65,7 @@ endmacro()
 
 macro(ze_version_get_revision_number)
 	set (VERSION_REVISION "0")
-	include(External/FindSubversion)
+	find_package(Subversion)
 	Subversion_WC_INFO(${ARGV0} SVN_INFO)
 	if (SVN_INFO_WC_RESULT)
 		set(VERSION_REVISION ${SVN_INFO_WC_REVISION})

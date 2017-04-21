@@ -90,7 +90,6 @@ class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, pub
 		bool							SaveConfiguration();
 		bool							SaveConfiguration(const ZEString& FileName);
 		virtual bool					SaveConfiguration(ZEMLWriterNode& ConfigNode);
-
 }
 ZEMT_ATTRIBUTE(ZEModule.Dependencies)
 ZEMT_ATTRIBUTE(ZEModule.MultiInstance, false)

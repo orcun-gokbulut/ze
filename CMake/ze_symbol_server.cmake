@@ -33,10 +33,34 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-macro(ze_symbol_server_init)
-	set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Upload symbols to symbol server.")
-	set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols" CACHE STRING "Symbol server address.")
-	set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX FALSE CACHE BOOL "Index code in sybols with svn address.")
+macro(ze_symbols_server_init)
+	if (ZEBUILD_PLATFORM_WINDOWS)
+		set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Generate symbol related targets.")
+		set(ZEBUILD_SYMBOL_SERVER_ADDRESS  CACHE STRING "Symbol server address.")
+		set(ZEBUILD_SYMBOL_SERVER_COMMENT "" CACHE STRING "Comment t"\\\\Server\\Symbols\\Zinek"ext of the store operation.")
+	
+		ze_symbols_server_generate_targets()
+	endif()
 endmacro()
 
-ze_symbol_server_init()
+function(ze_symbols_server_generate_targets)
+	file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Source" SOURCE_DIR_NATIVE)
+	file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Rundir" RUNDIR_DIR_NATIVE)
+	
+	add_custom_target(IndexSymbols
+		COMMAND "${CMAKE_SOURCE_DIR}/Tool/Windows/SymbolServer/ssindex.cmd" 
+			"/Debug" "/System=svn" "/Source=\"${SOURCE_DIR_NATIVE}\"" "/Symbols=\"${RUNDIR_DIR_NATIVE}\""
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+		COMMENT "Indexing sources of pdb files in version control")
+	set_property(TARGET IndexSymbols PROPERTY FOLDER "SymbolServer")
+	
+	add_custom_target(StoreSymbols
+		COMMAND "${CMAKE_SOURCE_DIR}/Tool/Windows/SymbolServer/symstore.exe" 
+			"add" "/o" "/r" "/f" "\"${RUNDIR_DIR_NATIVE}\\*.pdb\"" "/s" "\"${ZEBUILD_SYMBOL_SERVER_ADDRESS}\"" "/t" "\"Zinek Engine\"" "/v" "\"${ZEBUILD_VERSION}\""
+		WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+		COMMENT "Storing (Uploading) pdb files into Symbol Server. URL: ${ZEBUILD_SYMBOL_SERVER_ADDRESS}"
+		DEPENDS IndexSymbols)
+	set_property(TARGET StoreSymbols PROPERTY FOLDER "SymbolServer")
+endfunction()
+
+ze_symbols_server_init()

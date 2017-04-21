@@ -80,3 +80,11 @@ ze_add_executable(TARGET ZE
 ze_meta_register(LIBS ZECore ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETerrain ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere ZEResource ZEUI)
 
 #ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain)
+
+install(TARGETS ZEEngine RUNTIME DESTINATION "Engine/Runtime" LIBRARY DESTINATION "Engine/Runtime" COMPONENT "Runtime")
+install(TARGETS ZEEngine
+	ARCHIVE DESTINATION "Engine/Libraries"
+	PUBLIC_HEADER DESTINATION "Engine/Includes" 
+	COMPONENT "Development Kit")
+
+install(TARGETS ZE RUNTIME DESTINATION "Engine/Runtime" COMPONENT "Runtime")
