@@ -328,6 +328,12 @@ bool ZELightDirectional::PreRender(const ZERNPreRenderParameters* Parameters)
 			UpdateCascadeTransforms(*Parameters->View, ZELight::ConvertShadowResolution(StageShadowing->GetDirectionalShadowMapsResolution()));
 	}
 
+	ze_for_each(Cascade, Cascades)
+	{
+		Cascade->SampleCount = ZELight::ConvertShadowSampleCount(GetShadowSampleCount());
+		Cascade->SampleLength = GetShadowSampleLength();
+	}
+
 	Command.Scene = GetScene();
 	Command.RotationWorld = GetWorldRotation();
 	Command.Color = GetIsTerrestrial() ? (GetTerrestrialColor() * GetTerrestrialIntensity()) : (GetColor() * GetIntensity());

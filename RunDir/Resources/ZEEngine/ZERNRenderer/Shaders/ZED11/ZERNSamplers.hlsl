@@ -36,6 +36,7 @@
 #ifndef __ZERN_SAMPLERS_H__
 #define __ZERN_SAMPLERS_H__
 
+SamplerState			ZERNSampler_PointMirror					: register(s9);
 SamplerState			ZERNSampler_LinearClamp					: register(s10);
 SamplerState			ZERNSampler_LinearWrap					: register(s11);
 SamplerState			ZERNSampler_LinearBorderZero			: register(s12);

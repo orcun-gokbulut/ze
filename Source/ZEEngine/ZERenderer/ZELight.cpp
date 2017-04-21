@@ -316,12 +316,12 @@ ZEUInt ZELight::ConvertShadowSampleCount(ZERNLightShadowSampleCount ShadowSample
 	{
 		default:
 		case ZERN_LSC_LOW:
-			return 4;
+			return 16;
 		case ZERN_LSC_MEDIUM:
-			return 8;
+			return 32;
 		case ZERN_LSC_HIGH:
-			return 16;
+			return 64;
 		case ZERN_LSC_VERY_HIGH:
-			return 16;
+			return 128;
 	}
 }
