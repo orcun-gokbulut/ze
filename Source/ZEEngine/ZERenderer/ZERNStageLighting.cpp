@@ -82,7 +82,8 @@ static ZEGRVertexLayout GetVertexLayoutPosition()
 
 void ZERNStageLighting::CreateRandomVectors()
 {
-	ZEUInt Size = 128 * 128 * 2;
+	const ZEUInt Length = 64;
+	ZEUInt Size = Length * Length * 2;
 	ZEArray<ZEUInt8> RandomVectors;
 	RandomVectors.SetCount(Size);
 	for (ZEUInt I = 0; I < Size; I += 2)
@@ -91,7 +92,7 @@ void ZERNStageLighting::CreateRandomVectors()
 		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 	}
 	
-	RandomVectorsTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, 128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture::CreateResource(ZEGR_TT_2D, Length, Length, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_IMMUTABLE, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageLighting::CreateLightGeometries()
@@ -851,9 +852,6 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	if (GetCommands().GetCount() == 0)
-		return false;
-	
 	if (!SetupLights(Context))
 		return false;
 
