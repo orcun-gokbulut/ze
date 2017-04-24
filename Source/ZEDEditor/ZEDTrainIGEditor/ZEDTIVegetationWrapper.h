@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleVelocityOverLifeModifier.h
+ Zinek Engine - ZEDTIVegetationWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,17 @@
 
 #pragma once
 
-#include "ZEParticleUVModifier.h"
-#include "ZEExport.ZEEngine.h"
+#include "ZEDEntityWrapper.h"
 
-class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+class ZETIVegetation;
+
+class ZEDTIVegetationWrapper : public ZEDEntityWrapper
 {
 	ZE_OBJECT
-	private:
-		ZEVector3							FromVelocity;
-		ZEVector3							ToVelocity;
-
-		virtual ZEUInt						GetFlags() const override;
-
 	public:
-		void								SetFromVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetFromVelocity() const;
+		virtual void						SetObject(ZEObject* Object);
+		ZETIVegetation*						GetVegetation() const;
 
-		void								SetToVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetToVelocity() const;
-
-		virtual	void						Tick(float ElapsedTime) override;
-
-											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
-};
+		static ZEDTIVegetationWrapper*		CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZESector);

@@ -1427,6 +1427,10 @@ bool ZEEntity::IsDestroyed() const
 ZEUInt ZEEntity::GetLoadingPercentage()
 {
 	ZEEntityLoadingScore Score = GetLoadingScore();
+
+	if (Score.Count == 0)
+		return 0;
+
 	return Score.Score / Score.Count;
 }
 

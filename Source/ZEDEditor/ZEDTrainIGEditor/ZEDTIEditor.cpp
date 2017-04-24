@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDEntityEditor.cpp
+ Zinek Engine - ZEDTIEditor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDEntityEditor.h"
+#include "ZEDTIEditor.h"
 
 #include "ZEDCore/ZEDGrid.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
@@ -52,23 +52,23 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
-#include "ZEGame/ZELoadingScreen.h"
+#include "ZEGame/ZEStateScreen.h"
 #include "ZEInterior/ZEInterior.h"
-#include "ZEDTextureAssetType.h"
 #include "ZEDCore/ZEDAssetManager.h"
 
 #include "ZEDEntityWrapper.h"
 #include "ZEDSceneWrapper.h"
 
-#include "ZEDMaterialAssetType.h"
-#include "ZEDModelAssetType.h"
-#include "ZEDSceneAssetType.h"
-#include "ZEDSoundAssetType.h"
-#include "ZEDPrefabAssetType.h"
 #include "ZEDCore/ZEDViewportSelectionController.h"
-#include "ZEDWaypointPathWrapper.h"
+#include "ZEApplications/ZETrainIG/ZETISector.h"
+#include "ZEApplications/ZETrainIG/ZETIVegetation.h"
+#include "ZEApplications/ZETrainIG/ZETIVehicle.h"
+#include "ZEApplications/ZETrainIG/ZETIPerson.h"
+#include "ZEApplications/ZETrainIG/ZETIAnimal.h"
+#include "ZEDUserInterface/ZEDClassModel.h"
 
-bool ZEDEntityEditor::InitializeInternal()
+
+bool ZEDTIEditor::InitializeInternal()
 {
 	if (!ZEDEditor::InitializeInternal())
 		return false;
@@ -82,52 +82,76 @@ bool ZEDEntityEditor::InitializeInternal()
 	ObjectBrowser = new ZEDObjectBrowser();
 	GetMainWindow()->AddWindow(ObjectBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_LEFT);
 
-	AssetBrowser = new ZEDAssetBrowser();
-	GetMainWindow()->AddWindow(AssetBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
+// 	AssetBrowser = new ZEDAssetBrowser();
+// 	GetMainWindow()->AddWindow(AssetBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
 	PropertyWindow = new ZEDPropertyWindow();
 	GetMainWindow()->AddWindow(PropertyWindow, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
-	ClassBrowser = new ZEDClassBrowser();
+ 	ClassBrowser = new ZEDClassBrowser();
+	ZEDClassModel* ClassModel = new ZEDClassModel();
+	ClassModel->SetRootClass(ZEEntity::Class());
+	ClassModel->SetMode(ZED_CMM_LIST);
+	ClassModel->SetHierarchy(ZED_CMH_INHERITANCE);
+
+ 	ZEArray<ZEClass*> ClassIncFilter;
+	ClassIncFilter.Add(ZEModel::Class());
+	ClassIncFilter.Add(ZELightPoint::Class());
+ 	ClassIncFilter.Add(ZETIVegetation::Class());
+  	ClassIncFilter.Add(ZETIVehicle::Class());
+	ClassIncFilter.Add(ZETIPerson::Class());
+	ClassIncFilter.Add(ZETIAnimal::Class());
+ 	ClassModel->SetIncludeFilter(ClassIncFilter);
+
+	ClassBrowser->SetClassModel(ClassModel); 
+
 	GetMainWindow()->AddWindow(ClassBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
 	Viewport = new ZEDViewport();
 	GetViewportManager()->RegisterViewport(Viewport);
 	GetMainWindow()->GetMainWindow()->setCentralWidget(Viewport);
 
-	Scene = ZEScene::CreateInstance();
-	Scene->Initialize();
-
-	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
-	ObjectBrowser->SetRootWrapper(GetObjectManager()->GetRootWrapper());
+	OnNew.AddDelegate<ZEDTIEditor, &ZEDTIEditor::Editor_OnNew>(this);
 
 	New();
-	Scene->LoadEntities();
-
- 	ZEModel* Trial = ZEModel::CreateInstance();
-	Trial->SetModelFile("#R:/ZETrainSimulator/Actors/Vehicles/DE24000/DE24000.ZEMODEL");
-	//Trial->SetModelFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZEMODEL");
-	//Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.new.ZEMODEL");
-	Scene->AddEntity(Trial);
-
-	//ZEInterior* Sponza = ZEInterior::CreateInstance();
-	//Sponza->SetInteriorFile("#R:/GraphicsTest/Sponza/Sponza.ZEINTERIOR");
-	//Scene->AddEntity(Sponza);
 
 	Scene->SetAmbientColor(ZEVector3::One);
-	Scene->SetAmbientFactor(0.2f);
-
-	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
-	Scene->AddEntity(Atmosphere);
+	Scene->SetAmbientFactor(0.5f);
 
 	if (GetObjectManager()->GetRootWrapper() != NULL)
 		GetObjectManager()->GetRootWrapper()->Update();
+
 	GetMainWindow()->GetMainWindow()->show();
 
 	return true;
 }
 
-ZEDEntityEditor::ZEDEntityEditor()
+bool ZEDTIEditor::DeinitializeInternal()
+{
+	OnNew.DisconnectObject(this);
+
+	return ZEDEditor::DeinitializeInternal();
+}
+
+void ZEDTIEditor::Editor_OnNew(ZEDEditor* Editor)
+{
+	Scene = ZEScene::CreateInstance();
+	Scene->Initialize();
+
+	ZETISector* Sector = ZETISector::CreateInstance();
+	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Sector));
+	ObjectBrowser->SetRootWrapper(GetObjectManager()->GetRootWrapper());
+
+	Scene->AddEntity(Sector);
+	Scene->LoadEntities();
+}
+
+ZEString ZEDTIEditor::GetExtensions()
+{
+	return "*.ZESector";
+}
+
+ZEDTIEditor::ZEDTIEditor()
 {
 	Viewport = NULL;
 	ViewportController = NULL;
@@ -136,14 +160,17 @@ ZEDEntityEditor::ZEDEntityEditor()
 	AssetBrowser = NULL;
 	PropertyWindow = NULL;
 	Scene = NULL;
+	SectorManager = NULL;
 }
 
-ZEDEntityEditor::~ZEDEntityEditor()
+ZEDTIEditor::~ZEDTIEditor()
 {
 
 }
 
-ZEDEntityEditor* ZEDEntityEditor::CreateInstance()
+ZEDTIEditor* ZEDTIEditor::CreateInstance()
 {
-	return new ZEDEntityEditor();
+	return new ZEDTIEditor();
 }
+
+

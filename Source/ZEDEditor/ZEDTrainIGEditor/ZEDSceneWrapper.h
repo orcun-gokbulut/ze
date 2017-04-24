@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleVelocityOverLifeModifier.h
+ Zinek Engine - ZEDSceneWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,40 @@
 
 #pragma once
 
-#include "ZEParticleUVModifier.h"
-#include "ZEExport.ZEEngine.h"
+#include "ZEDCore/ZEDObjectWrapper3D.h"
 
-class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+class ZEScene;
+class ZEDEntityWrapper;
+
+class ZEDSceneWrapper : public ZEDObjectWrapper3D
 {
 	ZE_OBJECT
 	private:
-		ZEVector3							FromVelocity;
-		ZEVector3							ToVelocity;
-
-		virtual ZEUInt						GetFlags() const override;
+		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 	public:
-		void								SetFromVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetFromVelocity() const;
+		virtual void							SetObject(ZEObject* Object);
+		virtual ZEString						GetName() const;
+		
+		ZEScene*								GetScene();
 
-		void								SetToVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetToVelocity() const;
+		virtual bool							CheckChildrenClass(ZEClass* Class);
+		virtual bool							AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
-		virtual	void						Tick(float ElapsedTime) override;
+		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
-};
+		virtual void							LockWrapper();
+		virtual void							UnlockWrapper();
+
+		virtual bool							Load(const ZEString& FileName);
+		virtual bool							Save(const ZEString& FileName);
+		virtual void							Clean();
+
+		virtual void							Update();
+
+		static ZEDSceneWrapper*					CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);

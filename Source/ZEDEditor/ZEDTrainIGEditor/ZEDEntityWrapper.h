@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleVelocityOverLifeModifier.h
+ Zinek Engine - ZEDEntityWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,58 @@
 
 #pragma once
 
-#include "ZEParticleUVModifier.h"
-#include "ZEExport.ZEEngine.h"
+#include "ZEDCore/ZEDObjectWrapper3D.h"
 
-class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+class ZERayCastCollision;
+
+class ZEDEntityWrapper : public ZEDObjectWrapper3D
 {
 	ZE_OBJECT
 	private:
-		ZEVector3							FromVelocity;
-		ZEVector3							ToVelocity;
+		bool								AlterRaycast(ZERayCastCollision& Collision);
+		ZEAABBox							CalculateBoundingBox(ZEEntity* Entity, bool& BoundingBoxAvailable) const;
 
-		virtual ZEUInt						GetFlags() const override;
+	protected:
+		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
 
 	public:
-		void								SetFromVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetFromVelocity() const;
+		virtual void						SetObject(ZEObject* Object);
+		ZEEntity*							GetEntity() const;
 
-		void								SetToVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetToVelocity() const;
+		virtual void						SetId(ZEInt Id);
+		virtual ZEInt						GetId() const;
 
-		virtual	void						Tick(float ElapsedTime) override;
+		virtual void						SetName(const ZEString& Name);
+		virtual ZEString					GetName() const;
 
-											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
-};
+		virtual ZEAABBox					GetBoundingBox() const;
+		virtual ZEMatrix4x4					GetWorldTransform() const;
+
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition() const;
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation() const;
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale() const;
+
+		virtual void						SetVisible(bool Value);
+		virtual bool						GetVisible() const;
+
+		virtual bool						CheckChildrenClass(ZEClass* Class);
+
+		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool						RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+
+		virtual void						Tick(float ElapsedTime);
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual void						Update();
+
+		virtual void						Clean();
+
+		virtual void						LockWrapper();
+		virtual void						UnlockWrapper();
+
+		static ZEDEntityWrapper*			CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);

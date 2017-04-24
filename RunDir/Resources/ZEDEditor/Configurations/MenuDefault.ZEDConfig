@@ -127,7 +127,7 @@
     <Node Name="Items">
      <Node Name="Item">
       <Property Name="Type" Type="UInt8">1</Property>
-      <Property Name="TargetName" Type="String">ZEDEditor::CustomizeUICommand</Property>
+      <Property Name="TargetName" Type="String">ZEDOptionsManager::OptionsCommand</Property>
      </Node>
     </Node>
    </Node>

@@ -50,6 +50,8 @@ class ZE_EXPORT_ZEENGINE ZEParticleRotationModifier : public ZEParticleModifier
 		float								MinAngularVelocity;
 		float								MaxAngularVelocity;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
 		void								SetMaxRotation(float MaxRotation);
 		float								GetMaxRotation() const;

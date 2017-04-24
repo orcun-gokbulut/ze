@@ -35,6 +35,13 @@
 
 #include "ZEParticleRotationModifier.h"
 
+#include "ZEParticleEmitter.h"
+
+ZEUInt ZEParticleRotationModifier::GetFlags() const
+{
+	return ZE_PEF_ROTATION_PER_PARTICLE | ZE_PEF_ANGULAR_VELOCITY_PER_PARTICLE | ZE_PEF_ANGULAR_ACCELERATION_PER_PARTICLE;
+}
+
 void ZEParticleRotationModifier::SetMinAngularAcceleration(float AngularAcceleration)
 {
 	MinAngularAcceleration = AngularAcceleration;
@@ -97,43 +104,38 @@ float ZEParticleRotationModifier::GetMinRotation() const
 
 void ZEParticleRotationModifier::Tick(float ElapsedTime)
 {
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticlCount = Particles.GetCount();
+	ZEParticlePool& ParticlePool = GetPool();
 
-	for (ZESize I = 0; I < ParticlCount; I++)
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	const ZEArray<ZEUInt>& DeadParticleIndices = GetEmitter()->GetDeadParticleIndices();
+
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
+	ZEUInt DeadParticleStartIndex = GetEmitter()->GetDeadParticleStartIndex();
+	ZEUInt SpawnedParticleCount = GetEmitter()->GetLastSpawnedParticleCount();
+
+	for (ZEUInt I = DeadParticleStartIndex; I < (DeadParticleStartIndex + SpawnedParticleCount); I++)
 	{
-		switch (Particles[I].State)
-		{
-			case ZE_PAS_NEW:
-				Particles[I].Rotation = ZERandom::GetFloatRange(MinRotation, MaxRotation);
-				Particles[I].Cos_NegSin.x = cos(Particles[I].Rotation);
-				Particles[I].Cos_NegSin.y = -sin(Particles[I].Rotation);
-				Particles[I].AngularAcceleration = ZERandom::GetFloatRange(MinAngularAcceleration, MaxAngularAcceleration);
-				Particles[I].AngularVelocity = ZERandom::GetFloatRange(MinAngularVelocity, MaxAngularVelocity);
-				break;
+		ZEUInt Index = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
 
-			case ZE_PAS_ALIVE:
-				Particles[I].AngularVelocity += Particles[I].AngularAcceleration * ElapsedTime;
-				Particles[I].Rotation += Particles[I].AngularVelocity * ElapsedTime;
+		ParticlePool.Rotations[Index] = ZERandom::GetFloatRange(MinRotation, MaxRotation);
+		ParticlePool.AngularAccelerations[Index] = ZERandom::GetFloatRange(MinAngularAcceleration, MaxAngularAcceleration);
+		ParticlePool.AngularVelocities[Index] = ZERandom::GetFloatRange(MinAngularVelocity, MaxAngularVelocity);
+	}
 
-				if(Particles[I].AngularVelocity != 0.0f)
-				{
-					Particles[I].Cos_NegSin.x = cos(Particles[I].Rotation);
-					Particles[I].Cos_NegSin.y = -sin(Particles[I].Rotation);
-				}
-				break;
-
-			case ZE_PAS_DEAD:
-				break;
-		}
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
+	{
+		ZEUInt Index = AliveParticleIndices[I];
+		float OldAngularVelocity = ParticlePool.AngularVelocities[Index];
+		ParticlePool.AngularAccelerations[Index] += ParticlePool.AngularAccelerations[Index] * ElapsedTime;
+		ParticlePool.Rotations[Index] += ((OldAngularVelocity + ParticlePool.AngularVelocities[Index]) / 2.0f) * ElapsedTime;
 	}
 }
 
 ZEParticleRotationModifier::ZEParticleRotationModifier()
 {
-	MinAngularAcceleration = 0.0f;		
-	MaxAngularAcceleration = 0.0f;		
-	MinAngularVelocity = 0.0f;			
+	MinAngularAcceleration = 0.0f;
+	MaxAngularAcceleration = 0.0f;
+	MinAngularVelocity = 0.0f;
 	MaxAngularVelocity = 0.0f;
 	MaxRotation = 0.0f;
 	MinRotation = 0.0f;

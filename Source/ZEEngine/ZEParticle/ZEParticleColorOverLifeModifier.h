@@ -42,10 +42,16 @@ class ZE_EXPORT_ZEENGINE ZEParticleColorOverLifeModifier : public ZEParticleModi
 {
 	ZE_OBJECT
 	private:
+		ZEVector4							FromColor;
 		ZEVector4							ToColor;
 
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
-		void								SetToColor(const ZEVector4& Factor);
+		void								SetFromColor(const ZEVector4& Color);
+		const ZEVector4&					GetFromColor() const;
+
+		void								SetToColor(const ZEVector4& Color);
 		const ZEVector4&					GetToColor() const;
 
 		virtual	void						Tick(float ElapsedTime) override;

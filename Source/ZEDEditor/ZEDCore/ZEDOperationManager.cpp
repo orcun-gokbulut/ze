@@ -62,7 +62,7 @@ bool ZEDOperationManager::DeinitializeInternal()
 {
 	GetEditor()->OnClosed.DisconnectObject(this);
 
-	return ZEDComponent::Deinitialize();
+	return ZEDComponent::DeinitializeInternal();
 }
 
 ZEDOperationManager::ZEDOperationManager()

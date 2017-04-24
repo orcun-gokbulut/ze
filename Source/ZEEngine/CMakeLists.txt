@@ -77,6 +77,8 @@ ze_add_executable(TARGET ZE
 	SOURCES ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine)
 
+add_dependencies(ZE ZEModules)
+
 ze_meta_register(LIBS ZECore ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETerrain ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere ZEResource ZEUI)
 
 #ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain)

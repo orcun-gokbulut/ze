@@ -54,6 +54,8 @@ void ZERNParticleMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Opt
 {
 	Options.Definitions.Clear();
 
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_SHADING_TRANSPARENT"));
+
 	if (AlphaCullEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_PM_ALPHA_CULL"));
 

@@ -333,8 +333,13 @@ bool ZESector::RemoveLink(const ZEGUID& SectorId)
 
 bool ZESector::Save()
 {
+	return Save(SectorFile);
+}
+
+bool ZESector::Save(const ZEString& FileName)
+{
 	ZEMLWriter SectorWriter;
-	zeCheckError(!SectorWriter.Open(SectorFile), false, "Cannot write to sector file. File Name: \"%s\".", SectorFile.ToCString());
+	zeCheckError(!SectorWriter.Open(FileName), false, "Cannot write to sector file. File Name: \"%s\".", FileName.ToCString());
 	ZEMLWriterNode SectorNode;
 	SectorWriter.OpenRootNode("Sector", SectorNode);
 

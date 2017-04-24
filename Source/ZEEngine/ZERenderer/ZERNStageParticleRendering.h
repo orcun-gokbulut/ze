@@ -39,10 +39,15 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNShading.h"
 #include "ZEExport.ZEEngine.h"
 
 class ZEGRTexture;
 class ZEGRBuffer;
+class ZERNMaterial;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRComputeRenderStateData;
 
 class ZE_EXPORT_ZEENGINE ZERNStageParticleRendering : public ZERNStage
 {
@@ -51,14 +56,45 @@ class ZE_EXPORT_ZEENGINE ZERNStageParticleRendering : public ZERNStage
 		ZEFlags							DirtyFlags;
 		ZEGRViewport					Viewport;
 
+		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
+		ZEHolder<ZEGRShader>					TiledPixelShader;
+		ZEHolder<ZEGRShader>					TiledCullingComputeShader;
+
+		ZEHolder<ZEGRRenderStateData>			TiledRenderStateData;
+		ZEHolder<ZEGRComputeRenderStateData>	TiledCullingRenderStateData;
+
+		ZEHolder<ZEGRBuffer>					EmittersConstantBuffer;
+		ZEHolder<ZEGRBuffer>					ParticlePoolBuffer;
+		ZEHolder<ZEGRBuffer>					TileParticleStructuredBuffer;
+
 		ZEHolder<const ZEGRTexture>		AccumulationTexture;
 		ZEHolder<const ZEGRTexture>		DepthTexture;
 		ZEHolder<const ZEGRBuffer>		FogConstantBuffer;
+		ZEHolder<const ZEGRBuffer>				TileLightStructuredBuffer;
+		ZEHolder<const ZEGRBuffer>				LightsConstantBuffer;
+
+		struct MaterialInstanced
+		{
+			ZEHolder<const ZERNMaterial>		Material;
+			ZEUInt								InstanceCount;
+			ZEUInt								FirstConstant;
+			ZEUInt								ConstantCount;
+		};
+
+		ZESmartArray<MaterialInstanced>			Instances;
+		ZESmartArray<MaterialInstanced>			TiledInstances;
+		ZEChunkArray<ZEBYTE, 256>				Emitters;
+		ZEChunkArray<ZEBYTE, 65536>				ParticlePool;
 
 		virtual bool					InitializeInternal();
 		virtual bool					DeinitializeInternal();
 
 		virtual void					CreateOutput(const ZEString& Name);
+
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateBuffers();
+		bool									Update();
 
 	public:
 		virtual ZEInt					GetId() const;

@@ -36,8 +36,8 @@
 macro(ze_symbols_server_init)
 	if (ZEBUILD_PLATFORM_WINDOWS)
 		set(ZEBUILD_SYMBOL_SERVER_ENABLE FALSE CACHE BOOL "Generate symbol related targets.")
-		set(ZEBUILD_SYMBOL_SERVER_ADDRESS  CACHE STRING "Symbol server address.")
-		set(ZEBUILD_SYMBOL_SERVER_COMMENT "" CACHE STRING "Comment t"\\\\Server\\Symbols\\Zinek"ext of the store operation.")
+		set(ZEBUILD_SYMBOL_SERVER_ADDRESS "\\\\Server\\Symbols\\Zinek" CACHE STRING "Symbol server address.")
+		set(ZEBUILD_SYMBOL_SERVER_COMMENT "" CACHE STRING "Comment text of the store operation.")
 	
 		ze_symbols_server_generate_targets()
 	endif()

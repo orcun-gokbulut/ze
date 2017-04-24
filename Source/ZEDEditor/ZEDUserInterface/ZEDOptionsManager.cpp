@@ -46,12 +46,12 @@
 
 void ZEDOptionsManager::RegisterCommands()
 {
-	OptionsCommand.SetText("ZEDOptionsManager::OptionsCommand");
+	OptionsCommand.SetName("ZEDOptionsManager::OptionsCommand");
 	OptionsCommand.SetCategory("Application");
 	OptionsCommand.SetText("Options");
 	OptionsCommand.SetType(ZED_CT_COMMAND);
-	OptionsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Select.png");
-	OptionsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_Q));
+	OptionsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Settings.png");
+	OptionsCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL | ZED_VKM_SHIFT, ZED_VKK_Q));
 	OptionsCommand.OnAction.AddDelegate<ZEDOptionsManager, &ZEDOptionsManager::OptionsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&OptionsCommand);
 }

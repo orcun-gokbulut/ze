@@ -36,9 +36,11 @@
 #pragma once
 
 #include "ZEParticleModifier.h"
-#include "ZEMath/ZEAABBox.h"
 
-class ZEParticleConfineModifier : public ZEParticleModifier
+#include "ZEMath/ZEAABBox.h"
+#include "ZEExport.ZEEngine.h"
+
+class ZE_EXPORT_ZEENGINE ZEParticleConfineModifier : public ZEParticleModifier
 {
 	ZE_OBJECT
 	private:

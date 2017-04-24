@@ -251,6 +251,7 @@ void ZEDObjectWrapper3D::UpdateGraphics()
 ZEDObjectWrapper3D::ZEDObjectWrapper3D()
 {
 	Pickable = true;
+	Transformable = true;
 	NameplateVisible = true;
 	BoundingBoxVisible = true;
 
@@ -277,6 +278,7 @@ void ZEDObjectWrapper3D::SetObject(ZEObject* Object)
 		return;
 
 	Pickable = Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper3D.Pickable", "true");
+	Transformable = Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper3D.Transformable", "true");
 	NameplateVisible = Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper3D.NameplateVisible", "true");
 	BoundingBoxVisible = Object->GetClass()->CheckAttributeHasValue("ZEDEditor.ObjectWrapper3D.BoundingBoxVisible", "true");
 
@@ -393,6 +395,16 @@ void ZEDObjectWrapper3D::SetPickable(bool Pickable)
 bool ZEDObjectWrapper3D::GetPickable() const
 {
 	return Pickable;
+}
+
+void ZEDObjectWrapper3D::SetTransformable(bool Transformable)
+{
+	this->Transformable = Transformable;
+}
+
+bool ZEDObjectWrapper3D::GetTransformable() const
+{
+	return Transformable;
 }
 
 void ZEDObjectWrapper3D::PreRender(const ZERNPreRenderParameters* Parameters)

@@ -60,6 +60,7 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	ZETaskManager::GetInstance()->RegisterPool(ConcurrentPool);
 	ZETaskManager::GetInstance()->SetThreadCount(3);
 
+	zeCore->GetOptions()->Load("#E:\\Options.ini");
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetConsole()->ShowConsole();

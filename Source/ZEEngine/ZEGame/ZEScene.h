@@ -162,5 +162,6 @@ class ZE_EXPORT_ZEENGINE ZEScene : public ZEObject, public ZEInitializable, publ
 }
 ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Icons/ZEDObjectWrapper/ZEScene.png")
 ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Pickable, false)
+ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.Transformable, false)
 ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.BoundingBoxVisible, false)
 ZEMT_ATTRIBUTE(ZEDEditor.ObjectWrapper3D.NameplateVisible, false);

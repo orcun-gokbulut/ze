@@ -39,19 +39,60 @@
 
 #include "ZETypes.h"
 
-class ZEClass;
-class ZEMTEnumerator;
+class ZEMTDeclaration;
 
-#define ZEMT_REGISTAR(RegistarName)
+#define ZEMT_REISTAR_DECLARATION(Name) Count++;
+#define ZEMT_REGISTER_CLASS(Name) static_cast<ZEMTDeclaration*>(Name_Class()),
+#define ZEMT_REGISTER_ENUMERATION(Name) static_cast<ZEMTDeclaration*>(Name_Enumeration()),
 
 class ZEMTRegistar
 {
 	public:
-		virtual ZEClass**			GetClasses() = 0;
-		virtual ZESize				GetClassCount() = 0;
-
-		virtual ZEMTEnumerator**	GetEnumerators() = 0;
-		virtual ZESize				GetEnumeratorCount() = 0;
+		virtual ZEMTDeclaration* const*		GetDeclarations() const = 0;
+		virtual ZESize						GetDeclarationCount() const = 0;
 };
 
 #endif
+/*
+
+class ZEMT_REGISTART_NAME : public ZEMTRegistar
+{
+	public:
+		virtual ZEMTDeclaration* const*		GetDeclarations() const override;
+		virtual ZESize						GetDeclarationCount() const override;
+
+};
+
+
+ZEMTDeclaration* const* ZEMT_REGISTART_NAME::GetDeclarations() const
+{
+	static ZEArray<ZEMTDeclaration>* Declarations[];
+
+	bool Initialized = false;
+	if (Initialized)
+	{
+		Declarations[0] = ZEClass_Class();
+		Declarations[1] = ;
+		Declarations[2] = ;
+		Declarations[3] = ;
+		Declarations[4] = ;
+		Declarations[5] = ;
+
+		Initialized = true;
+	}
+
+	return Declarations;
+}
+
+ZESize ZEMT_REGISTART_NAME::GetDeclarationCount() const
+{
+	ZESSize Count = -1;
+	if (Count == -1)
+	{
+		Count = 0;
+		#define ZEMT_REISTAR_DECLARATION(Name) Count++;
+		#include "ZEMetaRegistar.h"
+	}
+
+	return Count;
+}*/

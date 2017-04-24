@@ -169,16 +169,11 @@ ZEAllocatorBase<ZEItemType>::ZEAllocatorBase()
 template <typename ZEItemType, ZEInt ChunkSize>
 bool ZEChunkAllocator<ZEItemType, ChunkSize>::Allocate(ZEItemType** Pointer, ZESize NewSize)
 {
-	ZESize OldSize;
 	if (NewSize != 0)
 	{
-		if ((this->Size < NewSize) || (this->Size - NewSize > ChunkSize))
+		if ((this->Size < NewSize) || (this->Size - NewSize >= ChunkSize))
 		{
-			OldSize = this->Size;
-			if (NewSize < ChunkSize)
-				this->Size = ChunkSize;
-			else
-				this->Size = ((NewSize / ChunkSize) + 1) * ChunkSize;
+			this->Size = ((NewSize + ChunkSize - 1) / ChunkSize) * ChunkSize;
 
 			*Pointer = new ZEItemType[this->Size];
 			return true;

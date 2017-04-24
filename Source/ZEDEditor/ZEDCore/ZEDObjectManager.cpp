@@ -278,6 +278,9 @@ ZEDObjectWrapper* ZEDObjectManager::FindWrapper(ZEObject* Object, ZEDObjectWrapp
 	if (ParentWrapper == NULL)
 		return NULL;
 
+	if (ParentWrapper->GetObject() == Object)
+		return ParentWrapper;
+
 	const ZEArray<ZEDObjectWrapper*>& ChildWrappers = ParentWrapper->GetChildWrappers();
 	for (ZESize I = 0 ; I < ChildWrappers.GetCount(); I++)
 	{

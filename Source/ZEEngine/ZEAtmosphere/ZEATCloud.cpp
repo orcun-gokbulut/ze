@@ -379,6 +379,9 @@ bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
+	if (CloudTexture == NULL || !CloudTexture->IsLoaded())
+		return false;
+
 	static ZEVector2 Translation = ZEVector2::Zero;
 	Translation += Parameters->TimeParameters->FrameTimeDelta * ZEVector2(0.0001f, 0.0003f);
 

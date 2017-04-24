@@ -35,6 +35,13 @@
 
 #include "ZEParticleRandomAccelerationModifier.h"
 
+#include "ZEMath/ZEMath.h"
+
+ZEUInt ZEParticleRandomAccelerationModifier::GetFlags() const
+{
+	return ZE_PEF_ACCELERATION_PER_PARTICLE;
+}
+
 void ZEParticleRandomAccelerationModifier::SetMaxStrength(float NewStrength)
 {
 	MaxStrength = NewStrength;
@@ -47,17 +54,20 @@ float ZEParticleRandomAccelerationModifier::GetMaxStrength() const
 
 void ZEParticleRandomAccelerationModifier::Tick(float ElapsedTime)
 {
-	ZEArray<ZEParticle>& Particles = GetPool();
-	ZESize ParticleCount = Particles.GetCount();
+	ZEParticlePool& ParticlePool = GetPool();
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
 
-	ZEVector3 RandomResult = ZEVector3::Zero;
-
-	for (ZESize I = 0; I < ParticleCount; I++)
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		RandomResult.x = (ZERandom::GetFloat() / RAND_MAX) * MaxStrength;
-		RandomResult.y = (ZERandom::GetFloat() / RAND_MAX) * MaxStrength;
-		RandomResult.z = (ZERandom::GetFloat() / RAND_MAX) * MaxStrength;
-		Particles[I].Velocity += RandomResult;
+		ZEUInt Index = AliveParticleIndices[I];
+
+		ZEVector3 RandomAcc;
+		RandomAcc.x = ZERandom::GetFloat() * MaxStrength;
+		RandomAcc.y = ZERandom::GetFloat() * MaxStrength;
+		RandomAcc.z = ZERandom::GetFloat() * MaxStrength;
+
+		ParticlePool.Velocities[Index] += RandomAcc * ElapsedTime;
 	}
 }
 

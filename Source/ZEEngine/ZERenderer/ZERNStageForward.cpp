@@ -127,7 +127,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	ZERNStageLighting* StageLighting = static_cast<ZERNStageLighting*>(GetRenderer()->GetStage(ZERN_STAGE_LIGHTING));
 	if (StageLighting != NULL)
 	{
-		Context->SetBuffer(ZEGR_ST_PIXEL, 17, TileLightStructuredBuffer);
+		Context->SetBuffer(ZEGR_ST_PIXEL, 15, TileLightStructuredBuffer);
 
 		const ZEGRBuffer* Buffers[] = {LightsConstantBuffer, LightsConstantBuffer, LightsConstantBuffer, LightsConstantBuffer};
 		const ZEUInt Offsets[] = {StageLighting->CommonParamsRange.Offset, StageLighting->PointLightRange.Offset, StageLighting->SpotLightRange.Offset, StageLighting->SpotLightShadowRange.Offset};

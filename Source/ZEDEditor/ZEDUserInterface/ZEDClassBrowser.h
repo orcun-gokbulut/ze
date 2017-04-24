@@ -68,6 +68,9 @@ class ZEDClassBrowser : public ZEDWindow
 		void								btnAdd_clicked();
 
 	public:
+		void								SetClassModel(ZEDClassModel* Model);
+		ZEDClassModel*						GetClassModel() const;
+
 											ZEDClassBrowser();
 		virtual								~ZEDClassBrowser();
 };

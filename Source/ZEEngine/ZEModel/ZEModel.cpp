@@ -50,59 +50,58 @@
 
 void ZEModel::CalculateBoundingBox() const
 {
-	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
+	if (!IsLoaded() || (Meshes.GetCount() == 0 && Bones.GetCount() == 0))
 	{
 		DirtyBoundingBox = false;
 		const_cast<ZEModel*>(this)->SetBoundingBox(ZEAABBox(ZEVector3::Zero, ZEVector3::Zero));
 		return;
 	}
-	else
+
+
+	ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
+
+	ze_for_each(Mesh, Meshes)
 	{
-		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
-
-		ze_for_each(Mesh, Meshes)
+		ze_for_each(LOD, Mesh->GetLODs())
 		{
-			ze_for_each(LOD, Mesh->GetLODs())
+			if (LOD->GetVertexType() != ZEMD_VT_SKINNED)
 			{
-				if (LOD->GetVertexType() != ZEMD_VT_SKINNED)
+				const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
+
+				for (ZEInt N = 0; N < 8; N++)
 				{
-					const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
+					ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+					if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+					if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+					if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
 
-					for (ZEInt N = 0; N < 8; N++)
-					{
-						ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-						if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-						if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-						if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
-
-						if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-						if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-						if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
-					}
+					if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+					if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+					if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
 				}
 			}
 		}
-
-		ze_for_each(Bone, Bones)
-		{
-			const ZEAABBox& CurrentBoundingBox = Bone->GetModelBoundingBox();
-
-			for (ZEInt N = 0; N < 8; N++)
-			{ 
-				ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-				if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-				if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-				if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
-
-				if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-				if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-				if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
-			}
-		}
-
-		DirtyBoundingBox = false;
-		const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox, true);
 	}
+
+	ze_for_each(Bone, Bones)
+	{
+		const ZEAABBox& CurrentBoundingBox = Bone->GetModelBoundingBox();
+
+		for (ZEInt N = 0; N < 8; N++)
+		{ 
+			ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+
+			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+		}
+	}
+
+	DirtyBoundingBox = false;
+	const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox, true);
 }
 
 void ZEModel::UpdateConstantBufferBoneTransforms()

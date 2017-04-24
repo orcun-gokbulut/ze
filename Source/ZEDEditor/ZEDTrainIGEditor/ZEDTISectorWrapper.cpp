@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.cpp
+ Zinek Engine - ZEDTISectorWrapper.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDSceneWrapper.h"
+#include "ZEDTISectorWrapper.h"
 
 #include "ZEMath/ZEViewVolume.h"
-#include "ZEDEntityWrapper.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZEFile/ZEPathManager.h"
+#include "ZEApplications/ZETrainIG/ZETISector.h"
 
-void ZEDSceneWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZERNPreRenderParameters* Parameters)
+void ZEDTISectorWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZERNPreRenderParameters* Parameters)
 {
 	if (!EntityWrapper->GetVisible())
 		return;
@@ -56,7 +56,7 @@ void ZEDSceneWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZER
 		PreRenderEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Parameters);
 }
 
-void ZEDSceneWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEDTISectorWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	Wrapper->RayCast(Report, Parameters);
 	if (Report.CheckDone())
@@ -75,33 +75,33 @@ void ZEDSceneWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& 
 	}
 }
 
-void ZEDSceneWrapper::SetObject(ZEObject* Object)
+void ZEDTISectorWrapper::SetObject(ZEObject* Object)
 {
 	if (Object == NULL)
 		return;
 
-	if (!ZEClass::IsDerivedFrom(ZEScene::Class(), Object->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZETISector::Class(), Object->GetClass()))
 		return;
 
 	ZEDObjectWrapper3D::SetObject(Object);
 }
 
-ZEString ZEDSceneWrapper::GetName() const
+ZEString ZEDTISectorWrapper::GetName() const
 {
-	return "Scene";
+	return "Sector";
 }
 
-ZEScene* ZEDSceneWrapper::GetScene()
+ZETISector* ZEDTISectorWrapper::GetSector() const
 {
-	return static_cast<ZEScene*>(GetObject());
+	return static_cast<ZETISector*>(GetObject());
 }
 
-bool ZEDSceneWrapper::CheckChildrenClass(ZEClass* Class)
+bool ZEDTISectorWrapper::CheckChildrenClass(ZEClass* Class)
 {
 	return ZEClass::IsDerivedFrom(ZEEntity::Class(), Class);
 }
 
-void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEDTISectorWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	ZEArray<ZEDObjectWrapper3D*> Wrappers = GetChildWrapper3Ds();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
@@ -116,108 +116,54 @@ void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters
 	}
 }
 
-void ZEDSceneWrapper::Update()
+bool ZEDTISectorWrapper::Load(const ZEString& FileName)
 {
-	if (GetScene() == NULL)
-	{
-		ClearChildWrappers();
-		return;
-	}
-
-	LockWrapper();
-	SyncronizeChildWrappers((ZEObject*const*)GetScene()->GetEntities().GetConstCArray(), GetScene()->GetEntities().GetCount());
-	UnlockWrapper();
-}
-
-void ZEDSceneWrapper::LockWrapper()
-{
-	if (GetScene() != NULL)
-		GetScene()->LockScene();
-}
-
-void ZEDSceneWrapper::UnlockWrapper()
-{
-	if (GetScene() != NULL)
-		GetScene()->UnlockScene();
-}
-
-bool ZEDSceneWrapper::Load(const ZEString& FileName)
-{
-	if (GetScene() == NULL)
+	if (GetSector() == NULL)
 		return false;
 
-	if (!GetScene()->Unserialize(FileName))
-		return false;
-
-	GetScene()->LoadEntities();
+	GetSector()->SetSectorFile(FileName);
+	GetSector()->SetIsPopulated(true);
+	GetSector()->Load();
 
 	Update();
 
 	return true;
 }
 
-bool ZEDSceneWrapper::Save(const ZEString& FileName)
+bool ZEDTISectorWrapper::Save(const ZEString& FileName)
 {
-	if (GetScene() == NULL)
+	if (GetSector() == NULL)
 		return false;
 
 	bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
 	ZEPathManager::GetInstance()->SetAccessControl(false);
-	return GetScene()->Serialize(FileName);
+	return GetSector()->Save(FileName);
 	ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
 }
 
-void ZEDSceneWrapper::Clean()
+ZEDTISectorWrapper* ZEDTISectorWrapper::CreateInstance()
 {
-	for (ZESize I = 0; I < GetChildWrappers().GetCount(); I++)
-	{
-		RemoveChildWrapper(GetChildWrappers()[I]);
-		I--;
-	}
-
-	GetScene()->ClearEntities();
-	Update();
+	return new ZEDTISectorWrapper();
 }
 
-ZEDSceneWrapper* ZEDSceneWrapper::CreateInstance()
+bool ZEDTISectorWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
-	return new ZEDSceneWrapper();
+	return ZEDEntityWrapper::AddChildWrapper(Wrapper, Update);
 }
 
-bool ZEDSceneWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+bool ZEDTISectorWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
-	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
-		return false;
-
-	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
-		return false;
-
-	if (!Update)
-	{
-		if (GetScene() != NULL)
-			GetScene()->AddEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
-	}
-
-	return true;
+	return ZEDEntityWrapper::RemoveChildWrapper(Wrapper, Update);
 }
 
-bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+void ZEDTISectorWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEDObjectWrapper3D::RemoveChildWrapper(Wrapper, Update))
-		return false;
-
-	if (!Update)
-	{
-		if (GetScene() != NULL)
-			GetScene()->RemoveEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
-	}
-
-	return ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update);
-}
-
-void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	GetScene()->PreRender(Parameters);
+	ZETISector* Sector = static_cast<ZETISector*>(GetObject());
+	
+	if (Sector->GetScene() != NULL)
+		Sector->GetScene()->PreRender(Parameters);
+	
+	ZEDEntityWrapper::PreRender(Parameters);
 
 	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)

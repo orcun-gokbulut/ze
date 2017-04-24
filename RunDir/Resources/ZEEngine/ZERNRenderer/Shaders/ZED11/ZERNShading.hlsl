@@ -43,8 +43,9 @@
 
 #define SAMPLE_COUNT					4
 
+#define MAX_EMITTER						1000
 #define MAX_DEFERRED_LIGHT				1024
-#define MAX_TILED_LIGHT					1024
+#define MAX_TILED_LIGHT					1021
 #define MAX_POINT_LIGHT_SHADOW			2
 #define MAX_SPOT_LIGHT_SHADOW			4
 #define MAX_PROJECTIVE_LIGHT			8
@@ -53,8 +54,18 @@
 #define MAX_DIRECTIONAL_LIGHT_SHADOW	1
 #define MAX_CASCADE						4
 
-#define TILE_DIMENSION					32
-#define TILE_SIZE						(TILE_DIMENSION * TILE_DIMENSION)
+#define TILE_LIGHT_HEADER_COUNT			3
+#define TILE_LIGHT_TOTAL_COUNT			(TILE_LIGHT_HEADER_COUNT + MAX_TILED_LIGHT)
+
+#define TILE_PARTICLE_HEADER_COUNT		1
+#define TILE_PARTICLE_COUNT				1023
+#define TILE_PARTICLE_TOTAL_COUNT		(TILE_PARTICLE_HEADER_COUNT + TILE_PARTICLE_COUNT)
+
+#define TILE_PARTICLE_DIM				16
+#define TILE_LIGHT_DIM					32
+
+#define TILE_PARTICLE_SIZE				(TILE_PARTICLE_DIM * TILE_PARTICLE_DIM)
+#define TILE_LIGHT_SIZE					(TILE_LIGHT_DIM * TILE_LIGHT_DIM)
 
 #define WORK_COUNT						4
 
@@ -137,7 +148,7 @@ struct ZERNShading_DirectionalLight
 	ZERNShading_Cascade							Cascades[MAX_CASCADE];
 };
 
-struct ZERNShading_Surface				
+struct ZERNShading_Surface
 {
 	float3										PositionView;
 	float3										NormalView;
@@ -148,6 +159,31 @@ struct ZERNShading_Surface
 	float3										Ambient;
 	float										Opacity;
 	float3										Emissive;
+};
+
+struct ZERNShading_Particle
+{
+	float3										Position;
+	float										Radius;
+	float4										Color;
+	float2										Size;
+	float										Rotation;
+	bool										LightReceiver;
+};
+
+struct ZERNShading_Emitter
+{
+	uint										Axis;
+	uint										Flags;
+	
+	uint										StartOffset;
+	uint										ParticleCount;
+	
+	uint										ColorStartOffset;
+	float2										Size;
+	float										Rotation;
+	float4										TexCoords;
+	float4										Color;
 };
 
 cbuffer ZERNShading_EdgeDetection_Constants														: register(b9)
@@ -200,13 +236,20 @@ cbuffer ZERNFog_Constants																		: register(b12)
 	float										ZERNShading_FogReserved1;
 };
 
+cbuffer ZERNShading_Emitters_Constants															: register(b13)
+{
+	ZERNShading_Emitter							ZERNShading_Emitters[MAX_EMITTER];
+};
+
 Texture2D<float4>								ZERNShading_ProjectionTexture					: register(t10);
 Texture2DArray<float>							ZERNShading_CascadeShadowMaps					: register(t11);
 Texture2DArray<float>							ZERNShading_SpotShadowMaps						: register(t12);
 Texture2DArray<float>							ZERNShading_ProjectiveShadowMaps				: register(t13);
 Texture2D<float2>								ZERNShading_RandomVectors						: register(t14);
 
-StructuredBuffer<uint>							ZERNShading_TileLightIndices					: register(t17);
+StructuredBuffer<uint>							ZERNShading_TileLightIndices					: register(t15);
+StructuredBuffer<uint>							ZERNShading_TileParticleIndices					: register(t16);
+Buffer<float4>									ZERNShading_ParticlePool						: register(t17);
 
 static const float2 ZERNShading_PoissonDiskSamples[] = 
 {
@@ -229,9 +272,9 @@ static const float2 ZERNShading_PoissonDiskSamples[] =
 };
 
 ZERNShading_Surface ZERNShading_GetSurfaceFromGBuffers(float2 PositionViewport
-#ifdef MSAA_ENABLED
+//#ifdef MSAA_ENABLED
 , float SampleIndex = 0
-#endif
+//#endif
 )
 {
 	#ifdef MSAA_ENABLED
@@ -537,30 +580,35 @@ float3 ZERNShading_Shade(float2 PositionViewport, ZERNShading_Surface Surface)
 {
 	float3 ResultColor = 0.0f;
 	
-	uint2 TileId = floor(PositionViewport) / TILE_DIMENSION;
+	uint2 TileId = floor(PositionViewport) / TILE_LIGHT_DIM;
 	uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
-	uint TileStartOffset = (MAX_TILED_LIGHT + 2) * TileIndex;
+	uint TileStartOffset = TileIndex * TILE_LIGHT_TOTAL_COUNT;
 	
 	uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
-	uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1];
+	#ifdef ZERN_SHADING_TRANSPARENT
+		uint TilePointLightCountTransparent = ZERNShading_TileLightIndices[TileStartOffset + 1];
+		uint TileSpotLightCountTransparent = ZERNShading_TileLightIndices[TileStartOffset + 2];
+		
+		TilePointLightCount += TilePointLightCountTransparent;
+	#endif
 	
 	[unroll(2)]
 	for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 		ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 	
-	uint LoopCount = TilePointLightCount & (WORK_COUNT - 1);
-	uint BufferIndex = TileStartOffset + 2;
+	uint TailCount = TilePointLightCount & (WORK_COUNT - 1);
+	uint BufferIndex = TileStartOffset + TILE_LIGHT_HEADER_COUNT;
 	uint LightIndices[WORK_COUNT];
 	
 	[unroll(WORK_COUNT - 1)]
-	for (uint JJ = 0; JJ < LoopCount; JJ++)
+	for (uint JJ = 0; JJ < TailCount; JJ++)
 	{
 		LightIndices[JJ] = ZERNShading_TileLightIndices[BufferIndex++];
 		
 		ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[LightIndices[JJ]], Surface);
 	}
 	
-	for (uint J = LoopCount; J < TilePointLightCount; J += WORK_COUNT)
+	for (uint J = TailCount; J < TilePointLightCount; J += WORK_COUNT)
 	{
 		[unroll]
 		for (int W = 0; W < WORK_COUNT; W++)
@@ -571,18 +619,18 @@ float3 ZERNShading_Shade(float2 PositionViewport, ZERNShading_Surface Surface)
 			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[LightIndices[WW]], Surface);
 	}
 	
-	#ifdef ZERN_FM_FORWARD
-		uint SpotLightCount = TileTotalLightCount - TilePointLightCount;
-		LoopCount = (SpotLightCount & (WORK_COUNT - 1));
+	#ifdef ZERN_SHADING_TRANSPARENT
+		TailCount = (TileSpotLightCountTransparent & (WORK_COUNT - 1));
 		
 		[unroll(WORK_COUNT - 1)]
-		for (uint KK = 0; KK < LoopCount; KK++)
+		for (uint KK = 0; KK < TailCount; KK++)
 		{
 			LightIndices[KK] = ZERNShading_TileLightIndices[BufferIndex++];
+			
 			ResultColor += ZERNShading_SpotShading(ZERNShading_SpotLights[LightIndices[KK]], Surface);
 		}
 		
-		for (uint K = LoopCount; K < SpotLightCount; K += WORK_COUNT)
+		for (uint K = TailCount; K < TileSpotLightCountTransparent; K += WORK_COUNT)
 		{
 			[unroll]
 			for (int W = 0; W < WORK_COUNT; W++)
@@ -592,6 +640,11 @@ float3 ZERNShading_Shade(float2 PositionViewport, ZERNShading_Surface Surface)
 			for (int WW = 0; WW < WORK_COUNT; WW++)
 				ResultColor += ZERNShading_SpotShading(ZERNShading_SpotLights[LightIndices[WW]], Surface);
 		}
+		
+		ResultColor += Surface.Ambient + Surface.Emissive;
+		
+		float4 FogColor = ZERNShading_CalculateFogColor(Surface.PositionView);
+		ResultColor = lerp(ResultColor, FogColor.rgb, FogColor.a);
 	#endif
 	
 	return ResultColor;	

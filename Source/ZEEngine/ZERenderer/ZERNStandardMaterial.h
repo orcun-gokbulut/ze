@@ -156,6 +156,7 @@ class ZE_EXPORT_ZEENGINE ZERNStandardMaterial : public ZERNMaterial
 			float										DetailNormalMapAttenuationFactor;
 		} Constants;
 
+		ZEUInt8											MaxTextureLOD;
 		bool											ShadowCaster;
 		bool											TwoSided;
 		bool											Wireframe;
@@ -227,6 +228,9 @@ class ZE_EXPORT_ZEENGINE ZERNStandardMaterial : public ZERNMaterial
 
 		void											SetSampler(const ZEHolder<ZEGRSampler>& Sampler);
 		const ZEHolder<ZEGRSampler>&					GetSampler() const;
+
+		void											SetMaxTextureLOD(ZEUInt8 MaxTextureLOD);
+		ZEUInt8											GetMaxTextureLOD() const;
 
 		void											SetShadowCaster(bool ShadowCaster);
 		bool											GetShadowCaster() const;

@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEParticleVelocityOverLifeModifier.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,32 +30,27 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+cmake_minimum_required(VERSION 2.8)
 
-#include "ZEParticleUVModifier.h"
-#include "ZEExport.ZEEngine.h"
+ze_add_source(ZEDTIEditor.cpp							Sources)
+ze_add_source(ZEDTIEditor.h								Sources ZEMC)
+ze_add_source(ZEDSceneWrapper.cpp						Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
+ze_add_source(ZEDEntityWrapper.cpp						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
+ze_add_source(ZEDTISectorWrapper.cpp					Sources)
+ze_add_source(ZEDTISectorWrapper.h						Sources ZEMC)
+ze_add_source(ZEDTIVegetationWrapper.cpp				Sources)
+ze_add_source(ZEDTIVegetationWrapper.h					Sources ZEMC)
 
-class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
-{
-	ZE_OBJECT
-	private:
-		ZEVector3							FromVelocity;
-		ZEVector3							ToVelocity;
+ze_add_library(TARGET ZEDTrainIGEditor 
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	LIBS ZEFoundation ZEDCore ZEDUserInterface ZETrainIG-Module)
 
-		virtual ZEUInt						GetFlags() const override;
+ze_meta_register(LIBS ZETrainIG-Module)
 
-	public:
-		void								SetFromVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetFromVelocity() const;
-
-		void								SetToVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetToVelocity() const;
-
-		virtual	void						Tick(float ElapsedTime) override;
-
-											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
-};
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

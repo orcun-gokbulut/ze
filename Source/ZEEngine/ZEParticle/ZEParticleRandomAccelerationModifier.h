@@ -43,7 +43,9 @@ class ZE_EXPORT_ZEENGINE ZEParticleRandomAccelerationModifier : public ZEParticl
 	ZE_OBJECT
 	private:
 		float								MaxStrength;
-	
+
+		virtual ZEUInt						GetFlags() const override;
+
 	public:
 		void								SetMaxStrength(float NewStrength = 1000.0f);
 		float								GetMaxStrength() const;

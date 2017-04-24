@@ -46,3 +46,4 @@ ze_add_module(ZEPhysX				Modules OPTIONAL DEFAULT PLATFORMS Windows Linux MacOSX
 
 ze_add_source(CMakeLists.txt		Sources)
 ze_add_cmake_project(ZEModules SOURCES ${Sources})
+add_dependencies(ZEModules ${Modules})

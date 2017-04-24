@@ -46,13 +46,14 @@ add_subdirectory(ZEDCore)
 add_subdirectory(ZEDConsole)
 add_subdirectory(ZEDUserInterface)
 add_subdirectory(ZEDEntityEditor)
+add_subdirectory(ZEDTrainIGEditor)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEDEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZETrainIG-Module)
+	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
 
 qt5_use_modules(ZEDEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZETrainIG-Module)
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)

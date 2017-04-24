@@ -67,7 +67,7 @@ static HINSTANCE ApplicationInstance;
 
 static ZEInt StartedCoreInstanceCount = 0;
 
-void ZECore_AtExit()
+static void ZECore_AtExit()
 {
 	if (StartedCoreInstanceCount != 0)
 		zeCriticalError("Unhandled exit function call detected. You cannot exit until core is shutdown. Terminating the core. This can cause huge problems.");
@@ -75,6 +75,14 @@ void ZECore_AtExit()
 	ZECore::GetInstance()->Terminate();
 }
 
+static LONG WINAPI ZEUnhandledExceptionHandler(EXCEPTION_POINTERS* Ex)
+{
+	zeCriticalError("Unhandled exception detected. Terminating the core. This can cause huge problems.");
+
+	ZECore::GetInstance()->Terminate();
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
 
 class ZECoreSystemMessageHandler : public ZESystemMessageHandler
 {
@@ -299,6 +307,7 @@ void ZECore::UnloadPlugins()
 
 ZECore::ZECore() 
 {
+	exit(0);
 	CrashHandler			= new ZECrashHandler();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
@@ -489,6 +498,8 @@ bool ZECore::RemoveModule(ZEModule* Module)
 bool ZECore::StartUp()
 {
 	atexit(ZECore_AtExit);
+	SetUnhandledExceptionFilter(ZEUnhandledExceptionHandler);
+
 	StartedCoreInstanceCount++;
 
 	ApplicationInstance = GetModuleHandle(NULL);
@@ -567,6 +578,8 @@ void ZECore::ShutDown()
 	ZEFoundation_UnregisterDeclarations();
 
 	SetState(ZE_CS_NONE);
+	SetUnhandledExceptionFilter(NULL);
+
 	StartedCoreInstanceCount--;
 }
 #include "ZEPhysics/ZEPhysicalWorld.h"

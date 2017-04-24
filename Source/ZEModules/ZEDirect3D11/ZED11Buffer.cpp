@@ -82,7 +82,21 @@ bool ZED11Buffer::Initialize(ZEGRBufferType BufferType, ZESize SizeInBytes, ZESi
 
 	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
 	{
-		Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ShaderResourceView);
+		if (Type == ZEGR_BT_BUFFER)
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC SrvDesc;
+			SrvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+			SrvDesc.Format = ConvertFormat(Format);
+			SrvDesc.Buffer.ElementOffset = 0;
+			SrvDesc.Buffer.ElementWidth = ElementCount;
+			
+			Result = GetDevice()->CreateShaderResourceView(Buffer, &SrvDesc, &ShaderResourceView);
+		}
+		else
+		{
+			Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ShaderResourceView);
+		}
+
 		if (FAILED(Result))
 		{
 			zeError("Buffer shader resource view creation failed. Error: 0x%X.", Result);

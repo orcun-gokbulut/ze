@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleVelocityOverLifeModifier.h
+ Zinek Engine - ZEDTIEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,43 @@
 
 #pragma once
 
-#include "ZEParticleUVModifier.h"
-#include "ZEExport.ZEEngine.h"
+#include "ZEDCore/ZEDEditor.h"
 
-class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
+class ZEDViewport;
+class ZEDViewportController;
+class ZEDViewportSelectionController;
+class ZEDObjectBrowser;
+class ZEDClassBrowser;
+class ZEDAssetBrowser;
+class ZEDPropertyWindow;
+class ZEScene;
+class ZESectorManager;
+
+class ZEDTIEditor : public ZEDEditor
 {
 	ZE_OBJECT
 	private:
-		ZEVector3							FromVelocity;
-		ZEVector3							ToVelocity;
+		ZEDViewport*						Viewport;
+		ZEDViewportController*				ViewportController;
+		ZEDViewportSelectionController*		ViewportSelectionController;
+		ZEDObjectBrowser*					ObjectBrowser;
+		ZEDClassBrowser*					ClassBrowser;
+		ZEDAssetBrowser*					AssetBrowser;
+		ZEDPropertyWindow*					PropertyWindow;
+		ZEScene*							Scene;
+		ZESectorManager*					SectorManager;
 
-		virtual ZEUInt						GetFlags() const override;
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
+
+		void								Editor_OnNew(ZEDEditor* Editor);
+
+											ZEDTIEditor();
+		virtual								~ZEDTIEditor();
 
 	public:
-		void								SetFromVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetFromVelocity() const;
+		virtual ZEString					GetExtensions();
 
-		void								SetToVelocity(const ZEVector3& Velocity);
-		const ZEVector3&					GetToVelocity() const;
-
-		virtual	void						Tick(float ElapsedTime) override;
-
-											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
-};
+		static ZEDTIEditor*					CreateInstance();
+}
+ZEMT_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZESector");

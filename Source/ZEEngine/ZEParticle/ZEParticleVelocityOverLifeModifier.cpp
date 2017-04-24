@@ -35,9 +35,26 @@
 
 #include "ZEParticleVelocityOverLifeModifier.h"
 
-void ZEParticleVelocityOverLifeModifier::SetToVelocity(const ZEVector3& ToVelocity)
+#include "ZEMath\ZEMath.h"
+
+ZEUInt ZEParticleVelocityOverLifeModifier::GetFlags() const
 {
-	this->ToVelocity = ToVelocity;
+	return ZE_PEF_VELOCITY_PER_PARTICLE | ZE_PEF_TOTAL_LIFE_PER_PARTICLE;
+}
+
+void ZEParticleVelocityOverLifeModifier::SetFromVelocity(const ZEVector3& Velocity)
+{
+	this->FromVelocity = Velocity;
+}
+
+const ZEVector3& ZEParticleVelocityOverLifeModifier::GetFromVelocity() const
+{
+	return FromVelocity;
+}
+
+void ZEParticleVelocityOverLifeModifier::SetToVelocity(const ZEVector3& Velocity)
+{
+	this->ToVelocity = Velocity;
 }
 
 const ZEVector3& ZEParticleVelocityOverLifeModifier::GetToVelocity() const
@@ -47,22 +64,18 @@ const ZEVector3& ZEParticleVelocityOverLifeModifier::GetToVelocity() const
 
 void ZEParticleVelocityOverLifeModifier::Tick(float ElapsedTime)
 {
-	ZESize ParticleCount = GetPool().GetCount();
-	ZEArray<ZEParticle>& Particles =  GetPool();
+	ZEParticlePool& ParticlePool = GetPool();
+	const ZEArray<ZEUInt>& AliveParticleIndices = GetEmitter()->GetAliveParticleIndices();
+	ZEUInt AliveParticleCount = GetEmitter()->GetAliveParticleCount();
 
-	for (ZESize I = 0; I < ParticleCount; I++)
+	for (ZEUInt I = 0; I < AliveParticleCount; I++)
 	{
-		ZEParticle* CurrentParticle = &Particles[I];
+		ZEUInt Index = AliveParticleIndices[I];
+		float Weight = 1.0f - (ParticlePool.Lifes[Index] / ParticlePool.TotalLifes[Index]);
 
-		if (CurrentParticle->State == ZE_PAS_ALIVE)
-		{
-			float TotalLife_Life = CurrentParticle->Life / CurrentParticle->TotalLife;
-			float LerpFactor = 1.0f - TotalLife_Life;
-
-			CurrentParticle->Velocity.x = CurrentParticle->InitialVelocity.x + (ToVelocity.x - CurrentParticle->InitialVelocity.x) * LerpFactor;
-			CurrentParticle->Velocity.y = CurrentParticle->InitialVelocity.y + (ToVelocity.y - CurrentParticle->InitialVelocity.y) * LerpFactor;
-			CurrentParticle->Velocity.z = CurrentParticle->InitialVelocity.z + (ToVelocity.z - CurrentParticle->InitialVelocity.z) * LerpFactor;
-		}
+		ParticlePool.Velocities[Index].x = ZEMath::Lerp(FromVelocity.x, ToVelocity.x, Weight);
+		ParticlePool.Velocities[Index].y = ZEMath::Lerp(FromVelocity.y, ToVelocity.y, Weight);
+		ParticlePool.Velocities[Index].z = ZEMath::Lerp(FromVelocity.z, ToVelocity.z, Weight);
 	}
 }
 

@@ -166,12 +166,17 @@ void ZEDEditor::SaveAsCommand_OnAction(const ZEDCommand* Command)
 	if (State == ZED_ES_NONE)
 		return;
 
-	QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save As", GetFileName().ToCString(), GetExtensions().ToCString(), NULL, QFileDialog::DontResolveSymlinks);
+	QString Result = QFileDialog::getSaveFileName(GetMainWindow()->GetMainWindow(), "Save", QString(), GetExtensions().ToCString(), NULL, QFileDialog::DontResolveSymlinks);
 	if (Result.isEmpty())
 		return;
 
+	FileName = Result.toStdString();
+
 	if (!Save(FileName))
+	{
 		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
+		return;
+	}
 }
 
 void ZEDEditor::CloseCommand_OnAction(const ZEDCommand* Command)
