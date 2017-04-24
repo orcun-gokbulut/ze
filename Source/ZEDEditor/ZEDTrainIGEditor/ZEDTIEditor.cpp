@@ -52,7 +52,6 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
-#include "ZEGame/ZEStateScreen.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEDCore/ZEDAssetManager.h"
 

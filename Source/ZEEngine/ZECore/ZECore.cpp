@@ -307,7 +307,8 @@ void ZECore::UnloadPlugins()
 
 ZECore::ZECore() 
 {
-	exit(0);
+	ConfigurationPath = "#E:/Configurations/ZECore.ZEConfig";
+
 	CrashHandler			= new ZECrashHandler();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
@@ -398,6 +399,17 @@ ZECrashHandler* ZECore::GetCrashHandler()
 void* ZECore::GetApplicationInstance()
 {
 	return ApplicationInstance;
+}
+
+
+void ZECore::SetConfigurationPath(const ZEString& Path)
+{
+	ConfigurationPath = Path;
+}
+
+const ZEString& ZECore::GetConfigurationPath() const
+{
+	return ConfigurationPath;
 }
 
 ZECoreState ZECore::GetState()
@@ -586,8 +598,10 @@ void ZECore::ShutDown()
 
 void ZECore::MainLoop()
 {
-	if (GetState() != ZE_CS_RUNNING)
+	if (GetState() != ZE_CS_PAUSED)
 		return;
+
+	State = ZE_CS_RUNNING;
 
 	const ZETimeParameters* Parameters = GetTimeManager()->GetParameters();
 	GetConsole()->Process();
@@ -601,6 +615,8 @@ void ZECore::MainLoop()
 
 	ze_for_each(Module, Modules)
 		Module->PostProcess(Parameters);
+
+	State = ZE_CS_PAUSED;
 }
 
 void ZECore::Execute()
@@ -615,8 +631,15 @@ void ZECore::Execute()
 
 bool ZECore::LoadConfiguration()
 {
+	return LoadConfiguration(ConfigurationPath);
+}
+
+bool ZECore::LoadConfiguration(const ZEString& FileName)
+{
+	ConfigurationPath = FileName;
+
 	ZEMLReader Reader;
-	if (!Reader.Open("#E:/Configurations/ZECore.ZEConfig"))
+	if (!Reader.Open(FileName))
 	{
 		zeError("Cannot load configuration. Cannot open configuration file. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
 		return false;
@@ -671,10 +694,17 @@ bool ZECore::LoadConfiguration()
 
 bool ZECore::SaveConfiguration()
 {
+	return SaveConfiguration(ConfigurationPath);
+}
+
+bool ZECore::SaveConfiguration(const ZEString& FileName)
+{
+	ConfigurationPath = FileName;
+
 	ZEMLWriter Writer;
 	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
 
-	if (!Writer.Open("#E:/Configurations/ZECore.ZEConfig"))
+	if (!Writer.Open(FileName))
 	{
 		zeError("Cannot save configuration. Cannot open configuration file. Configuration File Name: \"#E:/Configurations/ZECore.ZEConfig\".");
 		return false;

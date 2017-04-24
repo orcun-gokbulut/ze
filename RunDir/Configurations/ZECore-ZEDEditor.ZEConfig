@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?ZEML VersionMajor="1" VersionMinor="0"?>
+ <Node Name="ZEConfig">
+  <Property Name="Class" Type="String">ZECore</Property>
+  <Property Name="Signature" Type="UInt64">0</Property>
+  <Node Name="Plugins">
+   <Node Name="Plugin">
+    <Property Name="FileName" Type="String">#E:/ZEDirect3D11.dll</Property>
+   </Node>
+   <Node Name="Plugin">
+    <Property Name="FileName" Type="String">#E:/ZEOpenAL.dll</Property>
+   </Node>
+   <Node Name="Plugin">
+    <Property Name="FileName" Type="String">#E:/ZEWindowsInput.dll</Property>
+   </Node>
+   <Node Name="Plugin">
+    <Property Name="FileName" Type="String">#E:/ZEDirectInput.dll</Property>
+   </Node>
+   <Node Name="Plugin">
+    <Property Name="FileName" Type="String">#E:/ZEPhysX.dll</Property>
+   </Node>
+   <Node Name="Plugin">
+	<Property Name="FileName" Type="String">#E:/ZETrainIG.dll</Property>
+   </Node>
+  </Node>
+  <Node Name="Modules">
+   <Node Name="Module">
+    <Property Name="Class" Type="String">ZETimeManager</Property>
+   </Node>
+   <Node Name="Module">
+    <Property Name="Class" Type="String">ZEInputModule</Property>
+   </Node>
+   <Node Name="Module">
+    <Property Name="Class" Type="String">ZEALModule</Property>
+   </Node>
+   <Node Name="Module">
+    <Property Name="Class" Type="String">ZED11Module</Property>
+   </Node>
+   <Node Name="Module">
+    <Property Name="Class" Type="String">ZEPhysXModule</Property>
+   </Node>
+   <!--<Node Name="Module">
+    <Property Name="Class" Type="String">ZETIModule</Property>
+   </Node>-->
+  </Node>
+ </Node>

@@ -38,6 +38,7 @@
 #include "ZEMeta/ZEMTProvider.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZETimeManager.h"
 #include "ZECore/ZESystemMessageManager.h"
 #include "ZEDEditor.h"
 
@@ -46,8 +47,6 @@
 #include <windows.h>
 
 #undef RegisterClass
-
-extern HINSTANCE ApplicationInstance;
 
 void ZEDEditorCore::LoadClasses()
 {
@@ -68,19 +67,17 @@ bool ZEDEditorCore::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())
 		return false;
-/*
+
 	ZEInt argc = 0;
 	char** argv = NULL;
 	Application = new QApplication(argc, argv);
 
 	EngineCore = ZECore::GetInstance();
 
-	EngineCore->GetOptions()->Load("options.ini");
+	EngineCore->GetOptions()->Load("#E:/Options.ini");
 	EngineCore->GetOptions()->ResetChanges();
 	EngineCore->GetSystemMessageManager()->SetEnabled(false);
-	ApplicationInstance = (HINSTANCE)GetModuleHandle(NULL);
-
-	LoadClasses();
+	EngineCore->SetConfigurationPath("#E:/Configurations/ZECore-ZEDEditor.ZEConfig");
 
 	if (!EngineCore->StartUp())
 	{
@@ -88,10 +85,10 @@ bool ZEDEditorCore::InitializeInternal()
 		return false;
 	}
 
-	EngineCore->SetState(ZE_CS_RUNNING);
+	LoadClasses();
 
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
-		Editors[I]->Initialize();*/
+		Editors[I]->Initialize();
 
 	return true;
 }
@@ -139,23 +136,19 @@ void ZEDEditorCore::ExecuteEditor(ZEDEditor* Editor)
 
 void ZEDEditorCore::Execute()
 {
-	/*while(!ExitFlag)
+	while(!ExitFlag)
 	{
 		ZECoreState State = EngineCore->GetState();
-
-		if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
-			DeinitializeInternal();
-
 		EngineCore->MainLoop();
 
 		for (ZESize I = 0; I < Editors.GetCount(); I++)
-			Editors[I]->Process(EngineCore->GetElapsedTime());
+			Editors[I]->Process(EngineCore->GetTimeManager()->GetFrameTime());
 
 		for (ZESize I = 0; I < Editors.GetCount(); I++)
-			Editors[I]->PostProcess(EngineCore->GetElapsedTime());
+			Editors[I]->PostProcess(EngineCore->GetTimeManager()->GetFrameTime());
 
 		Application->processEvents();
-	}*/
+	}
 }
 
 void ZEDEditorCore::Exit()

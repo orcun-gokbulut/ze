@@ -90,6 +90,7 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZEProfiler*									Profiler;
 		ZESystemMessageManager*						SystemMessageManager;
 		ZESystemMessageHandler*						SystemMessageHandler;	
+		ZEString									ConfigurationPath;
 
 		void										SetState(ZECoreState CoreState);
 
@@ -125,6 +126,9 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZESystemMessageManager*						GetSystemMessageManager();
 		void*										GetApplicationInstance();
 
+		void										SetConfigurationPath(const ZEString& Path);
+		const ZEString&								GetConfigurationPath() const;
+
 		ZEModule*									GetModule(ZEClass* ModuleClass) const;
 		const ZEList2<ZEModule>&					GetModules() const;
 		bool										AddModule(ZEModule* Module);
@@ -141,7 +145,9 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		void										Execute();
 
 		bool										LoadConfiguration();
+		bool										LoadConfiguration(const ZEString& FileName);
 		bool										SaveConfiguration();
+		bool										SaveConfiguration(const ZEString& FileName);
 
 		static ZECore*								GetInstance();
 
