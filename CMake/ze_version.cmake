@@ -105,11 +105,11 @@ macro(ze_version_generate_version_info PARAMETER_TARGET PARAMETER_DESCRIPTION)
 			get_filename_component(PARAMETER_TARGET_FILENAME "${PARAMETER_TARGET_LOCATION}" NAME)	
 			configure_file(
 				"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
-				"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
+				"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.${PARAMETER_TARGET}.rc"
 				@ONLY)
 		endif()
-		target_sources(${PARAMETER_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
-		source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+		target_sources(${PARAMETER_TARGET} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.${PARAMETER_TARGET}.rc")
+		source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.${PARAMETER_TARGET}.rc")
 	endif()
 endmacro()
 

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDIconResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,33 +30,22 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by ZEIconResource.rc
+//
+#define IDI_ZEDICON						108
 
-project (ZEditor)
-ze_set_project_folder("ZEDEditor")
-
-find_package(Qt5 COMPONENTS Widgets)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-add_subdirectory(ZEDUserInterface)
-add_subdirectory(ZEDEntityEditor)
-add_subdirectory(ZEDTrainIGEditor)
-
-ze_add_source(ZEDMain.cpp				Sources)
-ze_add_source(ZEDIcon.ico				Sources)
-ze_add_source(ZEDIconResource.rc		Sources)
-ze_add_source(ZEDIconResource.h			Sources)
-
-ze_add_executable(TARGET ZEDEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
-
-qt5_use_modules(ZEDEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDEntityEditor ZEDTrainIGEditor)
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        109
+#define _APS_NEXT_COMMAND_VALUE         40003
+#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif

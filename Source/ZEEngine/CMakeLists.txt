@@ -61,6 +61,11 @@ add_subdirectory(ZEUI)
 #add_subdirectory(ZETerrain)
 add_subdirectory(ZEResource)
 
+ze_add_source(ZEMain.cpp					SourcesExe)
+ze_add_source(ZEIcon.ico					SourcesExe)
+ze_add_source(ZEIconResource.rc				SourcesExe)
+ze_add_source(ZEIconResource.h				SourcesExe)
+
 ze_add_source(ZEEngine.h					Sources)
 ze_add_source(ZEEngine.cpp					Sources)
 ze_add_source(ZEExport.ZEEngine.cpp			Sources Headers)
@@ -74,7 +79,7 @@ ze_add_library(TARGET ZEEngine DLL
 ze_end_components(TARGET ZEEngine)
 
 ze_add_executable(TARGET ZE 
-	SOURCES ZEMain.cpp ZECore/ZEWindowResources.rc
+	SOURCES ${SourcesExe}
 	LIBS ZEEngine)
 
 add_dependencies(ZE ZEModules)
