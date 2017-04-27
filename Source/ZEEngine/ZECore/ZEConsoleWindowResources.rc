@@ -1,6 +1,6 @@
 // Microsoft Visual C++ generated resource script.
 //
-#include "ZEWindowResources.h"
+#include "ZEConsoleWindowResources.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -29,7 +29,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 1 TEXTINCLUDE 
 BEGIN
-    "ZEWindowResources.h\0"
+    "ZEConsoleWindowResources.h\0"
 END
 
 2 TEXTINCLUDE 
@@ -113,15 +113,6 @@ BEGIN
     VK_RETURN,      ID_ACCELERATOR40001,    VIRTKEY, NOINVERT
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_ICON1               ICON                    "../zinek_engine.ico"
 #endif    // Turkish resources
 /////////////////////////////////////////////////////////////////////////////
 

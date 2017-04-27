@@ -139,7 +139,7 @@ void ZEDEditorCore::Execute()
 	while(!ExitFlag)
 	{
 		ZECoreState State = EngineCore->GetState();
-		EngineCore->MainLoop();
+		EngineCore->Process();
 
 		for (ZESize I = 0; I < Editors.GetCount(); I++)
 			Editors[I]->Process(EngineCore->GetTimeManager()->GetFrameTime());

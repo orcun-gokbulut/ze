@@ -594,14 +594,11 @@ void ZECore::ShutDown()
 
 	StartedCoreInstanceCount--;
 }
-#include "ZEPhysics/ZEPhysicalWorld.h"
 
-void ZECore::MainLoop()
+void ZECore::Process()
 {
-	if (GetState() != ZE_CS_PAUSED)
+	if (GetState() != ZE_CS_RUNNING)
 		return;
-
-	State = ZE_CS_RUNNING;
 
 	const ZETimeParameters* Parameters = GetTimeManager()->GetParameters();
 	GetConsole()->Process();
@@ -615,16 +612,21 @@ void ZECore::MainLoop()
 
 	ze_for_each(Module, Modules)
 		Module->PostProcess(Parameters);
-
-	State = ZE_CS_PAUSED;
 }
 
-void ZECore::Execute()
+void ZECore::MainLoop()
 {
-	StartUp();
-
 	while (State == ZE_CS_RUNNING)
-		MainLoop();
+		Process();
+}
+
+bool ZECore::Execute()
+{
+	if (!StartUp())
+		return false;
+
+	Run();
+	MainLoop();
 
 	ShutDown();
 }
@@ -734,8 +736,6 @@ void ZECore::Run()
 {
 	zeCheckError(State != ZE_CS_PAUSED, ZE_VOID, "Cannot run the core. Core is not started up or paused.");
 	SetState(ZE_CS_RUNNING);
-	while (State == ZE_CS_RUNNING)
-		MainLoop();
 }
 
 void ZECore::Pause()

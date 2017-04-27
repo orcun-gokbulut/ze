@@ -83,7 +83,7 @@ ze_add_source(ZELNContactModule.cpp				Sources)
 ze_add_source(ZELNContactModule.h				Sources)
 ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 
-ze_add_source(../ZEEngine/ZECore/ZEWindowResources.rc 	Sources)
+ze_add_source(../ZEEngine/ZEIconResource.rc 	Sources)
 
 set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
 find_package(Qt5 COMPONENTS Widgets)

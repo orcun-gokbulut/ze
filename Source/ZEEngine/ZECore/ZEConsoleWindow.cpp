@@ -38,7 +38,7 @@
 #include "ZECore.h"
 #include "ZEError.h"
 #include "ZETypes.h"
-#include "ZEWindowResources.h"
+#include "ZEConsoleWindowResources.h"
 #include "ZEPlatform.h"
 
 #define NOMINMAX
@@ -150,7 +150,7 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 
 bool ZEConsoleWindow::Initialize()
 {
-	Handle = CreateDialog((HINSTANCE)zeCore->GetApplicationInstance(), MAKEINTRESOURCE(IDD_CONSOLE), NULL, &ConsoleCallback);
+	Handle = CreateDialog((HINSTANCE)GetModuleHandle("ZEEngine.dll"), MAKEINTRESOURCE(IDD_CONSOLE), NULL, &ConsoleCallback);
 	if (Handle == NULL)
 	{
 		zeError("Can not create console window.");

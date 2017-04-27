@@ -140,9 +140,10 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 
 		void										Run();
 		void										Pause();
+		void										Process();
 		void										MainLoop();
 
-		void										Execute();
+		bool										Execute();
 
 		bool										LoadConfiguration();
 		bool										LoadConfiguration(const ZEString& FileName);
