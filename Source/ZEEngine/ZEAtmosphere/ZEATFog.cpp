@@ -187,7 +187,7 @@ ZEATFog::ZEATFog()
 
 ZEATFog::~ZEATFog()
 {
-	UnloadInternal();
+	Unload();
 }
 
 void ZEATFog::SetDensity(float Density)
