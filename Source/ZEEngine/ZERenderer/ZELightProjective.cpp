@@ -240,57 +240,6 @@ bool ZELightProjective::PreRender(const ZERNPreRenderParameters* Parameters)
 	return true;
 }
 
-//void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-//{
-//	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
-//		return;
-//
-//	// Do not update shadow map for second channel
-//	// Reuse the generated one for the first channel
-//	if (Parameters->Flags.GetFlags(ZERN_RF_STERIO_SECOND_PASS)) 
-//		return;
-//
-//	if (GetScene() == NULL)
-//		return;
-//
-//	UpdateShadowMap();
-//
-//	ZERNView View = ShadowRenderer.GetView();
-//	View.Position = Parameters->View->Position;
-//	View.Rotation = GetWorldRotation();
-//	View.Direction = GetWorldFront();
-//	View.U = GetWorldRight();
-//	View.V = GetWorldUp();
-//	View.N = GetWorldFront();
-//	View.VerticalFOV = FOV;
-//	View.HorizontalFOV = FOV;
-//	View.AspectRatio = AspectRatio;
-//	View.NearZ = 0.1f;
-//	View.FarZ = GetRange();
-//	View.ViewVolume = &GetViewVolume();
-//	View.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
-//
-//	ZERNPreRenderParameters PreRenderParameters;
-//	PreRenderParameters.Renderer = &ShadowRenderer;
-//	PreRenderParameters.View = &View;
-//	PreRenderParameters.Type = ZERN_RT_SHADOW;
-//
-//	ZEGRContext* Context = Parameters->Context;
-//	ShadowRenderer.SetContext(Context);
-//	ShadowRenderer.SetView(View);
-//	GetScene()->PreRender(&PreRenderParameters);
-//
-//	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
-//	this->ShadowMapIndex = const_cast<ZERNStageShadowing*>(StageShadowing)->ProjectiveShadowMapCount++;
-//	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, this->ShadowMapIndex);
-//
-//	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
-//	Context->SetRenderTargets(0, NULL, DepthBuffer);
-//	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
-//	
-//	ShadowRenderer.Render();
-//}
-
 ZELightProjective* ZELightProjective::CreateInstance()
 {
 	return new ZELightProjective();

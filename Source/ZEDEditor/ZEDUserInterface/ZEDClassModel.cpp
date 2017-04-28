@@ -53,10 +53,12 @@ bool ZEDClassModel::Filter(ZEClass* Class) const
 	if (!SearchPattern.GetPattern().IsEmpty() && !SearchPattern.Match(Class->GetName()))
 		return false;
 
-	bool IncludeResult = false;
+	bool IncludeResult = true;
 
 	if (IncludeFilter.GetCount() != 0)
 	{
+		IncludeResult = false;
+
 		for (ZESize I = 0; I < IncludeFilter.GetCount(); I++)
 		{
 			if (ZEClass::IsDerivedFrom(IncludeFilter[I], Class))
