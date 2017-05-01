@@ -73,12 +73,11 @@ bool ZEDEditorCore::InitializeInternal()
 	Application = new QApplication(argc, argv);
 
 	EngineCore = ZECore::GetInstance();
-
 	EngineCore->GetOptions()->Load("#E:/Options.ini");
 	EngineCore->GetOptions()->ResetChanges();
 	EngineCore->GetSystemMessageManager()->SetEnabled(false);
 	EngineCore->SetConfigurationPath("#E:/Configurations/ZECore-ZEDEditor.ZEConfig");
-
+	
 	if (!EngineCore->StartUp())
 	{
 		zeError("Cannot start up core.");
@@ -89,6 +88,8 @@ bool ZEDEditorCore::InitializeInternal()
 
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
 		Editors[I]->Initialize();
+
+	EngineCore->Run();
 
 	return true;
 }
@@ -142,10 +143,10 @@ void ZEDEditorCore::Execute()
 		EngineCore->Process();
 
 		for (ZESize I = 0; I < Editors.GetCount(); I++)
-			Editors[I]->Process(EngineCore->GetTimeManager()->GetFrameTime());
+			Editors[I]->Process(EngineCore->GetTimeManager()->GetFrameTimeDelta());
 
 		for (ZESize I = 0; I < Editors.GetCount(); I++)
-			Editors[I]->PostProcess(EngineCore->GetTimeManager()->GetFrameTime());
+			Editors[I]->PostProcess(EngineCore->GetTimeManager()->GetFrameTimeDelta());
 
 		Application->processEvents();
 	}

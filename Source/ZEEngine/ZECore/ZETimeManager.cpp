@@ -146,7 +146,7 @@ bool ZETimeManager::DeinitializeInternal()
 
 ZETimeManager::ZETimeManager()
 {
-	TickMode = ZE_TM_VARIABLE_INTERVAL;
+	Mode = ZE_TM_VARIABLE_INTERVAL;
 	FrameTimeInterval = 16.0f / 1000.0f; // 60 HZ
 	Reset();
 }
@@ -198,12 +198,12 @@ const ZETimeParameters* ZETimeManager::GetParameters() const
 
 void ZETimeManager::SetTickMode(ZETickMode Mode)
 {
-	TickMode = Mode;
+	Mode = Mode;
 }
 
 ZETickMode ZETimeManager::GetTickMode() const
 {
-	return TickMode;
+	return Mode;
 }
 
 void ZETimeManager::SetFrameTimeInterval(float Interval)
@@ -237,6 +237,8 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 	if (!Running)
 		return;
 	
+	Parameters.Mode = Mode;
+	Parameters.FrameTimeInterval = FrameTimeInterval;
 	Parameters.CycleId++;
 	Parameters.CycleTime = TimeCounter.GetTimeSeconds();
 
@@ -246,9 +248,9 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 	Parameters.CycleTimeDelta = Parameters.CycleTime - LastMeasuredTime;
 	LastMeasuredTime = Parameters.CycleTime;
 
-	if (TickMode == ZE_TM_FIXED_INTERVAL)
+	if (Mode == ZE_TM_FIXED_INTERVAL)
 		UpdateFrameFixedInterval();
-	else if (TickMode == ZE_TM_VARIABLE_INTERVAL)
+	else if (Mode == ZE_TM_VARIABLE_INTERVAL)
 		UpdateFrameVariableInterval();
 }
 

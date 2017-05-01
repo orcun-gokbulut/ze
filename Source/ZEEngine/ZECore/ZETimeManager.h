@@ -51,7 +51,7 @@ class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 	friend class ZETimer;
 	private:
 		ZETimeParameters						Parameters;
-		ZETickMode								TickMode;
+		ZETickMode								Mode;
 		ZEList2<ZETimer>						TimerList;
 		ZETimeCounter							TimeCounter;
 		float									FrameTimeInterval;

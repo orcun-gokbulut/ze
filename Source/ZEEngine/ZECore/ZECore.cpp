@@ -536,7 +536,6 @@ bool ZECore::StartUp()
 	if (GetApplicationModule() != NULL)
 		GetApplicationModule()->PreStartup();
 
-	CrashHandler->Initialize();
 	Console->Initialize();
 	Console->DisableInput();
 	
