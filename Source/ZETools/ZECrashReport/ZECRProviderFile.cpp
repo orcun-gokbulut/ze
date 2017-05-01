@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRProviderFile.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,118 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRProviderFile.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZEPlatform.h"
+#include "ZEFile/ZEFileInfo.h"
 
-enum ZECrashDumpType
+#ifdef ZE_PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#elif defined(ZE_PLATFORM_UNIX)
+	#include <unistd.h>
+#endif
+
+#include <stdio.h>
+
+ZECRDataProviderType ZECRProviderFile::GetProviderType()
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	return Binary ? ZECR_DPT_BINARY : ZECR_DPT_TEXT;
+}
 
-ZE_ENUM(ZECrashReason)
+const char*	ZECRProviderFile::GetName()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	return Name;
+}
 
-struct ZECrashReportParameters
+const char* ZECRProviderFile::GetExtension()
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+	return FileExtension;
+}
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+void ZECRProviderFile::SetName(const char* Name)
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	this->Name = Name;
+}
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+const char*	ZECRProviderFile::GetFileName()
+{
+	return FileName;
+}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+void ZECRProviderFile::SetFileName(const char* FileName)
+{
+	this->FileName = FileName;
+	FileExtension = ZEFileInfo(FileName).GetExtension();
+}
 
-									ZECrashHandler();
-									~ZECrashHandler();
+void ZECRProviderFile::SetDeleteOnExit(bool Delete)
+{
+	this->DeleteOnExit = Delete;
+}
 
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+bool ZECRProviderFile::GetDeleteOnExit()
+{
+	return DeleteOnExit;
+}
 
-		void						Crashed(ZECrashReason Reason);
+void ZECRProviderFile::SetBinary(bool Binary)
+{
+	this->Binary = Binary;
+}
 
-		static ZECrashHandler*		CreateInstance();
-};
+bool ZECRProviderFile::GetBinary()
+{
+	return Binary;
+}
+
+ZESize ZECRProviderFile::GetSize()
+{
+	return Size;
+}
+
+bool ZECRProviderFile::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	if (File == NULL)
+		return false;
+	
+	fseek((FILE*)File, Offset, SEEK_SET);
+	if (fread(Output, 1, Size, (FILE*)File) != Size)
+		return false;
+	
+	return true;
+}
+
+bool ZECRProviderFile::Generate()
+{
+	File = fopen(FileName, "rb");
+	
+	if (File == NULL)
+		return false;
+
+	fseek((FILE*)File, 0, SEEK_END);
+	Size = ftell((FILE*)File);
+
+	return true;
+}
+
+void ZECRProviderFile::CleanUp()
+{
+	if (File != NULL)
+		fclose((FILE*)File);
+
+	if (DeleteOnExit)
+	{
+		#ifdef ZE_PLATFORM_WINDOWS
+				DeleteFile(FileName);
+		#elif defined(ZE_PLATFORM_UNIX)
+				unlink(FileName);
+		#endif
+	}
+}
+
+ZECRProviderFile::ZECRProviderFile()
+{
+	DeleteOnExit = true;
+	Binary = false;
+}

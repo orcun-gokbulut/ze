@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEError.cpp
+ Zinek Engine - ZECRProviderMemoryDump.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,121 +33,93 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZEPlatform.h"
+#include "ZECRProviderMemoryDump.h"
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <DbgHelp.h>
+#pragma comment(lib, "DbgHelp.lib")
+#include "ZEDS/ZEFormat.h"
+#include "ZEGUID.h"
 
-#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-#define WINDOWS_MEAN_AND_LEAN
-#include <windows.h>
-#endif
-
-static ZELock BreakLock;
-
-static void DefaultErrorCallback(ZEErrorType Level)
+ZECRDataProviderType ZECRProviderMemoryDump::GetProviderType()
 {
-	if (Level >= ZE_ET_CRITICAL_ERROR)
-		abort();
+	return ZECR_DPT_BINARY;
 }
 
-void zeBreakLock()
+const char* ZECRProviderMemoryDump::GetName()
 {
-	BreakLock.Lock();
+	return "Crash Dump";
 }
 
-void zeBreakUnlock()
+const char* ZECRProviderMemoryDump::GetExtension()
 {
-	BreakLock.Unlock();
+	return ".dmp";
 }
 
-ZEError::ZEError()
+void ZECRProviderMemoryDump::SetProcessId(ZEUInt32 ProcessId)
 {
-	BreakOnAssertEnabled = true;
-	BreakOnErrorEnabled = true;
-	BreakOnWarningEnabled = true;
-	ErrorCallback = ZEErrorCallback::Create<&DefaultErrorCallback>();
+	this->ProcessId = ProcessId;
 }
 
-void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)
+ZEUInt32 ZECRProviderMemoryDump::GetProcessId()
 {
-	BreakOnAssertEnabled = Enabled;
+	return ProcessId;
 }
 
-bool ZEError::GetBreakOnDebugCheckEnabled()
+void ZECRProviderMemoryDump::SetDumpType(ZECrashDumpType Type)
 {
-	return BreakOnAssertEnabled;
+	DumpType = Type;
+}
+ZECrashDumpType ZECRProviderMemoryDump::GetDumpType()
+{
+	return DumpType;
 }
 
-void ZEError::SetBreakOnErrorEnabled(bool Enabled)
+bool ZECRProviderMemoryDump::Generate()
 {
-	BreakOnErrorEnabled = Enabled;
-}
+	MINIDUMP_TYPE DumpFlags;
 
-bool ZEError::GetBreakOnErrorEnabled()
-{
-	return BreakOnErrorEnabled;
-}
-
-void ZEError::SetBreakOnWarningEnabled(bool Enabled)
-{
-	BreakOnWarningEnabled = Enabled;
-}
-
-bool ZEError::GetBreakOnWarningEnabled()
-{
-	return BreakOnWarningEnabled;
-}
-
-const char* ZEError::GetErrorTypeString(ZEErrorType Type)
-{
-	switch(Type)
+	switch(DumpType)
 	{
-		case ZE_ET_CRITICAL_ERROR:
-			return "Critical Error";
+		case ZE_CDT_MINIMAL:		
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpNormal);
+			break;
 
-		case ZE_ET_ERROR:
-			return "Error";
+		case ZE_CDT_NORMAL:
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo);
+			break;
 
-		case ZE_ET_WARNING:
-			return "Warning";
-
-		case ZE_ET_DEBUG_CHECK_FAILED:
-			return "Debug Check Failed";
-
-		case ZE_ET_DEBUG_CHECK_WARNING:
-			return "Debug Check Warning";
-
-		default:
-			return "Unknown";
+		case ZE_CDT_FULL:
+			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithHandleData | MiniDumpWithThreadInfo);
+			break;
 	}
-}
 
-void ZEError::SetCallback(ZEErrorCallback Callback)
-{
-	ErrorCallback = Callback;
-}
+	char TempFolder[MAX_PATH];
+	if (GetTempPath (MAX_PATH, TempFolder) == 0)
+		return false;
 
-ZEErrorCallback ZEError::GetCallback()
-{
-	return ErrorCallback;
-}
+	SetFileName(ZEFormat::Format("{0}{1}.zeDump", TempFolder, ZEGUID::Generate().ToString()));
+	HANDLE hFile = CreateFileA(GetFileName(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-void ZEError::RaiseError(ZEErrorType Type)
-{
-	static ZELock Lock;
-	Lock.LockNested();
+	if(hFile == INVALID_HANDLE_VALUE)
+		return false;
 	
-	if (ErrorCallback != NULL)
-		ErrorCallback(Type);
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, ProcessId);
+	if(!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
+	{			
+		CloseHandle(hFile);
+		DeleteFileA(GetFileName());
+		return false;
+	}
 
-	Lock.Unlock();
+	CloseHandle(hFile);		
+	
+	return ZECRProviderFile::Generate();
 }
 
-ZEError* ZEError::GetInstance()
+ZECRProviderMemoryDump::ZECRProviderMemoryDump()
 {
-	static ZEError Instance;
-	return &Instance;
+	ProcessId = 0;
+	DumpType = ZE_CDT_NORMAL;
 }

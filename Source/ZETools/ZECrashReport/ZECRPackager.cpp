@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEError.cpp
+ Zinek Engine - ZECRPackager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,121 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZEPlatform.h"
+#include "ZECRPackager.h"
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include "ZECRProvider.h"
+#include "ZEFile\ZEFile.h"
+#include "ZECompression\ZECompressorZLIB.h"
+#include "ZEML\ZEMLWriter.h"
+#include "ZETimeStamp.h"
 
-#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-#define WINDOWS_MEAN_AND_LEAN
-#include <windows.h>
-#endif
-
-static ZELock BreakLock;
-
-static void DefaultErrorCallback(ZEErrorType Level)
+void ZECRPackager::SetOutputFileName(const char* FileName)
 {
-	if (Level >= ZE_ET_CRITICAL_ERROR)
-		abort();
+	OutputFileName = FileName;
 }
 
-void zeBreakLock()
+const char* ZECRPackager::GetOutputFileName()
 {
-	BreakLock.Lock();
+	return OutputFileName;
 }
 
-void zeBreakUnlock()
+void ZECRPackager::SetCrashReport(ZECRCrashReport* CrashReport)
 {
-	BreakLock.Unlock();
+	this->CrashReport = CrashReport;
 }
 
-ZEError::ZEError()
+ZECRCrashReport* ZECRPackager::GetCrashReport()
 {
-	BreakOnAssertEnabled = true;
-	BreakOnErrorEnabled = true;
-	BreakOnWarningEnabled = true;
-	ErrorCallback = ZEErrorCallback::Create<&DefaultErrorCallback>();
+	return CrashReport;
 }
 
-void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)
+bool ZECRPackager::Pack()
 {
-	BreakOnAssertEnabled = Enabled;
-}
+	ZEMLWriter Writer;
+	ZEMLWriterNode RootNode;
+	Writer.OpenRootNode("ZECRCrashReport", RootNode);
 
-bool ZEError::GetBreakOnDebugCheckEnabled()
-{
-	return BreakOnAssertEnabled;
-}
+	RootNode.WriteUInt32("VersionMajor", 1);
+	RootNode.WriteUInt32("VersionMinor", 0);
+	RootNode.WriteString("ComputerName", "");
 
-void ZEError::SetBreakOnErrorEnabled(bool Enabled)
-{
-	BreakOnErrorEnabled = Enabled;
-}
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+	ZEMLWriterNode TimeStampNode;
+	RootNode.OpenNode("TimeStamp", TimeStampNode);
+	TimeStampNode.WriteInt16("Year", TimeStamp.GetYear());
+	TimeStampNode.WriteInt16("Month", TimeStamp.GetMonth());
+	TimeStampNode.WriteInt16("Day", TimeStamp.GetDay());
+	TimeStampNode.WriteInt16("Hour", TimeStamp.GetHour());
+	TimeStampNode.WriteInt16("Minute", TimeStamp.GetMinute());
+	TimeStampNode.WriteInt16("Second", TimeStamp.GetSecond());
+	TimeStampNode.CloseNode();
 
-bool ZEError::GetBreakOnErrorEnabled()
-{
-	return BreakOnErrorEnabled;
-}
-
-void ZEError::SetBreakOnWarningEnabled(bool Enabled)
-{
-	BreakOnWarningEnabled = Enabled;
-}
-
-bool ZEError::GetBreakOnWarningEnabled()
-{
-	return BreakOnWarningEnabled;
-}
-
-const char* ZEError::GetErrorTypeString(ZEErrorType Type)
-{
-	switch(Type)
+	ZEMLWriterNode ProvidersNode;
+	RootNode.OpenNode("Providers", ProvidersNode);
+	for (ZESize I = 0; I < CrashReport->GetProviders().GetCount(); I++)
 	{
-		case ZE_ET_CRITICAL_ERROR:
-			return "Critical Error";
+		ZECRProvider* Provider = CrashReport->GetProviders()[I];
+		ZEMLWriterNode ProviderNode;
+		ProvidersNode.OpenNode("Provider", ProvidersNode);
+		
+		ProviderNode.WriteString("Name", Provider->GetName());
+		ProviderNode.WriteString("Extension", Provider->GetExtension());
 
-		case ZE_ET_ERROR:
-			return "Error";
+		ZEArray<ZEBYTE> Data;
+		Data.SetCount(Provider->GetSize());
+		Provider->GetData(Data.GetCArray(), 0, Data.GetSize());
+		
+		ProviderNode.WriteData("Data",  Data.GetCArray(), Data.GetCount());
 
-		case ZE_ET_WARNING:
-			return "Warning";
-
-		case ZE_ET_DEBUG_CHECK_FAILED:
-			return "Debug Check Failed";
-
-		case ZE_ET_DEBUG_CHECK_WARNING:
-			return "Debug Check Warning";
-
-		default:
-			return "Unknown";
+		ProviderNode.CloseNode();
 	}
-}
+	ProvidersNode.CloseNode();
+	RootNode.CloseNode();
 
-void ZEError::SetCallback(ZEErrorCallback Callback)
-{
-	ErrorCallback = Callback;
-}
-
-ZEErrorCallback ZEError::GetCallback()
-{
-	return ErrorCallback;
-}
-
-void ZEError::RaiseError(ZEErrorType Type)
-{
-	static ZELock Lock;
-	Lock.LockNested();
-	
-	if (ErrorCallback != NULL)
-		ErrorCallback(Type);
-
-	Lock.Unlock();
-}
-
-ZEError* ZEError::GetInstance()
-{
-	static ZEError Instance;
-	return &Instance;
+	return true;
 }

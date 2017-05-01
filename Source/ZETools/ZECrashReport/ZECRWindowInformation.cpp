@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRWindowInformation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRWindowInformation.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ui_ZECRWindowInformation.h"
+#include "ZECRWindow.h"
+#include "ZECRWindowViewReport.h"
+#include "ZECRWindowViewPrivacyPolicy.h"
 
-enum ZECrashDumpType
+#include <QDesktopServices>
+#include <QUrl>
+
+
+void ZECRWindowInformation::btnViewReport_Clicked()
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	ZECRWindowViewReport Viewer(GetWindow()->GetCrashReport());
+	Viewer.exec();
+}
 
-ZE_ENUM(ZECrashReason)
+void ZECRWindowInformation::btnViewPrivacyPolicy_Clicked()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	ZECRWindowViewPrivacyPolicy Viewer;
+	Viewer.exec();
+}
 
-struct ZECrashReportParameters
+void ZECRWindowInformation::btnGotoSupportPortal_Clicked()
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+	QDesktopServices::openUrl(QUrl("https://support.zinek.xyz"));
+}
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+void ZECRWindowInformation::btnSend_Clicked()
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	GetWindow()->SetPage(ZECR_WP_USER_FEEDBACK);
+}
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+void ZECRWindowInformation::btnDontSend_Clicked()
+{
+	qApp->exit(EXIT_FAILURE);
+}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+ZECRWindowInformation::ZECRWindowInformation(QWidget* Parent) : ZECRWindowPage(Parent)
+{
+	Form = new Ui_ZECRWindowInformation();
+	Form->setupUi(this);
 
-									ZECrashHandler();
-									~ZECrashHandler();
+	connect(Form->btnViewReport, SIGNAL(clicked()), this, SLOT(btnViewReport_Clicked()));
+	connect(Form->btnViewPrivacyPolicy, SIGNAL(clicked()), this, SLOT(btnViewPrivacyPolicy_Clicked()));
+	connect(Form->btnGotoSupportPortal, SIGNAL(clicked()), this, SLOT(btnGotoSupportPortal_Clicked()));
+	connect(Form->btnSend, SIGNAL(clicked()), this, SLOT(btnSend_Clicked()));
+	connect(Form->btnDontSend, SIGNAL(clicked()), this, SLOT(btnDontSend_Clicked()));
+}
 
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+ZECRWindowInformation::~ZECRWindowInformation()
+{
 
-		void						Crashed(ZECrashReason Reason);
-
-		static ZECrashHandler*		CreateInstance();
-};
+}

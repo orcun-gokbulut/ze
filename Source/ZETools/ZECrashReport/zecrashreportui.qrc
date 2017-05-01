@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="ZECrashReportUI">
-    <file>check_mark_green.png</file>
-    <file>ZinekCodeHouse.png</file>
-  </qresource>
-</RCC>

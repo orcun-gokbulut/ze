@@ -25,6 +25,9 @@
   </Node>
   <Node Name="Modules">
    <Node Name="Module">
+    <Property Name="Class" Type="String">ZECrashHandler</Property>
+   </Node>
+   <Node Name="Module">
     <Property Name="Class" Type="String">ZETimeManager</Property>
    </Node>
    <Node Name="Module">

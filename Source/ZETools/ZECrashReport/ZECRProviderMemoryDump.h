@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRProviderMemoryDump.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,69 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef	__ZE_CRASHREPORT_DUMPPROVIDER_H__
+#define __ZE_CRASHREPORT_DUMPPROVIDER_H__
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZECRProviderFile.h"
+#include "ZETypes.h"
+#include "ZECore/ZECrashHandler.h"
 
-enum ZECrashDumpType
+class ZECRProviderMemoryDump : public ZECRProviderFile
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
-
-ZE_ENUM(ZECrashReason)
-{
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
-
-struct ZECrashReportParameters
-{
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
-
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
-{
-	ZE_OBJECT
-	friend class ZECore;
 	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
-
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
-
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
-
-									ZECrashHandler();
-									~ZECrashHandler();
+		ZEUInt32							ProcessId;
+		ZECrashDumpType						DumpType;
 
 	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+		virtual const char*					GetName() override;
+		virtual	ZECRDataProviderType		GetProviderType() override;
+		virtual const char*					GetExtension() override;
+		virtual const char*					GetFileTypeDescription() override;
 
-		void						Crashed(ZECrashReason Reason);
+		void								SetProcessId(ZEUInt32 ProcessId);
+		ZEUInt32							GetProcessId();
 
-		static ZECrashHandler*		CreateInstance();
+		void								SetDumpType(ZECrashDumpType Type);
+		ZECrashDumpType						GetDumpType();
+
+		virtual bool						Generate() override;
+
+											ZECRProviderMemoryDump();
 };
+#endif

@@ -60,6 +60,7 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEFoundation.h"
 #include "ZEEngine.h"
+#include "ZEError.h"
 #undef ZE_CORE_MODULE_INCLUDES
 
 ZEOptionSection ZECore::CoreOptions; 
@@ -67,21 +68,24 @@ static HINSTANCE ApplicationInstance;
 
 static ZEInt StartedCoreInstanceCount = 0;
 
+static void ZEError_Callback(ZEErrorType Type)
+{
+	if (Type < ZE_ET_CRITICAL_ERROR)
+		return;
+
+	ZECore* Core = ZECore::GetInstance();
+	if (Core->GetCrashHandler() != NULL)
+		Core->GetCrashHandler()->Crashed(ZE_CR_CRITICIAL_ERROR);
+
+	ZECore::GetInstance()->Terminate();
+}
+
 static void ZECore_AtExit()
 {
 	if (StartedCoreInstanceCount != 0)
 		zeCriticalError("Unhandled exit function call detected. You cannot exit until core is shutdown. Terminating the core. This can cause huge problems.");
 
 	ZECore::GetInstance()->Terminate();
-}
-
-static LONG WINAPI ZEUnhandledExceptionHandler(EXCEPTION_POINTERS* Ex)
-{
-	zeCriticalError("Unhandled exception detected. Terminating the core. This can cause huge problems.");
-
-	ZECore::GetInstance()->Terminate();
-
-	return EXCEPTION_EXECUTE_HANDLER;
 }
 
 class ZECoreSystemMessageHandler : public ZESystemMessageHandler
@@ -102,7 +106,6 @@ bool ZECoreSystemMessageHandler::Callback(MSG* Message)
 			return false;
 	}
 }
-
 
 void ZECore::SetState(ZECoreState CoreState)
 {
@@ -509,9 +512,11 @@ bool ZECore::RemoveModule(ZEModule* Module)
 
 bool ZECore::StartUp()
 {
-	atexit(ZECore_AtExit);
-	SetUnhandledExceptionFilter(ZEUnhandledExceptionHandler);
+	OldErrorCallback = ZEError::GetInstance()->GetCallback();
+	ZEError::GetInstance()->SetCallback(ZEErrorCallback::Create<&ZEError_Callback>());
 
+	atexit(ZECore_AtExit);
+	
 	StartedCoreInstanceCount++;
 
 	ApplicationInstance = GetModuleHandle(NULL);
@@ -590,9 +595,10 @@ void ZECore::ShutDown()
 	ZEFoundation_UnregisterDeclarations();
 
 	SetState(ZE_CS_NONE);
-	SetUnhandledExceptionFilter(NULL);
-
+	
 	StartedCoreInstanceCount--;
+
+	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 }
 
 void ZECore::Process()
@@ -629,6 +635,8 @@ bool ZECore::Execute()
 	MainLoop();
 
 	ShutDown();
+
+	return true;
 }
 
 bool ZECore::LoadConfiguration()

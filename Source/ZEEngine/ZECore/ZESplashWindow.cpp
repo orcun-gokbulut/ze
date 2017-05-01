@@ -158,7 +158,7 @@ bool ZESplashWindow::InitializeInternal()
 	DWORD ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 	DWORD ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 	Data->Handle = CreateWindowEx(
-		WS_EX_TOPMOST | WS_EX_LAYERED, "ZESplashWindow", "", WS_POPUP, 
+		/*WS_EX_TOPMOST | */ WS_EX_LAYERED, "ZESplashWindow", "", WS_POPUP, 
 		(ScreenWidth - 400) / 2, (ScreenHeight - 300) / 2, 400,	300,
 		NULL, NULL,	Data->Instance,	Data);
 

@@ -38,30 +38,211 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEGUID.h"
 #include "ZEBase64.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include "ZEVersion.h"
 #include "ZELog.h"
 #include "ZELogSession.h"
+#include "ZEFile/ZEFileInfo.h"
+
+#include <stdlib.h>
+#include <signal.h>
+#include <new.h>
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+typedef void (__cdecl * SignalHandlerType)(int);
+
+LPTOP_LEVEL_EXCEPTION_FILTER OldUnhandledExceptionHandler = NULL;
+static _PNH OldOutOfMemoryHandler = NULL;
+static _invalid_parameter_handler OldInvalidParameterHandler = NULL;
+static _purecall_handler OldPureVirtualCallHandler = NULL;
+static SignalHandlerType OldAbortSignalHandler = NULL;
+static SignalHandlerType OldInvalidInstructionSignalHandler = NULL;
+static SignalHandlerType OldTerminateSignalHandler = NULL;
+
+#include "ZEThread/ZEThread.h"
+
+
+
+LONG WINAPI UnhandledExceptionHandler(EXCEPTION_POINTERS* Ex)
+{
+	ZECrashHandler* CrashHandler = ZECore::GetInstance()->GetCrashHandler();
+	if (CrashHandler != NULL)
+	{
+
+		switch (Ex->ExceptionRecord->ExceptionCode)
+		{
+			case EXCEPTION_ACCESS_VIOLATION:
+				CrashHandler->Crashed(ZE_CR_ACCESS_VIOLATION);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+				CrashHandler->Crashed(ZE_CR_INDEX_OUT_OF_BOUNDS);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			case EXCEPTION_PRIV_INSTRUCTION:
+			case EXCEPTION_ILLEGAL_INSTRUCTION:
+				CrashHandler->Crashed(ZE_CR_ILLEGAL_INSTRUCTION);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			case EXCEPTION_STACK_OVERFLOW:
+				CrashHandler->Crashed(ZE_CR_STACK_OVERFLOW);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			case EXCEPTION_INVALID_HANDLE:
+				CrashHandler->Crashed(ZE_CR_INVALID_CALL);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			case EXCEPTION_GUARD_PAGE:
+			case EXCEPTION_IN_PAGE_ERROR:
+				CrashHandler->Crashed(ZE_CR_OTHER);
+				return EXCEPTION_EXECUTE_HANDLER;
+
+			default:
+			case EXCEPTION_DATATYPE_MISALIGNMENT:
+			case EXCEPTION_BREAKPOINT:
+			case EXCEPTION_SINGLE_STEP:
+			case EXCEPTION_FLT_DENORMAL_OPERAND:
+			case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+			case EXCEPTION_FLT_INEXACT_RESULT:
+			case EXCEPTION_FLT_INVALID_OPERATION:
+			case EXCEPTION_FLT_OVERFLOW:
+			case EXCEPTION_FLT_STACK_CHECK:
+			case EXCEPTION_FLT_UNDERFLOW:
+			case EXCEPTION_INT_DIVIDE_BY_ZERO:
+			case EXCEPTION_INT_OVERFLOW:
+			case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+			case EXCEPTION_INVALID_DISPOSITION:
+			case CONTROL_C_EXIT:
+				CrashHandler->Crashed(ZE_CR_OTHER);
+				return EXCEPTION_EXECUTE_HANDLER;
+		}
+	}
+
+	if (OldUnhandledExceptionHandler != NULL)
+		return OldUnhandledExceptionHandler(Ex);
+
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static void PureVirtualCallHandler()
+{
+	ZECrashHandler* CrashHandler = ZECore::GetInstance()->GetCrashHandler();
+	if (CrashHandler != NULL)
+		CrashHandler->Crashed(ZE_CR_PURE_VIRTUAL_CALL);
+
+	if (OldPureVirtualCallHandler != NULL)
+		OldPureVirtualCallHandler();
+}
+
+static int OutOfMemoryHandler(size_t A)
+{  
+	ZECrashHandler* CrashHandler = ZECore::GetInstance()->GetCrashHandler();
+	if (CrashHandler != NULL)
+		CrashHandler->Crashed(ZE_CR_OUT_OF_MEMORY);
+
+	if (OldOutOfMemoryHandler != NULL)
+		return OldOutOfMemoryHandler(A);
+
+	return 0;
+}  
+
+static void InvalidParameterHandler(const wchar_t* A, const wchar_t* B, const wchar_t* C, unsigned int D, uintptr_t E)
+{
+	ZECrashHandler* CrashHandler = ZECore::GetInstance()->GetCrashHandler();
+	if (CrashHandler != NULL)
+		CrashHandler->Crashed(ZE_CR_INVALID_CALL);
+
+	if (OldInvalidParameterHandler != NULL)
+		OldInvalidParameterHandler(A, B, C, D, E);
+}
+
+static void SignalHandler(int Signal)
+{
+	ZECrashHandler* CrashHandler = ZECore::GetInstance()->GetCrashHandler();
+
+	switch (Signal)
+	{
+		default:
+			break;
+		
+		case SIGTERM:
+			if (CrashHandler != NULL)
+				CrashHandler->Crashed(ZE_CR_PREMATURE_TERMINATION);
+			
+			if (OldTerminateSignalHandler != NULL)
+				OldTerminateSignalHandler(Signal);
+
+			break;
+
+		case SIGABRT:
+			if (CrashHandler != NULL)
+				CrashHandler->Crashed(ZE_CR_ABORT);
+
+			if (OldAbortSignalHandler != NULL)
+				OldAbortSignalHandler(Signal);
+
+			break;
+		
+		case SIGILL:
+			if (CrashHandler != NULL)
+				CrashHandler->Crashed(ZE_CR_OTHER);
+
+			if (OldInvalidInstructionSignalHandler != NULL)
+				OldInvalidInstructionSignalHandler(Signal);
+
+			break;
+	}
+}
+
+void ZECrashHandler::RegisterHandlers()
+{
+	_set_new_mode(1);
+
+	OldUnhandledExceptionHandler = SetUnhandledExceptionFilter(UnhandledExceptionHandler);
+	OldOutOfMemoryHandler = _set_new_handler(OutOfMemoryHandler);
+	OldInvalidParameterHandler = _set_invalid_parameter_handler(InvalidParameterHandler);
+	OldPureVirtualCallHandler = _set_purecall_handler(PureVirtualCallHandler);   
+	OldAbortSignalHandler = signal(SIGABRT, SignalHandler);
+	OldInvalidInstructionSignalHandler = signal(SIGILL, SignalHandler);
+	OldTerminateSignalHandler = signal(SIGTERM, SignalHandler);
+}
+
+void ZECrashHandler::UnregisterHandlers()
+{
+	SetUnhandledExceptionFilter(OldUnhandledExceptionHandler);
+	_set_new_handler(OldOutOfMemoryHandler);
+	_set_invalid_parameter_handler(OldInvalidParameterHandler);
+	_set_purecall_handler(OldPureVirtualCallHandler);   
+	signal(SIGABRT, OldAbortSignalHandler);
+	signal(SIGILL, OldInvalidInstructionSignalHandler);
+	signal(SIGTERM, OldTerminateSignalHandler);
+}
+
+bool ZECrashHandler::InitializeInternal()
+{
+	if (!ZEModule::InitializeInternal())
+		return false;
+
+	RegisterHandlers();
+
+	return true;
+}
+
+bool ZECrashHandler::DeinitializeInternal()
+{
+
+	UnregisterHandlers();
+
+	return ZEModule::DeinitializeInternal();
+}
 
 ZECrashHandler::ZECrashHandler()
 {
-
-	Enable = true;
-	Initialized = false;
-	CrashDumpType = ZE_CDT_NORMAL;
-
-	#if(_DEBUG)
-	{
-		CrashReport = true;
-		CreateCrashDump = true;
-	}
+	#if ZE_DEBUG_ENABLE
+		ExecuteCrashReporter = true;
 	#else
-	{
-		CreateCrashDump = true;
-		CrashReport = true;
-	}
+		ExecuteCrashReporter = true;
 	#endif
 }
 
@@ -70,72 +251,64 @@ ZECrashHandler::~ZECrashHandler()
 	Deinitialize();
 }
 
-LONG WINAPI ZEUnhandledExceptionHandler(EXCEPTION_POINTERS* Ex)
+void CrashReportTestThreadFunction(ZEThread* Thread, void* Parameters)
 {
-	if(zeCore->GetCrashHandler()->GetEnable())
-	{
-		zeCore->GetCrashHandler()->SetCrashDumpType(ZE_CDT_FULL);
-		zeCore->GetCrashHandler()->SetCreateCrashDump(true);
-		zeCore->GetCrashHandler()->SetCrashReport(true);
-		zeCore->GetCrashHandler()->Crashed();		
-	}
-
-	return EXCEPTION_EXECUTE_HANDLER;
+	ZEString DLLPath = ZEFileInfo("#E:/ZECRCrashReporter.dll").GetRealPath().Path;
+	HMODULE Handle = LoadLibrary(DLLPath);
+	typedef void (*ZEReportCrashFunction)(HWND, HINSTANCE, LPSTR, int);
+	ZEReportCrashFunction ReportCrash = reinterpret_cast<ZEReportCrashFunction>(GetProcAddress(Handle, "ReportCrash"));
+	ReportCrash(NULL, Handle, (char*)Parameters, SW_SHOW);
 }
 
-void ZECrashHandler::Crashed()
+void ZECrashHandler::Crashed(ZECrashReason Reason)
 {
-	if (!Enable)
+	if (!GetEnabled())
 		return;
 
-	if (CrashReport)
-	{		
-		HMODULE CrashReportDLL = LoadLibrary("C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReport/Debug/ZECrashReport.dll");		
-		if (CrashReportDLL == NULL)
-			return;
-
-		void* FunctionPointer = GetProcAddress(CrashReportDLL, "CrashReportMain");
-		if (FunctionPointer == NULL)
-			return;
-
-		ZECrashReportParameters Data;
-		Data.ProcessId = GetCurrentProcessId();
-		Data.CreateDump = GetCreateCrashDump();
-		Data.DumpType = GetCrashDumpType();
-		Data.LogFile = !ZELog::GetInstance()->GetRootSession()->GetLogFileName().IsEmpty();
-		//strcpy(Data.LogFilePath, ZELog::GetInstance()->GetLogFileName());
-		strcpy(Data.URL, "http://localhost:8080/puttest/test.dat");
-		Data.Version = ZEVersion::GetZinekVersion();
-
-		ZEString NamedPipeName = "\\\\.\\pipe\\fsdf";//+ ZEGUID::Generate().ToString();		
-
-		HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_WAIT, 1, NULL, NULL, INFINITE, NULL);
-		
-		ZEString CommandArgument = "rundll32.exe C:/Users/onur.babaoglu/Desktop/ZE/trunk/Build/x64/Source/ZETools/ZECrashReport/Release/ZECrashReport.dll, CrashReportMain fsdf";
-		
-		if(WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
-			return;
-
-		ConnectNamedPipe(NamedPipeHandle, NULL);
-		DWORD Temp;
-		WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), &Temp, NULL);
-		DWORD Result;
-		ReadFile(NamedPipeHandle, &Result, sizeof(DWORD), &Temp, NULL);
-	}
-}
-
-void ZECrashHandler::Initialize()
-{
-	if (Initialized)
+	if (!ExecuteCrashReporter)
 		return;
 
-	SetUnhandledExceptionFilter(ZEUnhandledExceptionHandler);
-}
+	CrashLock.Lock();
 
-void ZECrashHandler::Deinitialize()
-{
-	if (!Initialized)
-		return;
+	UnregisterHandlers();
 
-	SetUnhandledExceptionFilter(NULL);
+	ZEString GUID = ZEGUID::Generate().ToString();
+	ZEString NamedPipeName = ZEFormat::Format("\\\\.\\pipe\\ZECRCrashReporter-{0}", GUID);
+	HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_WAIT, 1, NULL, NULL, INFINITE, NULL);
+	if (NamedPipeHandle == INVALID_HANDLE_VALUE)
+		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+
+	ZEString DLLPath = ZEFileInfo("#E:/ZECRCrashReporter.dll").GetRealPath().Path;
+	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\", ReportCrash \"{1}\"", DLLPath, NamedPipeName);
+
+	#define ZECR_CRASH_REPORT_TEST
+	#ifndef ZECR_CRASH_REPORT_TEST
+		if (WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
+			TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+	#else
+		static ZEThread CrashReporterThread;
+		CrashReporterThread.SetParameter((void*)NamedPipeName.ToCString());
+		CrashReporterThread.SetFunction(ZEThreadFunction::Create<CrashReportTestThreadFunction>());
+		CrashReporterThread.Run();
+	#endif
+
+	ConnectNamedPipe(NamedPipeHandle, NULL);
+
+	DWORD Signal;
+	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
+	if (Signal != 0xEEFF0012)
+		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+
+	ZECrashReportParameters Data;
+	Data.ProcessId = GetCurrentProcessId();
+	Data.Reason = Reason;
+	strncpy(Data.LogFilePath, ZELog::GetInstance()->GetRootSession()->GetLogFileName().ToCString(), 1024);
+	
+	if (!WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), NULL, NULL))
+		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+
+	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
+
+	Sleep(INFINITE);
+	TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
 }

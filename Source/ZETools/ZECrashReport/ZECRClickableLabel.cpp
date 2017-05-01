@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRClickableLabel.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRClickableLabel.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
-
-enum ZECrashDumpType
+ZECRClickableLabel::ZECRClickableLabel(const QString text, QWidget* parent) : QLabel(parent)
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	this->setText(text);
+	QPalette palette;
+	QBrush brush1(QColor(0, 0, 255, 255));
+	palette.setBrush(QPalette::Active, QPalette::WindowText, brush1);
+	palette.setBrush(QPalette::Inactive, QPalette::WindowText, brush1);
+	QBrush brush2(QColor(120, 120, 120, 255));
+	brush2.setStyle(Qt::SolidPattern);
+	palette.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+	this->setPalette(palette);
+	QFont font1;
+	font1.setUnderline(true);
+	this->setFont(font1);
+	this->setCursor(QCursor(Qt::PointingHandCursor));
+}
 
-ZE_ENUM(ZECrashReason)
+ZECRClickableLabel::~ZECRClickableLabel()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
 
-struct ZECrashReportParameters
+}
+
+void ZECRClickableLabel::mousePressEvent (QMouseEvent* Event)
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
-
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
-{
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
-
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
-
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
-
-									ZECrashHandler();
-									~ZECrashHandler();
-
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
-
-		void						Crashed(ZECrashReason Reason);
-
-		static ZECrashHandler*		CreateInstance();
-};
+	QLabel::mousePressEvent(Event);
+	emit clicked();
+}

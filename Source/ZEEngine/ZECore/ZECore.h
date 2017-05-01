@@ -91,6 +91,7 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZESystemMessageManager*						SystemMessageManager;
 		ZESystemMessageHandler*						SystemMessageHandler;	
 		ZEString									ConfigurationPath;
+		ZEErrorCallback								OldErrorCallback;
 
 		void										SetState(ZECoreState CoreState);
 

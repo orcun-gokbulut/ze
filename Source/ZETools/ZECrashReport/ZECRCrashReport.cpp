@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRCrashReport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRCrashReport.h"
+#include "ZECRProvider.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
-
-enum ZECrashDumpType
+const ZEArray<ZECRProvider*>& ZECRCrashReport::GetProviders()
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	return Providers;
+}
 
-ZE_ENUM(ZECrashReason)
+ZECRProvider* ZECRCrashReport::GetProvider(const ZEString& Name)
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	for (ZESize I = 0; I < Providers.GetCount(); I++)
+	{
+		if (Name == Providers[I]->GetName())
+			return Providers[I];
+	}
 
-struct ZECrashReportParameters
+	return NULL;
+}
+
+bool ZECRCrashReport::RegisterProvider(ZECRProvider* Provider)
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+	if (Providers.Exists(Provider))
+		return false;
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+	Providers.Add(Provider);
+
+	return true;
+}
+
+void ZECRCrashReport::UnregisterProvider(ZECRProvider* Provider)
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	Providers.RemoveValue(Provider);
+	delete Provider;
+}
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+void ZECRCrashReport::Generate()
+{
+	for (ZESize I = 0; I < Providers.GetCount(); I++)
+		Providers[I]->Generate();
+}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+void ZECRCrashReport::CleanUp()
+{
+	for (ZESize I = 0; I < Providers.GetCount(); I++)
+		Providers[I]->CleanUp();
+}
 
-									ZECrashHandler();
-									~ZECrashHandler();
-
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
-
-		void						Crashed(ZECrashReason Reason);
-
-		static ZECrashHandler*		CreateInstance();
-};
+ZECRCrashReport::~ZECRCrashReport()
+{
+	CleanUp();
+}

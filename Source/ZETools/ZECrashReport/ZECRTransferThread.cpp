@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRTransferThread.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,89 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRTransferThread.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZECrashReport/ZECRPackager.h"
+#include "ZECrashReport/ZECRSender.h"
 
-enum ZECrashDumpType
+#include "ZETimeStamp.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZECompression/ZECompressorZLIB.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
+void ZECRTransferThread::run()
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	SendReport();	
+}
 
-ZE_ENUM(ZECrashReason)
+ZECRTransferThread::ZECRTransferThread(ZECRCrashReport& CrashReport)
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	this->CrashReport = &CrashReport;		
+}
 
-struct ZECrashReportParameters
+ZECRTransferThread::~ZECRTransferThread()
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+}
+
+void ZECRTransferThread::SendReport()
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	if(!PackageItems())
+	{
+		emit UploadError();
+		return;
+	}
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+	if(!CompressPackage())
+	{		
+		emit UploadError();
+		return;
+	}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+	ZECRSender* Sender = new ZECRSender();
+	Sender->SetFileName(FileName);
+	Sender->SetUploadURL(UploadURL);
+	if(!Sender->OpenConnection())
+	{
+		CleanUp();
+		emit UploadError();
+		return;
+	}
+	Sender->CloseConnection();	
+	remove(FileName);	
+	emit UploadCompleted();
+}
 
-									ZECrashHandler();
-									~ZECrashHandler();
+bool ZECRTransferThread::PackageItems()
+{
+	char ComputerName[256];
+	DWORD Size = sizeof(ComputerName);
+	GetComputerNameA(ComputerName, &Size);
+	FileName = ZEFormat::Format("#S:/CrashReports/{0}-{1}.ZECrashReport", ComputerName, ZETimeStamp::Now().ToString("%Y%m%d-%H%M%S"));
 
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+	ZECRPackager* Packager = new ZECRPackager();
+	Packager->SetCrashReport(CrashReport);
+	Packager->SetOutputFileName(ZEFormat::Format("{0}.uncompressed", FileName));
 
-		void						Crashed(ZECrashReason Reason);
+	FileName = Packager->GetOutputFileName();
+	return Packager->Pack();
+}
 
-		static ZECrashHandler*		CreateInstance();
-};
+void ZECRTransferThread::CleanUp()
+{
+	ZEFileInfo PackedFileInfo(ZEFormat::Format("{0}.uncompressed", FileName));
+	PackedFileInfo.Delete();
+}
+
+void ZECRTransferThread::SetUploadURL(const char* UploadURL)
+{
+	this->UploadURL = UploadURL;
+}
+
+const char* ZECRTransferThread::GetUploadURL()
+{
+	return UploadURL;
+}

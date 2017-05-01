@@ -34,74 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECrashHandler.h"
+
 #include "ZECore.h"
-#include "ZEDS/ZEFormat.h"
 
-void ZECrashHandler::SetEnable(bool Enable)
+void ZECrashHandler::SetExecuteCrashReporter(bool Enabled)
 {
-	this->Enable = Enable;
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
+	ExecuteCrashReporter = Enabled;
 }
 
-bool ZECrashHandler::GetEnable()
+bool ZECrashHandler::GetExecuteCrashReporter() const
 {
-	return Enable;
+	return ExecuteCrashReporter;
 }
 
-void ZECrashHandler::SetCreateCrashDump(bool Enable)
+ZECrashHandler* ZECrashHandler::CreateInstance()
 {
-	CreateCrashDump = Enable;
-}
-
-bool ZECrashHandler::GetCreateCrashDump()
-{
-	return CreateCrashDump;
-}
-
-void ZECrashHandler::SetCrashDumpType(ZECrashDumpType CrashDumpType)
-{
-	this->CrashDumpType = CrashDumpType;
-}
-
-ZECrashDumpType ZECrashHandler::GetCrashDumpType()
-{
-	return CrashDumpType;
-}
-
-void ZECrashHandler::SetCrashReport(bool Enable)
-{
-	CrashReport = Enable;
-}
-
-bool ZECrashHandler::GetCrashReport()
-{
-	return CrashReport;
-}
-
-void ZECrashHandler::SetCrashDumpFilePath(const char* DumpFilePath)
-{
-	this->CrashDumpFilePath = DumpFilePath;
-}
-
-const char*	ZECrashHandler::GetCrashDumpFilePath()
-{
-	return CrashDumpFilePath;
-}
-
-ZECrashHandler*	ZECrashHandler::GetInstance()
-{
-	return ZECore::GetInstance()->GetCrashHandler();
-}
-
-ZEString ZECrashHandler::GenerateCommandArguments()
-{
-	ZEString Arguments = "<ZECrashReport>";
-
-	Arguments += "</ZECrashReport>";
-
-	return Arguments;
+	return new ZECrashHandler();
 }

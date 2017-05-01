@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRProviderUserFeedback.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRProviderUserFeedback.h"
 
 #include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEFormat.h"
 
-enum ZECrashDumpType
+#include <memory.h>
+
+const char* ZECRProviderUserFeedback::GetName()
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	return "UserFeedback";
+}
 
-ZE_ENUM(ZECrashReason)
+ZECRDataProviderType ZECRProviderUserFeedback::GetProviderType()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	return ZECR_DPT_TEXT;
+}
 
-struct ZECrashReportParameters
+const char* ZECRProviderUserFeedback::GetExtension()
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+	return ".xml";
+}
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+void ZECRProviderUserFeedback::SetNameSurname(const char* Name)
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	NameSurname = Name;
+}
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+const char* ZECRProviderUserFeedback::GetNameSurname()
+{
+	return NameSurname;
+}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+void ZECRProviderUserFeedback::SetEMail(const char* EMail)
+{
+	this->EMail = EMail;
+}
 
-									ZECrashHandler();
-									~ZECrashHandler();
+const char* ZECRProviderUserFeedback::GetEMail()
+{
+	return EMail;
+}
 
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+void ZECRProviderUserFeedback::SetComment(const char* Comment)
+{
+	this->Comments = Comment;
+}
 
-		void						Crashed(ZECrashReason Reason);
+const char* ZECRProviderUserFeedback::GetComment()
+{
+	return Comments;
+}
 
-		static ZECrashHandler*		CreateInstance();
-};
+void ZECRProviderUserFeedback::SetContactBack(bool ContactBack)
+{
+	this->ContactBack = ContactBack;
+}
+
+bool ZECRProviderUserFeedback::GetContactBack()
+{
+	return ContactBack;
+}
+
+ZESize ZECRProviderUserFeedback::GetSize()
+{
+	return Size;
+}
+
+bool ZECRProviderUserFeedback::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	memcpy(Output, Data.GetValue() + Offset, Size);
+	return true;
+}
+
+bool ZECRProviderUserFeedback::Generate()
+{
+	Data = ZEFormat::Format(
+		"<ZECrashReport>\n"
+		"  <UserComments>\n"
+		"    <NameSurname>{0}</NameSurname>\n"
+		"    <EMail>{1}</Email>\n"
+		"    <ContactBack>{2}</ContactBack>\n"
+		"    <Comments><![CDATA[\n"
+		"{3}\n"
+		"    ]]></Comments>\n"
+		"  </UserComments>\n"
+		"<ZECrashReport>\n", NameSurname, EMail, ContactBack ? "yes" : "no", Comments);
+	Size = Data.GetLength() + 1;
+	
+	return true;
+}

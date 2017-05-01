@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRWindowViewPrivacyPolicy.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRWindowViewPrivacyPolicy.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "Ui_ZECRWindowViewPrivacyPolicy.h"
 
-enum ZECrashDumpType
+ZECRWindowViewPrivacyPolicy::ZECRWindowViewPrivacyPolicy(QWidget *Parent) : QDialog(Parent)
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	Form = new Ui_ZECRWindowViewPrivacyPolicy();
+	Form->setupUi(this);
 
-ZE_ENUM(ZECrashReason)
+	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(close()));
+}
+
+ZECRWindowViewPrivacyPolicy::~ZECRWindowViewPrivacyPolicy()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
-
-struct ZECrashReportParameters
-{
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
-
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
-{
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
-
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
-
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
-
-									ZECrashHandler();
-									~ZECrashHandler();
-
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
-
-		void						Crashed(ZECrashReason Reason);
-
-		static ZECrashHandler*		CreateInstance();
-};
+	delete Form;
+}

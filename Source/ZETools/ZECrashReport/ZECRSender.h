@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRSender.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,67 +36,57 @@
 #pragma once
 
 #include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZETypes.h"
+#include "ZEThread/ZEThread.h"
+#include "ZEThread/ZELock.h"
 
-enum ZECrashDumpType
+enum ZECRSenderStatus
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
+	ZECR_SS_NONE,
+	ZECR_SS_TRANSMITTING,
+	ZECR_SS_DONE,
+	ZECR_SS_ERROR
 };
 
-ZE_ENUM(ZECrashReason)
-{
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
+struct ZECRSenderProgress
+{	
+	ZECRSenderStatus							Status;
+	ZESize										UploadedBytes;
+	ZESize										UploadedBytesPerSeconds;
+	ZESize										TransmitedBytes;
+	ZESize										TransmitedBytesPerSecond;
+	ZESize										ReceivedBytes;
+	ZESize										ReceivedBytesPerSecond;
 };
 
-struct ZECrashReportParameters
-{
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
-
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
-{
-	ZE_OBJECT
-	friend class ZECore;
+class ZECRSender
+{	
 	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+		ZEString								FileName;
+		ZEString								UploadURL;
+		void*									File;
+		void*									Curl;
+		ZESize									FileSize;
+		ZECRSenderProgress						Progress;
+		ZELock									ProgressLock;
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+		void									ResetProgress();
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
-
-									ZECrashHandler();
-									~ZECrashHandler();
-
+		static int								ProgressFunction(void* Output, double TotalDownloadSize, double Downloaded, double TotalUploadSize, double Uploaded);
+	
 	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+		void									SetFileName(const char* FileName);
+		const char*								GetFileName();
+		void									SetUploadURL(const char* ServerAddress);
+		const char*								GetUploadURL();
+		ZESize									GetFileSize();
+		ZESize									GetTransferedDataSize();
 
-		void						Crashed(ZECrashReason Reason);
+		ZECRSenderProgress						GetProgress();
+		bool									OpenConnection();
+		bool									TransferChunk();
+		void									CloseConnection();
 
-		static ZECrashHandler*		CreateInstance();
+												ZECRSender();
+												~ZECRSender();
 };

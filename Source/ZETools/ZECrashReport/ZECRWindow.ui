@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZECRWindow</class>
+ <widget class="QDialog" name="ZECRWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>601</width>
+    <height>650</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label_8">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>125</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::WinPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Sunken</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="../../ZELNLauncher/ZELNLauncher.qrc">:/ZELNLauncher/Logo.png</pixmap>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stckWidgets">
+     <property name="currentIndex">
+      <number>4</number>
+     </property>
+     <widget class="ZECRWindowGeneratingReport" name="widGeneratingReport"/>
+     <widget class="ZECRWindowInformation" name="widInformation"/>
+     <widget class="ZECRWindowUserFeedback" name="widUserFeedback"/>
+     <widget class="ZECRWindowTransfering" name="widTransfering"/>
+     <widget class="ZECRWindowTransferCompleted" name="widTransferCompleted"/>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ZECRWindowGeneratingReport</class>
+   <extends>QWidget</extends>
+   <header>ZECRWindowGeneratingReport.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ZECRWindowInformation</class>
+   <extends>QWidget</extends>
+   <header>ZECRWindowInformation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ZECRWindowUserFeedback</class>
+   <extends>QWidget</extends>
+   <header>ZECRWindowUserFeedback.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ZECRWindowTransfering</class>
+   <extends>QWidget</extends>
+   <header>ZECRWindowTransfering.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ZECRWindowTransferCompleted</class>
+   <extends>QWidget</extends>
+   <header>ZECRWindowTransferCompleted.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../ZELNLauncher/ZELNLauncher.qrc"/>
+ </resources>
+ <connections/>
+</ui>

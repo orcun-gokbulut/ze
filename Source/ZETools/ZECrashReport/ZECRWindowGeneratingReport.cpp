@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashHandler.h
+ Zinek Engine - ZECRWindowGeneratingReport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRWindowGeneratingReport.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEVersion.h"
-#include "ZEExport.ZEEngine.h"
-#include "ZEModule.h"
+#include "ZECRWindow.h"
+#include "ZECRCrashReport.h"
+#include "ui_ZECRWindowGeneratingReport.h"
 
-enum ZECrashDumpType
+void ZECRWindowGeneratingReport::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
-};
+	GetWindow()->GetCrashReport()->Generate();
+	GetWindow()->SetPage(ZECR_WP_INFORMATION);
+}
 
-ZE_ENUM(ZECrashReason)
+void ZECRWindowGeneratingReport::Activated()
 {
-	ZE_CR_NONE,
-	ZE_CR_CRITICIAL_ERROR,
-	ZE_CR_UNHANDLED_EXCEPTION,
-	ZE_CR_UNHANDLED_SYSTEM_EXCEPTION,
-	ZE_CR_ACCESS_VIOLATION,
-	ZE_CR_STACK_OVERFLOW,
-	ZE_CR_PREMATURE_TERMINATION,
-	ZE_CR_OUT_OF_MEMORY,
-	ZE_CR_PURE_VIRTUAL_CALL,
-	ZE_CR_INDEX_OUT_OF_BOUNDS,
-	ZE_CR_INVALID_CALL,
-	ZE_CR_PAGE_ERROR,
-	ZE_CR_ABORT,
-	ZE_CR_WATCH_DOG_TIMER,
-	ZE_CR_DIVISION_BY_ZERO,
-	ZE_CR_ILLEGAL_INSTRUCTION,
-	ZE_CR_OTHER
-};
+	GeneratorThread.Run();
+}
 
-struct ZECrashReportParameters
+void ZECRWindowGeneratingReport::btnCancel_clicked()
 {
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+	abort();
+}
 
-class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
+ZECRWindowGeneratingReport::ZECRWindowGeneratingReport(QWidget* Parent) : ZECRWindowPage(Parent)
 {
-	ZE_OBJECT
-	friend class ZECore;
-	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+	Form = new Ui_ZECRWindowGeneratingReport();
+	Form->setupUi(this);
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRWindowGeneratingReport, &ZECRWindowGeneratingReport::GeneratorThread_Function>(this));
+}
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
-
-									ZECrashHandler();
-									~ZECrashHandler();
-
-	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
-
-		void						Crashed(ZECrashReason Reason);
-
-		static ZECrashHandler*		CreateInstance();
-};
