@@ -150,7 +150,15 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 
 		NameplateIcon->SetTextureFileName(GetIconFileName());
 		NameplateName->SetText(ZEFormat::Format("{0} ({1})", GetName(), GetId()));
-		NameplateClass->SetText(ZEFormat::Format("Class: {0}", GetObjectClass()->GetName()));
+
+		ZEString ClassName;
+
+		if (GetObjectClass() != NULL)
+			ClassName = GetObjectClass()->GetName();
+		else
+			ClassName = "-";
+
+		NameplateClass->SetText(ZEFormat::Format("Class: {0}", ClassName));
 	}
 	else
 	{
