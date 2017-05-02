@@ -55,10 +55,10 @@
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 
-void ZELightProjective::LoadProjectionTexture()
+bool ZELightProjective::LoadProjectionTexture()
 {
 	if (ProjectionTextureFileName.IsEmpty())
-		return;
+		return false;
 
 	ZEGRTextureOptions TextureOptions;
 	TextureOptions.Type = ZEGR_TT_2D;
@@ -67,23 +67,35 @@ void ZELightProjective::LoadProjectionTexture()
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
 	ProjectionTexture = ZEGRTexture::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
+
+	return true;
 }
 
 ZEEntityResult ZELightProjective::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	LoadProjectionTexture();
+	ZE_ENTITY_RESOURCE_FENCE_LOADED(ProjectionTexture, ZE_ER_FAILED_CLEANUP)
+	{
+		if (!LoadProjectionTexture())
+			return ZE_ER_DONE;
+
+		return ZE_ER_WAIT;
+	}
 
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZELightProjective::UnloadInternal()
 {
-	ProjectionTexture.Release();
-	ShadowMap.Release();
+	if (ProjectionTexture != NULL)
+		ProjectionTexture.Release();
+
+	if (ShadowMap != NULL)
+		ShadowMap.Release();
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
+
 	return ZE_ER_DONE;
 }
 
@@ -94,11 +106,8 @@ ZELightProjective::ZELightProjective()
 	Command.Entity = this;
 	Command.Priority = 1;
 	FalloffExponent = 2.0f;
-}
-
-ZELightProjective::~ZELightProjective()
-{
-
+	ProjectionTexture = NULL;
+	ShadowMap = NULL;
 }
 
 ZELightType ZELightProjective::GetLightType() const
@@ -148,8 +157,8 @@ void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 
 	ProjectionTextureFileName = FileName;
 
-	if (IsLoadedOrLoading())
-		LoadProjectionTexture();
+	if (IsLoaded())
+		Reload();
 }
 
 const ZEString& ZELightProjective::GetProjectionTextureFile() const
