@@ -93,6 +93,9 @@ bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void
 
 void ZEDEntityWrapper::SetId(ZEInt Id)
 {
+	if (GetEntity() == NULL)
+		return;
+
 	if (GetEntity()->GetEntityId() == Id)
 		return;
 
@@ -103,6 +106,9 @@ void ZEDEntityWrapper::SetId(ZEInt Id)
 
 ZEInt ZEDEntityWrapper::GetId() const
 {
+	if (GetEntity() == NULL)
+		return -1;
+
 	return GetEntity()->GetEntityId();
 }
 
@@ -121,6 +127,9 @@ void ZEDEntityWrapper::SetName(const ZEString& Name)
 
 ZEString ZEDEntityWrapper::GetName() const
 {
+	if (GetEntity() == NULL)
+		return ZEString::Empty;
+
 	return GetEntity()->GetName();
 }
 
@@ -152,6 +161,9 @@ void ZEDEntityWrapper::SetVisible(bool Value)
 
 bool ZEDEntityWrapper::GetVisible() const
 {
+	if (GetEntity() == NULL)
+		return true;
+
 	return GetEntity()->GetVisible();
 }
 
