@@ -83,6 +83,15 @@ void ZERNRenderer::CreatePredefinedSamplers()
 {
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
+	ZEGRSamplerDescription SamplerPointMirrorDescription;
+	SamplerPointMirrorDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.AddressU = ZEGR_TAM_MIRROR;
+	SamplerPointMirrorDescription.AddressV = ZEGR_TAM_MIRROR;
+	SamplerPointMirrorDescription.AddressW = ZEGR_TAM_MIRROR;
+	SamplerPointMirror = ZEGRSampler::GetSampler(SamplerPointMirrorDescription);
+
 	ZEGRSamplerDescription SamplerLinearWrapDescription;
 	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
@@ -245,8 +254,8 @@ void ZERNRenderer::RenderStages()
 
 	UpdateConstantBuffers();
 
-	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
-	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
+	ZEGRSampler* Samplers[] = {SamplerPointMirror, SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
+	Context->SetSamplers(ZEGR_ST_PIXEL, 9, 7, Samplers);
 
 	ZEGRBuffer* PrevConstantBuffers[3] = {};
 	Context->GetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);

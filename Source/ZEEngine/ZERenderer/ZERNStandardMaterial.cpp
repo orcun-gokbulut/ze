@@ -356,6 +356,10 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RenderState.SetRasterizerState(RasterizerState);
 
+	ZEGRDepthStencilState DepthStencilState;
+	DepthStencilState.SetDepthFunction(ZEGR_CF_GREATER);
+	RenderState.SetDepthStencilState(DepthStencilState);
+
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
 

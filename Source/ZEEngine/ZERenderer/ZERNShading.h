@@ -89,6 +89,7 @@ struct ZERNShading_SpotLight
 
 struct ZERNShading_SpotLightShadow
 {
+	ZEMatrix4x4							ViewTransform;
 	ZEMatrix4x4							ProjectionTransform;
 	ZEUInt								ShadowSampleCount;
 	float								ShadowSampleLength;

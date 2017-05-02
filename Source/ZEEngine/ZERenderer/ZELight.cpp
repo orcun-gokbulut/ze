@@ -119,9 +119,9 @@ ZELight::ZELight()
 	DirtyFlags.RaiseAll();
 
 	CastsShadows = false;
-	ShadowSampleCount = ZERN_LSC_MEDIUM;
+	ShadowSampleCount = ZERN_LSC_HIGH;
 	ShadowSampleLength = 1.0f;
-	ShadowDepthBias = 0.005f;
+	ShadowDepthBias = 0.00005f;
 	ShadowNormalBias = 0.1f;
 
 	Range = 100.0f;
