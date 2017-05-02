@@ -448,7 +448,8 @@ bool ZERNStageLighting::SetupLights(ZEGRContext* Context)
 				const ZERNCommandSpotLightShadow& SpotLightShadow = static_cast<const ZERNCommandSpotLightShadow&>(Command.GetItem());
 
 				ZERNShading_SpotLightShadow DestLightShadow;
-				DestLightShadow.ProjectionTransform = TextureTransform * SpotLightShadow.ViewProjectionTransform * View.InvViewTransform;
+				DestLightShadow.ViewTransform = SpotLightShadow.ViewTransform * View.InvViewTransform;
+				DestLightShadow.ProjectionTransform = TextureTransform * SpotLightShadow.ProjectionTransform;
 				DestLightShadow.ShadowSampleCount = ZELight::ConvertShadowSampleCount(SpotLightShadow.ShadowSampleCount);
 				DestLightShadow.ShadowSampleLength = SpotLightShadow.ShadowSampleLength;
 				DestLightShadow.ShadowDepthBias = SpotLightShadow.ShadowDepthBias;
