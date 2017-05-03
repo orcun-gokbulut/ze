@@ -101,12 +101,14 @@ void ZEDSelectionManager::RegisterCommands()
 	SelectAllCommand.SetText("Select All");
 	SelectAllCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_A));
 	SelectAllCommand.OnAction.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::SelectAllCommand_OnAction>(this);
+	SelectAllCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/SelectAll.png");
 	ZEDCommandManager::GetInstance()->RegisterCommand(&SelectAllCommand);
 	
 	ClearSelectionCommand.SetCategory("Selection");
 	ClearSelectionCommand.SetName("ZEDSelectionManager::ClearSelectionCommand");
 	ClearSelectionCommand.SetText("Clear Selection");
 	ClearSelectionCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_D));
+	ClearSelectionCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/ClearSelection.png");
 	ClearSelectionCommand.OnAction.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::ClearSelectionCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&ClearSelectionCommand);
 
@@ -115,20 +117,21 @@ void ZEDSelectionManager::RegisterCommands()
 	LockSelectionCommand.SetText("Lock Selection");
 	LockSelectionCommand.SetType(ZED_CT_TOGGLE);
 	LockSelectionCommand.SetShortcut(ZEDCommandShortcut(ZED_VKM_CTRL, ZED_VKK_L));
+	LockSelectionCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Lock.png");
 	LockSelectionCommand.OnAction.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::LockSelectionCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&LockSelectionCommand);
 
 	FreezeObjectsCommand.SetCategory("Selection");
 	FreezeObjectsCommand.SetName("ZEDSelectionManager::FreezeObjectsCommand");
 	FreezeObjectsCommand.SetText("Freeze Objects");
-	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Lock.png");
+	FreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Freeze.png");
 	FreezeObjectsCommand.OnAction.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::FreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&FreezeObjectsCommand);
 
 	UnfreezeObjectsCommand.SetCategory("Selection");
 	UnfreezeObjectsCommand.SetName("ZEDSelectionManager::UnfreezeObjectsCommand");
 	UnfreezeObjectsCommand.SetText("Unfreeze Objects");
-	UnfreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unlock.png");
+	UnfreezeObjectsCommand.SetIcon("#R:/ZEDEditor/Icons/ZEDCommand/Unfreeze.png");
 	UnfreezeObjectsCommand.OnAction.AddDelegate<ZEDSelectionManager, &ZEDSelectionManager::UnfreezeObjectsCommand_OnAction>(this);
 	ZEDCommandManager::GetInstance()->RegisterCommand(&UnfreezeObjectsCommand);
 }
