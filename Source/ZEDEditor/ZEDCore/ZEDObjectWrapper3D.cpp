@@ -52,6 +52,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
+#include "ZEGame/ZERayCast.h"
 
 
 bool ZEDObjectWrapper3D::InitializeInternal()
@@ -255,6 +256,37 @@ void ZEDObjectWrapper3D::UpdateGraphics()
 	}
 }
 
+void ZEDObjectWrapper3D::PreRenderChildWrappers(const ZERNPreRenderParameters* Parameters)
+{
+	const ZEArray<ZEDObjectWrapper3D*>& ChildWrappers = GetChildWrapper3Ds();
+
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		ZEDObjectWrapper3D* ObjectWrapper = ChildWrappers[I];
+		if (!ObjectWrapper->GetVisible())
+			return;
+
+		ObjectWrapper->PreRender(Parameters);
+	}
+}
+
+void ZEDObjectWrapper3D::RayCastChildWrappers(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	const ZEArray<ZEDObjectWrapper3D*> ChildWrappers = GetChildWrapper3Ds();
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		ZEDObjectWrapper3D* ObjectWrapper = ChildWrappers[I];
+
+		if (!Parameters.Filter(ObjectWrapper))
+			continue;
+
+		ObjectWrapper->RayCast(Report, Parameters);
+
+		if (Report.CheckDone())
+			return;
+	}
+}
+
 ZEDObjectWrapper3D::ZEDObjectWrapper3D()
 {
 	Pickable = true;
@@ -440,6 +472,8 @@ void ZEDObjectWrapper3D::PreRender(const ZERNPreRenderParameters* Parameters)
 			Nameplate->SetVisiblity(false);
 		}
 	}
+
+	PreRenderChildWrappers(Parameters);
 }
 
 void ZEDObjectWrapper3D::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
@@ -464,7 +498,7 @@ void ZEDObjectWrapper3D::Render(const ZERNRenderParameters* Parameters, const ZE
 
 void ZEDObjectWrapper3D::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-
+	RayCastChildWrappers(Report, Parameters);
 }
 
 void ZEDObjectWrapper3D::UpdateLocal()

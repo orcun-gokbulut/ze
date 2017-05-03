@@ -44,36 +44,7 @@
 #include "ZERenderer/ZERNView.h"
 #include "ZEFile/ZEPathManager.h"
 
-void ZEDSceneWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZERNPreRenderParameters* Parameters)
-{
-	if (!EntityWrapper->GetVisible())
-		return;
 
-	EntityWrapper->PreRender(Parameters);
-
-	const ZEArray<ZEDObjectWrapper*>& ChildWrappers = EntityWrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-		PreRenderEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Parameters);
-}
-
-void ZEDSceneWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	Wrapper->RayCast(Report, Parameters);
-	if (Report.CheckDone())
-		return;
-
-	const ZEArray<ZEDObjectWrapper*> ChildWrappers = Wrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-	{
-		if (!Parameters.Filter(ChildWrappers[I]))
-			continue;
-
-		RayCastEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Report, Parameters);
-
-		if (Report.CheckDone())
-			break;
-	}
-}
 
 void ZEDSceneWrapper::SetObject(ZEObject* Object)
 {
@@ -99,21 +70,6 @@ ZEScene* ZEDSceneWrapper::GetScene()
 bool ZEDSceneWrapper::CheckChildrenClass(ZEClass* Class)
 {
 	return ZEClass::IsDerivedFrom(ZEEntity::Class(), Class);
-}
-
-void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	ZEArray<ZEDObjectWrapper3D*> Wrappers = GetChildWrapper3Ds();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		if (!Parameters.Filter(Wrappers[I]))
-			continue;
-
-		Wrappers[I]->RayCast(Report, Parameters);
-
-		if (Report.CheckDone())
-			break;
-	}
 }
 
 void ZEDSceneWrapper::Update()
@@ -218,8 +174,5 @@ bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	GetScene()->PreRender(Parameters);
-
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-		PreRenderEntity(static_cast<ZEDEntityWrapper*>(Wrappers[I]), Parameters);
+	ZEDObjectWrapper3D::PreRender(Parameters);
 }

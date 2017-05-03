@@ -270,6 +270,7 @@ void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 	Report.SetModifierFunction(ZEDelegateMethod(ZERayCastModifierFunction, ZEDEntityWrapper, RayCastModifier, this));
 	GetEntity()->RayCast(Report, Parameters);
 	Report.SetModifierFunction(ZERayCastModifierFunction());
+	ZEDObjectWrapper3D::RayCast(Report, Parameters);
 }
 
 void ZEDEntityWrapper::Tick(float ElapsedTime)
