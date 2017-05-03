@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="Icons">
+    <file alias="Add.png">Resources/Add.png</file>
+    <file alias="Delete.png">Resources/Delete.png</file>
     <file alias="List.png">Resources/List.png</file>
     <file alias="Tree.png">Resources/Tree.png</file>
   </qresource>

@@ -135,6 +135,7 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 
 		if (GetSelected())
 		{
+			NameplateIcon->SetVisiblity(true);
 			NameplateName->SetVisiblity(true);
 			NameplateClass->SetVisiblity(true);
 			if (GetFocused())
@@ -144,6 +145,7 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 		}
 		else
 		{
+			NameplateIcon->SetVisiblity(false);
 			NameplateName->SetVisiblity(false);
 			NameplateClass->SetVisiblity(false);
 		}
@@ -189,23 +191,20 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 void ZEDObjectWrapper3D::UpdateCanvas()
 {
 	ConstantBuffer->SetData(&GetWorldTransform());
-
+	
+	Canvas.Clean();
 	if (GetSelected())
 	{
 		if (GetFocused())
 			Canvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
 		else
 			Canvas.SetColor(ZEVector4::One);
-	}
-	else
-	{
-		Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
-	}
 
-	Canvas.ResetTransforms();
-	ZEAABBox BoundingBox = GetBoundingBox();
-	Canvas.ApplyTranslation(BoundingBox.GetCenter());
-	Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
+		Canvas.ResetTransforms();
+		ZEAABBox BoundingBox = GetBoundingBox();
+		Canvas.ApplyTranslation(BoundingBox.GetCenter());
+		Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
+	}
 }
 
 void ZEDObjectWrapper3D::UpdateGraphics()

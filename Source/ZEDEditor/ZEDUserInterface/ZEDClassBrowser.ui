@@ -93,6 +93,10 @@
        <property name="text">
         <string>Add</string>
        </property>
+       <property name="icon">
+        <iconset resource="ZEDCommon.qrc">
+         <normaloff>:/Icons/Add.png</normaloff>:/Icons/Add.png</iconset>
+       </property>
       </widget>
      </item>
     </layout>
