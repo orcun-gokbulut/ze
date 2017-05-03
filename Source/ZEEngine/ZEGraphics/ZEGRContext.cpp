@@ -662,6 +662,39 @@ void ZEGRContext::ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count)
 
 void ZEGRContext::ClearState()
 {
+	for (ZEUInt I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+	{
+		for (ZEUInt J = 0; J < ZEGR_MAX_CONSTANT_BUFFER_SLOT; J++)
+		{
+			if (ConstantBuffers[I][J] != NULL)
+			{
+				const_cast<ZEGRResource*>(ConstantBuffers[I][J])->BoundStages[I].Offset = 0;
+				const_cast<ZEGRResource*>(ConstantBuffers[I][J])->BoundStages[I].Count = 0;
+			}
+		}
+
+		for (ZEUInt J = 0; J < ZEGR_MAX_TEXTURE_SLOT; J++)
+		{
+			if (ShaderResources[I][J] != NULL)
+				const_cast<ZEGRResource*>(ShaderResources[I][J])->SetBoundStage((ZEGRShaderType)I, -1, false, false);
+		}
+	}
+
+	for (ZEUInt J = 0; J < ZEGR_MAX_RWTEXTURE_SLOT; J++)
+	{
+		if (UnorderedAccesses[J] != NULL)
+			const_cast<ZEGRResource*>(UnorderedAccesses[J])->SetBoundStage(ZEGR_ST_COMPUTE, -1, false, false);
+	}
+
+	for (ZEUInt J = 0; J < ZEGR_MAX_RENDER_TARGET_SLOT; J++)
+	{
+		if (RenderTargets[J] != NULL)
+			const_cast<ZEGRRenderTarget*>(RenderTargets[J])->SetBound(false);
+	}
+
+	if (DepthStencilBuffer != NULL)
+		const_cast<ZEGRDepthStencilBuffer*>(DepthStencilBuffer)->SetBound(false);
+
 	memset(VertexBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
 	IndexBuffer = NULL;
 	memset(ConstantBuffers, NULL, sizeof(ZEGRResource*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);

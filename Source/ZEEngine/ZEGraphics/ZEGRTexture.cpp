@@ -80,6 +80,11 @@ ZEGRTextureView::ZEGRTextureView(ZEGRFormat Format, ZEUInt LevelMin, ZEUInt Leve
 	this->LayerCount = LayerCount;
 }
 
+ZEGRTextureView::~ZEGRTextureView()
+{
+	Texture = NULL;
+}
+
 const ZEGRTexture* ZEGRTextureView::GetTexture() const
 {
 	return Texture;
@@ -165,7 +170,17 @@ bool ZEGRTexture::Initialize(ZEGRTextureType TextureType, ZEUInt Width, ZEUInt H
 
 void ZEGRTexture::Deinitialize()
 {
+	ze_for_each(Srv, ShaderResourceViews)
+		delete Srv.GetItem();
 
+	ze_for_each(Uav, UnorderedAccessViews)
+		delete Uav.GetItem();
+
+	ShaderResourceViews.Clear();
+	UnorderedAccessViews.Clear();
+
+	RenderTargets.Clear();
+	DepthStencilBuffers.Clear();
 }
 
 ZETaskResult ZEGRTexture::LoadInternal()
@@ -424,17 +439,7 @@ ZEGRTexture::~ZEGRTexture()
 {
 	Unregister();
 
-	ze_for_each(Srv, ShaderResourceViews)
-		delete Srv.GetItem();
-
-	ze_for_each(Uav, UnorderedAccessViews)
-		delete Uav.GetItem();
-
-	ShaderResourceViews.Clear();
-	UnorderedAccessViews.Clear();
-
-	RenderTargets.Clear();
-	DepthStencilBuffers.Clear();
+	Deinitialize();
 }
 
 ZERSResource* ZEGRTexture::Instanciator(const void* Parameters)
