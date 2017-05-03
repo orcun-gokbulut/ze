@@ -957,6 +957,8 @@ void ZED11Context::ClearState()
 	GraphicsState->VertexLayout = NULL;
 
 	ComputeState->ComputeShader = NULL;
+
+	GetMainContext()->ClearState();
 }
 
 void ZED11Context::BeginEvent(const ZEString& Name)

@@ -588,17 +588,17 @@ float ZERNShading_CalculateVisibilityArray(uint SampleCount, float SampleLength,
 {		
 	float Visibility = 0.0f;
 	
-	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointMirror, 1024.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
+	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointMirror, 16384.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
 	RandomVector = normalize(RandomVector);
 	
-	for (uint I = 0; I < SampleCount; I++)
+	for (uint I = 0; I < 64; I++)
 	{
 		float2 RandomOrientedSample = reflect(ZERNShading_PoissonDiskSamples64[I], RandomVector);
 		float2 Offset = RandomOrientedSample * SampleLength / ShadowMapDimensions;
 		Visibility += ShadowMap.SampleCmpLevelZero(ZERNSampler_ComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, ShadowMapIndex), TexCoordDepth.z);
 	}
 	
-	Visibility /= SampleCount;
+	Visibility /= 64;
 	
 	return Visibility;
 }

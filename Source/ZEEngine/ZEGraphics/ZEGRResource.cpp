@@ -84,6 +84,8 @@ ZEGRResource::ZEGRResource()
 	BoundStage Stage;
 	Stage.BoundAsShaderResource = false;
 	Stage.BoundAsUnorderedAccess = false;
+	Stage.Offset = 0;
+	Stage.Count = 0;
 	Stage.Slot = -1;
 	BoundStages.Fill(Stage);
 }

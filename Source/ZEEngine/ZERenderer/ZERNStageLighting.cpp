@@ -82,7 +82,7 @@ static ZEGRVertexLayout GetVertexLayoutPosition()
 
 void ZERNStageLighting::CreateRandomVectors()
 {
-	const ZEUInt Length = 64;
+	const ZEUInt Length = 16;
 	ZEUInt Size = Length * Length * 2;
 	ZEArray<ZEUInt8> RandomVectors;
 	RandomVectors.SetCount(Size);
