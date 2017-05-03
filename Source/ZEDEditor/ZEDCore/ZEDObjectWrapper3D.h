@@ -77,6 +77,7 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 		ZEUILabel*									NameplateName;
 		ZEUILabel*									NameplateClass;
 
+
 	protected:
 		/*void										SetNameplateText(const ZEString& String);
 		const ZEString&								GetNameplateText() const;
@@ -90,6 +91,9 @@ class ZEDObjectWrapper3D : public ZEDObjectWrapper
 		virtual void								UpdateNameplate();
 		virtual void								UpdateCanvas();
 		void										UpdateGraphics();
+
+		void										PreRenderChildWrappers(const ZERNPreRenderParameters* Parameters);
+		void										RayCastChildWrappers(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual bool								InitializeInternal() override;
 		virtual bool								DeinitializeInternal() override;

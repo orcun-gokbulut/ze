@@ -44,37 +44,6 @@
 #include "ZEFile/ZEPathManager.h"
 #include "ZEApplications/ZETrainIG/ZETISector.h"
 
-void ZEDTISectorWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZERNPreRenderParameters* Parameters)
-{
-	if (!EntityWrapper->GetVisible())
-		return;
-
-	EntityWrapper->PreRender(Parameters);
-
-	const ZEArray<ZEDObjectWrapper*>& ChildWrappers = EntityWrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-		PreRenderEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Parameters);
-}
-
-void ZEDTISectorWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	Wrapper->RayCast(Report, Parameters);
-	if (Report.CheckDone())
-		return;
-
-	const ZEArray<ZEDObjectWrapper*> ChildWrappers = Wrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-	{
-		if (!Parameters.Filter(ChildWrappers[I]))
-			continue;
-
-		RayCastEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Report, Parameters);
-
-		if (Report.CheckDone())
-			break;
-	}
-}
-
 void ZEDTISectorWrapper::SetObject(ZEObject* Object)
 {
 	if (Object == NULL)
@@ -99,21 +68,6 @@ ZETISector* ZEDTISectorWrapper::GetSector() const
 bool ZEDTISectorWrapper::CheckChildrenClass(ZEClass* Class)
 {
 	return ZEClass::IsDerivedFrom(ZEEntity::Class(), Class);
-}
-
-void ZEDTISectorWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	ZEArray<ZEDObjectWrapper3D*> Wrappers = GetChildWrapper3Ds();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		if (!Parameters.Filter(Wrappers[I]))
-			continue;
-
-		Wrappers[I]->RayCast(Report, Parameters);
-
-		if (Report.CheckDone())
-			break;
-	}
 }
 
 bool ZEDTISectorWrapper::Load(const ZEString& FileName)
@@ -164,8 +118,4 @@ void ZEDTISectorWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 		Sector->GetScene()->PreRender(Parameters);
 	
 	ZEDEntityWrapper::PreRender(Parameters);
-
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-		PreRenderEntity(static_cast<ZEDEntityWrapper*>(Wrappers[I]), Parameters);
 }
