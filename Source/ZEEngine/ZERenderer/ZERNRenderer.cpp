@@ -268,10 +268,10 @@ void ZERNRenderer::RenderStages()
 
 	if (Resized)
 	{
+		Context->ClearState();
+
 		ze_for_each(Stage, Stages)
 			Stage->Resized(OutputTexture->GetWidth(), OutputTexture->GetHeight());
-
-		Context->ClearState();
 	}
 
 	if (DirtyPipeline || Resized)
