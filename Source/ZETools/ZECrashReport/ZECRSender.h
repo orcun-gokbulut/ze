@@ -39,11 +39,14 @@
 #include "ZETypes.h"
 #include "ZEThread/ZEThread.h"
 #include "ZEThread/ZELock.h"
+#include "ZETimeCounter.h"
+#include "ZEFile/ZEFile.h"
 
 enum ZECRSenderStatus
 {
 	ZECR_SS_NONE,
-	ZECR_SS_TRANSMITTING,
+	ZECR_SS_DOWNLOADING,
+	ZECR_SS_UPLOADING,
 	ZECR_SS_DONE,
 	ZECR_SS_ERROR
 };
@@ -51,12 +54,14 @@ enum ZECRSenderStatus
 struct ZECRSenderProgress
 {	
 	ZECRSenderStatus							Status;
-	ZESize										UploadedBytes;
-	ZESize										UploadedBytesPerSeconds;
-	ZESize										TransmitedBytes;
-	ZESize										TransmitedBytesPerSecond;
-	ZESize										ReceivedBytes;
-	ZESize										ReceivedBytesPerSecond;
+
+	ZEUInt64									UpdloadSize;
+	ZEUInt64									UploadedBytes;
+	double										UploadedBytesPerSeconds;
+
+	ZEUInt64									DownloadSize;
+	ZEUInt64									DownloadedBytes;
+	double										DownloadedBytesPerSeconds;
 };
 
 class ZECRSender
@@ -64,9 +69,11 @@ class ZECRSender
 	private:
 		ZEString								FileName;
 		ZEString								UploadURL;
-		void*									File;
+		ZEFile									File;
+		ZEUInt64								FileSize;
 		void*									Curl;
-		ZESize									FileSize;
+		ZETimeCounter							Counter;
+		double									LastMeasuredTime;
 		ZECRSenderProgress						Progress;
 		ZELock									ProgressLock;
 
@@ -89,4 +96,7 @@ class ZECRSender
 
 												ZECRSender();
 												~ZECRSender();
+
+		static ZEString							FormatTransferSpeed(ZESize BytesPerSecond);
+		static ZEString							FormatEstimatedTime(ZESize TotalSize, ZESize BytesPerSecond);
 };

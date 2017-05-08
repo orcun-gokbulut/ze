@@ -71,7 +71,7 @@ void ZECRWindowTransfering::SendReport(ZEThread* Thread, void* Output)
 
 	while (Sender.TransferChunk())
 	{
-		Sender.GetProgress(ProgressInformation);
+		//Progress = Sender.GetProgress();
 	}
 
 	Form->lblOperation->setText("Report transfered");
@@ -110,61 +110,23 @@ void ZECRWindowTransfering::btnCancel_Clicked()
 
 void ZECRWindowTransfering::UpdateUploadInformation()
 {
-
-	ProgressInformation.stat
-	if(SenderThread->GetStatus() == ZE_TS_NOT_RUNNING)
+	ZECRSenderProgress Progress = Sender.GetProgress();
+	if (Progress.Status == ZECR_SS_DONE)
 	{
 		UploadCompleted();
-		return;
 	}
-
-	ZESize LastUploadSize = ProgressInformation.UploadedSize;
-
-	Sender.GetProgress(ProgressInformation);
-
-	if(ProgressInformation.UploadedSize != 0)
+	else if (Progress.Status == ZECR_SS_ERROR)
 	{
-		ZEString TransferSpeedText;
-		float TransferSpeed;
-		ZESize ApproximateBytePerSec = (ProgressInformation.UploadedSize - LastUploadSize) * 10;		
-
-		if(ApproximateBytePerSec > 1048576)
-		{
-			TransferSpeed = ((float)ApproximateBytePerSec / 1048576.0f) * 100.0f;
-			TransferSpeedText = ZEFormat::Format("{0}.{1} MB/sec", (int)TransferSpeed / 100, (int)TransferSpeed % 100);
-		}
-		else if(ApproximateBytePerSec > 1024)
-		{
-			TransferSpeed = ((float)ApproximateBytePerSec / 1024.0f) * 100.0f;
-			TransferSpeedText = ZEFormat::Format("{0}.{1} KB/sec", (int)TransferSpeed / 100, (int)TransferSpeed % 100);
-		}
-		else
-		{
-			TransferSpeed = ApproximateBytePerSec;
-			TransferSpeedText = ZEFormat::Format("{0} B/sec", (int)TransferSpeed);
-		}
-
-		ZESize EstimatedSeconds = ProgressInformation.TotalUploadSize - ProgressInformation.UploadedSize;
-
-		if (EstimatedSeconds != 0 && ApproximateBytePerSec != 0)
-			EstimatedSeconds /= ApproximateBytePerSec;
-
-		ZEString EstimatedTimeText;
-
-		if (EstimatedSeconds / 86400 > 0)
-			EstimatedTimeText = ZEFormat::Format("{0} Days ", EstimatedSeconds / 86400);
-
-		if (EstimatedSeconds % 86400 > 3600)
-			EstimatedTimeText += ZEFormat::Format("{0} Hours ", (EstimatedSeconds % 86400) / 3600);
-
-		if (EstimatedSeconds % 3600 > 60)
-			EstimatedTimeText += ZEFormat::Format("{0} Minutes ", (EstimatedSeconds % 3600) / 60);
-
-		EstimatedTimeText += ZEFormat::Format("{0} Seconds", EstimatedSeconds % 60 );
-
-		Form->lblTransferSpeed->setText(TransferSpeedText.ToCString());
-		Form->lblEstimatedTime->setText(EstimatedTimeText.ToCString());
-		Form->progProgress->setValue((int)ProgressInformation.ProcessPercentage);
+		UploadError();
+	}
+	else
+	{
+		Form->lblTransferSpeed->setText(ZECRSender::FormatTransferSpeed(Progress.UploadedBytesPerSeconds).ToCString());
+		Form->lblEstimatedTime->setText(
+			ZECRSender::FormatEstimatedTime(
+				Progress.UpdloadSize - Progress.UploadedBytes, 
+				Progress.UploadedBytesPerSeconds).ToCString());
+		Form->pbProgress->setValue(Progress.UploadedBytes / Progress.UpdloadSize);
 	}
 
 	UpdateInformationTimer.start();
@@ -173,9 +135,9 @@ void ZECRWindowTransfering::UpdateUploadInformation()
 void ZECRWindowTransfering::UploadCompleted()
 {
 	UpdateInformationTimer.stop();
-	Form->progProgress->setValue(100);
-	Form->lblTransferSpeed->setText("0 B/sec");
-	Form->lblEstimatedTime->setText("0 Seconds");	
+	Form->pbProgress->setValue(100);
+	Form->lblTransferSpeed->setText("");
+	Form->lblEstimatedTime->setText("");	
 	Form->btnCancel->setVisible(true);
 }
 
@@ -199,7 +161,7 @@ bool ZECRWindowTransfering::CompressPackage()
 	FILE* PackedFile = fopen(FileName,"rb");
 	FILE* CompressedFile = fopen(TempPath.ToCString(), "wb");
 
-	if(!PackedFile)
+	if (!PackedFile)
 		return false;
 
 	fseek(PackedFile, 0, SEEK_END);
@@ -218,23 +180,23 @@ bool ZECRWindowTransfering::CompressPackage()
 
 	bool ProcessError = false;
 	bool Reading = true;
-	while(Reading)
+	while (Reading)
 	{
-		if(ProcessError)
+		if (ProcessError)
 			Reading = false;
 
 		ZESize Readed = fread(InputBuffer, sizeof(char), 2048, PackedFile);
 
-		if(Readed != 2048)
+		if (Readed != 2048)
 		{
-			if(feof(PackedFile))
+			if (feof(PackedFile))
 			{
 				Compressor->SetEos(true);
 				Compressor->SetInputSize(Readed);
 				Compressor->Compress();
 				fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
 				
-				while(Compressor->GetState() == ZE_CS_OUTPUT_FULL)
+				while (Compressor->GetState() == ZE_CS_OUTPUT_FULL)
 				{
 					Compressor->Compress();
 
@@ -248,10 +210,10 @@ bool ZECRWindowTransfering::CompressPackage()
 
 		Compressor->Compress();
 
-		if(Compressor->GetState() == ZE_CS_OUTPUT_FULL)
+		if (Compressor->GetState() == ZE_CS_OUTPUT_FULL)
 			fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
 
-		if(Compressor->GetState() == ZE_CS_ERROR)
+		if (Compressor->GetState() == ZE_CS_ERROR)
 			ProcessError = true;
 	}
 
@@ -261,20 +223,18 @@ bool ZECRWindowTransfering::CompressPackage()
 
 	FileName = TempPath;
 
-	if(!ProcessError)
+	if (!ProcessError)
 		return true;
 	else			
 		return false;
 }
-
-
 
 ZECRWindowTransfering::ZECRWindowTransfering(QWidget* Parent) : ZECRWindowPage(Parent)
 {
 	Form = new Ui_ZECRWindowTransfering();
 	Form->setupUi(this);
 
-	Form->progProgress->setValue(0);
+	Form->pbProgress->setValue(0);
 	Form->lblEstimatedTime->setText(" Calculating...");
 	Form->lblTransferSpeed->setText(" Connecting to server...");
 
@@ -283,5 +243,5 @@ ZECRWindowTransfering::ZECRWindowTransfering(QWidget* Parent) : ZECRWindowPage(P
 
 ZECRWindowTransfering::~ZECRWindowTransfering()
 {
-
+	delete Form;
 }

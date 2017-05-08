@@ -47,7 +47,7 @@ ZECRDataProviderType ZECRProviderApplicationInformation::GetProviderType()
 
 const char* ZECRProviderApplicationInformation::GetExtension()
 {
-	return ".xml"
+	return ".xml";
 }
 
 const char* ZECRProviderApplicationInformation::GetName()
@@ -105,7 +105,7 @@ bool ZECRProviderApplicationInformation::Generate()
 	Data += "</Version>\n";
 	Data += "<Process>\n";
 
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", ProcessId)))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", ProcessId)))
 		return false;
 	
 	ZECRCIM::DeInitialize();

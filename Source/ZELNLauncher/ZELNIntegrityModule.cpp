@@ -43,8 +43,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDialogButtonBox>
-#include <md5.h>
-
 
 ZELN_MODULE_DECRIPTION(ZELNIntegrityModule, "Integrity");
 

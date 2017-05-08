@@ -50,9 +50,9 @@
 
 void ZELNLicenseWidget::UpdateWidget()
 {
-	Form->lblApplicationName->setText(License.GetApplicationName().ToCString());
-	Form->lblApplicationVersion->setText(QString("%1.%2").arg(License.GetApplicationVersionMajor()).arg(License.GetApplicationVersionMinor()));
-	Form->lblApplicationEdition->setText(QString::number(License.GetApplicationEdition()));
+	Form->lblApplicationName->setText(License.GetProductName().ToCString());
+	Form->lblApplicationVersion->setText(QString("%1.%2").arg(License.GetProductVersionMajor()).arg(License.GetProductVersionMinor()));
+	Form->lblApplicationEdition->setText(QString::number(License.GetProductEdition()));
 	Form->lblLicensee->setText(License.GetLicenseeName().ToCString());
 	Form->lblSerialKey->setText(License.GetSerialKey().ToCString());
 
@@ -105,7 +105,7 @@ void ZELNLicenseWidget::SaveLicense()
 
 void ZELNLicenseWidget::btnEnter_clicked()
 {
-	License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
+	License.SetProductName(ZELNLauncher::GetInstance()->GetProductName());
 	License.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
 	License.SetSerialKey(Form->txtSerialKey->text().toLocal8Bit().begin());
 

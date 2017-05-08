@@ -73,7 +73,7 @@ void ZEModule::FindConfigurationFileName()
 
 	const char* ApplicationName = "";
 	if (GetCore()->GetApplicationModule() != NULL)
-		ApplicationName = GetCore()->GetApplicationModule()->GetApplicationName();
+		ApplicationName = GetCore()->GetApplicationModule()->GetName();
 
 	for (ZEUInt I = 0; I < PathPatternCount; I++)
 	{

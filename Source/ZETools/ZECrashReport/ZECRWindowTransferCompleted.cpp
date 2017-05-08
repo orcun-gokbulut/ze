@@ -54,6 +54,5 @@ ZECRWindowTransferCompleted::ZECRWindowTransferCompleted(QWidget* Parent) : ZECR
 
 ZECRWindowTransferCompleted::~ZECRWindowTransferCompleted()
 {
-
+	delete Form;
 }
-

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRTransferThread.cpp
+ Zinek Engine - ZECRCrashReporterParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,89 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRTransferThread.h"
+#pragma once
 
-#include "ZECrashReport/ZECRPackager.h"
-#include "ZECrashReport/ZECRSender.h"
+#include "ZETypes.h"
+#include "ZEVersion.h"
+#include "ZECore/ZECrashHandler.h"
 
-#include "ZETimeStamp.h"
-#include "ZEDS/ZEFormat.h"
-#include "ZEFile/ZEFileInfo.h"
-#include "ZECompression/ZECompressorZLIB.h"
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
-void ZECRTransferThread::run()
+struct ZECRCrashReporterParameters
 {
-	SendReport();	
-}
-
-ZECRTransferThread::ZECRTransferThread(ZECRCrashReport& CrashReport)
-{
-	this->CrashReport = &CrashReport;		
-}
-
-ZECRTransferThread::~ZECRTransferThread()
-{
-
-}
-
-void ZECRTransferThread::SendReport()
-{
-	if(!PackageItems())
-	{
-		emit UploadError();
-		return;
-	}
-
-	if(!CompressPackage())
-	{		
-		emit UploadError();
-		return;
-	}
-
-	ZECRSender* Sender = new ZECRSender();
-	Sender->SetFileName(FileName);
-	Sender->SetUploadURL(UploadURL);
-	if(!Sender->OpenConnection())
-	{
-		CleanUp();
-		emit UploadError();
-		return;
-	}
-	Sender->CloseConnection();	
-	remove(FileName);	
-	emit UploadCompleted();
-}
-
-bool ZECRTransferThread::PackageItems()
-{
-	char ComputerName[256];
-	DWORD Size = sizeof(ComputerName);
-	GetComputerNameA(ComputerName, &Size);
-	FileName = ZEFormat::Format("#S:/CrashReports/{0}-{1}.ZECrashReport", ComputerName, ZETimeStamp::Now().ToString("%Y%m%d-%H%M%S"));
-
-	ZECRPackager* Packager = new ZECRPackager();
-	Packager->SetCrashReport(CrashReport);
-	Packager->SetOutputFileName(ZEFormat::Format("{0}.uncompressed", FileName));
-
-	FileName = Packager->GetOutputFileName();
-	return Packager->Pack();
-}
-
-void ZECRTransferThread::CleanUp()
-{
-	ZEFileInfo PackedFileInfo(ZEFormat::Format("{0}.uncompressed", FileName));
-	PackedFileInfo.Delete();
-}
-
-void ZECRTransferThread::SetUploadURL(const char* UploadURL)
-{
-	this->UploadURL = UploadURL;
-}
-
-const char* ZECRTransferThread::GetUploadURL()
-{
-	return UploadURL;
-}
+	ZEUInt32						ProcessId;
+	ZECrashReason					Reason;
+	char							LogFilePath[1024];
+	char							ApplicationName[1024];
+	ZEVersion						ApplicationVersion;
+	char							LicenseProductName[1024];
+	char							LicenseLicenseeName[1024];
+	char							LicenseSerialKey[1024];
+	ZEUInt							LicenseVersion;
+};

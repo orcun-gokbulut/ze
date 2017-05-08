@@ -231,21 +231,21 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 
 	if (Module == NULL)
 	{
-		zeError("Cannot load plugin. Plugin file is not a plugin. Plugin Path: \"%s\".", FileInfo.Normalize());
+		zeError("Cannot load plugin. Plugin file is not a plugin. Plugin Path: \"%s\".", FileInfo.Normalize().ToCString());
 		return NULL;
 	}
 
 	ZECreatePluginInstance CreatePluginInstance = reinterpret_cast<ZECreatePluginInstance>(GetProcAddress(Module, "zeCreatePluginInstance"));
 	if (CreatePluginInstance == NULL)
 	{
-		zeError("Cannot load plugin. Plugin does not have zeCreatePluginInstance() procedure. Plugin Path: \"%s\".", FileInfo.Normalize());
+		zeError("Cannot load plugin. Plugin does not have zeCreatePluginInstance() procedure. Plugin Path: \"%s\".", FileInfo.Normalize().ToCString());
 		return NULL;
 	}
 
 	ZEPlugin* Plugin = CreatePluginInstance();
 	if (Plugin == NULL)
 	{
-		zeError("Cannot load plugin. zeCreatePluginInstance() returned NULL. Plugin Path: \"%s\".", FileInfo.Normalize());
+		zeError("Cannot load plugin. zeCreatePluginInstance() returned NULL. Plugin Path: \"%s\".", FileInfo.Normalize().ToCString());
 		return NULL;
 	}
 
@@ -433,7 +433,7 @@ bool ZECore::IsStartedOrStartingUp()
 void ZECore::Terminate()
 {
 	SetState(ZE_CS_TERMINATING);
-	abort();
+	TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
 }
 
 ZEModule* ZECore::GetModule(ZEClass* Class) const
@@ -645,6 +645,7 @@ bool ZECore::LoadConfiguration()
 
 bool ZECore::LoadConfiguration(const ZEString& FileName)
 {
+	zeCriticalError("Bulluk");
 	ConfigurationPath = FileName;
 
 	ZEMLReader Reader;

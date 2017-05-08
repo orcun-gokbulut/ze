@@ -71,7 +71,7 @@ ZECRWindowViewReport::ZECRWindowViewReport(ZECRCrashReport* Report, QWidget* Par
 
 ZECRWindowViewReport::~ZECRWindowViewReport()
 {
-
+	delete Form;
 }
 
 void ZECRWindowViewReport::btnSaveAs_clicked()
@@ -85,7 +85,7 @@ void ZECRWindowViewReport::btnSaveAs_clicked()
 	const ZEArray<ZECRProvider*>& Providers = Report->GetProviders();
 	ZECRProvider* Provider = Providers[Index];
 
-	QString Filter = QString("%1 (*.%2);All files (*.*)").arg(Provider->GetFileTypeDescription()).arg(Provider->GetExtension());
+	QString Filter = QString("%1 (*%2);All files (*.*)").arg(Provider->GetName()).arg(Provider->GetExtension());
 	QString FileName = QFileDialog::getSaveFileName(this, "Save As", QString(), Filter);
 	
 	ZEArray<ZEBYTE> SelectedData;

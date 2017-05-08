@@ -41,5 +41,5 @@
 class ZELCChecker
 {
 	public:
-		static bool		Check(const ZEString& ApplicationName, ZEInt& ApplicationVersion, ZEInt& ApplicationEdition);
+		static bool		Check(const ZEString& ProductName, ZEInt& ProductVersion, ZEInt& ProductEdition);
 };

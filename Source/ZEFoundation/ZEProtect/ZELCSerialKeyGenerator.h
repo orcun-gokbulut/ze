@@ -40,25 +40,25 @@
 class ZELCSerialKeyGenerator
 {
 	private:
-		ZEString				ApplicationName;
-		ZEUInt8					ApplicationVersionMajor;
-		ZEUInt8					ApplicationVersionMinor;
-		ZEUInt8					ApplicationEdition;
+		ZEString				ProductName;
+		ZEUInt8					ProductVersionMajor;
+		ZEUInt8					ProductVersionMinor;
+		ZEUInt8					ProductEdition;
 		ZEString				LicenseeName;
 		ZEUInt32				SerialNumber;
 
 	public:
-		void					SetApplicationName(const ZEString& ApplicationName);
-		const ZEString&			GetApplicationName() const;
+		void					SetProductName(const ZEString& ApplicationName);
+		const ZEString&			GetProductName() const;
 
-		void					SetApplicationVersionMajor(ZEUInt8 Version);
-		ZEUInt8					GetApplicationVersionMajor() const;
+		void					SetProductVersionMajor(ZEUInt8 Version);
+		ZEUInt8					GetProductVersionMajor() const;
 
-		void					SetApplicationVersionMinor(ZEUInt8 Version);
-		ZEUInt8					GetApplicationVersionMinor() const;
+		void					SetProductVersionMinor(ZEUInt8 Version);
+		ZEUInt8					GetProductVersionMinor() const;
 
-		void					SetApplicationEdition(ZEUInt8 Edition);
-		ZEUInt8					GetApplicationEdition() const;
+		void					SetProductEdition(ZEUInt8 Edition);
+		ZEUInt8					GetProductEdition() const;
 
 		void					SetLicenseeName(const ZEString& Name);
 		const ZEString&			GetLicenseeName() const;

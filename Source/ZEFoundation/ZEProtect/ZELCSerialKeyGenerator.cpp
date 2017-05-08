@@ -38,44 +38,44 @@
 #include "ZELCUtils.h"
 #include "ZEDS\ZEFormat.h"
 
-void ZELCSerialKeyGenerator::SetApplicationName(const ZEString& Name)
+void ZELCSerialKeyGenerator::SetProductName(const ZEString& Name)
 {
-	ApplicationName = Name;
+	ProductName = Name;
 }
 
-const ZEString& ZELCSerialKeyGenerator::GetApplicationName() const
+const ZEString& ZELCSerialKeyGenerator::GetProductName() const
 {
-	return ApplicationName;
+	return ProductName;
 }
 
-void ZELCSerialKeyGenerator::SetApplicationVersionMajor(ZEUInt8 Version)
+void ZELCSerialKeyGenerator::SetProductVersionMajor(ZEUInt8 Version)
 {
-	ApplicationVersionMajor = Version;
+	ProductVersionMajor = Version;
 }
 
-ZEUInt8 ZELCSerialKeyGenerator::GetApplicationVersionMajor() const
+ZEUInt8 ZELCSerialKeyGenerator::GetProductVersionMajor() const
 {
-	return ApplicationVersionMajor;
+	return ProductVersionMajor;
 }
 
-void ZELCSerialKeyGenerator::SetApplicationVersionMinor(ZEUInt8 Version)
+void ZELCSerialKeyGenerator::SetProductVersionMinor(ZEUInt8 Version)
 {
-	ApplicationVersionMinor = Version;
+	ProductVersionMinor = Version;
 }
 
-ZEUInt8 ZELCSerialKeyGenerator::GetApplicationVersionMinor() const
+ZEUInt8 ZELCSerialKeyGenerator::GetProductVersionMinor() const
 {
-	return ApplicationVersionMinor;
+	return ProductVersionMinor;
 }
 
-void ZELCSerialKeyGenerator::SetApplicationEdition(ZEUInt8 Type)
+void ZELCSerialKeyGenerator::SetProductEdition(ZEUInt8 Type)
 {
-	this->ApplicationEdition = Type;
+	this->ProductEdition = Type;
 }
 
-ZEUInt8 ZELCSerialKeyGenerator::GetApplicationEdition() const
+ZEUInt8 ZELCSerialKeyGenerator::GetProductEdition() const
 {
-	return ApplicationEdition;
+	return ProductEdition;
 }
 
 void ZELCSerialKeyGenerator::SetLicenseeName(const ZEString& Name)
@@ -102,13 +102,13 @@ ZEString ZELCSerialKeyGenerator::GenerateSerialKey() const
 {
 	ZEUInt32 Values[4];
 	Values[0] = GetSerialNumber();
-	Values[1] = GetApplicationName().Hash();
+	Values[1] = GetProductName().Hash();
 	Values[2] = GetLicenseeName().Hash();
 	
 	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&Values[3];
-	VersionEditionFlags[0] = GetApplicationVersionMajor();
-	VersionEditionFlags[1] = GetApplicationVersionMinor();
-	VersionEditionFlags[2] = GetApplicationEdition();
+	VersionEditionFlags[0] = GetProductVersionMajor();
+	VersionEditionFlags[1] = GetProductVersionMinor();
+	VersionEditionFlags[2] = GetProductEdition();
 	VersionEditionFlags[3] = 0;
 
 	ZEUInt32 SerialKey[ZELC_SERIAL_KEY_SIZE / sizeof(ZEUInt32)];
@@ -129,8 +129,8 @@ ZEString ZELCSerialKeyGenerator::GenerateSerialKey() const
 
 ZELCSerialKeyGenerator::ZELCSerialKeyGenerator()
 {
-	ApplicationVersionMajor = 1;
-	ApplicationVersionMinor = 0;
-	ApplicationEdition = 0;
+	ProductVersionMajor = 1;
+	ProductVersionMinor = 0;
+	ProductEdition = 0;
 	SerialNumber = 0;
 }

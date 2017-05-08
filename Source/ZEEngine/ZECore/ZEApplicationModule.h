@@ -38,6 +38,8 @@
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
 #include "ZEExport.ZEEngine.h"
+#include "ZEVersion.h"
+#include "ZEProtect/ZELCLicense.h"
 
 class ZEData;
 
@@ -45,7 +47,9 @@ class ZE_EXPORT_ZEENGINE ZEApplicationModule : public ZEModule
 {
 	ZE_OBJECT
 	public:
-		virtual const char*				GetApplicationName() const;
+		virtual const char*				GetName() const;
+		virtual ZEVersion				GetVersion() const;
+		virtual ZELCLicense				GetLicense() const;
 
 		virtual bool					PreStartup();
 		virtual bool					StartUp();

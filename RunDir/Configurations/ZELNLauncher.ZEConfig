@@ -3,7 +3,7 @@
 <Node Name="LauncherConfiguration">
  <Property Name="VersionMajor" Type="UInt8">1</Property>
  <Property Name="VersionMinor" Type="UInt8">0</Property>
- <Node Name="Application">
+ <Node Name="Product">
   <Property Name="Name" Type="String">ZETrainIG</Property>
   <Property Name="VersionMajor" Type="UInt8">0</Property>
   <Property Name="VersionMinor" Type="UInt8">6</Property>

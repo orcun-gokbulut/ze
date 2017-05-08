@@ -49,13 +49,13 @@ bool ZECRCIM::Initialize()
 
 	HRESULT hResult = CoInitializeEx(0, COINIT_MULTITHREADED);
 	
-	if(FAILED(hResult))
+	if (FAILED(hResult))
 		return false;
 
 	hResult = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, 
 		RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 
-	if(hResult != S_OK && hResult != RPC_E_TOO_LATE)
+	if (hResult != S_OK && hResult != RPC_E_TOO_LATE)
 		return false;
 	
 	return true;
@@ -74,7 +74,7 @@ bool ZECRCIM::ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZE
 	hResult = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER,
 		IID_IWbemLocator, (LPVOID*) &pLocator);
 
-	if(FAILED(hResult))
+	if (FAILED(hResult))
 		return false;
 
 	IWbemServices*	pServices = 0;
@@ -82,7 +82,7 @@ bool ZECRCIM::ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZE
 	hResult = pLocator->ConnectServer(_bstr_t(NameSpace.ToCString()), NULL, NULL, 
 		0, NULL, 0, 0, &pServices);
 
-	if(FAILED(hResult))
+	if (FAILED(hResult))
 	{
 		pLocator->Release();		
 		return false;
@@ -93,7 +93,7 @@ bool ZECRCIM::ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZE
 	hResult = pServices->ExecQuery(bstr_t(Language.ToCString()), bstr_t(Query.ToCString()), 
 		WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
 
-	if(FAILED(hResult))
+	if (FAILED(hResult))
 	{
 		pServices->Release();
 		pLocator->Release();		
@@ -103,21 +103,21 @@ bool ZECRCIM::ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZE
 	IWbemClassObject* pClassObject;
 	ULONG uReturn = 0;
 
-	while(pEnumerator)
+	while (pEnumerator)
 	{
 		hResult = pEnumerator->Next(WBEM_INFINITE, 1, &pClassObject, &uReturn);
-		if(0 == uReturn)
+		if (0 == uReturn)
 			break;
 
-		if(pClassObject->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY) == WBEM_S_NO_ERROR)
+		if (pClassObject->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY) == WBEM_S_NO_ERROR)
 		{
 			BSTR bstrName;
 			VARIANT vtProp;		
 
-			while(pClassObject->Next(0, &bstrName, &vtProp, 0, 0) == WBEM_S_NO_ERROR)
+			while (pClassObject->Next(0, &bstrName, &vtProp, 0, 0) == WBEM_S_NO_ERROR)
 			{
 				VariantChangeType(&vtProp, &vtProp, 0, VT_BSTR);
-				if(vtProp.vt == VT_BSTR && !ZEString(vtProp.bstrVal).IsEmpty() && ZEString(bstrName) != "SystemName" && ZEString(bstrName) != "CSName")
+				if (vtProp.vt == VT_BSTR && !ZEString(vtProp.bstrVal).IsEmpty() && ZEString(bstrName) != "SystemName" && ZEString(bstrName) != "CSName")
 				{						
 					Output += ZEFormat::Format("<{0}>{1}</{0}>\n", ZEString(bstrName), ZEString(vtProp.bstrVal));
 				}

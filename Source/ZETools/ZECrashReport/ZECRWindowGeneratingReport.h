@@ -40,22 +40,27 @@
 #include "ZEThread\ZEThread.h"
 
 class ZECRWindow;
+class QTimer;
 class Ui_ZECRWindowGeneratingReport;
 
 class ZECRWindowGeneratingReport : public ZECRWindowPage
 {
 	Q_OBJECT
-	private:		
+	private:
 		Ui_ZECRWindowGeneratingReport*			Form;
 		ZEThread								GeneratorThread;
+		bool									Generated;
+		QTimer*									Timer;
 
 		void									GeneratorThread_Function(ZEThread* Thread, void* Parameters);
-		virtual void							Activated() override;
 
 	private slots:
+		void									Timer_timeout();
 		void									btnCancel_clicked();
 
 	public:
+		virtual void							Activated() override;
+
 												ZECRWindowGeneratingReport(QWidget* Parent = NULL);
 												~ZECRWindowGeneratingReport();
 };

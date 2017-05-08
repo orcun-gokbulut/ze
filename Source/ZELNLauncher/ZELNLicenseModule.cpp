@@ -45,7 +45,7 @@ void ZELNLicenseModule::LoadLicense()
 {
 	ZELCLicenseManager LicenseManager;
 	LicenseManager.LoadLicenses();
-	const ZELCLicense* ResultLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
+	const ZELCLicense* ResultLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetProductName(), ZELNLauncher::GetInstance()->GetProductVersionMajor());
 	if (ResultLicense != NULL)
 	{
 		License = *ResultLicense;
@@ -53,7 +53,7 @@ void ZELNLicenseModule::LoadLicense()
 	}
 	else
 	{
-		ZEArray<ZELCLicense> Licenses = LicenseManager.GetLicenses(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
+		ZEArray<ZELCLicense> Licenses = LicenseManager.GetLicenses(ZELNLauncher::GetInstance()->GetProductName(), ZELNLauncher::GetInstance()->GetProductVersionMajor());
 		Licenses.Sort2<ZELCLicenseManager::CompareLicenseOrder>();
 		if (Licenses.GetCount() != 0 && Licenses[0].GetEnabled())
 		{
@@ -62,7 +62,7 @@ void ZELNLicenseModule::LoadLicense()
 		else
 		{
 			License = ZELCLicense();
-			License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
+			License.SetProductName(ZELNLauncher::GetInstance()->GetProductName());
 		}
 		LicenseValid = false;
 	}

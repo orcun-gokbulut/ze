@@ -35,94 +35,30 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEBase64.h"
-#include "ZEDS/ZEFormat.h"
-
-#include "ZECore/ZECrashHandler.h"
 #include "ZECRWindow.h"
-#include "ZECRSender.h"
-#include "ZECRCrashReport.h"
-#include "ZECRProviderFile.h"
-#include "ZECRProviderApplicationInformation.h"
-#include "ZECRProviderSystemInformation.h"
-#include "ZECRProviderMemoryDump.h"
+
+#include <QApplication>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <QApplication>
-#include <tinyxml.h>
-#include <tinystr.h>
-
-ZEInt RunUI(ZECRCrashReport& CrashReport, const ZEString& UploadURL)
-{
-	ZEInt argc = 0;
-	char** argv = NULL;
-
-	QApplication a(argc, argv);
-	ZECRWindow* MainWindow = new ZECRWindow(&CrashReport);
-
-	return a.exec();
-}
-
-static void Process(ZEString CommandArguments)
-{	
-	if(CommandArguments == NULL)
-		return;
-	
-	HANDLE File = CreateFile(CommandArguments, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); 
-	if (File == INVALID_HANDLE_VALUE)
-		return;
-
-	DWORD Temp = 0xEEFF0012;
-
-	WriteFile(File, &Temp, sizeof(Temp), NULL, NULL);
-
-	ZECrashReportParameters Data;
-	if (!ReadFile(File, &Data, sizeof(ZECrashReportParameters), &Temp, NULL))
-		return;
-
-	ZECRCrashReport CrashReport;
-
-	if (strlen(Data.LogFilePath) != 0)
-	{
-		ZECRProviderFile* FileProvider = new ZECRProviderFile();
-		FileProvider->SetName("Log");
-		FileProvider->SetFileName(Data.LogFilePath);
-		FileProvider->SetBinary(false);
-	}
-
-	ZECRProviderMemoryDump*	DumpProvider = new ZECRProviderMemoryDump();
-	DumpProvider->SetName("Dump");
-	DumpProvider->SetBinary(true);
-	DumpProvider->SetProcessId(Data.ProcessId);
-	DumpProvider->SetDumpType(ZE_CDT_NORMAL);
-	CrashReport.RegisterProvider(DumpProvider);
-
-	ZECRProviderApplicationInformation* ApplicationProvider = new ZECRProviderApplicationInformation();
-	ApplicationProvider->SetProcessId(Data.ProcessId);
-	CrashReport.RegisterProvider(ApplicationProvider);
-
-	ZECRProviderSystemInformation* SystemInformation = new ZECRProviderSystemInformation();
-	CrashReport.RegisterProvider(SystemInformation);
-
-	CrashReport.Generate();
-
-	DWORD Result = 1;
-	WriteFile(File, &Result, sizeof(DWORD), &Temp, NULL);
-
-	CloseHandle(File);
-	
-	RunUI(CrashReport, "https://support.zinek.xyz/crash-report/upload");
-}
 
 extern "C" __declspec(dllexport) void CALLBACK ReportCrash(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {	
-	Process(lpszCmdLine);
+	int argc = 0;
+	char** argv = NULL;
+
+	MessageBox(NULL, "Attach", "Attach", MB_OK);
+
+	QApplication Application(argc, argv);
+	ZECRWindow* Window = new ZECRWindow();
+	Window->show();
+	Window->Process(lpszCmdLine);
+
+	Application.exec();
 }
 
-ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	Process(lpCmdLine);
+	ReportCrash(NULL, hInstance, lpCmdLine, nCmdShow);
 	return 0;
 }

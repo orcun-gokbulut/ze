@@ -45,7 +45,7 @@ class ZELCLicense
 {
 	private:
 		ZEGUID					GUID;
-		ZEString				ApplicationName;
+		ZEString				ProductName;
 		ZEString				LicenseeName;
 		ZEString				SerialKey;
 		ZEString				ActivationCode;
@@ -58,12 +58,12 @@ class ZELCLicense
 		void					SetGUID(const ZEGUID& GUID);
 		const ZEGUID&			GetGUID() const;
 
-		void					SetApplicationName(const ZEString& ApplicationName);
-		const ZEString&			GetApplicationName() const;
+		void					SetProductName(const ZEString& ApplicationName);
+		const ZEString&			GetProductName() const;
 
-		ZEUInt8					GetApplicationVersionMajor() const;
-		ZEUInt8					GetApplicationVersionMinor() const;
-		ZEUInt8					GetApplicationEdition() const;
+		ZEUInt8					GetProductVersionMajor() const;
+		ZEUInt8					GetProductVersionMinor() const;
+		ZEUInt8					GetProductEdition() const;
 		ZEUInt8					GetFlags() const;
 
 		void					SetLicenseeName(const ZEString& Name);

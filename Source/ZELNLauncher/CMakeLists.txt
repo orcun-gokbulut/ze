@@ -94,7 +94,7 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect ZEITIntegrity libCryptopp Qt5::WinMain
+	LIBS ZEFoundationStatic Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
 
 qt5_use_modules(ZELNLauncher Widgets)

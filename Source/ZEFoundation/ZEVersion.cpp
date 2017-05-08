@@ -36,8 +36,8 @@
 #include "ZEVersion.h"
 
 #include "ZEVersionData.h"
-#include "ZEDS/ZEFormat.h"
 #include "ZEPlatform.h"
+#include "ZEDS/ZEFormat.h"
 
 ZEString ZEVersion::GetShortString() 
 {
@@ -57,9 +57,9 @@ ZEVersion ZEVersion::GetZinekVersion()
 	Temp.Minor = ZE_VERSION_MINOR;
 	Temp.Internal = ZE_VERSION_INTERNAL;
 	Temp.Revision = ZE_VERSION_REVISION;
-	strcpy(Temp.Branch, ZE_VERSION_BRANCH);
-	strcpy(Temp.Platform, ZE_PLATFORM);
-	strcpy(Temp.Architecture, ZE_PLATFORM_ARCHITECTURE);
+	strncpy(Temp.Branch, ZE_VERSION_BRANCH, 50);
+	strncpy(Temp.Platform, ZE_PLATFORM, 50);
+	strncpy(Temp.Architecture, ZE_PLATFORM_ARCHITECTURE, 50);
 
 	return Temp;
 }
@@ -88,9 +88,9 @@ ZEVersion::ZEVersion()
 	this->Minor = 0;
 	this->Internal = 0;
 	this->Revision = 0;
-	strcpy(this->Branch, "");
-	strcpy(this->Platform, "");
-	strcpy(this->Architecture, "");
+	Branch[0] = '\0';
+	Platform[0] = '\0';
+	Architecture[0] = '\0';
 }
 
 ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Revision, const char* Branch, const char* Platform, const char* Architecture)

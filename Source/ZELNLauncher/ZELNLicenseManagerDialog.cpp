@@ -55,11 +55,11 @@ void ZELNLicenseManagerDialog::LoadLicenses()
 		Form->tblLicenses->setItem(I, 1, new QTableWidgetItem(License.CheckValid() ? "Yes" : "No"));
 		Form->tblLicenses->setItem(I, 2, new QTableWidgetItem(License.GetLicenseeName().ToCString()));
 		Form->tblLicenses->setItem(I, 3, new QTableWidgetItem(License.GetSerialKey().ToCString()));
-		Form->tblLicenses->setItem(I, 4, new QTableWidgetItem(License.GetApplicationName().ToCString()));
+		Form->tblLicenses->setItem(I, 4, new QTableWidgetItem(License.GetProductName().ToCString()));
 		Form->tblLicenses->setItem(I, 5, new QTableWidgetItem(QString("%1.%2")
-			.arg(License.GetApplicationVersionMajor())
-			.arg(License.GetApplicationVersionMinor())));
-		Form->tblLicenses->setItem(I, 6, new QTableWidgetItem(QString::number(License.GetApplicationEdition())));
+			.arg(License.GetProductVersionMajor())
+			.arg(License.GetProductVersionMinor())));
+		Form->tblLicenses->setItem(I, 6, new QTableWidgetItem(QString::number(License.GetProductEdition())));
 		Form->tblLicenses->setItem(I, 7, new QTableWidgetItem(License.GetSystemWide() ? "System Wide" : "Instance"));
 		Form->tblLicenses->setItem(I, 8, new QTableWidgetItem(License.GetEnabled() ? "Yes" : "No"));
 	}
@@ -110,7 +110,7 @@ void ZELNLicenseManagerDialog::btnViewEdit_clicked()
 void ZELNLicenseManagerDialog::btnAdd_clicked()
 {
 	ZELCLicense License;
-	License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
+	License.SetProductName(ZELNLauncher::GetInstance()->GetProductName());
 
 	ZELNLicenseEditorDialog Editor;
 	Editor.SetLicense(License);

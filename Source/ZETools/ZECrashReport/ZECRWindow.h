@@ -37,25 +37,32 @@
 #include <QDialog>
 
 #include "ZECRWindowPage.h"
+#include "ZECRCrashReport.h"
+#include "ZECRCrashReporterParameters.h"
 
-class ZECRCrashReport;
 class Ui_ZECRWindow;
 
 class ZECRWindow : public QDialog
 {
 	Q_OBJECT
 	private:		
-		Ui_ZECRWindow*						Form;
-		ZECRCrashReport*					CrashReport;
-		ZECRWindowPageId					CurrentPage;
+		Ui_ZECRWindow*							Form;
+		ZECRCrashReport							CrashReport;
+		ZECRWindowPageId						CurrentPage;
+		ZECRCrashReporterParameters				Parameters;
+		void*									ApplicationPipe;
 
 	public:
-		Ui_ZECRWindow*						GetForm();
-		ZECRCrashReport*					GetCrashReport();
+		Ui_ZECRWindow*							GetForm();
+		const ZECRCrashReporterParameters&		GetParameters();
+		ZECRCrashReport*						GetCrashReport();
 
-		void								SetPage(ZECRWindowPageId Id);
-		ZECRWindowPageId					GetPage();
+		void									SetPage(ZECRWindowPageId Id);
+		ZECRWindowPageId						GetPage();
 
-											ZECRWindow(ZECRCrashReport* CrashReport);
-											~ZECRWindow();	
+		void									Process(const ZEString& CommandLineParameters);
+		void									TerminateApplication();
+
+												ZECRWindow();
+												~ZECRWindow();	
 };

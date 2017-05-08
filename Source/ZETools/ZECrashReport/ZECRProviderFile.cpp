@@ -145,6 +145,8 @@ void ZECRProviderFile::CleanUp()
 
 ZECRProviderFile::ZECRProviderFile()
 {
+	File = NULL;
+	Size = 0;
 	DeleteOnExit = true;
 	Binary = false;
 }

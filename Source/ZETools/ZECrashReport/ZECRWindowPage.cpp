@@ -39,7 +39,7 @@
 
 ZECRWindow* ZECRWindowPage::GetWindow()
 {
-	return static_cast<ZECRWindow*>(parent());
+	return static_cast<ZECRWindow*>(window());
 }
 
 void ZECRWindowPage::Activated()

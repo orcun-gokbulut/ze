@@ -46,13 +46,13 @@ class ZELCLicenseManager
 
 	public:
 		const ZEArray<ZELCLicense>&		GetLicenses();
-		ZEArray<ZELCLicense>			GetLicenses(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition = -1);
+		ZEArray<ZELCLicense>			GetLicenses(const ZEString& ProductName, ZEUInt ProductVersionMajor, ZEInt ProductEdition = -1);
 		const ZELCLicense*				GetLicense(const ZEGUID& GUID);
 
 		void							RegisterLicense(const ZELCLicense& License);
 		void							UnregisterLicense(const ZEGUID& LicenseGUID);
 
-		const ZELCLicense*				RequestLicense(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition = -1);
+		const ZELCLicense*				RequestLicense(const ZEString& ProductName, ZEUInt ProductVersionMajor, ZEInt ProductEdition = -1);
 
 		void							LoadLicenses();
 		void							SaveLicenses();

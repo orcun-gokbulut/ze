@@ -45,6 +45,6 @@ bool ZELCChecker::Check(const ZEString& ApplicationName, ZEInt& ApplicationVersi
 	if (License == NULL)
 		return false;
 
-	ApplicationEdition = License->GetApplicationEdition();
+	ApplicationEdition = License->GetProductEdition();
 	return true;
 }

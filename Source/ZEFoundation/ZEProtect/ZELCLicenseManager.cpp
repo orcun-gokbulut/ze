@@ -44,18 +44,18 @@ const ZEArray<ZELCLicense>& ZELCLicenseManager::GetLicenses()
 	return Licenses;
 }
 
-ZEArray<ZELCLicense> ZELCLicenseManager::GetLicenses(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition)
+ZEArray<ZELCLicense> ZELCLicenseManager::GetLicenses(const ZEString& ProductName, ZEUInt ProductVersion, ZEInt ProductEdition)
 {
 	ZEArray<ZELCLicense> FoundLicenses;
 	for (ZESize I = 0; I < Licenses.GetCount(); I++)
 	{
-		if (Licenses[I].GetApplicationName() != ApplicationName)
+		if (Licenses[I].GetProductName() != ProductName)
 			continue;
 
-		if (Licenses[I].GetApplicationVersionMajor() < ApplicationVersionMajor)
+		if (Licenses[I].GetProductVersionMajor() < ProductVersion)
 			continue;
 
-		if ((ZEInt)Licenses[I].GetApplicationEdition() < ApplicationEdition)
+		if ((ZEInt)Licenses[I].GetProductEdition() < ProductEdition)
 			continue;
 
 		FoundLicenses.Add(Licenses[I]);
@@ -101,7 +101,7 @@ void ZELCLicenseManager::UnregisterLicense(const ZEGUID& LicenseGUID)
 	}
 }
 
-const ZELCLicense* ZELCLicenseManager::RequestLicense(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition)
+const ZELCLicense* ZELCLicenseManager::RequestLicense(const ZEString& ProductName, ZEUInt ProductVersionMajor, ZEInt ProductEdition)
 {
 	ZEArray<ZELCLicense*> FoundLicenses;
 	ZELCLicense* TargetLicense = NULL;
@@ -110,13 +110,13 @@ const ZELCLicense* ZELCLicenseManager::RequestLicense(const ZEString& Applicatio
 		if (!Licenses[I].GetEnabled())
 			continue;
 
-		if (Licenses[I].GetApplicationName() != ApplicationName)
+		if (Licenses[I].GetProductName() != ProductName)
 			continue;
 
-		if (Licenses[I].GetApplicationVersionMajor() < ApplicationVersionMajor)
+		if (Licenses[I].GetProductVersionMajor() < ProductVersionMajor)
 			continue;
 
-		if ((ZEInt)Licenses[I].GetApplicationEdition() < ApplicationEdition)
+		if ((ZEInt)Licenses[I].GetProductEdition() < ProductEdition)
 			continue;
 
 		if (Licenses[I].GetSerialKey().IsEmpty())
@@ -239,11 +239,11 @@ ZEInt ZELCLicenseManager::CompareLicenseOrder(const ZELCLicense& A, const ZELCLi
 	}
 	else
 	{
-		if (A.GetApplicationEdition() > B.GetApplicationEdition())
+		if (A.GetProductEdition() > B.GetProductEdition())
 		{
 			return -1;
 		}
-		else if (A.GetApplicationEdition() < B.GetApplicationEdition())
+		else if (A.GetProductEdition() < B.GetProductEdition())
 		{
 			return 1;
 		}

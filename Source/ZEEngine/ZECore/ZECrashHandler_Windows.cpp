@@ -61,6 +61,7 @@ static SignalHandlerType OldInvalidInstructionSignalHandler = NULL;
 static SignalHandlerType OldTerminateSignalHandler = NULL;
 
 #include "ZEThread/ZEThread.h"
+#include "ZETools/ZECrashReport/ZECRCrashReporterParameters.h"
 
 
 
@@ -251,14 +252,6 @@ ZECrashHandler::~ZECrashHandler()
 	Deinitialize();
 }
 
-void CrashReportTestThreadFunction(ZEThread* Thread, void* Parameters)
-{
-	ZEString DLLPath = ZEFileInfo("#E:/ZECRCrashReporter.dll").GetRealPath().Path;
-	HMODULE Handle = LoadLibrary(DLLPath);
-	typedef void (*ZEReportCrashFunction)(HWND, HINSTANCE, LPSTR, int);
-	ZEReportCrashFunction ReportCrash = reinterpret_cast<ZEReportCrashFunction>(GetProcAddress(Handle, "ReportCrash"));
-	ReportCrash(NULL, Handle, (char*)Parameters, SW_SHOW);
-}
 
 void ZECrashHandler::Crashed(ZECrashReason Reason)
 {
@@ -270,6 +263,8 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 
 	CrashLock.Lock();
 
+	HANDLE Process = GetCurrentProcess();
+
 	UnregisterHandlers();
 
 	ZEString GUID = ZEGUID::Generate().ToString();
@@ -279,36 +274,27 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
 
 	ZEString DLLPath = ZEFileInfo("#E:/ZECRCrashReporter.dll").GetRealPath().Path;
-	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\", ReportCrash \"{1}\"", DLLPath, NamedPipeName);
+	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\", ReportCrash {1}", DLLPath, NamedPipeName);
 
-	#define ZECR_CRASH_REPORT_TEST
-	#ifndef ZECR_CRASH_REPORT_TEST
-		if (WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
-			TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
-	#else
-		static ZEThread CrashReporterThread;
-		CrashReporterThread.SetParameter((void*)NamedPipeName.ToCString());
-		CrashReporterThread.SetFunction(ZEThreadFunction::Create<CrashReportTestThreadFunction>());
-		CrashReporterThread.Run();
-	#endif
+	if (WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
+		TerminateProcess(Process, EXIT_FAILURE);
 
 	ConnectNamedPipe(NamedPipeHandle, NULL);
 
 	DWORD Signal;
 	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
 	if (Signal != 0xEEFF0012)
-		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+		TerminateProcess(Process, EXIT_FAILURE);
 
-	ZECrashReportParameters Data;
-	Data.ProcessId = GetCurrentProcessId();
-	Data.Reason = Reason;
-	strncpy(Data.LogFilePath, ZELog::GetInstance()->GetRootSession()->GetLogFileName().ToCString(), 1024);
+	ZECRCrashReporterParameters Parameters;
+	Parameters.ProcessId = GetCurrentProcessId();
+	Parameters.Reason = Reason;
+	GenerateParameters(Parameters);
 	
-	if (!WriteFile(NamedPipeHandle, &Data, sizeof(ZECrashReportParameters), NULL, NULL))
-		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+	if (!WriteFile(NamedPipeHandle, &Parameters, sizeof(ZECRCrashReporterParameters), NULL, NULL))
+		TerminateProcess(Process, EXIT_FAILURE);
+
 
 	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
-
-	Sleep(INFINITE);
-	TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
+	TerminateProcess(Process, EXIT_FAILURE);
 }

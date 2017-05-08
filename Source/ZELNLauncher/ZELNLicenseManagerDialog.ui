@@ -63,7 +63,7 @@
        </column>
        <column>
         <property name="text">
-         <string>Application</string>
+         <string>Product</string>
         </property>
        </column>
        <column>

@@ -54,7 +54,6 @@ class ZECRWindowTransfering : public ZECRWindowPage
 		ZECRSender								Sender;
 		ZEString								FileName;
 		ZEString								UploadURL;
-		ZECRSenderProgress						ProgressInformation;
 		QTimer									UpdateInformationTimer;		
 
 		bool									PackageItems();

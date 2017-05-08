@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Zinek Crash Reporter</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ZECRResources.qrc">
+    <normaloff>:/Zinek.ico</normaloff>:/Zinek.ico</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -38,7 +42,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../../ZELNLauncher/ZELNLauncher.qrc">:/ZELNLauncher/Logo.png</pixmap>
+      <pixmap resource="ZECRResources.qrc">:/Logo.png</pixmap>
      </property>
      <property name="alignment">
       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -92,7 +96,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../ZELNLauncher/ZELNLauncher.qrc"/>
+  <include location="ZECRResources.qrc"/>
  </resources>
  <connections/>
 </ui>

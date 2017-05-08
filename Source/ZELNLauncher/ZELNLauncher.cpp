@@ -51,19 +51,19 @@
 
 ZELNLauncher* ZELNLauncher::Instance = NULL;
 
-void ZELNLauncher::InitializeApplication(const ZEMLReaderNode& ApplicationNode)
+void ZELNLauncher::InitializeApplication(const ZEMLReaderNode& ProductNode)
 {
-	if (!ApplicationNode.IsValid())
+	if (!ProductNode.IsValid())
 	{
 		zeWarning("Application information is missing in configuration file. Using default information.");
 		return;
 	}
 
-	ApplicationName = ApplicationNode.ReadString("Name", ApplicationName);
-	ApplicationVersionMajor = ApplicationNode.ReadUInt8("VersionMajor", ApplicationVersionMajor);
-	ApplicationVersionMinor = ApplicationNode.ReadUInt8("VersionMinor", ApplicationVersionMinor);
-	ApplicationExecutable = ApplicationNode.ReadString("Executable", ApplicationExecutable);
-	CommandLineArguments = ApplicationNode.ReadString("CommandLineArguments", CommandLineArguments);
+	ProductName = ProductNode.ReadString("Name", ProductName);
+	ProductVersionMajor = ProductNode.ReadUInt8("VersionMajor", ProductVersionMajor);
+	ProductVersionMinor = ProductNode.ReadUInt8("VersionMinor", ProductVersionMinor);
+	ProductMainExecutable = ProductNode.ReadString("Executable", ProductMainExecutable);
+	CommandLineArguments = ProductNode.ReadString("CommandLineArguments", CommandLineArguments);
 }
 
 void ZELNLauncher::InitializeModules(const ZEMLReaderNode& ModulesNode)
@@ -151,7 +151,7 @@ bool ZELNLauncher::InitializeInternal()
 
 	ZEMLReader Reader;
 	ZEMLReaderNode RootNode;
-	if (!Reader.Open("#E:/Launcher.ZEConfig"))
+	if (!Reader.Open("#E:/Configurations/ZELNLauncher.ZEConfig"))
 	{
 		zeWarning("Cannot open Zinek Launcher configuration file.");
 	}
@@ -168,7 +168,7 @@ bool ZELNLauncher::InitializeInternal()
 	Instance = this;
 	Window = new ZELNLauncherWindow();
 
-	InitializeApplication(RootNode.GetNode("Application"));
+	InitializeApplication(RootNode.GetNode("Product"));
 	InitializeModules(RootNode.GetNode("Modules"));
 
 	Update();
@@ -200,43 +200,43 @@ ZELNLauncherWindow* ZELNLauncher::GetWindow()
 	return Window;
 }
 
-void ZELNLauncher::SetApplicationName(const ZEString& Name)
+void ZELNLauncher::SetProductName(const ZEString& Name)
 {
-	ApplicationName = Name;
+	ProductName = Name;
 }
-const ZEString& ZELNLauncher::GetApplicationName()
+const ZEString& ZELNLauncher::GetProductName()
 {
-	return ApplicationName;
-}
-
-void ZELNLauncher::SetApplicationFileName(const ZEString& FileName)
-{
-	ApplicationExecutable = FileName;
+	return ProductName;
 }
 
-const ZEString& ZELNLauncher::GetApplicationFileName()
+void ZELNLauncher::SetProductMainExecutable(const ZEString& FileName)
 {
-	return ApplicationName;
+	ProductMainExecutable = FileName;
 }
 
-void ZELNLauncher::SetApplicationMajorVersion(ZEUInt Version)
+const ZEString& ZELNLauncher::GetProductMainExecutable()
 {
-	ApplicationVersionMajor = Version;
+	return ProductName;
 }
 
-ZEUInt ZELNLauncher::GetApplicationVersionMajor()
+void ZELNLauncher::SetProductMajorVersion(ZEUInt Version)
 {
-	return ApplicationVersionMajor;
+	ProductVersionMajor = Version;
 }
 
-void ZELNLauncher::SetApplicationMinorVersion(ZEUInt Version)
+ZEUInt ZELNLauncher::GetProductVersionMajor()
 {
-	ApplicationVersionMinor = Version;
+	return ProductVersionMajor;
 }
 
-ZEUInt ZELNLauncher::GetApplicationVersionMinor()
+void ZELNLauncher::SetProductMinorVersion(ZEUInt Version)
 {
-	return ApplicationVersionMinor;
+	ProductVersionMinor = Version;
+}
+
+ZEUInt ZELNLauncher::GetProductVersionMinor()
+{
+	return ProductVersionMinor;
 }
 
 void ZELNLauncher::Update()
@@ -283,7 +283,7 @@ void ZELNLauncher::Launch()
 	if (!AllowedToLaunch)
 		return;
 
-	zeLog("Launching %s...", ApplicationName.ToCString());
+	zeLog("Launching %s...", ProductName.ToCString());
 
 	Status = ZELN_LS_LAUNCHING;
 	Window->update();
@@ -293,7 +293,7 @@ void ZELNLauncher::Launch()
 	GetModuleFileName(NULL, LauncherPath, MAX_PATH);
 	ZEPathInfo PathInfo(LauncherPath);
 	ZEString ParentDirectory = PathInfo.GetParentDirectory();
-	Information.BinaryPath = ZEFormat::Format("{0}/{1}", ParentDirectory, ApplicationExecutable);
+	Information.BinaryPath = ZEFormat::Format("{0}/{1}", ParentDirectory, ProductMainExecutable);
 
 	// Command Line Arguments
 	Information.Parameters.Clear();
@@ -357,9 +357,9 @@ ZELNLauncher::ZELNLauncher()
 {
 	zeDebugCheck(Instance != NULL, "Multi instance detected.");
 	Instance = this;
-	ApplicationName = "Zinek Engine";
-	ApplicationVersionMajor = ZEVersion::GetZinekVersion().Major;
-	ApplicationVersionMinor = ZEVersion::GetZinekVersion().Minor;
+	ProductName = "Zinek Engine";
+	ProductVersionMajor = ZEVersion::GetZinekVersion().Major;
+	ProductVersionMinor = ZEVersion::GetZinekVersion().Minor;
 }
 
 ZELNLauncher::~ZELNLauncher()

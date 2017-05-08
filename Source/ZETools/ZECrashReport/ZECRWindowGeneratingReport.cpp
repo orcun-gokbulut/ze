@@ -39,15 +39,29 @@
 #include "ZECRCrashReport.h"
 #include "ui_ZECRWindowGeneratingReport.h"
 
+#include <QTimer>
+
 void ZECRWindowGeneratingReport::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
 {
 	GetWindow()->GetCrashReport()->Generate();
-	GetWindow()->SetPage(ZECR_WP_INFORMATION);
+	GetWindow()->TerminateApplication();
+	Generated = true;
 }
 
 void ZECRWindowGeneratingReport::Activated()
 {
+	Generated = false;
 	GeneratorThread.Run();
+}
+
+void ZECRWindowGeneratingReport::Timer_timeout()
+{
+	if (!Generated)
+		return;
+
+	Timer->stop();
+	GetWindow()->TerminateApplication();
+	GetWindow()->SetPage(ZECR_WP_INFORMATION);
 }
 
 void ZECRWindowGeneratingReport::btnCancel_clicked()
@@ -61,5 +75,15 @@ ZECRWindowGeneratingReport::ZECRWindowGeneratingReport(QWidget* Parent) : ZECRWi
 	Form->setupUi(this);
 
 	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRWindowGeneratingReport, &ZECRWindowGeneratingReport::GeneratorThread_Function>(this));
+	
+	Timer = new QTimer(this);
+	Timer->setInterval(1000);
+	Timer->setSingleShot(false);
+	connect(Timer, SIGNAL(timeout()), this, SLOT(Timer_timeout()));
+}
+
+ZECRWindowGeneratingReport::~ZECRWindowGeneratingReport()
+{
+	delete Form;
 }
 

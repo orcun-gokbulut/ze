@@ -36,6 +36,39 @@
 #include "ZECrashHandler.h"
 
 #include "ZECore.h"
+#include "ZEApplicationModule.h"
+#include "ZELogSession.h"
+#include "ZETools/ZECrashReport/ZECRCrashReporterParameters.h"
+
+void ZECrashHandler::GenerateParameters(ZECRCrashReporterParameters& Parameters)
+{
+	ZELogSession* Session = ZELog::GetInstance()->GetRootSession();
+	if (Session == NULL)
+		Parameters.LogFilePath[0] = '\0';
+	else
+		strncpy(Parameters.LogFilePath, Session->GetLogFileName().ToCString(), 1024);
+
+	ZEApplicationModule* Application = ZECore::GetInstance()->GetApplicationModule();
+	if (Application == NULL)
+	{
+		Parameters.ApplicationName[0] = '\0';
+		Parameters.ApplicationVersion = ZEVersion();		
+		Parameters.LicenseProductName[0] = '\0';
+		Parameters.LicenseLicenseeName[0] = '\0';
+		Parameters.LicenseSerialKey[0] = '\0';
+		Parameters.LicenseVersion = 0;
+	}
+	else
+	{
+		strncpy(Parameters.ApplicationName, Application->GetName(), 1024);
+		Parameters.ApplicationVersion = Application->GetVersion();
+		ZELCLicense License = Application->GetLicense();
+		strncpy(Parameters.LicenseProductName, License.GetProductName().ToCString(), 1024);
+		strncpy(Parameters.LicenseLicenseeName, License.GetLicenseeName().ToCString(), 1024);
+		strncpy(Parameters.LicenseSerialKey, License.GetSerialKey().ToCString(), 1024);
+		Parameters.LicenseVersion = License.GetLicenseVersion();
+	}
+}
 
 void ZECrashHandler::SetExecuteCrashReporter(bool Enabled)
 {

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRClickableLabel.h
+ Zinek Engine - ZECRCrashReporterParameters.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRCrashReporterParameters.h"
 
-#include <QLabel>
+#include "ZECommon.h"
 
-class ZECRClickableLabel : public QLabel
-{
-	Q_OBJECT
-	protected:
-		void					mousePressEvent(QMouseEvent* Event);
-	
-	public:
-		explicit				ZECRClickableLabel (const QString text = "", QWidget* parent = 0);
-								~ZECRClickableLabel();
-
-	signals:
-		void					clicked();
-};
-
-
+ZE_SUPPRESS_LNK4221

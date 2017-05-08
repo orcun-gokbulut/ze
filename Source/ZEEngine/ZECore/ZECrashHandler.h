@@ -68,12 +68,7 @@ ZE_ENUM(ZECrashReason)
 	ZE_CR_OTHER
 };
 
-struct ZECrashReportParameters
-{
-	ZEUInt32						ProcessId;
-	ZECrashReason					Reason;
-	char							LogFilePath[1024];
-};
+class ZECRCrashReporterParameters;
 
 class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
 {
@@ -88,6 +83,8 @@ class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
 
 		bool						InitializeInternal();
 		bool						DeinitializeInternal();
+
+		void						GenerateParameters(ZECRCrashReporterParameters& Parameters);
 
 									ZECrashHandler();
 									~ZECrashHandler();

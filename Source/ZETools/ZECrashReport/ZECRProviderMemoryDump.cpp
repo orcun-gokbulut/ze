@@ -102,11 +102,11 @@ bool ZECRProviderMemoryDump::Generate()
 	SetFileName(ZEFormat::Format("{0}{1}.zeDump", TempFolder, ZEGUID::Generate().ToString()));
 	HANDLE hFile = CreateFileA(GetFileName(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
-	if(hFile == INVALID_HANDLE_VALUE)
+	if (hFile == INVALID_HANDLE_VALUE)
 		return false;
 	
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, ProcessId);
-	if(!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
+	if (!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
 	{			
 		CloseHandle(hFile);
 		DeleteFileA(GetFileName());

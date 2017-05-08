@@ -49,7 +49,7 @@
 void ZELNLicenseEditorDialog::UpdateWidget()
 {
 	Form->txtGUID->setText(License.GetGUID().ToString().ToCString());
-	Form->txtApplicationName->setText(License.GetApplicationName().ToCString());
+	Form->txtApplicationName->setText(License.GetProductName().ToCString());
 	Form->txtLicensee->setText(License.GetLicenseeName().ToCString());
 	Form->txtSerialKey->setText(License.GetSerialKey().ToCString());
 	Form->txtActivationCode->setPlainText(License.GetActivationCode().ToCString());
@@ -58,7 +58,7 @@ void ZELNLicenseEditorDialog::UpdateWidget()
 
 void ZELNLicenseEditorDialog::btnGeneratePreActivationCode_clicked()
 {
-	License.SetApplicationName(Form->txtApplicationName->text().toLocal8Bit().begin());
+	License.SetProductName(Form->txtApplicationName->text().toLocal8Bit().begin());
 	License.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
 	License.SetSerialKey(Form->txtSerialKey->text().toLocal8Bit().begin());
 
@@ -106,7 +106,7 @@ void ZELNLicenseEditorDialog::btnOpenActivationCode_clicked()
 
 void ZELNLicenseEditorDialog::btnSave_clicked()
 {
-	License.SetApplicationName(Form->txtApplicationName->text().toLocal8Bit().begin());
+	License.SetProductName(Form->txtApplicationName->text().toLocal8Bit().begin());
 	License.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
 	License.SetSerialKey(Form->txtSerialKey->text().toLocal8Bit().begin());
 	License.SetActivationCode(Form->txtActivationCode->toPlainText().toLocal8Bit().begin());

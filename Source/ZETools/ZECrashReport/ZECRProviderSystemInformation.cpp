@@ -48,7 +48,7 @@ const char* ZECRProviderSystemInformation::GetName()
 
 const char* ZECRProviderSystemInformation::GetExtension()
 {
-	return ".xml"
+	return ".xml";
 }
 
 ZESize ZECRProviderSystemInformation::GetSize()
@@ -70,57 +70,57 @@ bool ZECRProviderSystemInformation::Generate()
 	Data += "<SystemInformation>\n";
 
 	Data += "<Processor>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Processor"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Processor"))
 		return false;
 	Data += "</Processor>\n";
 
 	Data += "<VideoController>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_VideoController"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_VideoController"))
 		return false;
 	Data += "</VideoController>\n";
 
 	Data += "<SoundDevice>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_SoundDevice"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_SoundDevice"))
 		return false;
 	Data += "</SoundDevice>\n";
 
 	Data += "<OperatingSystem>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_OperatingSystem"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_OperatingSystem"))
 		return false;
 	Data += "</OperatingSystem>\n";
 
 	Data += "<BaseBoard>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_BaseBoard"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_BaseBoard"))
 		return false;
 	Data += "</BaseBoard>\n";
 
 	Data += "<DesktopMonitor>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DesktopMonitor"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DesktopMonitor"))
 		return false;
 	Data += "</DesktopMonitor>\n";
 
 	Data += "<Keyboard>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Keyboard"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Keyboard"))
 		return false;
 	Data += "</Keyboard>\n";
 
 	Data += "<PointingDevice>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PointingDevice"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PointingDevice"))
 		return false;
 	Data += "</PointingDevice>\n";
 
 	Data += "<LogicalDisk>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_LogicalDisk"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_LogicalDisk"))
 		return false;
 	Data += "</LogicalDisk>\n";
 	
 	Data += "<DiskDrive>\n";
-	if(!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DiskDrive"))
+	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DiskDrive"))
 		return false;
 	Data += "</DiskDrive>\n";
 
 	/*Data += "<PnPSignedDriver>\n";
-	if(!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PnPSignedDriver"))
+	if (!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PnPSignedDriver"))
 		return false;
 	Data += "</PnPSignedDriver>\n";*/
 	

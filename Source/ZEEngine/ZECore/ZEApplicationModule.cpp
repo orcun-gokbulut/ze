@@ -36,11 +36,21 @@
 #include "ZEApplicationModule.h"
 
 #include "ZEFile/ZEPathManager.h"
+#include "ZEVersion.h"
 
-
-const char* ZEApplicationModule::GetApplicationName() const
+const char* ZEApplicationModule::GetName() const
 {
 	return GetClass()->GetName();
+}
+
+ZEVersion ZEApplicationModule::GetVersion() const
+{
+	return ZEVersion::GetZinekVersion();
+}
+
+ZELCLicense ZEApplicationModule::GetLicense() const
+{
+	return ZELCLicense();
 }
 
 bool ZEApplicationModule::PreStartup()

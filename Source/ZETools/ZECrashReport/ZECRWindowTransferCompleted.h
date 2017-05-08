@@ -37,9 +37,6 @@
 
 #include "ZECRWindowPage.h"
 
-#include "ZECRCrashReport.h"
-#include "ZECRClickableLabel.h"
-
 class Ui_ZECRWindowTransferCompleted;
 
 class ZECRWindowTransferCompleted : public ZECRWindowPage

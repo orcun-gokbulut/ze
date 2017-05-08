@@ -51,7 +51,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-137</y>
+        <y>0</y>
         <width>455</width>
         <height>675</height>
        </rect>
@@ -147,7 +147,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Application</string>
+             <string>Product</string>
             </property>
            </widget>
           </item>
@@ -167,7 +167,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Application Version</string>
+             <string>Product Version</string>
             </property>
            </widget>
           </item>
@@ -187,7 +187,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Application Edition</string>
+             <string>Product Edition</string>
             </property>
            </widget>
           </item>

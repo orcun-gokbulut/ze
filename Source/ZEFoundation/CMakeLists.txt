@@ -136,4 +136,6 @@ ze_end_components(TARGET ZEFoundationStatic)
 ze_end_components(TARGET ZEFoundationBase)
 ze_end_components(TARGET ZEFoundation)
 
+target_compile_definitions(ZEFoundationStatic PUBLIC ZE_ZEFOUNDATIONSTATIC)
+
 ze_link(ZEFoundation LIBS rt PLATFORMS Unix)

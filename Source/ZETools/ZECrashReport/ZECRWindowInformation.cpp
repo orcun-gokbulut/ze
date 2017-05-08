@@ -85,5 +85,5 @@ ZECRWindowInformation::ZECRWindowInformation(QWidget* Parent) : ZECRWindowPage(P
 
 ZECRWindowInformation::~ZECRWindowInformation()
 {
-
+	delete Form;
 }

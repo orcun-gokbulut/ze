@@ -48,10 +48,10 @@
 void ZELCLicenseToolWindow::btnGenerateSerial_clicked()
 {
 	ZELCSerialKeyGenerator Generator;
-	Generator.SetApplicationName(Form->txtName->text().toLocal8Bit().begin());
-	Generator.SetApplicationVersionMajor(Form->txtVersionMajor->value());
-	Generator.SetApplicationVersionMinor(Form->txtVersionMinor->value());
-	Generator.SetApplicationEdition(Form->txtEdition->value());
+	Generator.SetProductName(Form->txtName->text().toLocal8Bit().begin());
+	Generator.SetProductVersionMajor(Form->txtVersionMajor->value());
+	Generator.SetProductVersionMinor(Form->txtVersionMinor->value());
+	Generator.SetProductEdition(Form->txtEdition->value());
 	Generator.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
 	Generator.SetSerialNumber(Form->txtSerialNumber->value());
 

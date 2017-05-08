@@ -69,10 +69,10 @@ class ZELNLauncher : public ZEInitializable, public ZEDestroyable
 		ZELNLaunchStatus				Status;
 		bool							AllowedToLaunch;
 		ZELNLaunchInformation			Information;
-		ZEString						ApplicationName;
-		ZEUInt							ApplicationVersionMajor;
-		ZEUInt							ApplicationVersionMinor;
-		ZEString						ApplicationExecutable;
+		ZEString						ProductName;
+		ZEUInt							ProductVersionMajor;
+		ZEUInt							ProductVersionMinor;
+		ZEString						ProductMainExecutable;
 		ZEString						CommandLineArguments;
 
 		void							InitializeApplication(const ZEMLReaderNode& ApplicationNode);
@@ -88,17 +88,17 @@ class ZELNLauncher : public ZEInitializable, public ZEDestroyable
 		const ZEArray<ZELNModule*>		GetModules();
 		ZELNLauncherWindow*				GetWindow();
 
-		void							SetApplicationName(const ZEString& Name);
-		const ZEString&					GetApplicationName();
+		void							SetProductName(const ZEString& Name);
+		const ZEString&					GetProductName();
 
-		void							SetApplicationFileName(const ZEString& FileName);
-		const ZEString&					GetApplicationFileName();
+		void							SetProductMainExecutable(const ZEString& FileName);
+		const ZEString&					GetProductMainExecutable();
 
-		void							SetApplicationMajorVersion(ZEUInt Version);
-		ZEUInt							GetApplicationVersionMajor();
+		void							SetProductMajorVersion(ZEUInt Version);
+		ZEUInt							GetProductVersionMajor();
 		
-		void							SetApplicationMinorVersion(ZEUInt Version);
-		ZEUInt							GetApplicationVersionMinor();
+		void							SetProductMinorVersion(ZEUInt Version);
+		ZEUInt							GetProductVersionMinor();
 
 		ZELNLaunchStatus				GetStatus();
 		const ZELNLaunchInformation&	GetInformation();

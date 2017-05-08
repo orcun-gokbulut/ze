@@ -76,5 +76,5 @@ ZECRWindowUserFeedback::ZECRWindowUserFeedback(QWidget* Parent) : ZECRWindowPage
 
 ZECRWindowUserFeedback::~ZECRWindowUserFeedback()
 {
-
+	delete Form;
 }

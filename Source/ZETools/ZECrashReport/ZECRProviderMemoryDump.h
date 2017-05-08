@@ -51,7 +51,6 @@ class ZECRProviderMemoryDump : public ZECRProviderFile
 		virtual const char*					GetName() override;
 		virtual	ZECRDataProviderType		GetProviderType() override;
 		virtual const char*					GetExtension() override;
-		virtual const char*					GetFileTypeDescription() override;
 
 		void								SetProcessId(ZEUInt32 ProcessId);
 		ZEUInt32							GetProcessId();
