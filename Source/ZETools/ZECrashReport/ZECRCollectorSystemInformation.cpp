@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderSystemInformation.cpp
+ Zinek Engine - ZECRCollectorSystemInformation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRProviderSystemInformation.h"
+#include "ZECRCollectorSystemInformation.h"
+
 #include "ZECRCIM.h"
 
-ZECRDataProviderType ZECRProviderSystemInformation::GetProviderType()
+ZECRDataProviderType ZECRCollectorSystemInformation::GetProviderType()
 {
 	return ZECR_DPT_TEXT;
 }
 
-const char* ZECRProviderSystemInformation::GetName()
+const char* ZECRCollectorSystemInformation::GetName()
 {
 	return "System Information";
 }
 
-const char* ZECRProviderSystemInformation::GetExtension()
+const char* ZECRCollectorSystemInformation::GetExtension()
 {
 	return ".xml";
 }
 
-ZESize ZECRProviderSystemInformation::GetSize()
+ZESize ZECRCollectorSystemInformation::GetSize()
 {
 	return DataSize;
 }
 
-bool ZECRProviderSystemInformation::GetData(void* Output, ZESize Offset, ZESize Size)
+bool ZECRCollectorSystemInformation::GetData(void* Output, ZESize Offset, ZESize Size)
 {
 	memcpy(Output, Data.GetValue() + Offset, Size);
 	return true;
 }
 
-bool ZECRProviderSystemInformation::Generate()
+bool ZECRCollectorSystemInformation::Generate(const ZECRReportParameters* Parameters)
 {	
 	if (!ZECRCIM::Initialize())
 		return false;
@@ -133,7 +134,7 @@ bool ZECRProviderSystemInformation::Generate()
 	return true;
 }
 
-ZECRProviderSystemInformation::ZECRProviderSystemInformation()
+ZECRCollectorSystemInformation::ZECRCollectorSystemInformation()
 {
 	DataSize = 0;
 }

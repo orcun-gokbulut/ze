@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderApplicationInformation.h
+ Zinek Engine - ZECRCollectorUserFeedback.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_CRASHREPORT_APPLICATIONPROVIDER_H__
-#define __ZE_CRASHREPORT_APPLICATIONPROVIDER_H__
+#include "ZECRCollectorUserFeedback.h"
 
-#include "ZECRProvider.h"
-#include "ZEDS/ZEString.h"
 #include "ZETypes.h"
-#include "ZEVersion.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFormat.h"
 
-class ZECRProviderApplicationInformation : public ZECRProvider
+#include <memory.h>
+
+const char* ZECRCollectorUserFeedback::GetName()
 {
-	private:
-		ZEString							Data;
-		ZESize								DataSize;
-		ZEVersion							Version;
-		ZEUInt32							ProcessId;
+	return "UserFeedback";
+}
 
-	public:
-		virtual const char*					GetName() override;
-		virtual	ZECRDataProviderType		GetProviderType() override;
-		virtual const char*					GetExtension() override;
+ZECRDataProviderType ZECRCollectorUserFeedback::GetProviderType()
+{
+	return ZECR_DPT_TEXT;
+}
 
-		void								SetVersion(const ZEVersion& Version);
-		const ZEVersion&					GetVersion();
+const char* ZECRCollectorUserFeedback::GetExtension()
+{
+	return ".xml";
+}
 
-		void								SetProcessId(ZEUInt32 ProcessId);
-		ZEUInt32							GetProcessId();
+void ZECRCollectorUserFeedback::SetNameSurname(const char* Name)
+{
+	NameSurname = Name;
+}
 
-		virtual ZESize						GetSize();
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
+const char* ZECRCollectorUserFeedback::GetNameSurname()
+{
+	return NameSurname;
+}
 
-		virtual bool						Generate();
+void ZECRCollectorUserFeedback::SetEMail(const char* EMail)
+{
+	this->EMail = EMail;
+}
 
-											ZECRProviderApplicationInformation();
-};
-#endif
+const char* ZECRCollectorUserFeedback::GetEMail()
+{
+	return EMail;
+}
+
+void ZECRCollectorUserFeedback::SetComment(const char* Comment)
+{
+	this->Comments = Comment;
+}
+
+const char* ZECRCollectorUserFeedback::GetComment()
+{
+	return Comments;
+}
+
+void ZECRCollectorUserFeedback::SetContactBack(bool ContactBack)
+{
+	this->ContactBack = ContactBack;
+}
+
+bool ZECRCollectorUserFeedback::GetContactBack()
+{
+	return ContactBack;
+}
+
+ZESize ZECRCollectorUserFeedback::GetSize()
+{
+	return Size;
+}
+
+bool ZECRCollectorUserFeedback::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	memcpy(Output, Data.GetValue() + Offset, Size);
+	return true;
+}
+
+bool ZECRCollectorUserFeedback::Generate(const ZECRReportParameters* Parameters)
+{
+	Data = ZEFormat::Format(
+		"<ZECrashReport>\n"
+		"  <UserComments>\n"
+		"    <NameSurname>{0}</NameSurname>\n"
+		"    <EMail>{1}</Email>\n"
+		"    <ContactBack>{2}</ContactBack>\n"
+		"    <Comments><![CDATA[\n"
+		"{3}\n"
+		"    ]]></Comments>\n"
+		"  </UserComments>\n"
+		"<ZECrashReport>\n", NameSurname, EMail, ContactBack ? "yes" : "no", Comments);
+	Size = Data.GetLength() + 1;
+	
+	return true;
+}

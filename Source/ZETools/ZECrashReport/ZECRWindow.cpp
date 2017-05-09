@@ -37,20 +37,20 @@
 
 #include "ui_ZECRWindow.h"
 
-#include "ZECRProviderApplicationInformation.h"
-#include "ZECRProviderSystemInformation.h"
-#include "ZECRProviderFile.h"
+#include "ZECRCollectorProductInfo.h"
+#include "ZECRCollectorSystemInformation.h"
+#include "ZECRCollectorFile.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZECRProviderMemoryDump.h"
+#include "ZECRCollectorMemoryDump.h"
 
-const ZECRCrashReporterParameters& ZECRWindow::GetParameters()
+const ZECRReportParameters& ZECRWindow::GetParameters()
 {
 	return Parameters;
 }
 
-ZECRCrashReport* ZECRWindow::GetCrashReport()
+ZECRReport* ZECRWindow::GetCrashReport()
 {
 	return &CrashReport;
 }
@@ -107,31 +107,31 @@ void ZECRWindow::Process(const ZEString& CommandArguments)
 	DWORD Temp = 0xEEFF0012;
 	WriteFile(static_cast<HANDLE>(ApplicationPipe), &Temp, sizeof(Temp), NULL, NULL);
 
-	ZECRCrashReporterParameters Parameters;
-	if (!ReadFile(static_cast<HANDLE>(ApplicationPipe), &Parameters, sizeof(ZECRCrashReporterParameters), &Temp, NULL))
+	ZECRReportParameters Parameters;
+	if (!ReadFile(static_cast<HANDLE>(ApplicationPipe), &Parameters, sizeof(ZECRReportParameters), &Temp, NULL))
 		abort();
 
 	if (strlen(Parameters.LogFilePath) != 0)
 	{
-		ZECRProviderFile* FileProvider = new ZECRProviderFile();
+		ZECRCollectorFile* FileProvider = new ZECRCollectorFile();
 		FileProvider->SetName("Log");
 		FileProvider->SetFileName(Parameters.LogFilePath);
 		FileProvider->SetBinary(false);
 	}
 
-	ZECRProviderMemoryDump*	DumpProvider = new ZECRProviderMemoryDump();
+	ZECRCollectorMemoryDump*	DumpProvider = new ZECRCollectorMemoryDump();
 	DumpProvider->SetName("Dump");
 	DumpProvider->SetBinary(true);
 	DumpProvider->SetProcessId(Parameters.ProcessId);
 	DumpProvider->SetDumpType(ZE_CDT_NORMAL);
-	CrashReport.RegisterProvider(DumpProvider);
+	CrashReport.AddCollector(DumpProvider);
 
-	ZECRProviderApplicationInformation* ApplicationProvider = new ZECRProviderApplicationInformation();
+	ZECRCollectorProductInfo* ApplicationProvider = new ZECRCollectorProductInfo();
 	ApplicationProvider->SetProcessId(Parameters.ProcessId);
-	CrashReport.RegisterProvider(ApplicationProvider);
+	CrashReport.AddCollector(ApplicationProvider);
 
-	ZECRProviderSystemInformation* SystemInformation = new ZECRProviderSystemInformation();
-	CrashReport.RegisterProvider(SystemInformation);
+	ZECRCollectorSystemInformation* SystemInformation = new ZECRCollectorSystemInformation();
+	CrashReport.AddCollector(SystemInformation);
 
 	SetPage(ZECR_WP_GENERATING_REPORT);
 }

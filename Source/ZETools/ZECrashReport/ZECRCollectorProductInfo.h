@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProvider.cpp
+ Zinek Engine - ZECRCollectorProductInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,19 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "ZECRProvider.h"
 
-bool ZECRProvider::Generate()
+#include "ZECRCollector.h"
+#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
+#include "ZEVersion.h"
+
+class ZECRCollectorProductInfo : public ZECRCollector
 {
-	return true;
-}
+	private:
+		ZEString							Data;
+		ZESize								DataSize;
+		ZEVersion							Version;
+		ZEUInt32							ProcessId;
 
-void ZECRProvider::CleanUp()
-{
+	public:
+		virtual const char*					GetName() override;
+		virtual	ZECRDataProviderType		GetProviderType() override;
+		virtual const char*					GetExtension() override;
 
-}
+		void								SetVersion(const ZEVersion& Version);
+		const ZEVersion&					GetVersion();
 
-ZECRProvider::~ZECRProvider()
-{
-	CleanUp();
-}
+		void								SetProcessId(ZEUInt32 ProcessId);
+		ZEUInt32							GetProcessId();
+
+		virtual ZESize						GetSize();
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
+
+		virtual bool						Generate();
+
+											ZECRCollectorProductInfo();
+};

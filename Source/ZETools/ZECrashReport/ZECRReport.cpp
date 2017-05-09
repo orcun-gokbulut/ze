@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProvider.h
+ Zinek Engine - ZECRReport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRReport.h"
+#include "ZECRCollector.h"
 
-#include "ZETypes.h"
-
-enum ZECRDataProviderType
+const ZEArray<ZECRCollector*>& ZECRReport::GetCollectors()
 {
-	ZECR_DPT_TEXT,
-	ZECR_DPT_BINARY,
-};
+	return Collectors;
+}
 
-class ZECRProvider
-{		
-	public:
-		virtual ZECRDataProviderType		GetProviderType() = 0;
+ZECRCollector* ZECRReport::GetCollector(const ZEString& Name)
+{
+	for (ZESize I = 0; I < Collectors.GetCount(); I++)
+	{
+		if (Name == Collectors[I]->GetName())
+			return Collectors[I];
+	}
 
-		virtual const char*					GetName() = 0;
-		virtual const char*					GetExtension() = 0;
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
+	return NULL;
+}
 
-		virtual bool						Generate();
-		virtual void						CleanUp();
+bool ZECRReport::AddCollector(ZECRCollector* Collector)
+{
+	zeCheckError(Collector == NULL, false, "Cannot remove collector. Collector is NULL.");
+	zeCheckError(Collector->Report != NULL, false, "Cannot remove collector. Collector has been already added to a report.");
 
-		virtual								~ZECRProvider();
-};
+	Collectors.Add(Collector);
+
+	return true;
+}
+
+void ZECRReport::RemoveCollector(ZECRCollector* Collector)
+{
+	zeCheckError(Collector == NULL, ZE_VOID, "Cannot remove collector. Collector is NULL.");
+	zeCheckError(Collector->Report != this, ZE_VOID, "Cannot remove collector. Collector does not belong to this report.");
+
+	Collectors.RemoveValue(Collector);
+}
+
+void ZECRReport::Generate(const ZECRReportParameters* Parameters)
+{
+	for (ZESize I = 0; I < Collectors.GetCount(); I++)
+		Collectors[I]->Generate(Parameters);
+}
+
+void ZECRReport::CleanUp()
+{
+	for (ZESize I = 0; I < Collectors.GetCount(); I++)
+		Collectors[I]->CleanUp();
+}
+
+ZECRReport::~ZECRReport()
+{
+	CleanUp();
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderUserFeedback.cpp
+ Zinek Engine - ZECRCollectorSystemInformation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRProviderUserFeedback.h"
+#pragma once
 
+#include "ZECRCollector.h"
 #include "ZEDS/ZEString.h"
-#include "ZETypes.h"
-#include "ZEDS/ZEFormat.h"
 
-#include <memory.h>
-
-const char* ZECRProviderUserFeedback::GetName()
+class ZECRCollectorSystemInformation : public ZECRCollector
 {
-	return "UserFeedback";
-}
+	private:
+		ZEString							Data;
+		ZESize								DataSize;
 
-ZECRDataProviderType ZECRProviderUserFeedback::GetProviderType()
-{
-	return ZECR_DPT_TEXT;
-}
+	public:
+		virtual const char*					GetName() override;
+		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual const char*					GetExtension() override;
+		
+		virtual ZESize						GetSize() override;
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
+		
+		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
 
-const char* ZECRProviderUserFeedback::GetExtension()
-{
-	return ".xml";
-}
-
-void ZECRProviderUserFeedback::SetNameSurname(const char* Name)
-{
-	NameSurname = Name;
-}
-
-const char* ZECRProviderUserFeedback::GetNameSurname()
-{
-	return NameSurname;
-}
-
-void ZECRProviderUserFeedback::SetEMail(const char* EMail)
-{
-	this->EMail = EMail;
-}
-
-const char* ZECRProviderUserFeedback::GetEMail()
-{
-	return EMail;
-}
-
-void ZECRProviderUserFeedback::SetComment(const char* Comment)
-{
-	this->Comments = Comment;
-}
-
-const char* ZECRProviderUserFeedback::GetComment()
-{
-	return Comments;
-}
-
-void ZECRProviderUserFeedback::SetContactBack(bool ContactBack)
-{
-	this->ContactBack = ContactBack;
-}
-
-bool ZECRProviderUserFeedback::GetContactBack()
-{
-	return ContactBack;
-}
-
-ZESize ZECRProviderUserFeedback::GetSize()
-{
-	return Size;
-}
-
-bool ZECRProviderUserFeedback::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	memcpy(Output, Data.GetValue() + Offset, Size);
-	return true;
-}
-
-bool ZECRProviderUserFeedback::Generate()
-{
-	Data = ZEFormat::Format(
-		"<ZECrashReport>\n"
-		"  <UserComments>\n"
-		"    <NameSurname>{0}</NameSurname>\n"
-		"    <EMail>{1}</Email>\n"
-		"    <ContactBack>{2}</ContactBack>\n"
-		"    <Comments><![CDATA[\n"
-		"{3}\n"
-		"    ]]></Comments>\n"
-		"  </UserComments>\n"
-		"<ZECrashReport>\n", NameSurname, EMail, ContactBack ? "yes" : "no", Comments);
-	Size = Data.GetLength() + 1;
-	
-	return true;
-}
+											ZECRCollectorSystemInformation();
+};

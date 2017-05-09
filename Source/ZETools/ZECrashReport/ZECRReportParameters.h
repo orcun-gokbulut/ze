@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRCrashReporterParameters.h
+ Zinek Engine - ZECRReportParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,7 +39,7 @@
 #include "ZEVersion.h"
 #include "ZECore/ZECrashHandler.h"
 
-struct ZECRCrashReporterParameters
+struct ZECRReportParameters
 {
 	ZEUInt32						ProcessId;
 	ZECrashReason					Reason;

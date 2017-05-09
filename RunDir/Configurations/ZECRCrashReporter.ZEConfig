@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?ZEML VersionMajor="1" VersionMinor="0"?>
+ <Node Name="ZEConfig">
+  <Property Name="Class" Type="String">ZECRCrashReporter</Property>
+  <Node Name="Properties">
+   <Property Name="ReportStorage" Type="String">#S:/CrashReports</Property>
+   <Property Name="ReportFileNameFormat" Type="String">{0}-{1}.ZECrashReport</Property>
+   <Property Name="ReportQuota" Type="Int32">10</Property>
+   <Property Name="Upload" Type="Boolean">true</Property>
+   <Property Name="UploadURL" Type="String">https://support.zinek.xyz/crash-report</Property>
+   <Property Name="UploadKey" Type="String"></Property>
+   <Node Name="Collectors">
+   	<Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorProductInformation</Property>
+	 <Node Name="Properties">
+	  <Property Name="DumpType">1</Property> 
+	 </Node>
+	</Node>
+    <Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorUserFeedback</Property>
+	</Node>
+    <Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorLogFile</Property>
+	 <Node Name="Properties">
+	  <Property Name="DumpType">1</Property> 
+	 </Node>
+	</Node>
+	<Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorSystemInformation</Property>
+	 <Node Name="Properties">
+	  <Property Name="DumpType">1</Property> 
+	 </Node>
+	</Node>
+    <Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorCrashDump</Property>
+	 <Node Name="Properties">
+	  <Property Name="DumpType">1</Property> 
+	 </Node>
+	</Node>
+	<Node Name="Collector">
+     <Property Name="Class" Type="String">ZECRCollectorIntegrityCheck</Property>
+	 <Node Name="Properties">
+	  <Property Name="DumpType">1</Property> 
+	 </Node>
+	</Node>
+   </Node>
+  </Node>
+ </Node>
+

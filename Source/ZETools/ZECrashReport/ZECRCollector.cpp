@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderUserFeedback.h
+ Zinek Engine - ZECRCollector.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_CRASHREPORT_USERCOMMENTPROVIDER_H__
-#define __ZE_CRASHREPORT_USERCOMMENTPROVIDER_H__
+#include "ZECRCollector.h"
 
-#include "ZECRProvider.h"
-#include "ZEDS/ZEString.h"
-#include "ZETypes.h"
-
-class ZECRProviderUserFeedback : public ZECRProvider
+ZECRCollector::ZECRCollector()
 {
-	private:
-		ZEString							NameSurname;
-		ZEString							EMail;
-		ZEString							Comments;
-		bool								ContactBack;
+	Report = NULL;
+}
 
-		ZEString							Data;
-		ZESize								Size;
+ZECRReport* ZECRCollector::GetReport()
+{
+	return Report;
+}
 
-	public:
-		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
-		virtual const char*					GetExtension() override;
+bool ZECRCollector::Generate(const ZECRReportParameters* Parameters)
+{
+	return true;
+}
 
+void ZECRCollector::CleanUp()
+{
 
-		virtual const char*					GetNameSurname();
-		void								SetNameSurname(const char* Name);
-		
-		virtual const char*					GetEMail();
-		void								SetEMail(const char* EMail);
+}
 
-		virtual const char*					GetComment();
-		void								SetComment(const char* Comment);
-
-		void								SetContactBack(bool Yes);
-		bool								GetContactBack();
-
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate();
-};
-#endif
+ZECRCollector::~ZECRCollector()
+{
+	CleanUp();
+}

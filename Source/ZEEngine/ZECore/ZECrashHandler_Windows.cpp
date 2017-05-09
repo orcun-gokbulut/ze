@@ -61,7 +61,7 @@ static SignalHandlerType OldInvalidInstructionSignalHandler = NULL;
 static SignalHandlerType OldTerminateSignalHandler = NULL;
 
 #include "ZEThread/ZEThread.h"
-#include "ZETools/ZECrashReport/ZECRCrashReporterParameters.h"
+#include "ZETools/ZECrashReport/ZECRReportParameters.h"
 
 
 
@@ -286,12 +286,12 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 	if (Signal != 0xEEFF0012)
 		TerminateProcess(Process, EXIT_FAILURE);
 
-	ZECRCrashReporterParameters Parameters;
+	ZECRReportParameters Parameters;
 	Parameters.ProcessId = GetCurrentProcessId();
 	Parameters.Reason = Reason;
 	GenerateParameters(Parameters);
 	
-	if (!WriteFile(NamedPipeHandle, &Parameters, sizeof(ZECRCrashReporterParameters), NULL, NULL))
+	if (!WriteFile(NamedPipeHandle, &Parameters, sizeof(ZECRReportParameters), NULL, NULL))
 		TerminateProcess(Process, EXIT_FAILURE);
 
 

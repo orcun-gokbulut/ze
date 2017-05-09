@@ -35,7 +35,7 @@
 
 #include "ZECRPackager.h"
 
-#include "ZECRProvider.h"
+#include "ZECRCollector.h"
 #include "ZEFile\ZEFile.h"
 #include "ZECompression\ZECompressorZLIB.h"
 #include "ZEML\ZEMLWriter.h"
@@ -51,14 +51,14 @@ const char* ZECRPackager::GetOutputFileName()
 	return OutputFileName;
 }
 
-void ZECRPackager::SetCrashReport(ZECRCrashReport* CrashReport)
+void ZECRPackager::SetReport(ZECRReport* Report)
 {
-	this->CrashReport = CrashReport;
+	this->Report = Report;
 }
 
-ZECRCrashReport* ZECRPackager::GetCrashReport()
+ZECRReport* ZECRPackager::GetReport()
 {
-	return CrashReport;
+	return Report;
 }
 
 bool ZECRPackager::Pack()
@@ -84,9 +84,9 @@ bool ZECRPackager::Pack()
 
 	ZEMLWriterNode ProvidersNode;
 	RootNode.OpenNode("Providers", ProvidersNode);
-	for (ZESize I = 0; I < CrashReport->GetProviders().GetCount(); I++)
+	for (ZESize I = 0; I < Report->GetCollectors().GetCount(); I++)
 	{
-		ZECRProvider* Provider = CrashReport->GetProviders()[I];
+		ZECRCollector* Provider = Report->GetCollectors()[I];
 		ZEMLWriterNode ProviderNode;
 		ProvidersNode.OpenNode("Provider", ProvidersNode);
 		

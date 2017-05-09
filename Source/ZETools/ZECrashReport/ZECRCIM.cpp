@@ -34,14 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECRCIM.h"
+
+#include "ZEDS/ZEFormat.h"
+
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_DCOM
 #include <comdef.h>
 #include <Windows.h>
 #include <WbemIdl.h>
 #pragma comment(lib, "wbemuuid.lib")
-#include "ZEDS/ZEFormat.h"
-
 
 bool ZECRCIM::Initialize()
 {

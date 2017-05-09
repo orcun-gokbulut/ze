@@ -40,15 +40,15 @@
 #include "ZECRWindow.h"
 #include "ZECRWindowViewReport.h"
 #include "ZECRWindowViewPrivacyPolicy.h"
-#include "ZECRCrashReport.h"
-#include "ZECRProviderUserFeedback.h"
+#include "ZECRReport.h"
+#include "ZECRCollectorUserFeedback.h"
 
 #include <QDesktopServices>
 #include <QUrl>
 
 void ZECRWindowUserFeedback::btnSend_Clicked()
 {
-	ZECRProviderUserFeedback* Provider = static_cast<ZECRProviderUserFeedback*>(GetWindow()->GetCrashReport()->GetProvider("UserFeedback"));
+	ZECRCollectorUserFeedback* Provider = static_cast<ZECRCollectorUserFeedback*>(GetWindow()->GetCrashReport()->GetCollector("UserFeedback"));
 	
 	if (Provider != NULL)
 	{

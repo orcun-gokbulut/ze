@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderMemoryDump.h
+ Zinek Engine - ZECRCollectorFile.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,120 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_CRASHREPORT_DUMPPROVIDER_H__
-#define __ZE_CRASHREPORT_DUMPPROVIDER_H__
+#include "ZECRCollectorFile.h"
 
-#include "ZECRProviderFile.h"
-#include "ZETypes.h"
-#include "ZECore/ZECrashHandler.h"
+#include "ZEPlatform.h"
+#include "ZEFile/ZEFileInfo.h"
 
-class ZECRProviderMemoryDump : public ZECRProviderFile
-{
-	private:
-		ZEUInt32							ProcessId;
-		ZECrashDumpType						DumpType;
-
-	public:
-		virtual const char*					GetName() override;
-		virtual	ZECRDataProviderType		GetProviderType() override;
-		virtual const char*					GetExtension() override;
-
-		void								SetProcessId(ZEUInt32 ProcessId);
-		ZEUInt32							GetProcessId();
-
-		void								SetDumpType(ZECrashDumpType Type);
-		ZECrashDumpType						GetDumpType();
-
-		virtual bool						Generate() override;
-
-											ZECRProviderMemoryDump();
-};
+#ifdef ZE_PLATFORM_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#elif defined(ZE_PLATFORM_UNIX)
+	#include <unistd.h>
 #endif
+
+#include <stdio.h>
+
+ZECRDataProviderType ZECRCollectorFile::GetProviderType()
+{
+	return Binary ? ZECR_DPT_BINARY : ZECR_DPT_TEXT;
+}
+
+const char*	ZECRCollectorFile::GetName()
+{
+	return Name;
+}
+
+const char* ZECRCollectorFile::GetExtension()
+{
+	return FileExtension;
+}
+
+void ZECRCollectorFile::SetName(const char* Name)
+{
+	this->Name = Name;
+}
+
+const char*	ZECRCollectorFile::GetFileName()
+{
+	return FileName;
+}
+
+void ZECRCollectorFile::SetFileName(const char* FileName)
+{
+	this->FileName = FileName;
+	FileExtension = ZEFileInfo(FileName).GetExtension();
+}
+
+void ZECRCollectorFile::SetDeleteOnExit(bool Delete)
+{
+	this->DeleteOnExit = Delete;
+}
+
+bool ZECRCollectorFile::GetDeleteOnExit()
+{
+	return DeleteOnExit;
+}
+
+void ZECRCollectorFile::SetBinary(bool Binary)
+{
+	this->Binary = Binary;
+}
+
+bool ZECRCollectorFile::GetBinary()
+{
+	return Binary;
+}
+
+ZESize ZECRCollectorFile::GetSize()
+{
+	return Size;
+}
+
+bool ZECRCollectorFile::GetData(void* Output, ZESize Offset, ZESize Size)
+{
+	if (File == NULL)
+		return false;
+	
+	fseek((FILE*)File, Offset, SEEK_SET);
+	if (fread(Output, 1, Size, (FILE*)File) != Size)
+		return false;
+	
+	return true;
+}
+
+bool ZECRCollectorFile::Generate(const ZECRReportParameters* Parameters)
+{
+	File = fopen(FileName, "rb");
+	
+	if (File == NULL)
+		return false;
+
+	fseek((FILE*)File, 0, SEEK_END);
+	Size = ftell((FILE*)File);
+
+	return true;
+}
+
+void ZECRCollectorFile::CleanUp()
+{
+	if (File != NULL)
+		fclose((FILE*)File);
+
+	if (DeleteOnExit)
+	{
+		#ifdef ZE_PLATFORM_WINDOWS
+				DeleteFile(FileName);
+		#elif defined(ZE_PLATFORM_UNIX)
+				unlink(FileName);
+		#endif
+	}
+}
+
+ZECRCollectorFile::ZECRCollectorFile()
+{
+	File = NULL;
+	Size = 0;
+	DeleteOnExit = true;
+	Binary = false;
+}

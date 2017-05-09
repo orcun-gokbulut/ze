@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderFile.cpp
+ Zinek Engine - ZECRReport.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,120 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRProviderFile.h"
+#pragma once
 
-#include "ZEPlatform.h"
-#include "ZEFile/ZEFileInfo.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
-#ifdef ZE_PLATFORM_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-#elif defined(ZE_PLATFORM_UNIX)
-	#include <unistd.h>
-#endif
+class ZECRCollector;
+struct ZECRReportParameters;
 
-#include <stdio.h>
+class ZECRReport
+{		
+	private:
+		ZEArray<ZECRCollector*>				Collectors;
 
-ZECRDataProviderType ZECRProviderFile::GetProviderType()
-{
-	return Binary ? ZECR_DPT_BINARY : ZECR_DPT_TEXT;
-}
+	public:
+		const 
+		ZEArray<ZECRCollector*>&			GetCollectors();
+		ZECRCollector*						GetCollector(const ZEString& Name);
+		bool								AddCollector(ZECRCollector* Collector);
+		void								RemoveCollector(ZECRCollector* Collector);
 
-const char*	ZECRProviderFile::GetName()
-{
-	return Name;
-}
+		void								Generate(const ZECRReportParameters* Parameters);
+		void								CleanUp();
 
-const char* ZECRProviderFile::GetExtension()
-{
-	return FileExtension;
-}
-
-void ZECRProviderFile::SetName(const char* Name)
-{
-	this->Name = Name;
-}
-
-const char*	ZECRProviderFile::GetFileName()
-{
-	return FileName;
-}
-
-void ZECRProviderFile::SetFileName(const char* FileName)
-{
-	this->FileName = FileName;
-	FileExtension = ZEFileInfo(FileName).GetExtension();
-}
-
-void ZECRProviderFile::SetDeleteOnExit(bool Delete)
-{
-	this->DeleteOnExit = Delete;
-}
-
-bool ZECRProviderFile::GetDeleteOnExit()
-{
-	return DeleteOnExit;
-}
-
-void ZECRProviderFile::SetBinary(bool Binary)
-{
-	this->Binary = Binary;
-}
-
-bool ZECRProviderFile::GetBinary()
-{
-	return Binary;
-}
-
-ZESize ZECRProviderFile::GetSize()
-{
-	return Size;
-}
-
-bool ZECRProviderFile::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	if (File == NULL)
-		return false;
-	
-	fseek((FILE*)File, Offset, SEEK_SET);
-	if (fread(Output, 1, Size, (FILE*)File) != Size)
-		return false;
-	
-	return true;
-}
-
-bool ZECRProviderFile::Generate()
-{
-	File = fopen(FileName, "rb");
-	
-	if (File == NULL)
-		return false;
-
-	fseek((FILE*)File, 0, SEEK_END);
-	Size = ftell((FILE*)File);
-
-	return true;
-}
-
-void ZECRProviderFile::CleanUp()
-{
-	if (File != NULL)
-		fclose((FILE*)File);
-
-	if (DeleteOnExit)
-	{
-		#ifdef ZE_PLATFORM_WINDOWS
-				DeleteFile(FileName);
-		#elif defined(ZE_PLATFORM_UNIX)
-				unlink(FileName);
-		#endif
-	}
-}
-
-ZECRProviderFile::ZECRProviderFile()
-{
-	File = NULL;
-	Size = 0;
-	DeleteOnExit = true;
-	Binary = false;
-}
+											~ZECRReport();
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderApplicationInformation.cpp
+ Zinek Engine - ZECRCollectorProductInfo.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRProviderApplicationInformation.h"
+#include "ZECRCollectorProductInfo.h"
+
 #include "ZECRCIM.h"
 #include "ZEDS/ZEFormat.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include <memory.h>
 
-#include <Windows.h>
-
-ZECRDataProviderType ZECRProviderApplicationInformation::GetProviderType()
+ZECRDataProviderType ZECRCollectorProductInfo::GetProviderType()
 {
 	return ZECR_DPT_TEXT;
 }
 
-const char* ZECRProviderApplicationInformation::GetExtension()
+const char* ZECRCollectorProductInfo::GetExtension()
 {
 	return ".xml";
 }
 
-const char* ZECRProviderApplicationInformation::GetName()
+const char* ZECRCollectorProductInfo::GetName()
 {
 	return "Application Information";
 }
 
-ZESize ZECRProviderApplicationInformation::GetSize()
+ZESize ZECRCollectorProductInfo::GetSize()
 {
 	return DataSize;
 }
 
-bool ZECRProviderApplicationInformation::GetData(void* Output, ZESize Offset, ZESize Size)
+bool ZECRCollectorProductInfo::GetData(void* Output, ZESize Offset, ZESize Size)
 {
 	memcpy(Output, Data.GetValue() + Offset, Size);
 	return true;
 }
 
-void ZECRProviderApplicationInformation::SetVersion(const ZEVersion& Version)
+void ZECRCollectorProductInfo::SetVersion(const ZEVersion& Version)
 {
 	this->Version = Version;
 }
 
-const ZEVersion& ZECRProviderApplicationInformation::GetVersion()
+const ZEVersion& ZECRCollectorProductInfo::GetVersion()
 {
 	return Version;
 }
 
-void ZECRProviderApplicationInformation::SetProcessId(ZEUInt32 ProcessId)
+void ZECRCollectorProductInfo::SetProcessId(ZEUInt32 ProcessId)
 {
 	this->ProcessId = ProcessId;
 }
 
-ZEUInt32 ZECRProviderApplicationInformation::GetProcessId()
+ZEUInt32 ZECRCollectorProductInfo::GetProcessId()
 {
 	return ProcessId;
 }
 
-bool ZECRProviderApplicationInformation::Generate()
+bool ZECRCollectorProductInfo::Generate()
 {
 	if (!ZECRCIM::Initialize())
 		return false;
@@ -119,7 +121,7 @@ bool ZECRProviderApplicationInformation::Generate()
 	return true;
 }
 
-ZECRProviderApplicationInformation::ZECRProviderApplicationInformation()
+ZECRCollectorProductInfo::ZECRCollectorProductInfo()
 {
 	DataSize = 0;
 	ProcessId = 0;

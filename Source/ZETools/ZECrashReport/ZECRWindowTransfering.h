@@ -37,7 +37,7 @@
 
 #include "ZECRWindowPage.h"
 
-#include "ZECRCrashReport.h"
+#include "ZECRReport.h"
 #include "ZECRSender.h"
 #include "ZEThread/ZEThread.h"
 

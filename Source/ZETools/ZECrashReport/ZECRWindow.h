@@ -34,11 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include <QDialog>
 
 #include "ZECRWindowPage.h"
-#include "ZECRCrashReport.h"
-#include "ZECRCrashReporterParameters.h"
+#include "ZECRReport.h"
+#include "ZECRReportParameters.h"
+
+#include <QDialog>
 
 class Ui_ZECRWindow;
 
@@ -47,15 +48,15 @@ class ZECRWindow : public QDialog
 	Q_OBJECT
 	private:		
 		Ui_ZECRWindow*							Form;
-		ZECRCrashReport							CrashReport;
+		ZECRReport							CrashReport;
 		ZECRWindowPageId						CurrentPage;
-		ZECRCrashReporterParameters				Parameters;
+		ZECRReportParameters				Parameters;
 		void*									ApplicationPipe;
 
 	public:
 		Ui_ZECRWindow*							GetForm();
-		const ZECRCrashReporterParameters&		GetParameters();
-		ZECRCrashReport*						GetCrashReport();
+		const ZECRReportParameters&		GetParameters();
+		ZECRReport*						GetCrashReport();
 
 		void									SetPage(ZECRWindowPageId Id);
 		ZECRWindowPageId						GetPage();

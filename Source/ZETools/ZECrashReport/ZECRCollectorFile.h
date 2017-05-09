@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRCrashReport.cpp
+ Zinek Engine - ZECRCollectorFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRCrashReport.h"
-#include "ZECRProvider.h"
+#pragma once
 
-const ZEArray<ZECRProvider*>& ZECRCrashReport::GetProviders()
+#include "ZECRCollector.h"
+#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
+
+class ZECRCollectorFile : public ZECRCollector
 {
-	return Providers;
-}
+	private:
+		ZEString							Name;
+		ZEString							FileName;
+		ZEString							FileExtension;
+		bool								DeleteOnExit;
+		ZESSize								Size;
+		void*								File;
+		bool								Binary;
 
-ZECRProvider* ZECRCrashReport::GetProvider(const ZEString& Name)
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-	{
-		if (Name == Providers[I]->GetName())
-			return Providers[I];
-	}
+	public:
+		virtual const char*					GetName() override;
+		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual const char*					GetExtension() override;
 
-	return NULL;
-}
+		void								SetName(const char* Name);
 
-bool ZECRCrashReport::RegisterProvider(ZECRProvider* Provider)
-{
-	if (Providers.Exists(Provider))
-		return false;
+		void								SetFileName(const char* FileName);
+		const char*							GetFileName();
 
-	Providers.Add(Provider);
+		void								SetDeleteOnExit(bool Delete);
+		bool								GetDeleteOnExit();
 
-	return true;
-}
+		void								SetBinary(bool Binary);
+		bool								GetBinary();
 
-void ZECRCrashReport::UnregisterProvider(ZECRProvider* Provider)
-{
-	Providers.RemoveValue(Provider);
-	delete Provider;
-}
+		virtual ZESize						GetSize() override;
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
+		
+		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
+		virtual void						CleanUp() override;
 
-void ZECRCrashReport::Generate()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->Generate();
-}
-
-void ZECRCrashReport::CleanUp()
-{
-	for (ZESize I = 0; I < Providers.GetCount(); I++)
-		Providers[I]->CleanUp();
-}
-
-ZECRCrashReport::~ZECRCrashReport()
-{
-	CleanUp();
-}
+											ZECRCollectorFile();
+};

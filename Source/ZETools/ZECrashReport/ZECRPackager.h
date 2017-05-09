@@ -36,20 +36,20 @@
 #pragma once
 
 #include "ZEDS/ZEString.h"
-#include "ZECRCrashReport.h"
+#include "ZECRReport.h"
 
 class ZECRPackager
 {
 	private:
-		ZECRCrashReport*			CrashReport;
+		ZECRReport*					Report;
 		ZEString					OutputFileName;
 
 	public:
 		void						SetOutputFileName(const char* FileName);
 		const char*					GetOutputFileName();
 
-		void						SetCrashReport(ZECRCrashReport* CrashReport);
-		ZECRCrashReport*			GetCrashReport();
+		void						SetReport(ZECRReport* CrashReport);
+		ZECRReport*					GetReport();
 
 		bool						Pack();
 };

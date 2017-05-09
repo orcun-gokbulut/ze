@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRCrashReport.h
+ Zinek Engine - ZECRCollectorUserFeedback.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,26 +35,41 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
+#include "ZECRCollector.h"
 #include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
-class ZECRProvider;
-
-class ZECRCrashReport
-{		
+class ZECRCollectorUserFeedback : public ZECRCollector
+{
 	private:
-		ZEArray<ZECRProvider*>				Providers;
+		ZEString							NameSurname;
+		ZEString							EMail;
+		ZEString							Comments;
+		bool								ContactBack;
+
+		ZEString							Data;
+		ZESize								Size;
 
 	public:
-		const 
-		ZEArray<ZECRProvider*>&				GetProviders();
-		ZECRProvider*						GetProvider(const ZEString& Name);
-		bool								RegisterProvider(ZECRProvider* Provider);
-		void								UnregisterProvider(ZECRProvider* Provider);
+		virtual const char*					GetName() override;
+		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual const char*					GetExtension() override;
 
-		void								Generate();
-		void								CleanUp();
 
-											~ZECRCrashReport();
+		virtual const char*					GetNameSurname();
+		void								SetNameSurname(const char* Name);
+		
+		virtual const char*					GetEMail();
+		void								SetEMail(const char* EMail);
+
+		virtual const char*					GetComment();
+		void								SetComment(const char* Comment);
+
+		void								SetContactBack(bool Yes);
+		bool								GetContactBack();
+
+		virtual ZESize						GetSize() override;
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
+		
+		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
 };

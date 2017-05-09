@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderSystemInformation.h
+ Zinek Engine - ZECRCollector.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,29 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CRASHREPORT_SYSTEMINFORMATIONPROVIDER_H__
-#define __ZE_CRASHREPORT_SYSTEMINFORMATIONPROVIDER_H__
 
-#include "ZECRProvider.h"
-#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 
+class ZECRReport;
+struct ZECRReportParameters;
 
-class ZECRProviderSystemInformation : public ZECRProvider
+enum ZECRDataProviderType
 {
+	ZECR_DPT_TEXT,
+	ZECR_DPT_BINARY,
+};
+
+class ZECRCollector
+{
+	friend class ZECRReport;
 	private:
-		ZEString							Data;
-		ZESize								DataSize;
+		ZECRReport*							Report;
+
+	protected:
+											ZECRCollector();
 
 	public:
-		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
-		virtual const char*					GetExtension() override;
-		
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate() override;
+		virtual ZECRDataProviderType		GetProviderType() = 0;
 
-											ZECRProviderSystemInformation();
+		ZECRReport*							GetReport();
+
+		virtual const char*					GetName() = 0;
+		virtual const char*					GetExtension() = 0;
+		virtual ZESize						GetSize() = 0;
+		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
+
+		virtual bool						Generate(const ZECRReportParameters* Parameters);
+		virtual void						CleanUp();
+
+		virtual								~ZECRCollector();
 };
-#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderMemoryDump.cpp
+ Zinek Engine - ZECRCollectorMemoryDump.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRProviderMemoryDump.h"
+#include "ZECRCollectorMemoryDump.h"
+
+#include "ZEDS/ZEFormat.h"
+#include "ZEGUID.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "DbgHelp.lib")
-#include "ZEDS/ZEFormat.h"
-#include "ZEGUID.h"
 
-ZECRDataProviderType ZECRProviderMemoryDump::GetProviderType()
+ZECRDataProviderType ZECRCollectorMemoryDump::GetProviderType()
 {
 	return ZECR_DPT_BINARY;
 }
 
-const char* ZECRProviderMemoryDump::GetName()
+const char* ZECRCollectorMemoryDump::GetName()
 {
 	return "Crash Dump";
 }
 
-const char* ZECRProviderMemoryDump::GetExtension()
+const char* ZECRCollectorMemoryDump::GetExtension()
 {
 	return ".dmp";
 }
 
-void ZECRProviderMemoryDump::SetProcessId(ZEUInt32 ProcessId)
+void ZECRCollectorMemoryDump::SetProcessId(ZEUInt32 ProcessId)
 {
 	this->ProcessId = ProcessId;
 }
 
-ZEUInt32 ZECRProviderMemoryDump::GetProcessId()
+ZEUInt32 ZECRCollectorMemoryDump::GetProcessId()
 {
 	return ProcessId;
 }
 
-void ZECRProviderMemoryDump::SetDumpType(ZECrashDumpType Type)
+void ZECRCollectorMemoryDump::SetDumpType(ZECrashDumpType Type)
 {
 	DumpType = Type;
 }
-ZECrashDumpType ZECRProviderMemoryDump::GetDumpType()
+ZECrashDumpType ZECRCollectorMemoryDump::GetDumpType()
 {
 	return DumpType;
 }
 
-bool ZECRProviderMemoryDump::Generate()
+bool ZECRCollectorMemoryDump::Generate(const ZECRReportParameters* Parameters)
 {
 	MINIDUMP_TYPE DumpFlags;
 
@@ -115,10 +116,10 @@ bool ZECRProviderMemoryDump::Generate()
 
 	CloseHandle(hFile);		
 	
-	return ZECRProviderFile::Generate();
+	return ZECRCollectorFile::Generate(Parameters);
 }
 
-ZECRProviderMemoryDump::ZECRProviderMemoryDump()
+ZECRCollectorMemoryDump::ZECRCollectorMemoryDump()
 {
 	ProcessId = 0;
 	DumpType = ZE_CDT_NORMAL;

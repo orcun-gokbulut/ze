@@ -147,7 +147,7 @@ bool ZECRWindowTransfering::PackageItems()
 	TempPath += "/" + ZEGUID::Generate().ToString() + ".zePacked";
 
 	ZECRPackager* Packager = new ZECRPackager();
-	Packager->SetCrashReport(GetWindow()->GetCrashReport());
+	Packager->SetReport(GetWindow()->GetCrashReport());
 	Packager->SetOutputFileName(TempPath);
 	FileName = Packager->GetOutputFileName();
 	return Packager->Pack();

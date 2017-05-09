@@ -40,18 +40,18 @@
 
 #include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
-#include "ZECrashReport/ZECRProvider.h"
-#include "ZECrashReport/ZECRProviderFile.h"
+#include "ZECrashReport/ZECRCollector.h"
+#include "ZECrashReport/ZECRCollectorFile.h"
 
 #include <QFileDialog>
 #include <QFile>
 #include "QMessageBox"
 #include "ZEDS/ZEArray.h"
-#include "ZECRCrashReport.h"
+#include "ZECRReport.h"
 
 class ZECRWindow;
 
-ZECRWindowViewReport::ZECRWindowViewReport(ZECRCrashReport* Report, QWidget* Parent) : QDialog(Parent)
+ZECRWindowViewReport::ZECRWindowViewReport(ZECRReport* Report, QWidget* Parent) : QDialog(Parent)
 {
 	Form = new Ui_ZECRWindowViewReport();
 	Form->setupUi(this);
@@ -82,8 +82,8 @@ void ZECRWindowViewReport::btnSaveAs_clicked()
 		return;
 
 	ZESize Index = Form->trwProviders->selectedItems()[0]->data(0, Qt::UserRole).toUInt();
-	const ZEArray<ZECRProvider*>& Providers = Report->GetProviders();
-	ZECRProvider* Provider = Providers[Index];
+	const ZEArray<ZECRCollector*>& Providers = Report->GetCollectors();
+	ZECRCollector* Provider = Providers[Index];
 
 	QString Filter = QString("%1 (*%2);All files (*.*)").arg(Provider->GetName()).arg(Provider->GetExtension());
 	QString FileName = QFileDialog::getSaveFileName(this, "Save As", QString(), Filter);
@@ -111,7 +111,7 @@ void ZECRWindowViewReport::btnSaveAs_clicked()
 
 void ZECRWindowViewReport::PopulateProviders()
 {
-	const ZEArray<ZECRProvider*>& Providers = Report->GetProviders();
+	const ZEArray<ZECRCollector*>& Providers = Report->GetCollectors();
 
 	Form->trwProviders->setHeaderLabel("Items");
 	for (ZESize I = 0; I < Providers.GetCount(); I++)
@@ -142,7 +142,7 @@ void ZECRWindowViewReport::trwProviders_treeItemSelected()
 		Form->radASCII->setEnabled(true);
 
 		ZESize ItemIndex = Form->trwProviders->selectedItems()[0]->data(0, Qt::UserRole).toUInt();
-		const ZEArray<ZECRProvider*>& Providers = Report->GetProviders();
+		const ZEArray<ZECRCollector*>& Providers = Report->GetCollectors();
 
 		ZEArray<ZEBYTE> SelectedData;
 		SelectedData.SetCount(Providers[ItemIndex]->GetSize());

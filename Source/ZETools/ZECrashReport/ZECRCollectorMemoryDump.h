@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRProviderFile.h
+ Zinek Engine - ZECRCollectorMemoryDump.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CRASHREPORT_FILEPROVIDER_H__
-#define __ZE_CRASHREPORT_FILEPROVIDER_H__
 
-#include "ZECRProvider.h"
-#include "ZEDS/ZEString.h"
+#include "ZECRCollectorFile.h"
 #include "ZETypes.h"
+#include "ZECore/ZECrashHandler.h"
 
-
-class ZECRProviderFile : public ZECRProvider
+class ZECRCollectorMemoryDump : public ZECRCollectorFile
 {
 	private:
-		ZEString							Name;
-		ZEString							FileName;
-		ZEString							FileExtension;
-		bool								DeleteOnExit;
-		ZESSize								Size;
-		void*								File;
-		bool								Binary;
+		ZEUInt32							ProcessId;
+		ZECrashDumpType						DumpType;
 
 	public:
 		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual	ZECRDataProviderType		GetProviderType() override;
 		virtual const char*					GetExtension() override;
 
-		void								SetName(const char* Name);
+		void								SetProcessId(ZEUInt32 ProcessId);
+		ZEUInt32							GetProcessId();
 
-		void								SetFileName(const char* FileName);
-		const char*							GetFileName();
+		void								SetDumpType(ZECrashDumpType Type);
+		ZECrashDumpType						GetDumpType();
 
-		void								SetDeleteOnExit(bool Delete);
-		bool								GetDeleteOnExit();
+		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
 
-		void								SetBinary(bool Binary);
-		bool								GetBinary();
-
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate() override;
-		virtual void						CleanUp() override;
-
-											ZECRProviderFile();
+											ZECRCollectorMemoryDump();
 };
-#endif

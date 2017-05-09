@@ -32,10 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
 #pragma once
-#ifndef	__ZE_CIM_H__
-#define __ZE_CIM_H__
 
 #include "ZEDS/ZEString.h"
 
@@ -46,4 +43,3 @@ class ZECRCIM
 		static void				DeInitialize();
 		static bool				ExecuteQuery(ZEString& Output, const ZEString& NameSpace, const ZEString& Language, const ZEString& Query);
 };
-#endif

@@ -68,7 +68,7 @@ ZE_ENUM(ZECrashReason)
 	ZE_CR_OTHER
 };
 
-class ZECRCrashReporterParameters;
+struct ZECRReportParameters;
 
 class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
 {
@@ -84,7 +84,7 @@ class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
 		bool						InitializeInternal();
 		bool						DeinitializeInternal();
 
-		void						GenerateParameters(ZECRCrashReporterParameters& Parameters);
+		void						GenerateParameters(ZECRReportParameters& Parameters);
 
 									ZECrashHandler();
 									~ZECrashHandler();

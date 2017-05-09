@@ -39,14 +39,14 @@
 #include <QVariant>
 
 class Ui_ZECRWindowViewReport;
-class ZECRCrashReport;
+class ZECRReport;
 
 class ZECRWindowViewReport : public QDialog
 {
 	Q_OBJECT
 	private:
 		Ui_ZECRWindowViewReport*			Form;
-		ZECRCrashReport*					Report;
+		ZECRReport*							Report;
 	
 		void								PopulateProviders();
 		
@@ -55,6 +55,6 @@ class ZECRWindowViewReport : public QDialog
 		void								trwProviders_treeItemSelected();
 
 	public:		
-											ZECRWindowViewReport(ZECRCrashReport* Report, QWidget* Parent = 0);
+											ZECRWindowViewReport(ZECRReport* Report, QWidget* Parent = 0);
 											~ZECRWindowViewReport();
 };

@@ -38,9 +38,9 @@
 #include "ZECore.h"
 #include "ZEApplicationModule.h"
 #include "ZELogSession.h"
-#include "ZETools/ZECrashReport/ZECRCrashReporterParameters.h"
+#include "ZETools/ZECrashReport/ZECRReportParameters.h"
 
-void ZECrashHandler::GenerateParameters(ZECRCrashReporterParameters& Parameters)
+void ZECrashHandler::GenerateParameters(ZECRReportParameters& Parameters)
 {
 	ZELogSession* Session = ZELog::GetInstance()->GetRootSession();
 	if (Session == NULL)

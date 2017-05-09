@@ -36,14 +36,14 @@
 #include "ZECRWindowGeneratingReport.h"
 
 #include "ZECRWindow.h"
-#include "ZECRCrashReport.h"
+#include "ZECRReport.h"
 #include "ui_ZECRWindowGeneratingReport.h"
 
 #include <QTimer>
 
 void ZECRWindowGeneratingReport::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
 {
-	GetWindow()->GetCrashReport()->Generate();
+	GetWindow()->GetCrashReport()->Generate(&GetWindow()->GetParameters());
 	GetWindow()->TerminateApplication();
 	Generated = true;
 }
