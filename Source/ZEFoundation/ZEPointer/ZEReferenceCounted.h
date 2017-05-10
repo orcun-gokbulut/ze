@@ -50,10 +50,10 @@ class ZEReferenceCounted : public ZEObject
 	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	private:
 		#ifdef ZE_DEBUG_ENABLE
-		mutable bool					Destroyed;
+		volatile mutable bool			Destroyed;
 		#endif
 		mutable ZELock					ReferenceCountLock;
-		mutable ZESSize					ReferenceCount;
+		volatile mutable ZESSize		ReferenceCount;
 
 	protected:
 		virtual void					Release() const;
