@@ -35,6 +35,73 @@
 
 #include "ZECRReport.h"
 #include "ZECRCollector.h"
+#include "ZETimeStamp.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEDirectoryInfo.h"
+#include "ZEFile/ZEFileInfo.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZECRReportParameters.h"
+
+void ZECRReport::GenerateReportFileName(const ZECRReportParameters* Parameters)
+{
+	if (!ReportFileName.IsEmpty())
+		return;
+
+	ZEString FileName = ZEFormat::Format(ReportFilePattern, 
+		Parameters->ApplicationName, 
+		Parameters->LicenseProductName, 
+		ZEGUID::Generate().ToString(),
+		ZETimeStamp::Now().ToString("%Y%m%d%H%M%S"),
+		"");
+
+	ReportFileName = ZEFormat::Format("{0}/{1}.ZECRReport", ReportFileDirectory, FileName);
+}
+
+struct ZEReportQuoteEntry
+{
+	ZEFileInfo FileInfo;
+	ZETimeStamp ModificationTime;
+};
+
+static int SortByDate(const ZEReportQuoteEntry* A, const ZEReportQuoteEntry* B)
+{
+	if (A < B)
+		return -1;
+	else
+		return 1;
+}
+
+void ZECRReport::ManageReportQuote()
+{
+	if (ReportFileQuota < 0)
+		return;
+
+	ZEDirectoryInfo DirectoryInfo(ReportFileDirectory);
+	ZEArray<ZEString> Files = DirectoryInfo.GetFiles();
+
+	ZEArray<ZEReportQuoteEntry> QuoteEntires;
+	for (ZESize I = 0; I < Files.GetCount(); I++)
+	{
+		ZEReportQuoteEntry NewEntry;
+		NewEntry.FileInfo.SetPath(ZEFormat::Format("{0}/{1}", DirectoryInfo.GetPath(), Files[I]));
+		
+		if (NewEntry.FileInfo.GetExtension() != ".ZECRReport")
+			continue;
+
+		NewEntry.ModificationTime = NewEntry.FileInfo.GetModificationTime();
+		QuoteEntires.Add(NewEntry);
+	}
+
+	if (QuoteEntires.GetCount() < ReportFileQuota)
+		return;
+
+	QuoteEntires.Sort<SortByDate>();
+
+	for (ZESize I = 0; I < QuoteEntires.GetCount() - ReportFileQuota + 1; I++)
+		QuoteEntires[I].FileInfo.Delete();
+}
+
 
 const ZEArray<ZECRCollector*>& ZECRReport::GetCollectors()
 {
@@ -70,19 +137,115 @@ void ZECRReport::RemoveCollector(ZECRCollector* Collector)
 	Collectors.RemoveValue(Collector);
 }
 
-void ZECRReport::Generate(const ZECRReportParameters* Parameters)
+void ZECRReport::SetReportFileDirectory(const ZEString& Directory)
 {
-	for (ZESize I = 0; I < Collectors.GetCount(); I++)
-		Collectors[I]->Generate(Parameters);
+	ReportFileDirectory = Directory;
+}
+const ZEString& ZECRReport::GetReportFileDirectory()
+{
+	return ReportFileDirectory;
 }
 
-void ZECRReport::CleanUp()
+void ZECRReport::SetReportFileNamePattern(const ZEString& Pattern)
 {
+	ReportFilePattern = Pattern;
+}
+const ZEString& ZECRReport::GetReportFileNamePattern()
+{
+	return ReportFilePattern;
+}
+
+void ZECRReport::SetReportFileName(const ZEString& FileName)
+{
+	ReportFileName = FileName;
+}
+
+const ZEString& ZECRReport::GetReportFileName()
+{
+	return ReportFileName;
+}
+
+bool ZECRReport::Generate(const ZECRReportParameters* Parameters)
+{
+	ManageReportQuote();
+	GenerateReportFileName(Parameters);
+
+	ZEMLWriter Writer;
+	if (!Writer.Open(ReportFileName))
+		return false;
+
+	ZEMLWriterNode RootNode;
+	Writer.OpenRootNode("ZECRReport", RootNode);
+
+	RootNode.WriteUInt32("VersionMajor", 1);
+	RootNode.WriteUInt32("VersionMinor", 0);
+
+	RootNode.WriteString("GUID", ZEGUID::Generate().ToString());
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+	ZEMLWriterNode TimeStampNode;
+	RootNode.OpenNode("TimeStamp", TimeStampNode);
+	TimeStampNode.WriteInt16("Year", TimeStamp.GetYear());
+	TimeStampNode.WriteInt16("Month", TimeStamp.GetMonth());
+	TimeStampNode.WriteInt16("Day", TimeStamp.GetDay());
+	TimeStampNode.WriteInt16("Hour", TimeStamp.GetHour());
+	TimeStampNode.WriteInt16("Minute", TimeStamp.GetMinute());
+	TimeStampNode.WriteInt16("Second", TimeStamp.GetSecond());
+	TimeStampNode.CloseNode();
+	RootNode.WriteString("ComputerName", "");
+
+	ZEMLWriterNode CollectorsNode;
+	RootNode.OpenNode("Collectors", CollectorsNode);
 	for (ZESize I = 0; I < Collectors.GetCount(); I++)
-		Collectors[I]->CleanUp();
+	{
+		ZECRCollector* Collector =  Collectors[I];
+		ZEMLWriterNode CollectorNode;
+		CollectorsNode.OpenNode("Collector", CollectorNode);
+
+		CollectorNode.WriteString("Name", Collector->GetName());
+		CollectorNode.WriteString("Extension", Collector->GetExtension());
+		CollectorNode.WriteUInt8("Type", Collector->GetCollectorType());
+
+		Collector->Generate(&CollectorNode, Parameters);
+
+		CollectorNode.CloseNode();
+	}
+	CollectorsNode.CloseNode();
+	RootNode.CloseNode();
+
+	return true;
+}
+
+bool ZECRReport::LoadConfiguration()
+{
+	return LoadConfiguration("#E:/ZECRReport.ZEConfig");
+}
+
+bool ZECRReport::LoadConfiguration(const ZEString& FileName)
+{
+	ZEMLReader Reader;
+	if (!Reader.Open(FileName))
+		return false;
+
+	ZEMLReaderNode ReportNode = Reader.GetRootNode();
+	if (ReportNode.GetName() != "ZECRReport")
+		return false;
+
+	return LoadConfiguration(&ReportNode);
+}
+
+bool ZECRReport::LoadConfiguration(ZEMLReaderNode* ReportNode)
+{
+	return true;
+}
+
+ZECRReport::ZECRReport()
+{
+	ReportFileDirectory = "#S:/CrashReports";
+	ReportFilePattern = "Crash-{0}-{3}.ZECRReport";
+	ReportFileQuota = 5;
 }
 
 ZECRReport::~ZECRReport()
 {
-	CleanUp();
+
 }

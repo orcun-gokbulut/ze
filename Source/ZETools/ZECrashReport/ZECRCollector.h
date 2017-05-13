@@ -36,9 +36,11 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZECRReport;
 struct ZECRReportParameters;
+class ZEMLWriterNode;
 
 enum ZECRDataProviderType
 {
@@ -46,8 +48,9 @@ enum ZECRDataProviderType
 	ZECR_DPT_BINARY,
 };
 
-class ZECRCollector
+class ZECRCollector : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZECRReport;
 	private:
 		ZECRReport*							Report;
@@ -56,17 +59,16 @@ class ZECRCollector
 											ZECRCollector();
 
 	public:
-		virtual ZECRDataProviderType		GetProviderType() = 0;
+		virtual ZECRDataProviderType		GetCollectorType() = 0;
 
 		ZECRReport*							GetReport();
 
 		virtual const char*					GetName() = 0;
 		virtual const char*					GetExtension() = 0;
-		virtual ZESize						GetSize() = 0;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) = 0;
 
-		virtual bool						Generate(const ZECRReportParameters* Parameters);
-		virtual void						CleanUp();
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters);
+
+		virtual void						LoadConfiguration(const ZEMLReaderNode& ConfigurationNode);
 
 		virtual								~ZECRCollector();
 };

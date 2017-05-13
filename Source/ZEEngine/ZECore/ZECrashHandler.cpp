@@ -39,6 +39,7 @@
 #include "ZEApplicationModule.h"
 #include "ZELogSession.h"
 #include "ZETools/ZECrashReport/ZECRReportParameters.h"
+#include "ZEFile/ZEPathManager.h"
 
 void ZECrashHandler::GenerateParameters(ZECRReportParameters& Parameters)
 {
@@ -68,6 +69,12 @@ void ZECrashHandler::GenerateParameters(ZECRReportParameters& Parameters)
 		strncpy(Parameters.LicenseSerialKey, License.GetSerialKey().ToCString(), 1024);
 		Parameters.LicenseVersion = License.GetLicenseVersion();
 	}
+
+	strncpy(Parameters.EnginePath, ZEPathManager::GetInstance()->GetEnginePath(), 1024);
+	strncpy(Parameters.ResourcePath, ZEPathManager::GetInstance()->GetResourcePath(), 1024);
+	strncpy(Parameters.StoragePath, ZEPathManager::GetInstance()->GetStoragePath(), 1024);
+	strncpy(Parameters.UserStoragePath, ZEPathManager::GetInstance()->GetUserStoragePath(), 1024);
+	strncpy(Parameters.SystemStoragePath, ZEPathManager::GetInstance()->GetSystemStoragePath(), 1024);
 }
 
 void ZECrashHandler::SetExecuteCrashReporter(bool Enabled)

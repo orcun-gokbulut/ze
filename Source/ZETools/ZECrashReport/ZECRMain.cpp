@@ -37,6 +37,8 @@
 
 #include "ZECRWindow.h"
 
+#include "ZEFile/ZEPathManager.h"
+
 #include <QApplication>
 
 #define WIN32_LEAN_AND_MEAN
@@ -47,7 +49,10 @@ extern "C" __declspec(dllexport) void CALLBACK ReportCrash(HWND hwnd, HINSTANCE 
 	int argc = 0;
 	char** argv = NULL;
 
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+
 	MessageBox(NULL, "Attach", "Attach", MB_OK);
+	//__debugbreak();
 
 	QApplication Application(argc, argv);
 	ZECRWindow* Window = new ZECRWindow();
@@ -55,6 +60,8 @@ extern "C" __declspec(dllexport) void CALLBACK ReportCrash(HWND hwnd, HINSTANCE 
 	Window->Process(lpszCmdLine);
 
 	Application.exec();
+
+	TerminateProcess(GetCurrentProcess(), EXIT_SUCCESS);
 }
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

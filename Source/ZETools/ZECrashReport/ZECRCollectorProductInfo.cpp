@@ -35,14 +35,15 @@
 
 #include "ZECRCollectorProductInfo.h"
 
-#include "ZECRCIM.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZECRReportParameters.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <memory.h>
 
-ZECRDataProviderType ZECRCollectorProductInfo::GetProviderType()
+ZECRDataProviderType ZECRCollectorProductInfo::GetCollectorType()
 {
 	return ZECR_DPT_TEXT;
 }
@@ -54,75 +55,45 @@ const char* ZECRCollectorProductInfo::GetExtension()
 
 const char* ZECRCollectorProductInfo::GetName()
 {
-	return "Application Information";
+	return "Product Information";
 }
 
-ZESize ZECRCollectorProductInfo::GetSize()
+bool ZECRCollectorProductInfo::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {
-	return DataSize;
-}
-
-bool ZECRCollectorProductInfo::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	memcpy(Output, Data.GetValue() + Offset, Size);
-	return true;
-}
-
-void ZECRCollectorProductInfo::SetVersion(const ZEVersion& Version)
-{
-	this->Version = Version;
-}
-
-const ZEVersion& ZECRCollectorProductInfo::GetVersion()
-{
-	return Version;
-}
-
-void ZECRCollectorProductInfo::SetProcessId(ZEUInt32 ProcessId)
-{
-	this->ProcessId = ProcessId;
-}
-
-ZEUInt32 ZECRCollectorProductInfo::GetProcessId()
-{
-	return ProcessId;
-}
-
-bool ZECRCollectorProductInfo::Generate()
-{
-	if (!ZECRCIM::Initialize())
+	if (!ZECRCollector::Generate(CollectorNode, Parameters))
 		return false;
 
-	Data += "<ZECrashReport>\n";
-	Data += "<ApplicationInformation>\n";
-	Data += "<Version>\n";
+	ZEString Data;
 
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Major", Version.Major);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Minor", Version.Minor);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Internal", Version.Internal);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Revision", Version.Revision);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Branch", Version.Branch);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Platform", Version.Platform);
-	Data += ZEFormat::Format("<{0}>{1}</{0}>\n", "Architecture", Version.Architecture);
-	Data += "</Version>\n";
-	Data += "<Process>\n";
+	Data += "<ZECRCrashReport>\n";
+	Data += " <ZECRCollectorProductInfo>\n";
+	Data += "  <Application>\n";
+	Data += ZEFormat::Format("   <Name>{0}</Name>\n", Parameters->ApplicationName);
+	Data += "   <Version>\n";
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Major", Parameters->ApplicationVersion.Major);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Minor", Parameters->ApplicationVersion.Minor);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Internal", Parameters->ApplicationVersion.Internal);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Revision", Parameters->ApplicationVersion.Revision);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Branch", Parameters->ApplicationVersion.Branch);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Platform", Parameters->ApplicationVersion.Platform);
+	Data += ZEFormat::Format("    <{0}>{1}</{0}>\n", "Architecture", Parameters->ApplicationVersion.Architecture);
+	Data += "   </Version>\n";
+	Data += "  </Application>\n";
+	Data += "  <License>\n";
+	Data += ZEFormat::Format("   <{0}>{1}</{0}>\n", "Internal", Parameters->LicenseProductName);
+	Data += ZEFormat::Format("   <{0}>{1}</{0}>\n", "Major", Parameters->LicenseLicenseeName);
+	Data += ZEFormat::Format("   <{0}>{1}</{0}>\n", "Minor", Parameters->LicenseSerialKey);
+	Data += "  </License>\n";
+	Data += " </ZECRCollectorProductInfo>\n";
+	Data += "</ZECRCrashReport>";
 
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", ZEFormat::Format( "SELECT * FROM Win32_Process WHERE ProcessId = '{0}'", ProcessId)))
+	if (!CollectorNode->WriteData("Data", Data.GetValue(), Data.GetSize()))
 		return false;
-	
-	ZECRCIM::DeInitialize();
-
-	Data += "</Process>\n";	
-	Data += "</ApplicationInformation>\n";
-	Data += "</ZECrashReport>\n";
-
-	DataSize = Data.GetSize();
 
 	return true;
 }
 
 ZECRCollectorProductInfo::ZECRCollectorProductInfo()
 {
-	DataSize = 0;
-	ProcessId = 0;
+
 }

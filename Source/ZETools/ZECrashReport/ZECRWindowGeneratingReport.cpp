@@ -51,6 +51,7 @@ void ZECRWindowGeneratingReport::GeneratorThread_Function(ZEThread* Thread, void
 void ZECRWindowGeneratingReport::Activated()
 {
 	Generated = false;
+	Timer->start();
 	GeneratorThread.Run();
 }
 
@@ -66,7 +67,7 @@ void ZECRWindowGeneratingReport::Timer_timeout()
 
 void ZECRWindowGeneratingReport::btnCancel_clicked()
 {
-	abort();
+	exit(EXIT_FAILURE);
 }
 
 ZECRWindowGeneratingReport::ZECRWindowGeneratingReport(QWidget* Parent) : ZECRWindowPage(Parent)
@@ -76,9 +77,11 @@ ZECRWindowGeneratingReport::ZECRWindowGeneratingReport(QWidget* Parent) : ZECRWi
 
 	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRWindowGeneratingReport, &ZECRWindowGeneratingReport::GeneratorThread_Function>(this));
 	
+	Generated = false;
 	Timer = new QTimer(this);
 	Timer->setInterval(1000);
 	Timer->setSingleShot(false);
+	Timer->stop();
 	connect(Timer, SIGNAL(timeout()), this, SLOT(Timer_timeout()));
 }
 

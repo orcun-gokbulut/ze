@@ -35,9 +35,13 @@
 
 #include "ZECRCollectorSystemInformation.h"
 
-#include "ZECRCIM.h"
+#include "ZEDS/ZEFormat.h"
 
-ZECRDataProviderType ZECRCollectorSystemInformation::GetProviderType()
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <shellapi.h>
+
+ZECRDataProviderType ZECRCollectorSystemInformation::GetCollectorType()
 {
 	return ZECR_DPT_TEXT;
 }
@@ -49,93 +53,46 @@ const char* ZECRCollectorSystemInformation::GetName()
 
 const char* ZECRCollectorSystemInformation::GetExtension()
 {
-	return ".xml";
+	return ".nfo";
 }
 
-ZESize ZECRCollectorSystemInformation::GetSize()
-{
-	return DataSize;
-}
-
-bool ZECRCollectorSystemInformation::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	memcpy(Output, Data.GetValue() + Offset, Size);
-	return true;
-}
-
-bool ZECRCollectorSystemInformation::Generate(const ZECRReportParameters* Parameters)
+bool ZECRCollectorSystemInformation::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {	
-	if (!ZECRCIM::Initialize())
+	char TempFolder[MAX_PATH];
+	if (GetTempPath (MAX_PATH, TempFolder) == 0)
 		return false;
-	Data += "<ZECrashReport>\n";
-	Data += "<SystemInformation>\n";
 
-	Data += "<Processor>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Processor"))
-		return false;
-	Data += "</Processor>\n";
+	SetFileName(ZEFormat::Format("{0}{1}.nfo", TempFolder, ZEGUID::Generate().ToString()));
 
-	Data += "<VideoController>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_VideoController"))
-		return false;
-	Data += "</VideoController>\n";
+	STARTUPINFO StartupInfo;
+	memset(&StartupInfo, 0, sizeof(STARTUPINFO));
+	StartupInfo.cb = sizeof(STARTUPINFO);
+	StartupInfo.wShowWindow = SW_HIDE;
+	PROCESS_INFORMATION ProcessInfo;
+	memset(&ProcessInfo, 0, sizeof(PROCESS_INFORMATION));
 
-	Data += "<SoundDevice>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_SoundDevice"))
+	BOOL Result = CreateProcessA(NULL, 
+		(char*)ZEFormat::Format("msinfo32 /nfo \"{0}\"", GetFileName()).ToCString(), 
+		NULL, NULL, false, NORMAL_PRIORITY_CLASS, NULL, NULL, &StartupInfo, &ProcessInfo);
+	if (!Result)
 		return false;
-	Data += "</SoundDevice>\n";
 
-	Data += "<OperatingSystem>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_OperatingSystem"))
+	DWORD ResultW = WaitForSingleObject(ProcessInfo.hProcess, 180000);
+	if (ResultW == WAIT_FAILED || Result == WAIT_ABANDONED || Result == WAIT_TIMEOUT)
 		return false;
-	Data += "</OperatingSystem>\n";
-
-	Data += "<BaseBoard>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_BaseBoard"))
-		return false;
-	Data += "</BaseBoard>\n";
-
-	Data += "<DesktopMonitor>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DesktopMonitor"))
-		return false;
-	Data += "</DesktopMonitor>\n";
-
-	Data += "<Keyboard>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_Keyboard"))
-		return false;
-	Data += "</Keyboard>\n";
-
-	Data += "<PointingDevice>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PointingDevice"))
-		return false;
-	Data += "</PointingDevice>\n";
-
-	Data += "<LogicalDisk>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_LogicalDisk"))
-		return false;
-	Data += "</LogicalDisk>\n";
 	
-	Data += "<DiskDrive>\n";
-	if (!ZECRCIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_DiskDrive"))
+	DWORD ExitCode;
+	if (!GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode))
 		return false;
-	Data += "</DiskDrive>\n";
 
-	/*Data += "<PnPSignedDriver>\n";
-	if (!ZECIM::ExecuteQuery(Data, "ROOT\\CIMV2", "WQL", "SELECT * FROM Win32_PnPSignedDriver"))
+	if (ExitCode != EXIT_SUCCESS)
 		return false;
-	Data += "</PnPSignedDriver>\n";*/
-	
-	Data += "</SystemInformation>\n";
-	Data += "</ZECrashReport>\n";
 
-	DataSize = Data.GetLength() + 1;
-
-	ZECRCIM::DeInitialize();
-	return true;
+	return ZECRCollectorFile::Generate(CollectorNode, Parameters);
 }
 
 ZECRCollectorSystemInformation::ZECRCollectorSystemInformation()
 {
-	DataSize = 0;
+	SetBinary(false);
+	SetDeleteOnExit(true);
 }
-

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRPackager.h
+ Zinek Engine - ZECRReportViewer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,21 +35,38 @@
 
 #pragma once
 
-#include "ZEDS/ZEString.h"
-#include "ZECRReport.h"
+#include <QDialog>
+#include <QVariant>
 
-class ZECRPackager
+#include "ZEML/ZEMLReader.h"
+
+class Ui_ZECRReportViewer;
+class ZECRReport;
+
+struct ZECRReportEntry
 {
+	ZEString Name;
+	ZEString Extention;
+	bool Binary;
+	ZEMLReaderNode Node;
+};
+
+class ZECRReportViewer : public QDialog
+{
+	Q_OBJECT
 	private:
-		ZECRReport*					Report;
-		ZEString					OutputFileName;
+		Ui_ZECRReportViewer*				Form;
+		ZEString							ReportFileName;
+		ZEArray<ZECRReportEntry>			ReportEntries;
+		ZEMLReader							Reader;
+
+	private slots:
+		void								btnSaveAs_clicked();
+		void								lstCollectors_itemSelectionChanged();
 
 	public:
-		void						SetOutputFileName(const char* FileName);
-		const char*					GetOutputFileName();
+		bool								LoadReport(const ZEString& FileName);
 
-		void						SetReport(ZECRReport* CrashReport);
-		ZECRReport*					GetReport();
-
-		bool						Pack();
+											ZECRReportViewer(ZECRReport* Report, QWidget* Parent = 0);
+											~ZECRReportViewer();
 };

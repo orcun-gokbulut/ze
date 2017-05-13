@@ -52,14 +52,11 @@ class ZECRWindowTransfering : public ZECRWindowPage
 		Ui_ZECRWindowTransfering*				Form;
 		ZEThread								SenderThread;
 		ZECRSender								Sender;
-		ZEString								FileName;
 		ZEString								UploadURL;
 		QTimer									UpdateInformationTimer;		
 
-		bool									PackageItems();
-		bool									CompressPackage();		
 		void									SendReport(ZEThread* Thread, void* Output);	
-		
+	
 		virtual void							Activated() override;
 
 	public slots:		

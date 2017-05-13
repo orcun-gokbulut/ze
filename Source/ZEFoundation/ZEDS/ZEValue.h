@@ -198,9 +198,6 @@ class ZEValue
 
 		void					Clear();
 
-		bool					Serialize(ZESerializer* Serializer);
-		bool					Unserialize(ZEUnserializer* Unserializer);
-
 		ZEValue&				operator=(const ZEValue& Value);
 		ZEValue&				operator=(const char* Value);
 		ZEValue&				operator=(const ZEString& Value);

@@ -72,7 +72,17 @@
       <string>View Content of the Report</string>
      </property>
      <property name="description">
-      <string>View what we have collected from your computer</string>
+      <string>View what we have collected from your computer.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCommandLinkButton" name="btnOpenReportLocation">
+     <property name="text">
+      <string>Open Report Location</string>
+     </property>
+     <property name="description">
+      <string>Open the folder that contain generated report. You can send report files manually.</string>
      </property>
     </widget>
    </item>
@@ -89,7 +99,7 @@
       <string>View Privacy Policy</string>
      </property>
      <property name="description">
-      <string>View what we are going to do with the information that we have collected</string>
+      <string>View what we are going to do with the information that we have collected.</string>
      </property>
     </widget>
    </item>
@@ -106,7 +116,7 @@
       <string>Go to Support Portal</string>
      </property>
      <property name="description">
-      <string>Visit our support portal for help or bug report</string>
+      <string>Visit our support portal for help or bug report.</string>
      </property>
     </widget>
    </item>

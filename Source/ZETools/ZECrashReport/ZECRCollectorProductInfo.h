@@ -42,27 +42,13 @@
 
 class ZECRCollectorProductInfo : public ZECRCollector
 {
-	private:
-		ZEString							Data;
-		ZESize								DataSize;
-		ZEVersion							Version;
-		ZEUInt32							ProcessId;
-
+	ZE_OBJECT
 	public:
 		virtual const char*					GetName() override;
-		virtual	ZECRDataProviderType		GetProviderType() override;
+		virtual	ZECRDataProviderType		GetCollectorType() override;
 		virtual const char*					GetExtension() override;
 
-		void								SetVersion(const ZEVersion& Version);
-		const ZEVersion&					GetVersion();
-
-		void								SetProcessId(ZEUInt32 ProcessId);
-		ZEUInt32							GetProcessId();
-
-		virtual ZESize						GetSize();
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size);
-
-		virtual bool						Generate();
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters) override;
 
 											ZECRCollectorProductInfo();
 };

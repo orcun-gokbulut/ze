@@ -38,7 +38,7 @@
 #include "ui_ZECRWindowUserFeedback.h"
 
 #include "ZECRWindow.h"
-#include "ZECRWindowViewReport.h"
+#include "ZECRReportViewer.h"
 #include "ZECRWindowViewPrivacyPolicy.h"
 #include "ZECRReport.h"
 #include "ZECRCollectorUserFeedback.h"

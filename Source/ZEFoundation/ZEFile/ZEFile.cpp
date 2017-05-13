@@ -453,7 +453,7 @@ const ZEString& ZEFile::GetPath() const
 	return Path;
 }
 
-ZEFile&	ZEFile::operator = (ZEFile& OtherFile)
+const ZEFile& ZEFile::operator=(const ZEFile& OtherFile)
 {
 	File = OtherFile.File;
 	Path = OtherFile.Path;

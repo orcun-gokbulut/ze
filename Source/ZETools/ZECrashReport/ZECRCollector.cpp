@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECRCollector.h"
+#include "ZEML\ZEMLWriter.h"
 
 ZECRCollector::ZECRCollector()
 {
@@ -45,17 +46,17 @@ ZECRReport* ZECRCollector::GetReport()
 	return Report;
 }
 
-bool ZECRCollector::Generate(const ZECRReportParameters* Parameters)
+bool ZECRCollector::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {
 	return true;
 }
 
-void ZECRCollector::CleanUp()
+void ZECRCollector::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
 {
 
 }
 
 ZECRCollector::~ZECRCollector()
 {
-	CleanUp();
+
 }

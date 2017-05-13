@@ -38,10 +38,10 @@
 #include "Ui_ZECRWindowTransfering.h"
 
 #include "ZECRWindow.h"
-#include "ZECrashReport/ZECRPackager.h"
 #include "ZECrashReport/ZECRSender.h"
 
 #include "ZEGUID.h"
+#include "ZETimeStamp.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEThread/ZELock.h"
@@ -52,19 +52,10 @@
 
 void ZECRWindowTransfering::SendReport(ZEThread* Thread, void* Output)
 {
-	Form->lblOperation->setText("Packing items...");
-	if (!PackageItems())
-	{
-		remove(FileName);
-		emit UploadError();
-		return;
-	}
-
 	Form->lblOperation->setText("Transferring report...");
 	if (!Sender.OpenConnection())
 	{
 		UpdateInformationTimer.stop();
-		remove(FileName);
 		emit UploadError();
 		return;
 	}
@@ -81,7 +72,7 @@ void ZECRWindowTransfering::SendReport(ZEThread* Thread, void* Output)
 void ZECRWindowTransfering::Activated()
 {
 	Sender.SetUploadURL(UploadURL);
-	Sender.SetFileName(FileName);
+	Sender.SetFileName(GetWindow()->GetCrashReport()->GetReportFileName());
 
 	SenderThread.SetName("SenderThread");
 	SenderThread.SetParameter(NULL);
@@ -139,94 +130,6 @@ void ZECRWindowTransfering::UploadCompleted()
 	Form->lblTransferSpeed->setText("");
 	Form->lblEstimatedTime->setText("");	
 	Form->btnCancel->setVisible(true);
-}
-
-bool ZECRWindowTransfering::PackageItems()
-{
-	ZEString TempPath = QDir::temp().tempPath().toStdString();
-	TempPath += "/" + ZEGUID::Generate().ToString() + ".zePacked";
-
-	ZECRPackager* Packager = new ZECRPackager();
-	Packager->SetReport(GetWindow()->GetCrashReport());
-	Packager->SetOutputFileName(TempPath);
-	FileName = Packager->GetOutputFileName();
-	return Packager->Pack();
-}
-
-bool ZECRWindowTransfering::CompressPackage()
-{
-	ZEString TempPath = QDir::temp().tempPath().toStdString();
-	TempPath += "/" + ZEGUID::Generate().ToString() + ".zeCompressed";
-	
-	FILE* PackedFile = fopen(FileName,"rb");
-	FILE* CompressedFile = fopen(TempPath.ToCString(), "wb");
-
-	if (!PackedFile)
-		return false;
-
-	fseek(PackedFile, 0, SEEK_END);
-	ZESize PackedFileSize = ftell(PackedFile);
-	rewind(PackedFile);
-
-	void* InputBuffer = new char[2048];
-	void* OutputBuffer = new char[2048];
-
-	ZECompressorZLIB* Compressor = new ZECompressorZLIB();
-	Compressor->Reset();
-	Compressor->SetInput(InputBuffer);
-	Compressor->SetInputSize(2048);
-	Compressor->SetOutput(OutputBuffer);
-	Compressor->SetOutputSize(2048);
-
-	bool ProcessError = false;
-	bool Reading = true;
-	while (Reading)
-	{
-		if (ProcessError)
-			Reading = false;
-
-		ZESize Readed = fread(InputBuffer, sizeof(char), 2048, PackedFile);
-
-		if (Readed != 2048)
-		{
-			if (feof(PackedFile))
-			{
-				Compressor->SetEos(true);
-				Compressor->SetInputSize(Readed);
-				Compressor->Compress();
-				fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
-				
-				while (Compressor->GetState() == ZE_CS_OUTPUT_FULL)
-				{
-					Compressor->Compress();
-
-					fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
-				}
-				
-				Reading = false;
-				continue;
-			}
-		}
-
-		Compressor->Compress();
-
-		if (Compressor->GetState() == ZE_CS_OUTPUT_FULL)
-			fwrite(OutputBuffer, sizeof(char), Compressor->GetOutputSize(), CompressedFile);
-
-		if (Compressor->GetState() == ZE_CS_ERROR)
-			ProcessError = true;
-	}
-
-	fclose(CompressedFile);
-	fclose(PackedFile);
-	remove(FileName);
-
-	FileName = TempPath;
-
-	if (!ProcessError)
-		return true;
-	else			
-		return false;
 }
 
 ZECRWindowTransfering::ZECRWindowTransfering(QWidget* Parent) : ZECRWindowPage(Parent)

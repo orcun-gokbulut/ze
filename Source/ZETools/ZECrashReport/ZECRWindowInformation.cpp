@@ -37,17 +37,28 @@
 
 #include "ui_ZECRWindowInformation.h"
 #include "ZECRWindow.h"
-#include "ZECRWindowViewReport.h"
+#include "ZECRReportViewer.h"
 #include "ZECRWindowViewPrivacyPolicy.h"
+#include "ZEFile/ZEPathManager.h"
 
 #include <QDesktopServices>
 #include <QUrl>
+#include <QMessageBox>
 
 
 void ZECRWindowInformation::btnViewReport_Clicked()
 {
-	ZECRWindowViewReport Viewer(GetWindow()->GetCrashReport());
+	ZECRReportViewer Viewer(GetWindow()->GetCrashReport());
+	if (!Viewer.LoadReport(GetWindow()->GetCrashReport()->GetReportFileName()))
+		QMessageBox::critical(this, "ZECRCrashReport", "Cannot load report. File may be corrupted.", QMessageBox::Ok);
+
 	Viewer.exec();
+}
+
+void ZECRWindowInformation::btnOpenReportLocation_Clicked()
+{
+	ZEString RealPath = ZEPathManager::GetInstance()->TranslateToRealPath(GetWindow()->GetCrashReport()->GetReportFileDirectory()).Path;
+	QDesktopServices::openUrl(QUrl(RealPath.ToCString()));
 }
 
 void ZECRWindowInformation::btnViewPrivacyPolicy_Clicked()
@@ -77,6 +88,7 @@ ZECRWindowInformation::ZECRWindowInformation(QWidget* Parent) : ZECRWindowPage(P
 	Form->setupUi(this);
 
 	connect(Form->btnViewReport, SIGNAL(clicked()), this, SLOT(btnViewReport_Clicked()));
+	connect(Form->btnOpenReportLocation, SIGNAL(clicked()), this, SLOT(btnOpenReportLocation_Clicked()));
 	connect(Form->btnViewPrivacyPolicy, SIGNAL(clicked()), this, SLOT(btnViewPrivacyPolicy_Clicked()));
 	connect(Form->btnGotoSupportPortal, SIGNAL(clicked()), this, SLOT(btnGotoSupportPortal_Clicked()));
 	connect(Form->btnSend, SIGNAL(clicked()), this, SLOT(btnSend_Clicked()));

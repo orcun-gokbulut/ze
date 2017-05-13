@@ -37,6 +37,7 @@
 
 #include "ZEPlatform.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEML/ZEMLReader.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#define WIN32_LEAN_AND_MEAN
@@ -46,10 +47,16 @@
 #endif
 
 #include <stdio.h>
+#include "ZEML/ZEMLWriter.h"
 
-ZECRDataProviderType ZECRCollectorFile::GetProviderType()
+ZECRDataProviderType ZECRCollectorFile::GetCollectorType()
 {
 	return Binary ? ZECR_DPT_BINARY : ZECR_DPT_TEXT;
+}
+
+ZEFile& ZECRCollectorFile::GetFile()
+{
+	return File;
 }
 
 const char*	ZECRCollectorFile::GetName()
@@ -98,54 +105,45 @@ bool ZECRCollectorFile::GetBinary()
 	return Binary;
 }
 
-ZESize ZECRCollectorFile::GetSize()
+bool ZECRCollectorFile::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {
-	return Size;
-}
-
-bool ZECRCollectorFile::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	if (File == NULL)
-		return false;
-	
-	fseek((FILE*)File, Offset, SEEK_SET);
-	if (fread(Output, 1, Size, (FILE*)File) != Size)
-		return false;
-	
-	return true;
-}
-
-bool ZECRCollectorFile::Generate(const ZECRReportParameters* Parameters)
-{
-	File = fopen(FileName, "rb");
-	
-	if (File == NULL)
+	ZEFile File;
+	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;
 
-	fseek((FILE*)File, 0, SEEK_END);
-	Size = ftell((FILE*)File);
+	ZEArray<ZEBYTE> FileData;
+	FileData.SetCount(File.GetSize());
+	if (File.Read(FileData.GetCArray(), FileData.GetSize(), 1) != 1)
+		return false;
+	
+	File.Close();
 
-	return true;
-}
+	if (!ZECRCollector::Generate(CollectorNode, Parameters))
+		return false;
 
-void ZECRCollectorFile::CleanUp()
-{
-	if (File != NULL)
-		fclose((FILE*)File);
+	if (!CollectorNode->WriteData("Data", FileData.GetConstCArray(), FileData.GetCount()))
+		return false;
 
 	if (DeleteOnExit)
 	{
-		#ifdef ZE_PLATFORM_WINDOWS
-				DeleteFile(FileName);
-		#elif defined(ZE_PLATFORM_UNIX)
-				unlink(FileName);
-		#endif
+		ZEFileInfo FileInfo(FileName);
+		FileInfo.Delete();
 	}
+
+	return true;
+}
+
+void ZECRCollectorFile::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
+{
+	ZECRCollector::LoadConfiguration(ConfigurationNode);
+
+	Name = ConfigurationNode.ReadString("Name");
+	FileName = ConfigurationNode.ReadString("FileName");
+	DeleteOnExit = ConfigurationNode.ReadBoolean("DeleteOnExit");
 }
 
 ZECRCollectorFile::ZECRCollectorFile()
 {
-	File = NULL;
 	Size = 0;
 	DeleteOnExit = true;
 	Binary = false;

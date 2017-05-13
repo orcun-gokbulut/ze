@@ -44,7 +44,6 @@ ze_begin_components(TARGET ZEFoundationStatic)
 
 add_subdirectory(ZEDS)
 add_subdirectory(ZEMath)
-add_subdirectory(ZESerialization)
 add_subdirectory(ZEStateMachine)
 add_subdirectory(ZEFile)
 add_subdirectory(ZEMacro)

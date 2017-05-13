@@ -41,22 +41,21 @@
 
 class ZECRCollectorMemoryDump : public ZECRCollectorFile
 {
+	ZE_OBJECT
 	private:
-		ZEUInt32							ProcessId;
-		ZECrashDumpType						DumpType;
+		ZECRMemoryDumpType					DumpType;
 
 	public:
 		virtual const char*					GetName() override;
-		virtual	ZECRDataProviderType		GetProviderType() override;
+		virtual	ZECRDataProviderType		GetCollectorType() override;
 		virtual const char*					GetExtension() override;
 
-		void								SetProcessId(ZEUInt32 ProcessId);
-		ZEUInt32							GetProcessId();
+		void								SetDumpType(ZECRMemoryDumpType Type);
+		ZECRMemoryDumpType					GetDumpType();
 
-		void								SetDumpType(ZECrashDumpType Type);
-		ZECrashDumpType						GetDumpType();
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters) override;
 
-		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
+		virtual void						LoadConfiguration(const ZEMLReaderNode& ConfigurationNode) override;
 
 											ZECRCollectorMemoryDump();
 };

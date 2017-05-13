@@ -36,23 +36,29 @@
 #pragma once
 
 #include "ZECRCollector.h"
-#include "ZEDS/ZEString.h"
+
 #include "ZETypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEFile/ZEFile.h"
 
 class ZECRCollectorFile : public ZECRCollector
 {
+	ZE_OBJECT
 	private:
 		ZEString							Name;
 		ZEString							FileName;
 		ZEString							FileExtension;
 		bool								DeleteOnExit;
 		ZESSize								Size;
-		void*								File;
+		ZEFile								File;
 		bool								Binary;
+
+	protected:
+		ZEFile&								GetFile();
 
 	public:
 		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual ZECRDataProviderType		GetCollectorType() override;
 		virtual const char*					GetExtension() override;
 
 		void								SetName(const char* Name);
@@ -66,11 +72,9 @@ class ZECRCollectorFile : public ZECRCollector
 		void								SetBinary(bool Binary);
 		bool								GetBinary();
 
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
-		virtual void						CleanUp() override;
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters) override;
+
+		virtual void						LoadConfiguration(const ZEMLReaderNode& ConfigurationNode) override;
 
 											ZECRCollectorFile();
 };

@@ -40,11 +40,11 @@
 #include "ZEExport.ZEEngine.h"
 #include "ZEModule.h"
 
-enum ZECrashDumpType
+enum ZECRMemoryDumpType
 {
-	ZE_CDT_MINIMAL,
-	ZE_CDT_NORMAL,
-	ZE_CDT_FULL
+	ZECR_CDT_MINIMAL,
+	ZECR_CDT_NORMAL,
+	ZECR_CDT_FULL
 };
 
 ZE_ENUM(ZECrashReason)

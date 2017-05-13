@@ -36,14 +36,16 @@
 #include "ZECRWindow.h"
 
 #include "ui_ZECRWindow.h"
+#include "ZEFile/ZEPathManager.h"
 
 #include "ZECRCollectorProductInfo.h"
 #include "ZECRCollectorSystemInformation.h"
 #include "ZECRCollectorFile.h"
+#include "ZECRCollectorMemoryDump.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZECRCollectorMemoryDump.h"
+
 
 const ZECRReportParameters& ZECRWindow::GetParameters()
 {
@@ -69,27 +71,27 @@ void ZECRWindow::SetPage(ZECRWindowPageId Id)
 			break;
 
 		case ZECR_WP_GENERATING_REPORT:
-			Form->stckWidgets->setCurrentIndex(1);
+			Form->stckWidgets->setCurrentIndex(0);
 			Form->widGeneratingReport->Activated();
 			break;
 
 		case ZECR_WP_INFORMATION:
-			Form->stckWidgets->setCurrentIndex(2);
+			Form->stckWidgets->setCurrentIndex(1);
 			Form->widInformation->Deactivated();
 			break;
 
 		case ZECR_WP_USER_FEEDBACK:
-			Form->stckWidgets->setCurrentIndex(3);
+			Form->stckWidgets->setCurrentIndex(2);
 			Form->widUserFeedback->Deactivated();
 			break;
 
 		case ZECR_WP_TRANSFERING:
-			Form->stckWidgets->setCurrentIndex(4);
+			Form->stckWidgets->setCurrentIndex(3);
 			Form->widTransfering->Deactivated();
 			break;
 
 		case ZECR_WP_TRANSFE_COMPLETED:
-			Form->stckWidgets->setCurrentIndex(5);
+			Form->stckWidgets->setCurrentIndex(4);
 			Form->widTransferCompleted->Deactivated();
 			break;
 
@@ -107,7 +109,6 @@ void ZECRWindow::Process(const ZEString& CommandArguments)
 	DWORD Temp = 0xEEFF0012;
 	WriteFile(static_cast<HANDLE>(ApplicationPipe), &Temp, sizeof(Temp), NULL, NULL);
 
-	ZECRReportParameters Parameters;
 	if (!ReadFile(static_cast<HANDLE>(ApplicationPipe), &Parameters, sizeof(ZECRReportParameters), &Temp, NULL))
 		abort();
 
@@ -119,15 +120,19 @@ void ZECRWindow::Process(const ZEString& CommandArguments)
 		FileProvider->SetBinary(false);
 	}
 
-	ZECRCollectorMemoryDump*	DumpProvider = new ZECRCollectorMemoryDump();
+	ZEPathManager::GetInstance()->SetEnginePath(Parameters.EnginePath);
+	ZEPathManager::GetInstance()->SetResourcePath(Parameters.ResourcePath);
+	ZEPathManager::GetInstance()->SetStoragePath(Parameters.StoragePath);
+	ZEPathManager::GetInstance()->SetUserStoragePath(Parameters.UserStoragePath);
+	ZEPathManager::GetInstance()->SetSystemStoragePath(Parameters.SystemStoragePath);
+
+	ZECRCollectorMemoryDump* DumpProvider = new ZECRCollectorMemoryDump();
 	DumpProvider->SetName("Dump");
 	DumpProvider->SetBinary(true);
-	DumpProvider->SetProcessId(Parameters.ProcessId);
-	DumpProvider->SetDumpType(ZE_CDT_NORMAL);
+	DumpProvider->SetDumpType(ZECR_CDT_NORMAL);
 	CrashReport.AddCollector(DumpProvider);
 
 	ZECRCollectorProductInfo* ApplicationProvider = new ZECRCollectorProductInfo();
-	ApplicationProvider->SetProcessId(Parameters.ProcessId);
 	CrashReport.AddCollector(ApplicationProvider);
 
 	ZECRCollectorSystemInformation* SystemInformation = new ZECRCollectorSystemInformation();

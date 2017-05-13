@@ -41,18 +41,16 @@
 
 class ZECRCollectorUserFeedback : public ZECRCollector
 {
+	ZE_OBJECT
 	private:
 		ZEString							NameSurname;
 		ZEString							EMail;
 		ZEString							Comments;
 		bool								ContactBack;
 
-		ZEString							Data;
-		ZESize								Size;
-
 	public:
 		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual ZECRDataProviderType		GetCollectorType() override;
 		virtual const char*					GetExtension() override;
 
 
@@ -68,8 +66,5 @@ class ZECRCollectorUserFeedback : public ZECRCollector
 		void								SetContactBack(bool Yes);
 		bool								GetContactBack();
 
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters) override;
 };

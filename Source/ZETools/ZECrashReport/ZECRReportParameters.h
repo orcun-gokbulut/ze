@@ -50,4 +50,10 @@ struct ZECRReportParameters
 	char							LicenseLicenseeName[1024];
 	char							LicenseSerialKey[1024];
 	ZEUInt							LicenseVersion;
+
+	char							EnginePath[4096];
+	char							StoragePath[4096];
+	char							ResourcePath[4096];
+	char							UserStoragePath[4096];
+	char							SystemStoragePath[4096];
 };

@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
@@ -42,10 +44,18 @@
 class ZECRCollector;
 struct ZECRReportParameters;
 
-class ZECRReport
+class ZECRReport : public ZEObject
 {		
+	ZE_OBJECT
 	private:
 		ZEArray<ZECRCollector*>				Collectors;
+		ZEString							ReportFileDirectory;
+		ZEString							ReportFilePattern;
+		ZEString							ReportFileName;
+		ZEInt								ReportFileQuota;
+
+		void								GenerateReportFileName(const ZECRReportParameters* Parameters);
+		void								ManageReportQuote();
 
 	public:
 		const 
@@ -54,8 +64,21 @@ class ZECRReport
 		bool								AddCollector(ZECRCollector* Collector);
 		void								RemoveCollector(ZECRCollector* Collector);
 
-		void								Generate(const ZECRReportParameters* Parameters);
-		void								CleanUp();
+		void								SetReportFileDirectory(const ZEString& Directory);
+		const ZEString&						GetReportFileDirectory();
 
+		void								SetReportFileNamePattern(const ZEString& Pattern);
+		const ZEString&						GetReportFileNamePattern();
+
+		void								SetReportFileName(const ZEString& FileName);
+		const ZEString&						GetReportFileName();
+
+		bool								Generate(const ZECRReportParameters* Parameters);
+
+		bool								LoadConfiguration();
+		bool								LoadConfiguration(const ZEString& FileName);
+		bool								LoadConfiguration(ZEMLReaderNode* ReportNode);
+
+											ZECRReport();
 											~ZECRReport();
 };

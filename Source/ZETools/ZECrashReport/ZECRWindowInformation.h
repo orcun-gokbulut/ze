@@ -47,6 +47,7 @@ class ZECRWindowInformation : public ZECRWindowPage
 
 	private slots:
 		void								btnViewReport_Clicked();
+		void								btnOpenReportLocation_Clicked();
 		void								btnViewPrivacyPolicy_Clicked();
 		void								btnGotoSupportPortal_Clicked();
 		void								btnSend_Clicked();

@@ -34,15 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FILE_H__
-#define __ZE_FILE_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-#include "ZESerialization/ZESerializer.h"
-#include "ZESerialization/ZEUnserializer.h"
 #include "ZEExport.ZEFoundation.h"
-
 
 enum ZESeekFrom
 {
@@ -62,7 +57,6 @@ enum ZEFileOpenMode
 	ZE_FOM_READ_WRITE		= 3
 };
 
-
 // ZE_FCT_OPEN : Opens an existing file. If there is no file, gives error.						
 // ZE_FCT_OPEN_CREATE : Creates a new file if file does not exists, otherwise opens the existing file.	
 // ZE_FCT_OPEN_CREATE_OVERWRITE : Creates a file, if file exists the file's content is deleted.				
@@ -74,8 +68,7 @@ enum ZEFileCreationMode
 
 };
 
-
-class ZE_EXPORT_ZEFOUNDATION ZEFile : public ZESerializer, public ZEUnserializer
+class ZE_EXPORT_ZEFOUNDATION ZEFile
 {
 	protected:
 		void*					File;
@@ -84,9 +77,6 @@ class ZE_EXPORT_ZEFOUNDATION ZEFile : public ZESerializer, public ZEUnserializer
 		ZEFileCreationMode		CreationMode;
 
 	public:
-								ZEFile();
-		virtual					~ZEFile();
-
 		virtual ZEInt			Close();
 		virtual bool			Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, const ZEFileCreationMode FileCreationMode);
 		
@@ -106,11 +96,11 @@ class ZE_EXPORT_ZEFOUNDATION ZEFile : public ZESerializer, public ZEUnserializer
 		ZEFileOpenMode			GetOpenMode() const;
 		ZEFileCreationMode		GetCreationMode() const;
 
-		ZEFile&					operator = (ZEFile& OtherFile);
+		const ZEFile&			operator=(const ZEFile& OtherFile);
 
+								ZEFile();
+		virtual					~ZEFile();
+		
 		static bool				ReadFile(const ZEString& FilePath, void* Buffer, const ZESize BufferSize);
 		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, const ZESize BufferSize);
-
 };
-
-#endif

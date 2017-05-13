@@ -35,22 +35,25 @@
 
 #include "ZECRCollectorMemoryDump.h"
 
+#include "ZECRReportParameters.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEML/ZEMLReader.h"
 #include "ZEGUID.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <DbgHelp.h>
+
 #pragma comment(lib, "DbgHelp.lib")
 
-ZECRDataProviderType ZECRCollectorMemoryDump::GetProviderType()
+ZECRDataProviderType ZECRCollectorMemoryDump::GetCollectorType()
 {
 	return ZECR_DPT_BINARY;
 }
 
 const char* ZECRCollectorMemoryDump::GetName()
 {
-	return "Crash Dump";
+	return "Memory Dump";
 }
 
 const char* ZECRCollectorMemoryDump::GetExtension()
@@ -58,40 +61,30 @@ const char* ZECRCollectorMemoryDump::GetExtension()
 	return ".dmp";
 }
 
-void ZECRCollectorMemoryDump::SetProcessId(ZEUInt32 ProcessId)
-{
-	this->ProcessId = ProcessId;
-}
-
-ZEUInt32 ZECRCollectorMemoryDump::GetProcessId()
-{
-	return ProcessId;
-}
-
-void ZECRCollectorMemoryDump::SetDumpType(ZECrashDumpType Type)
+void ZECRCollectorMemoryDump::SetDumpType(ZECRMemoryDumpType Type)
 {
 	DumpType = Type;
 }
-ZECrashDumpType ZECRCollectorMemoryDump::GetDumpType()
+ZECRMemoryDumpType ZECRCollectorMemoryDump::GetDumpType()
 {
 	return DumpType;
 }
 
-bool ZECRCollectorMemoryDump::Generate(const ZECRReportParameters* Parameters)
+bool ZECRCollectorMemoryDump::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {
 	MINIDUMP_TYPE DumpFlags;
 
 	switch(DumpType)
 	{
-		case ZE_CDT_MINIMAL:		
+		case ZECR_CDT_MINIMAL:		
 			DumpFlags = (MINIDUMP_TYPE)(MiniDumpNormal);
 			break;
 
-		case ZE_CDT_NORMAL:
+		case ZECR_CDT_NORMAL:
 			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData | MiniDumpWithFullMemoryInfo | MiniDumpWithThreadInfo);
 			break;
 
-		case ZE_CDT_FULL:
+		case ZECR_CDT_FULL:
 			DumpFlags = (MINIDUMP_TYPE)(MiniDumpWithFullMemory | MiniDumpWithFullMemoryInfo | MiniDumpWithHandleData | MiniDumpWithThreadInfo);
 			break;
 	}
@@ -100,14 +93,14 @@ bool ZECRCollectorMemoryDump::Generate(const ZECRReportParameters* Parameters)
 	if (GetTempPath (MAX_PATH, TempFolder) == 0)
 		return false;
 
-	SetFileName(ZEFormat::Format("{0}{1}.zeDump", TempFolder, ZEGUID::Generate().ToString()));
+	SetFileName(ZEFormat::Format("{0}{1}.ZEMemoryDump", TempFolder, ZEGUID::Generate().ToString()));
 	HANDLE hFile = CreateFileA(GetFileName(), GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (hFile == INVALID_HANDLE_VALUE)
 		return false;
 	
-	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, ProcessId);
-	if (!MiniDumpWriteDump(hProcess, ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
+	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, Parameters->ProcessId);
+	if (!MiniDumpWriteDump(hProcess, Parameters->ProcessId, hFile, DumpFlags, NULL, NULL, NULL))
 	{			
 		CloseHandle(hFile);
 		DeleteFileA(GetFileName());
@@ -116,11 +109,20 @@ bool ZECRCollectorMemoryDump::Generate(const ZECRReportParameters* Parameters)
 
 	CloseHandle(hFile);		
 	
-	return ZECRCollectorFile::Generate(Parameters);
+	return ZECRCollectorFile::Generate(CollectorNode, Parameters);
+}
+
+void ZECRCollectorMemoryDump::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
+{
+	// Skip ZECRCollectorFile::LoadConfiguration
+	ZECRCollector::LoadConfiguration(ConfigurationNode);
+
+	DumpType = (ZECRMemoryDumpType)ConfigurationNode.ReadUInt8("DumpType");
 }
 
 ZECRCollectorMemoryDump::ZECRCollectorMemoryDump()
 {
-	ProcessId = 0;
-	DumpType = ZE_CDT_NORMAL;
+	SetBinary(true);
+	SetDeleteOnExit(true);
+	DumpType = ZECR_CDT_NORMAL;
 }

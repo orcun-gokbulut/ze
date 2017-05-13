@@ -38,15 +38,14 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEFormat.h"
-
-#include <memory.h>
+#include "ZEML/ZEMLWriter.h"
 
 const char* ZECRCollectorUserFeedback::GetName()
 {
 	return "UserFeedback";
 }
 
-ZECRDataProviderType ZECRCollectorUserFeedback::GetProviderType()
+ZECRDataProviderType ZECRCollectorUserFeedback::GetCollectorType()
 {
 	return ZECR_DPT_TEXT;
 }
@@ -96,20 +95,9 @@ bool ZECRCollectorUserFeedback::GetContactBack()
 	return ContactBack;
 }
 
-ZESize ZECRCollectorUserFeedback::GetSize()
+bool ZECRCollectorUserFeedback::Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters)
 {
-	return Size;
-}
-
-bool ZECRCollectorUserFeedback::GetData(void* Output, ZESize Offset, ZESize Size)
-{
-	memcpy(Output, Data.GetValue() + Offset, Size);
-	return true;
-}
-
-bool ZECRCollectorUserFeedback::Generate(const ZECRReportParameters* Parameters)
-{
-	Data = ZEFormat::Format(
+	ZEString Data = ZEFormat::Format(
 		"<ZECrashReport>\n"
 		"  <UserComments>\n"
 		"    <NameSurname>{0}</NameSurname>\n"
@@ -120,7 +108,11 @@ bool ZECRCollectorUserFeedback::Generate(const ZECRReportParameters* Parameters)
 		"    ]]></Comments>\n"
 		"  </UserComments>\n"
 		"<ZECrashReport>\n", NameSurname, EMail, ContactBack ? "yes" : "no", Comments);
-	Size = Data.GetLength() + 1;
 	
+	CollectorNode->WriteData("Data", Data.ToCString(), Data.GetSize());
+		
+	if (!ZECRCollector::Generate(CollectorNode, Parameters))
+		return false;
+
 	return true;
 }

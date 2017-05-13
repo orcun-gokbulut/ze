@@ -35,24 +35,18 @@
 
 #pragma once
 
-#include "ZECRCollector.h"
+#include "ZECRCollectorFile.h"
 #include "ZEDS/ZEString.h"
 
-class ZECRCollectorSystemInformation : public ZECRCollector
+class ZECRCollectorSystemInformation : public ZECRCollectorFile
 {
-	private:
-		ZEString							Data;
-		ZESize								DataSize;
-
+	ZE_OBJECT
 	public:
 		virtual const char*					GetName() override;
-		virtual ZECRDataProviderType		GetProviderType() override;
+		virtual ZECRDataProviderType		GetCollectorType() override;
 		virtual const char*					GetExtension() override;
 		
-		virtual ZESize						GetSize() override;
-		virtual bool						GetData(void* Output, ZESize Offset, ZESize Size) override;
-		
-		virtual bool						Generate(const ZECRReportParameters* Parameters) override;
+		virtual bool						Generate(ZEMLWriterNode* CollectorNode, const ZECRReportParameters* Parameters) override;
 
 											ZECRCollectorSystemInformation();
 };
