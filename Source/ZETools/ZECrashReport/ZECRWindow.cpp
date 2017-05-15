@@ -42,19 +42,19 @@
 #include "ZECRCollectorSystemInformation.h"
 #include "ZECRCollectorFile.h"
 #include "ZECRCollectorMemoryDump.h"
+#include "ZECRCollectorUserFeedback.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 
 const ZECRReportParameters& ZECRWindow::GetParameters()
 {
 	return Parameters;
 }
 
-ZECRReport* ZECRWindow::GetCrashReport()
+ZECRReport* ZECRWindow::GetReport()
 {
-	return &CrashReport;
+	return &Report;
 }
 
 void ZECRWindow::SetPage(ZECRWindowPageId Id)
@@ -70,28 +70,33 @@ void ZECRWindow::SetPage(ZECRWindowPageId Id)
 			Form->widGeneratingReport->Deactivated();
 			break;
 
-		case ZECR_WP_GENERATING_REPORT:
+		case ZECR_WP_GENERATE_INFORMATION:
 			Form->stckWidgets->setCurrentIndex(0);
-			Form->widGeneratingReport->Activated();
-			break;
-
-		case ZECR_WP_INFORMATION:
-			Form->stckWidgets->setCurrentIndex(1);
-			Form->widInformation->Deactivated();
+			Form->widGenerateInformation->Activated();
 			break;
 
 		case ZECR_WP_USER_FEEDBACK:
-			Form->stckWidgets->setCurrentIndex(2);
+			Form->stckWidgets->setCurrentIndex(1);
 			Form->widUserFeedback->Deactivated();
+			break;
+		
+		case ZECR_WP_GENERATING:
+			Form->stckWidgets->setCurrentIndex(2);
+			Form->widGeneratingReport->Activated();
+			break;
+
+		case ZECR_WP_SEND_INFORMATION:
+			Form->stckWidgets->setCurrentIndex(3);
+			Form->widSendInformation->Deactivated();
 			break;
 
 		case ZECR_WP_TRANSFERING:
-			Form->stckWidgets->setCurrentIndex(3);
+			Form->stckWidgets->setCurrentIndex(4);
 			Form->widTransfering->Deactivated();
 			break;
 
 		case ZECR_WP_TRANSFE_COMPLETED:
-			Form->stckWidgets->setCurrentIndex(4);
+			Form->stckWidgets->setCurrentIndex(5);
 			Form->widTransferCompleted->Deactivated();
 			break;
 
@@ -130,15 +135,18 @@ void ZECRWindow::Process(const ZEString& CommandArguments)
 	DumpProvider->SetName("Dump");
 	DumpProvider->SetBinary(true);
 	DumpProvider->SetDumpType(ZECR_CDT_NORMAL);
-	CrashReport.AddCollector(DumpProvider);
+	Report.AddCollector(DumpProvider);
 
-	ZECRCollectorProductInfo* ApplicationProvider = new ZECRCollectorProductInfo();
-	CrashReport.AddCollector(ApplicationProvider);
+	ZECRCollectorProductInfo* ProductInfo = new ZECRCollectorProductInfo();
+	Report.AddCollector(ProductInfo);
+
+	ZECRCollectorUserFeedback* UserFeedback = new ZECRCollectorUserFeedback();
+	Report.AddCollector(UserFeedback);
 
 	ZECRCollectorSystemInformation* SystemInformation = new ZECRCollectorSystemInformation();
-	CrashReport.AddCollector(SystemInformation);
+	Report.AddCollector(SystemInformation);
 
-	SetPage(ZECR_WP_GENERATING_REPORT);
+	SetPage(ZECR_WP_GENERATE_INFORMATION);
 }
 
 void ZECRWindow::TerminateApplication()

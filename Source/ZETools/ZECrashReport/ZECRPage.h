@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowGeneratingReport.h
+ Zinek Engine - ZECRPage.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,32 +35,28 @@
 
 #pragma once
 
-#include "ZECRWindowPage.h"
-
-#include "ZEThread\ZEThread.h"
+#include <QWidget>
 
 class ZECRWindow;
-class QTimer;
-class Ui_ZECRWindowGeneratingReport;
 
-class ZECRWindowGeneratingReport : public ZECRWindowPage
+enum ZECRWindowPageId
 {
-	Q_OBJECT
-	private:
-		Ui_ZECRWindowGeneratingReport*			Form;
-		ZEThread								GeneratorThread;
-		bool									Generated;
-		QTimer*									Timer;
+	ZECR_WP_NONE,
+	ZECR_WP_GENERATE_INFORMATION,
+	ZECR_WP_USER_FEEDBACK,
+	ZECR_WP_GENERATING,
+	ZECR_WP_SEND_INFORMATION,
+	ZECR_WP_TRANSFERING,
+	ZECR_WP_TRANSFE_COMPLETED
+};
 
-		void									GeneratorThread_Function(ZEThread* Thread, void* Parameters);
+class ZECRPage : public QWidget
+{
+	friend class ZECRWindow;
+	protected:
+		ZECRWindow*							GetWindow();
+		virtual void						Activated();
+		virtual void						Deactivated();
 
-	private slots:
-		void									Timer_timeout();
-		void									btnCancel_clicked();
-
-	public:
-		virtual void							Activated() override;
-
-												ZECRWindowGeneratingReport(QWidget* Parent = NULL);
-												~ZECRWindowGeneratingReport();
+											ZECRPage(QWidget* Parent = NULL);
 };

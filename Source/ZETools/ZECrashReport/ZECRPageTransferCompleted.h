@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowTransferCompleted.h
+ Zinek Engine - ZECRPageTransferCompleted.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,20 +35,20 @@
 
 #pragma once
 
-#include "ZECRWindowPage.h"
+#include "ZECRPage.h"
 
-class Ui_ZECRWindowTransferCompleted;
+class Ui_ZECRPageTransferCompleted;
 
-class ZECRWindowTransferCompleted : public ZECRWindowPage
+class ZECRPageTransferCompleted : public ZECRPage
 {
 	Q_OBJECT
 	private:
-		Ui_ZECRWindowTransferCompleted*		Form;
+		Ui_ZECRPageTransferCompleted*		Form;
 
 	public slots:
 		void								btnClose_Clicked();
 
 	public:		
-											ZECRWindowTransferCompleted(QWidget* Parent = NULL);
-											~ZECRWindowTransferCompleted();
+											ZECRPageTransferCompleted(QWidget* Parent = NULL);
+											~ZECRPageTransferCompleted();
 };

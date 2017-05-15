@@ -57,6 +57,8 @@ class ZELNCrashReportsWidget : public QWidget
 		void							btnView_clicked();
 		void							btnUpload_clicked();
 		void							btnDelete_clicked();
+		void							btnOpenReportDirectory_clicked();
+		void							trwReports_itemSelectionChanged();
 
 	public:
 		void							SetReportDirectory(const ZEString& ReportDirectory);

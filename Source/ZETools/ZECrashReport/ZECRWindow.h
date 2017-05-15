@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZECRWindowPage.h"
+#include "ZECRPage.h"
 #include "ZECRReport.h"
 #include "ZECRReportParameters.h"
 
@@ -48,15 +48,15 @@ class ZECRWindow : public QDialog
 	Q_OBJECT
 	private:		
 		Ui_ZECRWindow*							Form;
-		ZECRReport							CrashReport;
+		ZECRReport								Report;
 		ZECRWindowPageId						CurrentPage;
-		ZECRReportParameters				Parameters;
+		ZECRReportParameters					Parameters;
 		void*									ApplicationPipe;
 
 	public:
 		Ui_ZECRWindow*							GetForm();
-		const ZECRReportParameters&		GetParameters();
-		ZECRReport*						GetCrashReport();
+		ZECRReport*								GetReport();
+		const ZECRReportParameters&				GetParameters();
 
 		void									SetPage(ZECRWindowPageId Id);
 		ZECRWindowPageId						GetPage();

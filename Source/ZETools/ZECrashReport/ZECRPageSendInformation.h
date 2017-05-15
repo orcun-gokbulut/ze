@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECrashReportMain.cpp
+ Zinek Engine - ZECRPageSendInformation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECrashReport.h"
-#include "ZECrashReportFileProvider.h"
-#include "ZECrashReportUserCommentProvider.h"
-#include "ZECrashReportPackager.h"
-#include "ZECrashReportSender.h"
-#include "ZECrashReportSystemInformationProvider.h"
-#include "ZECrashReportApplicationInformationProvider.h"
-#include "ZETypes.h"
+#pragma once
 
-void main()
+#include "ZECRPage.h"
+
+class Ui_ZECRPageSendInformation;
+
+class ZECRPageSendInformation : public ZECRPage
 {
-	
-}
+	Q_OBJECT
+	private:
+		Ui_ZECRPageSendInformation*			Form;
 
-static void ZECrashReportMain(ZEString DumpFileName, ZEString LogFileName)
-{
-	ZECrashReport CrashReport;
+	private slots:
+		void								btnViewReport_Clicked();
+		void								btnOpenReportLocation_Clicked();
+		void								btnViewPrivacyPolicy_Clicked();
+		void								btnGotoSupportPortal_Clicked();
+		void								btnSend_Clicked();
+		void								btnDontSend_Clicked();
 
-	/*ZECrashReportUserCommentProvider* UserCommentProvider = new ZECrashReportUserCommentProvider();
-	UserCommentProvider->SetNameSurname("");
-	UserCommentProvider->SetEMail("");
-	UserCommentProvider->SetContactBack(false);
-	UserCommentProvider->SetComment("");
-	CrashReport.RegisterProvider(UserCommentProvider);*/
-
-	ZECrashReportSystemInformationProvider* SystemInformationProvider = new ZECrashReportSystemInformationProvider();
-	CrashReport.RegisterProvider(SystemInformationProvider);
-
-	ZECrashReportApplicationInformationProvider* ApplicationInformationProvider = new ZECrashReportApplicationInformationProvider();
-	CrashReport.RegisterProvider(ApplicationInformationProvider);
-
-	ZECrashReportFileProvider* LogFileProvider = new ZECrashReportFileProvider();
-	LogFileProvider->SetName("Log File");
-	LogFileProvider->SetFileName(LogFileName);
-	LogFileProvider->SetDeleteOnExit(false);
-	CrashReport.RegisterProvider(LogFileProvider);
-
-	ZECrashReportFileProvider* DumpFileProvider = new ZECrashReportFileProvider();
-	DumpFileProvider->SetName("Dump File");
-	DumpFileProvider->SetFileName(DumpFileName);
-	DumpFileProvider->SetDeleteOnExit(false);
-	CrashReport.RegisterProvider(DumpFileProvider);
-	
-	CrashReport.Generate();
-
-}
+	public:		
+											ZECRPageSendInformation(QWidget* Parent = NULL);
+											~ZECRPageSendInformation();
+};

@@ -43,19 +43,18 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZECRReportParameters.h"
 
-void ZECRReport::GenerateReportFileName(const ZECRReportParameters* Parameters)
+void ZECRReport::GenerateReportFileName(const ZECRReportParameters* Parameters, const ZEGUID& GUID, const ZETimeStamp& TimeStamp)
 {
 	if (!ReportFileName.IsEmpty())
 		return;
 
 	ZEString FileName = ZEFormat::Format(ReportFilePattern, 
-		Parameters->ApplicationName, 
-		Parameters->LicenseProductName, 
-		ZEGUID::Generate().ToString(),
-		ZETimeStamp::Now().ToString("%Y%m%d%H%M%S"),
+		ZEFileInfo(Parameters->Executable).GetName(), 
+		GUID.ToString(),
+		TimeStamp.ToString("%Y%m%d%H%M%S"),
 		"");
 
-	ReportFileName = ZEFormat::Format("{0}/{1}.ZECRReport", ReportFileDirectory, FileName);
+	ReportFileName = ZEFormat::Format("{0}/{1}", ReportFileDirectory, FileName);
 }
 
 struct ZEReportQuoteEntry
@@ -167,8 +166,12 @@ const ZEString& ZECRReport::GetReportFileName()
 
 bool ZECRReport::Generate(const ZECRReportParameters* Parameters)
 {
+	ZEString ExecutableName = ZEFileInfo(Parameters->Executable).GetFileName();
+	ZEGUID GUID = ZEGUID::Generate();
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+
 	ManageReportQuote();
-	GenerateReportFileName(Parameters);
+	GenerateReportFileName(Parameters, GUID, TimeStamp);
 
 	ZEMLWriter Writer;
 	if (!Writer.Open(ReportFileName))
@@ -180,17 +183,9 @@ bool ZECRReport::Generate(const ZECRReportParameters* Parameters)
 	RootNode.WriteUInt32("VersionMajor", 1);
 	RootNode.WriteUInt32("VersionMinor", 0);
 
-	RootNode.WriteString("GUID", ZEGUID::Generate().ToString());
-	ZETimeStamp TimeStamp = ZETimeStamp::Now();
-	ZEMLWriterNode TimeStampNode;
-	RootNode.OpenNode("TimeStamp", TimeStampNode);
-	TimeStampNode.WriteInt16("Year", TimeStamp.GetYear());
-	TimeStampNode.WriteInt16("Month", TimeStamp.GetMonth());
-	TimeStampNode.WriteInt16("Day", TimeStamp.GetDay());
-	TimeStampNode.WriteInt16("Hour", TimeStamp.GetHour());
-	TimeStampNode.WriteInt16("Minute", TimeStamp.GetMinute());
-	TimeStampNode.WriteInt16("Second", TimeStamp.GetSecond());
-	TimeStampNode.CloseNode();
+	RootNode.WriteString("GUID", GUID.ToString());
+	RootNode.WriteString("Executable", ExecutableName);
+	RootNode.WriteUInt64("TimeStamp", TimeStamp.ToCTime());
 	RootNode.WriteString("ComputerName", "");
 
 	ZEMLWriterNode CollectorsNode;
@@ -241,7 +236,7 @@ bool ZECRReport::LoadConfiguration(ZEMLReaderNode* ReportNode)
 ZECRReport::ZECRReport()
 {
 	ReportFileDirectory = "#S:/CrashReports";
-	ReportFilePattern = "Crash-{0}-{3}.ZECRReport";
+	ReportFilePattern = "{0}-{2}.ZECRReport";
 	ReportFileQuota = 5;
 }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZECRWindowTransfering</class>
- <widget class="QWidget" name="ZECRWindowTransfering">
+ <class>ZECRPageTransfering</class>
+ <widget class="QWidget" name="ZECRPageTransfering">
   <property name="geometry">
    <rect>
     <x>0</x>

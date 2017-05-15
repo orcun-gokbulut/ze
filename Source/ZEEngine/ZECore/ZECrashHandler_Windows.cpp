@@ -292,9 +292,11 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 		TerminateProcess(Process, EXIT_FAILURE);
 
 	ZECRReportParameters Parameters;
-	Parameters.ProcessId = GetCurrentProcessId();
-	Parameters.Reason = Reason;
+	memset(&Parameters, 0, sizeof(ZECRReportParameters));
 	GenerateParameters(Parameters);
+	Parameters.Reason = Reason;
+	Parameters.ProcessId = GetCurrentProcessId();
+	GetModuleFileName(NULL, Parameters.Executable, 1024);
 	
 	if (!WriteFile(NamedPipeHandle, &Parameters, sizeof(ZECRReportParameters), NULL, NULL))
 		TerminateProcess(Process, EXIT_FAILURE);

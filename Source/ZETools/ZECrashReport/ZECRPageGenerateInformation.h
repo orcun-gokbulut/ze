@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowViewPrivacyPolicy.cpp
+ Zinek Engine - ZECRPageGenerateInformation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowViewPrivacyPolicy.h"
+#pragma once
 
-#include "Ui_ZECRWindowViewPrivacyPolicy.h"
+#include "ZECRPage.h"
 
-ZECRWindowViewPrivacyPolicy::ZECRWindowViewPrivacyPolicy(QWidget *Parent) : QDialog(Parent)
+class ZECRWindow;
+class Ui_ZECRPageGenerateInformation;
+
+class ZECRPageGenerateInformation : public ZECRPage
 {
-	Form = new Ui_ZECRWindowViewPrivacyPolicy();
-	Form->setupUi(this);
+	Q_OBJECT
+	private:
+		Ui_ZECRPageGenerateInformation*			Form;
+		
+	private slots:
+		void									btnGenerate_clicked();
+		void									btnDontGenerate_clicked();
 
-	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(close()));
-}
-
-ZECRWindowViewPrivacyPolicy::~ZECRWindowViewPrivacyPolicy()
-{
-	delete Form;
-}
+	public:
+												ZECRPageGenerateInformation(QWidget* Parent = NULL);
+		virtual									~ZECRPageGenerateInformation() override;
+};

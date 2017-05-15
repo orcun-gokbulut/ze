@@ -54,44 +54,51 @@
      <property name="currentIndex">
       <number>4</number>
      </property>
-     <widget class="ZECRWindowGeneratingReport" name="widGeneratingReport"/>
-     <widget class="ZECRWindowInformation" name="widInformation"/>
-     <widget class="ZECRWindowUserFeedback" name="widUserFeedback"/>
-     <widget class="ZECRWindowTransfering" name="widTransfering"/>
-     <widget class="ZECRWindowTransferCompleted" name="widTransferCompleted"/>
+     <widget class="ZECRPageGenerateInformation" name="widGenerateInformation"/>
+     <widget class="ZECRPageUserFeedback" name="widUserFeedback"/>
+     <widget class="ZECRPageGenerating" name="widGeneratingReport"/>
+     <widget class="ZECRPageSendInformation" name="widSendInformation"/>
+     <widget class="ZECRPageTransfering" name="widTransfering"/>
+     <widget class="ZECRPageTransferCompleted" name="widTransferCompleted"/>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ZECRWindowGeneratingReport</class>
+   <class>ZECRPageGenerating</class>
    <extends>QWidget</extends>
-   <header>ZECRWindowGeneratingReport.h</header>
+   <header>ZECRPageGenerating.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ZECRWindowInformation</class>
+   <class>ZECRPageSendInformation</class>
    <extends>QWidget</extends>
-   <header>ZECRWindowInformation.h</header>
+   <header>ZECRPageSendInformation.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ZECRWindowUserFeedback</class>
+   <class>ZECRPageUserFeedback</class>
    <extends>QWidget</extends>
-   <header>ZECRWindowUserFeedback.h</header>
+   <header>ZECRPageUserFeedback.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ZECRWindowTransfering</class>
+   <class>ZECRPageTransfering</class>
    <extends>QWidget</extends>
-   <header>ZECRWindowTransfering.h</header>
+   <header>ZECRPageTransfering.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ZECRWindowTransferCompleted</class>
+   <class>ZECRPageTransferCompleted</class>
    <extends>QWidget</extends>
-   <header>ZECRWindowTransferCompleted.h</header>
+   <header>ZECRPageTransferCompleted.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ZECRPageGenerateInformation</class>
+   <extends>QWidget</extends>
+   <header>ZECRPageGenerateInformation.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

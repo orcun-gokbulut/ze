@@ -105,20 +105,35 @@
            </layout>
           </item>
           <item>
-           <widget class="QTreeWidget" name="tblReports">
+           <widget class="QTreeWidget" name="trwReports">
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
+            <property name="itemsExpandable">
+             <bool>false</bool>
+            </property>
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
             <column>
              <property name="text">
-              <string>Application</string>
+              <string>Executable</string>
              </property>
             </column>
             <column>
              <property name="text">
               <string>Date</string>
              </property>
+             <property name="textAlignment">
+              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+             </property>
             </column>
             <column>
              <property name="text">
               <string>Uploaded</string>
+             </property>
+             <property name="textAlignment">
+              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
              </property>
             </column>
            </widget>
@@ -127,7 +142,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCommandLinkButton" name="cmdOpenReportDirectory">
+        <widget class="QCommandLinkButton" name="btnOpenReportDirectory">
          <property name="text">
           <string>Open Reports Directory</string>
          </property>

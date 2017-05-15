@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowTransfering.h
+ Zinek Engine - ZECRPageGenerateInformation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRPageGenerateInformation.h"
 
-#include "ZECRWindowPage.h"
-
+#include "ZECRWindow.h"
 #include "ZECRReport.h"
-#include "ZECRSender.h"
-#include "ZEThread/ZEThread.h"
+#include "Ui_ZECRPageGenerateInformation.h"
 
-#include <QTimer>
-
-class Ui_ZECRWindowTransfering;
-
-class ZECRWindowTransfering : public ZECRWindowPage
+void ZECRPageGenerateInformation::btnGenerate_clicked()
 {
-	Q_OBJECT
-	private:		
-		Ui_ZECRWindowTransfering*				Form;
-		ZEThread								SenderThread;
-		ZECRSender								Sender;
-		ZEString								UploadURL;
-		QTimer									UpdateInformationTimer;		
+	GetWindow()->SetPage(ZECR_WP_USER_FEEDBACK);
+}
 
-		void									SendReport(ZEThread* Thread, void* Output);	
-	
-		virtual void							Activated() override;
+void ZECRPageGenerateInformation::btnDontGenerate_clicked()
+{
+	exit(EXIT_FAILURE);
+}
 
-	public slots:		
-		void									btnCancel_Clicked();
+ZECRPageGenerateInformation::ZECRPageGenerateInformation(QWidget* Parent) : ZECRPage(Parent)
+{
+	Form = new Ui_ZECRPageGenerateInformation();
+	Form->setupUi(this);
 
-		void									UploadError();
-		void									UpdateUploadInformation();
-		void									UploadCompleted();
+	connect(Form->btnGenerate, SIGNAL(clicked()), this, SLOT(btnGenerate_clicked()));
+	connect(Form->btnDontGenerate, SIGNAL(clicked()), this, SLOT(btnDontGenerate_clicked()));
+}
 
-	public:
-												ZECRWindowTransfering(QWidget* Parent = 0);
-												~ZECRWindowTransfering();
-
-};
+ZECRPageGenerateInformation::~ZECRPageGenerateInformation()
+{
+	delete Form;
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowInformation.h
+ Zinek Engine - ZECRPrivacyPolicyViewer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,25 +35,17 @@
 
 #pragma once
 
-#include "ZECRWindowPage.h"
+#include <QDialog>
 
-class Ui_ZECRWindowInformation;
+class Ui_ZECRPrivacyPolicyViewer;
 
-class ZECRWindowInformation : public ZECRWindowPage
+class ZECRPrivacyPolicyViewer : public QDialog
 {
 	Q_OBJECT
 	private:
-		Ui_ZECRWindowInformation*			Form;
+		Ui_ZECRPrivacyPolicyViewer*		Form;
 
-	private slots:
-		void								btnViewReport_Clicked();
-		void								btnOpenReportLocation_Clicked();
-		void								btnViewPrivacyPolicy_Clicked();
-		void								btnGotoSupportPortal_Clicked();
-		void								btnSend_Clicked();
-		void								btnDontSend_Clicked();
-
-	public:		
-											ZECRWindowInformation(QWidget* Parent = NULL);
-											~ZECRWindowInformation();
+	public:	
+											ZECRPrivacyPolicyViewer(QWidget *Parent = 0);
+											~ZECRPrivacyPolicyViewer();	
 };

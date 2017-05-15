@@ -159,7 +159,7 @@ void ZECRReportViewer::lstCollectors_itemSelectionChanged()
 		else	
 		{
 			if (SelectedData.GetCount() >= 2 && SelectedData[0] == 0xFF && SelectedData[1] == 0xFE) // UTF-16 BOM
-				Form->txtContent->setText(QString::fromWCharArray((wchar_t*)(SelectedData.GetCArray() + 2), SelectedData.GetCount() - 2));
+				Form->txtContent->setText(QString::fromWCharArray((wchar_t*)(SelectedData.GetCArray() + 2), SelectedData.GetCount() - 4));
 			else if (SelectedData.GetCount() >= 3 && SelectedData[0] == 0xEF && SelectedData[1] == 0xBB && SelectedData[1] == 0xBF) // UTF-8 BOM
 				Form->txtContent->setText(QString::fromUtf8((char*)SelectedData.GetCArray() + 3, SelectedData.GetCount() - 3));
 			else

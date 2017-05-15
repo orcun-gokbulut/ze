@@ -43,6 +43,8 @@
 #include "ZEExport.ZECRCrashReporter.h"
 
 class ZECRCollector;
+class ZETimeStamp;
+class ZEGUID;
 struct ZECRReportParameters;
 
 class ZE_EXPORT_ZECRCRASHREPORTER ZECRReport : public ZEObject
@@ -55,7 +57,7 @@ class ZE_EXPORT_ZECRCRASHREPORTER ZECRReport : public ZEObject
 		ZEString							ReportFileName;
 		ZEInt								ReportFileQuota;
 
-		void								GenerateReportFileName(const ZECRReportParameters* Parameters);
+		void								GenerateReportFileName(const ZECRReportParameters* Parameters, const ZEGUID& GUID, const ZETimeStamp& TimeStamp);
 		void								ManageReportQuote();
 
 	public:

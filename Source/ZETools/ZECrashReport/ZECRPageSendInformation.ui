@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZECRWindowInformation</class>
- <widget class="QWidget" name="ZECRWindowInformation">
+ <class>ZECRPageSendInformation</class>
+ <widget class="QWidget" name="ZECRPageSendInformation">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,7 +36,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Your application has crashed unexpectedly !&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Send crash report to us&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -49,7 +49,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The problem may be due a bug in application or a problem in your computer. We are sorry for the inconvience. Please restart the application and do not forget to save often.&lt;/p&gt;&lt;p&gt;You can help us to find the root cause of this problem.&lt;/p&gt;&lt;p&gt;We have crated a report about this crash that you can send to us through internet. This report is going to help us what happened in our application that caused it to crash. Therefore, it will help us to solve your problem and improve our software in the process.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The problem may be due a bug in application or a problem in your computer. We are sorry for the inconvience. Please restart the application and do not forget to save often.&lt;/p&gt;&lt;p&gt;You can help us to find the root cause of this problem.&lt;/p&gt;&lt;p&gt;We have crated a report about this crash that you can send to us through internet. This report is going to help us what happened in our application that caused it to crash. Therefore, it will help us to solve your problem and improve our software in the process.&lt;/p&gt;&lt;p&gt;You can always access your crash reports, view them or send them us by using Zinek Launcher application. Howerever it is much more convinient and easier if you send it right now.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -167,12 +167,23 @@
        <property name="text">
         <string>Send</string>
        </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btnViewReport</tabstop>
+  <tabstop>btnOpenReportLocation</tabstop>
+  <tabstop>btnViewPrivacyPolicy</tabstop>
+  <tabstop>btnGotoSupportPortal</tabstop>
+  <tabstop>btnSend</tabstop>
+  <tabstop>btnDontSend</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

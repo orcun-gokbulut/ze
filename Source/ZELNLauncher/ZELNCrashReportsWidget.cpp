@@ -43,16 +43,19 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEDirectoryInfo.h"
+#include "ZEFile/ZEPathManager.h"
 #include "ZETools/ZECrashReport/ZECRReportViewer.h"
 
-#include <QtWidgets/QMessageBox>
-#include "QTreeWidget"
+#include <QMessageBox>
+#include <QTreeWidget>
+#include <QUrl>
+#include <QDesktopServices>
 
 void ZELNCrashReportsWidget::UpdateWidget()
 {
-	bool HasSelection = (Form->tblReports->selectedItems().count() != 0);
+	bool HasSelection = (Form->trwReports->selectedItems().count() != 0);
 	Form->btnView->setEnabled(HasSelection);
-	Form->btnUpload->setEnabled(HasSelection);
+	Form->btnUpload->setEnabled(false);
 	Form->btnDelete->setEnabled(HasSelection);
 }
 
@@ -61,7 +64,7 @@ void ZELNCrashReportsWidget::LoadReports()
 	ZEDirectoryInfo DirectoryInfo(ReportDirectory);
 	const ZEArray<ZEString> Files = DirectoryInfo.GetFiles();
 
-	Form->tblReports->clear();
+	Form->trwReports->clear();
 	for (ZESize I = 0; I < Files.GetCount(); I++)
 	{
 		ZEFileInfo FileInfo(ZEFormat::Format("{0}/{1}", ReportDirectory, Files[I]));
@@ -79,20 +82,22 @@ void ZELNCrashReportsWidget::LoadReports()
 			continue;
 
 		QTreeWidgetItem* Item = new QTreeWidgetItem();
-		Item->setText(0, FileInfo.GetName().ToCString());
+		Item->setText(0, RootNode.ReadString("Executable").ToCString());
 		Item->setText(1, FileInfo.GetModificationTime().ToString().ToCString());
+		Item->setTextAlignment(1, Qt::AlignVCenter | Qt::AlignHCenter);
 		Item->setText(2, RootNode.ReadBoolean("Uploaded") ? "Yes" : "No");
+		Item->setTextAlignment(2, Qt::AlignVCenter | Qt::AlignHCenter);
 		Item->setData(0, Qt::UserRole, FileInfo.GetPath().ToCString());
-		Form->tblReports->addTopLevelItem(Item);
+		Form->trwReports->addTopLevelItem(Item);
 	}
 }
 
 void ZELNCrashReportsWidget::btnView_clicked()
 {
-	if (Form->tblReports->selectedItems().count() != 1)
+	if (Form->trwReports->selectedItems().count() != 1)
 		return;
 
-	ZEString ReportPath = Form->tblReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin();
+	ZEString ReportPath = Form->trwReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin();
 
 	ZECRReportViewer Viewer;
 	Viewer.LoadReport(ReportPath);
@@ -101,15 +106,15 @@ void ZELNCrashReportsWidget::btnView_clicked()
 
 void ZELNCrashReportsWidget::btnUpload_clicked()
 {
-	if (Form->tblReports->selectedItems().count() != 1)
+	if (Form->trwReports->selectedItems().count() != 1)
 		return;
 
-	ZEString ReportPath = Form->tblReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin();
+	ZEString ReportPath = Form->trwReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin();
 }
 
 void ZELNCrashReportsWidget::btnDelete_clicked()
 {
-	if (Form->tblReports->selectedItems().count() != 1)
+	if (Form->trwReports->selectedItems().count() != 1)
 		return;
 
 	int Result = QMessageBox::question(this, "Zinek Launcher", "Are you sure that you want to delete this report ?", QMessageBox::Yes, QMessageBox::No);
@@ -117,13 +122,24 @@ void ZELNCrashReportsWidget::btnDelete_clicked()
 		return;
 
 	ZEFileInfo FileInfo;
-	FileInfo.SetPath(Form->tblReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin());
+	FileInfo.SetPath(Form->trwReports->selectedItems()[0]->data(0, Qt::UserRole).toString().toUtf8().begin());
 	FileInfo.Delete();
 	
 	LoadReports();
 	UpdateWidget();
 }
 
+
+void ZELNCrashReportsWidget::btnOpenReportDirectory_clicked()
+{
+	ZEString RealPath = ZEPathManager::GetInstance()->TranslateToRealPath(ReportDirectory).Path;
+	QDesktopServices::openUrl(QUrl::fromLocalFile(RealPath.ToCString()));
+}
+
+void ZELNCrashReportsWidget::trwReports_itemSelectionChanged()
+{
+	UpdateWidget();
+}
 
 void ZELNCrashReportsWidget::SetReportDirectory(const ZEString& ReportDirectory)
 {
@@ -137,13 +153,20 @@ const ZEString& ZELNCrashReportsWidget::GetReportDirectory()
 
 ZELNCrashReportsWidget::ZELNCrashReportsWidget(QWidget* Parent) : QWidget(Parent)
 {
+	ReportDirectory = "#S:/CrashReports";
+
 	Form = new Ui_ZELNCrashReportsWidget();
 	Form->setupUi(this);
+
+	Form->trwReports->header()->setStretchLastSection(false);
+	Form->trwReports->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	Form->trwReports->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+
 	connect(Form->btnView, SIGNAL(clicked()), this, SLOT(btnView_clicked()));
 	connect(Form->btnUpload, SIGNAL(clicked()), this, SLOT(btnUpload_clicked()));
 	connect(Form->btnDelete, SIGNAL(clicked()), this, SLOT(btnDelete_clicked()));
-
-	ReportDirectory = "#S:/CrashReports";
+	connect(Form->btnOpenReportDirectory, SIGNAL(clicked()), this, SLOT(btnOpenReportDirectory_clicked()));
+	connect(Form->trwReports, SIGNAL(itemSelectionChanged()), this, SLOT(trwReports_itemSelectionChanged()));
 
 	UpdateWidget();
 }

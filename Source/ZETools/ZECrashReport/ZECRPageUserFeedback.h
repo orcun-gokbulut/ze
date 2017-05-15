@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowPage.h
+ Zinek Engine - ZECRPageUserFeedback.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,23 @@
 
 #pragma once
 
-#include <QWidget>
+#include "ZECRPage.h"
 
-class ZECRWindow;
+class Ui_ZECRPageUserFeedback;
 
-enum ZECRWindowPageId
+class ZECRPageUserFeedback : public ZECRPage
 {
-	ZECR_WP_NONE,
-	ZECR_WP_GENERATING_REPORT,
-	ZECR_WP_INFORMATION,
-	ZECR_WP_USER_FEEDBACK,
-	ZECR_WP_TRANSFERING,
-	ZECR_WP_TRANSFE_COMPLETED
-};
+	Q_OBJECT
+	private:
+		Ui_ZECRPageUserFeedback*			Form;
 
-class ZECRWindowPage : public QWidget
-{
-	friend class ZECRWindow;
-	protected:
-		ZECRWindow*							GetWindow();
 		virtual void						Activated();
-		virtual void						Deactivated();
 
-											ZECRWindowPage(QWidget* Parent = NULL);
+	private slots:
+		void								btnGenerate_Clicked();
+		void								btnPrev_Clicked();
+
+	public:		
+											ZECRPageUserFeedback(QWidget* Parent = NULL);
+											~ZECRPageUserFeedback();
 };

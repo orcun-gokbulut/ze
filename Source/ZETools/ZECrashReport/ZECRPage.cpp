@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowInformation.cpp
+ Zinek Engine - ZECRPage.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowInformation.h"
+#include "ZECRPage.h"
 
-#include "ui_ZECRWindowInformation.h"
 #include "ZECRWindow.h"
-#include "ZECRReportViewer.h"
-#include "ZECRWindowViewPrivacyPolicy.h"
-#include "ZEFile/ZEPathManager.h"
 
-#include <QDesktopServices>
-#include <QUrl>
-#include <QMessageBox>
-
-
-void ZECRWindowInformation::btnViewReport_Clicked()
+ZECRWindow* ZECRPage::GetWindow()
 {
-	ZECRReportViewer Viewer;
-	if (!Viewer.LoadReport(GetWindow()->GetCrashReport()->GetReportFileName()))
-		QMessageBox::critical(this, "ZECRCrashReport", "Cannot load report. File may be corrupted.", QMessageBox::Ok);
-
-	Viewer.exec();
+	return static_cast<ZECRWindow*>(window());
 }
 
-void ZECRWindowInformation::btnOpenReportLocation_Clicked()
+void ZECRPage::Activated()
 {
-	ZEString RealPath = ZEPathManager::GetInstance()->TranslateToRealPath(GetWindow()->GetCrashReport()->GetReportFileDirectory()).Path;
-	QDesktopServices::openUrl(QUrl(RealPath.ToCString()));
+
 }
 
-void ZECRWindowInformation::btnViewPrivacyPolicy_Clicked()
+void ZECRPage::Deactivated()
 {
-	ZECRWindowViewPrivacyPolicy Viewer;
-	Viewer.exec();
+
 }
 
-void ZECRWindowInformation::btnGotoSupportPortal_Clicked()
+ZECRPage::ZECRPage(QWidget* Parent) : QWidget(Parent)
 {
-	QDesktopServices::openUrl(QUrl("https://support.zinek.xyz"));
-}
 
-void ZECRWindowInformation::btnSend_Clicked()
-{
-	GetWindow()->SetPage(ZECR_WP_USER_FEEDBACK);
-}
-
-void ZECRWindowInformation::btnDontSend_Clicked()
-{
-	qApp->exit(EXIT_FAILURE);
-}
-
-ZECRWindowInformation::ZECRWindowInformation(QWidget* Parent) : ZECRWindowPage(Parent)
-{
-	Form = new Ui_ZECRWindowInformation();
-	Form->setupUi(this);
-
-	connect(Form->btnViewReport, SIGNAL(clicked()), this, SLOT(btnViewReport_Clicked()));
-	connect(Form->btnOpenReportLocation, SIGNAL(clicked()), this, SLOT(btnOpenReportLocation_Clicked()));
-	connect(Form->btnViewPrivacyPolicy, SIGNAL(clicked()), this, SLOT(btnViewPrivacyPolicy_Clicked()));
-	connect(Form->btnGotoSupportPortal, SIGNAL(clicked()), this, SLOT(btnGotoSupportPortal_Clicked()));
-	connect(Form->btnSend, SIGNAL(clicked()), this, SLOT(btnSend_Clicked()));
-	connect(Form->btnDontSend, SIGNAL(clicked()), this, SLOT(btnDontSend_Clicked()));
-}
-
-ZECRWindowInformation::~ZECRWindowInformation()
-{
-	delete Form;
 }

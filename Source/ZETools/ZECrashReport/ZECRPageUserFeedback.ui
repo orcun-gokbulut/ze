@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZECRWindowUserFeedback</class>
- <widget class="QWidget" name="ZECRWindowUserFeedback">
+ <class>ZECRPageUserFeedback</class>
+ <widget class="QWidget" name="ZECRPageUserFeedback">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -157,9 +157,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnSend">
+      <widget class="QPushButton" name="btnGenerate">
        <property name="text">
-        <string>Send</string>
+        <string>Generate</string>
+       </property>
+       <property name="default">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -167,6 +170,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txtNameSurname</tabstop>
+  <tabstop>txtEmail</tabstop>
+  <tabstop>txtFeedback</tabstop>
+  <tabstop>chkCanContact</tabstop>
+  <tabstop>btnGenerate</tabstop>
+  <tabstop>btnPrev</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

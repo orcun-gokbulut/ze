@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowViewPrivacyPolicy.h
+ Zinek Engine - ZECRPageGenerating.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,17 +35,32 @@
 
 #pragma once
 
-#include <QDialog>
+#include "ZECRPage.h"
 
-class Ui_ZECRWindowViewPrivacyPolicy;
+#include "ZEThread\ZEThread.h"
 
-class ZECRWindowViewPrivacyPolicy : public QDialog
+class ZECRWindow;
+class QTimer;
+class Ui_ZECRPageGenerating;
+
+class ZECRPageGenerating : public ZECRPage
 {
 	Q_OBJECT
 	private:
-		Ui_ZECRWindowViewPrivacyPolicy*		Form;
+		Ui_ZECRPageGenerating*					Form;
+		ZEThread								GeneratorThread;
+		bool									Generated;
+		QTimer*									Timer;
 
-	public:	
-											ZECRWindowViewPrivacyPolicy(QWidget *Parent = 0);
-											~ZECRWindowViewPrivacyPolicy();	
+		void									GeneratorThread_Function(ZEThread* Thread, void* Parameters);
+
+	private slots:
+		void									Timer_timeout();
+		void									btnCancel_clicked();
+
+	public:
+		virtual void							Activated() override;
+
+												ZECRPageGenerating(QWidget* Parent = NULL);
+												~ZECRPageGenerating();
 };

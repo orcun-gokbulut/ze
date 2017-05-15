@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowGeneratingReport.cpp
+ Zinek Engine - ZECRPageTransfering.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowGeneratingReport.h"
+#pragma once
 
-#include "ZECRWindow.h"
+#include "ZECRPage.h"
+
 #include "ZECRReport.h"
-#include "ui_ZECRWindowGeneratingReport.h"
+#include "ZECRSender.h"
+#include "ZEThread/ZEThread.h"
 
 #include <QTimer>
 
-void ZECRWindowGeneratingReport::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
+class Ui_ZECRPageTransfering;
+
+class ZECRPageTransfering : public ZECRPage
 {
-	GetWindow()->GetCrashReport()->Generate(&GetWindow()->GetParameters());
-	GetWindow()->TerminateApplication();
-	Generated = true;
-}
+	Q_OBJECT
+	private:		
+		Ui_ZECRPageTransfering*				Form;
+		ZEThread								SenderThread;
+		ZECRSender								Sender;
+		ZEString								UploadURL;
+		QTimer									UpdateInformationTimer;		
 
-void ZECRWindowGeneratingReport::Activated()
-{
-	Generated = false;
-	Timer->start();
-	GeneratorThread.Run();
-}
-
-void ZECRWindowGeneratingReport::Timer_timeout()
-{
-	if (!Generated)
-		return;
-
-	Timer->stop();
-	GetWindow()->TerminateApplication();
-	GetWindow()->SetPage(ZECR_WP_INFORMATION);
-}
-
-void ZECRWindowGeneratingReport::btnCancel_clicked()
-{
-	exit(EXIT_FAILURE);
-}
-
-ZECRWindowGeneratingReport::ZECRWindowGeneratingReport(QWidget* Parent) : ZECRWindowPage(Parent)
-{
-	Form = new Ui_ZECRWindowGeneratingReport();
-	Form->setupUi(this);
-
-	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRWindowGeneratingReport, &ZECRWindowGeneratingReport::GeneratorThread_Function>(this));
+		void									SendReport(ZEThread* Thread, void* Output);	
 	
-	Generated = false;
-	Timer = new QTimer(this);
-	Timer->setInterval(1000);
-	Timer->setSingleShot(false);
-	Timer->stop();
-	connect(Timer, SIGNAL(timeout()), this, SLOT(Timer_timeout()));
-}
+		virtual void							Activated() override;
 
-ZECRWindowGeneratingReport::~ZECRWindowGeneratingReport()
-{
-	delete Form;
-}
+	public slots:		
+		void									btnCancel_Clicked();
 
+		void									UploadError();
+		void									UpdateUploadInformation();
+		void									UploadCompleted();
+
+	public:
+												ZECRPageTransfering(QWidget* Parent = 0);
+												~ZECRPageTransfering();
+
+};

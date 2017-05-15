@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowUserFeedback.cpp
+ Zinek Engine - ZECRPageUserFeedback.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowUserFeedback.h"
+#include "ZECRPageUserFeedback.h"
 
-#include "ui_ZECRWindowUserFeedback.h"
+#include "Ui_ZECRPageUserFeedback.h"
 
 #include "ZECRWindow.h"
 #include "ZECRReportViewer.h"
-#include "ZECRWindowViewPrivacyPolicy.h"
+#include "ZECRPrivacyPolicyViewer.h"
 #include "ZECRReport.h"
 #include "ZECRCollectorUserFeedback.h"
 
 #include <QDesktopServices>
 #include <QUrl>
 
-void ZECRWindowUserFeedback::btnSend_Clicked()
+void ZECRPageUserFeedback::Activated()
 {
-	ZECRCollectorUserFeedback* Provider = static_cast<ZECRCollectorUserFeedback*>(GetWindow()->GetCrashReport()->GetCollector("UserFeedback"));
+	ZECRReport* Report = GetWindow()->GetReport();
+	if (Report->GetCollector("UserFeedback") == NULL)
+		GetWindow()->SetPage(ZECR_WP_GENERATING);
+}
+
+void ZECRPageUserFeedback::btnGenerate_Clicked()
+{
+	ZECRCollectorUserFeedback* Collector = static_cast<ZECRCollectorUserFeedback*>(GetWindow()->GetReport()->GetCollector("UserFeedback"));
 	
-	if (Provider != NULL)
+	if (Collector != NULL)
 	{
-		Provider->SetNameSurname(Form->txtNameSurname->text().toLocal8Bit().begin());
-		Provider->SetEMail(Form->txtEmail->text().toLocal8Bit().begin());
-		Provider->SetComment(Form->txtFeedback->toPlainText().toLocal8Bit().begin());
+		Collector->SetNameSurname(Form->txtNameSurname->text().toLocal8Bit().begin());
+		Collector->SetEMail(Form->txtEmail->text().toLocal8Bit().begin());
+		Collector->SetComment(Form->txtFeedback->toPlainText().toLocal8Bit().begin());
 	}
 
-	GetWindow()->SetPage(ZECR_WP_TRANSFERING);
+	GetWindow()->SetPage(ZECR_WP_GENERATING);
 }
 
-void ZECRWindowUserFeedback::btnPrev_Clicked()
+void ZECRPageUserFeedback::btnPrev_Clicked()
 {
-	GetWindow()->SetPage(ZECR_WP_INFORMATION);
+	GetWindow()->SetPage(ZECR_WP_GENERATE_INFORMATION);
 }
 
-ZECRWindowUserFeedback::ZECRWindowUserFeedback(QWidget* Parent) : ZECRWindowPage(Parent)
+ZECRPageUserFeedback::ZECRPageUserFeedback(QWidget* Parent) : ZECRPage(Parent)
 {
-	Form = new Ui_ZECRWindowUserFeedback();
+	Form = new Ui_ZECRPageUserFeedback();
 	Form->setupUi(this);
 
-	connect(Form->btnSend, SIGNAL(clicked()), this, SLOT(btnSend_Clicked()));
+	connect(Form->btnGenerate, SIGNAL(clicked()), this, SLOT(btnGenerate_Clicked()));
 	connect(Form->btnPrev, SIGNAL(clicked()), this, SLOT(btnPrev_Clicked()));
 }
 
-ZECRWindowUserFeedback::~ZECRWindowUserFeedback()
+ZECRPageUserFeedback::~ZECRPageUserFeedback()
 {
 	delete Form;
 }

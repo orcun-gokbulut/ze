@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZECRWindowViewPrivacyPolicy</class>
- <widget class="QDialog" name="ZECRWindowViewPrivacyPolicy">
+ <class>ZECRPrivacyPolicyViewer</class>
+ <widget class="QDialog" name="ZECRPrivacyPolicyViewer">
   <property name="geometry">
    <rect>
     <x>0</x>

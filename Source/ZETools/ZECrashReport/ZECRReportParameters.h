@@ -43,6 +43,7 @@ struct ZECRReportParameters
 {
 	ZEUInt32						ProcessId;
 	ZECrashReason					Reason;
+	char							Executable[1024];
 	char							LogFilePath[1024];
 	char							ApplicationName[1024];
 	ZEVersion						ApplicationVersion;

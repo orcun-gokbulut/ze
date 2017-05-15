@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowTransferCompleted.cpp
+ Zinek Engine - ZECRPageSendInformation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowTransferCompleted.h"
+#include "ZECRPageSendInformation.h"
 
-#include "ui_ZECRWindowTransferCompleted.h"
+#include "ZECRWindow.h"
+#include "ZECRReportViewer.h"
+#include "ZECRPrivacyPolicyViewer.h"
+#include "ZEFile/ZEPathManager.h"
+#include "Ui_ZECRPageSendInformation.h"
 
-#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QMessageBox>
 
-void ZECRWindowTransferCompleted::btnClose_Clicked()
+
+void ZECRPageSendInformation::btnViewReport_Clicked()
 {
-	qApp->exit();
+	ZECRReportViewer Viewer;
+	if (!Viewer.LoadReport(GetWindow()->GetReport()->GetReportFileName()))
+		QMessageBox::critical(this, "ZECRCrashReport", "Cannot load report. File may be corrupted.", QMessageBox::Ok);
+
+	Viewer.exec();
 }
 
-ZECRWindowTransferCompleted::ZECRWindowTransferCompleted(QWidget* Parent) : ZECRWindowPage(Parent)
+void ZECRPageSendInformation::btnOpenReportLocation_Clicked()
 {
-	Form = new Ui_ZECRWindowTransferCompleted();
+	ZEString RealPath = ZEPathManager::GetInstance()->TranslateToRealPath(GetWindow()->GetReport()->GetReportFileDirectory()).Path;
+	QDesktopServices::openUrl(QUrl::fromLocalFile(RealPath.ToCString()));
+}
+
+void ZECRPageSendInformation::btnViewPrivacyPolicy_Clicked()
+{
+	ZECRPrivacyPolicyViewer Viewer;
+	Viewer.exec();
+}
+
+void ZECRPageSendInformation::btnGotoSupportPortal_Clicked()
+{
+	QDesktopServices::openUrl(QUrl("https://support.zinek.xyz"));
+}
+
+void ZECRPageSendInformation::btnSend_Clicked()
+{
+	GetWindow()->SetPage(ZECR_WP_TRANSFERING);
+}
+
+void ZECRPageSendInformation::btnDontSend_Clicked()
+{
+	qApp->exit(EXIT_FAILURE);
+}
+
+ZECRPageSendInformation::ZECRPageSendInformation(QWidget* Parent) : ZECRPage(Parent)
+{
+	Form = new Ui_ZECRPageSendInformation();
 	Form->setupUi(this);
 
-	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(btnClose_Clicked()));
+	connect(Form->btnViewReport, SIGNAL(clicked()), this, SLOT(btnViewReport_Clicked()));
+	connect(Form->btnOpenReportLocation, SIGNAL(clicked()), this, SLOT(btnOpenReportLocation_Clicked()));
+	connect(Form->btnViewPrivacyPolicy, SIGNAL(clicked()), this, SLOT(btnViewPrivacyPolicy_Clicked()));
+	connect(Form->btnGotoSupportPortal, SIGNAL(clicked()), this, SLOT(btnGotoSupportPortal_Clicked()));
+	connect(Form->btnSend, SIGNAL(clicked()), this, SLOT(btnSend_Clicked()));
+	connect(Form->btnDontSend, SIGNAL(clicked()), this, SLOT(btnDontSend_Clicked()));
 }
 
-ZECRWindowTransferCompleted::~ZECRWindowTransferCompleted()
+ZECRPageSendInformation::~ZECRPageSendInformation()
 {
 	delete Form;
 }

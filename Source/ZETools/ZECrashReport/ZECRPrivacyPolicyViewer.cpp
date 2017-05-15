@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNCrashReportsModule.cpp
+ Zinek Engine - ZECRPrivacyPolicyViewer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNCrashReportsModule.h"
+#include "ZECRPrivacyPolicyViewer.h"
 
-#include "ZELNCrashReportsWidget.h"
-#include "ZELNLauncher.h"
+#include "Ui_ZECRPrivacyPolicyViewer.h"
 
-ZELN_MODULE_DECRIPTION(ZELNCrashReportsModule, "CrashReports");
-
-bool ZELNCrashReportsModule::InitializeInternal()
+ZECRPrivacyPolicyViewer::ZECRPrivacyPolicyViewer(QWidget *Parent) : QDialog(Parent)
 {
-	if (!ZELNModule::InitializeInternal())
-		return false;
-	
-	Widget = new ZELNCrashReportsWidget();
-	Widget->Module = this;
-	Widget->LoadReports();
+	Form = new Ui_ZECRPrivacyPolicyViewer();
+	Form->setupUi(this);
 
-	return true;
+	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(close()));
 }
 
-QWidget* ZELNCrashReportsModule::GetWidget()
+ZECRPrivacyPolicyViewer::~ZECRPrivacyPolicyViewer()
 {
-	return Widget;
-}
-
-bool ZELNCrashReportsModule::GetAllowLaunch()
-{
-	return true;
-}
-
-Ui_ZELNCrashReportsWidget* ZELNCrashReportsModule::GetForm()
-{
-	return Widget->Form;
-}
-
-ZELNCrashReportsModule::ZELNCrashReportsModule()
-{
-	Widget = NULL;
+	delete Form;
 }

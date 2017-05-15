@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowPage.cpp
+ Zinek Engine - ZECRPageGenerating.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowPage.h"
+#include "ZECRPageGenerating.h"
 
 #include "ZECRWindow.h"
+#include "ZECRReport.h"
+#include "Ui_ZECRPageGenerating.h"
 
-ZECRWindow* ZECRWindowPage::GetWindow()
+#include <QTimer>
+
+void ZECRPageGenerating::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
 {
-	return static_cast<ZECRWindow*>(window());
+	GetWindow()->GetReport()->Generate(&GetWindow()->GetParameters());
+	GetWindow()->TerminateApplication();
+	Generated = true;
 }
 
-void ZECRWindowPage::Activated()
+void ZECRPageGenerating::Activated()
 {
-
+	Generated = false;
+	Timer->start();
+	GeneratorThread.Run();
 }
 
-void ZECRWindowPage::Deactivated()
+void ZECRPageGenerating::Timer_timeout()
 {
+	if (!Generated)
+		return;
 
+	Timer->stop();
+	GetWindow()->TerminateApplication();
+	GetWindow()->SetPage(ZECR_WP_SEND_INFORMATION);
 }
 
-ZECRWindowPage::ZECRWindowPage(QWidget* Parent) : QWidget(Parent)
+void ZECRPageGenerating::btnCancel_clicked()
 {
-
+	exit(EXIT_FAILURE);
 }
+
+ZECRPageGenerating::ZECRPageGenerating(QWidget* Parent) : ZECRPage(Parent)
+{
+	Form = new Ui_ZECRPageGenerating();
+	Form->setupUi(this);
+
+	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRPageGenerating, &ZECRPageGenerating::GeneratorThread_Function>(this));
+	
+	Generated = false;
+	Timer = new QTimer(this);
+	Timer->setInterval(1000);
+	Timer->setSingleShot(false);
+	Timer->stop();
+	connect(Timer, SIGNAL(timeout()), this, SLOT(Timer_timeout()));
+}
+
+ZECRPageGenerating::~ZECRPageGenerating()
+{
+	delete Form;
+}
+

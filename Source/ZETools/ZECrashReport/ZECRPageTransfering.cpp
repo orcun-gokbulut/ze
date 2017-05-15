@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowTransfering.cpp
+ Zinek Engine - ZECRPageTransfering.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECRWindowTransfering.h"
+#include "ZECRPageTransfering.h"
 
-#include "Ui_ZECRWindowTransfering.h"
+#include "Ui_ZECRPageTransfering.h"
 
 #include "ZECRWindow.h"
 #include "ZECrashReport/ZECRSender.h"
@@ -50,7 +50,7 @@
 #include <QDir>
 #include <QMessageBox>
 
-void ZECRWindowTransfering::SendReport(ZEThread* Thread, void* Output)
+void ZECRPageTransfering::SendReport(ZEThread* Thread, void* Output)
 {
 	Form->lblOperation->setText("Transferring report...");
 	if (!Sender.OpenConnection())
@@ -69,14 +69,14 @@ void ZECRWindowTransfering::SendReport(ZEThread* Thread, void* Output)
 	Sender.CloseConnection();	
 }
 
-void ZECRWindowTransfering::Activated()
+void ZECRPageTransfering::Activated()
 {
 	Sender.SetUploadURL(UploadURL);
-	Sender.SetFileName(GetWindow()->GetCrashReport()->GetReportFileName());
+	Sender.SetFileName(GetWindow()->GetReport()->GetReportFileName());
 
 	SenderThread.SetName("SenderThread");
 	SenderThread.SetParameter(NULL);
-	SenderThread.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<ZECRWindowTransfering, &ZECRWindowTransfering::SendReport>(this));
+	SenderThread.SetFunction(ZEDelegate<void (ZEThread*, void*)>::Create<ZECRPageTransfering, &ZECRPageTransfering::SendReport>(this));
 	SenderThread.Run();
 
 	UpdateInformationTimer.setInterval(100);
@@ -85,13 +85,13 @@ void ZECRWindowTransfering::Activated()
 }
 
 
-void ZECRWindowTransfering::UploadError()
+void ZECRPageTransfering::UploadError()
 {
 	QMessageBox::critical(this, "ZECRCrashReporter", "There is an error occurred while transferring crash report package.\n", QMessageBox::Ok);
 	qApp->exit(EXIT_FAILURE);
 }
 
-void ZECRWindowTransfering::btnCancel_Clicked()
+void ZECRPageTransfering::btnCancel_Clicked()
 {
 	int Result = QMessageBox::question(this, "ZECRCrashReporter", "Current progress will be lost. Do you want to continue ?", QMessageBox::Yes, QMessageBox::No);
 	if (Result == QMessageBox::Yes)
@@ -99,7 +99,7 @@ void ZECRWindowTransfering::btnCancel_Clicked()
 }
 
 
-void ZECRWindowTransfering::UpdateUploadInformation()
+void ZECRPageTransfering::UpdateUploadInformation()
 {
 	ZECRSenderProgress Progress = Sender.GetProgress();
 	if (Progress.Status == ZECR_SS_DONE)
@@ -123,7 +123,7 @@ void ZECRWindowTransfering::UpdateUploadInformation()
 	UpdateInformationTimer.start();
 }
 
-void ZECRWindowTransfering::UploadCompleted()
+void ZECRPageTransfering::UploadCompleted()
 {
 	UpdateInformationTimer.stop();
 	Form->pbProgress->setValue(100);
@@ -132,9 +132,9 @@ void ZECRWindowTransfering::UploadCompleted()
 	Form->btnCancel->setVisible(true);
 }
 
-ZECRWindowTransfering::ZECRWindowTransfering(QWidget* Parent) : ZECRWindowPage(Parent)
+ZECRPageTransfering::ZECRPageTransfering(QWidget* Parent) : ZECRPage(Parent)
 {
-	Form = new Ui_ZECRWindowTransfering();
+	Form = new Ui_ZECRPageTransfering();
 	Form->setupUi(this);
 
 	Form->pbProgress->setValue(0);
@@ -144,7 +144,7 @@ ZECRWindowTransfering::ZECRWindowTransfering(QWidget* Parent) : ZECRWindowPage(P
 	QObject::connect(Form->btnCancel, SIGNAL(clicked()), this, SLOT(btnCancel_Clicked()));
 }
 
-ZECRWindowTransfering::~ZECRWindowTransfering()
+ZECRPageTransfering::~ZECRPageTransfering()
 {
 	delete Form;
 }

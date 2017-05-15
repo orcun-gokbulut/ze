@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRWindowUserFeedback.h
+ Zinek Engine - ZECRPageTransferCompleted.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZECRPageTransferCompleted.h"
 
-#include "ZECRWindowPage.h"
+#include "Ui_ZECRPageTransferCompleted.h"
 
-class Ui_ZECRWindowUserFeedback;
+#include <QCoreApplication>
 
-class ZECRWindowUserFeedback : public ZECRWindowPage
+void ZECRPageTransferCompleted::btnClose_Clicked()
 {
-	Q_OBJECT
-	private:
-		Ui_ZECRWindowUserFeedback*			Form;
+	qApp->exit();
+}
 
-	private slots:
-		void								btnSend_Clicked();
-		void								btnPrev_Clicked();
+ZECRPageTransferCompleted::ZECRPageTransferCompleted(QWidget* Parent) : ZECRPage(Parent)
+{
+	Form = new Ui_ZECRPageTransferCompleted();
+	Form->setupUi(this);
 
-	public:		
-											ZECRWindowUserFeedback(QWidget* Parent = NULL);
-											~ZECRWindowUserFeedback();
-};
+	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(btnClose_Clicked()));
+}
+
+ZECRPageTransferCompleted::~ZECRPageTransferCompleted()
+{
+	delete Form;
+}

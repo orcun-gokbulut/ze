@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZECRWindowGeneratingReport</class>
- <widget class="QWidget" name="ZECRWindowGeneratingReport">
+ <class>ZECRPageGenerating</class>
+ <widget class="QWidget" name="ZECRPageGenerating">
   <property name="geometry">
    <rect>
     <x>0</x>
