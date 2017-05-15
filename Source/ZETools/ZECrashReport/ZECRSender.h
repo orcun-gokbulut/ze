@@ -35,14 +35,18 @@
 
 #pragma once
 
-#include "ZEDS/ZEString.h"
+#include "ZEMeta/ZEObject.h"
+
 #include "ZETypes.h"
+#include "ZETimeCounter.h"
+#include "ZEDS/ZEString.h"
+#include "ZEFile/ZEFile.h"
 #include "ZEThread/ZEThread.h"
 #include "ZEThread/ZELock.h"
-#include "ZETimeCounter.h"
-#include "ZEFile/ZEFile.h"
+#include "ZEExport.ZECRCrashReporter.h"
 
-enum ZECRSenderStatus
+
+ZE_ENUM(ZECRSenderStatus)
 {
 	ZECR_SS_NONE,
 	ZECR_SS_DOWNLOADING,
@@ -64,7 +68,7 @@ struct ZECRSenderProgress
 	double										DownloadedBytesPerSeconds;
 };
 
-class ZECRSender
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRSender : public ZEObject
 {	
 	private:
 		ZEString								FileName;

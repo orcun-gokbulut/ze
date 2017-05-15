@@ -37,6 +37,9 @@ cmake_minimum_required (VERSION 2.8)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+ze_add_source(ZEExport.ZECRCrashReporter.cpp				Sources)
+ze_add_source(ZEExport.ZECRCrashReporter.h					Sources ZEMC)
+
 ze_add_source(ZECRReport.cpp								Sources)
 ze_add_source(ZECRReport.h									Sources ZEMC)
 ze_add_source(ZECRReportParameters.cpp						Sources)

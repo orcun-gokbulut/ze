@@ -41,9 +41,9 @@
 #include "ZELNLogModule.h"
 #include "ZELNContactModule.h"
 #include "ZEVersion.h"
-#include "ZEDS\ZEFormat.h"
-#include "ZEML\ZEMLReader.h"
-#include "ZEFile\ZEPathInfo.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEFile/ZEPathInfo.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

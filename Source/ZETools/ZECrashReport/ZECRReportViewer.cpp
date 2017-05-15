@@ -168,7 +168,7 @@ void ZECRReportViewer::lstCollectors_itemSelectionChanged()
 	}
 }
 
-ZECRReportViewer::ZECRReportViewer(ZECRReport* Report, QWidget* Parent) : QDialog(Parent)
+ZECRReportViewer::ZECRReportViewer(QWidget* Parent) : QDialog(Parent)
 {
 	Form = new Ui_ZECRReportViewer();
 	Form->setupUi(this);

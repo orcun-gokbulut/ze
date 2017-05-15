@@ -37,8 +37,9 @@
 
 #include "ZECRCollectorFile.h"
 #include "ZEDS/ZEString.h"
+#include "ZEExport.ZECRCrashReporter.h"
 
-class ZECRCollectorSystemInformation : public ZECRCollectorFile
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRCollectorSystemInformation : public ZECRCollectorFile
 {
 	ZE_OBJECT
 	public:

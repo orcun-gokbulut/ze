@@ -38,8 +38,9 @@
 #include "ZECRCollectorFile.h"
 #include "ZETypes.h"
 #include "ZECore/ZECrashHandler.h"
+#include "ZEExport.ZECRCrashReporter.h"
 
-class ZECRCollectorMemoryDump : public ZECRCollectorFile
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRCollectorMemoryDump : public ZECRCollectorFile
 {
 	ZE_OBJECT
 	private:

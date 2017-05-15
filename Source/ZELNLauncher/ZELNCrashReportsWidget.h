@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECRReport.h
+ Zinek Engine - ZELNCrashReportsWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,51 +35,35 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
+#include <QtWidgets/QWidget>
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEExport.ZECRCrashReporter.h"
 
-class ZECRCollector;
-struct ZECRReportParameters;
+class Ui_ZELNCrashReportsWidget;
+class ZELNCrashReportsModule;
 
-class ZE_EXPORT_ZECRCRASHREPORTER ZECRReport : public ZEObject
-{		
-	ZE_OBJECT
+class ZELNCrashReportsWidget : public QWidget
+{
+	Q_OBJECT
+	friend class ZELNCrashReportsModule;
 	private:
-		ZEArray<ZECRCollector*>				Collectors;
-		ZEString							ReportFileDirectory;
-		ZEString							ReportFilePattern;
-		ZEString							ReportFileName;
-		ZEInt								ReportFileQuota;
+		ZELNCrashReportsModule*			Module;
+		Ui_ZELNCrashReportsWidget*		Form;
+		ZEString						ReportDirectory;
 
-		void								GenerateReportFileName(const ZECRReportParameters* Parameters);
-		void								ManageReportQuote();
+		void							UpdateWidget();
+
+	private slots:
+		void							btnView_clicked();
+		void							btnUpload_clicked();
+		void							btnDelete_clicked();
 
 	public:
-		const 
-		ZEArray<ZECRCollector*>&			GetCollectors();
-		ZECRCollector*						GetCollector(const ZEString& Name);
-		bool								AddCollector(ZECRCollector* Collector);
-		void								RemoveCollector(ZECRCollector* Collector);
+		void							SetReportDirectory(const ZEString& ReportDirectory);
+		const ZEString&					GetReportDirectory();
 
-		void								SetReportFileDirectory(const ZEString& Directory);
-		const ZEString&						GetReportFileDirectory();
+		void							LoadReports();
 
-		void								SetReportFileNamePattern(const ZEString& Pattern);
-		const ZEString&						GetReportFileNamePattern();
-
-		void								SetReportFileName(const ZEString& FileName);
-		const ZEString&						GetReportFileName();
-
-		bool								Generate(const ZECRReportParameters* Parameters);
-
-		bool								LoadConfiguration();
-		bool								LoadConfiguration(const ZEString& FileName);
-		bool								LoadConfiguration(ZEMLReaderNode* ReportNode);
-
-											ZECRReport();
-											~ZECRReport();
+										ZELNCrashReportsWidget(QWidget* Parent = NULL);
+										~ZELNCrashReportsWidget();
 };

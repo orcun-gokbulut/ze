@@ -98,3 +98,9 @@ Ui_ZELNLicenseWidget* ZELNLicenseModule::GetForm()
 {
 	return Widget->Form;
 }
+
+ZELNLicenseModule::ZELNLicenseModule()
+{
+	Widget = NULL;
+	LicenseValid = false;
+}

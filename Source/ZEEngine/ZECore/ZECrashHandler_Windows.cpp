@@ -232,7 +232,6 @@ bool ZECrashHandler::InitializeInternal()
 
 bool ZECrashHandler::DeinitializeInternal()
 {
-
 	UnregisterHandlers();
 
 	return ZEModule::DeinitializeInternal();
@@ -251,7 +250,6 @@ ZECrashHandler::~ZECrashHandler()
 {
 	Deinitialize();
 }
-
 
 void ZECrashHandler::Crashed(ZECrashReason Reason)
 {
@@ -273,10 +271,17 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 	if (NamedPipeHandle == INVALID_HANDLE_VALUE)
 		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
 
-	ZEString DLLPath = ZEFileInfo("#E:/ZECRCrashReporter.dll").GetRealPath().Path;
-	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\", ReportCrash {1}", DLLPath, NamedPipeName);
+	ZEString DLLPath = ZEFileInfo("#E:/").GetRealPath().Path;
+	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\\ZECRCrashReporter.dll\", ReportCrash {1}", DLLPath, NamedPipeName);
 
-	if (WinExec(CommandArgument.ToCString(), SW_NORMAL) < 32)
+	STARTUPINFO StartUpInfo;
+	StartUpInfo.cb = sizeof(STARTUPINFO);
+	memset(&StartUpInfo, 0, sizeof(STARTUPINFO));
+
+	PROCESS_INFORMATION ProcessInfo;
+	memset(&ProcessInfo, 0, sizeof(PROCESS_INFORMATION));
+
+	if (!CreateProcess(NULL, (char*)CommandArgument.ToCString(), NULL, NULL, false, NORMAL_PRIORITY_CLASS, NULL, DLLPath, &StartUpInfo, &ProcessInfo))
 		TerminateProcess(Process, EXIT_FAILURE);
 
 	ConnectNamedPipe(NamedPipeHandle, NULL);

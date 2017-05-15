@@ -45,17 +45,19 @@ class ZELNLicenseModule : public ZELNModule
 {
 	ZELN_MODULE
 	private:
-		ZELNLicenseWidget*			Widget;
-		ZELCLicense					License;
-		bool						LicenseValid;
+		ZELNLicenseWidget*					Widget;
+		ZELCLicense							License;
+		bool								LicenseValid;
 
-		virtual bool				InitializeInternal();
+		virtual bool						InitializeInternal();
 
 	public:
-		virtual QWidget*			GetWidget();
-		virtual bool				GetAllowLaunch();
-		Ui_ZELNLicenseWidget*		GetForm();
-		const ZELNLicenseModule&	GetCurrentLicense();
+		virtual QWidget*					GetWidget();
+		virtual bool						GetAllowLaunch();
+		Ui_ZELNLicenseWidget*				GetForm();
+		const ZELNLicenseModule&			GetCurrentLicense();
 
-		void						LoadLicense();
+		void								LoadLicense();
+
+											ZELNLicenseModule();
 };

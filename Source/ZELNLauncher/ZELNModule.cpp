@@ -39,6 +39,7 @@
 #include "ZELNLogModule.h"
 #include "ZELNContactModule.h"
 #include "ZELNIntegrityModule.h"
+#include "ZELNCrashReportsModule.h"
 
 static ZELNModuleDescription* Modules[] =
 {
@@ -46,7 +47,8 @@ static ZELNModuleDescription* Modules[] =
 	ZELNLicenseModule::Description(),
 	ZELNUpdateModule::Description(),
 	ZELNContactModule::Description(),
-	ZELNIntegrityModule::Description()
+	ZELNIntegrityModule::Description(),
+	ZELNCrashReportsModule::Description()
 };
 
 bool ZELNModule::OnPreLaunch()

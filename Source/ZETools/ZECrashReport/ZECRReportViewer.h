@@ -35,10 +35,11 @@
 
 #pragma once
 
+#include "ZEML/ZEMLReader.h"
+#include "ZEExport.ZECRCrashReporter.h"
+
 #include <QDialog>
 #include <QVariant>
-
-#include "ZEML/ZEMLReader.h"
 
 class Ui_ZECRReportViewer;
 class ZECRReport;
@@ -51,7 +52,7 @@ struct ZECRReportEntry
 	ZEMLReaderNode Node;
 };
 
-class ZECRReportViewer : public QDialog
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRReportViewer : public QDialog
 {
 	Q_OBJECT
 	private:
@@ -67,6 +68,6 @@ class ZECRReportViewer : public QDialog
 	public:
 		bool								LoadReport(const ZEString& FileName);
 
-											ZECRReportViewer(ZECRReport* Report, QWidget* Parent = 0);
+											ZECRReportViewer(QWidget* Parent = 0);
 											~ZECRReportViewer();
 };

@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEExport.ZECRCrashReporter.h"
 
 class ZECRReport;
 struct ZECRReportParameters;
@@ -48,7 +49,7 @@ enum ZECRDataProviderType
 	ZECR_DPT_BINARY,
 };
 
-class ZECRCollector : public ZEObject
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRCollector : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZECRReport;

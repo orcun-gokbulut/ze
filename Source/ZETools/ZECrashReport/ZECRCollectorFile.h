@@ -40,8 +40,9 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEExport.ZECRCrashReporter.h"
 
-class ZECRCollectorFile : public ZECRCollector
+class ZE_EXPORT_ZECRCRASHREPORTER ZECRCollectorFile : public ZECRCollector
 {
 	ZE_OBJECT
 	private:

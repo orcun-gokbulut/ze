@@ -48,7 +48,7 @@
 
 void ZECRWindowInformation::btnViewReport_Clicked()
 {
-	ZECRReportViewer Viewer(GetWindow()->GetCrashReport());
+	ZECRReportViewer Viewer;
 	if (!Viewer.LoadReport(GetWindow()->GetCrashReport()->GetReportFileName()))
 		QMessageBox::critical(this, "ZECRCrashReport", "Cannot load report. File may be corrupted.", QMessageBox::Ok);
 

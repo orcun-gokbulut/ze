@@ -79,6 +79,13 @@ ze_add_source(ZELNUpdateWidget.cpp				Sources)
 ze_add_source(ZELNUpdateWidget.h				Sources QtMocs)
 ze_add_source(ZELNUpdateWidget.ui				Sources QtUIs)
 
+ze_add_source(ZELNCrashReportsModule.cpp		Sources)
+ze_add_source(ZELNCrashReportsModule.h			Sources)
+ze_add_source(ZELNCrashReportsWidget.cpp		Sources)
+ze_add_source(ZELNCrashReportsWidget.h			Sources QtMocs)
+ze_add_source(ZELNCrashReportsWidget.ui			Sources QtUIs)
+
+
 ze_add_source(ZELNContactModule.cpp				Sources)
 ze_add_source(ZELNContactModule.h				Sources)
 ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
@@ -94,7 +101,7 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundationStatic Qt5::WinMain
+	LIBS ZEFoundationStatic Qt5::WinMain ZECRCrashReporter
 	DESCRIPTION "Zinek Launcher")
 
 qt5_use_modules(ZELNLauncher Widgets)

@@ -34,6 +34,11 @@
    <Node Name="Configuration"/>
   </Node>
   <Node Name="Module">
+   <Property Name="Name" Type="String">CrashReports</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration"/>
+  </Node>
+  <Node Name="Module">
    <Property Name="Name" Type="String">Contact</Property>
    <Property Name="Enabled" Type="Bool">true</Property>
    <Node Name="Configuration"/>
