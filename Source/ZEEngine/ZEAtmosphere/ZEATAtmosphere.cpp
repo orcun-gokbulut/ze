@@ -759,6 +759,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (PrecomputedMultipleScatteringBuffer == NULL || !PrecomputedMultipleScatteringBuffer->IsLoaded())
 		return false;
 
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
 	if (GetSunLight() != NULL)
 	{
 		ZELightDirectional* SunLight = GetSunLight();
@@ -797,7 +800,9 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
 
-	Parameters->Renderer->AddCommand(&Command);
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

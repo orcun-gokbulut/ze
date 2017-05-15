@@ -123,7 +123,7 @@ void ZERNStageShadowing::GenerateSpotShadowMaps(ZEGRContext* Context, const ZERN
 	ZERNView View;
 	View.Position = GetRenderer()->GetView().Position;
 	View.ViewVolume = &SpotLight.ViewFrustum;
-	View.ViewProjectionTransform = SpotLight.ViewProjectionTransform;
+	View.ViewProjectionTransform = SpotLight.ProjectionTransform * SpotLight.ViewTransform;
 	ShadowRenderer.SetView(View);
 
 	ZERNPreRenderParameters PreRenderParameters;
@@ -375,7 +375,7 @@ ZERNStageShadowing::ZERNStageShadowing()
 	ProjectiveShadowMapIndex = 0;
 
 	DirectionalShadowMapsResolution = ZERN_LSR_HIGH;
-	SpotShadowMapsResolution = ZERN_LSR_MEDIUM;
+	SpotShadowMapsResolution = ZERN_LSR_HIGH;
 	ProjectiveShadowMapsResolution = ZERN_LSR_MEDIUM;
 
 	AddOutputResource(reinterpret_cast<ZEHolder<const ZEGRResource>*>(&DirectionalShadowMaps), "DirectionalShadowMaps", ZERN_SRUT_WRITE, ZERN_SRCF_CREATE_OWN | ZERN_SRCF_REQUIRED);

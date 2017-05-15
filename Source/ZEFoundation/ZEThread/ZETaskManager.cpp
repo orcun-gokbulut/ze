@@ -381,8 +381,6 @@ void ZETaskManager::TerminateTasks()
 	}
 	SchedulerLock.Unlock();
 
-	while (ThreadCount != SuspendedThreads.GetCount());
-
 	ZEArray<ZEThread*> Threads;
 	Threads.SetCount(SuspendedThreads.GetCount());
 	ze_for_each(Thread, Threads)

@@ -44,10 +44,12 @@
 #include "ZERNView.h"
 #include "ZERNStageID.h"
 #include "ZEModel/ZEMDVertex.h"
+#include "ZEGraphics/ZEGRRasterizerState.h"
 
 ZEMT_FORWARD_DECLARE(ZEScene);
 ZEMT_FORWARD_DECLARE(ZERNStage);
 
+class ZERNCommandList;
 class ZERNCommand;
 class ZEGRContext;
 class ZEGRBuffer;
@@ -64,11 +66,25 @@ struct ZERNInstanceData
 	ZEUInt32_4	DrawLODTransition;
 };
 
+class ZERNGeometry : public ZEReferenceCounted
+{
+	ZE_OBJECT
+	public:
+		ZEHolder<const ZEGRBuffer>	VertexBuffer;
+		ZEHolder<const ZEGRBuffer>	IndexBuffer;
+		ZEUInt						VertexOffset;
+		ZEUInt						VertexCount;
+		ZEUInt						IndexOffset;
+		ZEUInt						IndexCount;
+		ZEGRPrimitiveType			PrimitiveType;
+};
+
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	friend class ZERNStage;
 	friend class ZEModelDraw;
+	friend class ZERNCommandDraw;
 	private:
 		ZERNView									View;
 		ZEList2<ZERNStage>							Stages;
@@ -76,8 +92,11 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEHolder<ZEGRBuffer>						RendererConstantBuffer;
 		ZEInt										CurrentSceneIndex;
 		ZEArray<ZEScene*>							Scenes;
-		ZEList2<ZERNCommand>						CommandList;
-		ZEList2<ZERNCommand>						CommandListInstanced;
+		//ZEList2<ZERNCommand>						CommandList;
+		//ZEList2<ZERNCommand>						CommandListInstanced;
+		ZEArray<ZERNCommandList*>					CommandLists;
+		ZEUInt										CommandListCount;
+		ZELock										CommandListLock;
 
 		ZEHolder<ZEGRBuffer>						InstanceVertexBuffer;
 
@@ -101,7 +120,9 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 			ZEVector2								InvOutputSize;
 			ZEMatrix3x3Shader						ScreenTransform;
 		} RendererConstants;
-
+		
+		ZEHolder<ZEGRSampler>						SamplerPointMirror;
+		ZEHolder<ZEGRSampler>						SamplerPointMirror;
 		ZEHolder<ZEGRSampler>						SamplerLinearClamp;
 		ZEHolder<ZEGRSampler>						SamplerLinearWrap;
 		ZEHolder<ZEGRSampler>						SamplerLinearBorderZero;
@@ -144,8 +165,10 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 
 		void										BeginScene(ZEScene* Scene);
 		void										EndScene();
-
-		void										AddCommand(ZERNCommand* Command);
+		
+		ZERNCommandList*							GetCommandList();
+		//void										AddCommand(ZERNCommand* Command);
+		//void										AddCommandList(ZERNCommandList* CommandList);
 		void										CleanCommands();
 
 		void										BeginNestedRenderer();

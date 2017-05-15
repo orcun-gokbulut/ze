@@ -521,13 +521,13 @@ void ZEInteriorRoom::Deinitialize()
 
 void ZEInteriorRoom::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	IsDrawn = true;
-	ZESize RenderCommandCount = Draws.GetCount();
-	for(ZESize I = 0; I < RenderCommandCount; I++)
-	{
-		Draws[I].Material->PreRender(Draws[I].RenderCommand);
-		Parameters->Renderer->AddCommand(&Draws[I].RenderCommand);
-	}
+	//IsDrawn = true;
+	//ZESize RenderCommandCount = Draws.GetCount();
+	//for(ZESize I = 0; I < RenderCommandCount; I++)
+	//{
+	//	Draws[I].Material->PreRender(Draws[I].RenderCommand);
+	//	Parameters->Renderer->AddCommand(&Draws[I].RenderCommand);
+	//}
 }
 
 void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)

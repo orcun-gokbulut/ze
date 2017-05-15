@@ -48,4 +48,4 @@ class ZEDTIVegetationWrapper : public ZEDEntityWrapper
 
 		static ZEDTIVegetationWrapper*		CreateInstance();
 }
-ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZESector);
+ZEMT_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZETIVegetation);

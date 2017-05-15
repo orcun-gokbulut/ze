@@ -82,7 +82,7 @@ static ZEGRVertexLayout GetVertexLayoutPosition()
 
 void ZERNStageLighting::CreateRandomVectors()
 {
-	const ZEUInt Length = 64;
+	const ZEUInt Length = 16;
 	ZEUInt Size = Length * Length * 2;
 	ZEArray<ZEUInt8> RandomVectors;
 	RandomVectors.SetCount(Size);
@@ -448,7 +448,8 @@ bool ZERNStageLighting::SetupLights(ZEGRContext* Context)
 				const ZERNCommandSpotLightShadow& SpotLightShadow = static_cast<const ZERNCommandSpotLightShadow&>(Command.GetItem());
 
 				ZERNShading_SpotLightShadow DestLightShadow;
-				DestLightShadow.ProjectionTransform = TextureTransform * SpotLightShadow.ViewProjectionTransform * View.InvViewTransform;
+				DestLightShadow.ViewTransform = SpotLightShadow.ViewTransform * View.InvViewTransform;
+				DestLightShadow.ProjectionTransform = TextureTransform * SpotLightShadow.ProjectionTransform;
 				DestLightShadow.ShadowSampleCount = ZELight::ConvertShadowSampleCount(SpotLightShadow.ShadowSampleCount);
 				DestLightShadow.ShadowSampleLength = SpotLightShadow.ShadowSampleLength;
 				DestLightShadow.ShadowDepthBias = SpotLightShadow.ShadowDepthBias;

@@ -37,16 +37,16 @@
 
 #include "ZEGame\ZEEntity.h"
 
-void ZERNCommand::PushInstances()
+void ZERNCommand::Push()
 {
-	InstancesPrevious.Clear();
-	InstancesPrevious.MergeEnd(Instances);
+	SubCommandsPrevious.Clear();
+	SubCommandsPrevious.MergeEnd(SubCommands);
 }
 
-void ZERNCommand::PopInstances()
+void ZERNCommand::Pop()
 {
-	Instances.Clear();
-	Instances.MergeEnd(InstancesPrevious);
+	SubCommands.Clear();
+	SubCommands.MergeEnd(SubCommandsPrevious);
 }
 
 ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
@@ -59,6 +59,36 @@ ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
 	return NULL;
 }
 
+bool ZERNCommand::AddSubCommand(ZERNCommand* Command)
+{
+	return false;
+}
+
+void ZERNCommand::Reset()
+{
+	SubCommands.AddBegin(&Link);
+	//SubCommands.AddBegin(GetFreeLink());
+}
+
+void ZERNCommand::Clear()
+{
+	if (SubCommands.GetCount() == 0)
+		return;
+
+	ZELink<ZERNCommand>* Temp = SubCommands.GetFirst()->GetNext();//Link.GetNext();
+	while (Temp != NULL)
+	{
+		Temp->GetItem()->Clear();
+		Temp = Temp->GetNext();
+	}
+
+	//ze_for_each(Command, SubCommands)
+	//	Command->Clear();
+	
+	SubCommands.Clear();
+	//SubCommands.AddBegin(&PrivateLink);
+}
+
 void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 {
 	if (!Callback.IsNull())
@@ -67,7 +97,7 @@ void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 		Entity->Render(Parameters, this);
 }
 
-ZERNCommand::ZERNCommand()
+ZERNCommand::ZERNCommand() : Link(this)
 {
 	Entity = NULL;
 	Priority = 0;
@@ -75,8 +105,10 @@ ZERNCommand::ZERNCommand()
 	SceneIndex = 0;
 	StageMask = 0;
 	ExtraParameters = NULL;
-	InstanceTag = NULL;
+	//InstanceTag = NULL;
 
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
 		new (&Links[I]) ZELink<ZERNCommand>(this);
+	
+	//SubCommands.AddEnd(&Link);
 }

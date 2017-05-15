@@ -42,6 +42,7 @@
 #include "ZEMDResource.h"
 #include "ZEMDResourceLOD.h"
 #include "ZERenderer/ZERNMaterial.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 void ZEMDResourceDraw::SetVertexOffset(ZESize Offset)
 {
@@ -117,6 +118,25 @@ void ZEMDResourceDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 ZEHolder<const ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
 {
 	return Material;
+}
+
+ZEHolder<const ZERNGeometry> ZEMDResourceDraw::GetGeometry() const
+{
+	GeometryLock.Lock();
+	if (Geometry == NULL)
+	{
+		Geometry = new ZERNGeometry();
+		Geometry->VertexBuffer = LOD->GetResource()->GetVertexBuffer(LOD->GetVertexType());
+		Geometry->IndexBuffer = LOD->GetResource()->GetIndexBuffer(LOD->GetIndexType());
+		Geometry->VertexOffset = GetVertexOffset();
+		Geometry->VertexCount = GetVertexCount();
+		Geometry->IndexOffset = GetIndexOffset();
+		Geometry->IndexCount = GetIndexCount();
+	}
+
+	GeometryLock.Unlock();
+
+	return Geometry;
 }
 
 bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)

@@ -57,7 +57,8 @@ class ZERNCommandSpotLightShadow : public ZERNCommandSpotLight
 	ZE_OBJECT
 	public:
 		ZEViewFrustum					ViewFrustum;
-		ZEMatrix4x4						ViewProjectionTransform;
+		ZEMatrix4x4						ViewTransform;
+		ZEMatrix4x4						ProjectionTransform;
 		ZERNLightShadowSampleCount		ShadowSampleCount;
 		float							ShadowSampleLength;
 		float							ShadowDepthBias;

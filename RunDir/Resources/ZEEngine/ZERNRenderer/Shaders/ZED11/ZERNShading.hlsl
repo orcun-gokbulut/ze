@@ -97,6 +97,7 @@ struct ZERNShading_SpotLight
 
 struct ZERNShading_SpotLightShadow
 {
+	float4x4									ViewTransform;
 	float4x4									ProjectionTransform;
 	uint										ShadowSampleCount;
 	float										ShadowSampleLength;
@@ -587,17 +588,17 @@ float ZERNShading_CalculateVisibilityArray(uint SampleCount, float SampleLength,
 {		
 	float Visibility = 0.0f;
 	
-	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointMirror, 1024.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
+	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointMirror, 16384.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
 	RandomVector = normalize(RandomVector);
 	
-	for (uint I = 0; I < SampleCount; I++)
+	for (uint I = 0; I < 64; I++)
 	{
 		float2 RandomOrientedSample = reflect(ZERNShading_PoissonDiskSamples64[I], RandomVector);
 		float2 Offset = RandomOrientedSample * SampleLength / ShadowMapDimensions;
 		Visibility += ShadowMap.SampleCmpLevelZero(ZERNSampler_ComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, ShadowMapIndex), TexCoordDepth.z);
 	}
 	
-	Visibility /= SampleCount;
+	Visibility /= 64;
 	
 	return Visibility;
 }
@@ -648,10 +649,6 @@ float3 ZERNShading_DirectionalShadowing(ZERNShading_DirectionalLight Directional
 	{	
 		if (Surface.PositionView.z < ZERNView_ShadowDistance)
 		{
-			float2 ShadowMapDimensions;
-			float Index = 0.0f;
-			ZERNShading_CascadeShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
-		
 			for (uint CascadeIndex = 0; CascadeIndex < DirectionalLight.CascadeCount; CascadeIndex++)
 			{
 				ZERNShading_Cascade Cascade = DirectionalLight.Cascades[CascadeIndex];
@@ -663,6 +660,10 @@ float3 ZERNShading_DirectionalShadowing(ZERNShading_DirectionalLight Directional
 				float3 TexCoordDepth;
 				if (ZERNShading_InsideLightVolume(Cascade.ProjectionTransform, PositionLightView, TexCoordDepth))
 				{
+					float2 ShadowMapDimensions;
+					float Index = 0.0f;
+					ZERNShading_CascadeShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
+					
 					TexCoordDepth.z += Cascade.DepthBias;
 					Visibility = ZERNShading_CalculateVisibilityArray(Cascade.SampleCount, Cascade.SampleLength, ZERNShading_CascadeShadowMaps, DirectionalLight.ShadowMapIndex + CascadeIndex, ShadowMapDimensions, TexCoordDepth);
 					
@@ -768,13 +769,17 @@ float3 ZERNShading_SpotShadowing(ZERNShading_SpotLight SpotLight, ZERNShading_Su
 	{
 		ZERNShading_SpotLightShadow SpotLightShadow = ZERNShading_SpotLightsShadow[SpotLight.ShadowIndex];
 
+		float3 PositionLightView = mul(SpotLightShadow.ViewTransform, float4(Surface.PositionView, 1.0f)).xyz;
+		float3 NormalLightView = mul(SpotLightShadow.ViewTransform, float4(Surface.NormalView, 0.0f)).xyz;
+		PositionLightView += normalize(NormalLightView) * SpotLightShadow.ShadowNormalBias;
+		
 		float3 TexCoordDepth;
-		if (ZERNShading_InsideLightVolume(SpotLightShadow.ProjectionTransform, Surface.PositionView, TexCoordDepth))
+		if (ZERNShading_InsideLightVolume(SpotLightShadow.ProjectionTransform, PositionLightView, TexCoordDepth))
 		{
 			float2 ShadowMapDimensions;
 			float Index = 0.0f;
 			ZERNShading_SpotShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
-		
+			
 			TexCoordDepth.z += SpotLightShadow.ShadowDepthBias;
 			Visibility = ZERNShading_CalculateVisibilityArray(SpotLightShadow.ShadowSampleCount, SpotLightShadow.ShadowSampleLength, ZERNShading_SpotShadowMaps, SpotLight.ShadowIndex, ShadowMapDimensions, TexCoordDepth);
 		}

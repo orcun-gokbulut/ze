@@ -83,6 +83,15 @@ void ZERNRenderer::CreatePredefinedSamplers()
 {
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
+	ZEGRSamplerDescription SamplerPointMirrorDescription;
+	SamplerPointMirrorDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointMirrorDescription.AddressU = ZEGR_TAM_MIRROR;
+	SamplerPointMirrorDescription.AddressV = ZEGR_TAM_MIRROR;
+	SamplerPointMirrorDescription.AddressW = ZEGR_TAM_MIRROR;
+	SamplerPointMirror = ZEGRSampler::GetSampler(SamplerPointMirrorDescription);
+
 	ZEGRSamplerDescription SamplerLinearWrapDescription;
 	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
@@ -213,12 +222,14 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 void ZERNRenderer::PopulateStageCommands()
 {
-	CommandList.MergeEnd(CommandListInstanced);
-	CommandList.Sort<CompareCommands>();
+	ZERNCommandList* MainCommandList = CommandLists[0];
+	for (ZEUInt I = 1; I < CommandListCount; I++)
+		MainCommandList->AddCommandMultiple(CommandLists[I]->CommandList);
 
-	ze_for_each(Command, CommandList)
+	MainCommandList->CommandList.Sort<CompareCommands>();
+
+	ze_for_each(Command, MainCommandList->CommandList)
 	{
-		Command->Instances.Sort<CompareCommands>();
 		ze_for_each(Stage, Stages)
 		{
 			if ((Command->StageMask & Stage->GetId()) == 0)
@@ -227,6 +238,21 @@ void ZERNRenderer::PopulateStageCommands()
 			Stage->Commands.AddEnd(Command->GetFreeLink());
 		}
 	}
+
+	//CommandList.MergeEnd(CommandListInstanced);
+	//CommandList.Sort<CompareCommands>();
+	//
+	//ze_for_each(Command, CommandList)
+	//{
+	//	Command->Instances.Sort<CompareCommands>();
+	//	ze_for_each(Stage, Stages)
+	//	{
+	//		if ((Command->StageMask & Stage->GetId()) == 0)
+	//			continue;
+	//
+	//		Stage->Commands.AddEnd(Command->GetFreeLink());
+	//	}
+	//}
 }
 
 void ZERNRenderer::RenderStages()
@@ -245,8 +271,8 @@ void ZERNRenderer::RenderStages()
 
 	UpdateConstantBuffers();
 
-	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
-	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
+	ZEGRSampler* Samplers[] = {SamplerPointMirror, SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
+	Context->SetSamplers(ZEGR_ST_PIXEL, 9, 7, Samplers);
 
 	ZEGRBuffer* PrevConstantBuffers[3] = {};
 	Context->GetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
@@ -259,6 +285,8 @@ void ZERNRenderer::RenderStages()
 
 	if (Resized)
 	{
+		Context->ClearState();
+
 		ze_for_each(Stage, Stages)
 			Stage->Resized(OutputTexture->GetWidth(), OutputTexture->GetHeight());
 	}
@@ -613,84 +641,133 @@ void ZERNRenderer::EndScene()
 	zeDebugCheck(CurrentSceneIndex < -1, "EndScene called befor BeginScene.");
 }
 
-void ZERNRenderer::AddCommand(ZERNCommand* Command)
+ZERNCommandList* ZERNRenderer::GetCommandList()
 {
-	if (!IsInitialized())
-		return;
-
-	Command->SceneIndex = CurrentSceneIndex;
-	if (Command->InstanceTag != NULL)
+	CommandListLock.Lock();
+	if (CommandListCount < CommandLists.GetCount())
 	{
-		bool Found = false;
-		ZELink<ZERNCommand>* InstancedCommand;
-		CommandListInstanced.LockRead();
-		{
-			InstancedCommand = CommandListInstanced.GetFirst();
-			while (InstancedCommand != NULL)
-			{
-				ZERNCommand* CurrentCommand = InstancedCommand->GetItem();
-
-				if (CurrentCommand->InstanceTag == NULL ||
-					CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
-					CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
-					!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
-				{
-					InstancedCommand = InstancedCommand->GetNext();
-					continue;
-				}
-
-				Found = true;
-				break;
-			}
-		}
-		CommandListInstanced.UnlockRead();
-
-		if (Found)
-		{
-			if (InstancedCommand != CommandListInstanced.GetFirst())
-			{
-				CommandListInstanced.LockWrite();
-				{
-					CommandListInstanced.Remove(InstancedCommand);
-					CommandListInstanced.AddBegin(InstancedCommand);
-				}
-				CommandListInstanced.UnlockWrite();
-			}
-
-			InstancedCommand->GetItem()->Instances.AddEnd(Command->GetFreeLink());
-		}
-		else
-		{
-			CommandListInstanced.AddEnd(Command->GetFreeLink());
-		}
+		ZEUInt Index = CommandListCount++;
+		CommandListLock.Unlock();
+		return CommandLists[Index];
 	}
-	else
-	{
-		CommandList.AddEnd(Command->GetFreeLink());
-	}
+	//else
+	//{
+	//}
+	
+	ZERNCommandList* CmdList = new ZERNCommandList();
+	CommandLists.Add(CmdList);
+	CommandListCount++;
+	
+	CommandListLock.Unlock();
+
+	return CmdList;
 }
+
+//void ZERNRenderer::AddCommand(ZERNCommand* Command)
+//{
+//	if (!IsInitialized())
+//		return;
+//
+//	Command->SceneIndex = CurrentSceneIndex;
+//	if (Command->InstanceTag != NULL)
+//	{
+//		bool Found = false;
+//		ZELink<ZERNCommand>* InstancedCommand;
+//		CommandListInstanced.LockRead();
+//		{
+//			InstancedCommand = CommandListInstanced.GetFirst();
+//			while (InstancedCommand != NULL)
+//			{
+//				ZERNCommand* CurrentCommand = InstancedCommand->GetItem();
+//
+//				if (CurrentCommand->InstanceTag == NULL ||
+//					CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
+//					CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
+//					!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
+//				{
+//					InstancedCommand = InstancedCommand->GetNext();
+//					continue;
+//				}
+//
+//				Found = true;
+//				break;
+//			}
+//		}
+//		CommandListInstanced.UnlockRead();
+//
+//		if (Found)
+//		{
+//			if (InstancedCommand != CommandListInstanced.GetFirst())
+//			{
+//				CommandListInstanced.LockWrite();
+//				{
+//					CommandListInstanced.Remove(InstancedCommand);
+//					CommandListInstanced.AddBegin(InstancedCommand);
+//				}
+//				CommandListInstanced.UnlockWrite();
+//			}
+//
+//			InstancedCommand->GetItem()->Instances.AddEnd(Command->GetFreeLink());
+//		}
+//		else
+//		{
+//			CommandListInstanced.AddEnd(Command->GetFreeLink());
+//		}
+//	}
+//	else
+//	{
+//		CommandList.AddEnd(Command->GetFreeLink());
+//	}
+//}
+//
+//void ZERNRenderer::AddCommandList(ZERNCommandList* CommandList)
+//{
+//	CommandList->AddCommandMultiple(CommandList->CommandList);
+//}
 
 void ZERNRenderer::CleanCommands()
 {
-	ze_for_each(Command, CommandList)
-		Command->Instances.Clear();
+	CommandListCount = 0;
+	ze_for_each(CmdList, CommandLists)
+		CmdList.GetItem()->Clear();
+
+	//ze_for_each(CmdList, CommandLists)
+	//	CmdList.GetItem()->CommandList.Clear();
 
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clear();
 
-	CommandList.Clear();
+	//ze_for_each(Command, CommandList)
+	//	Command->Instances.Clear();
+	//
+	//ze_for_each(Stage, Stages)
+	//	Stage->Commands.Clear();
+	//
+	//CommandList.Clear();
 }
 
 void ZERNRenderer::BeginNestedRenderer()
 {
-	ze_for_each(Command, CommandList)
-		Command->PushInstances();
+	//ze_for_each(CmdList, CommandLists)
+	//{
+	//	ze_for_each(Cmd, CmdList.GetItem()->CommandList)
+	//		Cmd->Push();
+	//}
+
+	//ze_for_each(Command, CommandList)
+	//	Command->PushInstances();
 }
 
 void ZERNRenderer::EndNestedRenderer()
 {
-	ze_for_each(Command, CommandList)
-		Command->PopInstances();
+	//ze_for_each(CmdList, CommandLists)
+	//{
+	//	ze_for_each(Cmd, CmdList.GetItem()->CommandList)
+	//		Cmd->Pop();
+	//}
+
+	//ze_for_each(Command, CommandList)
+	//	Command->PopInstances();
 }
 
 void ZERNRenderer::Render()
@@ -721,6 +798,8 @@ ZERNRenderer::ZERNRenderer()
 	CurrentSceneIndex = -1;
 	DirtyPipeline = false;
 	Resized = false;
+
+	CommandListCount = 0;
 
 	memset(&RendererConstants, 0, sizeof(RendererConstants));
 }

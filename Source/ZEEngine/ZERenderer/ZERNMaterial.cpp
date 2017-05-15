@@ -78,6 +78,7 @@ ZERSResource* ZERNMaterial::Instanciator(const void* Params)
 ZERNMaterial::ZERNMaterial()
 {
 	GUID = ZEGUID::Zero;
+	InstancingEnabled = false;
 }
 
 ZERNMaterial::~ZERNMaterial()
@@ -103,6 +104,16 @@ void ZERNMaterial::SetName(const ZEString& Name)
 const ZEString& ZERNMaterial::GetName() const
 {
 	return Name;
+}
+
+void ZERNMaterial::SetInstancingEnabled(bool Enabled)
+{
+	InstancingEnabled = Enabled;
+}
+
+bool ZERNMaterial::GetInstancingEnabled() const
+{
+	return InstancingEnabled;
 }
 
 bool ZERNMaterial::PreRender(ZERNCommand& Command) const

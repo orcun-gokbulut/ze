@@ -35,17 +35,13 @@
 
 #pragma once
 
-#include "ZEDEntityWrapper.h"
+#include "ZEDEntityEditor/ZEDEntityWrapper.h"
 
 class ZETISector;
 
 class ZEDTISectorWrapper : public ZEDEntityWrapper
 {
 	ZE_OBJECT
-	private:
-		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
-		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
 	public:
 		virtual void							SetObject(ZEObject* Object);
 		virtual ZEString						GetName() const;
@@ -57,7 +53,6 @@ class ZEDTISectorWrapper : public ZEDEntityWrapper
 		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
 		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual bool							Load(const ZEString& FileName);
 		virtual bool							Save(const ZEString& FileName);

@@ -166,7 +166,9 @@ void ZEEntity::UpdateRenderabilityState(bool Forced)
 			return;
 		}
 
-		Renderable = VisibleFlattened &&
+		Renderable = 
+			Visible && 
+			VisibleFlattened &&
 			(GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) && IsLoaded() ||
 			GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM));
 
@@ -1647,8 +1649,6 @@ void ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 
 	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
 }
-
-
 
 void ZEEntity::VolumeCast(ZEVolumeCastReport& Report, const ZEVolumeCastParameters& Parameters)
 {

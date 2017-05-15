@@ -47,6 +47,177 @@
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNRenderer.h"
 
+void ZERNCommandDraw::Push()
+{
+	InstancesPrevious.Clear();
+	InstancesPrevious.MergeEnd(Instances);
+
+	ZERNCommand::Push();
+}
+
+void ZERNCommandDraw::Pop()
+{
+	Instances.Clear();
+	Instances.MergeEnd(InstancesPrevious);
+
+	ZERNCommand::Pop();
+}
+
+ZELink<ZERNCommandDraw>* ZERNCommandDraw::GetFreeInstanceLink()
+{
+	//for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
+	//	if (!InstanceLinks[I].GetInUse())
+	//		return &InstanceLinks[I];
+	//
+	//zeBreak(true);
+	return NULL;
+}
+
+bool ZERNCommandDraw::AddSubCommand(ZERNCommand* Command)
+{
+	if (Command->GetClass() != ZERNCommandDraw::Class())
+		return false;
+	
+	ZERNCommandDraw* CommandDraw = static_cast<ZERNCommandDraw*>(Command);
+	if (Material != CommandDraw->Material)
+		return false;
+
+	bool InstanceFound = false;
+
+	if (Material->GetInstancingEnabled())
+	{
+		ze_for_each(SrcCommand, CommandDraw->SubCommands)
+		{
+			ZERNCommandDraw* SrcCommandDraw = static_cast<ZERNCommandDraw*>(SrcCommand.GetPointer());
+
+			ze_for_each(DestCommand, SubCommands)
+			{
+				ZERNCommandDraw* DestCommandDraw = static_cast<ZERNCommandDraw*>(DestCommand.GetPointer());
+
+				if (DestCommandDraw->Geometry == SrcCommandDraw->Geometry)
+				{
+					DestCommandDraw->Instances.MergeEnd(SrcCommandDraw->Instances);
+					InstanceFound = true;
+					break;
+				}
+			}
+		}
+	}
+
+	if (!InstanceFound)
+		SubCommands.MergeEnd(CommandDraw->SubCommands);
+
+	return true;
+}
+
+void ZERNCommandDraw::Reset()
+{
+	ZERNCommand::Reset();
+	
+	Instances.AddBegin(&InstanceLink);
+	//Instances.AddBegin(GetFreeInstanceLink());
+}
+
+void ZERNCommandDraw::Clear()
+{
+	ZERNCommand::Clear();
+
+	if (Instances.GetCount() == 0)
+		return;
+
+	ZELink<ZERNCommandDraw>* Temp = Instances.GetFirst()->GetNext();
+
+	while (Temp != NULL)
+	{
+		Temp->GetItem()->Clear();
+		Temp = Temp->GetNext();
+	}
+
+	Instances.Clear();
+	//Instances.AddBegin(&PrivateInstanceLink);
+}
+
+void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
+{
+	ZEGRContext* Context = RenderParameters->Context;
+	const ZERNStage* Stage = RenderParameters->Stage;
+	
+	ze_for_each(Command, SubCommands)
+	{
+		ZERNCommandDraw* CommandDraw = static_cast<ZERNCommandDraw*>(Command.GetPointer());
+		bool Instanced = CommandDraw->Instances.GetCount() > 1;
+
+		if (!Material->SetupMaterial(Context, Stage, Instanced))
+			continue;
+
+		ZEUInt InstanceOffset = 0;
+		//Context->SetConstantBuffer(ZEGR_ST_VERTEX, 6, InstanceConstantBufferShared, Command->FirstConstant, Command->ConstantCount);
+		//Context->SetConstantBuffer(ZEGR_ST_PIXEL, 6, InstanceConstantBufferShared, Command->FirstConstant, Command->ConstantCount);
+
+		if (Instanced)
+		{
+			ZERNRenderer* Renderer = RenderParameters->Renderer;
+			static ZEUInt Index = 0;
+			ZERNInstanceData* InstanceBuffer;
+			if ((Index + CommandDraw->Instances.GetCount()) >= Renderer->InstanceVertexBuffer->GetElementCount())
+			{
+				Index = 0;
+				Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceBuffer));
+			}
+			else
+			{
+				Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_NO_OVERWRITE, reinterpret_cast<void**>(&InstanceBuffer));
+			}
+
+			InstanceOffset = Index;
+			//ZEUInt InstanceOffset = Index;
+			ze_for_each(Instance, Instances)
+			{
+				memcpy(&InstanceBuffer[Index], &Instance->InstanceData, sizeof(ZERNInstanceData));
+				Index++;
+			}
+
+			//Index += CommandDraw->Instances.GetCount();
+
+			Renderer->InstanceVertexBuffer->Unmap();
+
+			Context->SetVertexBuffer(1, Renderer->InstanceVertexBuffer);
+		}
+		else
+		{
+			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, CommandDraw->TransformConstantBuffer);
+			Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW_MATERIAL, CommandDraw->DrawConstantBuffer);
+			if (CommandDraw->BoneConstantBuffer != NULL)
+				Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_BONE_TRANSFORMS, CommandDraw->BoneConstantBuffer);
+		}
+
+		const ZERNGeometry* Geometry = CommandDraw->Geometry;
+		Context->SetVertexBuffer(0, Geometry->VertexBuffer);
+		if (Geometry->IndexBuffer != NULL)
+		{
+			Context->SetIndexBuffer(Geometry->IndexBuffer);
+			Context->DrawIndexedInstanced(Geometry->IndexCount, Geometry->IndexOffset, Geometry->VertexOffset, CommandDraw->Instances.GetCount(), InstanceOffset);
+		}
+		else
+		{
+			Context->DrawInstanced(Geometry->VertexCount, Geometry->VertexOffset, CommandDraw->Instances.GetCount(), InstanceOffset);
+		}
+
+		Material->CleanupMaterial(Context, Stage);
+	}
+}
+
+ZERNCommandDraw::ZERNCommandDraw() : InstanceLink(this)
+{
+	//InstanceData = NULL;
+	//InstanceDataSize = 0;
+
+	//Instances.AddBegin(&InstanceLink);
+
+	//for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
+		//new (&InstanceLinks[I]) ZELink<ZERNCommand>(this);
+}
+
 bool ZEMDInstanceTag::Update()
 {
 	if (!Dirty)
@@ -105,6 +276,7 @@ bool ZEModelDraw::Load(const ZEMDResourceDraw* Resource)
 	SetVertexCount(Resource->GetVertexCount());
 	SetIndexOffset(Resource->GetIndexOffset());
 	SetIndexCount(Resource->GetIndexCount());
+	SetGeometry(Resource->GetGeometry());
 
 	return InstanceTag.Update();
 }
@@ -308,92 +480,116 @@ void ZEModelDraw::ResetMaterial()
 	SetMaterial(Resource->GetMaterial());
 }
 
+void ZEModelDraw::SetGeometry(const ZERNGeometry* Geometry)
+{
+	this->Geometry = Geometry;
+}
+
+const ZERNGeometry* ZEModelDraw::GetGeometry() const
+{
+	return Geometry;
+}
+
+const ZEGRBuffer* ZEModelDraw::GetConstantBuffer() const
+{
+	if (DirtyConstants)
+	{
+		if (ConstantBuffer == NULL)
+			ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	
+		ConstantBuffer->SetData(&Constants);
+		DirtyConstants = false;
+	}
+
+	return ConstantBuffer;
+}
+
 void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	if (GetMesh() == NULL || GetModel() == NULL || GetMaterial() == NULL)
-		return;
-	
-	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage, Command->Instances.GetCount() > 0))
-		return;
-
-	ZEGRContext* Context = Parameters->Context;
-	Context->SetVertexBuffer(0, GetModel()->GetVertexBuffer(GetLOD()->GetVertexType()));
-	Context->SetIndexBuffer(GetModel()->GetIndexBuffer(GetLOD()->GetIndexType()));
-
-	if (Command->Instances.GetCount() > 0)
-	{
-		ZERNRenderer* Renderer = Parameters->Renderer;
-		static ZEUInt Index = 0;
-		ZERNInstanceData* InstanceBuffer;
-		if ((Index + Command->Instances.GetCount() + 1) >= Renderer->InstanceVertexBuffer->GetElementCount())
-		{
-			Index = 0;
-			Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceBuffer));
-		}
-		else
-		{
-			Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_NO_OVERWRITE, reinterpret_cast<void**>(&InstanceBuffer));
-		}
-
-		ZEUInt InstanceOffset = Index;
-		ze_for_each(Instance, Command->Instances)
-		{
-			const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag)->Draw;
-			InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
-			InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
-			InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
-			InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
-			Index++;
-		}
-		const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Command->InstanceTag)->Draw;
-		InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
-		InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
-		InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
-		InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
-		Index++;
-		Renderer->InstanceVertexBuffer->Unmap();
-
-		Context->SetVertexBuffer(1, Renderer->InstanceVertexBuffer);
-
-		if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
-			Context->DrawInstanced(GetVertexCount(), GetVertexOffset(), (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
-		else
-			Context->DrawIndexedInstanced(GetIndexCount(), GetIndexOffset(), GetVertexOffset(), (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
-	}
-	else
-	{
-		GetMesh()->UpdateConstantBuffer();
-
-		if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
-		{
-			GetModel()->UpdateConstantBufferBoneTransforms();
-
-			ZEGRBuffer* ConstantBuffers[] = {GetMesh()->ConstantBuffer, GetModel()->ConstantBufferBoneTransforms};
-			Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
-		}
-		else
-		{
-			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetMesh()->ConstantBuffer);
-		}
-
-		if (DirtyConstants)
-		{
-			if (ConstantBuffer == NULL)
-				ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
-
-			ConstantBuffer->SetData(&Constants);
-			DirtyConstants = false;
-		}
-
-		Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW_MATERIAL, ConstantBuffer);
-
-		if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
-			Context->Draw(GetVertexCount(), GetVertexOffset());
-		else
-			Context->DrawIndexed(GetIndexCount(), GetIndexOffset(), GetVertexOffset());
-	}
-	
-	GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
+	//if (GetMesh() == NULL || GetModel() == NULL || GetMaterial() == NULL)
+	//	return;
+	//
+	//if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage, Command->Instances.GetCount() > 0))
+	//	return;
+	//
+	//ZEGRContext* Context = Parameters->Context;
+	//Context->SetVertexBuffer(0, GetModel()->GetVertexBuffer(GetLOD()->GetVertexType()));
+	//Context->SetIndexBuffer(GetModel()->GetIndexBuffer(GetLOD()->GetIndexType()));
+	//
+	//if (Command->Instances.GetCount() > 0)
+	//{
+	//	ZERNRenderer* Renderer = Parameters->Renderer;
+	//	static ZEUInt Index = 0;
+	//	ZERNInstanceData* InstanceBuffer;
+	//	if ((Index + Command->Instances.GetCount() + 1) >= Renderer->InstanceVertexBuffer->GetElementCount())
+	//	{
+	//		Index = 0;
+	//		Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceBuffer));
+	//	}
+	//	else
+	//	{
+	//		Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_NO_OVERWRITE, reinterpret_cast<void**>(&InstanceBuffer));
+	//	}
+	//
+	//	ZEUInt InstanceOffset = Index;
+	//	ze_for_each(Instance, Command->Instances)
+	//	{
+	//		const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Instance->InstanceTag)->Draw;
+	//		InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
+	//		InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
+	//		InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
+	//		InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
+	//		Index++;
+	//	}
+	//	const ZEModelDraw* InstanceDraw = static_cast<const ZEMDInstanceTag*>(Command->InstanceTag)->Draw;
+	//	InstanceBuffer[Index].WorldTransform = InstanceDraw->GetMesh()->GetWorldTransform();
+	//	InstanceBuffer[Index].WorldTransformInverseTranspose = InstanceDraw->GetMesh()->GetInvWorldTransform().Transpose();
+	//	InstanceBuffer[Index].DrawColor = ZEVector4(InstanceDraw->Constants.Color, InstanceDraw->Constants.Opacity);
+	//	InstanceBuffer[Index].DrawLODTransition.w = InstanceDraw->Constants.LODTransition;
+	//	Index++;
+	//	Renderer->InstanceVertexBuffer->Unmap();
+	//
+	//	Context->SetVertexBuffer(1, Renderer->InstanceVertexBuffer);
+	//
+	//	if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
+	//		Context->DrawInstanced(GetVertexCount(), GetVertexOffset(), (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
+	//	else
+	//		Context->DrawIndexedInstanced(GetIndexCount(), GetIndexOffset(), GetVertexOffset(), (ZEUInt)Command->Instances.GetCount() + 1, InstanceOffset);
+	//}
+	//else
+	//{
+	//	GetMesh()->UpdateConstantBuffer();
+	//
+	//	if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
+	//	{
+	//		GetModel()->UpdateConstantBufferBoneTransforms();
+	//
+	//		ZEGRBuffer* ConstantBuffers[] = {GetMesh()->ConstantBuffer, GetModel()->ConstantBufferBoneTransforms};
+	//		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 2, ConstantBuffers);
+	//	}
+	//	else
+	//	{
+	//		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetMesh()->ConstantBuffer);
+	//	}
+	//
+	//	if (DirtyConstants)
+	//	{
+	//		if (ConstantBuffer == NULL)
+	//			ConstantBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_CONSTANT_BUFFER, sizeof(Constants), 0, ZEGR_RU_DYNAMIC, ZEGR_RBF_CONSTANT_BUFFER);
+	//
+	//		ConstantBuffer->SetData(&Constants);
+	//		DirtyConstants = false;
+	//	}
+	//
+	//	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW_MATERIAL, ConstantBuffer);
+	//
+	//	if (GetLOD()->GetIndexType() == ZEMD_VIT_NONE)
+	//		Context->Draw(GetVertexCount(), GetVertexOffset());
+	//	else
+	//		Context->DrawIndexed(GetIndexCount(), GetIndexOffset(), GetVertexOffset());
+	//}
+	//
+	//GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
 }
 
 ZEModelDraw::ZEModelDraw()
@@ -407,7 +603,7 @@ ZEModelDraw::ZEModelDraw()
 	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEModelDraw, Render, this);
 	InstanceTag.Draw = this;
 	InstanceTag.Dirty = true;
-	RenderCommand.InstanceTag = &InstanceTag;
+	//RenderCommand.InstanceTag = &InstanceTag;
 	DirtyConstants = true;
 
 	Constants.Color = ZEVector3::One;

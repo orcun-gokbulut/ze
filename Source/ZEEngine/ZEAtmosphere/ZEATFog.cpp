@@ -154,6 +154,8 @@ ZEEntityResult ZEATFog::LoadInternal()
 
 ZEEntityResult ZEATFog::UnloadInternal()
 {
+	DirtyFlags.RaiseAll();
+
 	ScreenCoverVertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
@@ -174,6 +176,8 @@ ZEATFog::ZEATFog()
 
 	ConstantBuffer = NULL;
 
+	Density = 0.0f;
+
 	Constants.Density = 0.0f;
 	Constants.StartDistance = 0.0f;
 	Constants.Color = ZEVector3(0.5f);
@@ -183,7 +187,7 @@ ZEATFog::ZEATFog()
 
 ZEATFog::~ZEATFog()
 {
-
+	Unload();
 }
 
 void ZEATFog::SetDensity(float Density)
@@ -236,7 +240,12 @@ bool ZEATFog::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	Parameters->Renderer->AddCommand(&Command);
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

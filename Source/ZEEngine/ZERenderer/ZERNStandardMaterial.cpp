@@ -356,6 +356,10 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RenderState.SetRasterizerState(RasterizerState);
 
+	ZEGRDepthStencilState DepthStencilState;
+	DepthStencilState.SetDepthFunction(ZEGR_CF_GREATER);
+	RenderState.SetDepthStencilState(DepthStencilState);
+
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
 
@@ -2192,7 +2196,8 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
 
 	SetMaxTextureLOD(PropertiesNode.ReadUInt8("MaxTextureLOD", 0));
-	
+	SetInstancingEnabled(PropertiesNode.ReadBoolean("InstancingEnabled"));
+
 	SetGUID(ZEGUID::FromString(MaterialNode->ReadString("GUID")));
 	SetName(PropertiesNode.ReadString("Name"));
 	SetShadowCaster(PropertiesNode.ReadBoolean("ShadowCaster", false));

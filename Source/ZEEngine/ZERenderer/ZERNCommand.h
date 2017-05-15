@@ -56,14 +56,20 @@ class ZERNCommand : public ZEObject
 	ZE_OBJECT
 	//ZE_DISALLOW_COPY(ZERNCommand);
 	friend class ZERNRenderer;
+	friend class ZERNCommandList;
 	private:
 		ZELink<ZERNCommand>		Links[ZERN_MAX_COMMAND_LINK];
-		ZEList2<ZERNCommand>	InstancesPrevious;
-
-		void					PushInstances();
-		void					PopInstances();
+		
 		ZELink<ZERNCommand>*	GetFreeLink();
 
+	protected:
+		ZELink<ZERNCommand>		Link;
+		ZEList2<ZERNCommand>	SubCommands;
+		ZEList2<ZERNCommand>	SubCommandsPrevious;
+
+		virtual void			Push();
+		virtual void			Pop();
+	
 	public:
 		ZERNCommandCallback		Callback;
 		ZEEntity*				Entity;
@@ -74,10 +80,64 @@ class ZERNCommand : public ZEObject
 		ZEInt					SceneIndex;
 		ZEUInt					StageMask;
 		void*					ExtraParameters;
-		ZEList2<ZERNCommand>	Instances;
-		const ZERNInstanceTag*	InstanceTag;
-		
+		//ZEList2<ZERNCommand>	Instances;
+		//const ZERNInstanceTag*	InstanceTag;
+
+		virtual bool			AddSubCommand(ZERNCommand* Command);
+		virtual void			Reset();
+		virtual void			Clear();
 		virtual void			Execute(const ZERNRenderParameters* Parameters);
 
 								ZERNCommand();
+};
+
+class ZERNCommandList
+{
+	friend class ZERNRenderer;
+	private:
+		ZEList2<ZERNCommand>	CommandList;
+
+	public:
+		void AddCommand(ZERNCommand* Command)
+		{
+			bool GroupFound = false;
+			ze_for_each(DestCmd, CommandList)
+			{
+				if (DestCmd->AddSubCommand(Command))
+				{
+					GroupFound = true;
+					break;
+				}
+			}
+
+			if (!GroupFound)
+				this->CommandList.AddBegin(Command->GetFreeLink());
+		}
+
+		void AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList)
+		{
+			ze_for_each(SrcCmd, CommandList)
+			{
+				bool GroupFound = false;
+				ze_for_each(DestCmd, this->CommandList)
+				{
+					if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
+					{
+						GroupFound = true;
+						break;
+					}
+				}
+
+				if (!GroupFound)
+					this->CommandList.AddBegin(SrcCmd->GetFreeLink());
+			}
+		}
+
+		void Clear()
+		{
+			ze_for_each(Cmd, CommandList)
+				Cmd->Clear();
+
+			CommandList.Clear();
+		}
 };

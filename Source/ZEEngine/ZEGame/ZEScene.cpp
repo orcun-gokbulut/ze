@@ -108,6 +108,9 @@ ZETaskResult ZEScene::PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize I
 	};
 	ZETaskParameters* TaskParameters = static_cast<ZETaskParameters*>(Parameters);
 	
+	ZERNPreRenderParameters PreRenderParameters = *TaskParameters->Parameters;
+	PreRenderParameters.CommandList = PreRenderParameters.Renderer->GetCommandList();
+
 	while (true)
 	{
 		ZEEntity* Entity = TaskParameters->Iterator->NextItem();
@@ -115,7 +118,7 @@ ZETaskResult ZEScene::PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize I
 		if (Entity == NULL)
 			return ZE_TR_STOP_INSTANCING;
 	
-		PreRenderEntity(Entity, TaskParameters->Parameters);
+		PreRenderEntity(Entity, &PreRenderParameters);
 	}
 
 	return ZE_TR_DONE;
