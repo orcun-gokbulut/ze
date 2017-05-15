@@ -58,14 +58,15 @@ class ZE_EXPORT_ZEENGINE ZERNCommandSpotLightShadow : public ZERNCommandSpotLigh
 	ZE_OBJECT
 	public:
 		ZEViewFrustum					ViewFrustum;
-		ZEMatrix4x4						ViewProjectionTransform;
+		ZEMatrix4x4						ViewTransform;
+		ZEMatrix4x4						ProjectionTransform;
 		ZERNLightShadowSampleCount		ShadowSampleCount;
 		float							ShadowSampleLength;
 		float							ShadowDepthBias;
 		float							ShadowNormalBias;
 };
 
-class ZELightSpot : public ZELight
+class ZE_EXPORT_ZEENGINE ZELightSpot : public ZELight
 {
 	ZE_OBJECT
 	private:

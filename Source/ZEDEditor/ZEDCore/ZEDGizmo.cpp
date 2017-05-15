@@ -749,82 +749,83 @@ ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, floa
 	ZEVector3::CrossProduct(Right, Up, Front);
 	ZEVector3::Normalize(Right, Right);
 
-	float NewTRay, TLineSegment;
+	float InternalTRay = 0.0f;
+	float TLineSegment = 0.0f;
 
 	// Check Planes
 	ZEPlane AxisXY(Front, Position);
-	if (ZEPlane::IntersectionTest(AxisXY, Ray, NewTRay) && (NewTRay < TRay))
+	if (ZEPlane::IntersectionTest(AxisXY, Ray, InternalTRay) && (InternalTRay < TRay))
 	{
-		ZEVector3 TestPos(AxisXY.p, Ray.GetPointOn(NewTRay));
+		ZEVector3 TestPos(AxisXY.p, Ray.GetPointOn(InternalTRay));
 		float ProjU  = ZEVector3::DotProduct(TestPos, Right);
 		float ProjV = ZEVector3::DotProduct(TestPos, Up);
 		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			TRay = NewTRay;
+			TRay = InternalTRay;
 			PickedAxis = ZED_GA_XY_AXIS;
 		}
 	}
 
 	ZEPlane AxisXZ(Up, Position);
-	if (ZEPlane::IntersectionTest(AxisXZ, Ray, NewTRay) && (NewTRay < TRay))
+	if (ZEPlane::IntersectionTest(AxisXZ, Ray, InternalTRay) && (InternalTRay < TRay))
 	{
-		ZEVector3 TestPos(AxisXZ.p, Ray.GetPointOn(NewTRay));
+		ZEVector3 TestPos(AxisXZ.p, Ray.GetPointOn(InternalTRay));
 		float ProjU  = ZEVector3::DotProduct(TestPos, Right);
 		float ProjV = ZEVector3::DotProduct(TestPos, Front);
 		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			TRay = NewTRay;
+			TRay = InternalTRay;
 			PickedAxis = ZED_GA_XZ_AXIS;
 		}
 	}
 
 	ZEPlane AxisYZ(Right, Position);
-	if (ZEPlane::IntersectionTest(AxisYZ, Ray, NewTRay) && (NewTRay < TRay))
+	if (ZEPlane::IntersectionTest(AxisYZ, Ray, InternalTRay) && (InternalTRay < TRay))
 	{		
-		ZEVector3 TestPos(AxisYZ.p, Ray.GetPointOn(NewTRay));
+		ZEVector3 TestPos(AxisYZ.p, Ray.GetPointOn(InternalTRay));
 		float ProjU  = ZEVector3::DotProduct(TestPos, Up);
 		float ProjV = ZEVector3::DotProduct(TestPos, Front);
 		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			TRay = NewTRay;
+			TRay = InternalTRay;
 			PickedAxis = ZED_GA_YZ_AXIS;
 		}
 	}
 
 	// Check Line Segments
 	ZELineSegment XAxis(Position, Position + Right * AxisLength);
-	ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay);
+	ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, InternalTRay);
 	ZEVector2 PointA = ZERNScreenUtilities::WorldToScreen(View, XAxis.GetPointOn(TLineSegment));
-	ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	ZEVector2 PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(InternalTRay));
 	float DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
 	float MinDistanceSquare = ZE_FLOAT_MAX;
-	if (DistanceSquare < PickTreshold)
+	if (InternalTRay > 0.001f && DistanceSquare < PickTreshold)
 	{
-		TRay = NewTRay;
+		TRay = InternalTRay;
 		PickedAxis = ZED_GA_X_AXIS;
 		MinDistanceSquare = DistanceSquare;
 	}
 	
 	ZELineSegment YAxis(Position, Position + Up * AxisLength);
-	ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay);
+	ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, InternalTRay);
 	PointA = ZERNScreenUtilities::WorldToScreen(View, YAxis.GetPointOn(TLineSegment));
-	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(InternalTRay));
 	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
-	if (DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
+	if (InternalTRay > 0.001f && DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
 	{
-		TRay = NewTRay;
+		TRay = InternalTRay;
 		PickedAxis = ZED_GA_Y_AXIS;
 		MinDistanceSquare = DistanceSquare;
 	}
 
 	ZELineSegment ZAxis(Position, Position + Front * AxisLength);
-	ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay);
+	ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, InternalTRay);
 	PointA = ZERNScreenUtilities::WorldToScreen(View, ZAxis.GetPointOn(TLineSegment));
-	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(NewTRay));
+	PointB = ZERNScreenUtilities::WorldToScreen(View, Ray.GetPointOn(InternalTRay));
 	DistanceSquare = ZEVector2::DistanceSquare(PointA, PointB);
-	if (DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
+	if (InternalTRay > 0.001f && DistanceSquare < PickTreshold && DistanceSquare < MinDistanceSquare)
 	{
-		TRay = NewTRay;
+		TRay = InternalTRay;
 		PickedAxis = ZED_GA_Z_AXIS;
 		MinDistanceSquare = DistanceSquare;
 	}

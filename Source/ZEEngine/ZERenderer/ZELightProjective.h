@@ -76,13 +76,12 @@ class ZE_EXPORT_ZEENGINE ZELightProjective : public ZELight
 		ZERNCommandProjectiveLight		Command;
 		float							FalloffExponent;
 
-		void							LoadProjectionTexture();
+		bool							LoadProjectionTexture();
 
 		virtual ZEEntityResult			LoadInternal();
 		virtual ZEEntityResult			UnloadInternal();
 
 										ZELightProjective();
-		virtual							~ZELightProjective();
 
 	public:
 		virtual ZELightType				GetLightType() const;

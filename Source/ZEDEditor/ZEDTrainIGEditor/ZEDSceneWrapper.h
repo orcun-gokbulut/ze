@@ -58,7 +58,6 @@ class ZEDSceneWrapper : public ZEDObjectWrapper3D
 		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
 		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual void							LockWrapper();
 		virtual void							UnlockWrapper();

@@ -103,6 +103,7 @@ class ZE_EXPORT_ZEENGINE ZERNRenderer : public ZEObject, public ZEInitializable
 			ZEMatrix3x3Shader						ScreenTransform;
 		} RendererConstants;
 
+		ZEHolder<ZEGRSampler>						SamplerPointMirror;
 		ZEHolder<ZEGRSampler>						SamplerLinearClamp;
 		ZEHolder<ZEGRSampler>						SamplerLinearWrap;
 		ZEHolder<ZEGRSampler>						SamplerLinearBorderZero;

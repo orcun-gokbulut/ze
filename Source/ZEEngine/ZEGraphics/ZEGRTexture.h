@@ -89,6 +89,7 @@ class ZE_EXPORT_ZEENGINE ZEGRTextureView : public ZEObject
 
 								ZEGRTextureView();
 								ZEGRTextureView(ZEGRFormat Format, ZEUInt LevelMin, ZEUInt LevelCount, ZEUInt LayerMin, ZEUInt LayerCount);
+		virtual					~ZEGRTextureView();
 
 	public:
 		const ZEGRTexture*		GetTexture() const;

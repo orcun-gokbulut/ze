@@ -168,7 +168,8 @@ bool ZELightSpot::PreRender(const ZERNPreRenderParameters* Parameters)
 		CommandShadow.InnerConeAngle = GetInnerConeAngle();
 		CommandShadow.OuterConeAngle = GetOuterConeAngle();
 		CommandShadow.ViewFrustum = static_cast<const ZEViewFrustum&>(GetViewVolume());
-		CommandShadow.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
+		CommandShadow.ViewTransform = GetViewTransform();
+		CommandShadow.ProjectionTransform = GetProjectionTransform();
 		CommandShadow.ShadowSampleCount = GetShadowSampleCount();
 		CommandShadow.ShadowSampleLength = GetShadowSampleLength();
 		CommandShadow.ShadowDepthBias = GetShadowDepthBias();

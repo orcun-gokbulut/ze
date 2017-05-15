@@ -52,6 +52,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
+#include "ZEGame/ZERayCast.h"
 
 
 bool ZEDObjectWrapper3D::InitializeInternal()
@@ -135,6 +136,7 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 
 		if (GetSelected())
 		{
+			NameplateIcon->SetVisiblity(true);
 			NameplateName->SetVisiblity(true);
 			NameplateClass->SetVisiblity(true);
 			if (GetFocused())
@@ -144,13 +146,22 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 		}
 		else
 		{
+			NameplateIcon->SetVisiblity(false);
 			NameplateName->SetVisiblity(false);
 			NameplateClass->SetVisiblity(false);
 		}
 
 		NameplateIcon->SetTextureFileName(GetIconFileName());
 		NameplateName->SetText(ZEFormat::Format("{0} ({1})", GetName(), GetId()));
-		NameplateClass->SetText(ZEFormat::Format("Class: {0}", GetObjectClass()->GetName()));
+
+		ZEString ClassName;
+
+		if (GetObjectClass() != NULL)
+			ClassName = GetObjectClass()->GetName();
+		else
+			ClassName = "-";
+
+		NameplateClass->SetText(ZEFormat::Format("Class: {0}", ClassName));
 	}
 	else
 	{
@@ -181,7 +192,7 @@ void ZEDObjectWrapper3D::UpdateNameplate()
 void ZEDObjectWrapper3D::UpdateCanvas()
 {
 	ConstantBuffer->SetData(&GetWorldTransform());
-
+	
 	Canvas.Clean();
 	if (GetSelected())
 	{
@@ -194,10 +205,6 @@ void ZEDObjectWrapper3D::UpdateCanvas()
 		ZEAABBox BoundingBox = GetBoundingBox();
 		Canvas.ApplyTranslation(BoundingBox.GetCenter());
 		Canvas.AddWireframeBox(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z);
-	}
-	else
-	{
-		Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
 	}
 }
 
@@ -246,6 +253,37 @@ void ZEDObjectWrapper3D::UpdateGraphics()
 
 		if (!VertexBuffer.IsNull())
 			VertexBuffer.Release();
+	}
+}
+
+void ZEDObjectWrapper3D::PreRenderChildWrappers(const ZERNPreRenderParameters* Parameters)
+{
+	const ZEArray<ZEDObjectWrapper3D*>& ChildWrappers = GetChildWrapper3Ds();
+
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		ZEDObjectWrapper3D* ObjectWrapper = ChildWrappers[I];
+		if (!ObjectWrapper->GetVisible())
+			return;
+
+		ObjectWrapper->PreRender(Parameters);
+	}
+}
+
+void ZEDObjectWrapper3D::RayCastChildWrappers(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	const ZEArray<ZEDObjectWrapper3D*> ChildWrappers = GetChildWrapper3Ds();
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		ZEDObjectWrapper3D* ObjectWrapper = ChildWrappers[I];
+
+		if (!Parameters.Filter(ObjectWrapper))
+			continue;
+
+		ObjectWrapper->RayCast(Report, Parameters);
+
+		if (Report.CheckDone())
+			return;
 	}
 }
 
@@ -434,6 +472,8 @@ void ZEDObjectWrapper3D::PreRender(const ZERNPreRenderParameters* Parameters)
 			Nameplate->SetVisiblity(false);
 		}
 	}
+
+	PreRenderChildWrappers(Parameters);
 }
 
 void ZEDObjectWrapper3D::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
@@ -458,7 +498,7 @@ void ZEDObjectWrapper3D::Render(const ZERNRenderParameters* Parameters, const ZE
 
 void ZEDObjectWrapper3D::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-
+	RayCastChildWrappers(Report, Parameters);
 }
 
 void ZEDObjectWrapper3D::UpdateLocal()

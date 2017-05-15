@@ -51,9 +51,6 @@ extern "C" __declspec(dllexport) void CALLBACK ReportCrash(HWND hwnd, HINSTANCE 
 
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
-	MessageBox(NULL, "Attach", "Attach", MB_OK);
-	//__debugbreak();
-
 	QApplication Application(argc, argv);
 	ZECRWindow* Window = new ZECRWindow();
 	Window->show();

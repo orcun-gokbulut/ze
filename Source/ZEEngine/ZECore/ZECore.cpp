@@ -645,7 +645,6 @@ bool ZECore::LoadConfiguration()
 
 bool ZECore::LoadConfiguration(const ZEString& FileName)
 {
-	zeCriticalError("Bulluk");
 	ConfigurationPath = FileName;
 
 	ZEMLReader Reader;
