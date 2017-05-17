@@ -838,7 +838,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				Draw->RenderCommand.Entity = GetModel();
 				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 				Draw->RenderCommand.Order = DrawOrder;
-				//Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 					continue;
@@ -856,18 +855,12 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				else
 				{
 					Draw->RenderCommand.BoneConstantBuffer = NULL;
+					Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
+					Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
+					Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
+					Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
 				}
 
-				//ZERNInstanceData* InstanceData = new ZERNInstanceData();
-				Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-				Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-				Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-				Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-
-				//Draw->RenderCommand.InstanceData = InstanceData;
-				//Draw->RenderCommand.InstanceDataSize = sizeof(ZERNInstanceData);
-
-				//Parameters->Renderer->AddCommand(&Draw->RenderCommand);
 				if (Parameters->Type == ZERN_RT_SHADOW)
 				{
 					Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;
@@ -896,7 +889,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				Draw->RenderCommand.Entity = GetModel();
 				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 				Draw->RenderCommand.Order = DrawOrder;
-				//Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 					continue;
@@ -906,7 +898,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				Draw->RenderCommand.TransformConstantBuffer = ConstantBuffer;
 				Draw->RenderCommand.DrawConstantBuffer = Draw->GetConstantBuffer();
 
-				if (PrevLOD->GetVertexType() == ZEMD_VT_SKINNED)
+				if (NextLOD->GetVertexType() == ZEMD_VT_SKINNED)
 				{
 					Model->UpdateConstantBufferBoneTransforms();
 					Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
@@ -914,18 +906,12 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 				else
 				{
 					Draw->RenderCommand.BoneConstantBuffer = NULL;
+					Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
+					Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
+					Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
+					Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
 				}
 
-				//ZERNInstanceData* InstanceData = new ZERNInstanceData();
-				Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-				Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-				Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-				Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-
-				//Draw->RenderCommand.InstanceData = InstanceData;
-				//Draw->RenderCommand.InstanceDataSize = sizeof(ZERNInstanceData);
-
-				//Parameters->Renderer->AddCommand(&Draw->RenderCommand);
 				if (Parameters->Type == ZERN_RT_SHADOW)
 				{
 					Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;
@@ -968,7 +954,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			Draw->RenderCommand.Entity = GetModel();
 			Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
 			Draw->RenderCommand.Order = DrawOrder;
-			//Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
 			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 				continue;
@@ -977,9 +962,8 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			Draw->RenderCommand.Geometry = Draw->GetGeometry();
 			Draw->RenderCommand.TransformConstantBuffer = ConstantBuffer;
 			Draw->RenderCommand.DrawConstantBuffer = Draw->GetConstantBuffer();
-			//Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
 
-			if (PrevLOD->GetVertexType() == ZEMD_VT_SKINNED)
+			if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
 			{
 				Model->UpdateConstantBufferBoneTransforms();
 				Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
@@ -987,18 +971,12 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			else
 			{
 				Draw->RenderCommand.BoneConstantBuffer = NULL;
+				Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
+				Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
+				Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
+				Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
 			}
 
-			//ZERNInstanceData* InstanceData = new ZERNInstanceData();
-			Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-			Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-			Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-			Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-
-			//Draw->RenderCommand.InstanceData = InstanceData;
-			//Draw->RenderCommand.InstanceDataSize = sizeof(ZERNInstanceData);
-
-			//Parameters->Renderer->AddCommand(&Draw->RenderCommand);
 			if (Parameters->Type == ZERN_RT_SHADOW)
 			{
 				Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;

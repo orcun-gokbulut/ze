@@ -82,30 +82,39 @@ bool ZERNCommandDraw::AddSubCommand(ZERNCommand* Command)
 	if (Material != CommandDraw->Material)
 		return false;
 
-	bool InstanceFound = false;
-
-	if (Material->GetInstancingEnabled())
+	bool InstancingEnabled = Material->GetInstancingEnabled();
+	
+	ZELink<ZERNCommand>* LinkEnd = SubCommands.GetLast();
+	ZELink<ZERNCommand>* SrcLink = NULL;
+	while ((SrcLink = CommandDraw->SubCommands.Pop()) != NULL)
 	{
-		ze_for_each(SrcCommand, CommandDraw->SubCommands)
+		bool InstanceFound = false;
+		if (InstancingEnabled)
 		{
-			ZERNCommandDraw* SrcCommandDraw = static_cast<ZERNCommandDraw*>(SrcCommand.GetPointer());
+			ZERNCommandDraw* SrcCommandDraw = static_cast<ZERNCommandDraw*>(SrcLink->GetItem());
 
-			ze_for_each(DestCommand, SubCommands)
+			if (SrcCommandDraw->BoneConstantBuffer == NULL)
 			{
-				ZERNCommandDraw* DestCommandDraw = static_cast<ZERNCommandDraw*>(DestCommand.GetPointer());
-
-				if (DestCommandDraw->Geometry == SrcCommandDraw->Geometry)
+				for (ZELink<ZERNCommand>* Temp = SubCommands.GetFirst(); Temp != LinkEnd->GetNext(); Temp = Temp->GetNext())
 				{
-					DestCommandDraw->Instances.MergeEnd(SrcCommandDraw->Instances);
-					InstanceFound = true;
-					break;
+					ZERNCommandDraw* DestCommandDraw = static_cast<ZERNCommandDraw*>(Temp->GetItem());
+
+					if (DestCommandDraw->BoneConstantBuffer != NULL)
+						continue;
+
+					if (DestCommandDraw->Geometry == SrcCommandDraw->Geometry)
+					{
+						DestCommandDraw->Instances.MergeBegin(SrcCommandDraw->Instances);
+						InstanceFound = true;
+						break;
+					}
 				}
 			}
 		}
-	}
 
-	if (!InstanceFound)
-		SubCommands.MergeEnd(CommandDraw->SubCommands);
+		if (!InstanceFound)
+			SubCommands.AddBegin(SrcLink);
+	}
 
 	return true;
 }
@@ -122,19 +131,26 @@ void ZERNCommandDraw::Clear()
 {
 	ZERNCommand::Clear();
 
-	if (Instances.GetCount() == 0)
-		return;
+	//if (Instances.GetCount() == 0)
+	//	return;
+	//
+	//ZELink<ZERNCommandDraw>* Temp = Instances.GetFirst()->GetNext();
+	//
+	//while (Temp != NULL)
+	//{
+	//	Temp->GetItem()->Clear();
+	//	Temp = Temp->GetNext();
+	//}
 
-	ZELink<ZERNCommandDraw>* Temp = Instances.GetFirst()->GetNext();
-
-	while (Temp != NULL)
-	{
-		Temp->GetItem()->Clear();
-		Temp = Temp->GetNext();
-	}
+	//ze_for_each(Instance, Instances)
+	//{
+	//	if (Instance.GetPointer() == this)
+	//		continue;
+	//
+	//	Instance->Clear();
+	//}
 
 	Instances.Clear();
-	//Instances.AddBegin(&PrivateInstanceLink);
 }
 
 void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
@@ -151,8 +167,6 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 			continue;
 
 		ZEUInt InstanceOffset = 0;
-		//Context->SetConstantBuffer(ZEGR_ST_VERTEX, 6, InstanceConstantBufferShared, Command->FirstConstant, Command->ConstantCount);
-		//Context->SetConstantBuffer(ZEGR_ST_PIXEL, 6, InstanceConstantBufferShared, Command->FirstConstant, Command->ConstantCount);
 
 		if (Instanced)
 		{
@@ -170,14 +184,8 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 			}
 
 			InstanceOffset = Index;
-			//ZEUInt InstanceOffset = Index;
-			ze_for_each(Instance, Instances)
-			{
-				memcpy(&InstanceBuffer[Index], &Instance->InstanceData, sizeof(ZERNInstanceData));
-				Index++;
-			}
-
-			//Index += CommandDraw->Instances.GetCount();
+			ze_for_each(Instance, CommandDraw->Instances)
+				InstanceBuffer[Index++] = Instance->InstanceData;
 
 			Renderer->InstanceVertexBuffer->Unmap();
 
@@ -209,11 +217,6 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 
 ZERNCommandDraw::ZERNCommandDraw() : InstanceLink(this)
 {
-	//InstanceData = NULL;
-	//InstanceDataSize = 0;
-
-	//Instances.AddBegin(&InstanceLink);
-
 	//for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
 		//new (&InstanceLinks[I]) ZELink<ZERNCommand>(this);
 }

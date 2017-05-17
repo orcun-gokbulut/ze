@@ -72,19 +72,24 @@ void ZERNCommand::Reset()
 
 void ZERNCommand::Clear()
 {
-	if (SubCommands.GetCount() == 0)
-		return;
-
-	ZELink<ZERNCommand>* Temp = SubCommands.GetFirst()->GetNext();//Link.GetNext();
-	while (Temp != NULL)
+	//if (SubCommands.GetCount() == 0)
+	//	return;
+	//
+	//ZELink<ZERNCommand>* Temp = SubCommands.GetFirst()->GetNext();//Link.GetNext();
+	//while (Temp != NULL)
+	//{
+	//	Temp->GetItem()->Clear();
+	//	Temp = Temp->GetNext();
+	//}
+	
+	ze_for_each(Command, SubCommands)
 	{
-		Temp->GetItem()->Clear();
-		Temp = Temp->GetNext();
+		if (Command.GetPointer() == this)
+			continue;
+
+		Command->Clear();
 	}
 
-	//ze_for_each(Command, SubCommands)
-	//	Command->Clear();
-	
 	SubCommands.Clear();
 	//SubCommands.AddBegin(&PrivateLink);
 }

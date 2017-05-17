@@ -103,6 +103,8 @@ class ZERNCommandList
 			bool GroupFound = false;
 			ze_for_each(DestCmd, CommandList)
 			{
+				zeCheckError(DestCmd.GetPointer() == Command, ZE_VOID, "Duplicated commands have been detected");
+
 				if (DestCmd->AddSubCommand(Command))
 				{
 					GroupFound = true;
@@ -121,13 +123,15 @@ class ZERNCommandList
 				bool GroupFound = false;
 				ze_for_each(DestCmd, this->CommandList)
 				{
+					zeCheckError(DestCmd.GetPointer() == SrcCmd.GetPointer(), ZE_VOID, "Duplicated commands have been detected");
+
 					if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
 					{
 						GroupFound = true;
 						break;
 					}
 				}
-
+				
 				if (!GroupFound)
 					this->CommandList.AddBegin(SrcCmd->GetFreeLink());
 			}
