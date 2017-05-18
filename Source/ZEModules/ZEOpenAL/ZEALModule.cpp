@@ -92,8 +92,9 @@ bool ZEALModule::InitializeInternal()
 	Device = alcOpenDevice(NULL);
 	if (Device == NULL) 
 	{
-		zeError("Can not open OpenAL device.");
-		return false;
+		zeError("Can not open OpenAL device. Disabling OpenAL module");
+		SetEnabled(false);
+		return true;
 	}
 
 	Context = alcCreateContext(Device, NULL);
