@@ -222,7 +222,11 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 	ZEFileInfo FileInfo(Path);
 	FileInfo.SetPath(FileInfo.GetRealPath().Path);
 
-	zeLog("Loading plugin. Plugin Path: \"%s\".", FileInfo.Normalize());
+	#ifdef ZE_DEBUG_ENABLE
+		FileInfo.SetPath(ZEFormat::Format("{0}/{1}-Debug{2}", FileInfo.GetParentDirectory(), FileInfo.GetName(), FileInfo.GetExtension()));
+	#endif
+
+	zeLog("Loading plugin. Plugin Path: \"%s\".", FileInfo.Normalize().ToCString());
 
 	SetDllDirectory(FileInfo.GetParentDirectory());
 	SetDllDirectory(ZEFormat::Format("{0}\\Dependencies", FileInfo.GetParentDirectory()));
@@ -551,6 +555,9 @@ bool ZECore::StartUp()
 		ApplicationModule->StartUp();
 
 	Console->EnableInput();
+
+	char* A = 0x0;
+	*A = 4;
 
 	zeLog("Core initialized.");
 

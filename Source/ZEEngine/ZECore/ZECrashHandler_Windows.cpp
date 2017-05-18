@@ -267,12 +267,18 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 
 	ZEString GUID = ZEGUID::Generate().ToString();
 	ZEString NamedPipeName = ZEFormat::Format("\\\\.\\pipe\\ZECRCrashReporter-{0}", GUID);
-	HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_WAIT, 1, NULL, NULL, INFINITE, NULL);
+	HANDLE NamedPipeHandle = CreateNamedPipe(NamedPipeName.ToCString(), PIPE_ACCESS_DUPLEX,	PIPE_TYPE_MESSAGE | PIPE_NOWAIT, 1, NULL, NULL, INFINITE, NULL);
 	if (NamedPipeHandle == INVALID_HANDLE_VALUE)
 		TerminateProcess(GetModuleHandle(NULL), EXIT_FAILURE);
 
 	ZEString DLLPath = ZEFileInfo("#E:/").GetRealPath().Path;
-	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\\ZECRCrashReporter.dll\", ReportCrash {1}", DLLPath, NamedPipeName);
+	#ifdef ZE_DEBUG_ENABLE
+	const char* DLLFileName = "ZECRCrashReporter-Debug.dll";
+	#else	
+	const char* DLLFileName = "ZECRCrashReporter.dll";
+	#endif
+
+	ZEString CommandArgument = ZEFormat::Format("rundll32.exe \"{0}\\{1}\", ReportCrash {2}", DLLPath, DLLFileName, NamedPipeName);
 
 	STARTUPINFO StartUpInfo;
 	StartUpInfo.cb = sizeof(STARTUPINFO);
@@ -284,10 +290,26 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 	if (!CreateProcess(NULL, (char*)CommandArgument.ToCString(), NULL, NULL, false, NORMAL_PRIORITY_CLASS, NULL, DLLPath, &StartUpInfo, &ProcessInfo))
 		TerminateProcess(Process, EXIT_FAILURE);
 
-	ConnectNamedPipe(NamedPipeHandle, NULL);
+	DWORD Signal = 0;
+	DWORD ExitCode;
+	while (GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode))
+	{
+		if (ExitCode != STILL_ACTIVE)
+			TerminateProcess(Process, EXIT_FAILURE);
 
-	DWORD Signal;
-	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
+		DWORD ReadCount = 0;
+		if (!ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), &ReadCount, NULL))
+			TerminateProcess(NamedPipeHandle, EXIT_FAILURE);
+		
+		if (ReadCount == 0)
+		{
+			WaitForSingleObject(NamedPipeHandle, 1000);
+			continue;
+		}
+
+		break;
+	}
+
 	if (Signal != 0xEEFF0012)
 		TerminateProcess(Process, EXIT_FAILURE);
 
@@ -301,7 +323,23 @@ void ZECrashHandler::Crashed(ZECrashReason Reason)
 	if (!WriteFile(NamedPipeHandle, &Parameters, sizeof(ZECRReportParameters), NULL, NULL))
 		TerminateProcess(Process, EXIT_FAILURE);
 
+	while (GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode))
+	{
+		if (ExitCode != STILL_ACTIVE)
+			TerminateProcess(Process, EXIT_FAILURE);
 
-	ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), NULL, NULL);
+		DWORD ReadCount = 0;
+		if (!ReadFile(NamedPipeHandle, &Signal, sizeof(DWORD), &ReadCount, NULL))
+			TerminateProcess(NamedPipeHandle, EXIT_FAILURE);
+
+		if (ReadCount == 0)
+		{
+			WaitForSingleObject(NamedPipeHandle, 1000);
+			continue;
+		}
+
+		break;
+	}
+
 	TerminateProcess(Process, EXIT_FAILURE);
 }

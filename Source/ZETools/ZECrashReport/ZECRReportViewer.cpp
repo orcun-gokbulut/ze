@@ -36,13 +36,14 @@
 #include "ZECRReportViewer.h"
 
 #include "ZETypes.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEFile/ZEPathManager.h"
 #include "ZECRWindow.h"
 #include "Ui_ZECRReportViewer.h"
 
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
-#include "ZEML\ZEMLReader.h"
 
 class ZECRWindow;
 
@@ -93,6 +94,8 @@ void ZECRReportViewer::btnSaveAs_clicked()
 	SelectedData.SetCount(Entry.Node.ReadDataSize("Data"));
 	Entry.Node.ReadData("Data", SelectedData.GetCArray(), SelectedData.GetCount(), 0);
 
+	bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 	ZEFile FileToSave;
 	if (!FileToSave.Open(FileName.toStdString(), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 	{
@@ -108,6 +111,7 @@ void ZECRReportViewer::btnSaveAs_clicked()
 	}
 
 	FileToSave.Close();
+	ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
 }
 
 void ZECRReportViewer::lstCollectors_itemSelectionChanged()

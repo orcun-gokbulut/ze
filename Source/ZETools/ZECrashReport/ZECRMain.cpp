@@ -54,6 +54,7 @@ extern "C" __declspec(dllexport) void CALLBACK ReportCrash(HWND hwnd, HINSTANCE 
 	QApplication Application(argc, argv);
 	ZECRWindow* Window = new ZECRWindow();
 	Window->show();
+	Window->update();
 	Window->Process(lpszCmdLine);
 
 	Application.exec();

@@ -40,29 +40,46 @@
 #include "Ui_ZECRPageGenerating.h"
 
 #include <QTimer>
+#include <QMessageBox>
 
 void ZECRPageGenerating::GeneratorThread_Function(ZEThread* Thread, void* Parameters)
 {
-	GetWindow()->GetReport()->Generate(&GetWindow()->GetParameters());
-	GetWindow()->TerminateApplication();
-	Generated = true;
+	bool Result = GetWindow()->GetReport()->Generate(&GetWindow()->GetParameters());
+	if (Result)
+	{
+		GetWindow()->TerminateApplication();
+		State = 1;
+	}
+	else
+	{
+		State = -1;
+	}
 }
 
 void ZECRPageGenerating::Activated()
 {
-	Generated = false;
+	State = 0;
 	Timer->start();
 	GeneratorThread.Run();
 }
 
 void ZECRPageGenerating::Timer_timeout()
 {
-	if (!Generated)
+	if (State == 0)
+	{
 		return;
-
-	Timer->stop();
-	GetWindow()->TerminateApplication();
-	GetWindow()->SetPage(ZECR_WP_SEND_INFORMATION);
+	}
+	else if (State == 1)
+	{
+		Timer->stop();
+		GetWindow()->TerminateApplication();
+		GetWindow()->SetPage(ZECR_WP_SEND_INFORMATION);
+	}
+	else
+	{
+		QMessageBox::critical(this, "Zinek Crash Reporter", "Report generation failed.", QMessageBox::Ok);
+		qApp->exit(EXIT_FAILURE);
+	}
 }
 
 void ZECRPageGenerating::btnCancel_clicked()
@@ -77,7 +94,7 @@ ZECRPageGenerating::ZECRPageGenerating(QWidget* Parent) : ZECRPage(Parent)
 
 	GeneratorThread.SetFunction(ZEThreadFunction::Create<ZECRPageGenerating, &ZECRPageGenerating::GeneratorThread_Function>(this));
 	
-	Generated = false;
+	State = 0;
 	Timer = new QTimer(this);
 	Timer->setInterval(1000);
 	Timer->setSingleShot(false);

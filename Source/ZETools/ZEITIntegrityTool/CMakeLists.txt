@@ -52,7 +52,7 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZEITIntegrityTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEITIntegrity Qt5::WinMain)
+	LIBS ZEFoundation Qt5::WinMain)
 	
 qt5_use_modules(ZEITIntegrityTool Widgets)
 

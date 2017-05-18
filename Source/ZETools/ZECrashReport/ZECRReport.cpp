@@ -200,7 +200,8 @@ bool ZECRReport::Generate(const ZECRReportParameters* Parameters)
 		CollectorNode.WriteString("Extension", Collector->GetExtension());
 		CollectorNode.WriteUInt8("Type", Collector->GetCollectorType());
 
-		Collector->Generate(&CollectorNode, Parameters);
+		if (!Collector->Generate(&CollectorNode, Parameters))
+			return false;
 
 		CollectorNode.CloseNode();
 	}

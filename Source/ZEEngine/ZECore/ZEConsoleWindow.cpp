@@ -150,7 +150,14 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 
 bool ZEConsoleWindow::Initialize()
 {
-	Handle = CreateDialog((HINSTANCE)GetModuleHandle("ZEEngine.dll"), MAKEINTRESOURCE(IDD_CONSOLE), NULL, &ConsoleCallback);
+	#ifdef ZE_DEBUG_ENABLE
+	const char* EngineDLLPath = "ZEEngine-Debug.dll";
+	#else
+	const char* EngineDLLPath = "ZEEngine.dll";
+	#endif
+
+ 	HINSTANCE ModuleHandle = (HINSTANCE)GetModuleHandle(EngineDLLPath);
+	Handle = CreateDialog(ModuleHandle, MAKEINTRESOURCE(IDD_CONSOLE), NULL, &ConsoleCallback);
 	if (Handle == NULL)
 	{
 		zeError("Can not create console window.");

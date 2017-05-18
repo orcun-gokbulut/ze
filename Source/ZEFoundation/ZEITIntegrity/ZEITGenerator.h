@@ -60,7 +60,7 @@ class ZE_EXPORT_ZEFOUNDATION ZEITScannerEntry
 											ZEITScannerEntry();
 };
 
-class ZEITGenerator
+class ZE_EXPORT_ZEFOUNDATION ZEITGenerator
 {
 	private:
 		ZELock								Lock;

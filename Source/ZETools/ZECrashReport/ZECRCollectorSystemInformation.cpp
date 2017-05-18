@@ -36,10 +36,12 @@
 #include "ZECRCollectorSystemInformation.h"
 
 #include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEFileInfo.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <shellapi.h>
+
 
 ZECRDataProviderType ZECRCollectorSystemInformation::GetCollectorType()
 {
@@ -71,22 +73,32 @@ bool ZECRCollectorSystemInformation::Generate(ZEMLWriterNode* CollectorNode, con
 	PROCESS_INFORMATION ProcessInfo;
 	memset(&ProcessInfo, 0, sizeof(PROCESS_INFORMATION));
 
+	ZEString FileRealPath = ZEFileInfo(GetFileName()).GetRealPath().Path;
+
 	BOOL Result = CreateProcessA(NULL, 
-		(char*)ZEFormat::Format("msinfo32 /nfo \"{0}\"", GetFileName()).ToCString(), 
+		(char*)ZEFormat::Format("msinfo32 /nfo \"{0}\"", FileRealPath).ToCString(), 
 		NULL, NULL, false, NORMAL_PRIORITY_CLASS, NULL, NULL, &StartupInfo, &ProcessInfo);
 	if (!Result)
 		return false;
 
-	DWORD ResultW = WaitForSingleObject(ProcessInfo.hProcess, 180000);
-	if (ResultW == WAIT_FAILED || Result == WAIT_ABANDONED || Result == WAIT_TIMEOUT)
-		return false;
-	
 	DWORD ExitCode;
-	if (!GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode))
-		return false;
-
-	if (ExitCode != EXIT_SUCCESS)
-		return false;
+	while (GetExitCodeProcess(ProcessInfo.hProcess, &ExitCode))
+	{
+		if (ExitCode == STILL_ACTIVE)
+		{
+			WaitForSingleObject(ProcessInfo.hProcess, 1000);
+			continue;
+		}
+		else if (ExitCode == EXIT_FAILURE)
+		{
+			ZEFileInfo(GetFileName()).Delete();
+			return false;
+		}
+		else
+		{
+			break;
+		}
+	}
 
 	return ZECRCollectorFile::Generate(CollectorNode, Parameters);
 }

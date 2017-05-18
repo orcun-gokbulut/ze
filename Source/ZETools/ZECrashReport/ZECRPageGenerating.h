@@ -49,7 +49,7 @@ class ZECRPageGenerating : public ZECRPage
 	private:
 		Ui_ZECRPageGenerating*					Form;
 		ZEThread								GeneratorThread;
-		bool									Generated;
+		int										State;
 		QTimer*									Timer;
 
 		void									GeneratorThread_Function(ZEThread* Thread, void* Parameters);

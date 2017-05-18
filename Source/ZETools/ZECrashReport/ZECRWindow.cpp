@@ -112,7 +112,8 @@ void ZECRWindow::Process(const ZEString& CommandArguments)
 		abort();
 
 	DWORD Temp = 0xEEFF0012;
-	WriteFile(static_cast<HANDLE>(ApplicationPipe), &Temp, sizeof(Temp), NULL, NULL);
+	if (!WriteFile(static_cast<HANDLE>(ApplicationPipe), &Temp, sizeof(Temp), NULL, NULL))
+		abort();
 
 	if (!ReadFile(static_cast<HANDLE>(ApplicationPipe), &Parameters, sizeof(ZECRReportParameters), &Temp, NULL))
 		abort();
@@ -169,6 +170,8 @@ ZECRWindow::ZECRWindow() : QDialog(NULL)
 
 	Form = new Ui_ZECRWindow();	
 	Form->setupUi(this);
+
+	Form->stckWidgets->setCurrentIndex(0);
 }
 
 ZECRWindow::~ZECRWindow()
