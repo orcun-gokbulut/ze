@@ -121,9 +121,9 @@ ZEEntityResult ZESector::LoadInternal()
 
 		if (!NewChildEntity->Unserialize(&ChildEntityNode))
 		{
-			zeError("ZESector Load failed. Unserialization of child entity has failed. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
+			zeWarning("Unserialization of child entity has failed. Class Name: \"%s\".", ChildEntityNode.ReadString("Class").ToCString());
 			NewChildEntity->Destroy();
-			return ZE_ER_FAILED;
+			continue;
 		}
 
 		if (!AddChildEntity(NewChildEntity))
