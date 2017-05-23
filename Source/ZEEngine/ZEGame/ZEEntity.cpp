@@ -53,6 +53,69 @@
 #define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
 #define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
 
+ZEEntityStateStats ZEEntityStateStats::operator+(const ZEEntityStateStats& Other)
+{
+	ZEEntityStateStats Temp;
+
+	Temp.Count = Count + Other.Count;
+	Temp.LoadingScore = LoadingScore + Other.LoadingScore;
+	Temp.LoadingCount = LoadingCount + Other.LoadingCount;
+	Temp.LoadedCount = LoadedCount + Other.LoadedCount;
+	Temp.UnloadingCount = UnloadingCount + Other.UnloadingCount;
+	Temp.UnloadedCount = UnloadedCount + Other.UnloadedCount;
+	Temp.InitializingCount = InitializingCount + Other.InitializingCount;
+	Temp.InitializedCount = InitializedCount + Other.InitializedCount;
+	Temp.DeinitializingCount = DeinitializingCount + Other.DeinitializingCount;
+	Temp.DeinitalizedCount = DeinitalizedCount + Other.DeinitalizedCount;
+	Temp.FailedCount = FailedCount + Other.FailedCount;
+	Temp.FailedLoadingCount = FailedLoadingCount + Other.FailedLoadingCount;
+	Temp.FailedUnloadingCount = FailedUnloadingCount + Other.FailedUnloadingCount;
+	Temp.FailedInitializingCount = FailedInitializingCount + Other.FailedInitializingCount;
+	Temp.FailedDeinitializingCount = FailedDeinitializingCount + Other.FailedDeinitializingCount;
+
+	return Temp;
+}
+
+const ZEEntityStateStats& ZEEntityStateStats::operator+=(const ZEEntityStateStats& Other)
+{
+	Count += Other.Count;
+	LoadingScore += Other.LoadingScore;
+	LoadingCount += Other.LoadingCount;
+	LoadedCount += Other.LoadedCount;
+	UnloadingCount += Other.UnloadingCount;
+	UnloadedCount += Other.UnloadedCount;
+	InitializingCount += Other.InitializingCount;
+	InitializedCount += Other.InitializedCount;
+	DeinitializingCount += Other.DeinitializingCount;
+	DeinitalizedCount += Other.DeinitalizedCount;
+	FailedCount += Other.FailedCount;
+	FailedLoadingCount += Other.FailedLoadingCount;
+	FailedUnloadingCount += Other.FailedUnloadingCount;
+	FailedInitializingCount += Other.FailedInitializingCount;
+	FailedDeinitializingCount += Other.FailedDeinitializingCount;
+
+	return *this;
+}
+
+ZEEntityStateStats::ZEEntityStateStats()
+{
+	Count = 0;
+	LoadingScore = 0;
+	LoadingCount = 0;
+	LoadedCount = 0;
+	UnloadingCount = 0;
+	UnloadedCount = 0;
+	InitializingCount = 0;
+	InitializedCount = 0;
+	DeinitializingCount = 0;
+	DeinitalizedCount = 0;
+	FailedCount = 0;
+	FailedLoadingCount = 0;
+	FailedUnloadingCount = 0;
+	FailedInitializingCount = 0;
+	FailedDeinitializingCount = 0;
+}
+
 void ZEEntity::GetComponentsInternal(ZEClass* Class, ZEArray<ZEEntity*>& Output) const
 {
 	Components.LockRead();
@@ -1426,53 +1489,74 @@ bool ZEEntity::IsDestroyed() const
 	return TargetState == ZE_ES_DESTROYED || TargetState == ZE_ES_DESTROYING;
 }
 
-ZEUInt ZEEntity::GetLoadingPercentage()
+ZEEntityStateStats ZEEntity::GetStateStats()
 {
-	ZEEntityLoadingScore Score = GetLoadingScore();
+	ZEEntityStateStats Stats;
 
-	if (Score.Count == 0)
-		return 0;
+	Stats.Count = 1;
 
-	return Score.Score / Score.Count;
-}
-
-ZEEntityLoadingScore ZEEntity::GetLoadingScore()
-{
-	ZEEntityLoadingScore TotalScore;
-	if (!IsFailed())
+	if (IsLoaded())
 	{
-		TotalScore.Count = 1;
-		TotalScore.Score = GetLocalLoadingPercentage();
+		Stats.LoadedCount = 1;
 	}
 	else
 	{
-		TotalScore.Count = 0;
-		TotalScore.Score = 0;
+		Stats.UnloadedCount = 1;
+		
+		if (GetState() == ZE_ES_ERROR_LOADING)
+		{
+			Stats.FailedCount = 1;
+			Stats.FailedLoadingCount = 1;
+		}
+		else if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_INITIALIZED)
+		{
+			Stats.LoadingCount = 1;
+		}
+	}
+
+	if (IsInitialized())
+	{
+		Stats.InitializedCount = 1;
+	}
+	else
+	{
+		Stats.DeinitalizedCount = 1;
+
+		if (GetState() == ZE_ES_ERROR_INITIALIZATION)
+		{
+			Stats.FailedCount = 1;
+			Stats.FailedInitializingCount = 1;
+		}
+		else if (TargetState == ZE_ES_INITIALIZING)
+		{
+			Stats.InitializingCount = 1;
+		}
+	}
+
+	if (IsFailed())
+	{
+		Stats.FailedCount = 1;
+		if (GetState() == ZE_ES_ERROR_UNLOADING)
+			Stats.FailedUnloadingCount = 1;
+		else if (GetState() == ZE_ES_ERROR_DEINITIALIZATION)
+			Stats.FailedDeinitializingCount = 1;
 	}
 
 	Components.LockRead();
 	{
 		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			ZEEntityLoadingScore ComponentScore = Components[I]->GetLoadingScore();
-			TotalScore.Count += ComponentScore.Count;
-			TotalScore.Score += ComponentScore.Score;
-		}
+			Stats += Components[I]->GetStateStats();
 	}
 	Components.UnlockRead();
 
 	ChildEntities.LockRead();
 	{
 		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		{
-			ZEEntityLoadingScore ChildEntityScore = ChildEntities[I]->GetLoadingScore();
-			TotalScore.Count += ChildEntityScore.Count;
-			TotalScore.Score += ChildEntityScore.Score;
-		}
+			Stats += ChildEntities[I]->GetStateStats();
 	}
 	ChildEntities.UnlockRead();
 
-	return TotalScore;
+	return Stats;
 }
 
 void ZEEntity::SetEnabled(bool Enabled)

@@ -50,7 +50,7 @@ class ZE_EXPORT_ZEENGINE ZESplashWindow : public ZEInitializable, public ZEDestr
 		virtual bool				DeinitializeInternal() override;
 
 									ZESplashWindow();
-		virtual						~ZESplashWindow() override;
+		virtual						~ZESplashWindow();
 
 	public:
 		void						SetStatusText(const ZEString& Name);

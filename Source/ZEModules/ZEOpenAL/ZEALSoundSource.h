@@ -70,7 +70,7 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 		virtual void						ParentTransformChanged() override;
 
 											ZEALSoundSource();
-		virtual								~ZEALSoundSource() override;
+		virtual								~ZEALSoundSource();
 
 	public:
 		virtual void						SetCurrentPosition(ZESize SampleIndex) override;

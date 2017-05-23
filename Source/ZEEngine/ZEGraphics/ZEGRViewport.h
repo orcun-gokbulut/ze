@@ -54,10 +54,10 @@ class ZE_EXPORT_ZEENGINE ZEGRViewport : public ZEObject
 
 	public:
 		void					SetPosition(const ZEVector2& Position);
-		const ZEVector2&		GetPosition();
+		const ZEVector2&		GetPosition() const;
 
 		void					SetSize(const ZEVector2& Size);
-		const ZEVector2&		GetSize();
+		const ZEVector2&		GetSize() const;
 
 		void					SetX(float x);
 		float					GetX() const;

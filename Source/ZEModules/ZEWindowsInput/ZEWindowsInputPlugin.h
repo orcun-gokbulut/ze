@@ -48,7 +48,7 @@ class ZE_EXPORT_ZEWINDOWSINPUT ZEWindowsInputPlugin : public ZEPlugin
 	friend ZEPlugin* zeCreatePluginInstance();
 	private:
 												ZEWindowsInputPlugin();
-		virtual									~ZEWindowsInputPlugin() override;
+		virtual									~ZEWindowsInputPlugin();
 
 	public:
 		virtual const char*						GetName() const override;

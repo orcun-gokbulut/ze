@@ -36,7 +36,6 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 
 class ZEMTType;
 class ZEVariant;

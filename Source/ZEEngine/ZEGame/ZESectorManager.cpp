@@ -41,6 +41,7 @@
 #include "ZEML\ZEMLWriter.h"
 #include "ZEML\ZEMLReader.h"
 #include "ZEMeta\ZEMTProvider.h"
+#include "ZELoadingScreen.h"
 
 #define ZE_GEDF_LOCAL_TRANSFORM 0x0004
 
@@ -152,6 +153,13 @@ void ZESectorManager::UpdateTransformations()
 	if (OriginSector != ResultSector)
 	{
 		OriginSector = ResultSector;
+
+		OriginSector->Load();
+		if (!OriginSector->IsLoaded())
+		{
+			ZELoadingScreen* LoadingScreen = static_cast<ZELoadingScreen*>(GetScene()->GetEntity(ZELoadingScreen::Class()));
+			LoadingScreen->Show();
+		}
 
 		UpdateActiveSectors();
 

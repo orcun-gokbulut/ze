@@ -111,11 +111,33 @@ ZE_EXPORT_ZEENGINE ZE_ENUM(ZEEntityState)
 
 };
 
-class ZEEntityLoadingScore
+class ZE_EXPORT_ZEENGINE ZEEntityStateStats
 {
 	public:
-		ZESize Score;
-		ZESize Count;
+		ZESize						Count;
+
+		ZESize						LoadingScore;
+		ZESize						LoadingCount;
+		ZESize						LoadedCount;
+		ZESize						UnloadingCount;
+		ZESize						UnloadedCount;
+
+		ZESize						InitializingCount;
+		ZESize						InitializedCount;
+		ZESize						DeinitializingCount;
+		ZESize						DeinitalizedCount;
+
+
+		ZESize						FailedCount;
+		ZESize						FailedLoadingCount;
+		ZESize						FailedUnloadingCount;
+		ZESize						FailedInitializingCount;
+		ZESize						FailedDeinitializingCount;
+
+		ZEEntityStateStats			operator+(const ZEEntityStateStats& Other);
+		const ZEEntityStateStats&	operator+=(const ZEEntityStateStats& Other);
+
+									ZEEntityStateStats();
 };
 
 class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
@@ -288,8 +310,7 @@ class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
 
 		ZEEntityState							GetState() const;
 		ZEEntityState							GetTargetState() const;
-		ZEUInt									GetLoadingPercentage();
-		ZEEntityLoadingScore					GetLoadingScore();
+		ZEEntityStateStats						GetStateStats();
 
 		bool									IsLoaded() const;
 		bool									IsLoadedOrLoading() const;

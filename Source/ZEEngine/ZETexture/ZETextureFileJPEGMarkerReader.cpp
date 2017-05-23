@@ -49,7 +49,7 @@
 /************************************************************************/
 
 // Gets data from image file and fills the buffer
-_inline bool ZEJpegFileMarkerBuffer::FillBuffer(bool ForceFill)
+bool ZEJpegFileMarkerBuffer::FillBuffer(bool ForceFill)
 {
 	// If not forced to fill buffer
 	if (!ForceFill)
@@ -132,13 +132,13 @@ ZEJpegFileMarkerBuffer::~ZEJpegFileMarkerBuffer()
 	this->Deinitialize();
 }
 
-_inline ZESize ZEJpegFileMarkerBuffer::GetAvailableByteCount() const
+ZESize ZEJpegFileMarkerBuffer::GetAvailableByteCount() const
 {
 	return BytesAvailable;
 }
 
 // Gets one byte
-_inline bool ZEJpegFileMarkerBuffer::GetOneByte(ZEUInt8& Byte)
+bool ZEJpegFileMarkerBuffer::GetOneByte(ZEUInt8& Byte)
 {
 	// Fill the buffer if needed
 	if (!this->FillBuffer())
@@ -151,7 +151,7 @@ _inline bool ZEJpegFileMarkerBuffer::GetOneByte(ZEUInt8& Byte)
 }
 
 // Gets two arbitrary bytes one by one
-_inline bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt8& Byte1, ZEUInt8& Byte2)
+bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt8& Byte1, ZEUInt8& Byte2)
 {
 	if (!GetOneByte(Byte1))
 		return false;
@@ -162,7 +162,7 @@ _inline bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt8& Byte1, ZEUInt8& Byte2)
 }
 
 // Gets two arbitrary byte and converts to little endian
-_inline bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt16& TwoByte)
+bool ZEJpegFileMarkerBuffer::GetTwoByte(ZEUInt16& TwoByte)
 {
 	// Fill the buffer if needed
 	if (!this->FillBuffer())

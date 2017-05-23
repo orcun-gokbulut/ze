@@ -51,5 +51,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleDisplacementModifier : public ZEParticleModif
 		virtual	void						Tick(float ElapsedTime) override;
 	
 											ZEParticleDisplacementModifier();
-		virtual								~ZEParticleDisplacementModifier() override;
+		virtual								~ZEParticleDisplacementModifier();
 };

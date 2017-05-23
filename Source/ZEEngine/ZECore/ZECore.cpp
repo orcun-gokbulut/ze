@@ -68,7 +68,7 @@ static HINSTANCE ApplicationInstance;
 
 static ZEInt StartedCoreInstanceCount = 0;
 
-static void ZEError_Callback(ZEErrorType Type)
+void ZEError_Callback(ZEErrorType Type)
 {
 	if (Type < ZE_ET_CRITICAL_ERROR)
 		return;
@@ -555,9 +555,6 @@ bool ZECore::StartUp()
 		ApplicationModule->StartUp();
 
 	Console->EnableInput();
-
-	char* A = 0x0;
-	*A = 4;
 
 	zeLog("Core initialized.");
 

@@ -48,7 +48,7 @@ class ZE_EXPORT_ZEPHYSX ZEPhysXPlugin : public ZEPlugin
 	friend ZEPlugin* zeCreatePluginInstance();
 	private:
 												ZEPhysXPlugin();
-		virtual									~ZEPhysXPlugin() override;
+		virtual									~ZEPhysXPlugin();
 
 	public:
 		virtual const char*						GetName() const override;

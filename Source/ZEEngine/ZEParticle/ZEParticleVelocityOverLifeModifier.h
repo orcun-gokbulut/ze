@@ -57,5 +57,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleVelocityOverLifeModifier : public ZEParticleM
 		virtual	void						Tick(float ElapsedTime) override;
 
 											ZEParticleVelocityOverLifeModifier();
-		virtual								~ZEParticleVelocityOverLifeModifier() override;
+		virtual								~ZEParticleVelocityOverLifeModifier();
 };

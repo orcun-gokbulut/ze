@@ -53,5 +53,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleRandomAccelerationModifier : public ZEParticl
 		virtual	void						Tick(float ElapsedTime) override;
 	
 											ZEParticleRandomAccelerationModifier();
-		virtual								~ZEParticleRandomAccelerationModifier() override;
+		virtual								~ZEParticleRandomAccelerationModifier();
 };

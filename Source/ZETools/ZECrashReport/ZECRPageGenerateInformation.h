@@ -52,5 +52,5 @@ class ZECRPageGenerateInformation : public ZECRPage
 
 	public:
 												ZECRPageGenerateInformation(QWidget* Parent = NULL);
-		virtual									~ZECRPageGenerateInformation() override;
+		virtual									~ZECRPageGenerateInformation();
 };

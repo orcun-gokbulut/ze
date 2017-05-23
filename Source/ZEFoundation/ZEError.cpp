@@ -47,7 +47,7 @@
 
 static ZELock BreakLock;
 
-static void DefaultErrorCallback(ZEErrorType Level)
+void ZEError_DefaultErrorCallback(ZEErrorType Level)
 {
 	if (Level >= ZE_ET_CRITICAL_ERROR)
 		abort();
@@ -68,7 +68,7 @@ ZEError::ZEError()
 	BreakOnAssertEnabled = true;
 	BreakOnErrorEnabled = true;
 	BreakOnWarningEnabled = true;
-	ErrorCallback = ZEErrorCallback::Create<&DefaultErrorCallback>();
+	ErrorCallback = ZEErrorCallback::Create<&ZEError_DefaultErrorCallback>();
 }
 
 void ZEError::SetBreakOnDebugCheckEnabled(bool Enabled)

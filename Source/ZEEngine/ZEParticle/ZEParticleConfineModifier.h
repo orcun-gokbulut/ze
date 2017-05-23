@@ -53,5 +53,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleConfineModifier : public ZEParticleModifier
 		virtual void						Tick(float ElapsedTime) override;
 
 											ZEParticleConfineModifier();
-		virtual								~ZEParticleConfineModifier() override;
+		virtual								~ZEParticleConfineModifier();
 };

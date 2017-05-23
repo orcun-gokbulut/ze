@@ -71,5 +71,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleRotationModifier : public ZEParticleModifier
 		virtual	void						Tick(float ElapsedTime) override;
 
 											ZEParticleRotationModifier();
-		virtual								~ZEParticleRotationModifier() override;
+		virtual								~ZEParticleRotationModifier();
 };

@@ -64,5 +64,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleUVModifier : public ZEParticleModifier
 		virtual void						Tick(float ElapsedTime) override;
 
 											ZEParticleUVModifier();
-		virtual								~ZEParticleUVModifier() override;
+		virtual								~ZEParticleUVModifier();
 };

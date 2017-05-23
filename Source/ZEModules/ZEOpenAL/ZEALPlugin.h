@@ -48,7 +48,7 @@ class ZE_EXPORT_ZEOPENAL ZEALPlugin : public ZEPlugin
 	friend ZEPlugin* zeCreatePluginInstance();
 	private:
 												ZEALPlugin();
-		virtual									~ZEALPlugin() override;
+		virtual									~ZEALPlugin();
 
 	public:
 		virtual const char*						GetName() const override;

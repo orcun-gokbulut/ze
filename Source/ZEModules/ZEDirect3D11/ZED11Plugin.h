@@ -48,7 +48,7 @@ class ZE_EXPORT_ZEDIRECT3D11 ZED11Plugin : public ZEPlugin
 	friend ZEPlugin* zeCreatePluginInstance();
 	private:
 												ZED11Plugin();
-		virtual									~ZED11Plugin() override;
+		virtual									~ZED11Plugin();
 
 	public:
 		virtual const char*						GetName() const override;

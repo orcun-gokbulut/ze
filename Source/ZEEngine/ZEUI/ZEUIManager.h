@@ -198,7 +198,7 @@ class ZE_EXPORT_ZEENGINE ZEUIManager : public ZEObject, public ZEInitializable
 
 		static ZEVector4					DefaultBackgroundColor;
 		static ZEVector4					DefaultForegroundColor;
-		//static ZEFontResource*				DefaultFontResource;
+		//static ZEFontResource*			DefaultFontResource;
 
 		bool								InitializeInternal();
 		bool								DeinitializeInternal();

@@ -64,7 +64,7 @@ class ZE_EXPORT_ZEENGINE ZERNMultiplexerMaterial : public ZERNMaterial
 		virtual ZETaskResult							UnloadInternal() override;
 
 														ZERNMultiplexerMaterial();
-		virtual											~ZERNMultiplexerMaterial() override;
+		virtual											~ZERNMultiplexerMaterial();
 
 	public:
 		virtual ZEUInt									GetStageMask() const override;

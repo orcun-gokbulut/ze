@@ -69,7 +69,7 @@ class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, pub
 		virtual bool					DeinitializeInternal() override;
 
 										ZEModule();
-		virtual							~ZEModule() override;
+		virtual							~ZEModule();
 
 	public:
 		ZECore*							GetCore() const;

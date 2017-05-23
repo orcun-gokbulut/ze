@@ -70,7 +70,7 @@ class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 		virtual bool							DeinitializeInternal() override;
 
 												ZETimeManager();
-		virtual									~ZETimeManager() override;
+		virtual									~ZETimeManager();
 	
 	public:
 		ZEUInt64								GetCycleId() const;

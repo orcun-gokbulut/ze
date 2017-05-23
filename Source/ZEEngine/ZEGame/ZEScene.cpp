@@ -443,28 +443,17 @@ bool ZEScene::GetSpatialDatabase()
 	return SpatialDatabase;
 }
 
-
-ZEUInt ZEScene::GetLoadingPercentage()
+ZEEntityStateStats ZEScene::GetEntityStateStats()
 {
-	ZEEntityLoadingScore TotalScore;
-	TotalScore.Score = 0;
-	TotalScore.Count = 0;
-
+	ZEEntityStateStats Stats;
 	Entities.LockRead();
 	{
 		for (ZESize I = 0; I < Entities.GetCount(); I++)
-		{
-			ZEEntityLoadingScore EntityScore = Entities[I]->GetLoadingScore();
-			TotalScore.Score += EntityScore.Score;
-			TotalScore.Count += EntityScore.Count;
-		}
+			Stats += Entities[I]->GetStateStats();
 	}
 	Entities.UnlockRead();
-
-	if (TotalScore.Count == 0)
-		return 100;
-	else
-		return (ZEUInt)(TotalScore.Score / TotalScore.Count);
+	
+	return Stats;
 }
 
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()

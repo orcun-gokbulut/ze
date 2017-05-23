@@ -39,27 +39,37 @@
 #include "ZEEntity.h"
 #include "ZEUI/ZEUILabel.h"
 #include "ZEExport.ZEEngine.h"
+#include "ZETimeCounter.h"
 
 class ZERNMaterial;
 class ZEGRBuffer;
 class ZEUIFontTrueType;
 class ZEUIManager;
 
+ZE_ENUM(ZELoadingScreenState)
+{
+	ZE_LSS_NONE,
+	ZE_LSS_FADING_IN,
+	ZE_LSS_SCREEN,
+	ZE_LSS_FADING_OUT
+};
+
 class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 {
 	ZE_OBJECT
 	private:
 		ZEUIManager*						Manager;
+		ZEUIFrameControl*					ImageControl;
+		ZEUIControl*						BackgroundControl;
 
-		ZEArray<ZEUILabel*>					ConsoleLines;
-		ZEUILabel*							LoadingLabel;
+		ZETimeCounter						Counter;
+		ZEString							ImageFileName;
+		ZEVector4							BackgroundColor;
+		float								FadeInFactor;
+		float								FadeOutFactor;
 
-		ZEUIFrameControl*					LoadingIndicatorFrame;
-		ZEHolder<const ZEUIFontTrueType>	Font;
-
-		ZEUInt								LoadingPercentage;
-		ZEUInt								LastLoadingPercentage;
-		ZESize								LastOutputBufferCount;
+		ZELoadingScreenState				State;
+		float								FadeValue;
 
 		virtual ZEEntityResult				LoadInternal();
 		virtual ZEEntityResult				UnloadInternal();
@@ -71,20 +81,23 @@ class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 		void								SetManager(ZEUIManager* Manager);
 		ZEUIManager*						GetManager();
 
-		void								SetLoadingStageCount(ZEUInt Count);
-		ZEUInt								GetLoadingStageCount() const;
+		void								SetImageFileName(const ZEString& FileName);
+		const ZEString&						GetImageFileName();
 
-		void								SetLoadingStageIndex(ZEUInt Index);
-		ZEUInt								GetLoadingStageIndex() const;
-
-		void								ShowStartupScreen();
-		void								HideStartupScreen();
-
-		void								ShowLoadingScreen();
-		void								HideLoadingScreen();
+		void								SetBackgroundColor(const ZEVector4& Color);
+		const ZEVector4&					GetBackgroundColor();
+		
+		void								SetFadeInFactor(float Factor);
+		float								GetFadeInFacotr();
+	
+		void								SetFadeOutFactor(float Factor);
+		float								GetFadeOutFactor();
 
 		virtual void						Tick(float ElapsedTime);
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
+
+		void								Show();
+		void								Hide();
 
 		static ZELoadingScreen*				CreateInstance();
 };

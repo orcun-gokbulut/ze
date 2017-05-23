@@ -40,7 +40,7 @@ void ZEGRViewport::SetPosition(const ZEVector2& Position)
 	StateData.Position = Position;
 }
 
-const ZEVector2& ZEGRViewport::GetPosition()
+const ZEVector2& ZEGRViewport::GetPosition() const
 {
 	return StateData.Position;
 }
@@ -50,7 +50,7 @@ void ZEGRViewport::SetSize(const ZEVector2& Size)
 	StateData.Size = Size;
 }
 
-const ZEVector2& ZEGRViewport::GetSize()
+const ZEVector2& ZEGRViewport::GetSize() const
 {
 	return StateData.Size;
 }

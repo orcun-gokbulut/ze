@@ -52,6 +52,7 @@ ZEMT_FORWARD_DECLARE(ZEListener);
 ZEMT_FORWARD_DECLARE(ZEPhysicalWorld);
 ZEMT_FORWARD_DECLARE(ZERNPreRenderParameters);
 
+class ZEEntityStateStats;
 class ZEPhysicalWorld;
 class ZEGRBuffer;
 enum ZEEntityState;
@@ -128,7 +129,7 @@ class ZE_EXPORT_ZEENGINE ZEScene : public ZEObject, public ZEInitializable, publ
 		void									SetSpatialDatabase(bool Enabled);
 		bool									GetSpatialDatabase();
 
-		ZEUInt									GetLoadingPercentage();
+		ZEEntityStateStats						GetEntityStateStats();
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
 		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class, bool Recursive = false);

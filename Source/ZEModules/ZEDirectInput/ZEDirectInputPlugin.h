@@ -48,7 +48,7 @@ class  ZEDirectInputPlugin : public ZEPlugin
 	friend ZEPlugin* zeCreatePluginInstance();
 	private:
 												ZEDirectInputPlugin();
-		virtual									~ZEDirectInputPlugin() override;
+		virtual									~ZEDirectInputPlugin();
 
 	public:
 		virtual const char*						GetName() const override;

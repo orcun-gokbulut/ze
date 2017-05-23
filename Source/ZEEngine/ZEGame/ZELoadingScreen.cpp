@@ -43,6 +43,8 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEPathInfo.h"
+#include "ZECore/ZETimeParameters.h"
 
 ZEEntityResult ZELoadingScreen::LoadInternal()
 {
@@ -51,43 +53,43 @@ ZEEntityResult ZELoadingScreen::LoadInternal()
 	if (Manager == NULL)
 		return ZE_ER_FAILED;
 
-	ConsoleLines.SetCount(5);
-	for (ZESize I = 0; I < ConsoleLines.GetCount(); I++)
-	{
-		ConsoleLines[I] = ZEUILabel::CreateInstance();
-		Manager->AddControl(ConsoleLines[I]);
-	}
+	FadeValue = 0.0f;
 
-	LoadingLabel = ZEUILabel::CreateInstance();
-	LoadingLabel->SetPosition(ZEVector2::Zero);
-	LoadingLabel->SetSize(ZEVector2(100, 100));
-	Manager->AddControl(LoadingLabel);
+	ImageControl = new ZEUIFrameControl();
+	ImageControl->SetTextureFileName(ImageFileName);
+	Manager->AddControl(ImageControl);
+
+	BackgroundControl = new ZEUIFrameControl();
+	BackgroundControl->SetBackgroundColor(BackgroundColor);
+	Manager->AddControl(BackgroundControl);
 
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZELoadingScreen::UnloadInternal()
 {
-	for (ZESize I = 0; I < ConsoleLines.GetCount(); I++)
-	{
-		Manager->RemoveControl(LoadingLabel);
-		ConsoleLines[I]->Destroy();
-	}
-	ConsoleLines.Clear();
+	Manager->RemoveControl(ImageControl);
+	ImageControl->Destroy();
+	ImageControl = NULL;
 
-	Manager->RemoveControl(LoadingLabel);
-	LoadingLabel->Destroy();
+	Manager->RemoveControl(BackgroundControl);
+	BackgroundControl->Destroy();
+	BackgroundControl = NULL;
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+
 	return ZE_ER_DONE;
 }
 
 ZELoadingScreen::ZELoadingScreen()
 {
-	LastLoadingPercentage = -1;
-	LastOutputBufferCount = 0;
-
-	SetEntityFlags(ZE_EF_RENDERABLE_CUSTOM | ZE_EF_TICKABLE_CUSTOM);
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
+	State = ZE_LSS_NONE;
+	FadeValue = 0.0f;
+	ImageFileName = "#R:/ZEEngine/ZELoadingScreen/LoadingScreen-Development.png";
+	BackgroundColor = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
+	FadeInFactor = 10.0f;
+	FadeOutFactor = 1.0f;
 }
 
 ZELoadingScreen::~ZELoadingScreen()
@@ -111,73 +113,160 @@ ZEUIManager* ZELoadingScreen::GetManager()
 	return Manager;
 }
 
-void ZELoadingScreen::SetLoadingStageCount(ZEUInt Count)
+void ZELoadingScreen::SetImageFileName(const ZEString& FileName)
 {
-
+	bool Diffrent = ZEPathInfo::Compare(ImageFileName, FileName);
+	ImageFileName = FileName;
+	if (Diffrent && IsLoaded())
+		ImageControl->SetTextureFileName(FileName);
 }
 
-ZEUInt ZELoadingScreen::GetLoadingStageCount() const
+const ZEString& ZELoadingScreen::GetImageFileName()
 {
-	return 0;
+	return ImageFileName;
 }
 
-void ZELoadingScreen::SetLoadingStageIndex(ZEUInt Index)
-{
 
+void ZELoadingScreen::SetBackgroundColor(const ZEVector4& Color)
+{
+	BackgroundColor = Color;
 }
 
-ZEUInt ZELoadingScreen::GetLoadingStageIndex() const
+const ZEVector4& ZELoadingScreen::GetBackgroundColor()
 {
-	return 0;
+	return BackgroundColor;
 }
 
-void ZELoadingScreen::ShowStartupScreen()
+void ZELoadingScreen::SetFadeInFactor(float Factor)
 {
-
+	FadeInFactor = Factor;
 }
 
-void ZELoadingScreen::HideStartupScreen()
+float ZELoadingScreen::GetFadeInFacotr()
 {
-
+	return FadeInFactor;
 }
 
-void ZELoadingScreen::ShowLoadingScreen()
+void ZELoadingScreen::SetFadeOutFactor(float Factor)
 {
-
+	FadeOutFactor = Factor;
 }
 
-void ZELoadingScreen::HideLoadingScreen()
+float ZELoadingScreen::GetFadeOutFactor()
 {
-
+	return FadeOutFactor;
 }
 
 void ZELoadingScreen::Tick(float ElapsedTime)
 {
-//	LoadingPercentage = GetScene()->GetLoadingPercentage();
+	if (State == ZE_LSS_NONE)
+		return;
+
+	if (State == ZE_LSS_FADING_IN)
+	{
+		FadeValue += ElapsedTime * FadeOutFactor;
+		if (FadeValue >= 1.0f)
+		{
+			FadeValue = 1.0f;
+			State = ZE_LSS_SCREEN;
+		}
+	}
+	else if (State == ZE_LSS_FADING_OUT)
+	{
+		FadeValue -= ElapsedTime * FadeOutFactor;
+		if (FadeValue <= 0.0f)
+		{
+			FadeValue = 0.0f;
+			State = ZE_LSS_NONE;
+		}
+	}
+
+	if (Counter.GetTimeMilliseconds() <= 0.5)
+		return;
+
+	Counter.Reset();
+
+	if (GetScene()->GetEntityStateStats().LoadingCount == 0)
+		State = ZE_LSS_FADING_OUT;
+	
 }
 
 bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (LoadingPercentage == 100)
+	if (Parameters->Type != ZERN_RT_COLOR)
+		return false;
+
+	if (State == ZE_LSS_NONE)
 	{
-		LoadingLabel->SetVisiblity(false);
+		BackgroundControl->SetVisiblity(false);
+		ImageControl->SetVisiblity(false);
 	}
 	else
 	{
-		LoadingLabel->SetVisiblity(true);
-
-		if (LastLoadingPercentage != LoadingPercentage)
+		ZEVector2 ScreenSize = Parameters->View->Viewport.GetSize();
+		const ZEGRTexture* ImageTexture = ImageControl->GetTexture();
+		if (ImageTexture != NULL && ImageTexture->IsLoaded())
 		{
-			LoadingLabel->SetText(ZEFormat::Format("Loading... %{0}", LoadingPercentage));
-			zeLog(LoadingLabel->GetText().ToCString());
-			LastLoadingPercentage = LoadingPercentage;
+			ZEVector2 Position;
+			float ImageWidth = ImageTexture->GetWidth();
+			float ImageHeight = ImageTexture->GetHeight();
+			float ImageAR = ImageWidth / ImageHeight;
+
+			if (ImageWidth > ScreenSize.x && ImageHeight > ScreenSize.y)
+			{
+				float ScreenAR = ScreenSize.x / ScreenSize.y;
+				if (ScreenAR > ImageAR)
+				{
+					ImageHeight = ScreenSize.y; 
+					ImageWidth = ImageHeight * ImageAR;
+				}
+				else
+				{
+					ImageWidth = ScreenSize.x; 
+					ImageHeight = ImageWidth / ImageAR;
+				}
+			}
+			else if (ImageWidth > ScreenSize.x)
+			{
+				ImageWidth = ScreenSize.x; 
+				ImageHeight = ImageWidth / ImageAR;
+			}
+			else if (ImageHeight > ScreenSize.y)
+			{
+				ImageHeight = ScreenSize.y; 
+				ImageWidth *= ImageHeight * ImageAR;
+			}
+
+			Position.x = (ScreenSize.x - ImageWidth) / 2.0f;
+			Position.y = (ScreenSize.y - ImageHeight) / 2.0f;
+
+			ImageControl->SetPosition(Position);
+			ImageControl->SetSize(ZEVector2(ImageWidth, ImageHeight));
+			ImageControl->SetBackgroundColor(ZEVector4(ZEVector3::One, BackgroundColor.w * FadeValue));
+			ImageControl->SetVisiblity(true);
 		}
+
+		BackgroundControl->SetPosition(ZEVector2(0.0f, 0.0f));
+		BackgroundControl->SetSize(ScreenSize);
+		BackgroundControl->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+		BackgroundControl->SetVisiblity(true);
 	}
 
 	return false;
 }
 
+void ZELoadingScreen::Show()
+{
+	State = ZE_LSS_FADING_IN;
+	Counter.Start();
+}
+
+void ZELoadingScreen::Hide()
+{
+	State = ZE_LSS_FADING_OUT;
+}
+
 ZELoadingScreen* ZELoadingScreen::CreateInstance()
 {
-	return new ZELoadingScreen();
+	return new ZELoadingScreen;
 }

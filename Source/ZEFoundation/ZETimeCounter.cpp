@@ -159,8 +159,11 @@ void ZETimeCounter::Stop()
 
 void ZETimeCounter::Reset()
 {
-	State = ZE_TCS_STOPPED;
-	LastMeasuredTime = 0;
+	if (State == ZE_TCS_RUNNING)
+		LastMeasuredTime = GetClock();
+	else
+		LastMeasuredTime = 0;
+
 	AcumulatedTime = 0;
 }
 

@@ -54,7 +54,7 @@ class ZEDOptionsManager : public ZEDComponent
 		virtual bool						DeinitializeInternal() override;
 
 											ZEDOptionsManager();
-		virtual								~ZEDOptionsManager() override;
+		virtual								~ZEDOptionsManager();
 
 	public:
 		const ZEArray<ZEDOptionsPage*>&		GetOptionsPages() const;

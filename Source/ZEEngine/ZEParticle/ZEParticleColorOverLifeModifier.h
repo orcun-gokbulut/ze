@@ -57,5 +57,5 @@ class ZE_EXPORT_ZEENGINE ZEParticleColorOverLifeModifier : public ZEParticleModi
 		virtual	void						Tick(float ElapsedTime) override;
 
 											ZEParticleColorOverLifeModifier();
-		virtual								~ZEParticleColorOverLifeModifier() override;
+		virtual								~ZEParticleColorOverLifeModifier();
 };
