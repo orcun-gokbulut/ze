@@ -92,6 +92,10 @@ ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 	IndexType = ZEMD_VIT_NONE;
 	IndexOffset = 0;
 	IndexCount = 0;
+	Color = ZEVector3::One;
+	Opacity = 1.0f;
+	LODTransition = false;
+	DirtyDraws = true;
 
 	Resource = NULL;
 }
@@ -222,6 +226,64 @@ void ZEModelMeshLOD::SetIndexCount(ZESize Count)
 ZESize ZEModelMeshLOD::GetIndexCount() const
 {
 	return IndexCount;
+}
+
+void ZEModelMeshLOD::SetColor(const ZEVector3& Color)
+{
+	if (this->Color == Color)
+		return;
+
+	this->Color = Color;
+
+	DirtyDraws = true;
+}
+
+const ZEVector3& ZEModelMeshLOD::GetColor() const
+{
+	return Color;
+}
+
+void ZEModelMeshLOD::SetOpacity(float Opacity)
+{
+	if (this->Opacity == Opacity)
+		return;
+
+	this->Opacity = Opacity;
+
+	DirtyDraws = true;
+}
+
+float ZEModelMeshLOD::GetOpacity() const
+{
+	return Opacity;
+}
+
+void ZEModelMeshLOD::SetLODTransition(bool LODTransition)
+{
+	if (this->LODTransition == LODTransition)
+		return;
+
+	this->LODTransition = LODTransition;
+
+	DirtyDraws = true;
+}
+
+bool ZEModelMeshLOD::GetLODTransition() const
+{
+	return LODTransition;
+}
+
+bool ZEModelMeshLOD::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
+{
+	ze_for_each(Draw, Draws)
+	{
+		Draw->DirtyConstants = DirtyDraws;
+		Draw->PreRender(PreRenderParameters);
+	}
+
+	DirtyDraws = false;
+
+	return true;
 }
 
 ZEModelMeshLOD* ZEModelMeshLOD::CreateInstance()

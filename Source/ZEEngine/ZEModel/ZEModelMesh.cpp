@@ -208,6 +208,7 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 	AnimationType = ZE_MAT_NOANIMATION;
 	CustomDrawOrderEnabled = false;
 	CustomDrawOrder = 0;
+	DrawOrder = 0.0f;
 
 	Resource = NULL;
 }
@@ -786,10 +787,13 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	}
 
 	UpdateConstantBuffer();
+	Model->UpdateConstantBufferBoneTransforms();
+	
+	DrawOrder = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldPosition());
 
-	float DrawOrder = FLT_MAX;
-	for (ZEUInt I = 0; I < 8; I++)
-		DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
+	//float DrawOrder = FLT_MAX;
+	//for (ZEUInt I = 0; I < 8; I++)
+	//	DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
 
 	ZEModelMeshLOD* CurrentLOD = NULL;
 	ze_for_each(LOD, LODs)
@@ -804,6 +808,9 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (CurrentLOD == NULL)
 	{
 		PrevLOD = NULL;
+		NextLOD = NULL;
+		LODTransitionPlaying = false;
+		LODTransitionElapsedTime = 0.0f;
 		return false;
 	}
 
@@ -811,7 +818,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		PrevLOD = CurrentLOD;
 	
 	float LODTransitionDirection = 1.0f;
-
+	
 	if (CurrentLOD != PrevLOD)
 	{
 		LODTransitionPlaying = true;
@@ -829,177 +836,27 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		if (LODTransitionElapsedTime > 0.0f && LODTransitionElapsedTime < LODTransitionTime)
 		{
 			float PrevLODOpacity = ZEMath::Lerp(1.0f, 0.0f, LODTransitionElapsedTime / LODTransitionTime);
+	
+			PrevLOD->SetOpacity(PrevLODOpacity);
+			PrevLOD->SetLODTransition(true);
 
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(PrevLODOpacity);
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(true);
-
-			ze_for_each(Draw, PrevLOD->GetDraws())
-			{
-				Draw->RenderCommand.Entity = GetModel();
-				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-				Draw->RenderCommand.Order = DrawOrder;
-
-				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-					continue;
-
-				Draw->RenderCommand.Material = Draw->GetMaterial();
-				Draw->RenderCommand.Geometry = Draw->GetGeometry();
-				Draw->RenderCommand.TransformConstantBuffer = ConstantBuffer;
-				Draw->RenderCommand.DrawConstantBuffer = Draw->GetConstantBuffer();
-
-				if (PrevLOD->GetVertexType() == ZEMD_VT_SKINNED)
-				{
-					Model->UpdateConstantBufferBoneTransforms();
-					Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
-				}
-				else
-				{
-					Draw->RenderCommand.BoneConstantBuffer = NULL;
-					Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-					Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-					Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-					Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-				}
-
-				if (Parameters->Type == ZERN_RT_SHADOW)
-				{
-					Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;
-					Draw->RenderCommandShadow.Priority = Draw->RenderCommand.Priority;
-					Draw->RenderCommandShadow.Order = Draw->RenderCommand.Order;
-					Draw->RenderCommandShadow.StageMask = Draw->RenderCommand.StageMask;
-					Draw->RenderCommandShadow.Material = Draw->RenderCommand.Material;
-					Draw->RenderCommandShadow.Geometry = Draw->RenderCommand.Geometry;
-					Draw->RenderCommandShadow.TransformConstantBuffer = Draw->RenderCommand.TransformConstantBuffer;
-					Draw->RenderCommandShadow.DrawConstantBuffer = Draw->RenderCommand.DrawConstantBuffer;
-					Draw->RenderCommandShadow.BoneConstantBuffer = Draw->RenderCommand.BoneConstantBuffer;
-					Draw->RenderCommandShadow.InstanceData = Draw->RenderCommand.InstanceData;
-
-					Draw->RenderCommandShadow.Reset();
-					Parameters->CommandList->AddCommand(&Draw->RenderCommandShadow);
-				}
-				else
-				{
-					Draw->RenderCommand.Reset();
-					Parameters->CommandList->AddCommand(&Draw->RenderCommand);
-				}
-			}
-
-			ze_for_each(Draw, NextLOD->GetDraws())
-			{
-				Draw->RenderCommand.Entity = GetModel();
-				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-				Draw->RenderCommand.Order = DrawOrder;
-
-				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-					continue;
-
-				Draw->RenderCommand.Material = Draw->GetMaterial();
-				Draw->RenderCommand.Geometry = Draw->GetGeometry();
-				Draw->RenderCommand.TransformConstantBuffer = ConstantBuffer;
-				Draw->RenderCommand.DrawConstantBuffer = Draw->GetConstantBuffer();
-
-				if (NextLOD->GetVertexType() == ZEMD_VT_SKINNED)
-				{
-					Model->UpdateConstantBufferBoneTransforms();
-					Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
-				}
-				else
-				{
-					Draw->RenderCommand.BoneConstantBuffer = NULL;
-					Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-					Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-					Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-					Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-				}
-
-				if (Parameters->Type == ZERN_RT_SHADOW)
-				{
-					Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;
-					Draw->RenderCommandShadow.Priority = Draw->RenderCommand.Priority;
-					Draw->RenderCommandShadow.Order = Draw->RenderCommand.Order;
-					Draw->RenderCommandShadow.StageMask = Draw->RenderCommand.StageMask;
-					Draw->RenderCommandShadow.Material = Draw->RenderCommand.Material;
-					Draw->RenderCommandShadow.Geometry = Draw->RenderCommand.Geometry;
-					Draw->RenderCommandShadow.TransformConstantBuffer = Draw->RenderCommand.TransformConstantBuffer;
-					Draw->RenderCommandShadow.DrawConstantBuffer = Draw->RenderCommand.DrawConstantBuffer;
-					Draw->RenderCommandShadow.BoneConstantBuffer = Draw->RenderCommand.BoneConstantBuffer;
-					Draw->RenderCommandShadow.InstanceData = Draw->RenderCommand.InstanceData;
-
-					Draw->RenderCommandShadow.Reset();
-					Parameters->CommandList->AddCommand(&Draw->RenderCommandShadow);
-				}
-				else
-				{
-					Draw->RenderCommand.Reset();
-					Parameters->CommandList->AddCommand(&Draw->RenderCommand);
-				}
-			}
+			PrevLOD->PreRender(Parameters);
+			NextLOD->PreRender(Parameters);
 		}
 		else
 		{
 			LODTransitionPlaying = false;
 			LODTransitionElapsedTime = 0.0f;
 
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(1.0f);
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(false);
+			PrevLOD->SetOpacity(1.0f);
+			PrevLOD->SetLODTransition(false);
 
 			PrevLOD = CurrentLOD;
 		}
 	}
 
 	if (!LODTransitionPlaying)
-	{
-		ze_for_each(Draw, CurrentLOD->GetDraws())
-		{
-			Draw->RenderCommand.Entity = GetModel();
-			Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-			Draw->RenderCommand.Order = DrawOrder;
-
-			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-				continue;
-
-			Draw->RenderCommand.Material = Draw->GetMaterial();
-			Draw->RenderCommand.Geometry = Draw->GetGeometry();
-			Draw->RenderCommand.TransformConstantBuffer = ConstantBuffer;
-			Draw->RenderCommand.DrawConstantBuffer = Draw->GetConstantBuffer();
-
-			if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
-			{
-				Model->UpdateConstantBufferBoneTransforms();
-				Draw->RenderCommand.BoneConstantBuffer = Model->ConstantBufferBoneTransforms;
-			}
-			else
-			{
-				Draw->RenderCommand.BoneConstantBuffer = NULL;
-				Draw->RenderCommand.InstanceData.WorldTransform = GetWorldTransform();
-				Draw->RenderCommand.InstanceData.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
-				Draw->RenderCommand.InstanceData.DrawColor = ZEVector4(Draw->GetColor(), Draw->GetOpacity());
-				Draw->RenderCommand.InstanceData.DrawLODTransition.w = Draw->GetLODTransition();
-			}
-
-			if (Parameters->Type == ZERN_RT_SHADOW)
-			{
-				Draw->RenderCommandShadow.Entity = Draw->RenderCommand.Entity;
-				Draw->RenderCommandShadow.Priority = Draw->RenderCommand.Priority;
-				Draw->RenderCommandShadow.Order = Draw->RenderCommand.Order;
-				Draw->RenderCommandShadow.StageMask = Draw->RenderCommand.StageMask;
-				Draw->RenderCommandShadow.Material = Draw->RenderCommand.Material;
-				Draw->RenderCommandShadow.Geometry = Draw->RenderCommand.Geometry;
-				Draw->RenderCommandShadow.TransformConstantBuffer = Draw->RenderCommand.TransformConstantBuffer;
-				Draw->RenderCommandShadow.DrawConstantBuffer = Draw->RenderCommand.DrawConstantBuffer;
-				Draw->RenderCommandShadow.BoneConstantBuffer = Draw->RenderCommand.BoneConstantBuffer;
-				Draw->RenderCommandShadow.InstanceData = Draw->RenderCommand.InstanceData;
-
-				Draw->RenderCommandShadow.Reset();
-				Parameters->CommandList->AddCommand(&Draw->RenderCommandShadow);
-			}
-			else
-			{
-				Draw->RenderCommand.Reset();
-				Parameters->CommandList->AddCommand(&Draw->RenderCommand);
-			}
-		}
-	}
+		CurrentLOD->PreRender(Parameters);
 
 	return true;
 }

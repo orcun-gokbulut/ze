@@ -122,7 +122,6 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		} RendererConstants;
 		
 		ZEHolder<ZEGRSampler>						SamplerPointMirror;
-		ZEHolder<ZEGRSampler>						SamplerPointMirror;
 		ZEHolder<ZEGRSampler>						SamplerLinearClamp;
 		ZEHolder<ZEGRSampler>						SamplerLinearWrap;
 		ZEHolder<ZEGRSampler>						SamplerLinearBorderZero;

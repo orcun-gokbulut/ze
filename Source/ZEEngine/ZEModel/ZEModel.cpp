@@ -106,7 +106,7 @@ void ZEModel::CalculateBoundingBox() const
 
 void ZEModel::UpdateConstantBufferBoneTransforms()
 {
-	if (!DirtyConstantBufferSkin)
+	if (!DirtyConstantBufferSkin || Bones.GetCount() == 0)
 		return;
 
 	if (ConstantBufferBoneTransforms == NULL)

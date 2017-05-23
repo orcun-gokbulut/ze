@@ -45,8 +45,8 @@
 ZEMT_FORWARD_DECLARE(ZEEntity);
 ZEMT_FORWARD_DECLARE(ZERNRenderParameters);
 
+class ZERNCommandList;
 class ZERNCommand;
-class ZERNInstanceTag;
 class ZEScene;
 
 typedef ZEDelegate<void (const ZERNRenderParameters*, const ZERNCommand*)> ZERNCommandCallback;
@@ -65,10 +65,6 @@ class ZERNCommand : public ZEObject
 	protected:
 		ZELink<ZERNCommand>		Link;
 		ZEList2<ZERNCommand>	SubCommands;
-		ZEList2<ZERNCommand>	SubCommandsPrevious;
-
-		virtual void			Push();
-		virtual void			Pop();
 	
 	public:
 		ZERNCommandCallback		Callback;
@@ -80,8 +76,6 @@ class ZERNCommand : public ZEObject
 		ZEInt					SceneIndex;
 		ZEUInt					StageMask;
 		void*					ExtraParameters;
-		//ZEList2<ZERNCommand>	Instances;
-		//const ZERNInstanceTag*	InstanceTag;
 
 		virtual bool			AddSubCommand(ZERNCommand* Command);
 		virtual void			Reset();
@@ -91,57 +85,15 @@ class ZERNCommand : public ZEObject
 								ZERNCommand();
 };
 
-class ZERNCommandList
+class ZERNCommandList : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZERNRenderer;
 	private:
 		ZEList2<ZERNCommand>	CommandList;
 
 	public:
-		void AddCommand(ZERNCommand* Command)
-		{
-			bool GroupFound = false;
-			ze_for_each(DestCmd, CommandList)
-			{
-				zeCheckError(DestCmd.GetPointer() == Command, ZE_VOID, "Duplicated commands have been detected");
-
-				if (DestCmd->AddSubCommand(Command))
-				{
-					GroupFound = true;
-					break;
-				}
-			}
-
-			if (!GroupFound)
-				this->CommandList.AddBegin(Command->GetFreeLink());
-		}
-
-		void AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList)
-		{
-			ze_for_each(SrcCmd, CommandList)
-			{
-				bool GroupFound = false;
-				ze_for_each(DestCmd, this->CommandList)
-				{
-					zeCheckError(DestCmd.GetPointer() == SrcCmd.GetPointer(), ZE_VOID, "Duplicated commands have been detected");
-
-					if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
-					{
-						GroupFound = true;
-						break;
-					}
-				}
-				
-				if (!GroupFound)
-					this->CommandList.AddBegin(SrcCmd->GetFreeLink());
-			}
-		}
-
-		void Clear()
-		{
-			ze_for_each(Cmd, CommandList)
-				Cmd->Clear();
-
-			CommandList.Clear();
-		}
+		void					AddCommand(ZERNCommand* Command);
+		void					AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList);
+		void					Clear();
 };

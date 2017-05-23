@@ -345,7 +345,7 @@ bool ZERNRenderer::InitializeInternal()
 	}
 	
 	if (::InstanceVertexBuffer == NULL)
-		this->InstanceVertexBuffer = ::InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 8192, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
+		this->InstanceVertexBuffer = ::InstanceVertexBuffer = ZEGRBuffer::CreateResource(ZEGR_BT_VERTEX_BUFFER, sizeof(ZERNInstanceData) * 16384, sizeof(ZERNInstanceData), ZEGR_RU_DYNAMIC, ZEGR_RBF_VERTEX_BUFFER);
 	else
 		this->InstanceVertexBuffer = ::InstanceVertexBuffer;
 

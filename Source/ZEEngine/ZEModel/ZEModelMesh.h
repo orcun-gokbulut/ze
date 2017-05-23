@@ -99,6 +99,7 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		ZEModelMeshLOD*							PrevLOD;
 		ZEModelMeshLOD*							NextLOD;
 
+		float									DrawOrder;
 		bool									CustomDrawOrderEnabled;
 		ZEUInt8									CustomDrawOrder;
 		ZEArray<ZEPlane>						ClippingPlanes;
