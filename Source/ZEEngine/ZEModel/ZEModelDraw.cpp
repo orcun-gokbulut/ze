@@ -106,19 +106,6 @@ void ZERNCommandDraw::Clear()
 {
 	ZERNCommand::Clear();
 	Instances.Clear();
-	
-	//ZERNCommandDraw* CommandDraw = NULL;
-	//while ((CommandDraw = Instances.PopItem()) != NULL)
-	//{
-	//	if (CommandDraw == this)
-	//		continue;
-	//	
-	//	CommandDraw->Clear();
-	//
-	//	//CommandDraw->Instances.AddBegin(&CommandDraw->InstanceLink);
-	//}
-	//
-	//Instances.AddBegin(&InstanceLink);
 }
 
 void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
@@ -153,10 +140,7 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 
 			InstanceOffset = Index;
 			ze_for_each(Instance, CommandDraw->Instances)
-			{
-				InstanceBuffer[Index] = Instance->InstanceData;
-				Index++;
-			}
+				InstanceBuffer[Index++] = Instance->InstanceData;
 
 			Renderer->InstanceVertexBuffer->Unmap();
 
@@ -188,7 +172,7 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 
 ZERNCommandDraw::ZERNCommandDraw() : InstanceLink(this)
 {
-	//Instances.AddBegin(&InstanceLink);
+
 }
 
 bool ZEModelDraw::Load(const ZEMDResourceDraw* Resource)
@@ -390,7 +374,7 @@ const ZEGRBuffer* ZEModelDraw::GetConstantBuffer() const
 
 bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 {
-	if (!GetMaterial()->IsLoaded())
+	if (GetMaterial() == NULL || GetGeometry() == NULL || !GetMaterial()->IsLoaded())
 		return false;
 
 	ZERNInstanceData InstanceData;

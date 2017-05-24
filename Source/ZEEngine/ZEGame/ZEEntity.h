@@ -278,6 +278,9 @@ class ZEEntity : public ZEObject
 		void									SetWorldScale(const ZEVector3& NewScale);
 		ZEVector3								GetWorldScale() const;
 
+		void									SetTransform(const ZEMatrix4x4& Transform);
+		void									SetWorldTransform(const ZEMatrix4x4& Transform);
+
 		ZEVector3								GetFront() const;
 		ZEVector3								GetRight() const;
 		ZEVector3								GetUp() const;

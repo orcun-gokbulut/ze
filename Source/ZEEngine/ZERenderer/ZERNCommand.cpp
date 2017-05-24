@@ -61,19 +61,6 @@ void ZERNCommand::Reset()
 
 void ZERNCommand::Clear()
 {
-	//SubCommands.Clear();
-
-	//ZERNCommand* Command = NULL;//SubCommands.GetFirstItem();
-	//while ((Command = SubCommands.PopItem()) != NULL)
-	//{
-	//	if (Command == this)
-	//		continue;
-	//
-	//	Command->Clear();
-	//}
-	//
-	//SubCommands.AddBegin(&Link);
-
 	ze_for_each(Command, SubCommands)
 	{
 		if (Command.GetPointer() == this)
@@ -104,8 +91,6 @@ ZERNCommand::ZERNCommand() : Link(this)
 
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
 		new (&Links[I]) ZELink<ZERNCommand>(this);
-	
-	//SubCommands.AddBegin(&Link);
 }
 
 void ZERNCommandList::AddCommand(ZERNCommand* Command)

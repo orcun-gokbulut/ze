@@ -789,11 +789,9 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	UpdateConstantBuffer();
 	Model->UpdateConstantBufferBoneTransforms();
 	
-	DrawOrder = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldPosition());
-
-	//float DrawOrder = FLT_MAX;
-	//for (ZEUInt I = 0; I < 8; I++)
-	//	DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
+	DrawOrder = FLT_MAX;
+	for (ZEUInt I = 0; I < 8; I++)
+		DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
 
 	ZEModelMeshLOD* CurrentLOD = NULL;
 	ze_for_each(LOD, LODs)
