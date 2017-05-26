@@ -83,6 +83,8 @@ bool ZESector::CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool De
 
 ZEEntityResult ZESector::LoadInternal()
 {
+	static ZEUInt32 VegetationReductionCount = 0;
+
 	ZE_ENTITY_LOAD_CHAIN(ZEGeographicEntity);
 
 	if (SectorFile.IsEmpty())
@@ -109,6 +111,23 @@ ZEEntityResult ZESector::LoadInternal()
 		ZEClass* NewChildEntityClass = ZEMTProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
 		zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
 			GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
+
+		ZEString VegetationClassName = "ZETIVegetation";
+
+		if (NewChildEntityClass->GetName() == VegetationClassName)
+		{
+			ZEMLReaderNode PropertiesNode = ChildEntityNode.GetNode("Properties");
+			ZEInt32 VegetationType = PropertiesNode.ReadInt32("Type");
+
+			if (VegetationType == 7) //Grass
+				continue;
+
+			VegetationReductionCount++;
+
+			if (VegetationReductionCount % 4 != 0)
+				continue;
+
+		}
 
 		ZEEntity* NewChildEntity = static_cast<ZEEntity*>(NewChildEntityClass->CreateInstance());
 
