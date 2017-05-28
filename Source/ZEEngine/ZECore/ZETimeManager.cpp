@@ -76,14 +76,21 @@ void ZETimeManager::UpdateFrameFixedInterval()
 	else
 	{
 		Parameters.FrameId++;
-		Parameters.FrameTime += FrameTimeInterval;
-		Parameters.FrameTimeDelta = FrameTimeInterval;
 
 		FrameTimeRemainder -= FrameTimeInterval;
 		if (FrameTimeRemainder <= FrameTimeInterval)
+		{
 			Parameters.FrameType = ZE_TT_NORMAL;
+			Parameters.FrameTimeDelta = FrameTimeInterval + FrameTimeRemainder;
+			Parameters.FrameTime += Parameters.FrameTimeDelta;
+			FrameTimeRemainder = 0.0f;
+		}
 		else
+		{
 			Parameters.FrameType = ZE_TT_DROPPED;
+			Parameters.FrameTimeDelta = FrameTimeInterval;
+			Parameters.FrameTime += Parameters.FrameTimeDelta;
+		}
 
 		OnTick(&Parameters);
 	}
@@ -252,6 +259,24 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 		UpdateFrameFixedInterval();
 	else if (Mode == ZE_TM_VARIABLE_INTERVAL)
 		UpdateFrameVariableInterval();
+
+	static const ZESize CycleHistorySize = 300;
+	static ZETimeParameters CycleHistory[CycleHistorySize];
+
+	CycleHistory[Parameters.CycleId % CycleHistorySize] = Parameters;
+
+	if (Parameters.CycleId % CycleHistorySize == CycleHistorySize - 1)
+		for (ZESize I = 0; I < CycleHistorySize; I++)
+		{
+			zeLog("CID: %ull, CT: %f, CTD: %f, FT:%u, FID: %ull, FT: %f, FTD: %f.",
+				CycleHistory[I].CycleId,
+				CycleHistory[I].CycleTime,
+				CycleHistory[I].CycleTimeDelta,
+				CycleHistory[I].FrameType,
+				CycleHistory[I].FrameId,
+				CycleHistory[I].FrameTime,
+				CycleHistory[I].FrameTimeDelta);
+		}
 }
 
 void ZETimeManager::Process(const ZETimeParameters* ParametersOld)
