@@ -193,7 +193,7 @@ void ZESectorManager::UpdateActiveSectors()
 	if (!CacheList.Exists(OriginSector))
 		CacheList.Add(OriginSector);
 
-	FollowLinks(ActivateList, CacheList, OriginSector, 3, CacheDepth);
+	FollowLinks(ActivateList, CacheList, OriginSector, CacheDepth, CacheDepth);
 
 	// Update Active Sectors
 	for (ZESSize I = 0; I < ActiveSectors.GetCount(); I++)
