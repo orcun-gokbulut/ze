@@ -113,6 +113,7 @@ class ZEModelMesh : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
+		void									VisibilityChanged();
 
 		void									UpdateConstantBuffer();
 

@@ -183,16 +183,13 @@ class ZEEntity : public ZEObject
 		void									UpdateState();
 
 		void									SetParent(ZEEntity* Parent);
-		void									SetScene(ZEScene* Scene);
 		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
 		void									UpdateRenderabilityState(bool Forced = false);
 		void									UpdateTickabilityState();
 		void									UpdateOctree();
 
-		void									ParentVisibleChanged();
 		void									ParentEnabledChanged();
-
 	protected:
 		void									SetEntityFlags(ZEEntityFlags Flags);
 
@@ -215,6 +212,9 @@ class ZEEntity : public ZEObject
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
 		void									ClearComponents();
+
+		virtual void							SetScene(ZEScene* Scene);
+		virtual void							ParentVisibleChanged();
 
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();

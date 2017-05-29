@@ -115,7 +115,7 @@ bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 	return true;
 }
 
-bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	if (!IsLoaded())
 		return false;
@@ -126,7 +126,7 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, b
 	return true;
 }
 
-void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 
 }
