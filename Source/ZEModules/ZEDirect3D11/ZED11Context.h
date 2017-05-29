@@ -118,4 +118,5 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 
 		virtual void									BeginEvent(const ZEString& Name);
 		virtual void									EndEvent();
+		virtual void									SetMarker(const ZEString& Name);
 };

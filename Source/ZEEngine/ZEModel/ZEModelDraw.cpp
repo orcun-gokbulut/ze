@@ -313,7 +313,7 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	if (GetMesh() == NULL || GetModel() == NULL || GetMaterial() == NULL)
 		return;
 	
-	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage, Command->Instances.GetCount() > 0))
+	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage, Command->Instances.GetCount() > 0, GetLODTransition()))
 		return;
 
 	ZEGRContext* Context = Parameters->Context;

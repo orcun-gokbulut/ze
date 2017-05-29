@@ -136,6 +136,14 @@ void ZEModelMesh::TransformChangedWorld()
 		ChildMesh->TransformChangedWorld();
 }
 
+void ZEModelMesh::VisibilityChanged()
+{
+	PrevLOD = NULL;
+	NextLOD = NULL;
+	LODTransitionPlaying = false;
+	LODTransitionElapsedTime = 0.0f;
+}
+
 void ZEModelMesh::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZEMD_MDF_CONSTANT_BUFFER))
@@ -802,12 +810,18 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (CurrentLOD == NULL)
 	{
 		PrevLOD = NULL;
+		NextLOD = NULL;
+		LODTransitionPlaying = false;
+		LODTransitionElapsedTime = 0.0f;
 		return false;
 	}
 
 	if (PrevLOD == NULL)
-		PrevLOD = CurrentLOD;
-	
+	{
+		if (!GetModel()->LODTransitionOnVisible)
+			PrevLOD = CurrentLOD;
+	}
+
 	float LODTransitionDirection = 1.0f;
 
 	if (CurrentLOD != PrevLOD)
@@ -822,39 +836,52 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (LODTransitionPlaying)
 	{
-		LODTransitionElapsedTime += Parameters->ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
+		float ElapsedTime = ZEMath::Min(Parameters->ElapsedTime, 16.0f);
+		LODTransitionElapsedTime += ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
 
 		if (LODTransitionElapsedTime > 0.0f && LODTransitionElapsedTime < LODTransitionTime)
 		{
 			float PrevLODOpacity = ZEMath::Lerp(1.0f, 0.0f, LODTransitionElapsedTime / LODTransitionTime);
 
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(PrevLODOpacity);
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(true);
-
-			ze_for_each(Draw, PrevLOD->GetDraws())
+			if (PrevLOD != NULL)
 			{
-				Draw->RenderCommand.Entity = GetModel();
-				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-				Draw->RenderCommand.Order = DrawOrder;
-				Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
+				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(PrevLODOpacity);
+				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(true);
 
-				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-					continue;
+				ze_for_each(Draw, PrevLOD->GetDraws())
+				{
+					Draw->RenderCommand.Entity = GetModel();
+					Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
+					Draw->RenderCommand.Order = DrawOrder;
+					Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
-				Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+					if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
+						continue;
+
+					Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+				}
 			}
 
-			ze_for_each(Draw, NextLOD->GetDraws())
+			if (NextLOD != NULL)
 			{
-				Draw->RenderCommand.Entity = GetModel();
-				Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-				Draw->RenderCommand.Order = DrawOrder;
-				Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
+				if (PrevLOD == NULL && GetModel()->LODTransitionOnVisible)
+				{
+					const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetOpacity(1.0f - PrevLODOpacity);
+					const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetLODTransition(true);
+				}
 
-				if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-					continue;
+				ze_for_each(Draw, NextLOD->GetDraws())
+				{
+					Draw->RenderCommand.Entity = GetModel();
+					Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
+					Draw->RenderCommand.Order = DrawOrder;
+					Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
 
-				Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+					if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
+						continue;
+
+					Parameters->Renderer->AddCommand(&Draw->RenderCommand);
+				}
 			}
 		}
 		else
@@ -862,8 +889,17 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			LODTransitionPlaying = false;
 			LODTransitionElapsedTime = 0.0f;
 
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(1.0f);
-			const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(false);
+			if (PrevLOD != NULL)
+			{
+				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(1.0f);
+				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(false);
+			}
+
+			if (NextLOD != NULL)
+			{
+				const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetOpacity(1.0f);
+				const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetLODTransition(false);
+			}
 
 			PrevLOD = CurrentLOD;
 		}
