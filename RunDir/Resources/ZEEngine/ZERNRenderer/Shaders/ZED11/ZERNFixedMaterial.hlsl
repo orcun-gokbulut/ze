@@ -233,6 +233,7 @@ struct ZERNFixedMaterial_PSInput
 		nointerpolation float4	DrawColor			: TEXCOORD9;
 		nointerpolation bool	DrawLODTransition	: TEXCOORD10;
 	#endif
+	bool IsFrontFace		: SV_IsFrontFace;
 };
 
 struct ZERNFixedMaterial_PSOutput
@@ -461,7 +462,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	#ifdef ZERN_FM_FORWARD
 		Surface.PositionView = Input.PositionView;
 	#endif
-	Surface.NormalView = Normal;
+	Surface.NormalView = (Input.IsFrontFace) ? Normal : -Normal;
 	Surface.Diffuse = DiffuseColor;
 	Surface.SubsurfaceScattering = SubsurfaceScattering;
 	Surface.Specular = SpecularColor;
@@ -474,7 +475,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 }
 
 ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInput Input)
-{	
+{
 	ZERNFixedMaterial_PSOutput Output;
 	
 	ZERNShading_Surface Surface = GetSurfaceDataFromResources(Input);
