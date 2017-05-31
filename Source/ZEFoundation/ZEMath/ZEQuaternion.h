@@ -41,6 +41,7 @@
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEMeta\ZEMTFundamental.h"
+#include "ZEVectord.h"
 
 class ZEQuaternion
 {
@@ -72,6 +73,7 @@ class ZEQuaternion
 
 		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
 		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
+		static void						VectorProduct(ZEVector3d& Output, const ZEQuaternion& Quaternion, const ZEVector3d& Vector);
 
 		static void						Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
 		static void						Nlerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
@@ -105,6 +107,7 @@ class ZEQuaternion
 		bool							Equals(const ZEQuaternion& Quaternion, float Threshold) const;
 
 		ZEVector3						operator*(const ZEVector3& Vector) const;
+		ZEVector3d						operator*(const ZEVector3d& Vector) const;
 		ZEQuaternion					operator*(const ZEQuaternion& Other) const;
 		ZEQuaternion&					operator*=(const ZEQuaternion& Other);
 
