@@ -103,6 +103,9 @@ ZETask* ZETaskManager::RequestTask(ZESize& QueuedTaskCount)
 		if (CurrentPool->SchedulingPolicy != ZE_TSP_ALWAYS_FIRST)
 			continue;
 
+		if (CurrentPool->MaxThreadCount != -1 && CurrentPool->ThreadCount >= CurrentPool->MaxThreadCount)
+			continue;
+
 		TaskPool = CurrentPool;
 		LastScheduledPoolIndex = I;
 		break;
@@ -352,6 +355,8 @@ void ZETaskManager::RemoveTask(ZETask* Task)
 		if (Task->GetStatus() == ZE_TS2_WAITING)
 			Task->Pool->QueuedTasks.Remove(&Task->Link);
 	
+		Task->Pool->ThreadCount--;
+		
 		if (Task->GetStatus() == ZE_TS2_RUNNING)
 		{
 			Task->Pool->RunningTasks.Remove(&Task->Link);

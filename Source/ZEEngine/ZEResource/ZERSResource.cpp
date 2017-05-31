@@ -315,7 +315,6 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, ZESize 
 	return ZE_TR_DONE;
 }
 
-
 void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
 {
 	MemoryUsageSelf[Pool] = Size;
@@ -449,7 +448,7 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	LoadInternalDone = false;
 	UnloadInternalDone = false;
 	ReloadFlag = false;
-	UpdateStateTask.SetPoolId(ZE_TPI_IO);
+	UpdateStateTask.SetPoolId(ZE_TPI_CONCURENT);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
 }
 
@@ -590,7 +589,6 @@ bool ZERSResource::IsLoaded() const
 {
 	return State >= ZERS_RS_LOADED;
 }
-
 
 bool ZERSResource::IsLoadedOrLoading() const
 {
