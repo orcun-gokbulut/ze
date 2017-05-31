@@ -80,6 +80,16 @@ ZEUInt ZETaskPool::GetReservedThreadCount() const
 	return ReservedThreadCount;
 }
 
+void ZETaskPool::SetMaxThreadCount(ZEUInt Count)
+{
+	MaxThreadCount = Count;
+}
+
+ZESize ZETaskPool::GetMaxThreadCount() const
+{
+	return MaxThreadCount;
+}
+
 ZETaskPool::ZETaskPool()
 {
 	Manager = NULL;
@@ -88,6 +98,8 @@ ZETaskPool::ZETaskPool()
 	ReservedThreadCount = 0;
 	RemainingReservedThreadCount = 0;
 	SchedulingPolicy = ZE_TSP_ROUND_ROBIN;
+	ThreadCount = 0;
+	MaxThreadCount = -1;
 }
 
 ZETaskPool::~ZETaskPool()

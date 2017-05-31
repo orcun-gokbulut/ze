@@ -882,6 +882,7 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	ReinitializeFlag = false;
 	SerialOperation = false;
 	LocalLoadingPercentage = 0;
+	UpdateStateTask.SetPoolId(ZE_TPI_CONCURENT);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
 
 	EntityId = 0;
