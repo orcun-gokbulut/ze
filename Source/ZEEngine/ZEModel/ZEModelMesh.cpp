@@ -829,7 +829,8 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (LODTransitionPlaying)
 	{
-		LODTransitionElapsedTime += Parameters->ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
+		float ElapsedTime = ZEMath::Min(Parameters->ElapsedTime, 16.0f);
+		LODTransitionElapsedTime += ElapsedTime * LODTransitionSpeed * LODTransitionDirection;
 
 		if (LODTransitionElapsedTime > 0.0f && LODTransitionElapsedTime < LODTransitionTime)
 		{
@@ -848,6 +849,9 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 			PrevLOD->SetOpacity(1.0f);
 			PrevLOD->SetLODTransition(false);
+
+			NextLOD->SetOpacity(1.0f);
+			NextLOD->SetLODTransition(false);
 
 			PrevLOD = CurrentLOD;
 		}
