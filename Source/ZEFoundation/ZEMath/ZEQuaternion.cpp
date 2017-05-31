@@ -202,6 +202,23 @@ static inline void Product_NOCHECK(ZEQuaternion& Output, const ZEQuaternion& A, 
 	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
 }
 
+static inline void Product_NOCHECK_D(ZEVector4d& Output, const ZEVector4d& A, const ZEVector4d& B)
+{
+	Output.w = A.w * B.w - A.x * B.x - A.y * B.y - A.z * B.z;
+	Output.x = A.w * B.x + A.x * B.w + A.y * B.z - A.z * B.y;
+	Output.y = A.w * B.y - A.x * B.z + A.y * B.w + A.z * B.x;
+	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
+}
+
+void Conjugate_D(ZEVector4d& Output, const ZEVector4d& Quaternion)
+{
+	zeDebugCheck(!Quaternion.IsValid(), "Parameter Quaternion is not valid.");
+
+	Output.x = -Quaternion.x;
+	Output.y = -Quaternion.y;
+	Output.z = -Quaternion.z;
+	Output.w = Quaternion.w;
+}
 
 void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)
 {
@@ -222,11 +239,28 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 	zeDebugCheck(!Quaternion.IsValid(), "Input Quaternion is not valid.");
 	zeDebugCheck(!Quaternion.IsNormalized(), "Input Quaternion is not normalized.");
 
-	ZEQuaternion Vect(0, Vector.x, Vector.y, Vector.z), Temp, InvQ;
+	ZEQuaternion Vect(0.0f, Vector.x, Vector.y, Vector.z), Temp, InvQ;
 	
 	Product_NOCHECK(Temp, Quaternion, Vect);	
 	Conjugate(InvQ, Quaternion);
 	Product_NOCHECK(Vect, Temp, InvQ);
+
+	Output.x = Vect.x;
+	Output.y = Vect.y;
+	Output.z = Vect.z;
+}
+
+void ZEQuaternion::VectorProduct(ZEVector3d& Output, const ZEQuaternion& Quaternion, const ZEVector3d& Vector)
+{
+	zeDebugCheck(!Quaternion.IsValid(), "Input Quaternion is not valid.");
+	zeDebugCheck(!Quaternion.IsNormalized(), "Input Quaternion is not normalized.");
+
+	ZEVector4d QuaternionD(Quaternion.x, Quaternion.y, Quaternion.z, Quaternion.w);
+	ZEVector4d Vect(Vector.x, Vector.y, Vector.z, 0.0), Temp, InvQ;
+	
+	Product_NOCHECK_D(Temp, QuaternionD, Vect);	
+	Conjugate_D(InvQ, QuaternionD);
+	Product_NOCHECK_D(Vect, Temp, InvQ);
 
 	Output.x = Vect.x;
 	Output.y = Vect.y;
@@ -525,6 +559,13 @@ ZEQuaternion& ZEQuaternion::operator*=(const ZEQuaternion& Other)
 ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 {
 	ZEVector3 Temp;
+	VectorProduct(Temp, *this, Vector);
+	return Temp;
+}
+
+ZEVector3d ZEQuaternion::operator*(const ZEVector3d& Vector) const
+{
+	ZEVector3d Temp;
 	VectorProduct(Temp, *this, Vector);
 	return Temp;
 }
