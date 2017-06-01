@@ -45,6 +45,7 @@
 
 #include <tinyxml.h>
 #include "ZEFile\ZEFileInfo.h"
+#include "ZEMath\ZEAngle.h"
 
 #define FormatError(Text) zeError(Text##" File Name: \"%s\", Element: \"%s\".", File->GetPath().ToCString(), CurrentNode->Attribute("Name") != NULL ? CurrentNode->Attribute("Name") : "Unknown")
 
@@ -640,6 +641,21 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 			if (!ReadVectors(File, Output, Members, 4))
 				return false;
 			Element.Value.SetQuaternion(*(ZEQuaternion*)Output);
+		}
+		else if (strcmp(Type, "EulerAngles") == 0)
+		{
+			Element.ValueType = ZEML_VT_QUATERNION;
+
+			static const char* Members[3] = {"x", "y", "z"};
+			float Output[3];
+			if (!ReadVectors(File, Output, Members, 3))
+				return false;
+			Output[0] = ZEAngle::ToRadian(Output[0]);
+			Output[1] = ZEAngle::ToRadian(Output[1]);
+			Output[2] = ZEAngle::ToRadian(Output[2]);
+			ZEQuaternion Quaternion;
+			ZEQuaternion::CreateFromEuler(Quaternion, *(ZEVector3*)Output);
+			Element.Value.SetQuaternion(*(ZEQuaternion*)&Quaternion);
 		}
 		else if (strcmp(Type, "Matrix3x3") == 0)
 		{

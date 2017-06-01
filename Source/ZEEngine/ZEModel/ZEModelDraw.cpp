@@ -116,7 +116,7 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 	ze_for_each(Command, SubCommands)
 	{
 		ZERNCommandDraw* CommandDraw = static_cast<ZERNCommandDraw*>(Command.GetPointer());
-		bool Instanced = CommandDraw->Instances.GetCount() > 1;
+		bool Instanced = Material->GetInstancingEnabled();
 
 		if (!Material->SetupMaterial(Context, Stage, Instanced))
 			continue;
@@ -376,6 +376,9 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 {
 	if (GetMaterial() == NULL || GetGeometry() == NULL || !GetMaterial()->IsLoaded())
 		return false;
+
+	if (!GetMaterial()->GetInstancingEnabled())
+		GetMesh()->UpdateConstantBuffer();
 
 	ZERNInstanceData InstanceData;
 	InstanceData.WorldTransform = GetMesh()->GetWorldTransform();

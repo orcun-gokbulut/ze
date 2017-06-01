@@ -790,7 +790,7 @@ float ZERNParticleMaterial::GetAlphaCullLimit() const
 	return Constants.AlphaCullLimit;
 }
 
-bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -808,7 +808,7 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	return true;
 }
 
-void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }

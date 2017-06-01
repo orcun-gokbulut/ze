@@ -412,7 +412,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 		
 		float DetailBasePixelDistance = Input.ViewDistance - ZERNFixedMaterial_DetailBaseMapAttenuationStart;
 		float DetailBaseAttenuation = saturate(1.0f /  (1.0f + DetailBasePixelDistance * ZERNFixedMaterial_DetailBaseMapAttenuationFactor));
-    
+
 		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
 	#endif
 	

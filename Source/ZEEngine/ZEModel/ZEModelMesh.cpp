@@ -136,6 +136,14 @@ void ZEModelMesh::TransformChangedWorld()
 		ChildMesh->TransformChangedWorld();
 }
 
+void ZEModelMesh::VisibilityChanged()
+{
+	PrevLOD = NULL;
+	NextLOD = NULL;
+	LODTransitionPlaying = false;
+	LODTransitionElapsedTime = 0.0f;
+}
+
 void ZEModelMesh::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZEMD_MDF_CONSTANT_BUFFER))
@@ -786,7 +794,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			return false;
 	}
 
-	UpdateConstantBuffer();
+	//UpdateConstantBuffer();
 	Model->UpdateConstantBufferBoneTransforms();
 	
 	DrawOrder = FLT_MAX;
@@ -814,7 +822,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (PrevLOD == NULL)
 		PrevLOD = CurrentLOD;
-	
+
 	float LODTransitionDirection = 1.0f;
 	
 	if (CurrentLOD != PrevLOD)

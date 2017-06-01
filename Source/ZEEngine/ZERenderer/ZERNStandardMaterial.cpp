@@ -2006,7 +2006,7 @@ bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 	return true;
 }
 
-bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	zeDebugCheck(Instanced && SkinningEnabled, "Cannot setup skinned material for instanced draw");
 
@@ -2046,7 +2046,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	{
 		Context->SetRenderState(Instanced ? StageShadowmapGeneration_Instancing_RenderState : StageShadowmapGeneration_RenderState);
 
-		if (AlphaCullEnabled)
+		if (AlphaCullEnabled || LODTransitionEnabled)
 		{
 			if (OpacityMapEnabled)
 				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
@@ -2058,7 +2058,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	{
 		Context->SetRenderState(Instanced ? StageRenderDepth_Instancing_RenderState : StageRenderDepth_RenderState);
 
-		if (AlphaCullEnabled)
+		if (AlphaCullEnabled || LODTransitionEnabled)
 		{
 			if (OpacityMapEnabled)
 				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
@@ -2070,7 +2070,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	return true;
 }
 
-void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }

@@ -984,3 +984,10 @@ void ZED11Context::EndEvent()
 		UnlockContext();
 	}
 }
+
+void ZED11Context::SetMarker(const ZEString& Name)
+{
+	LockContext();
+	D3DPERF_SetMarker(D3DCOLOR_XRGB(ZERandom::GetUInt8(), ZERandom::GetUInt8(), ZERandom::GetUInt8()), Name.ToWCString());
+	UnlockContext();
+}
