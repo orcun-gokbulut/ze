@@ -2196,7 +2196,8 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
 
 	SetMaxTextureLOD(PropertiesNode.ReadUInt8("MaxTextureLOD", 0));
-	
+	SetInstancingEnabled(PropertiesNode.ReadBoolean("InstancingEnabled"));
+
 	SetGUID(ZEGUID::FromString(MaterialNode->ReadString("GUID")));
 	SetName(PropertiesNode.ReadString("Name"));
 	SetShadowCaster(PropertiesNode.ReadBoolean("ShadowCaster", false));

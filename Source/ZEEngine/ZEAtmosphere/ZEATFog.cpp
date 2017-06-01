@@ -240,7 +240,12 @@ bool ZEATFog::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	Parameters->Renderer->AddCommand(&Command);
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

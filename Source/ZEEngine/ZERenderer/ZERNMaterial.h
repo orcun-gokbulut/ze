@@ -48,6 +48,7 @@ class ZERNMaterial : public ZERSResource
 	protected:
 		ZEGUID										GUID;
 		ZEString									Name;
+		bool										InstancingEnabled;
 
 		static ZEClass*								DetermineClass(const ZEString& FileName);
 		static ZERSResource*						Instanciator(const void* Params);
@@ -61,6 +62,9 @@ class ZERNMaterial : public ZERSResource
 
 		void										SetName(const ZEString& Name);
 		const ZEString&								GetName() const;
+
+		void										SetInstancingEnabled(bool Enabled);
+		bool										GetInstancingEnabled() const;
 
 		virtual ZEUInt								GetStageMask() const = 0;
 

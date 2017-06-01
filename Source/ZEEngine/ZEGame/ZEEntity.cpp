@@ -1357,6 +1357,29 @@ ZEVector3 ZEEntity::GetWorldScale() const
 	return GetScale();
 }
 
+void ZEEntity::SetTransform(const ZEMatrix4x4& Transform)
+{
+	this->Position = Transform.GetTranslation();
+	this->Rotation = Transform.GetRotation();
+	this->Scale = Transform.GetScale();
+
+	LocalTransformChanged();
+}
+
+void ZEEntity::SetWorldTransform(const ZEMatrix4x4& Transform)
+{
+	if (Parent != NULL)
+	{
+		ZEMatrix4x4 Result;
+		ZEMatrix4x4::Multiply(Result, Parent->GetInvWorldTransform(), Transform);
+		SetTransform(Result);
+	}
+	else
+	{
+		SetTransform(Transform);
+	}
+}
+
 ZEVector3 ZEEntity::GetFront() const
 {
 	return Rotation * ZEVector3::UnitZ;

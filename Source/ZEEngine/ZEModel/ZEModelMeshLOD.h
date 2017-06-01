@@ -76,6 +76,11 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		ZESize										IndexOffset;
 		ZESize										IndexCount;
 
+		ZEVector3									Color;
+		float										Opacity;
+		bool										LODTransition;
+		bool										DirtyDraws;
+
 		ZEArray<ZEModelDraw>						Draws;
 		
 		const ZEMDResourceLOD*						Resource;
@@ -120,6 +125,17 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 
 		void										SetIndexCount(ZESize Count);
 		ZESize										GetIndexCount() const;
-		
+
+		void										SetColor(const ZEVector3& Color);
+		const ZEVector3&							GetColor() const;
+
+		void										SetOpacity(float Opacity);
+		float										GetOpacity() const;
+
+		void										SetLODTransition(bool LODTransition);
+		bool										GetLODTransition() const;
+
+		bool										PreRender(const ZERNPreRenderParameters* PreRenderParameters);
+
 		static ZEModelMeshLOD*						CreateInstance();
 };

@@ -216,6 +216,7 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 	AnimationType = ZE_MAT_NOANIMATION;
 	CustomDrawOrderEnabled = false;
 	CustomDrawOrder = 0;
+	DrawOrder = 0.0f;
 
 	Resource = NULL;
 }
@@ -793,7 +794,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			return false;
 	}
 
-	float DrawOrder = FLT_MAX;
+	DrawOrder = FLT_MAX;
 	for (ZEUInt I = 0; I < 8; I++)
 		DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
 
@@ -818,12 +819,12 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (PrevLOD == NULL)
 	{
-		if (!GetModel()->LODTransitionOnVisible)
+		if (!GetModel()->GetLODTransitionOnVisible())
 			PrevLOD = CurrentLOD;
 	}
 
 	float LODTransitionDirection = 1.0f;
-
+	
 	if (CurrentLOD != PrevLOD)
 	{
 		LODTransitionPlaying = true;
@@ -842,46 +843,24 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		if (LODTransitionElapsedTime > 0.0f && LODTransitionElapsedTime < LODTransitionTime)
 		{
 			float PrevLODOpacity = ZEMath::Lerp(1.0f, 0.0f, LODTransitionElapsedTime / LODTransitionTime);
-
+	
 			if (PrevLOD != NULL)
 			{
-				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(PrevLODOpacity);
-				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(true);
+				PrevLOD->SetOpacity(PrevLODOpacity);
+				PrevLOD->SetLODTransition(true);
 
-				ze_for_each(Draw, PrevLOD->GetDraws())
-				{
-					Draw->RenderCommand.Entity = GetModel();
-					Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-					Draw->RenderCommand.Order = DrawOrder;
-					Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
-
-					if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-						continue;
-
-					Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-				}
+				PrevLOD->PreRender(Parameters);
 			}
 
 			if (NextLOD != NULL)
 			{
-				if (PrevLOD == NULL && GetModel()->LODTransitionOnVisible)
+				if (PrevLOD == NULL && GetModel()->GetLODTransitionOnVisible())
 				{
-					const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetOpacity(1.0f - PrevLODOpacity);
-					const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetLODTransition(true);
+					NextLOD->SetOpacity(1.0f - PrevLODOpacity);
+					NextLOD->SetLODTransition(true);
 				}
 
-				ze_for_each(Draw, NextLOD->GetDraws())
-				{
-					Draw->RenderCommand.Entity = GetModel();
-					Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-					Draw->RenderCommand.Order = DrawOrder;
-					Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
-
-					if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-						continue;
-
-					Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-				}
+				NextLOD->PreRender(Parameters);
 			}
 		}
 		else
@@ -891,14 +870,14 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 			if (PrevLOD != NULL)
 			{
-				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetOpacity(1.0f);
-				const_cast<ZEModelDraw&>(PrevLOD->GetDraws()[0]).SetLODTransition(false);
+				PrevLOD->SetOpacity(1.0f);
+				PrevLOD->SetLODTransition(false);
 			}
 
 			if (NextLOD != NULL)
 			{
-				const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetOpacity(1.0f);
-				const_cast<ZEModelDraw&>(NextLOD->GetDraws()[0]).SetLODTransition(false);
+				NextLOD->SetOpacity(1.0f);
+				NextLOD->SetLODTransition(false);
 			}
 
 			PrevLOD = CurrentLOD;
@@ -906,20 +885,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	}
 
 	if (!LODTransitionPlaying)
-	{
-		ze_for_each(Draw, CurrentLOD->GetDraws())
-		{
-			Draw->RenderCommand.Entity = GetModel();
-			Draw->RenderCommand.Priority = CustomDrawOrderEnabled ? CustomDrawOrder : 0;
-			Draw->RenderCommand.Order = DrawOrder;
-			Draw->RenderCommand.InstanceTag = Draw->GetInstanceTag();
-
-			if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->PreRender(Draw->RenderCommand))
-				continue;
-
-			Parameters->Renderer->AddCommand(&Draw->RenderCommand);
-		}
-	}
+		CurrentLOD->PreRender(Parameters);
 
 	return true;
 }

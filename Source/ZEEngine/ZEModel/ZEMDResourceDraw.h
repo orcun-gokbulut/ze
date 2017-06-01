@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEPointer/ZEHolder.h"
 
+class ZERNGeometry;
 class ZERNMaterial;
 class ZEMDResourceLOD;
 class ZEMLReaderNode;
@@ -55,8 +56,10 @@ class ZEMDResourceDraw : public ZEObject
 		ZESize							VertexCount;
 		ZESize							IndexOffset;
 		ZESize							IndexCount;
+		mutable ZEHolder<ZERNGeometry>	Geometry;
 		ZEHolder<const ZERNMaterial>	Material;
 		ZEString						MaterialFileName;
+		mutable ZELock					GeometryLock;
 
 	public:
 		void							SetVertexOffset(ZESize Offset);
@@ -76,6 +79,8 @@ class ZEMDResourceDraw : public ZEObject
 
 		void							SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>	GetMaterial() const;
+
+		ZEHolder<const ZERNGeometry>	GetGeometry() const;
 
 		bool							Unserialize(ZEMLReaderNode& DrawNode);
 		bool							Serialize(ZEMLWriterNode& DrawNode) const;

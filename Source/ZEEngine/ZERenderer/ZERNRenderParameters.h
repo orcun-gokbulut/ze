@@ -45,6 +45,8 @@ ZEMT_FORWARD_DECLARE(ZERNStage);
 ZEMT_FORWARD_DECLARE(ZERNCommand);
 ZEMT_FORWARD_DECLARE(ZERNView);
 
+class ZERNCommandList;
+
 ZE_ENUM(ZERNRenderType)
 {
 	ZERN_RT_COLOR,
@@ -82,6 +84,7 @@ class ZERNPreRenderParameters : public ZEObject
 		const ZERNView*				View;
 		ZERNRenderType				Type;
 		ZERNRenderFlags				Flags;
+		ZERNCommandList*			CommandList;
 
 		void						UpdateTime();
 
