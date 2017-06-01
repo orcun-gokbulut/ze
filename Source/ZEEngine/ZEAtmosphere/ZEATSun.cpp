@@ -263,6 +263,9 @@ bool ZEATSun::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
 	const ZERNView& View = *Parameters->View;
 
 	ZEVector2 SunPositionScreen;
@@ -282,7 +285,9 @@ bool ZEATSun::PreRender(const ZERNPreRenderParameters* Parameters)
 		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
 	}
 
-	Parameters->Renderer->AddCommand(&Command);
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

@@ -113,7 +113,9 @@ bool ZELightPoint::PreRender(const ZERNPreRenderParameters* Parameters)
 	Command.FalloffExponent = GetFalloffExponent();
 	Command.StageMask = ZERN_STAGE_LIGHTING;
 
-	Parameters->Renderer->AddCommand(&Command);
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

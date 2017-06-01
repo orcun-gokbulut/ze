@@ -270,7 +270,12 @@ bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (SkyTexture == NULL || !SkyTexture->IsLoaded())
 		return false;
 
-	Parameters->Renderer->AddCommand(&SkyRenderCommand);
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
+	//Parameters->Renderer->AddCommand(&SkyRenderCommand);
+	SkyRenderCommand.Reset();
+	Parameters->CommandList->AddCommand(&SkyRenderCommand);
 
 	return true;
 }

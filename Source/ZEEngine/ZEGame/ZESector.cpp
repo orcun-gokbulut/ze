@@ -114,7 +114,7 @@ ZEEntityResult ZESector::LoadInternal()
 
 		ZEString VegetationClassName = "ZETIVegetation";
 
-		/*if (NewChildEntityClass->GetName() == VegetationClassName)
+		if (NewChildEntityClass->GetName() == VegetationClassName)
 		{
 			ZEMLReaderNode PropertiesNode = ChildEntityNode.GetNode("Properties");
 			ZEInt32 VegetationType = PropertiesNode.ReadInt32("Type");
@@ -127,7 +127,7 @@ ZEEntityResult ZESector::LoadInternal()
 			if (VegetationReductionCount % 4 != 0)
 				continue;
 
-		}*/
+		}
 
 		ZEEntity* NewChildEntity = static_cast<ZEEntity*>(NewChildEntityClass->CreateInstance());
 

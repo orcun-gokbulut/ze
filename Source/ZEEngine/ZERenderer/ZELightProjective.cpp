@@ -244,7 +244,9 @@ bool ZELightProjective::PreRender(const ZERNPreRenderParameters* Parameters)
 	Command.ShadowNormalBias = GetShadowNormalBias();
 	Command.StageMask = ZERN_STAGE_LIGHTING | (GetCastsShadow() ? ZERN_STAGE_SHADOWING : 0);
 	
-	Parameters->Renderer->AddCommand(&Command);
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }

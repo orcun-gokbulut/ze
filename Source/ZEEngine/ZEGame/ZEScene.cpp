@@ -108,6 +108,9 @@ ZETaskResult ZEScene::PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize I
 	};
 	ZETaskParameters* TaskParameters = static_cast<ZETaskParameters*>(Parameters);
 	
+	ZERNPreRenderParameters PreRenderParameters = *TaskParameters->Parameters;
+	PreRenderParameters.CommandList = PreRenderParameters.Renderer->GetCommandList();
+
 	while (true)
 	{
 		ZEEntity* Entity = TaskParameters->Iterator->NextItem();
@@ -115,7 +118,7 @@ ZETaskResult ZEScene::PreRenderEntityTaskFunction(ZETaskThread* Thread, ZESize I
 		if (Entity == NULL)
 			return ZE_TR_STOP_INSTANCING;
 	
-		PreRenderEntity(Entity, TaskParameters->Parameters);
+		PreRenderEntity(Entity, &PreRenderParameters);
 	}
 
 	return ZE_TR_DONE;
@@ -768,19 +771,21 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 			ZEList2IteratorAtomic<ZEEntity, ZELockRW>* Iterator;
 			const ZERNPreRenderParameters* Parameters;
 		} TaskParameters;
-
+		
 		TaskParameters.Iterator = &RenderList.GetIteratorAtomic();
 		TaskParameters.Parameters = Parameters;
 		PreRenderTask.SetParameter(&TaskParameters);
 		PreRenderTask.SetPoolId(ZE_TPI_REAL_TIME);
-		/*ze_for_each(Entity, RenderList)
-		{
-			if (PreRenderEntity(Entity.GetPointer(), Parameters))
-				RenderedEntity++;
-			else
-				ViewTestCulledEntity++;
-		}*/
 		PreRenderTask.RunInstanced();
+
+		//const_cast<ZERNPreRenderParameters*>(Parameters)->CommandList = Parameters->Renderer->GetCommandList();
+		//ze_for_each(Entity, RenderList)
+		//{
+		//	if (PreRenderEntity(Entity.GetPointer(), Parameters))
+		//		RenderedEntity++;
+		//	else
+		//		ViewTestCulledEntity++;
+		//}
 
 		ViewTestCullRatio = (float)ViewTestCulledEntity / (float)RenderList.GetCount();
 

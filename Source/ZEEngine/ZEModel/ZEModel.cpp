@@ -106,7 +106,7 @@ void ZEModel::CalculateBoundingBox() const
 
 void ZEModel::UpdateConstantBufferBoneTransforms()
 {
-	if (!DirtyConstantBufferSkin)
+	if (!DirtyConstantBufferSkin || Bones.GetCount() == 0)
 		return;
 
 	if (ConstantBufferBoneTransforms == NULL)
@@ -154,10 +154,10 @@ void ZEModel::LocalTransformChanged()
 	ZEEntity::LocalTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedModel();
+		Bone->TransformChangedWorld();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedModel();
+		Mesh->TransformChangedWorld();
 	
 	BoundingBoxChanged();
 }
@@ -167,10 +167,10 @@ void ZEModel::ParentTransformChanged()
 	ZEEntity::ParentTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedModel();
+		Bone->TransformChangedWorld();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedModel();
+		Mesh->TransformChangedWorld();
 
 	BoundingBoxChanged();
 }

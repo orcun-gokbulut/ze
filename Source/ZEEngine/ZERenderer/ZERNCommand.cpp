@@ -37,18 +37,6 @@
 
 #include "ZEGame\ZEEntity.h"
 
-void ZERNCommand::PushInstances()
-{
-	InstancesPrevious.Clear();
-	InstancesPrevious.MergeEnd(Instances);
-}
-
-void ZERNCommand::PopInstances()
-{
-	Instances.Clear();
-	Instances.MergeEnd(InstancesPrevious);
-}
-
 ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
 {
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
@@ -59,6 +47,31 @@ ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
 	return NULL;
 }
 
+bool ZERNCommand::AddSubCommand(ZERNCommand* Command)
+{
+	return false;
+}
+
+void ZERNCommand::Reset()
+{
+	zeCheckError(Link.GetInUse(), ZE_VOID, "Instancelink in use");
+
+	SubCommands.AddBegin(&Link);
+}
+
+void ZERNCommand::Clear()
+{
+	ze_for_each(Command, SubCommands)
+	{
+		if (Command.GetPointer() == this)
+			continue;
+	
+		Command->Clear();
+	}
+	
+	SubCommands.Clear();
+}
+
 void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 {
 	if (!Callback.IsNull())
@@ -67,7 +80,7 @@ void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 		Entity->Render(Parameters, this);
 }
 
-ZERNCommand::ZERNCommand()
+ZERNCommand::ZERNCommand() : Link(this)
 {
 	Entity = NULL;
 	Priority = 0;
@@ -75,8 +88,54 @@ ZERNCommand::ZERNCommand()
 	SceneIndex = 0;
 	StageMask = 0;
 	ExtraParameters = NULL;
-	InstanceTag = NULL;
 
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_LINK; I++)
 		new (&Links[I]) ZELink<ZERNCommand>(this);
+}
+
+void ZERNCommandList::AddCommand(ZERNCommand* Command)
+{
+	bool GroupFound = false;
+	ze_for_each(DestCmd, CommandList)
+	{
+		zeCheckError(DestCmd.GetPointer() == Command, ZE_VOID, "Duplicated commands have been detected");
+
+		if (DestCmd->AddSubCommand(Command))
+		{
+			GroupFound = true;
+			break;
+		}
+	}
+
+	if (!GroupFound)
+		this->CommandList.AddBegin(Command->GetFreeLink());
+}
+
+void ZERNCommandList::AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList)
+{
+	ze_for_each(SrcCmd, CommandList)
+	{
+		bool GroupFound = false;
+		ze_for_each(DestCmd, this->CommandList)
+		{
+			zeCheckError(DestCmd.GetPointer() == SrcCmd.GetPointer(), ZE_VOID, "Duplicated commands have been detected");
+
+			if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
+			{
+				GroupFound = true;
+				break;
+			}
+		}
+
+		if (!GroupFound)
+			this->CommandList.AddBegin(SrcCmd->GetFreeLink());
+	}
+}
+
+void ZERNCommandList::Clear()
+{
+	ze_for_each(Cmd, CommandList)
+		Cmd->Clear();
+
+	CommandList.Clear();
 }

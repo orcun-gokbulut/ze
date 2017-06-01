@@ -37,11 +37,11 @@
 
 #include "ZEMeta/ZEObject.h"
 
+#include "ZEDS/ZEList2.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZERNInstanceTag.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 class ZEModel;
 class ZEModelMesh;
@@ -49,39 +49,34 @@ class ZEModelMeshLOD;
 class ZEModelDraw;
 class ZEMDResourceDraw;
 class ZEGRBuffer;
+class ZERNPreRenderParameters;
+class ZERNRenderParameters;
 
+ZEMT_FORWARD_DECLARE(ZERNGeometry);
 ZEMT_FORWARD_DECLARE(ZERNMaterial);
 
 class ZERNCommandDraw : public ZERNCommand
 {
 	ZE_OBJECT
-	public:
-		ZEHolder<ZEGRBuffer>	VertexBuffer;
-		ZEHolder<ZEGRBuffer>	IndexBuffer;
-		ZEHolder<ZERNMaterial>	Material;
-
-		ZEVector3				Position;
-		ZEQuaternion			Rotation;
-		ZEVector3				Scale;
-
-		ZEVector4				Color;
-		bool					LODTransition;
-		bool					Instanced;
-		bool					DirtyTransform;
-};
-
-class ZEMDInstanceTag : public ZERNInstanceTag
-{
-	ZE_OBJECT
-	friend class ZEModelDraw;
 	private:
-		ZEModelDraw*								Draw;
-		bool										Dirty;
-
-		bool										Update();
+		ZELink<ZERNCommandDraw>			InstanceLink;
+		ZEList2<ZERNCommandDraw>		Instances;
 
 	public:
-		virtual bool								Check(const ZERNInstanceTag* Other) const;
+		ZEHolder<const ZERNMaterial>	Material;
+		ZEHolder<const ZERNGeometry>	Geometry;
+		ZEHolder<const ZEGRBuffer>		TransformConstantBuffer;
+		ZEHolder<const ZEGRBuffer>		DrawConstantBuffer;
+		ZEHolder<const ZEGRBuffer>		BoneConstantBuffer;
+
+		ZERNInstanceData				InstanceData;
+
+		virtual bool					AddSubCommand(ZERNCommand* Command) override;
+		virtual void					Reset() override;
+		virtual void					Clear() override;
+		virtual void					Execute(const ZERNRenderParameters* RenderParameters) override;
+
+										ZERNCommandDraw();
 };
 
 class ZEModelDraw : public ZEObject
@@ -96,14 +91,18 @@ class ZEModelDraw : public ZEObject
 		ZEUInt32									VertexCount;
 		ZEUInt32									IndexOffset;
 		ZEUInt32									IndexCount;
+		ZEHolder<const ZERNGeometry>				Geometry;
 		ZEHolder<const ZERNMaterial>				Material;
-		mutable ZERNCommand							RenderCommand;
-		mutable ZEMDInstanceTag						InstanceTag;
-		bool										DirtyConstants;
+		ZERNCommandDraw								RenderCommand;
+		ZERNCommandDraw								RenderCommandShadow;
+		mutable bool								DirtyConstants;
 		
-		ZEHolder<ZEGRBuffer>						ConstantBuffer;
+		mutable ZEHolder<ZEGRBuffer>				ConstantBuffer;
 
-		struct
+		ZEVector3									Color;
+		float										Opacity;
+
+		mutable struct
 		{
 			ZEVector3								Color;
 			float									Opacity;
@@ -114,10 +113,6 @@ class ZEModelDraw : public ZEObject
 
 		bool										Load(const ZEMDResourceDraw* Resource);
 		bool										Unload();
-
-		const ZEMDInstanceTag*						GetInstanceTag() const;
-
-		void										SetLOD(ZEModelMeshLOD* LOD);
 
 	public:
 		ZEModel*									GetModel();
@@ -147,14 +142,16 @@ class ZEModelDraw : public ZEObject
 		void										SetOpacity(float Opacity);
 		float										GetOpacity() const;
 
-		void										SetLODTransition(bool LODTransition);
-		bool										GetLODTransition() const;
-
 		void										SetMaterial(const ZERNMaterial* Material);
 		const ZERNMaterial*							GetMaterial() const;
 		void										ResetMaterial();
 
-		void										Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		void										SetGeometry(const ZERNGeometry* Geometry);
+		const ZERNGeometry*							GetGeometry() const;
+
+		const ZEGRBuffer*							GetConstantBuffer() const;
+
+		bool										PreRender(const ZERNPreRenderParameters* PreRenderParameters);
 
 													ZEModelDraw();
 		virtual										~ZEModelDraw();

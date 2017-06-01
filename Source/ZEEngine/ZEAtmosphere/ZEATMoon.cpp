@@ -271,6 +271,9 @@ bool ZEATMoon::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (PhaseTexture == NULL || !PhaseTexture->IsLoaded())
 		return false;
 
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
 	const ZERNView& View = *Parameters->View;
 
 	ZEVector2 MoonPositionScreen;
@@ -290,7 +293,9 @@ bool ZEATMoon::PreRender(const ZERNPreRenderParameters* Parameters)
 		DirtyFlags.RaiseFlags(ZEAT_MDF_CONSTANT_BUFFERS);
 	}
 
-	Parameters->Renderer->AddCommand(&Command);
+	//Parameters->Renderer->AddCommand(&Command);
+	Command.Reset();
+	Parameters->CommandList->AddCommand(&Command);
 
 	return true;
 }
