@@ -794,9 +794,6 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 			return false;
 	}
 
-	//UpdateConstantBuffer();
-	Model->UpdateConstantBufferBoneTransforms();
-	
 	DrawOrder = FLT_MAX;
 	for (ZEUInt I = 0; I < 8; I++)
 		DrawOrder = ZEMath::Min(ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldBoundingBox().GetVertex(I)), DrawOrder);
@@ -821,7 +818,10 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	}
 
 	if (PrevLOD == NULL)
-		PrevLOD = CurrentLOD;
+	{
+		if (!GetModel()->GetLODTransitionOnVisible())
+			PrevLOD = CurrentLOD;
+	}
 
 	float LODTransitionDirection = 1.0f;
 	
@@ -844,22 +844,41 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		{
 			float PrevLODOpacity = ZEMath::Lerp(1.0f, 0.0f, LODTransitionElapsedTime / LODTransitionTime);
 	
-			PrevLOD->SetOpacity(PrevLODOpacity);
-			PrevLOD->SetLODTransition(true);
+			if (PrevLOD != NULL)
+			{
+				PrevLOD->SetOpacity(PrevLODOpacity);
+				PrevLOD->SetLODTransition(true);
 
-			PrevLOD->PreRender(Parameters);
-			NextLOD->PreRender(Parameters);
+				PrevLOD->PreRender(Parameters);
+			}
+
+			if (NextLOD != NULL)
+			{
+				if (PrevLOD == NULL && GetModel()->GetLODTransitionOnVisible())
+				{
+					NextLOD->SetOpacity(1.0f - PrevLODOpacity);
+					NextLOD->SetLODTransition(true);
+				}
+
+				NextLOD->PreRender(Parameters);
+			}
 		}
 		else
 		{
 			LODTransitionPlaying = false;
 			LODTransitionElapsedTime = 0.0f;
 
-			PrevLOD->SetOpacity(1.0f);
-			PrevLOD->SetLODTransition(false);
+			if (PrevLOD != NULL)
+			{
+				PrevLOD->SetOpacity(1.0f);
+				PrevLOD->SetLODTransition(false);
+			}
 
-			NextLOD->SetOpacity(1.0f);
-			NextLOD->SetLODTransition(false);
+			if (NextLOD != NULL)
+			{
+				NextLOD->SetOpacity(1.0f);
+				NextLOD->SetLODTransition(false);
+			}
 
 			PrevLOD = CurrentLOD;
 		}

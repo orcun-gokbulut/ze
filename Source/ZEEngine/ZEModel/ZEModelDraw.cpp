@@ -118,7 +118,7 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 		ZERNCommandDraw* CommandDraw = static_cast<ZERNCommandDraw*>(Command.GetPointer());
 		bool Instanced = Material->GetInstancingEnabled();
 
-		if (!Material->SetupMaterial(Context, Stage, Instanced))
+		if (!Material->SetupMaterial(Context, Stage, Instanced, (bool)CommandDraw->InstanceData.DrawLODTransition.w))
 			continue;
 
 		ZEUInt InstanceOffset = 0;
@@ -379,6 +379,9 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 
 	if (!GetMaterial()->GetInstancingEnabled())
 		GetMesh()->UpdateConstantBuffer();
+
+	if (GetLOD()->GetVertexType() == ZEMD_VT_SKINNED)
+		GetModel()->UpdateConstantBufferBoneTransforms();
 
 	ZERNInstanceData InstanceData;
 	InstanceData.WorldTransform = GetMesh()->GetWorldTransform();
