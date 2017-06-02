@@ -154,6 +154,7 @@ class ZERNStandardMaterial : public ZERNMaterial
 			float										DetailNormalMapAttenuationFactor;
 		} Constants;
 
+		bool											AlphaToCoverageEnabled;
 		ZEUInt8											MaxTextureLOD;
 		bool											ShadowCaster;
 		bool											TwoSided;
@@ -226,6 +227,9 @@ class ZERNStandardMaterial : public ZERNMaterial
 
 		void											SetSampler(const ZEHolder<ZEGRSampler>& Sampler);
 		const ZEHolder<ZEGRSampler>&					GetSampler() const;
+
+		void											SetAlphaToCoverageEnabled(bool Enabled);
+		bool											GetAlphaToCoverageEnabled() const;
 
 		void											SetMaxTextureLOD(ZEUInt8 MaxTextureLOD);
 		ZEUInt8											GetMaxTextureLOD() const;
