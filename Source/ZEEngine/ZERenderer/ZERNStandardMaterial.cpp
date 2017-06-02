@@ -302,7 +302,7 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	{
 		RenderState = ZERNStageGBuffer::GetRenderState();
 
-		if (AlphaCullEnabled)
+		if (AlphaCullEnabled && AlphaToCoverageEnabled)
 		{
 			ZEGRBlendState BlendState;
 			BlendState.SetAlphaToCoverageEnable(true);
@@ -382,7 +382,7 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
-	if (AlphaCullEnabled)
+	if (AlphaCullEnabled && AlphaToCoverageEnabled)
 	{
 		ZEGRBlendState BlendState;
 		BlendState.SetAlphaToCoverageEnable(true);
@@ -539,6 +539,7 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 
 	UseInteriorVertexLayout = false;
 
+	AlphaToCoverageEnabled = false;
 	MaxTextureLOD = 0;
 	ShadowCaster = true;
 	TwoSided = false;
@@ -636,6 +637,21 @@ void ZERNStandardMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
 const ZEHolder<ZEGRSampler>& ZERNStandardMaterial::GetSampler() const
 {
 	return Sampler;
+}
+
+void ZERNStandardMaterial::SetAlphaToCoverageEnabled(bool Enabled)
+{
+	if (AlphaToCoverageEnabled == Enabled)
+		return;
+
+	AlphaToCoverageEnabled = Enabled;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
+}
+
+bool ZERNStandardMaterial::GetAlphaToCoverageEnabled() const
+{
+	return AlphaToCoverageEnabled;
 }
 
 void ZERNStandardMaterial::SetMaxTextureLOD(ZEUInt8 MaxTextureLOD)
@@ -2190,7 +2206,8 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 		PropertiesNode = MaterialNode->GetNode("Properties");
 	
 	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
-
+	
+	SetAlphaToCoverageEnabled(PropertiesNode.ReadBoolean("AlphaToCoverageEnabled"));
 	SetMaxTextureLOD(PropertiesNode.ReadUInt8("MaxTextureLOD", 0));
 	SetInstancingEnabled(PropertiesNode.ReadBoolean("InstancingEnabled"));
 
