@@ -153,12 +153,7 @@ const void* ZEGRBlendState::GetData() const
 
 ZESize ZEGRBlendState::GetDataSize() const
 {
-	if (!StateData.BlendEnable)
-		return sizeof(StateData.BlendEnable);
-	else if (!StateData.IndividualBlendEnable)
-		return offsetof(ZEGRBlendStateData, RenderTargets[1]);
-	else
-		return sizeof(StateData);
+	return sizeof(StateData);
 }
 
 void ZEGRBlendState::SetBlendEnable(bool Enable)

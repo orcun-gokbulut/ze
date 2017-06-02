@@ -387,9 +387,10 @@ ID3D11BlendState* ZED11StatePool::CreateBlendState(const ZEGRBlendState& BlendSt
 	D3D11_BLEND_DESC BlendDesc;
 	memset(&BlendDesc, 0, sizeof(D3D11_BLEND_DESC));
 
+	BlendDesc.AlphaToCoverageEnable = BlendState.GetAlphaToCoverageEnable();
+
 	if (!BlendState.GetBlendEnable())
 	{
-		BlendDesc.AlphaToCoverageEnable = FALSE;
 		BlendDesc.IndependentBlendEnable = FALSE;
 		BlendDesc.RenderTarget[0].BlendEnable = FALSE;
 		BlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -405,7 +406,6 @@ ID3D11BlendState* ZED11StatePool::CreateBlendState(const ZEGRBlendState& BlendSt
 	else
 	{
 		BlendDesc.IndependentBlendEnable = BlendState.GetIndividualBlendEnable();
-		BlendDesc.AlphaToCoverageEnable = BlendState.GetAlphaToCoverageEnable();
 
 		ZESize RenderTargetCount = (!BlendState.GetIndividualBlendEnable() ? 1 : ZEGR_MAX_RENDER_TARGET_SLOT);
 		for (ZESize I = 0; I < RenderTargetCount; I++)

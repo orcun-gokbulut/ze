@@ -382,15 +382,11 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
-	if (TransparencyEnabled)
+	if (AlphaCullEnabled)
 	{
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthWriteEnable(false);
-		DepthStencilState.SetStencilTestEnable(true);
-		DepthStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
-		DepthStencilState.SetBackStencilPass(ZEGR_SO_REPLACE);
-
-		RenderState.SetDepthStencilState(DepthStencilState);
+		ZEGRBlendState BlendState;
+		BlendState.SetAlphaToCoverageEnable(true);
+		RenderState.SetBlendState(BlendState);
 	}
 
 	RasterizerState = RenderState.GetRasterizerState();
