@@ -486,6 +486,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		Input.PrevPosition.xy /= Input.PrevPosition.z;
 		
 		ZERNGBuffer GBuffer = (ZERNGBuffer)0;
+		ZERNGBuffer_SetAlphaToCoverage(GBuffer, Surface.Opacity);
 		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient + Surface.Emissive);
 		ZERNGBuffer_SetViewNormal(GBuffer, Surface.NormalView);
 		ZERNGBuffer_SetSpecularColor(GBuffer, Surface.Specular);
@@ -548,7 +549,7 @@ ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapG
 // SHADOW MAP GENERATION STAGE - PIXEL SHADER FOR ALPHA TEST
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMaterial_ShadowMapGenerationStage_PSInput Input)
+float4 ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMaterial_ShadowMapGenerationStage_PSInput Input) : SV_Target0
 {
 	float Alpha = ZERNFixedMaterial_Opacity;
 	#ifdef ZERN_FM_DEPTH_PREPASS
@@ -587,6 +588,8 @@ void ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMateri
 	#if defined ZERN_FM_ALPHA_CULL
 		clip(Alpha - ZERNFixedMaterial_AlphaCullLimit);
 	#endif
+	
+	return float4(0.0f, 0.0f, 0.0f, Alpha);
 }
 
 #endif
