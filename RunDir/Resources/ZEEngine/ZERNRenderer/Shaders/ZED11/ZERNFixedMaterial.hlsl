@@ -377,6 +377,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 		#endif
 	#endif
 	
+	Input.Normal = (Input.IsFrontFace) ? Input.Normal : -Input.Normal;
 	float3 Normal = normalize(Input.Normal);
 	float3 Tangent = normalize(Input.Tangent);
 	float3 Binormal = normalize(Input.Binormal);
@@ -462,7 +463,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	#ifdef ZERN_FM_FORWARD
 		Surface.PositionView = Input.PositionView;
 	#endif
-	Surface.NormalView = (Input.IsFrontFace) ? Normal : -Normal;
+	Surface.NormalView = Normal;
 	Surface.Diffuse = DiffuseColor;
 	Surface.SubsurfaceScattering = SubsurfaceScattering;
 	Surface.Specular = SpecularColor;
