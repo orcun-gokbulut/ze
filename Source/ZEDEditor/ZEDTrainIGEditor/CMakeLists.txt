@@ -49,8 +49,8 @@ ze_add_source(ZEDTIVegetationWrapper.h					Sources ZEMC)
 ze_add_library(TARGET ZEDTrainIGEditor 
 	ZEMC ${ZEMC}
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
-	LIBS ZEFoundation ZEDCore ZEDUserInterface ZETrainIG)
+	LIBS ZEFoundation ZEDCore ZEDUserInterface ZETrainIG-Module)
 
-ze_meta_register(LIBS ZETrainIG-Module)
+ze_meta_register(LIBS ZETrainIGModule)
 
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

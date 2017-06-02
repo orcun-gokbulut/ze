@@ -68,6 +68,8 @@ ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	ZELCLicenseManager Manager;
 	Manager.LoadLicenses();
 	const ZELCLicense* License = Manager.RequestLicense("ZETrainIG", 0);
+	if (License == NULL)
+		return EXIT_SUCCESS;
 
 	zeCore->Execute();
 	

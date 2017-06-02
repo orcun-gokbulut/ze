@@ -46,12 +46,14 @@ void ZEFoundation_RegisterDeclarations()
 	
 	DeclarationsRegistered = true;
 
+	#ifndef ZE_ZEFOUNDATIONSTATIC
 	#undef RegisterClass
 	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
 	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "ZEFoundation.ZEMetaRegister.h"
 	#undef ZEMT_REGISTER_ENUM
 	#undef ZEMT_REGISTER_CLASS
+	#endif
 }
 
 void ZEFoundation_UnregisterDeclarations()
@@ -61,10 +63,12 @@ void ZEFoundation_UnregisterDeclarations()
 
 	DeclarationsRegistered = false;
 
+	#ifndef ZE_ZEFOUNDATIONSTATIC
 	#undef UnregisterClass
 	#define ZEMT_REGISTER_ENUM(Name) ZEMTEnumerator* Name ## _Enumerator(); ZEMTProvider::GetInstance()->UnregisterEnumerator(Name ## _Enumerator());
 	#define ZEMT_REGISTER_CLASS(Name) ZEClass* Name ## _Class(); ZEMTProvider::GetInstance()->UnregisterClass(Name ## _Class());
 	#include "ZEFoundation.ZEMetaRegister.h"
 	#undef ZEMT_REGISTER_ENUM
 	#undef ZEMT_REGISTER_CLASS
+	#endif
 }

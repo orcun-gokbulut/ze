@@ -59,9 +59,13 @@ ZEEntityResult ZELoadingScreen::LoadInternal()
 	ImageControl->SetTextureFileName(ImageFileName);
 	Manager->AddControl(ImageControl);
 
-	BackgroundControl = new ZEUIFrameControl();
-	BackgroundControl->SetBackgroundColor(BackgroundColor);
-	Manager->AddControl(BackgroundControl);
+	BackgroundControlA = new ZEUIFrameControl();
+	BackgroundControlA->SetBackgroundColor(BackgroundColor);
+	Manager->AddControl(BackgroundControlA);
+
+	BackgroundControlB = new ZEUIFrameControl();
+	BackgroundControlB->SetBackgroundColor(BackgroundColor);
+	Manager->AddControl(BackgroundControlB);
 
 	return ZE_ER_DONE;
 }
@@ -72,9 +76,13 @@ ZEEntityResult ZELoadingScreen::UnloadInternal()
 	ImageControl->Destroy();
 	ImageControl = NULL;
 
-	Manager->RemoveControl(BackgroundControl);
-	BackgroundControl->Destroy();
-	BackgroundControl = NULL;
+	Manager->RemoveControl(BackgroundControlA);
+	BackgroundControlA->Destroy();
+	BackgroundControlA = NULL;
+
+	Manager->RemoveControl(BackgroundControlB);
+	BackgroundControlB->Destroy();
+	BackgroundControlB = NULL;
 
 	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 
@@ -88,7 +96,7 @@ ZELoadingScreen::ZELoadingScreen()
 	FadeValue = 0.0f;
 	ImageFileName = "#R:/ZEEngine/ZELoadingScreen/LoadingScreen-Development.png";
 	BackgroundColor = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
-	FadeInFactor = 10.0f;
+	FadeInFactor = 0.0f;
 	FadeOutFactor = 1.0f;
 }
 
@@ -164,7 +172,11 @@ void ZELoadingScreen::Tick(float ElapsedTime)
 
 	if (State == ZE_LSS_FADING_IN)
 	{
-		FadeValue += ElapsedTime * FadeOutFactor;
+		if (FadeInFactor == 0.0f)
+			FadeValue = 1.0f;
+		else
+			FadeValue += ElapsedTime * FadeInFactor;
+
 		if (FadeValue >= 1.0f)
 		{
 			FadeValue = 1.0f;
@@ -173,7 +185,11 @@ void ZELoadingScreen::Tick(float ElapsedTime)
 	}
 	else if (State == ZE_LSS_FADING_OUT)
 	{
-		FadeValue -= ElapsedTime * FadeOutFactor;
+		if (FadeOutFactor == 0.0f)
+			FadeValue = 0.0f;
+		else
+			FadeValue -= ElapsedTime * FadeOutFactor;
+
 		if (FadeValue <= 0.0f)
 		{
 			FadeValue = 0.0f;
@@ -198,7 +214,8 @@ bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	if (State == ZE_LSS_NONE)
 	{
-		BackgroundControl->SetVisiblity(false);
+		BackgroundControlA->SetVisiblity(false);
+		BackgroundControlB->SetVisiblity(false);
 		ImageControl->SetVisiblity(false);
 	}
 	else
@@ -208,9 +225,9 @@ bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 		if (ImageTexture != NULL && ImageTexture->IsLoaded())
 		{
 			ZEVector2 Position;
-			float ImageWidth = ImageTexture->GetWidth();
-			float ImageHeight = ImageTexture->GetHeight();
-			float ImageAR = ImageWidth / ImageHeight;
+			ZEUInt ImageWidth = ImageTexture->GetWidth();
+			ZEUInt ImageHeight = ImageTexture->GetHeight();
+			float ImageAR = (float)ImageWidth / (float)ImageHeight;
 
 			if (ImageWidth > ScreenSize.x && ImageHeight > ScreenSize.y)
 			{
@@ -237,19 +254,55 @@ bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 				ImageWidth *= ImageHeight * ImageAR;
 			}
 
-			Position.x = (ScreenSize.x - ImageWidth) / 2.0f;
-			Position.y = (ScreenSize.y - ImageHeight) / 2.0f;
+			Position.x = (ZEUInt)(ScreenSize.x - ImageWidth) / 2;
+			Position.y = (ZEUInt)(ScreenSize.y - ImageHeight) / 2;
 
 			ImageControl->SetPosition(Position);
 			ImageControl->SetSize(ZEVector2(ImageWidth, ImageHeight));
 			ImageControl->SetBackgroundColor(ZEVector4(ZEVector3::One, BackgroundColor.w * FadeValue));
 			ImageControl->SetVisiblity(true);
-		}
 
-		BackgroundControl->SetPosition(ZEVector2(0.0f, 0.0f));
-		BackgroundControl->SetSize(ScreenSize);
-		BackgroundControl->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
-		BackgroundControl->SetVisiblity(true);
+			if (Position.x == 0.0f && Position.y == 0.0f)
+			{
+				// Fully Covers
+				BackgroundControlA->SetVisiblity(false);
+				BackgroundControlB->SetVisiblity(false);
+			}
+			else if (Position.x == 0.0f)
+			{
+				// Horizontal
+				BackgroundControlA->SetPosition(ZEVector2(0.0f, 0.0f));
+				BackgroundControlA->SetSize(ZEVector2(ScreenSize.x, Position.y));
+				BackgroundControlA->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+				BackgroundControlA->SetVisiblity(true);
+
+				BackgroundControlB->SetPosition(ZEVector2(0.0f, Position.y + ImageHeight));
+				BackgroundControlB->SetSize(ZEVector2(ScreenSize.x, Position.y));
+				BackgroundControlB->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+				BackgroundControlB->SetVisiblity(true);
+			}
+			else if (Position.y == 0.0f)
+			{
+				// Vertical
+				BackgroundControlA->SetPosition(ZEVector2(0.0f, 0.0f));
+				BackgroundControlA->SetSize(ZEVector2(Position.x, ScreenSize.y));
+				BackgroundControlA->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+				BackgroundControlA->SetVisiblity(true);
+
+				BackgroundControlB->SetPosition(ZEVector2(Position.x + ImageWidth, 0.0f));
+				BackgroundControlB->SetSize(ZEVector2(Position.x, ScreenSize.y));
+				BackgroundControlB->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+				BackgroundControlB->SetVisiblity(true);
+			}
+		}
+		else
+		{
+			BackgroundControlA->SetPosition(ZEVector2(0.0f, 0.0f));
+			BackgroundControlA->SetSize(ScreenSize);
+			BackgroundControlA->SetBackgroundColor(ZEVector4(BackgroundColor.xyz(), BackgroundColor.w * FadeValue));
+			BackgroundControlA->SetVisiblity(true);
+			BackgroundControlB->SetVisiblity(false);			
+		}
 	}
 
 	return false;

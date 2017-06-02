@@ -60,7 +60,8 @@ class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 	private:
 		ZEUIManager*						Manager;
 		ZEUIFrameControl*					ImageControl;
-		ZEUIControl*						BackgroundControl;
+		ZEUIControl*						BackgroundControlA;
+		ZEUIControl*						BackgroundControlB;
 
 		ZETimeCounter						Counter;
 		ZEString							ImageFileName;

@@ -20,7 +20,7 @@
     <Property Name="FileName" Type="String">#E:/ZEPhysX.dll</Property>
    </Node>
    <Node Name="Plugin">
-	<Property Name="FileName" Type="String">#E:/ZETrainIG.dll</Property>
+	<Property Name="FileName" Type="String">#E:/ZETrainIGModule.dll</Property>
    </Node>
   </Node>
   <Node Name="Modules">
