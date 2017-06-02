@@ -132,9 +132,10 @@ void ZESectorManager::UpdateTransformation(ZEGeographicEntity* Entity, bool Forc
 	{
 		ZEMatrix4x4d EntityLocalTransform;
 		ZEMatrix4x4d::Multiply(EntityLocalTransform, OriginSector->GetInvGeographicTransform(), Entity->GetGeographicTransform());
-		Entity->SetPosition(EntityLocalTransform.GetTranslation().ToVector3());
-		Entity->SetRotation(EntityLocalTransform.GetRotation());
-		Entity->SetScale(EntityLocalTransform.GetScale().ToVector3());
+		//Entity->SetPosition(EntityLocalTransform.GetTranslation().ToVector3());
+		//Entity->SetRotation(EntityLocalTransform.GetRotation());
+		//Entity->SetScale(EntityLocalTransform.GetScale().ToVector3());
+		Entity->SetTransform(EntityLocalTransform.ToMatrix4x4());
 		Entity->GeographicEntityDirtyFlags.UnraiseFlags(ZE_GEDF_LOCAL_TRANSFORM);
 	}
 }

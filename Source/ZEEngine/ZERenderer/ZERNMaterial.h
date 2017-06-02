@@ -49,6 +49,7 @@ class ZE_EXPORT_ZEENGINE ZERNMaterial : public ZERSResource
 	protected:
 		ZEGUID										GUID;
 		ZEString									Name;
+		bool										InstancingEnabled;
 
 		static ZEClass*								DetermineClass(const ZEString& FileName);
 		static ZERSResource*						Instanciator(const void* Params);
@@ -63,11 +64,14 @@ class ZE_EXPORT_ZEENGINE ZERNMaterial : public ZERSResource
 		void										SetName(const ZEString& Name);
 		const ZEString&								GetName() const;
 
+		void										SetInstancingEnabled(bool Enabled);
+		bool										GetInstancingEnabled() const;
+
 		virtual ZEUInt								GetStageMask() const = 0;
 
 		virtual bool								PreRender(ZERNCommand& Command) const;
-		virtual bool								SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
-		virtual void								CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual bool								SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
+		virtual void								CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
 
 		virtual bool								Update();	
 

@@ -308,6 +308,7 @@ bool ZEMCParser::ProcessType(ZEMCType& Output, const QualType& ClangType)
 
 			Output.BaseType = ZEMC_BT_OBJECT_HOLDER;
 			Output.TypeQualifier = SecondLevelType.TypeQualifier;
+			Output.Class = SecondLevelType.Class;
 
 			return true;
 		}

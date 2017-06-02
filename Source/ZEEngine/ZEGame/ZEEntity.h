@@ -205,16 +205,13 @@ class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
 		void									UpdateState();
 
 		void									SetParent(ZEEntity* Parent);
-		void									SetScene(ZEScene* Scene);
 		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
 		void									UpdateRenderabilityState(bool Forced = false);
 		void									UpdateTickabilityState();
 		void									UpdateOctree();
 
-		void									ParentVisibleChanged();
 		void									ParentEnabledChanged();
-
 	protected:
 		void									SetEntityFlags(ZEEntityFlags Flags);
 
@@ -237,6 +234,9 @@ class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
 		void									ClearComponents();
+
+		virtual void							SetScene(ZEScene* Scene);
+		virtual void							ParentVisibleChanged();
 
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
@@ -299,6 +299,9 @@ class ZE_EXPORT_ZEENGINE ZEEntity : public ZEObject
 
 		void									SetWorldScale(const ZEVector3& NewScale);
 		ZEVector3								GetWorldScale() const;
+
+		void									SetTransform(const ZEMatrix4x4& Transform);
+		void									SetWorldTransform(const ZEMatrix4x4& Transform);
 
 		ZEVector3								GetFront() const;
 		ZEVector3								GetRight() const;

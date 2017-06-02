@@ -382,6 +382,9 @@ bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (CloudTexture == NULL || !CloudTexture->IsLoaded())
 		return false;
 
+	if (Parameters->Type == ZERN_RT_SHADOW)
+		return false;
+
 	static ZEVector2 Translation = ZEVector2::Zero;
 	Translation += Parameters->TimeParameters->FrameTimeDelta * ZEVector2(0.0001f, 0.0003f);
 
@@ -393,7 +396,9 @@ bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	SetTranslation(Translation);
 
-	Parameters->Renderer->AddCommand(&RenderCommand);
+	//Parameters->Renderer->AddCommand(&RenderCommand);
+	RenderCommand.Reset();
+	Parameters->CommandList->AddCommand(&RenderCommand);
 
 	return true;
 }

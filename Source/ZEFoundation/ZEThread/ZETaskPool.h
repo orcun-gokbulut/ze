@@ -59,6 +59,9 @@ class ZETaskPool
 		ZEUInt							ReservedThreadCount;
 		ZEUInt							RemainingReservedThreadCount;
 		ZETaskSchedulePolicy			SchedulingPolicy;
+
+		ZEUInt							ThreadCount;
+		ZEInt							MaxThreadCount;
 		
 		ZEList2<ZETask>					QueuedTasks;
 		ZEList2<ZETask>					RunningTasks;
@@ -78,6 +81,9 @@ class ZETaskPool
 
 		void							SetReservedThreadCount(ZESize Count);
 		ZEUInt							GetReservedThreadCount() const;
+
+		void							SetMaxThreadCount(ZEUInt Count);
+		ZESize							GetMaxThreadCount() const;
 
 		const ZEList2<ZETask>&			GetRunningTasks() const;
 		const ZEList2<ZETask>&			GetWaitingTasks() const;

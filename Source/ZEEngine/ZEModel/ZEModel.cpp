@@ -106,7 +106,7 @@ void ZEModel::CalculateBoundingBox() const
 
 void ZEModel::UpdateConstantBufferBoneTransforms()
 {
-	if (!DirtyConstantBufferSkin)
+	if (!DirtyConstantBufferSkin || Bones.GetCount() == 0)
 		return;
 
 	if (ConstantBufferBoneTransforms == NULL)
@@ -128,6 +128,22 @@ void ZEModel::UpdateConstantBufferBoneTransforms()
 	DirtyConstantBufferSkin = false;
 }
 
+void ZEModel::ParentVisibleChanged()
+{
+	ZEEntity::ParentVisibleChanged();
+
+	ze_for_each(Mesh, Meshes)
+		Mesh->VisibilityChanged();
+}
+
+void ZEModel::SetScene(ZEScene* Scene)
+{
+	ZEEntity::SetScene(Scene);
+	
+	ze_for_each(Mesh, Meshes)
+		Mesh->VisibilityChanged();
+}
+
 void ZEModel::ChildBoundingBoxChanged()
 {
 	BoundingBoxChanged();
@@ -138,10 +154,10 @@ void ZEModel::LocalTransformChanged()
 	ZEEntity::LocalTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedModel();
+		Bone->TransformChangedWorld();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedModel();
+		Mesh->TransformChangedWorld();
 	
 	BoundingBoxChanged();
 }
@@ -151,10 +167,10 @@ void ZEModel::ParentTransformChanged()
 	ZEEntity::ParentTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedModel();
+		Bone->TransformChangedWorld();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedModel();
+		Mesh->TransformChangedWorld();
 
 	BoundingBoxChanged();
 }
@@ -317,6 +333,7 @@ ZEModel::ZEModel()
 	BoundingBoxIsUserDefined = false;
 	DirtyBoundingBox = true;
 	DirtyConstantBufferSkin = true;
+	LODTransitionOnVisible = true;
 
 	SetStatic(true);
 	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE | ZE_EF_STATIC_SUPPORT);
@@ -644,6 +661,16 @@ const ZEGRBuffer* ZEModel::GetIndexBuffer(ZEMDVertexIndexType IndexType) const
 	zeDebugCheck(IndexType >= ZEMD_VIT_COUNT, "Unknown index type");
 
 	return IndexBuffers[IndexType];
+}
+
+void ZEModel::SetLODTransitionOnVisible(bool Enabled)
+{
+	LODTransitionOnVisible = Enabled;
+}
+
+bool ZEModel::GetLODTransitionOnVisible() const
+{
+	return LODTransitionOnVisible;
 }
 
 bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)

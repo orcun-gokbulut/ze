@@ -226,8 +226,8 @@ class ZE_EXPORT_ZEENGINE ZERNParticleMaterial : public ZERNMaterial
 		void									SetAlphaCullLimit(float Limit);
 		float									GetAlphaCullLimit() const;
 
-		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false) const;
+		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
 
 		virtual bool							Update();
 

@@ -144,4 +144,5 @@ class ZE_EXPORT_ZEENGINE ZEGRContext : public ZEObject
 
 		virtual void					BeginEvent(const ZEString& Name) = 0;
 		virtual void					EndEvent() = 0;
+		virtual void					SetMarker(const ZEString& Name) = 0;
 };

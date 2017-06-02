@@ -945,6 +945,7 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	ReinitializeFlag = false;
 	SerialOperation = false;
 	LocalLoadingPercentage = 0;
+	UpdateStateTask.SetPoolId(ZE_TPI_CONCURENT);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
 
 	EntityId = 0;
@@ -1417,6 +1418,29 @@ ZEVector3 ZEEntity::GetWorldScale() const
 	}
 
 	return GetScale();
+}
+
+void ZEEntity::SetTransform(const ZEMatrix4x4& Transform)
+{
+	this->Position = Transform.GetTranslation();
+	this->Rotation = Transform.GetRotation();
+	this->Scale = Transform.GetScale();
+
+	LocalTransformChanged();
+}
+
+void ZEEntity::SetWorldTransform(const ZEMatrix4x4& Transform)
+{
+	if (Parent != NULL)
+	{
+		ZEMatrix4x4 Result;
+		ZEMatrix4x4::Multiply(Result, Parent->GetInvWorldTransform(), Transform);
+		SetTransform(Result);
+	}
+	else
+	{
+		SetTransform(Transform);
+	}
 }
 
 ZEVector3 ZEEntity::GetFront() const

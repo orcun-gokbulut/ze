@@ -192,7 +192,7 @@ bool ZERNMultiplexerMaterial::PreRender(ZERNCommand& Command) const
 	return SelectedMaterial->PreRender(Command);
 }
 
-bool ZERNMultiplexerMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+bool ZERNMultiplexerMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	if (SelectedMaterial == NULL)
 		return false;
@@ -200,7 +200,7 @@ bool ZERNMultiplexerMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStag
 	return SelectedMaterial->SetupMaterial(Context, Stage, Instanced);
 }
 
-void ZERNMultiplexerMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced) const
+void ZERNMultiplexerMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
 {
 	if (SelectedMaterial == NULL)
 		return;

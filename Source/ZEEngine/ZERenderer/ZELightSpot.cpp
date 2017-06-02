@@ -155,7 +155,9 @@ bool ZELightSpot::PreRender(const ZERNPreRenderParameters* Parameters)
 		Command.OuterConeAngle = GetOuterConeAngle();
 		Command.StageMask = ZERN_STAGE_LIGHTING;
 
-		Parameters->Renderer->AddCommand(&Command);
+		//Parameters->Renderer->AddCommand(&Command);
+		Command.Reset();
+		Parameters->CommandList->AddCommand(&Command);
 	}
 	else
 	{
@@ -176,7 +178,9 @@ bool ZELightSpot::PreRender(const ZERNPreRenderParameters* Parameters)
 		CommandShadow.ShadowNormalBias = GetShadowNormalBias();
 		CommandShadow.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_SHADOWING;
 
-		Parameters->Renderer->AddCommand(&CommandShadow);
+		//Parameters->Renderer->AddCommand(&CommandShadow);
+		CommandShadow.Reset();
+		Parameters->CommandList->AddCommand(&CommandShadow);
 	}
 
 	return true;

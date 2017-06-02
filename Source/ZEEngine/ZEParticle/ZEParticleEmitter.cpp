@@ -827,7 +827,9 @@ bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	memcpy(RenderCommand.Data, Buffer.GetConstCArray(), DataSize);
 
-	Parameters->Renderer->AddCommand(&RenderCommand);
+	//Parameters->Renderer->AddCommand(&RenderCommand);
+	RenderCommand.Reset();
+	Parameters->CommandList->AddCommand(&RenderCommand);
 
 	return true;
 }

@@ -100,6 +100,7 @@ class ZE_EXPORT_ZEENGINE ZEModelMesh : public ZEObject, public ZEDestroyable
 		ZEModelMeshLOD*							PrevLOD;
 		ZEModelMeshLOD*							NextLOD;
 
+		float									DrawOrder;
 		bool									CustomDrawOrderEnabled;
 		ZEUInt8									CustomDrawOrder;
 		ZEArray<ZEPlane>						ClippingPlanes;
@@ -114,6 +115,7 @@ class ZE_EXPORT_ZEENGINE ZEModelMesh : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
+		void									VisibilityChanged();
 
 		void									UpdateConstantBuffer();
 

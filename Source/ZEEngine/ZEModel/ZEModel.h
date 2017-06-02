@@ -93,11 +93,15 @@ class ZE_EXPORT_ZEENGINE ZEModel : public ZEEntity
 		mutable bool							DirtyBoundingBox;
 		bool									BoundingBoxIsUserDefined;
 
+		bool									LODTransitionOnVisible;
+
 		ZERSHolder<const ZEMDResource>			Resource;
 
 		void									CalculateBoundingBox() const;
 
 		virtual void							UpdateConstantBufferBoneTransforms();
+		virtual void							ParentVisibleChanged();
+		virtual void							SetScene(ZEScene* Scene);
 
 		virtual void							ChildBoundingBoxChanged();
 		virtual void							LocalTransformChanged();
@@ -159,7 +163,10 @@ class ZE_EXPORT_ZEENGINE ZEModel : public ZEEntity
 		void									SetIndexBuffer(const ZEGRBuffer* IndexBuffer, ZEMDVertexIndexType IndexType);
 		const ZEGRBuffer*						GetIndexBuffer(ZEMDVertexIndexType IndexType) const;
 
-		void									Tick(float ElapsedTime);
+		void									SetLODTransitionOnVisible(bool Enabled);
+		bool									GetLODTransitionOnVisible() const;
+
+		virtual void							Tick(float ElapsedTime);
 
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
