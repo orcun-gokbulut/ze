@@ -109,6 +109,11 @@ uint ZERNGBuffer_GetStencil(float2 ScreenPos, float SampleIndex = 0)
 	#endif
 }
 
+void ZERNGBuffer_SetAlphaToCoverage(inout ZERNGBuffer GBuffer, float Alpha)
+{
+	GBuffer.Buffer0.w = Alpha;
+}
+
 // ACCUMULATION
 ///////////////////////////////////////////////////////////////////////////////
 
