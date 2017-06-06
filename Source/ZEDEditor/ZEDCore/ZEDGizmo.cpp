@@ -1146,7 +1146,7 @@ bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Update())
 		return false;
 	
-	Parameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->GetCommandList()->AddCommand(&RenderCommand);
 	return true;
 }
 

@@ -454,7 +454,7 @@ void ZEDObjectWrapper3D::PreRender(const ZERNPreRenderParameters* Parameters)
 			return;
 
 		Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDObjectWrapper3D, Render, this);
-		Parameters->Renderer->AddCommand(&Command);
+		Parameters->Renderer->GetCommandList()->AddCommand(&Command);
 	}
 
 	if (Nameplate != NULL)
