@@ -349,7 +349,7 @@ bool ZEDGrid::PreRender(const ZERNPreRenderParameters* Parameters)
 		ConstantBufferMajorGridTransform->SetData(&Constants.MajorGridTransform);
 	}
 	
-	Parameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->GetCommandList()->AddCommand(&RenderCommand);
 
 	return true;
 }
