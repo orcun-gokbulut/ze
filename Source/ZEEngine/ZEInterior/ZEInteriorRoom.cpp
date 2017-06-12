@@ -337,6 +337,8 @@ static void VerifyVertexNormals(const ZEVertexTypeV1& InputVertex, const ZEVerte
 template<typename ZEVertexTypeV1, typename ZEVertexTypeV2>
 static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexTypeV2& OutputVertex)
 {
+	//zeDebugCheck(InputVertex.Normal == InputVertex.Tangent, "Same normal-tangent");
+
 	const ZEVector3& Normal = InputVertex.Normal;
 	const ZEVector3& Tangent = InputVertex.Tangent;
 	const ZEVector3& Binormal = InputVertex.Binormal;
@@ -358,8 +360,8 @@ static void ConvertVertexNormals(const ZEVertexTypeV1& InputVertex, ZEVertexType
 	ZEVector3 CalculatedBinormal;
 	ZEVector3::CrossProduct(CalculatedBinormal, Tangent, Normal);
 	CalculatedBinormal.NormalizeSelf();
-	if (!CalculatedBinormal.IsValid())
-		zeError("Calculated normal is not valid.");
+	//if (!CalculatedBinormal.IsValid())
+		//zeError("Calculated normal is not valid.");
 
 	if (ZEVector3::DotProduct(CalculatedBinormal, Binormal) < 0.0f) // Mirrored
 	{
@@ -521,13 +523,24 @@ void ZEInteriorRoom::Deinitialize()
 
 void ZEInteriorRoom::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	//IsDrawn = true;
-	//ZESize RenderCommandCount = Draws.GetCount();
-	//for(ZESize I = 0; I < RenderCommandCount; I++)
-	//{
-	//	Draws[I].Material->PreRender(Draws[I].RenderCommand);
-	//	Parameters->Renderer->AddCommand(&Draws[I].RenderCommand);
-	//}
+	IsDrawn = true;
+	ZESize RenderCommandCount = Draws.GetCount();
+	for(ZESize I = 0; I < RenderCommandCount; I++)
+	{
+		if (!Draws[I].Material->PreRender(Draws[I].RenderCommand))
+			continue;
+		
+		if (Parameters->Type != ZERN_RT_SHADOW)
+		{
+			Draws[I].RenderCommand.Reset();
+			Parameters->CommandList->AddCommand(&Draws[I].RenderCommand);
+		}
+		else
+		{
+			Draws[I].RenderCommandShadow.Reset();
+			Parameters->CommandList->AddCommand(&Draws[I].RenderCommandShadow);
+		}
+	}
 }
 
 void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
