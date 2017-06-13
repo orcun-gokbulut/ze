@@ -44,7 +44,14 @@
 float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
 	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy));
-	
+
+	return ZERNShading_CalculateFogColor(PositionView);
+}
+
+float4 ZERNFog_PixelShaderPerSample_Main(float4 PositionViewport : SV_Position, uint SampleIndex : SV_SampleIndex) : SV_Target0
+{
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, SampleIndex));
+
 	return ZERNShading_CalculateFogColor(PositionView);
 }
 

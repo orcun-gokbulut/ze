@@ -391,7 +391,7 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 
 	if (PreRenderParameters->Type != ZERN_RT_SHADOW)
 	{
-		RenderCommand.Order = GetMesh()->DrawOrder;
+		RenderCommand.Order = (GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -GetMesh()->DrawOrder : GetMesh()->DrawOrder;
 		RenderCommand.TransformConstantBuffer = GetMesh()->ConstantBuffer;
 		RenderCommand.DrawConstantBuffer = GetConstantBuffer();
 		RenderCommand.BoneConstantBuffer = GetModel()->ConstantBufferBoneTransforms;
@@ -405,7 +405,7 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 	}
 	else
 	{
-		RenderCommandShadow.Order = GetMesh()->DrawOrder;
+		RenderCommandShadow.Order = (GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -GetMesh()->DrawOrder : GetMesh()->DrawOrder;
 		RenderCommandShadow.TransformConstantBuffer = GetMesh()->ConstantBuffer;
 		RenderCommandShadow.DrawConstantBuffer = GetConstantBuffer();
 		RenderCommandShadow.BoneConstantBuffer = GetModel()->ConstantBufferBoneTransforms;

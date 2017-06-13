@@ -288,9 +288,8 @@ bool ZERNStageLighting::UpdateRenderState()
 	GraphicsRenderState = ZEGRRenderState();
 
 	ZEGRDepthStencilState DepthStencilStateTestNoWriteLessWriteStencil;
-	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthTestEnable(false);
 	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthWriteEnable(false);
-	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthFunction(ZEGR_CF_LESS);
 	DepthStencilStateTestNoWriteLessWriteStencil.SetStencilTestEnable(true);
 	DepthStencilStateTestNoWriteLessWriteStencil.SetFrontStencilPass(ZEGR_SO_REPLACE);
 	DepthStencilStateTestNoWriteLessWriteStencil.SetBackStencilPass(ZEGR_SO_REPLACE);
