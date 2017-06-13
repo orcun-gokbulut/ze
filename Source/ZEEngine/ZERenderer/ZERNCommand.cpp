@@ -36,6 +36,7 @@
 #include "ZERNCommand.h"
 
 #include "ZEGame\ZEEntity.h"
+#include "ZERNStageID.h"
 
 ZELink<ZERNCommand>* ZERNCommand::GetFreeLink()
 {
@@ -96,14 +97,17 @@ ZERNCommand::ZERNCommand() : Link(this)
 void ZERNCommandList::AddCommand(ZERNCommand* Command)
 {
 	bool GroupFound = false;
-	ze_for_each(DestCmd, CommandList)
+	if ((Command->StageMask & ZERN_STAGE_FORWARD_TRANSPARENT) == 0)
 	{
-		zeCheckError(DestCmd.GetPointer() == Command, ZE_VOID, "Duplicated commands have been detected");
-
-		if (DestCmd->AddSubCommand(Command))
+		ze_for_each(DestCmd, CommandList)
 		{
-			GroupFound = true;
-			break;
+			zeCheckError(DestCmd.GetPointer() == Command, ZE_VOID, "Duplicated commands have been detected");
+
+			if (DestCmd->AddSubCommand(Command))
+			{
+				GroupFound = true;
+				break;
+			}
 		}
 	}
 
@@ -116,14 +120,17 @@ void ZERNCommandList::AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList
 	ze_for_each(SrcCmd, CommandList)
 	{
 		bool GroupFound = false;
-		ze_for_each(DestCmd, this->CommandList)
+		if ((SrcCmd->StageMask & ZERN_STAGE_FORWARD_TRANSPARENT) == 0)
 		{
-			zeCheckError(DestCmd.GetPointer() == SrcCmd.GetPointer(), ZE_VOID, "Duplicated commands have been detected");
-
-			if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
+			ze_for_each(DestCmd, this->CommandList)
 			{
-				GroupFound = true;
-				break;
+				zeCheckError(DestCmd.GetPointer() == SrcCmd.GetPointer(), ZE_VOID, "Duplicated commands have been detected");
+
+				if (DestCmd->AddSubCommand(SrcCmd.GetPointer()))
+				{
+					GroupFound = true;
+					break;
+				}
 			}
 		}
 

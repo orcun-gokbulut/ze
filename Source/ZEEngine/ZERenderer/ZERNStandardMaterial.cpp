@@ -1156,8 +1156,8 @@ void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(SpecularMap);
@@ -1319,8 +1319,8 @@ void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(EmissiveMap);
