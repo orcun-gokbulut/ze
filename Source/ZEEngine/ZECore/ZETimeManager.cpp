@@ -37,6 +37,7 @@
 
 #include "ZETimer.h"
 #include "ZECore.h"
+#include "ZEMath\ZEMath.h"
 
 void ZETimeManager::FireTimers(bool PostTick)
 {
@@ -66,33 +67,50 @@ void ZETimeManager::UpdateFrameFixedInterval()
 {
 	Parameters.Mode = ZE_TM_FIXED_INTERVAL;
 
-	FrameTimeRemainder += Parameters.CycleTimeDelta;
-
-	if (FrameTimeRemainder < FrameTimeInterval)
+	double ElapsedTime = Parameters.CycleTime - LastFrameTime;
+	
+	if (ElapsedTime < FrameInterval)
 	{
 		Parameters.FrameType = ZE_TT_INTERMEDIATE;
-		Parameters.FrameTimeDelta = FrameTimeRemainder;
+		Parameters.FrameTime = LastFrameTime;
+		Parameters.FrameTimeDelta = ElapsedTime;
+		Parameters.FrameTimeInterval = FrameInterval;
 	}
 	else
 	{
 		Parameters.FrameId++;
 
-		FrameTimeRemainder -= FrameTimeInterval;
-		if (FrameTimeRemainder <= FrameTimeInterval)
+		double RemainingFrameTime = ElapsedTime - FrameInterval;
+
+		if (RemainingFrameTime < FrameInterval)
 		{
 			Parameters.FrameType = ZE_TT_NORMAL;
-			Parameters.FrameTimeDelta = FrameTimeInterval + FrameTimeRemainder;
-			Parameters.FrameTime += Parameters.FrameTimeDelta;
-			FrameTimeRemainder = 0.0f;
+			Parameters.FrameTime = LastFrameTime + FrameInterval;
+			Parameters.FrameTimeDelta = FrameInterval;
+			Parameters.FrameTimeInterval = FrameInterval;
+			LastFrameTime = Parameters.CycleTime - ZEMath::Mod(Parameters.CycleTime, FrameInterval);
+		}
+		else if (RemainingFrameTime > FrameJumpThreshold)
+		{
+			int JumpedFrameCount = ZEMath::Ceil(ElapsedTime / FrameInterval);
+			Parameters.FrameType = ZE_TT_JUMPED;
+			Parameters.FrameId += JumpedFrameCount;
+			Parameters.FrameTimeDelta = JumpedFrameCount * FrameInterval;
+			Parameters.FrameTimeInterval = FrameInterval;
+			Parameters.FrameTime = LastFrameTime + Parameters.FrameTimeDelta;
+			LastFrameTime = Parameters.CycleTime - ZEMath::Mod(Parameters.CycleTime, FrameInterval);
 		}
 		else
 		{
 			Parameters.FrameType = ZE_TT_DROPPED;
-			Parameters.FrameTimeDelta = FrameTimeInterval;
-			Parameters.FrameTime += Parameters.FrameTimeDelta;
+			Parameters.FrameTimeDelta = FrameInterval;
+			Parameters.FrameTimeInterval = FrameInterval;
+			Parameters.FrameTime = LastFrameTime + FrameInterval;
+			LastFrameTime += FrameInterval;
 		}
 
 		OnTick(&Parameters);
+
 	}
 }
 
@@ -104,7 +122,6 @@ void ZETimeManager::UpdateFrameVariableInterval()
 	Parameters.FrameTime = Parameters.CycleTime;
 	Parameters.FrameTimeDelta = Parameters.CycleTimeDelta;
 	Parameters.FrameTimeInterval = Parameters.CycleTimeDelta;
-	FrameTimeRemainder = 0.0f;
 
 	OnTick(&Parameters);
 	FireTimers(true);
@@ -121,8 +138,6 @@ void ZETimeManager::UpdateFrameEventBased()
 	Parameters.FrameId++;
 	Parameters.FrameTime = Parameters.CycleTime;
 	Parameters.FrameTimeDelta = Parameters.CycleTimeDelta;
-
-	FrameTimeRemainder = 0.0f;
 
 	OnTick(&Parameters);
 	FireTimers(true);
@@ -153,8 +168,9 @@ bool ZETimeManager::DeinitializeInternal()
 
 ZETimeManager::ZETimeManager()
 {
-	Mode = ZE_TM_VARIABLE_INTERVAL;
-	FrameTimeInterval = 16.0f / 1000.0f; // 60 HZ
+	Mode = ZE_TM_FIXED_INTERVAL;
+	FrameInterval = 1.0 / 30.0; // 60 HZ
+	FrameJumpThreshold = 0.150;
 	Reset();
 }
 
@@ -213,14 +229,24 @@ ZETickMode ZETimeManager::GetTickMode() const
 	return Mode;
 }
 
-void ZETimeManager::SetFrameTimeInterval(float Interval)
+void ZETimeManager::SetFrameInterval(float Interval)
 {
-	FrameTimeInterval = Interval;
+	FrameInterval = Interval;
 }
 
-float ZETimeManager::GetFrameTimeInterval() const
+float ZETimeManager::GetFrameInterval() const
 {
-	return FrameTimeInterval;
+	return FrameInterval;
+}
+
+void ZETimeManager::SetFrameJumpThreshold(ZEUInt Frames)
+{
+	FrameJumpThreshold = Frames;
+}
+
+ZEUInt ZETimeManager::GetFrameJumpThreshold() const
+{
+	return FrameJumpThreshold;
 }
 
 void ZETimeManager::RegisterTimer(ZETimer* Timer)
@@ -245,7 +271,6 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 		return;
 	
 	Parameters.Mode = Mode;
-	Parameters.FrameTimeInterval = FrameTimeInterval;
 	Parameters.CycleId++;
 	Parameters.CycleTime = TimeCounter.GetTimeSeconds();
 
@@ -268,11 +293,35 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 	if (Parameters.CycleId % CycleHistorySize == CycleHistorySize - 1)
 		for (ZESize I = 0; I < CycleHistorySize; I++)
 		{
-			zeLog("CID: %ull, CT: %f, CTD: %f, FT:%u, FID: %ull, FT: %f, FTD: %f.",
+			const char* FrameType;
+			switch (CycleHistory[I].FrameType)
+			{
+				case ZE_TT_NORMAL:
+					FrameType = "Normal";
+					break;
+
+				case ZE_TT_DROPPED:
+					FrameType = "Dropped";
+					break;
+
+				case ZE_TT_INTERMEDIATE:
+					FrameType = "Intermediate";
+					break;
+
+				case ZE_TT_JUMPED:
+					FrameType = "Jumped";
+					break;
+
+				default:
+					FrameType = "Unknown";
+					break;
+			}
+
+			zeLog("CID: %I64u, CT: %f, CTD: %f, FT:%s, FID: %I64u, FT: %f, FTD: %f.",
 				CycleHistory[I].CycleId,
 				CycleHistory[I].CycleTime,
 				CycleHistory[I].CycleTimeDelta,
-				CycleHistory[I].FrameType,
+				FrameType,
 				CycleHistory[I].FrameId,
 				CycleHistory[I].FrameTime,
 				CycleHistory[I].FrameTimeDelta);
@@ -322,7 +371,6 @@ void ZETimeManager::Reset()
 	Parameters.FrameTime = 0;
 	Parameters.FrameTimeDelta = 0.0;
 	
-	FrameTimeRemainder = 0.0;
 	LastMeasuredTime = Parameters.FrameTime;
 	Running = false;
 	AdvanceFrame = false;

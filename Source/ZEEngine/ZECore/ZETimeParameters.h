@@ -50,7 +50,8 @@ ZE_ENUM(ZEFrameType)
 {
 	ZE_TT_NORMAL,
 	ZE_TT_INTERMEDIATE,
-	ZE_TT_DROPPED
+	ZE_TT_DROPPED,
+	ZE_TT_JUMPED
 };
 
 class ZE_EXPORT_ZEENGINE ZETimeParameters : public ZEObject

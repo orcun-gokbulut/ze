@@ -54,9 +54,12 @@ class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 		ZETickMode								Mode;
 		ZEList2<ZETimer>						TimerList;
 		ZETimeCounter							TimeCounter;
-		float									FrameTimeInterval;
-		double									FrameTimeRemainder;
+		float									FrameInterval;
+		double									FrameJumpThreshold;
 		double									LastMeasuredTime;
+		double									LastFrameTime;
+
+
 		bool									Running;
 		bool									AdvanceFrame;
 
@@ -87,8 +90,11 @@ class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 		void									SetTickMode(ZETickMode Mode);
 		ZETickMode								GetTickMode() const;
 
-		void									SetFrameTimeInterval(float Interval);
-		float									GetFrameTimeInterval() const;
+		void									SetFrameInterval(float Interval);
+		float									GetFrameInterval() const;
+
+		void									SetFrameJumpThreshold(ZEUInt Frames);
+		ZEUInt									GetFrameJumpThreshold() const;
 			
 		const ZEList2<ZETimer>					GetTimers() const;
 		void									RegisterTimer(ZETimer* Timer);

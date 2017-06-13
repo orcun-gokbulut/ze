@@ -664,6 +664,9 @@ bool ZEScene::IsEntitiesInitialized()
 
 void ZEScene::Tick(const ZETimeParameters* Parameters)
 {
+	if (Parameters->FrameType == ZE_TT_INTERMEDIATE)
+		return;
+
 	if (!Enabled)
 		return;
 

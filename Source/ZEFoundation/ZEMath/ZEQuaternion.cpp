@@ -319,6 +319,7 @@ void ZEQuaternion::ConvertToAngleAxis(float& Angle, ZEVector3& Axis, const ZEQua
 	if (!ZEMath::IsValid(Angle) || Angle == 0.0f)
 	{
 		Axis = ZEVector3::UnitY;
+		Angle = 0.0f;
 		return;
 	}
 

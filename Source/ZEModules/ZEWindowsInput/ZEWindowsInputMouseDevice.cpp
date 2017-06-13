@@ -41,14 +41,16 @@
 
 #include "ZEWindowsInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
+#include "ZEInput/ZEInputDeviceIndexes.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZESystemMessageHandler.h"
 #include "ZECore/ZESystemMessageManager.h"
+#include "ZECore/ZETimeManager.h"
+#include "ZECore/ZETimeParameters.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <windowsx.h>
-#include "ZEInput/ZEInputDeviceIndexes.h"
 
 
 void ZEWindowsInputMouseDevice::UnAcquire()

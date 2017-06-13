@@ -177,15 +177,18 @@ void ZEConsoleWindow::Deinitialize()
 void ZEConsoleWindow::Process()
 {
 	BufferLock.Lock();
-	if (!Buffer.IsEmpty())
 	{
-		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)0, (LPARAM)-1);
-		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
-		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)Buffer.GetValue());
+		if (!Buffer.IsEmpty())
+		{
+			SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)0, (LPARAM)-1);
+			SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+			SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)Buffer.GetValue());
 
-		Buffer.Clear();
+			Buffer.Clear();
 
-		UpdateWindow((HWND)Handle);
+			UpdateWindow((HWND)Handle);
+		}
+
 	}
 	BufferLock.Unlock();
 }
@@ -238,25 +241,27 @@ void ZEConsoleWindow::TerminationState()
 void ZEConsoleWindow::Output(const char* OutputText)
 {
 	BufferLock.Lock();
-	const char* Current = OutputText;
-	const char* Start = Current;
-
-	while (*Current != '\0')
 	{
-		if (*Current == '\n')
+		const char* Current = OutputText;
+		const char* Start = Current;
+
+		while (*Current != '\0')
 		{
-			if (Current != Start)
-				Buffer.Append(Start, Current - Start - (Current != OutputText && Current[-1] == '\r' ? 1 : 0));
+			if (*Current == '\n')
+			{
+				if (Current != Start)
+					Buffer.Append(Start, Current - Start - (Current != OutputText && Current[-1] == '\r' ? 1 : 0));
 
-			Buffer.Append("\r\n");
-			Start = Current + 1;
+				Buffer.Append("\r\n");
+				Start = Current + 1;
+			}
+			Current++;
 		}
-		Current++;
+
+		if (Current != Start)
+			Buffer.Append(Start);
+
 	}
-
-	if (Current != Start)
-		Buffer.Append(Start);
-
 	BufferLock.Unlock();
 }
 
