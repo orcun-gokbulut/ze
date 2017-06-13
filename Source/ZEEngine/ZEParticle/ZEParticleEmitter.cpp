@@ -262,7 +262,7 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 	{
 		ZEUInt ParticleIndex = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
 		GenerateParticle(ParticleIndex);
-		AliveParticleIndices[AliveParticleCount++] = DeadParticleIndices[ParticleIndex];
+		AliveParticleIndices[AliveParticleCount++] = ParticleIndex;
 	}
 	
 	for (ZEUInt I = 0; I < Modifiers.GetCount(); I++)
