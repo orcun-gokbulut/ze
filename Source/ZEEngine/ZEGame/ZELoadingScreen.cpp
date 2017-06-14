@@ -98,6 +98,7 @@ ZELoadingScreen::ZELoadingScreen()
 	BackgroundColor = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
 	FadeInFactor = 0.0f;
 	FadeOutFactor = 1.0f;
+	AlwaysShow = true;
 }
 
 ZELoadingScreen::~ZELoadingScreen()
@@ -165,6 +166,18 @@ float ZELoadingScreen::GetFadeOutFactor()
 	return FadeOutFactor;
 }
 
+
+void ZELoadingScreen::SetAlwaysShow(bool Show)
+{
+	AlwaysShow = Show;
+}
+
+
+bool ZELoadingScreen::GetAlwaysShow()
+{
+	return AlwaysShow;
+}
+
 void ZELoadingScreen::Tick(float ElapsedTime)
 {
 	if (State == ZE_LSS_NONE)
@@ -211,6 +224,12 @@ bool ZELoadingScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (Parameters->Type != ZERN_RT_COLOR)
 		return false;
+
+	if (AlwaysShow)
+	{
+		FadeValue = 1.0f;
+		State = ZE_LSS_SCREEN;
+	}
 
 	if (State == ZE_LSS_NONE)
 	{

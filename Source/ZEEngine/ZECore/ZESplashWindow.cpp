@@ -35,11 +35,15 @@
 
 #include "ZESplashWindow.h"
 
+#include "ZESplashWindow_Logo.bmp.h"
 #include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+static HBITMAP LogoBitmap;
+static const DWORD WindowWidth = 400;
+static const DWORD WindowHeight = 500;
 
 struct ZESplashWindowData
 {
@@ -112,12 +116,13 @@ void ZESplashWindow::HandleMessage(ZESplashWindowMessage* Message)
 		return;
 	}
 
-	PAINTSTRUCT ps; 
-	HDC hdc = BeginPaint(Message->hwnd, &ps);
-	SetBkColor(hdc, RGB(0, 0, 0));
-	Rectangle(hdc, 0, 0, 400, 300);
-	TextOut(hdc, 0, 0, "Hello, Windows!", 15); 
-	EndPaint(Message->hwnd, &ps); 
+	PAINTSTRUCT Ps;
+	HDC hDC = BeginPaint(Message->hwnd, &Ps);
+	HDC MemDCExercising = CreateCompatibleDC(hDC);
+	SelectObject(MemDCExercising, LogoBitmap);
+	BitBlt(hDC, 0, 0, WindowWidth, WindowHeight, MemDCExercising, 0, 0, SRCCOPY);
+	DeleteDC(MemDCExercising);
+	EndPaint(Message->hwnd, &Ps);
 
 	ValidateRect(Data->Handle, NULL);
 }
@@ -152,14 +157,11 @@ bool ZESplashWindow::InitializeInternal()
 		return false;
 	}
 
-	const DWORD WindowWidth = 500;
-	const DWORD WindowHeight = 350;
-
 	DWORD ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 	DWORD ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 	Data->Handle = CreateWindowEx(
 		/*WS_EX_TOPMOST | */ WS_EX_LAYERED, "ZESplashWindow", "", WS_POPUP, 
-		(ScreenWidth - 400) / 2, (ScreenHeight - 300) / 2, 400,	300,
+		(ScreenWidth - WindowWidth) / 2, (ScreenHeight - WindowHeight) / 2, WindowWidth, WindowHeight,
 		NULL, NULL,	Data->Instance,	Data);
 
 	if (Data->Handle == NULL)
@@ -168,6 +170,15 @@ bool ZESplashWindow::InitializeInternal()
 		return false;
 	}
 
+	ZESplashWindow_Logo_bmp Logo;
+	BITMAPFILEHEADER* BMPHeader = (BITMAPFILEHEADER*)Logo.GetData();
+	BITMAPINFOHEADER* BMPInfoHeader = (BITMAPINFOHEADER*)((ZEBYTE*)Logo.GetData() + sizeof(BITMAPFILEHEADER));
+	BITMAPINFO* BMPInfo = (BITMAPINFO*)BMPInfoHeader;
+	void* BMPData = (void*)((ZEBYTE*)Logo.GetData() + BMPHeader->bfOffBits);
+	void* BMPBuffer = 0;
+	LogoBitmap = CreateDIBSection(NULL, BMPInfo, DIB_RGB_COLORS, &BMPBuffer, NULL, NULL);
+	memcpy(BMPBuffer, BMPData, BMPHeader->bfSize - BMPHeader->bfOffBits); // this line should be added!!
+	
 	::EnableWindow(Data->Handle, true);
 	::ShowWindow(Data->Handle, true);
 
@@ -180,6 +191,7 @@ bool ZESplashWindow::InitializeInternal()
 bool ZESplashWindow::DeinitializeInternal()
 {
 	Hide();
+	DeleteObject(LogoBitmap);
 	DestroyWindow(Data->Handle);
 	UnregisterClass("ZESplashWindow", Data->Instance);
 	

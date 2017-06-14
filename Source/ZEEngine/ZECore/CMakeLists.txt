@@ -86,9 +86,11 @@ ze_add_source(ZECrashHandler.h						Sources Headers ZEMC)
 ze_add_source(ZECrashHandler_Windows.cpp			Sources PLATFORMS Windows)
 ze_add_source(ZESplashWindow.cpp					Sources)
 ze_add_source(ZESplashWindow.h						Sources)
+ze_add_source(ZESplashWindow_Logo.bmp				Sources ZEFC)
 
 ze_add_component(COMPONENT ZECore
 	TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC})
+	ZEMC ${ZEMC}
+	ZEFC ${ZEFC})

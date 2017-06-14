@@ -70,6 +70,7 @@ class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 		float								FadeOutFactor;
 
 		ZELoadingScreenState				State;
+		bool								AlwaysShow;
 		float								FadeValue;
 
 		virtual ZEEntityResult				LoadInternal();
@@ -93,6 +94,9 @@ class ZE_EXPORT_ZEENGINE ZELoadingScreen : public ZEEntity
 	
 		void								SetFadeOutFactor(float Factor);
 		float								GetFadeOutFactor();
+
+		void								SetAlwaysShow(bool Show);
+		bool								GetAlwaysShow();
 
 		virtual void						Tick(float ElapsedTime);
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);

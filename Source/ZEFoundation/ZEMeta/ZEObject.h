@@ -51,18 +51,20 @@
 #define ZEMT_OBJECT_IMPLEMENTATION(ClassName) \
 	ZEClass* ClassName::GetClass() const \
 	{ \
-		return ClassName::Class(); \
+		ZEClass* ClassName##_Class(); \
+		return ClassName##_Class(); \
 	} \
 	\
 	ZEClass* ClassName::Class() \
 	{ \
-		static ClassName##Class Class;\
-		return &Class; \
+		ZEClass* ClassName##_Class(); \
+		return ClassName##_Class(); \
 	} \
 	\
 	ZEMT_EXPORT ZEClass* ClassName##_Class() \
 	{ \
-		return ClassName::Class(); \
+		static ClassName##Class Class;\
+		return &Class; \
 	}
 
 class ZEMTEventBase;

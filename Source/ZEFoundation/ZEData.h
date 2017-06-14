@@ -36,9 +36,8 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEExport.ZEFoundation.h"
 
-class ZE_EXPORT_ZEFOUNDATION ZEData
+class ZEData
 {
 	public:
 		virtual void*		GetData() = 0;

@@ -467,7 +467,7 @@ bool ZECore::AddModule(ZEModule* Module)
 	ze_for_each(CurrentModule, Modules)
 	{
 		// Check MultiInstance
-		if (Module->GetClass()->CheckAttributeHasValue("MultiInstance", "false"))
+		if (Module->GetClass()->CheckAttributeHasValue("ZEModule.MultiInstance", "false"))
 		{
 			if (ZEClass::IsDerivedFrom(CurrentModule->GetClass(), Module))
 			{

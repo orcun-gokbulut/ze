@@ -384,9 +384,9 @@ bool ZEClass::IsDerivedFrom(ZEClass* ParentClass, ZEClass* Class)
 	if (ParentClass == NULL)
 		return false;
 
-	while(Class != NULL)
+	while (Class != NULL)
 	{
-		if(ParentClass == Class)
+		if (ParentClass == Class)
 			return true;
 
 		Class = Class->GetParentClass();

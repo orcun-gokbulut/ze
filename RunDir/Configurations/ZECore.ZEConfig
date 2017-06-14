@@ -19,9 +19,6 @@
    <Node Name="Plugin">
     <Property Name="FileName" Type="String">#E:/ZEPhysX.dll</Property>
    </Node>
-   <Node Name="Plugin">
-	<Property Name="FileName" Type="String">#E:/ZETrainIGModule.dll</Property>
-   </Node>
   </Node>
   <Node Name="Modules">
    <Node Name="Module">
@@ -41,9 +38,6 @@
    </Node>
    <Node Name="Module">
     <Property Name="Class" Type="String">ZEPhysXModule</Property>
-   </Node>
-   <Node Name="Module">
-    <Property Name="Class" Type="String">ZETIModule</Property>
    </Node>
   </Node>
  </Node>
