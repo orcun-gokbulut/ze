@@ -2018,9 +2018,9 @@ bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 	return true;
 }
 
-bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
+bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
-	zeDebugCheck(Instanced && SkinningEnabled, "Cannot setup skinned material for instanced draw");
+	zeDebugCheck(InstancingEnabled && SkinningEnabled, "Cannot setup skinned material for instanced draw");
 
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -2036,7 +2036,7 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	ZEUInt StageID = Stage->GetId();
 	if (StageID == ZERN_STAGE_GBUFFER || StageID == ZERN_STAGE_FORWARD_TRANSPARENT)
 	{
-		Context->SetRenderState(Instanced ? StageGBuffer_Forward_Instancing_RenderState : StageGBuffer_Forward_RenderState);
+		Context->SetRenderState(InstancingEnabled ? StageGBuffer_Forward_Instancing_RenderState : StageGBuffer_Forward_RenderState);
 
 		const ZEGRTexture* Textures[] = 
 		{
@@ -2056,33 +2056,27 @@ bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	}
 	else if (StageID == ZERN_STAGE_SHADOW_MAP_GENERATION)
 	{
-		Context->SetRenderState(Instanced ? StageShadowmapGeneration_Instancing_RenderState : StageShadowmapGeneration_RenderState);
+		Context->SetRenderState(InstancingEnabled ? StageShadowmapGeneration_Instancing_RenderState : StageShadowmapGeneration_RenderState);
 
-		if (AlphaCullEnabled || LODTransitionEnabled)
-		{
-			if (OpacityMapEnabled)
-				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
-			else if (BaseMapEnabled)
-				Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
-		}
+		if (OpacityMapEnabled)
+			Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
+		else if (BaseMapEnabled)
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
 	}
 	else if (StageID == ZERN_STAGE_RENDER_DEPTH)
 	{
-		Context->SetRenderState(Instanced ? StageRenderDepth_Instancing_RenderState : StageRenderDepth_RenderState);
+		Context->SetRenderState(InstancingEnabled ? StageRenderDepth_Instancing_RenderState : StageRenderDepth_RenderState);
 
-		if (AlphaCullEnabled || LODTransitionEnabled)
-		{
-			if (OpacityMapEnabled)
-				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
-			else if (BaseMapEnabled)
-				Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
-		}
+		if (OpacityMapEnabled)
+			Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
+		else if (BaseMapEnabled)
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap);
 	}
 
 	return true;
 }
 
-void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
+void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }

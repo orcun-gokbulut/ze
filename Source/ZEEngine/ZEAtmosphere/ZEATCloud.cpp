@@ -82,7 +82,7 @@ void ZEATCloud::CreatePlane()
 
 	float Height1 = 0.0f;
 	float Radius1 = 1.0f;
-	float CurveOffset1 = 0.11f;
+	float CurveOffset1 = 0.2f;
 	float EdgePoint1 = Radius1 / 3.0f;
 	Vertex Vertices[] = 
 	{
@@ -252,7 +252,7 @@ ZEATCloud::ZEATCloud()
 	Constants.Inscattering = ZEVector3::One * 0.5f;
 	Constants.LightDirection = ZEVector3::One;
 	Constants.Translation = ZEVector2::Zero;
-	Constants.TextureTileFactor = ZEVector2(4.0f, 4.0f);
+	Constants.TextureTileFactor = ZEVector2(2.0f, 2.0f);
 
 	SetEntityFlags(ZE_EF_RENDERABLE);
 }

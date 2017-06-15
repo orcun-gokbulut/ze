@@ -363,7 +363,7 @@ const ZEGRSampler* ZERNSimpleMaterial::GetSampler() const
 	return Sampler;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -385,7 +385,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 	return true;
 }
 
-void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced, bool LODTransitionEnabled) const
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
