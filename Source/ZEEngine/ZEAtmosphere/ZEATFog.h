@@ -56,8 +56,10 @@ class ZE_EXPORT_ZEENGINE ZEATFog : public ZEEntity
 
 		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
 		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRShader>			PixelShaderPerSample;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		
+		ZEHolder<ZEGRRenderStateData>	RenderStateDataPerSample;
+
 		ZEGRBuffer*						ConstantBuffer;
 
 		float							Density;

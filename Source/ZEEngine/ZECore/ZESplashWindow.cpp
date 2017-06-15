@@ -160,7 +160,7 @@ bool ZESplashWindow::InitializeInternal()
 	DWORD ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 	DWORD ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 	Data->Handle = CreateWindowEx(
-		/*WS_EX_TOPMOST | */ WS_EX_LAYERED, "ZESplashWindow", "", WS_POPUP, 
+		WS_EX_TOOLWINDOW | WS_EX_LAYERED, "ZESplashWindow", "Zinek Engine", WS_POPUP, 
 		(ScreenWidth - WindowWidth) / 2, (ScreenHeight - WindowHeight) / 2, WindowWidth, WindowHeight,
 		NULL, NULL,	Data->Instance,	Data);
 

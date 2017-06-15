@@ -290,7 +290,7 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 
 	CycleHistory[Parameters.CycleId % CycleHistorySize] = Parameters;
 
-	if (Parameters.CycleId % CycleHistorySize == CycleHistorySize - 1)
+	/*if (Parameters.CycleId % CycleHistorySize == CycleHistorySize - 1)
 		for (ZESize I = 0; I < CycleHistorySize; I++)
 		{
 			const char* FrameType;
@@ -325,7 +325,7 @@ void ZETimeManager::PreProcess(const ZETimeParameters* ParametersOld)
 				CycleHistory[I].FrameId,
 				CycleHistory[I].FrameTime,
 				CycleHistory[I].FrameTimeDelta);
-		}
+		}*/
 }
 
 void ZETimeManager::Process(const ZETimeParameters* ParametersOld)

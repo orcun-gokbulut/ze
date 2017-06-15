@@ -33,42 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDSHMainWindow.h"
-
-#include "ZEFile/ZEPathManager.h"
-#include "ZEGraphics/ZEGRShaderCompileOptions.h"
-
-#include <QApplication>
-#include <QMessageBox>
+#include "ZEDSHShaderEditor.h"
+#include "ZEGraphics\ZEGRShaderCompileOptions.h"
 
 int main(int argc, char** argv)
 {
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	QApplication Application(argc, argv);
-	ZEDSHMainWindow MainWindow;
-	MainWindow.show();
-	return Application.exec();
-}
-
-void ZEDSHEditor_RunEditor(ZEGRShaderCompileOptions& Options)
-{
-	int argc = 1;
-	char* argv[] =
-	{
-		"ZEDSHShaderEditor.exe"
-	};
-
-	QString Filename = Options.FileName.ToCString();
-
-	QApplication Application(argc, argv);
-
-	int Result = QMessageBox::warning(NULL, "Zinek Engine", Filename + " can not be compiled!\n" + "Do you want to open Shader Editor ?", QMessageBox::Yes | QMessageBox::No);
-	if(Result == QMessageBox::Yes)
-	{
-		ZEDSHMainWindow MainWindow;
-		MainWindow.Load(Options);
-		MainWindow.show();
-		Application.exec();
-	}
+	ZEDSHShaderEditor_RunEditor(NULL);
 }

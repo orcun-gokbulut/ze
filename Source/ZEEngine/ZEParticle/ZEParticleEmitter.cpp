@@ -238,8 +238,8 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 		ParticlePool.Lifes[AliveParticleIndices[Index]] -= ElapsedTime;
 		if (ParticlePool.Lifes[AliveParticleIndices[Index]] <= 0.0f)
 		{
-			DeadParticleCount++;
 			DeadParticleIndices[(DeadParticleStartIndex + DeadParticleCount) % DeadParticleIndices.GetCount()] = AliveParticleIndices[Index];
+			DeadParticleCount++;
 			AliveParticleIndices[Index] = AliveParticleIndices[--AliveParticleCount];
 			
 			continue;
@@ -248,7 +248,6 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 		Index++;
 	}
 
-
 	CurrentTime += ElapsedTime;
 	
 	if (CurrentTime >= TotalTime)
@@ -256,20 +255,21 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 
 	ZEUInt MaxSpawnedParticleCount = EmissionRateMax * TotalTime;
 	LastSpawnedParticleCount = ZERandom::GetFloatRange((float)EmissionRateMin, (float)EmissionRateMax) * ElapsedTime;
-	LastSpawnedParticleCount = ZEMath::Clamp(LastSpawnedParticleCount, (ZEUInt)0, MaxSpawnedParticleCount);
-	LastSpawnedParticleCount = ZEMath::Clamp(LastSpawnedParticleCount, (ZEUInt)0, (ZEUInt)DeadParticleCount);
+	LastSpawnedParticleCount = ZEMath::Min(LastSpawnedParticleCount, MaxSpawnedParticleCount);
+	LastSpawnedParticleCount = ZEMath::Min(LastSpawnedParticleCount, (ZEUInt)DeadParticleCount);
 	
 	for (ZESize I = DeadParticleStartIndex; I < (DeadParticleStartIndex + LastSpawnedParticleCount); I++)
 	{
-		GenerateParticle(DeadParticleIndices[I % DeadParticleIndices.GetCount()]);
-		AliveParticleIndices[AliveParticleCount++] = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
+		ZEUInt ParticleIndex = DeadParticleIndices[I % DeadParticleIndices.GetCount()];
+		GenerateParticle(ParticleIndex);
+		AliveParticleIndices[AliveParticleCount++] = ParticleIndex;
 	}
+	
+	for (ZEUInt I = 0; I < Modifiers.GetCount(); I++)
+		Modifiers[I]->Tick(ElapsedTime);
 	
 	DeadParticleCount -= LastSpawnedParticleCount;
 	DeadParticleStartIndex = (DeadParticleStartIndex + LastSpawnedParticleCount) % DeadParticleIndices.GetCount();
-
-	for (ZEUInt I = 0; I < Modifiers.GetCount(); I++)
-		Modifiers[I]->Tick(ElapsedTime);
 }
 
 ZEParticleEmitter::ZEParticleEmitter()
@@ -782,7 +782,7 @@ bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 		{
 			ZESize Index = RenderParticleIndices[I];
 
-			Buffer[Offset++].x = ParticlePool.Sizes[Index].x;
+			Buffer[Offset].x = ParticlePool.Sizes[Index].x;
 			Buffer[Offset++].y = ParticlePool.Sizes[Index].y;
 		}
 	}

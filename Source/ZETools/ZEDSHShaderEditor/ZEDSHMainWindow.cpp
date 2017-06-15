@@ -473,10 +473,23 @@ ZEDSHCompileOptionsWindow* ZEDSHMainWindow::GetCompileOptionsWindow()
 	return CompileOptionsWindow;
 }
 
-void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions& Options)
+void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions* Options)
 {
-	CompileOptionsWindow->SetOptions(Options);
-	Editor->setPlainText((char*)Options.SourceData.GetCArray());
+	if (Options != NULL)
+	{
+		Form->actUploadToEngine->setEnabled(true);
+		CompileOptions = *Options;
+		EngineCompileOptions = Options;
+	}
+	else
+	{
+		Form->actUploadToEngine->setEnabled(false);
+		CompileOptions = ZEGRShaderCompileOptions();
+		EngineCompileOptions = NULL;
+	}
+
+	CompileOptionsWindow->SetOptions(CompileOptions);
+	Editor->setPlainText((const char*)CompileOptions.SourceData.GetConstCArray());
 
 	Loaded = true;
 	Engine = true;
@@ -484,9 +497,7 @@ void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions& Options)
 	HasChanges = false;
 	UploadedToEngine = false;
 
-	FileName = Options.FileName.ToCString();
-
-	EngineCompileOptions = &Options;
+	FileName = CompileOptions.FileName.ToCString();
 
 	actCompile_OnTrigger();
 
@@ -496,7 +507,8 @@ void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions& Options)
 
 void ZEDSHMainWindow::UploadToEngine()
 {
-	*EngineCompileOptions = GetCompileOptionsWindow()->GetOptions();
+	if (EngineCompileOptions != NULL)
+		*EngineCompileOptions = GetCompileOptionsWindow()->GetOptions();
 
 	UploadedToEngine = true;
 
@@ -572,4 +584,9 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 	connect(Editor,						SIGNAL(cursorPositionChanged()), this, SLOT(UpdateRowColNums()));
 
 	LoadRecentFiles();
+}
+
+ZEDSHMainWindow::~ZEDSHMainWindow()
+{
+	delete Form;
 }

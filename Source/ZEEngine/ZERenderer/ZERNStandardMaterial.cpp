@@ -302,7 +302,7 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	{
 		RenderState = ZERNStageGBuffer::GetRenderState();
 
-		if (AlphaCullEnabled)
+		if (AlphaCullEnabled && AlphaToCoverageEnabled)
 		{
 			ZEGRBlendState BlendState;
 			BlendState.SetAlphaToCoverageEnable(true);
@@ -382,15 +382,11 @@ bool ZERNStandardMaterial::UpdateRenderState()
 	else
 		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
-	if (TransparencyEnabled)
+	if (AlphaCullEnabled && AlphaToCoverageEnabled)
 	{
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthWriteEnable(false);
-		DepthStencilState.SetStencilTestEnable(true);
-		DepthStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
-		DepthStencilState.SetBackStencilPass(ZEGR_SO_REPLACE);
-
-		RenderState.SetDepthStencilState(DepthStencilState);
+		ZEGRBlendState BlendState;
+		BlendState.SetAlphaToCoverageEnable(true);
+		RenderState.SetBlendState(BlendState);
 	}
 
 	RasterizerState = RenderState.GetRasterizerState();
@@ -543,6 +539,7 @@ ZERNStandardMaterial::ZERNStandardMaterial()
 
 	UseInteriorVertexLayout = false;
 
+	AlphaToCoverageEnabled = false;
 	MaxTextureLOD = 0;
 	ShadowCaster = true;
 	TwoSided = false;
@@ -640,6 +637,21 @@ void ZERNStandardMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
 const ZEHolder<ZEGRSampler>& ZERNStandardMaterial::GetSampler() const
 {
 	return Sampler;
+}
+
+void ZERNStandardMaterial::SetAlphaToCoverageEnabled(bool Enabled)
+{
+	if (AlphaToCoverageEnabled == Enabled)
+		return;
+
+	AlphaToCoverageEnabled = Enabled;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
+}
+
+bool ZERNStandardMaterial::GetAlphaToCoverageEnabled() const
+{
+	return AlphaToCoverageEnabled;
 }
 
 void ZERNStandardMaterial::SetMaxTextureLOD(ZEUInt8 MaxTextureLOD)
@@ -1144,8 +1156,8 @@ void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(SpecularMap);
@@ -1307,8 +1319,8 @@ void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.Type = ZEGR_TT_2D;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
-		TextureOptions.GenerateMipMaps = true;
-		TextureOptions.MaximumMipmapLevel = 0;
+		TextureOptions.MaximumMipmapLevel = GetMaxTextureLOD();
+		TextureOptions.GenerateMipMaps = (TextureOptions.MaximumMipmapLevel != 1) ? true : false;
 		TextureOptions.sRGB = true;
 
 		UnregisterExternalResource(EmissiveMap);
@@ -2194,7 +2206,8 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 		PropertiesNode = MaterialNode->GetNode("Properties");
 	
 	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
-
+	
+	SetAlphaToCoverageEnabled(PropertiesNode.ReadBoolean("AlphaToCoverageEnabled"));
 	SetMaxTextureLOD(PropertiesNode.ReadUInt8("MaxTextureLOD", 0));
 	SetInstancingEnabled(PropertiesNode.ReadBoolean("InstancingEnabled"));
 

@@ -81,6 +81,7 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZECoreState									State;
 		ZEList2<ZEPlugin>							Plugins;
 		ZEList2<ZEModule>							Modules;
+		ZEList2<ZEModule>							LateModules;
 		ZECrashHandler*								CrashHandler;
 		ZEErrorManager*								ErrorManager;
 		ZEOptionManager*							OptionManager;
@@ -101,11 +102,10 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		bool										InitializeModules();
 		void										DeinitializeModules();
 
-		ZEPlugin*									LoadPlugin(const ZEString& Path);
-		void										UnloadPlugin(ZEPlugin* Plugin);
-
 		void										LoadPlugins();
 		void										UnloadPlugins();
+
+		void										LoadLateModules();
 
 													ZECore();
 													~ZECore();
@@ -133,7 +133,13 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZEModule*									GetModule(ZEClass* ModuleClass) const;
 		const ZEList2<ZEModule>&					GetModules() const;
 		bool										AddModule(ZEModule* Module);
+		bool										AddLateModule(ZEModule* Module);
 		bool										RemoveModule(ZEModule* Module);
+
+		ZEPlugin*									LoadPlugin(const ZEString& Path);
+		bool										UnloadPlugin(ZEPlugin* Plugin);
+		bool										AddPlugin(ZEPlugin* Plugin);
+		bool										RemovePlugin(ZEPlugin* Plugin);
 
 		bool										StartUp();
 		void										Terminate();

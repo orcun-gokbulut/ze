@@ -35,15 +35,12 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-
 #include "ZEDS/ZEArray.h"
 
 class ZEState;
 
-class ZEStateMachine : public ZEObject
+class ZEStateMachine
 {
-	ZE_OBJECT
 	friend class ZEState;
 	private:
 		ZEArray<ZEState*>				States;

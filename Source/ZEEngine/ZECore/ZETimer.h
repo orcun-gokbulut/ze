@@ -40,7 +40,7 @@
 #include "ZEExport.ZEEngine.h"
 
 class ZETimeManager;
-struct ZETimeParameters;
+class ZETimeParameters;
 
 class ZE_EXPORT_ZEENGINE ZETimer : public ZEObject
 {

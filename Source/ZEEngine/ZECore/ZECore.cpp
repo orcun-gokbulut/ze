@@ -266,8 +266,6 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 		return NULL;
 	}
 
-	Plugins.AddEnd(&Plugin->CoreLink);
-
 	#undef RegisterClass
 	ZESize DeclarationCount = Plugin->GetDeclarationCount();
 	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
@@ -279,17 +277,58 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 	return Plugin;
 }
 
-void ZECore::UnloadPlugin(ZEPlugin* Plugin)
+bool ZECore::UnloadPlugin(ZEPlugin* Plugin)
 {
+	zeCheckError(Plugin == NULL, false, "Cannot unload plugin. Plugin is NULL.");
+	zeCheckError(Plugins.Exists(Plugin), false, "Cannot unload plugin. Plugin is still added to core. Plugin Name: \"%s\".", Plugin->GetName());
+
+	HMODULE Module = (HMODULE)Plugin->GetData();
+	Plugin->Destroy();
+	FreeLibrary(Module);
+}
+
+bool ZECore::AddPlugin(ZEPlugin* Plugin)
+{
+	zeCheckError(Plugin == NULL, false, "Cannot add plugin. Plugin is NULL.");
+	zeCheckError(Plugin->CoreLink.GetInUse(), false, "Cannot add plugin. Plugin is already added to a core. Plugin Name: \"%s\".", Plugin->GetName());
+
+	ZEVersion EngineVersion = ZEVersion::GetZinekVersion();
+	ZEVersion PluginEngineVersion = Plugin->GetEngineVersion();
+	if (PluginEngineVersion.Major != EngineVersion.Major ||
+		PluginEngineVersion.Minor != EngineVersion.Minor)
+	{
+		zeError("Cannot add plugin. Plugin's engine version does not match with this engine version. "
+			"Plugin Name: \"%s\", "
+			"Plugin's Engine Version: %d.%d.", Plugin->GetName(), PluginEngineVersion.Major, PluginEngineVersion.Minor);
+
+		Plugin->Destroy();
+		return NULL;
+	}
+
+	Plugins.AddEnd(&Plugin->CoreLink);
+
+	#undef RegisterClass
 	ZESize DeclarationCount = Plugin->GetDeclarationCount();
+	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
+	for (ZESize I = 0; I < DeclarationCount; I++)
+		ZEMTProvider::GetInstance()->RegisterDeclaration(Declarations[I]);
+
+	zeLog("Plugin added. Plugin Name: \"%s\". Plugin Version: \"%s\".", Plugin->GetName(), Plugin->GetVersion().GetShortString().ToCString());
+}
+
+bool ZECore::RemovePlugin(ZEPlugin* Plugin)
+{
+	zeCheckError(Plugin == NULL, false, "Cannot remove plugin. Plugin is NULL.");
+	zeCheckError(!Plugins.Exists(Plugin), false, "Cannot remove plugin. Plugin is not added to this core. Plugin Name: \"%s\".", Plugin->GetName());
+
+		ZESize DeclarationCount = Plugin->GetDeclarationCount();
 	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
 	for (ZESize I = 0; I < DeclarationCount; I++)
 		ZEMTProvider::GetInstance()->UnregisterDeclaration(Declarations[I]);
 
 	Plugins.Remove(&Plugin->CoreLink);
 
-	FreeLibrary((HMODULE)Plugin->GetData());
-	Plugin->Destroy();
+	return true;
 }
 
 void ZECore::LoadPlugins()
@@ -303,13 +342,30 @@ void ZECore::LoadPlugins()
 		if (!FileInfo.GetExtension().EqualsIncase(".ZEPlugin"))
 			continue;
 
-		LoadPlugin(FileInfo.GetPath());
+		ZEPlugin* Plugin = LoadPlugin(FileInfo.GetPath());
+		if (Plugin != NULL)
+			AddPlugin(Plugin);
 	}
 }
 
 void ZECore::UnloadPlugins()
 {
+	while (Plugins.GetFirst() != NULL)
+	{
+		ZEPlugin* Plugin = Plugins.GetFirstItem();
+		RemovePlugin(Plugin);
+		UnloadPlugin(Plugin);
+	}
+}
 
+void ZECore::LoadLateModules()
+{
+	while (LateModules.GetFirst() != NULL)
+	{
+		ZEModule* LateModule = LateModules.GetFirst()->GetItem();
+		LateModules.Remove(LateModules.GetFirst());
+		AddModule(LateModule);
+	}
 }
 
 ZECore::ZECore() 
@@ -494,6 +550,22 @@ bool ZECore::AddModule(ZEModule* Module)
 	return true;
 }
 
+bool ZECore::AddLateModule(ZEModule* Module)
+{
+	zeCheckError(Module == NULL, false, "Cannot add late module. Module is NULL.");
+	zeCheckError(Module->Core == this, false, "Cannot add late module. Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
+
+	if (IsStartedOrStartingUp())
+	{
+		AddModule(Module);
+		return true;
+	}
+
+	LateModules.AddEnd(&Module->CoreLink);
+
+	return true;
+}
+
 bool ZECore::RemoveModule(ZEModule* Module)
 {
 	zeCheckError(Module == NULL, false, "Module is NULL.");
@@ -536,6 +608,9 @@ bool ZECore::StartUp()
 	
 	zeLog("Loading ZECore configuration.");
 	LoadConfiguration();
+
+	zeLog("Loading late modules");
+	LoadLateModules();
 
 	if (GetApplicationModule() != NULL)
 		GetApplicationModule()->PreStartup();
@@ -684,6 +759,8 @@ bool ZECore::LoadConfiguration(const ZEString& FileName)
 			zeError("Cannot load configuration. Cannot load plugin. File Name: \"%s\".", FileName.ToCString());
 			continue;
 		}
+
+		AddPlugin(Plugin);
 	}
 
 	ZEMLReaderNode ModulesNode = RootNode.GetNode("Modules");

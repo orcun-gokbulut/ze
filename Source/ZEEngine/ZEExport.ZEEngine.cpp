@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExport.ZEFoundation.h"
+#include "ZEExport.ZEEngine.h"
 
 #include "ZECommon.h"
 ZE_SUPPRESS_LNK4221

@@ -106,15 +106,15 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 
 bool ZED11ShaderCompiler::OpenShaderEditor(ZEGRShaderCompileOptions& Options)
 {
-	 HMODULE Module = GetModuleHandle("ZEDSHShaderEditorDll.dll");
+	 HMODULE Module = GetModuleHandle("ZEDSHShaderEditor.dll");
 	 if (Module == NULL)
 	 {
-		 Module = LoadLibrary("ZEDSHShaderEditorDll.dll");
+		 Module = LoadLibrary("ZEDSHShaderEditor.dll");
 		 if (Module == NULL)
 			 return false;
 	 }
 
-	 ZEGRShaderEditorFunction Function = (ZEGRShaderEditorFunction)GetProcAddress(Module, "ZEDSHEditor_RunEditor");
+	 ZEGRShaderEditorFunction Function = (ZEGRShaderEditorFunction)GetProcAddress(Module, "ZEDSHShaderEditor_RunEditor");
 	 if (Function == NULL)
 		 return false;
 

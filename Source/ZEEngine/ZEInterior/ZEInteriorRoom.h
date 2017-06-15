@@ -63,6 +63,7 @@ struct ZEInteriorRoomDraw
 	ZEUInt										VertexCount;
 	ZEHolder<const ZERNMaterial>				Material;
 	ZERNCommand									RenderCommand;
+	ZERNCommand									RenderCommandShadow;
 };
 
 class ZE_EXPORT_ZEENGINE ZEInteriorRoom : public ZEObject

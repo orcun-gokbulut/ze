@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOCKET_TCP_CLIENT_H__
-#define __ZE_SOCKET_TCP_CLIENT_H__
+#ifndef	__ZE_SOCKET_UDP_H__
+#define __ZE_SOCKET_UDP_H__
 
 #include "ZETypes.h"
 #include "ZESocketDefinitions.h"

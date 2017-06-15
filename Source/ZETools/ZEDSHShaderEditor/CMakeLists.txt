@@ -35,6 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEDSHShaderEditor.cpp				Sources)
+ze_add_source(ZEDSHShaderEditor.h				Sources)
 ze_add_source(ZEDSHErrorsWindow.cpp				Sources)
 ze_add_source(ZEDSHErrorsWindow.h				Sources QtMocs)
 ze_add_source(ZEDSHOutputWindow.cpp				Sources)
@@ -51,28 +53,24 @@ ze_add_source(ZEDSHMainWindow.ui				Sources QtUIs)
 ze_add_source(ZEDSHCompileOptionsWindow.cpp		Sources)
 ze_add_source(ZEDSHCompileOptionsWindow.h		Sources QtMocs)
 ze_add_source(ZEDSHCompileOptionsWindow.ui		Sources QtUIs)
-ze_add_source(ZEDSHMain.cpp						Sources)
+ze_add_source(ZEExport.ZEDSHShaderEditor.h		Sources)
+ze_add_source(ZEExport.ZEDSHShaderEditor.cpp	Sources)
+
+ze_add_source(ZEDSHMain.cpp						SourcesExe)
 
 qt5_wrap_cpp(QtMocFiles ${QtMocs})
 qt5_wrap_ui(QtUIFiles ${QtUIs})
-
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
-ze_add_executable(TARGET ZEDSHShaderEditor
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
-	LIBS ZEFoundation ZEEngine ZEDirect3D11 Qt5::WinMain)
-
-qt5_use_modules(ZEDSHShaderEditor Widgets)
-
-ze_add_source(ZEDSHShaderEditor.def SourcesDLL)
-ze_add_library(TARGET ZEDSHShaderEditorDLL
+ze_add_library(TARGET ZEDSHShaderEditor
 	SOURCES ${SourcesDLL} ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation ZEEngine ZEDirect3D11
 	DLL)
 
-qt5_use_modules(ZEDSHShaderEditorDLL Widgets)
-	
-set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Rundir")
-set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Rundir")
-set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Rundir")
-set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/Rundir")
+qt5_use_modules(ZEDSHShaderEditor Widgets)
+
+ze_add_executable(TARGET ZEDSHShaderEditorExecutable
+	SOURCES ${SourcesExe}
+	LIBS ZEDSHShaderEditor)
+
+set_property(TARGET ZEDSHShaderEditorExecutable PROPERTY OUTPUT_NAME "ZEDSHShaderEditor")

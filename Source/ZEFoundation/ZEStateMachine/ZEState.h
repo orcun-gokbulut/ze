@@ -46,7 +46,7 @@
 class ZEStateMachine;
 class ZEStateTransition;
 
-ZE_ENUM(ZEStateTransitionRule)
+enum ZEStateTransitionRule
 {
 	ZE_STL_NONE,
 	ZE_STL_ALLOW_LIST,
@@ -55,7 +55,6 @@ ZE_ENUM(ZEStateTransitionRule)
 
 class ZEState : public ZEObject
 {
-	ZE_OBJECT
 	friend class ZEStateMachine;
 	private:
 		ZEString							Name;

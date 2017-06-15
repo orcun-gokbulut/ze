@@ -104,7 +104,7 @@ class ZE_EXPORT_ZEENGINE ZERNFilter : public ZEObject, public ZEInitializable
 		static void								GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
 };
 
-class ZERNFilterGaussianBlur : public ZERNFilter
+class ZE_EXPORT_ZEENGINE ZERNFilterGaussianBlur : public ZERNFilter
 {
 	ZE_OBJECT
 	private:
@@ -154,7 +154,7 @@ class ZERNFilterGaussianBlur : public ZERNFilter
 												ZERNFilterGaussianBlur();
 };
 
-class ZERNFilterImageTransform : public ZERNFilter
+class ZE_EXPORT_ZEENGINE ZERNFilterImageTransform : public ZERNFilter
 {
 	ZE_OBJECT
 	private:
@@ -187,7 +187,7 @@ class ZERNFilterImageTransform : public ZERNFilter
 												ZERNFilterImageTransform();
 };
 
-class ZERNFilterEdgeDetection : public ZERNFilter
+class ZE_EXPORT_ZEENGINE ZERNFilterEdgeDetection : public ZERNFilter
 {
 	ZE_OBJECT
 	private:
@@ -207,7 +207,7 @@ class ZERNFilterEdgeDetection : public ZERNFilter
 												ZERNFilterEdgeDetection();
 };
 
-class ZERNFilterColorTransform : public ZERNFilter
+class ZE_EXPORT_ZEENGINE ZERNFilterColorTransform : public ZERNFilter
 {
 	ZE_OBJECT
 	private:
@@ -238,7 +238,7 @@ class ZERNFilterColorTransform : public ZERNFilter
 												ZERNFilterColorTransform();
 };
 
-class ZERNFilterNoise : public ZERNFilter
+class ZE_EXPORT_ZEENGINE ZERNFilterNoise : public ZERNFilter
 {
 	ZE_OBJECT
 	private:

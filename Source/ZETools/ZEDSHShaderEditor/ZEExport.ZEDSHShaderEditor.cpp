@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateTransition.h
+ Zinek Engine - ZEExport.ZEDSHShaderEditor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEExport.ZEDSHShaderEditor.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEMeta/ZEEvent.h"
-
-class ZEState;
-
-enum ZEStateTransitionType
-{
-	ZE_STT_PLANAR,
-	ZE_STT_HIERARCHICAL,
-	ZE_STT_BOTH
-};
-
-class ZEStateTransition
-{
-	friend class ZEState;
-	friend class ZEStateMachine;
-	private:
-		ZEState*							State;
-		ZEString							Name;
-		ZEStateTransitionType				Type;
-
-		ZEState*							TargetState;
-		bool								AutoTransition;
-		ZEInt								AutoTransitionPriority;
-
-	protected:
-		virtual	bool						CheckTransitionCondition() const;
-		virtual	void						Transition();
-
-	public:
-		ZEState*							GetState() const;
-
-		void								SetName(const ZEString& Name);
-		const ZEString&						GetName() const;
-
-		void								SetType(ZEStateTransitionType Type);
-		ZEStateTransitionType				GetType() const;
-
-		void								SetTargetState(ZEState* State);
-		ZEState*							GetTargetState() const;
-
-		void								SetAutoTransition(bool Enabled);
-		bool								GetAutoTransition() const;
-
-		void								SetAutoTransitionPriority(ZEInt Priority);
-		ZEInt								GetAutoTransitionPriority();
-
-		ZE_EVENT(							OnCheckTransitionCondition,(const ZEStateTransition* Transition, bool& Result));
-		ZE_EVENT(							OnTransition,(const ZEStateTransition* Transition));
-
-											ZEStateTransition();
-											~ZEStateTransition();
-};
+#include "ZECommon.h"
+ZE_SUPPRESS_LNK4221

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStateTransition.h
+ Zinek Engine - ZEDSHShaderEditor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDSHShaderEditor.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEMeta/ZEEvent.h"
+#include "ZEDSHMainWindow.h"
 
-class ZEState;
+#include "ZEFile/ZEPathManager.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
-enum ZEStateTransitionType
+#include <QApplication>
+#include <QMessageBox>
+
+void ZEDSHShaderEditor_RunEditor(ZEGRShaderCompileOptions* Options)
 {
-	ZE_STT_PLANAR,
-	ZE_STT_HIERARCHICAL,
-	ZE_STT_BOTH
-};
+	int argc = 1;
+	char* argv[] =
+	{
+		"ZEDSHShaderEditor.dll"
+	};
 
-class ZEStateTransition
-{
-	friend class ZEState;
-	friend class ZEStateMachine;
-	private:
-		ZEState*							State;
-		ZEString							Name;
-		ZEStateTransitionType				Type;
+	QApplication Application(argc, argv);
 
-		ZEState*							TargetState;
-		bool								AutoTransition;
-		ZEInt								AutoTransitionPriority;
+	if (Options != NULL)
+	{
+		int Result = QMessageBox::warning(NULL, 
+			"Zinek Engine", QString("%1 can not be compiled!\nDo you want to open Shader Editor ?").arg(Options->FileName.ToCString()), 
+			QMessageBox::Yes | QMessageBox::No);
 
-	protected:
-		virtual	bool						CheckTransitionCondition() const;
-		virtual	void						Transition();
+		if (Result != QMessageBox::Yes)
+			return;
+	}
 
-	public:
-		ZEState*							GetState() const;
+	ZEDSHMainWindow MainWindow;
+	MainWindow.Load(Options);
+	MainWindow.show();
+	Application.exec();
 
-		void								SetName(const ZEString& Name);
-		const ZEString&						GetName() const;
-
-		void								SetType(ZEStateTransitionType Type);
-		ZEStateTransitionType				GetType() const;
-
-		void								SetTargetState(ZEState* State);
-		ZEState*							GetTargetState() const;
-
-		void								SetAutoTransition(bool Enabled);
-		bool								GetAutoTransition() const;
-
-		void								SetAutoTransitionPriority(ZEInt Priority);
-		ZEInt								GetAutoTransitionPriority();
-
-		ZE_EVENT(							OnCheckTransitionCondition,(const ZEStateTransition* Transition, bool& Result));
-		ZE_EVENT(							OnTransition,(const ZEStateTransition* Transition));
-
-											ZEStateTransition();
-											~ZEStateTransition();
-};
+}

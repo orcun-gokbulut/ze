@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEPointer/ZEPointer.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
 #include <QMainWindow>
 
@@ -46,83 +47,84 @@ class ZEDSHEditorWidget;
 class ZEDSHCompileOptionsWindow;
 class QLabel;
 
-struct ZEGRShaderCompileOptions;
+class ZEGRShaderCompileOptions;
 
 class ZEDSHMainWindow : public QMainWindow
 {
 	Q_OBJECT
 	private:
-		bool Loaded;
-		bool Engine;
-		bool Compiled;
-		bool HasChanges;
-		bool UploadedToEngine;
-		QString	FileName;
+		bool								Loaded;
+		bool								Engine;
+		bool								Compiled;
+		bool								HasChanges;
+		bool								UploadedToEngine;
+		QString								FileName;
 
-		ZEPointer<Ui_ZEDSHMainWindow> Form;
-		ZEDSHEditorWidget* Editor;
-		ZEDSHOutputWindow* OutputWindow;
-		ZEDSHErrorsWindow* ErrorsWindow;
-		ZEDSHCompileOptionsWindow* CompileOptionsWindow;
-		QLabel* lblRowColNum;
+		Ui_ZEDSHMainWindow* 				Form;
+		ZEDSHEditorWidget*					Editor;
+		ZEDSHOutputWindow*					OutputWindow;
+		ZEDSHErrorsWindow*					ErrorsWindow;
+		ZEDSHCompileOptionsWindow* 			CompileOptionsWindow;
+		QLabel* 							lblRowColNum;
 
-		ZEGRShaderCompileOptions* EngineCompileOptions;
+		ZEGRShaderCompileOptions 			CompileOptions;
+		ZEGRShaderCompileOptions* 			EngineCompileOptions;
 
-		void NewDocument();
-		void OpenDocument(const QString& FileName);
-		void SaveDocument(const QString& FileName);
-		bool CloseDocument();
+		void								NewDocument();
+		void								OpenDocument(const QString& FileName);
+		void								SaveDocument(const QString& FileName);
+		bool								CloseDocument();
 
-		void RegisterRecentFile(const QString& FileName);
-		void LoadRecentFiles();
+		void								RegisterRecentFile(const QString& FileName);
+		void								LoadRecentFiles();
 
-		void UpdateUI();
+		void								UpdateUI();
 
 	private slots:
-		void Editor_OnTextChanged();
-		void Editor_OnSelectionChanged();
-		void Editor_OnCursorPositionChanged();
+		void								Editor_OnTextChanged();
+		void								Editor_OnSelectionChanged();
+		void								Editor_OnCursorPositionChanged();
 
-		void actNew_OnTrigger();
-		void actOpen_OnTrigger();
-		void actRecentFile_OnTrigger();
-		void actSave_OnTrigger();
-		void actSaveAs_OnTrigger();
-		void actClose_OnTrigger();
-		void actQuit_OnTrigger();
-		void actUndo_OnTrigger();
-		void actRedo_OnTrigger();
-		void actSelectAll_OnTrigger();
-		void actDeselect_OnTrigger();
-		void actCut_OnTrigger();
-		void actCopy_OnTrigger();
-		void actPaste_OnTrigger();
-		void actDelete_OnTrigger();
-		void actFind_OnTrigger();
-		void actReplace_OnTrigger();
-		void actCompile_OnTrigger();
-		void actPreference_OnTrigger();
-		void actOutput_OnTrigger();
-		void actError_OnTrigger();
-		void actDefinitions_OnTrigger();
-		void actCompileParameters_OnTrigger();
-		void actReflection_OnTrigger();
-		void actAbout_OnTrigger();
-		void actUploadToEngine_OnTrigger();
+		void								actNew_OnTrigger();
+		void								actOpen_OnTrigger();
+		void								actRecentFile_OnTrigger();
+		void								actSave_OnTrigger();
+		void								actSaveAs_OnTrigger();
+		void								actClose_OnTrigger();
+		void								actQuit_OnTrigger();
+		void								actUndo_OnTrigger();
+		void								actRedo_OnTrigger();
+		void								actSelectAll_OnTrigger();
+		void								actDeselect_OnTrigger();
+		void								actCut_OnTrigger();
+		void								actCopy_OnTrigger();
+		void								actPaste_OnTrigger();
+		void								actDelete_OnTrigger();
+		void								actFind_OnTrigger();
+		void								actReplace_OnTrigger();
+		void								actCompile_OnTrigger();
+		void								actPreference_OnTrigger();
+		void								actOutput_OnTrigger();
+		void								actError_OnTrigger();
+		void								actDefinitions_OnTrigger();
+		void								actCompileParameters_OnTrigger();
+		void								actReflection_OnTrigger();
+		void								actAbout_OnTrigger();
+		void								actUploadToEngine_OnTrigger();
 
-		void UploadToEngine();
-		void UpdateRowColNums();
+		void								UploadToEngine();
+		void								UpdateRowColNums();
 
-	protected:
-		void closeEvent(QCloseEvent* e);
+		void								closeEvent(QCloseEvent* e);
 
 	public:
-		ZEDSHEditorWidget* GetEditor();
-		ZEDSHOutputWindow* GetOutputWindow();
-		ZEDSHErrorsWindow* GetErrorsWindow();
-		ZEDSHCompileOptionsWindow* GetCompileOptionsWindow();
+		ZEDSHEditorWidget*					GetEditor();
+		ZEDSHOutputWindow*					GetOutputWindow();
+		ZEDSHErrorsWindow*					GetErrorsWindow();
+		ZEDSHCompileOptionsWindow*			GetCompileOptionsWindow();
 		
-		void Load(ZEGRShaderCompileOptions& Options);
+		void								Load(ZEGRShaderCompileOptions* Options);
 
-		ZEDSHMainWindow(QWidget* Parent = NULL);
+											ZEDSHMainWindow(QWidget* Parent = NULL);
+		virtual								~ZEDSHMainWindow();
 };

@@ -70,6 +70,10 @@ bool ZEATFog::UpdateShaders()
 	PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Can not compile pixel shader");
 
+	Options.EntryPoint = "ZERNFog_PixelShaderPerSample_Main";
+	PixelShaderPerSample = ZEGRShader::Compile(Options);
+	zeCheckError(PixelShaderPerSample == NULL, false, "Can not compile pixel shader");
+
 	DirtyFlags.UnraiseFlags(ZEAT_FDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZEAT_FDF_RENDER_STATES);
 
@@ -84,11 +88,13 @@ bool ZEATFog::UpdateRenderStates()
 	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
-	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
-	DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
-	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
-
-	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
+	ZEGRDepthStencilState DepthStencilStateNoTestWriteTestStencil;
+	DepthStencilStateNoTestWriteTestStencil.SetDepthTestEnable(false);
+	DepthStencilStateNoTestWriteTestStencil.SetDepthWriteEnable(false);
+	DepthStencilStateNoTestWriteTestStencil.SetStencilTestEnable(true);
+	DepthStencilStateNoTestWriteTestStencil.SetFrontStencilFunction(ZEGR_CF_EQUAL);
+	DepthStencilStateNoTestWriteTestStencil.SetBackStencilFunction(ZEGR_CF_EQUAL);
+	RenderState.SetDepthStencilState(DepthStencilStateNoTestWriteTestStencil);
 
 	ZEGRBlendState BlendStateAlphaBlend;
 	BlendStateAlphaBlend.SetBlendEnable(true);
@@ -106,6 +112,11 @@ bool ZEATFog::UpdateRenderStates()
 
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Can not compile render state");
+
+	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShaderPerSample);
+
+	RenderStateDataPerSample = RenderState.Compile();
+	zeCheckError(RenderStateDataPerSample == NULL, false, "Can not compile render state");
 
 	DirtyFlags.UnraiseFlags(ZEAT_FDF_RENDER_STATES);
 
@@ -158,7 +169,9 @@ ZEEntityResult ZEATFog::UnloadInternal()
 
 	ScreenCoverVertexShader.Release();
 	PixelShader.Release();
+	PixelShaderPerSample.Release();
 	RenderStateData.Release();
+	RenderStateDataPerSample.Release();
 
 	ConstantBuffer = NULL;
 
@@ -263,7 +276,15 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 		return;
 
 	Context->SetRenderState(RenderStateData);
+	Context->SetStencilRef(0);
 	Context->Draw(3, 0);
+
+	if (ZEGRGraphicsModule::GetInstance()->SAMPLE_COUNT > 1)
+	{
+		Context->SetRenderState(RenderStateDataPerSample);
+		Context->SetStencilRef(1);
+		Context->Draw(3, 0);
+	}
 }
 
 ZEATFog* ZEATFog::CreateInstance()

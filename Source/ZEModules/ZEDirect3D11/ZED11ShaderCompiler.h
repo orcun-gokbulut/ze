@@ -43,7 +43,7 @@
 class ZED11Module;
 class ZED11ShaderCompilerIncludeInterface;
 
-class ZED11ShaderCompiler : public ZEGRShaderCompiler
+class __declspec(dllexport) ZED11ShaderCompiler : public ZEGRShaderCompiler
 {
 	friend class ZED11Module;
 	private:
