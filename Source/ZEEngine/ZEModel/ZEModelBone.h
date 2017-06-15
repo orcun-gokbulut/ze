@@ -98,6 +98,7 @@ class ZEModelBone : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
+		void									TransformChangedWorldNonRecursive();
 
 		//void									LocalTransformChanged();
 		//void									ParentTransformChanged();

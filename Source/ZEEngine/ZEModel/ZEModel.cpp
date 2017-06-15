@@ -154,12 +154,10 @@ void ZEModel::LocalTransformChanged()
 	ZEEntity::LocalTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedWorld();
+		Bone->TransformChangedWorldNonRecursive();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedWorld();
-	
-	BoundingBoxChanged();
+		Mesh->TransformChangedWorldNonRecursive();
 }
 
 void ZEModel::ParentTransformChanged()
@@ -167,12 +165,10 @@ void ZEModel::ParentTransformChanged()
 	ZEEntity::ParentTransformChanged();
 
 	ze_for_each(Bone, Bones)
-		Bone->TransformChangedWorld();
+		Bone->TransformChangedWorldNonRecursive();
 
 	ze_for_each(Mesh, Meshes)
-		Mesh->TransformChangedWorld();
-
-	BoundingBoxChanged();
+		Mesh->TransformChangedWorldNonRecursive();
 }
 
 void ZEModel::AnimationStateChanged()
@@ -379,7 +375,7 @@ void ZEModel::AddMesh(ZEModelMesh* Mesh)
 		"Can not add mesh. Mesh already added to this Model. Model Name: \"%s\", Mesh Name: \"%s\".",
 		GetName().ToCString(), Mesh->GetName().ToCString());
 
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 
 	Mesh->SetModel(this);
 	Meshes.AddEnd(&Mesh->ModelLink);
@@ -400,7 +396,7 @@ void ZEModel::RemoveMesh(ZEModelMesh* Mesh)
 	if (Mesh->GetParent() != NULL)
 		Mesh->GetParent()->RemoveChildMesh(Mesh);
 
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 
 	Mesh->SetModel(NULL);
 	Meshes.Remove(&Mesh->ModelLink);
@@ -442,7 +438,7 @@ void ZEModel::AddBone(ZEModelBone* Bone)
 		GetName().ToCString(), Bone->GetName().ToCString());
 
 	DirtyConstantBufferSkin = true;
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 
 	Bone->SetModel(this);
 	Bones.AddEnd(&Bone->ModelLink);
@@ -464,7 +460,7 @@ void ZEModel::RemoveBone(ZEModelBone* Bone)
 		Bone->GetParent()->RemoveChildBone(Bone);
 
 	DirtyConstantBufferSkin = true;
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 
 	Bone->SetModel(NULL);
 	Bones.Remove(&Bone->ModelLink);
