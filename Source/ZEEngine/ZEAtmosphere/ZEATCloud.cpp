@@ -82,7 +82,7 @@ void ZEATCloud::CreatePlane()
 
 	float Height1 = 0.0f;
 	float Radius1 = 1.0f;
-	float CurveOffset1 = 0.2f;
+	float CurveOffset1 = 0.11f;
 	float EdgePoint1 = Radius1 / 3.0f;
 	Vertex Vertices[] = 
 	{
@@ -183,6 +183,7 @@ bool ZEATCloud::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZE_CDF_CONSTANT_BUFFER))
 		return true;
 
+	Constants.CloudDensity = Density * 64.0f;
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZE_CDF_CONSTANT_BUFFER);
@@ -244,6 +245,8 @@ ZEATCloud::ZEATCloud()
 	RenderCommand.StageMask = ZERN_STAGE_ATMOSPHERE;
 
 	CloudTexture = NULL;
+	
+	Density = 0.0f;
 
 	Constants.PlaneSubdivision = 16.0f;
 	Constants.CloudCoverage = 0.0f;
@@ -300,17 +303,17 @@ void ZEATCloud::SetCloudDensity(float CloudDensity)
 {
 	CloudDensity = ZEMath::Clamp(CloudDensity, 0.0f, 1.0f);
 
-	if (Constants.CloudDensity == CloudDensity)
+	if (Density == CloudDensity)
 		return;
 
-	Constants.CloudDensity = CloudDensity;
+	Density = CloudDensity;
 
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
 float ZEATCloud::GetCloudDensity() const
 {
-	return Constants.CloudDensity;
+	return Density;
 }
 
 void ZEATCloud::SetLightColor(const ZEVector3& LightColor)

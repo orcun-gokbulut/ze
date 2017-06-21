@@ -70,6 +70,8 @@ class ZEATCloud : public ZEEntity
 
 		ZEHolder<const ZEGRTexture>				CloudTexture;
 
+		float									Density;
+
 		struct  
 		{
 			ZEVector3							LightColor;

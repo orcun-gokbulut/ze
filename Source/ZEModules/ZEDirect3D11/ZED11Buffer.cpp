@@ -143,7 +143,8 @@ bool ZED11Buffer::Map(ZEGRResourceMapType MapType, void** Data, ZESize* SizeInBy
 		return false;
 	}
 
-	*Data = MapData.pData;
+	if (Data != NULL)
+		*Data = MapData.pData;
 
 	if (SizeInBytes != NULL)
 		*SizeInBytes = MapData.RowPitch;
