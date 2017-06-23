@@ -81,8 +81,8 @@ class ZE_EXPORT_ZEENGINE ZERNMultiplexerMaterial : public ZERNMaterial
 		ZEHolder<const ZERNMaterial>					GetSelectedMaterial() const;
 
 		virtual bool									PreRender(ZERNCommand& Command) const override;
-		virtual bool									SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const override;
-		virtual void									CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const override;
+		virtual bool									SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const override;
+		virtual void									CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const override;
 
 		virtual bool									Update() override;
 

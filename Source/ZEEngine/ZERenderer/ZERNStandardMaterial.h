@@ -419,8 +419,8 @@ class ZE_EXPORT_ZEENGINE ZERNStandardMaterial : public ZERNMaterial
 		bool											GetClippingPlanesEnabled() const;
 
 		virtual bool									PreRender(ZERNCommand& Command) const;
-		virtual bool									SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
-		virtual void									CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage, bool Instanced = false, bool LODTransitionEnabled = false) const;
+		virtual bool									SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual void									CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
 		virtual bool									Update();
 

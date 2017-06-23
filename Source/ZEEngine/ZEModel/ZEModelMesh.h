@@ -115,6 +115,7 @@ class ZE_EXPORT_ZEENGINE ZEModelMesh : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
+		void									TransformChangedWorldNonRecursive();
 		void									VisibilityChanged();
 
 		void									UpdateConstantBuffer();

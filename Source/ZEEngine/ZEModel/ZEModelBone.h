@@ -99,6 +99,7 @@ class ZE_EXPORT_ZEENGINE ZEModelBone : public ZEObject, public ZEDestroyable
 		void									TransformChangedLocal();
 		void									TransformChangedModel();
 		void									TransformChangedWorld();
+		void									TransformChangedWorldNonRecursive();
 
 		//void									LocalTransformChanged();
 		//void									ParentTransformChanged();

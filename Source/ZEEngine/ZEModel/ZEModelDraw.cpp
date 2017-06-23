@@ -112,39 +112,40 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 {
 	ZEGRContext* Context = RenderParameters->Context;
 	const ZERNStage* Stage = RenderParameters->Stage;
-	
+
+	if (!Material->SetupMaterial(Context, Stage))
+		return;
+
 	ze_for_each(Command, SubCommands)
 	{
 		ZERNCommandDraw* CommandDraw = static_cast<ZERNCommandDraw*>(Command.GetPointer());
-		bool Instanced = Material->GetInstancingEnabled();
-
-		if (!Material->SetupMaterial(Context, Stage, Instanced, (bool)CommandDraw->InstanceData.DrawLODTransition.w))
-			continue;
 
 		ZEUInt InstanceOffset = 0;
+		ZEUInt InstanceCount = CommandDraw->Instances.GetCount();
 
-		if (Instanced)
+		if (Material->GetInstancingEnabled())
 		{
-			ZERNRenderer* Renderer = RenderParameters->Renderer;
 			static ZEUInt Index = 0;
-			ZERNInstanceData* InstanceBuffer;
-			if ((Index + CommandDraw->Instances.GetCount()) >= Renderer->InstanceVertexBuffer->GetElementCount())
+
+			ZEGRBuffer* InstanceVertexBuffer = RenderParameters->Renderer->InstanceVertexBuffer;
+			ZEGRResourceMapType MapType = ZEGR_RMT_WRITE_NO_OVERWRITE;
+			if ((Index + InstanceCount) >= InstanceVertexBuffer->GetElementCount())
 			{
 				Index = 0;
-				Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_DISCARD, reinterpret_cast<void**>(&InstanceBuffer));
-			}
-			else
-			{
-				Renderer->InstanceVertexBuffer->Map(ZEGR_RMT_WRITE_NO_OVERWRITE, reinterpret_cast<void**>(&InstanceBuffer));
+				MapType = ZEGR_RMT_WRITE_DISCARD;
 			}
 
 			InstanceOffset = Index;
+
+			ZERNInstanceData* InstanceBuffer;
+			InstanceVertexBuffer->Map(MapType, reinterpret_cast<void**>(&InstanceBuffer));
+
 			ze_for_each(Instance, CommandDraw->Instances)
 				InstanceBuffer[Index++] = Instance->InstanceData;
 
-			Renderer->InstanceVertexBuffer->Unmap();
+			InstanceVertexBuffer->Unmap();
 
-			Context->SetVertexBuffer(1, Renderer->InstanceVertexBuffer);
+			Context->SetVertexBuffer(1, InstanceVertexBuffer);
 		}
 		else
 		{
@@ -159,15 +160,15 @@ void ZERNCommandDraw::Execute(const ZERNRenderParameters* RenderParameters)
 		if (Geometry->IndexBuffer != NULL)
 		{
 			Context->SetIndexBuffer(Geometry->IndexBuffer);
-			Context->DrawIndexedInstanced(Geometry->IndexCount, Geometry->IndexOffset, Geometry->VertexOffset, CommandDraw->Instances.GetCount(), InstanceOffset);
+			Context->DrawIndexedInstanced(Geometry->IndexCount, Geometry->IndexOffset, Geometry->VertexOffset, InstanceCount, InstanceOffset);
 		}
 		else
 		{
-			Context->DrawInstanced(Geometry->VertexCount, Geometry->VertexOffset, CommandDraw->Instances.GetCount(), InstanceOffset);
+			Context->DrawInstanced(Geometry->VertexCount, Geometry->VertexOffset, InstanceCount, InstanceOffset);
 		}
-
-		Material->CleanupMaterial(Context, Stage);
 	}
+
+	Material->CleanupMaterial(Context, Stage);
 }
 
 ZERNCommandDraw::ZERNCommandDraw() : InstanceLink(this)
@@ -391,6 +392,7 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 
 	if (PreRenderParameters->Type != ZERN_RT_SHADOW)
 	{
+		RenderCommand.Entity = GetModel();
 		RenderCommand.Order = (GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -GetMesh()->DrawOrder : GetMesh()->DrawOrder;
 		RenderCommand.TransformConstantBuffer = GetMesh()->ConstantBuffer;
 		RenderCommand.DrawConstantBuffer = GetConstantBuffer();
@@ -405,6 +407,7 @@ bool ZEModelDraw::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 	}
 	else
 	{
+		RenderCommandShadow.Entity = GetModel();
 		RenderCommandShadow.Order = (GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -GetMesh()->DrawOrder : GetMesh()->DrawOrder;
 		RenderCommandShadow.TransformConstantBuffer = GetMesh()->ConstantBuffer;
 		RenderCommandShadow.DrawConstantBuffer = GetConstantBuffer();

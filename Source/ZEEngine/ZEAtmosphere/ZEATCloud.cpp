@@ -184,6 +184,7 @@ bool ZEATCloud::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZE_CDF_CONSTANT_BUFFER))
 		return true;
 
+	Constants.CloudDensity = Density * 64.0f;
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZE_CDF_CONSTANT_BUFFER);
@@ -245,6 +246,8 @@ ZEATCloud::ZEATCloud()
 	RenderCommand.StageMask = ZERN_STAGE_ATMOSPHERE;
 
 	CloudTexture = NULL;
+	
+	Density = 0.0f;
 
 	Constants.PlaneSubdivision = 16.0f;
 	Constants.CloudCoverage = 0.0f;
@@ -253,7 +256,7 @@ ZEATCloud::ZEATCloud()
 	Constants.Inscattering = ZEVector3::One * 0.5f;
 	Constants.LightDirection = ZEVector3::One;
 	Constants.Translation = ZEVector2::Zero;
-	Constants.TextureTileFactor = ZEVector2(4.0f, 4.0f);
+	Constants.TextureTileFactor = ZEVector2(2.0f, 2.0f);
 
 	SetEntityFlags(ZE_EF_RENDERABLE);
 }
@@ -301,17 +304,17 @@ void ZEATCloud::SetCloudDensity(float CloudDensity)
 {
 	CloudDensity = ZEMath::Clamp(CloudDensity, 0.0f, 1.0f);
 
-	if (Constants.CloudDensity == CloudDensity)
+	if (Density == CloudDensity)
 		return;
 
-	Constants.CloudDensity = CloudDensity;
+	Density = CloudDensity;
 
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
 float ZEATCloud::GetCloudDensity() const
 {
-	return Constants.CloudDensity;
+	return Density;
 }
 
 void ZEATCloud::SetLightColor(const ZEVector3& LightColor)

@@ -179,10 +179,15 @@ void ZEModelBone::TransformChangedModel()
 
 void ZEModelBone::TransformChangedWorld()
 {
-	DirtyFlags.RaiseFlags(ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM | ZEMD_BDF_WORLD_BOUNDING_BOX);
+	TransformChangedWorldNonRecursive();
 
 	ze_for_each(ChildBone, ChildBones)
 		ChildBone->TransformChangedWorld();
+}
+
+void ZEModelBone::TransformChangedWorldNonRecursive()
+{
+	DirtyFlags.RaiseFlags(ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM | ZEMD_BDF_WORLD_BOUNDING_BOX);
 }
 
 bool ZEModelBone::Load(const ZEMDResourceBone* Resource)

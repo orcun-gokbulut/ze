@@ -40,6 +40,7 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNMath.hlsl"
 #include "ZERNSamplers.hlsl"
+#include "ZERNScene.hlsl"
 
 #define INPUT_CPOINTS	16
 #define OUTPUT_CPOINTS	16
@@ -201,12 +202,10 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 	const float AngularFactor = (1.0f / (8.0f * ZERNMath_PI));
 	float PhaseMie = AngularFactor * ((1.0f - GG) * (1.0f + CosLightView * CosLightView)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f));
 	
-	float Density = ZERNCloud_CloudDensity * dot(CloudSample, float4((ZERNCloud_CloudCoverage >= 1), (ZERNCloud_CloudCoverage >= 2), (ZERNCloud_CloudCoverage >= 3), (ZERNCloud_CloudCoverage >= 4)));
-	float Transmittance = exp(-Density * 3.0f);
-	
-	float Airmass = clamp(0.0f, 2.0f, 1.0f / dot(-ViewDirection, float3(0.0f, 1.0f, 0.0f)));
+	float Density = 0.25f * dot(CloudSample, float4((ZERNCloud_CloudCoverage >= 1), (ZERNCloud_CloudCoverage >= 2), (ZERNCloud_CloudCoverage >= 3), (ZERNCloud_CloudCoverage >= 4)));
+	float Transmittance = exp(-Density * ZERNCloud_CloudDensity);
 
-	return float4(ZERNCloud_LightColor * PhaseMie * Density * Transmittance + ZERNCloud_Inscattering * Airmass, max(1.0f - Transmittance, 0.0f));
+	return float4((ZERNCloud_LightColor * PhaseMie + ZERNCloud_Inscattering) * Density * Transmittance + ZERNScene_AmbientColor, max(1.0f - Transmittance, 0.0f));
 }
 
 #endif

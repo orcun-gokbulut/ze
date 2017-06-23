@@ -86,7 +86,7 @@ class ZE_EXPORT_ZEENGINE ZERNCommand : public ZEObject
 								ZERNCommand();
 };
 
-class ZERNCommandList : public ZEObject
+class ZE_EXPORT_ZEENGINE ZERNCommandList : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZERNRenderer;

@@ -130,11 +130,15 @@ void ZEModelMesh::TransformChangedModel()
 
 void ZEModelMesh::TransformChangedWorld()
 {
-	DirtyFlags.RaiseFlags(ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_WORLD_INV_TRANSFORM | ZEMD_MDF_WORLD_BOUNDING_BOX |
-		ZEMD_MDF_CONSTANT_BUFFER);
+	TransformChangedWorldNonRecursive();
 
 	ze_for_each(ChildMesh, ChildMeshes)
 		ChildMesh->TransformChangedWorld();
+}
+
+void ZEModelMesh::TransformChangedWorldNonRecursive()
+{
+	DirtyFlags.RaiseFlags(ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_WORLD_INV_TRANSFORM | ZEMD_MDF_WORLD_BOUNDING_BOX | ZEMD_MDF_CONSTANT_BUFFER);
 }
 
 void ZEModelMesh::VisibilityChanged()
