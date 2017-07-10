@@ -200,7 +200,8 @@ class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool							GetManageInputAcquisition() const;
 
 		ZEGROutput*						GetOutput() const;
-		
+		void							WaitForVSync();
+
 		bool							GetFocused() const;
 		bool							GetMinimized() const;
 		bool							GetMaximized() const;

@@ -68,4 +68,5 @@ class ZED11ComponentBase
 		static UINT						ConvertBindFlags(ZEFlags BindFlags);
 		static UINT						ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage);
 		static D3D11_MAP				ConvertMapType(ZEGRResourceMapType MapType);
+		static DXGI_FORMAT				ConvertToNonSRGB(ZEGRFormat Format);
 };

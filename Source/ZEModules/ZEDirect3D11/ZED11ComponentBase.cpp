@@ -527,3 +527,24 @@ D3D11_MAP ZED11ComponentBase::ConvertMapType(ZEGRResourceMapType MapType)
 			return (D3D11_MAP)0;
 	}
 }
+
+DXGI_FORMAT ZED11ComponentBase::ConvertToNonSRGB(ZEGRFormat Format)
+{
+	switch (Format)
+	{
+		case ZEGR_TF_R8G8B8A8_UNORM_SRGB:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		case ZEGR_TF_BC1_UNORM_SRGB:
+			return DXGI_FORMAT_BC1_UNORM;
+
+		case ZEGR_TF_BC3_UNORM_SRGB:
+			return DXGI_FORMAT_BC3_UNORM;
+
+		case ZEGR_TF_BC7_UNORM_SRGB:
+			return DXGI_FORMAT_BC7_UNORM;
+
+		default:
+			return ConvertFormat(Format);
+	}
+}

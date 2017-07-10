@@ -280,8 +280,8 @@ void ZERNRenderer::RenderStages()
 	ZEGRBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
 
-	if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
-		Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
+	//if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
+	//	Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
 
 	if (Resized)
 	{

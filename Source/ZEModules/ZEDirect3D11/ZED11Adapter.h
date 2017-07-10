@@ -56,6 +56,8 @@ class ZED11Monitor : public ZEGRMonitor
 	public:
 		IDXGIOutput1*							GetOutput() const;
 		virtual const ZEArray<ZEGRMonitorMode>&	GetModes() const;
+
+		virtual void							WaitForVSync() override;
 };
 
 class ZED11Adapter : public ZEGRAdapter

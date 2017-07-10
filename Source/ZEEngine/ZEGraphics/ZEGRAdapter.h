@@ -95,6 +95,7 @@ class ZEGRMonitor : public ZEObject
 		const ZERectangle&						GetArea() const;
 
 		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() const = 0;
+		virtual void							WaitForVSync() = 0;
 };
 
 class ZEGRAdapter : public ZEObject
