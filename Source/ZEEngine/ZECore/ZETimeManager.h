@@ -69,8 +69,8 @@ class ZE_EXPORT_ZEENGINE ZETimeManager : public ZEModule
 		void									UpdateFrameVariableInterval();
 		void									UpdateFrameEventBased();
 
-		virtual bool							InitializeInternal() override;
-		virtual bool							DeinitializeInternal() override;
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 												ZETimeManager();
 		virtual									~ZETimeManager();

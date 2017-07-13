@@ -51,8 +51,8 @@ class ZE_EXPORT_ZEENGINE ZEInputModule : public ZEModule
 		ZEArray<ZEInputDeviceModule*>		DeviceModules;
 		bool								Acquired;
 
-		virtual bool						InitializeInternal();
-		virtual bool						DeinitializeInternal();
+		virtual ZEInitializationResult		InitializeInternal() override;
+		virtual ZEInitializationResult		DeinitializeInternal() override;
 
 											ZEInputModule();
 		virtual								~ZEInputModule();

@@ -86,10 +86,9 @@ void ZEInputModule::UnAcquire()
 		DeviceModules[I]->UnAcquire();
 }
 
-bool ZEInputModule::InitializeInternal()
+ZEInitializationResult ZEInputModule::InitializeInternal()
 {
-	if (!ZEModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEModule);
 
 	zeLog("Initializing Input.");
 
@@ -106,35 +105,22 @@ bool ZEInputModule::InitializeInternal()
 		}
 
 		zeCore->AddModule(DeviceModule);
-		bool Result = DeviceModule->Initialize();
-		if (!Result)
-		{
-			zeError("Can not initialize input device module.");
-			DeviceModule->Destroy();
-			continue;
-		}
-
 		DeviceModules.Add(DeviceModule);
-
-		const ZEArray<ZEInputDevice*>& Devices = DeviceModule->GetDevices();
-		for (ZESize I = 0; I < DeviceModule->GetDevices().GetCount(); I++)
-		{
-			if (!Devices[I]->Initialize())
-				zeError("Cannot initialize input device.");
-		}
 	}
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEInputModule::DeinitializeInternal()
+ZEInitializationResult ZEInputModule::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
 		DeviceModules[I]->Destroy();
 
 	DeviceModules.Clear();
 
-	return ZEModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
+
+	return ZE_IR_DONE;
 }
 
 void ZEInputModule::Process()
@@ -143,8 +129,6 @@ void ZEInputModule::Process()
 		return;
 
 	Acquired = false;
-	/*for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
-		DeviceModules[I]->Process();*/
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

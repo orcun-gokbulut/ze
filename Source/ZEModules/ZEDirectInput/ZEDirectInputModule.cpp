@@ -54,10 +54,9 @@ BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, 
 	return TRUE;
 }
 
-bool ZEDirectInputModule::InitializeInternal()
+ZEInitializationResult ZEDirectInputModule::InitializeInternal()
 {
-	if (!ZEInputDeviceModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEInputDeviceModule);
 
 	HRESULT hr;
 	hr = DirectInput8Create((HINSTANCE)ZECore::GetInstance()->GetApplicationInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&DirectInput, NULL);
@@ -65,7 +64,7 @@ bool ZEDirectInputModule::InitializeInternal()
 	{	
 		Deinitialize();
 		zeError("Can not create direct input.");
-		return false;
+		return ZE_IR_DONE;
 	}
 
 	hr = DirectInput->EnumDevices(DI8DEVCLASS_ALL, &CheckDirectInputDevices, this, DIEDFL_ATTACHEDONLY);
@@ -73,13 +72,13 @@ bool ZEDirectInputModule::InitializeInternal()
 	{
 		Deinitialize();
 		zeError("Can not enumurate devices.");
-		return false;
+		return ZE_IR_DONE;
 	}
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEDirectInputModule::DeinitializeInternal()
+ZEInitializationResult ZEDirectInputModule::DeinitializeInternal()
 {
 	const ZEArray<ZEInputDevice*>& Devices = GetDevices();
 	for(ZESize I = 0; I < Devices.GetCount(); I++)
@@ -91,7 +90,9 @@ bool ZEDirectInputModule::DeinitializeInternal()
 		DirectInput = NULL;
 	}
 
-	return ZEInputDeviceModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEInputDeviceModule);
+
+	return ZE_IR_DONE;
 }
 
 ZEDirectInputModule::ZEDirectInputModule()

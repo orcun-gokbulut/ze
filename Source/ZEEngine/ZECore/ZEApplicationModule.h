@@ -60,4 +60,5 @@ class ZE_EXPORT_ZEENGINE ZEApplicationModule : public ZEModule
 
 										ZEApplicationModule();
 		virtual							~ZEApplicationModule();
-};
+}
+ZEMT_ATTRIBUTE(ZEModule.Dependencies, ZEGRGraphicsModule, ZEPhysicsModule, ZESoundModule, ZEInputModule);

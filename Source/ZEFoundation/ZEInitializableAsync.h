@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputModule.h
+ Zinek Engine - ZEInitializableAsync.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,56 +35,66 @@
 
 #pragma once
 
-#include "ZEInput/ZEInputDeviceModule.h"
-#include "ZECore/ZESystemMessageHandler.h"
-#include "ZEExport.ZEWindowsInput.h"
+#include "ZEInitializable.h"
+#include "ZEThread/ZETask.h"
+#include "ZEMeta/ZEEvent.h"
+#include "ZEExport.ZEFoundation.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#define ZE_INITIALIZABLE_FUNCTION_CHAIN(BaseClass, Function) do {ZEInitializationResult Result = __super::Function(); if (Result != ZE_IR_DONE) return Result;} while(false)
+#define ZE_INITIALIZABLE_INITIALIZE_CHAIN(BaseClass) ZE_INITIALIZABLE_FUNCTION_CHAIN(BaseClass, InitializeInternal)
+#define ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(BaseClass) ZE_INITIALIZABLE_FUNCTION_CHAIN(BaseClass, DeinitializeInternal)
 
-#define ZE_MAX_RAW_INPUT_COUNT 256
-
-class ZEInputDevice;
-class ZEWindowsInputModule;
-class ZEWindowsInputKeyboardDevice;
-class ZEWindowsInputMouseDevice;
-
-struct ZEWindowsInputMessage
+enum ZEInitializationResult
 {
-	MSG				Message;
-	RAWINPUT		RawInput;
+	ZE_IR_FAILED,
+	ZE_IR_DONE,
+	ZE_IR_ASYNC,
+	ZE_IR_COOPERATING
 };
 
-class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
+class ZE_EXPORT_ZEFOUNDATION ZEInitializableAsync
 {
-	public:
-		ZEWindowsInputModule*		Module;
-		virtual bool				Callback(MSG* Message);
-};
-
-
-class ZE_EXPORT_ZEWINDOWSINPUT ZEWindowsInputModule : public ZEInputDeviceModule
-{
-	ZE_OBJECT
-	friend class ZEWindowsInputModule;
-	friend class ZEWindowsInputSystemMessageHandler;
 	private:
-		ZEWindowsInputSystemMessageHandler	MessageHandler;
-		ZEWindowsInputMessage				Messages[ZE_MAX_RAW_INPUT_COUNT];
-		ZESize								MessageCount;
-		ZEWindowsInputMouseDevice*			MouseDevice;
-		ZEWindowsInputKeyboardDevice*		KeyboardDevice;
+		#ifdef ZE_DEBUG_ENABLE
+		bool							CallChainCompleted;
+		#endif
 
-		virtual ZEInitializationResult		InitializeInternal() override;
-		virtual ZEInitializationResult		DeinitializeInternal() override;
+		volatile ZEInitializationState	InitializationState;
+		volatile ZEInitializationState	InitializationTargetState;
+		volatile bool					ReinitializeFlag;
+		ZETask							UpdateStateTask;
 
-											ZEWindowsInputModule();
-		virtual								~ZEWindowsInputModule();
+		void							InitializationDone();
+		void							InitializationFailed();
+
+		void							DeinitializationDone();
+		void							DeinitializationFailed();
+
+		ZETaskResult					UpdateStateFunction(ZETaskThread* Thread, ZESize InstanceIndex, void* Parameters);
+		void							UpdateState();
+
+	protected:
+		virtual ZEInitializationResult	InitializeInternal();
+		virtual ZEInitializationResult	DeinitializeInternal();
 
 	public:
-		virtual void						Process(const ZETimeParameters* Parameters);
+		virtual ZEClass*				GetClass() const;
 
-		static ZEWindowsInputModule*		CreateInstance();
+		ZEInitializationState			GetInitializationState() const;
 
-}
-ZEMT_ATTRIBUTE(ZEModule.Dependencies, ZEInputModule);
+		bool							IsInitialized() const;
+		bool							IsInitializedOrInitializing() const;
+		bool							IsFailed() const;
+
+		void							Initialize();
+		void							Deinitialize();
+		void							Reinitialize();
+
+		ZE_EVENT(						OnInitialized, (ZEInitializableAsync*));
+		ZE_EVENT(						OnDeinitialized, (ZEInitializableAsync*));
+		ZE_EVENT(						OnInitializationFailed, (ZEInitializableAsync*));
+		ZE_EVENT(						OnDeinitializationFailed, (ZEInitializableAsync*));
+
+										ZEInitializableAsync();
+		virtual							~ZEInitializableAsync();
+};

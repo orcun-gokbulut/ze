@@ -129,7 +129,7 @@ bool ZEInitializable::Deinitialize()
 
 	#ifdef ZE_DEBUG_ENABLE
 	if (!CallChainCompleted)
-		zeWarning("Initialization chain is not complete. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");	
+		zeWarning("Deinitialization chain is not complete. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");	
 	#endif
 	
 	InitializationState = ZE_IS_UNINITIALIZED;
@@ -151,6 +151,9 @@ bool ZEInitializable::Reinitialize()
 ZEInitializable::ZEInitializable()
 {
 	InitializationState = ZE_IS_UNINITIALIZED;
+	#ifdef ZE_DEBUG_ENABLE
+		CallChainCompleted = false;
+	#endif
 }
 
 ZEInitializable::~ZEInitializable()

@@ -82,12 +82,11 @@ ALCcontext* ZEALModule::GetContext()
 	return Context;
 }
 
-bool ZEALModule::InitializeInternal()
+ZEInitializationResult ZEALModule::InitializeInternal()
 {	
 	zeLog("Initializing OpenAL module.");
 
-	if (!ZESoundModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZESoundModule);
 
 	ZESoundModule::BaseInitialize();
 
@@ -96,7 +95,7 @@ bool ZEALModule::InitializeInternal()
 	{
 		zeError("Can not open OpenAL device. Disabling OpenAL module");
 		SetEnabled(false);
-		return true;
+		return ZE_IR_DONE;
 	}
 
 	Context = alcCreateContext(Device, NULL);
@@ -123,10 +122,10 @@ bool ZEALModule::InitializeInternal()
 
 	zeLog("OpenAL module initialized.");
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEALModule::DeinitializeInternal()
+ZEInitializationResult ZEALModule::DeinitializeInternal()
 {	
 	zeLog("Destroying OpenAL.");
 
@@ -134,7 +133,9 @@ bool ZEALModule::DeinitializeInternal()
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
 
-	return ZESoundModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZESoundModule);
+
+	return ZE_IR_DONE;
 }
 
 void ZEALModule::SetSpeakerLayout(ZESpeakerLayout Layout)

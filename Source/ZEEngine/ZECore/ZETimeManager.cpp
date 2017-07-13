@@ -145,17 +145,16 @@ void ZETimeManager::UpdateFrameEventBased()
 	AdvanceFrame = false;
 }
 
-bool ZETimeManager::InitializeInternal()
+ZEInitializationResult ZETimeManager::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEModule);
 
 	Start();
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZETimeManager::DeinitializeInternal()
+ZEInitializationResult ZETimeManager::DeinitializeInternal()
 {
 	ze_for_each(Timer, TimerList)
 	{
@@ -163,7 +162,7 @@ bool ZETimeManager::DeinitializeInternal()
 			delete Timer.GetPointer();
 	}
 
-	return ZEInitializable::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
 }
 
 ZETimeManager::ZETimeManager()

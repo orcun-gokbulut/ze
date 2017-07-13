@@ -52,43 +52,63 @@ const ZEArray<ZEClass*>& ZEMTProvider::GetClasses()
 ZEArray<ZEClass*> ZEMTProvider::GetClasses(ZEClass* ParentClass, bool ExcludeParentClass)
 {
 	ZEArray<ZEClass*> DerivedClasses;
-	for (ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if (ExcludeParentClass && Classes[I] == ParentClass)
-			continue;
 
-		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
-			DerivedClasses.Add(Classes[I]);
+	Classes.LockRead();
+	{
+		for (ZESize I = 0; I < Classes.GetCount(); I++)
+		{
+			if (ExcludeParentClass && Classes[I] == ParentClass)
+				continue;
+
+			if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+				DerivedClasses.Add(Classes[I]);
+		}
 	}
+	Classes.UnlockRead();
 
 	return DerivedClasses;
 }
 
 ZEClass* ZEMTProvider::GetClass(const char* ClassName)
 {
-	for (ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if (strcmp(Classes[I]->GetName(), ClassName) == 0)
-			return Classes[I];
-	}
+	ZEClass* Output = NULL;
 
-	return NULL;
+	Classes.LockRead();
+	{
+		for (ZESize I = 0; I < Classes.GetCount(); I++)
+		{
+			if (strcmp(Classes[I]->GetName(), ClassName) == 0)
+			{
+				Output = Classes[I];
+				break;
+			}
+		}
+	}
+	Classes.UnlockRead();
+
+	return Output;
 }
 
 ZEClass* ZEMTProvider::GetClass(ZEClass* ParentClass, const char* ClassName)
 {
-	for(ZESize I = 0; I < Classes.GetCount(); I++)
+	ZEClass* Output = NULL;
+
+	Classes.LockRead();
 	{
-		if (strcmp(Classes[I]->GetName(), ClassName) == 0)
+		for(ZESize I = 0; I < Classes.GetCount(); I++)
 		{
-			if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
-				return Classes[I];
-			else
-				return NULL;
+			if (strcmp(Classes[I]->GetName(), ClassName) == 0)
+			{
+				if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+					Output = Classes[I];
+
+				break;
+			}
 		}
 	}
+	Classes.UnlockRead();
 
-	return NULL;
+	return Output;
 }
 
 bool ZEMTProvider::RegisterClass(ZEClass* Class)
@@ -96,12 +116,19 @@ bool ZEMTProvider::RegisterClass(ZEClass* Class)
 	if (Class == NULL)
 		return false;
 
-	if (Classes.Exists(Class))
-		return false;
+	Classes.LockWriteNested();
+	{
+		if (Classes.Exists(Class))
+		{
+			Classes.UnlockWrite();
+			return false;
+		}
 
-	RegisterClass(Class->GetParentClass());
+		RegisterClass(Class->GetParentClass());
 
-	Classes.Add(Class);
+		Classes.Add(Class);
+	}
+	Classes.UnlockWrite();
 
 	return true;
 }
@@ -118,12 +145,19 @@ const ZEArray<ZEMTEnumerator*>& ZEMTProvider::GetEnumerators()
 
 ZEMTEnumerator* ZEMTProvider::GetEnumerator(const char* EnumeratorName)
 {
-	for (ZESize I = 0; I < Enumerators.GetCount(); I++)
-	{
-		if (Enumerators[I]->GetName() == EnumeratorName)
-			return Enumerators[I];
-	}
+	ZEMTEnumerator* Enumerator = NULL;
 
+	Enumerators.LockRead();
+	{
+		for (ZESize I = 0; I < Enumerators.GetCount(); I++)
+		{
+			if (Enumerators[I]->GetName() == EnumeratorName)
+				return Enumerators[I];
+		}
+
+	}
+	Enumerators.UnlockRead();
+	
 	return NULL;
 }
 
@@ -132,10 +166,17 @@ bool ZEMTProvider::RegisterEnumerator(ZEMTEnumerator* Enumerator)
 	if (Enumerator == NULL)
 		return false;
 
-	if (Enumerators.Exists(Enumerator))
-		return false;
+	Enumerators.LockWrite();
+	{
+		if (Enumerators.Exists(Enumerator))
+		{
+			Enumerators.UnlockWrite();
+			return false;
+		}
 
-	Enumerators.Add(Enumerator);
+		Enumerators.Add(Enumerator);
+	}
+	Enumerators.UnlockWrite();
 
 	return true;
 }

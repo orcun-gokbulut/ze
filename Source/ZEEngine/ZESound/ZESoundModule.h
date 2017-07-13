@@ -80,8 +80,8 @@ class ZE_EXPORT_ZEENGINE ZESoundModule : public ZEModule
 	protected:
 		static ZEOptionSection					SoundOptions;
 
-		virtual bool							InitializeInternal() override;
-		virtual bool							DeinitializeInternal() override;
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 	public:
 		static void								BaseInitialize();

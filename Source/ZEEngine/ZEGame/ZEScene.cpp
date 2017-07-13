@@ -775,7 +775,7 @@ void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 		TaskParameters.Parameters = Parameters;
 		PreRenderTask.SetParameter(&TaskParameters);
 		PreRenderTask.SetPoolId(ZE_TPI_REAL_TIME);
-		PreRenderTask.RunInstanced();
+		PreRenderTask.RunInstancedJoined();
 
 		//const_cast<ZERNPreRenderParameters*>(Parameters)->CommandList = Parameters->Renderer->GetCommandList();
 		//ze_for_each(Entity, RenderList)

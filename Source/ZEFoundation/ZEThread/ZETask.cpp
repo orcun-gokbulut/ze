@@ -106,6 +106,14 @@ void ZETask::RunInstanced()
 	if (Function.IsNull())
 		return;
 
+	ZETaskManager::GetInstance()->RunTaskInstanced(this, false);
+}
+
+void ZETask::RunInstancedJoined()
+{
+	if (Function.IsNull())
+		return;
+
 	ZETaskManager::GetInstance()->RunTaskInstanced(this, true);
 }
 

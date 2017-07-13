@@ -62,8 +62,8 @@ class ZE_EXPORT_ZEENGINE ZEGRGraphicsModule : public ZEModule
 	protected:
 		ZEGRCounter								Counter;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 												ZEGRGraphicsModule();
 		virtual									~ZEGRGraphicsModule();

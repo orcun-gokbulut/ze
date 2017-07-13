@@ -77,7 +77,7 @@ void ZEError_Callback(ZEErrorType Type)
 	if (Core->GetCrashHandler() != NULL)
 		Core->GetCrashHandler()->Crashed(ZE_CR_CRITICIAL_ERROR);
 
-	ZECore::GetInstance()->Terminate();
+	TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
 }
 
 static void ZECore_AtExit()
@@ -85,7 +85,7 @@ static void ZECore_AtExit()
 	if (StartedCoreInstanceCount != 0)
 		zeCriticalError("Unhandled exit function call detected. You cannot exit until core is shutdown. Terminating the core. This can cause huge problems.");
 
-	ZECore::GetInstance()->Terminate();
+	TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
 }
 
 class ZECoreSystemMessageHandler : public ZESystemMessageHandler
@@ -107,116 +107,6 @@ bool ZECoreSystemMessageHandler::Callback(MSG* Message)
 	}
 }
 
-void ZECore::SetState(ZECoreState CoreState)
-{
-	this->State = CoreState;
-
-	const char* CoreStateText;
-
-	switch(CoreState)
-	{
-		default:
-			CoreStateText = "UNKNOWN";
-			break;
-
-		case ZE_CS_STARTING_UP:
-			CoreStateText = "StartUp";
-			break;
-
-		case ZE_CS_RUNNING:
-			CoreStateText = "Running";
-			break;
-
-		case ZE_CS_PAUSED:
-			CoreStateText = "Paused";
-			break;
-
-		case ZE_CS_TERMINATING:
-			CoreStateText = "Terminating";
-			break;
-
-		case ZE_CS_TERMINATED:
-			CoreStateText = "Terminated";
-			break;
-
-
-		case ZE_CS_SHUTTING_DOWN:
-			CoreStateText = "Shutting Down";
-			break;
-
-		case ZE_CS_SHUTTED_DOWN:
-			CoreStateText = "Shut Down";
-			break;
-	}
-
-	zeLog("Core state changed to \"%s\".", CoreStateText);
-}
-
-bool ZECore::InitializeModule(ZEModule* Module)
-{
-	if (Module == NULL)
-	{
-		zeError("Module is not present for initialization.");
-		return false;
-	}
-
-	Module->RegisterClasses();
-
-	if (Module->Initialize() == false)
-	{
-		Module->UnregisterClasses();
-		Module->Destroy();
-		const char* ModuleName =  Module->GetClass()->GetName();
-		zeError("Can not initialize module. Module Name : \"%s\".", ModuleName);
-		return false;
-	}
-	return true;
-}
-
-void ZECore::DeInitializeModule(ZEModule** Module)
-{
-	if (*Module != NULL)
-	{
-		(*Module)->UnregisterClasses();
-		(*Module)->Deinitialize();
-	}
-
-	*Module = NULL;
-}
-
-bool ZECore::InitializeModules()
-{
-	zeLog("Initializing Modules.");
-	ze_for_each(Module, Modules)
-	{
-		if (Module->IsInitialized())
-			continue;
-
-		zeLog("Initializing module. Module Name: \"%s\".", Module->GetClass()->GetName());
-		if (!Module->Initialize())
-		{
-			zeError("Cannot initialize module. Module Name: \"%s\".", Module->GetClass()->GetName());
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void ZECore::DeinitializeModules()
-{
-	zeLog("Deinitializing Modules.");
-	ze_for_each(Module, Modules)
-	{
-		if (!Module->IsInitialized())
-			continue;
-
-		zeLog("Initializing module. Module Name: \"%s\".", Module->GetClass()->GetName());
-		if (!Module->Deinitialize())
-			zeError("Cannot deinitialize module. Module Name: \"%s\".", Module->GetClass()->GetName());
-	}
-}
-
 ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 {
 	ZEFileInfo FileInfo(Path);
@@ -230,6 +120,8 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 
 	SetDllDirectory(FileInfo.GetParentDirectory());
 	SetDllDirectory(ZEFormat::Format("{0}\\Dependencies", FileInfo.GetParentDirectory()));
+	SetDllDirectory(ZEFormat::Format("{0}\\Dependencies\\Common", FileInfo.GetParentDirectory()));
+	SetDllDirectory(ZEFormat::Format("{0}\\Dependencies\\{1}", FileInfo.GetParentDirectory(), FileInfo.GetName()));
 	HMODULE Module = LoadLibrary(FileInfo.GetRealPath().Path);
 	SetDllDirectory(NULL);
 
@@ -280,14 +172,28 @@ ZEPlugin* ZECore::LoadPlugin(const ZEString& Path)
 bool ZECore::UnloadPlugin(ZEPlugin* Plugin)
 {
 	zeCheckError(Plugin == NULL, false, "Cannot unload plugin. Plugin is NULL.");
-	zeCheckError(Plugins.Exists(Plugin), false, "Cannot unload plugin. Plugin is still added to core. Plugin Name: \"%s\".", Plugin->GetName());
+	zeCheckError(Plugin->CoreLink.GetInUse(), false, "Cannot unload plugin. Plugin is not added to core. Plugin Name: \"%s\".", Plugin->GetName());
+	
+	if (State != ZE_CS_NONE)
+		zeWarning("Unloading plugin from alive core. This is dangerous operation. Plugin Name: \"%s\".", Plugin->GetName());
+	
+	Plugins.LockWrite();
+	{
+		ZESize DeclarationCount = Plugin->GetDeclarationCount();
+		ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
+		for (ZESize I = 0; I < DeclarationCount; I++)
+			ZEMTProvider::GetInstance()->UnregisterDeclaration(Declarations[I]);
 
-	HMODULE Module = (HMODULE)Plugin->GetData();
-	Plugin->Destroy();
-	FreeLibrary(Module);
+		Plugins.Remove(&Plugin->CoreLink);
+
+		HMODULE Module = (HMODULE)Plugin->GetData();
+		Plugin->Destroy();
+		FreeLibrary(Module);
+	}
+	Plugins.UnlockWrite();
 }
 
-bool ZECore::AddPlugin(ZEPlugin* Plugin)
+bool ZECore::LoadInternalPlugin(ZEPlugin* Plugin)
 {
 	zeCheckError(Plugin == NULL, false, "Cannot add plugin. Plugin is NULL.");
 	zeCheckError(Plugin->CoreLink.GetInUse(), false, "Cannot add plugin. Plugin is already added to a core. Plugin Name: \"%s\".", Plugin->GetName());
@@ -316,62 +222,43 @@ bool ZECore::AddPlugin(ZEPlugin* Plugin)
 	zeLog("Plugin added. Plugin Name: \"%s\". Plugin Version: \"%s\".", Plugin->GetName(), Plugin->GetVersion().GetShortString().ToCString());
 }
 
-bool ZECore::RemovePlugin(ZEPlugin* Plugin)
+void ZECore::StartUpCompleted()
 {
-	zeCheckError(Plugin == NULL, false, "Cannot remove plugin. Plugin is NULL.");
-	zeCheckError(!Plugins.Exists(Plugin), false, "Cannot remove plugin. Plugin is not added to this core. Plugin Name: \"%s\".", Plugin->GetName());
+	zeLog("Core initialized.");
 
-		ZESize DeclarationCount = Plugin->GetDeclarationCount();
-	ZEMTDeclaration* const* Declarations = Plugin->GetDeclarations();
-	for (ZESize I = 0; I < DeclarationCount; I++)
-		ZEMTProvider::GetInstance()->UnregisterDeclaration(Declarations[I]);
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PostStartup();
 
-	Plugins.Remove(&Plugin->CoreLink);
+	SplashWindow->Destroy();
+	SplashWindow = NULL;
 
-	return true;
+	State = ZE_CS_RUNNING;
 }
 
-void ZECore::LoadPlugins()
+void ZECore::ShutDownCompleted()
 {
-	ZEDirectoryInfo Info("#E:/Plugins");
-	ZEArray<ZEString> FileNames = Info.GetFiles();
-	for (ZESize I = 0; I < FileNames.GetCount(); I++)
-	{
-		ZEFileInfo FileInfo(FileNames[I]);
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PreShutdown();
 
-		if (!FileInfo.GetExtension().EqualsIncase(".ZEPlugin"))
-			continue;
+	Console->Deinitialize();
+	CrashHandler->Deinitialize();
 
-		ZEPlugin* Plugin = LoadPlugin(FileInfo.GetPath());
-		if (Plugin != NULL)
-			AddPlugin(Plugin);
-	}
-}
+	ZEEngine_UnregisterDeclarations();
+	ZEFoundation_UnregisterDeclarations();
 
-void ZECore::UnloadPlugins()
-{
-	while (Plugins.GetFirst() != NULL)
-	{
-		ZEPlugin* Plugin = Plugins.GetFirstItem();
-		RemovePlugin(Plugin);
-		UnloadPlugin(Plugin);
-	}
-}
+	StartedCoreInstanceCount--;
 
-void ZECore::LoadLateModules()
-{
-	while (LateModules.GetFirst() != NULL)
-	{
-		ZEModule* LateModule = LateModules.GetFirst()->GetItem();
-		LateModules.Remove(LateModules.GetFirst());
-		AddModule(LateModule);
-	}
+	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 }
 
 ZECore::ZECore() 
 {
+	ZEFoundation_RegisterDeclarations();
+	ZEEngine_RegisterDeclarations();
+
 	ConfigurationPath = "#E:/Configurations/ZECore.ZEConfig";
 
+	SplashWindow			= ZESplashWindow::CreateInstance();
 	CrashHandler			= new ZECrashHandler();
 	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
@@ -404,6 +291,22 @@ ZECore::ZECore()
 
 ZECore::~ZECore()
 {
+	if (State != ZE_CS_NONE)
+		zeCriticalError("Cannot deconstruct the core. Core is still starting, running or shutting down.");
+
+	while (Modules.GetFirstItem() != NULL)
+	{
+		ZEModule* Module = Modules.GetFirstItem();
+		RemoveModule(Module);
+		Module->Destroy();
+	}
+
+	while (Plugins.GetFirstItem() != NULL)
+	{
+		ZEPlugin* Plugin = Plugins.GetFirstItem();
+		UnloadPlugin(Plugin);
+	}
+
 	/*ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();*/
 
@@ -417,6 +320,9 @@ ZECore::~ZECore()
 	delete SystemMessageHandler;
 	delete SystemMessageManager;
 	delete CrashHandler;
+
+	ZEEngine_UnregisterDeclarations();
+	ZEFoundation_UnregisterDeclarations();
 }
 
 ZEErrorManager* ZECore::GetError()
@@ -480,31 +386,33 @@ ZECoreState ZECore::GetState()
 	return State;
 }
 
-bool ZECore::IsStarted()
+bool ZECore::IsAlive()
 {
-	return (State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
+	return (State == ZE_CS_RUNNING || State == ZE_CS_STARTING_UP || State == ZE_CS_SHUTTING_DOWN);
 }
 
-bool ZECore::IsStartedOrStartingUp()
+bool ZECore::IsRunning()
 {
-	return (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING || State == ZE_CS_PAUSED);
-}
-
-void ZECore::Terminate()
-{
-	SetState(ZE_CS_TERMINATING);
-	TerminateProcess(GetCurrentProcess(), EXIT_FAILURE);
+	return State == ZE_CS_RUNNING;
 }
 
 ZEModule* ZECore::GetModule(ZEClass* Class) const
 {
-	ze_for_each(Module, Modules)
+	ZEModule* Output = NULL;
+	Modules.LockRead();
 	{
-		if (ZEClass::IsDerivedFrom(Class, Module->GetClass()))
-			return Module.GetPointer();
+		ze_for_each(Module, Modules)
+		{
+			if (ZEClass::IsDerivedFrom(Class, Module->GetClass()))
+			{
+				Output = Module.GetPointer();
+				break;
+			}
+		}
 	}
+	Modules.UnlockRead();
 
-	return NULL;
+	return Output;
 }
 
 const ZEList2<ZEModule>& ZECore::GetModules() const
@@ -516,52 +424,51 @@ bool ZECore::AddModule(ZEModule* Module)
 {
 	zeCheckError(Module == NULL, false, "Cannot add module. Module is NULL.");
 	zeCheckError(Module->Core == this, false, "Cannot add module. Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
-	
-	if (IsStarted())
-		zeWarning("Adding new module to core while is already started. Not a good idea ! Module Name: \"%s\".", Module->GetClass()->GetName());
 
-	ze_for_each(CurrentModule, Modules)
+	Modules.LockWriteNested();
 	{
-		// Check MultiInstance
-		if (Module->GetClass()->CheckAttributeHasValue("ZEModule.MultiInstance", "false"))
+		ze_for_each(CurrentModule, Modules)
 		{
-			if (ZEClass::IsDerivedFrom(CurrentModule->GetClass(), Module))
+			// Check MultiInstance
+			if (Module->GetClass()->CheckAttributeHasValue("ZEModule.MultiInstance", "false"))
 			{
-				zeError(
-					"Cannot add module. There is an already added module with same/derived class that does not allow MultiInstance."
-					"Already Registred Module Name: \"%s\", Module Name: \"%s\".\n",
-					CurrentModule->GetClass()->GetName(), Module->GetClass()->GetName());
+				if (ZEClass::IsDerivedFrom(CurrentModule->GetClass(), Module))
+				{
+					zeError(
+						"Cannot add module. There is an already added module with same/derived class that does not allow MultiInstance."
+						"Already Registred Module Name: \"%s\", Module Name: \"%s\".\n",
+						CurrentModule->GetClass()->GetName(), Module->GetClass()->GetName());
 
-				return false;
+					Modules.UnlockWrite();
+					return false;
+				}
 			}
 		}
+
+		Module->Core = this;
+		if (!Module->SetupDependence())
+		{
+			zeError("Cannot add module. Error setting up module dependencies. Module Name: \"%s\".\n", Module->GetClass()->GetName());
+			Module->Core = NULL;
+
+			Modules.UnlockWrite();
+			return false;
+		}
+
+		#define ZE_CORE_MODULE(Type, Variable) if (ZEClass::IsDerivedFrom(Type::Class(), Module)) Variable = static_cast<Type*>(Module);
+		#include "ZECoreModules.h"
+		#undef ZE_CORE_MODULE
+
+		Module->Core = this;
+		Modules.AddEnd(&Module->CoreLink);
+		
+		if (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING)
+		{
+			if (Module->CheckUninitializedDependency())
+				Module->Initialize();
+		}
 	}
-
-	#define ZE_CORE_MODULE(Type, Variable) if (ZEClass::IsDerivedFrom(Type::Class(), Module)) Variable = static_cast<Type*>(Module);
-	#include "ZECoreModules.h"
-	#undef ZE_CORE_MODULE
-
-	Module->Core = this;
-	Modules.AddEnd(&Module->CoreLink);
-	Module->RegisterClasses();
-	if (IsStartedOrStartingUp())
-		Module->Initialize();
-
-	return true;
-}
-
-bool ZECore::AddLateModule(ZEModule* Module)
-{
-	zeCheckError(Module == NULL, false, "Cannot add late module. Module is NULL.");
-	zeCheckError(Module->Core == this, false, "Cannot add late module. Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
-
-	if (IsStartedOrStartingUp())
-	{
-		AddModule(Module);
-		return true;
-	}
-
-	LateModules.AddEnd(&Module->CoreLink);
+	Modules.UnlockWrite();
 
 	return true;
 }
@@ -570,24 +477,33 @@ bool ZECore::RemoveModule(ZEModule* Module)
 {
 	zeCheckError(Module == NULL, false, "Module is NULL.");
 	zeCheckError(Module->Core == this, false, "Module is already registered. Module Name: \"%s\".", Module->GetClass()->GetName());
+	zeCheckError(Module->CheckInitializedDependent(), false, "Cannot remove module. There are modules that depends on this module.");
 	
-	if (IsStarted())
-		zeWarning("Removing a module from core while is already started. Not a good idea ! Module Name: \"%s\".", Module->GetClass()->GetName());
+	if (IsAlive())
+		zeWarning("Removing a module from core while is already alive. Not a good idea ! Module Name: \"%s\".", Module->GetClass()->GetName());
 
-	#define ZE_CORE_MODULE(Type, Variable) if (Variable == NULL) Variable = NULL;
-	#include "ZECoreModules.h"
-	#undef  ZE_CORE_MODULE
+	Modules.LockWrite();
+	{
+		#define ZE_CORE_MODULE(Type, Variable) if (Variable == NULL) Variable = NULL;
+		#include "ZECoreModules.h"
+		#undef  ZE_CORE_MODULE
 
-	Module->Deinitialize();
-	Module->Core = NULL;
-	Modules.Remove(&Module->CoreLink);
-	Module->UnregisterClasses();
+		Module->Deinitialize();
+		Module->Core = NULL;
+		Modules.Remove(&Module->CoreLink);
+	}
+	Modules.UnlockWrite();
 
 	return true;
 }
 
-bool ZECore::StartUp()
+void ZECore::StartUp()
 {
+	if (State != ZE_CS_NONE)
+		return;
+
+	State = ZE_CS_STARTING_UP;
+
 	OldErrorCallback = ZEError::GetInstance()->GetCallback();
 	ZEError::GetInstance()->SetCallback(ZEErrorCallback::Create<&ZEError_Callback>());
 
@@ -597,20 +513,11 @@ bool ZECore::StartUp()
 
 	ApplicationInstance = GetModuleHandle(NULL);
 
-	SetState(ZE_CS_STARTING_UP);
-
 	ZESplashWindow* SplashWindow = ZESplashWindow::CreateInstance();
 	SplashWindow->Show();
 
-	zeLog("Loading declarations.");
-	ZEFoundation_RegisterDeclarations();
-	ZEEngine_RegisterDeclarations();
-	
 	zeLog("Loading ZECore configuration.");
 	LoadConfiguration();
-
-	zeLog("Loading late modules");
-	LoadLateModules();
 
 	if (GetApplicationModule() != NULL)
 		GetApplicationModule()->PreStartup();
@@ -620,99 +527,87 @@ bool ZECore::StartUp()
 	
 	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString().ToCString());
 	zeLog("Initializing core...");
-
-	zeLog("Initializing Modules...");
-	if (!InitializeModules())
-		zeCriticalError("Can not initialize modules.");
-	zeLog("Modules initialized.");
-
+	
 	if (ApplicationModule != NULL)
 		ApplicationModule->StartUp();
 
 	Console->EnableInput();
-
-	zeLog("Core initialized.");
-
-	if (GetApplicationModule() != NULL)
-		GetApplicationModule()->PostStartup();
-
-	SplashWindow->Destroy();
-	SplashWindow = NULL;
-
-	SetState(ZE_CS_PAUSED);
-
-	return true;
 }
 
 void ZECore::ShutDown()
 {
-	SetState(ZE_CS_SHUTTING_DOWN);
-	zeLog("Deinitializing Core.");
-
-	if (GetApplicationModule() != NULL)
-		GetApplicationModule()->PreShutdown();
-
-	zeLog("Saving options.");
-	if (State == ZE_CS_CRITICAL_ERROR)
-		zeLog("Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
-	OptionManager->Save("#E:/options.ini");
-
-	zeLog("Releasing shared resources.");
-	ResourceManager->ReleaseAllResources();
-
-	zeLog("Releasing cached resources.");
-	ResourceManager->UncacheAllResources();
-	
-	zeLog("Core deinitialized.");
-	zeLog("Terminating engine.");
-
-	Console->Deinitialize();
-	CrashHandler->Deinitialize();
-
-	ZEEngine_UnregisterDeclarations();
-	ZEFoundation_UnregisterDeclarations();
-
-	SetState(ZE_CS_NONE);
-	
-	StartedCoreInstanceCount--;
-
-	ZEError::GetInstance()->SetCallback(OldErrorCallback);
+	zeLog("Shuting Down Core.");
+	State = ZE_CS_SHUTTING_DOWN;
 }
 
 void ZECore::Process()
 {
-	if (GetState() != ZE_CS_RUNNING)
-		return;
+	ZETimeParameters Parameters;
+	if (GetTimeManager() != NULL)
+		Parameters = *GetTimeManager()->GetParameters();
 
-	const ZETimeParameters* Parameters = GetTimeManager()->GetParameters();
 	GetConsole()->Process();
 	SystemMessageManager->ProcessMessages();
 
-	ze_for_each(Module, Modules)
-		Module->PreProcess(Parameters);
+	Modules.LockRead();
+	{
+		if (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING)
+		{
+			bool AllModulesInitialized = true;
+			ze_for_each(Module, Modules)
+			{
+				if (!Module->IsInitializedOrInitializing() && Module->GetInitializationState() != ZE_IS_ERROR_INITIALIZATION)
+				{
+					AllModulesInitialized = false;
+					if (Module->CheckUninitializedDependency())
+						Module->Initialize();
+				}
+			}
 
-	ze_for_each(Module, Modules)
-		Module->Process(Parameters);
+			if (AllModulesInitialized)
+				State = ZE_CS_RUNNING;
+		}
+		else if (State == ZE_CS_SHUTTING_DOWN)
+		{
+			bool AllModuleDeinitialized = true;
+			ze_for_each(Module, Modules)
+			{
+				if (Module->IsInitializedOrInitializing())
+				{
+					AllModuleDeinitialized = false;
+					if (Module->CheckInitializedDependent())
+						Module->Deinitialize();
+				}
+			}
+		}
 
-	ze_for_each(Module, Modules)
-		Module->PostProcess(Parameters);
-}
+		ze_for_each(Module, Modules)
+		{
+			if (Module->IsInitialized())
+				Module->PreProcess(&Parameters);
+		}
 
-void ZECore::MainLoop()
-{
-	while (State == ZE_CS_RUNNING)
-		Process();
+		ze_for_each(Module, Modules)
+		{
+			if (Module->IsInitialized())
+				Module->Process(&Parameters);
+		}
+
+		ze_for_each(Module, Modules)
+		{
+			if (Module->IsInitialized())
+				Module->PostProcess(&Parameters);
+		}
+	}
+	Modules.UnlockRead();
 }
 
 bool ZECore::Execute()
 {
-	if (!StartUp())
-		return false;
+	StartUp();
 
-	Run();
-	MainLoop();
-
-	ShutDown();
+	while (State != ZE_CS_NONE)
+		Process();
 
 	return true;
 }
@@ -760,7 +655,7 @@ bool ZECore::LoadConfiguration(const ZEString& FileName)
 			continue;
 		}
 
-		AddPlugin(Plugin);
+		LoadInternalPlugin(Plugin);
 	}
 
 	ZEMLReaderNode ModulesNode = RootNode.GetNode("Modules");
@@ -818,18 +713,6 @@ bool ZECore::SaveConfiguration(const ZEString& FileName)
 	Writer.Close();
 
 	return true;
-}
-
-void ZECore::Run()
-{
-	zeCheckError(State != ZE_CS_PAUSED, ZE_VOID, "Cannot run the core. Core is not started up or paused.");
-	SetState(ZE_CS_RUNNING);
-}
-
-void ZECore::Pause()
-{
-	zeCheckError(State != ZE_CS_PAUSED, ZE_VOID, "Cannot pause the core. Core is not running.");
-	SetState(ZE_CS_PAUSED);
 }
 
 ZECore* ZECore::GetInstance()

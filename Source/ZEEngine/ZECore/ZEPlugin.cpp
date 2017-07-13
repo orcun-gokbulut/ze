@@ -50,11 +50,13 @@
 ZEPlugin::ZEPlugin() : CoreLink(this)
 {
 	Data = NULL;
+	Core = NULL;
 }
 
 ZEPlugin::~ZEPlugin()
 {
-
+	if (Core != NULL)
+		zeCriticalError("Cannot deconstruct plugin it is still loaded to the core. Plugin Name: \"%s\".", GetName());
 }
 
 const char* ZEPlugin::GetName() const
@@ -65,6 +67,11 @@ const char* ZEPlugin::GetName() const
 ZEVersion ZEPlugin::GetVersion() const
 {
 	return ZEVersion(1, 0, 0);
+}
+
+ZECore* ZEPlugin::GetCore() const
+{
+	return Core;
 }
 
 ZEVersion ZEPlugin::GetEngineVersion() const

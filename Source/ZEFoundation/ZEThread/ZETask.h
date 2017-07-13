@@ -117,6 +117,7 @@ class ZETask
 
 		void							Run();
 		void							RunInstanced();
+		void							RunInstancedJoined();
 		void							Wait();
 
 										ZETask();

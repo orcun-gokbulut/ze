@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECT_INPUT_DEVICE_H__
-#define __ZE_DIRECT_INPUT_DEVICE_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -65,5 +63,3 @@ class ZEDirectInputDevice : public ZEInputDevice
 												ZEDirectInputDevice();
 		virtual									~ZEDirectInputDevice();
 };
-
-#endif

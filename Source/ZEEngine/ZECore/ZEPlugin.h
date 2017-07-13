@@ -51,6 +51,7 @@ class ZE_EXPORT_ZEENGINE ZEPlugin
 	ZE_DISALLOW_COPY(ZEPlugin)
 	friend class ZECore;
 	private:
+		ZECore*									Core;
 		ZELink<ZEPlugin>						CoreLink;
 		ZEString								FileName;
 		ZESharedLibraryData*					Data;
@@ -62,6 +63,7 @@ class ZE_EXPORT_ZEENGINE ZEPlugin
 	public:
 		virtual const char*						GetName() const;
 		virtual ZEVersion						GetVersion() const;
+		ZECore*									GetCore() const;
 		virtual ZEVersion						GetEngineVersion() const;
 		virtual ZESharedLibraryData*			GetData() const;
 		const ZEString&							GetFileName() const;

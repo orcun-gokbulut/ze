@@ -220,21 +220,20 @@ void ZECrashHandler::UnregisterHandlers()
 	signal(SIGTERM, OldTerminateSignalHandler);
 }
 
-bool ZECrashHandler::InitializeInternal()
+ZEInitializationResult ZECrashHandler::InitializeInternal()
 {
-	if (!ZEModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEModule);
 
 	RegisterHandlers();
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZECrashHandler::DeinitializeInternal()
+ZEInitializationResult ZECrashHandler::DeinitializeInternal()
 {
 	UnregisterHandlers();
 
-	return ZEModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
 }
 
 ZECrashHandler::ZECrashHandler()

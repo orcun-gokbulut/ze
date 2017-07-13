@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECT_INPUT_MODULE_H__
-#define __ZE_DIRECT_INPUT_MODULE_H__
 
 #include "ZEInput/ZEInputDeviceModule.h"
 #include "ZEDirectInputDevice.h"
@@ -47,8 +45,8 @@ class ZEDirectInputModule : public ZEInputDeviceModule
 	ZE_OBJECT
 	friend BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceDescription, LPVOID Ref);
 	private:
-		virtual bool						InitializeInternal();
-		virtual bool						DeinitializeInternal();
+		virtual ZEInitializationResult		InitializeInternal() override;
+		virtual ZEInitializationResult		DeinitializeInternal() override;
 
 											ZEDirectInputModule();
 		virtual								~ZEDirectInputModule();
@@ -56,9 +54,8 @@ class ZEDirectInputModule : public ZEInputDeviceModule
 	public:
 		LPDIRECTINPUT8						DirectInput;
 
-		virtual void						Process(const ZETimeParameters* Parameters);
+		virtual void						Process(const ZETimeParameters* Parameters) override;
 
 		static ZEDirectInputModule*			CreateInstance();
-};
-
-#endif
+}
+ZEMT_ATTRIBUTE(ZEModule.Dependencies, ZEInputModule);

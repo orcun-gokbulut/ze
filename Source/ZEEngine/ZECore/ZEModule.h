@@ -36,18 +36,19 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
+#include "ZEInitializableAsync.h"
 #include "ZEDestroyable.h"
 
 #include "ZEDS/ZELink.h"
 #include "ZEExport.ZEEngine.h"
+#include "ZEMeta/ZEEvent.h"
 
 class ZECore;
 class ZETimeParameters;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
+class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializableAsync, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZECore;
@@ -56,17 +57,21 @@ class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, pub
 		ZELink<ZEModule>				CoreLink;
 		bool							Enabled;
 		ZEString						ConfigurationFileName;
+		ZEArray<ZEModule*>				DependentModules;
+		ZEArray<ZEModule*>				DependencyModules;
+		bool							BrokenDependency;
 
 		void							FindConfigurationFileName();
 
 	protected:
 		void							SetConfigurationFileName(const ZEString& FileName);
 
-		virtual void					RegisterClasses();
-		virtual void					UnregisterClasses();
+		virtual ZEInitializationResult	InitializeInternal() override;
+		virtual ZEInitializationResult	DeinitializeInternal() override;
 
-		virtual bool					InitializeInternal() override;
-		virtual bool					DeinitializeInternal() override;
+		bool							SetupDependence();
+		bool							CheckUninitializedDependency();
+		bool							CheckInitializedDependent();
 
 										ZEModule();
 		virtual							~ZEModule();
@@ -75,6 +80,8 @@ class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, pub
 		ZECore*							GetCore() const;
 		virtual ZEClass*				GetBaseModule() const;
 		const ZEString&					GetConfigurationFileName() const;
+		const ZEArray<ZEModule*>&		GetDependencyModules() const;
+		const ZEArray<ZEModule*>&		GetDependentModules() const;
 
 		virtual bool					GetEnabled() const;
 		virtual void					SetEnabled(bool Enabled);
@@ -90,7 +97,14 @@ class ZE_EXPORT_ZEENGINE ZEModule : public ZEObject, public ZEInitializable, pub
 		bool							SaveConfiguration();
 		bool							SaveConfiguration(const ZEString& FileName);
 		virtual bool					SaveConfiguration(ZEMLWriterNode& ConfigNode);
+
+		ZE_EVENT(						OnInitializationDone,(ZEModule* Module));
+		ZE_EVENT(						OnInitializationFailed,(ZEModule* Module));
+		ZE_EVENT(						OnDeinitializationDone,(ZEModule* Module));
+		ZE_EVENT(						OnDeinitializationFailed,(ZEModule* Module));
 }
 ZEMT_ATTRIBUTE(ZEModule.Dependencies)
 ZEMT_ATTRIBUTE(ZEModule.MultiInstance, false)
-ZEMT_ATTRIBUTE(ZEModule.MultiThreaded, true);
+ZEMT_ATTRIBUTE(ZEModule.Dependencies)
+ZEMT_ATTRIBUTE(ZEModule.ProcessOrderBefore)
+ZEMT_ATTRIBUTE(ZEModule.ProcessOrderAfter);

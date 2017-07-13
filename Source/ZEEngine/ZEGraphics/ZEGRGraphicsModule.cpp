@@ -101,8 +101,10 @@ ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()
 	return ZECore::GetInstance()->GetGraphicsModule();
 }
 
-bool ZEGRGraphicsModule::InitializeInternal()
+ZEInitializationResult ZEGRGraphicsModule::InitializeInternal()
 {
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEModule);
+
 	HRESULT HR = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	if (HR != RPC_E_CHANGED_MODE)
 	{
@@ -113,16 +115,16 @@ bool ZEGRGraphicsModule::InitializeInternal()
 		if (WICFactory == NULL)
 		{
 			zeError("WIC Factory creation failed.");
-			return false;
+			return ZE_IR_FAILED;
 		}
 
 		SetWICFactory(WICFactory);
 	}
 
-	return ZEModule::InitializeInternal();
+	return ZE_IR_DONE;
 }
 
-bool ZEGRGraphicsModule::DeinitializeInternal()
+ZEInitializationResult ZEGRGraphicsModule::DeinitializeInternal()
 {
 	extern ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
 	InstanceVertexBuffer.Release();
@@ -130,7 +132,9 @@ bool ZEGRGraphicsModule::DeinitializeInternal()
 	if (IsComInitialized)
 		CoUninitialize();
 
-	return ZEModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
+
+	return ZE_IR_DONE;
 }
 
 ZEGRGraphicsModule::ZEGRGraphicsModule()

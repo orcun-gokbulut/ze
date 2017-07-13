@@ -78,7 +78,7 @@ void ZELockRW::UnlockRead()
 	if (WriterCount > 0)
 	{
 		zeDebugCheck(AccessLock.OwnerThreadId != ZEThread::GetCurrentThreadId(), "Cannot UnlockWrite. Nested read lock is not locked by this thread.");
-		zeDebugCheck(ReaderCount >= 0, "Cannot UnlockWrite. Lock is not locked for nested read.");
+		zeDebugCheck(ReaderCount >= 0, "Cannot UnlockRead. Lock is not locked for nested read.");
 		ReaderCount++;
 		CountersLock.Unlock();
 	}

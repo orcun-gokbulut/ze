@@ -120,7 +120,7 @@ void ZEErrorManager::ErrorCallback(ZEErrorType Level)
 
 	if (Level == ZE_ET_CRITICAL_ERROR)
 	{
-		zeCore->Terminate();
+		//zeCore->Terminate();
 		ZEConsoleWindow ConsoleWindow;
 		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 		ConsoleWindow.TerminationState();

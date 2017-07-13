@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AL_MODULE_H__
-#define __ZE_AL_MODULE_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -76,8 +74,8 @@ class ZEALModule : public ZESoundModule
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 												ZEALModule();
 		virtual									~ZEALModule();
@@ -114,5 +112,4 @@ class ZEALModule : public ZESoundModule
 		virtual ZEListener*						CreateListener();
 
 		static ZEALModule*						CreateInstance();
-};		
-#endif
+};

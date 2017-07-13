@@ -51,7 +51,7 @@ class ZE_EXPORT_ZEENGINE ZEInputDeviceModule : public ZEModule
 		void								UnregisterDevice(ZEInputDevice* Device);
 		void								DestroyDevices();
 
-		virtual bool						DeinitializeInternal();
+		virtual ZEInitializationResult		DeinitializeInternal() override;
 
 		virtual								~ZEInputDeviceModule();
 

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AL_COMPONENT_BASE_H__
-#define __ZE_AL_COMPONENT_BASE_H__
 
 #include "ZEALModule.h"
 #include <AL/al.h>
@@ -67,5 +65,3 @@ class ZEALComponentBase
 	public:
 		static bool						BaseInitialize(ZEALModule* D3DModule);
 };
-
-#endif

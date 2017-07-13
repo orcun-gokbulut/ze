@@ -57,8 +57,8 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxCookingInterface*						CookingInterface;
 		ZEArray<ZEPhysXPhysicalWorld*>			PhysicalWorlds;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 												ZEPhysXModule();
 		virtual									~ZEPhysXModule();

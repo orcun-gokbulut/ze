@@ -88,12 +88,14 @@ const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
 	return Devices;
 }
 
-bool ZEInputDeviceModule::DeinitializeInternal()
+ZEInitializationResult ZEInputDeviceModule::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Deinitialize();
 
-	return ZEModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
+
+	return ZE_IR_DONE;
 }
 
 void ZEInputDeviceModule::Acquire()

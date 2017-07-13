@@ -41,6 +41,7 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZECore.h"
 #include "ZEApplicationModule.h"
+#include "ZEMeta/ZEMTProvider.h"
 
 void ZEModule::FindConfigurationFileName()
 {
@@ -91,32 +92,110 @@ void ZEModule::SetConfigurationFileName(const ZEString& FileName)
 	ConfigurationFileName = FileName;
 }
 
-void ZEModule::RegisterClasses()
+ZEInitializationResult ZEModule::InitializeInternal()
 {
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEInitializableAsync);
 
-}
+	zeCheckError(Core == NULL, ZE_IR_FAILED, "Cannot initialize module. Module is not added to a core. Module Name: \"%s\".", GetClass()->GetName());
 
-void ZEModule::UnregisterClasses()
-{
-
-}
-
-bool ZEModule::InitializeInternal()
-{
-	if (!ZEInitializable::InitializeInternal())
-		return false;
-
-	RegisterClasses();
 	LoadConfiguration();
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEModule::DeinitializeInternal()
+ZEInitializationResult ZEModule::DeinitializeInternal()
 {
-	UnregisterClasses();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEInitializableAsync);
 
-	return ZEInitializable::DeinitializeInternal();
+	return ZE_IR_DONE;
+}
+
+bool ZEModule::SetupDependence()
+{
+	BrokenDependency = false;
+
+	const ZEMTAttribute* Attribute = GetClass()->GetAttribute("ZEModule.Dependencies");
+	if (Attribute != NULL && Attribute->ValueCount != 0)
+	{
+		const ZEList2<ZEModule>& CoreModules = GetCore()->GetModules();
+		CoreModules.LockRead();
+		{
+			for (ZESize I = 0; I < Attribute->ValueCount; I++)
+			{
+				const char* ClassName = Attribute->Values[I];
+				ZEClass* Class = ZEMTProvider::GetInstance()->GetClass(ClassName);
+				if (Class == NULL)
+				{
+					zeError("Cannot setup module dependence. Cannot find dependency module class. Module Name: \"%s\". Dependency Module Class: \"%s\".", 
+						GetClass()->GetName(),
+						ClassName);
+
+					BrokenDependency = true;
+					continue;
+				}
+
+				ZEModule* Module = GetCore()->GetModule(Class);
+				if (Module == NULL)
+				{
+					zeError("Cannot setup module dependence. Dependency module is not added to core. Module Name: \"%s\". Dependency Module Name: \"%s\".", 
+						GetClass()->GetName(),
+						ClassName);
+
+					BrokenDependency = true;
+					continue;
+				}
+
+				if (!DependencyModules.Exists(Module))
+					DependencyModules.Add(Module);	
+			}
+
+		}
+		CoreModules.UnlockRead();
+	}
+
+	if (BrokenDependency)
+		DependencyModules.Clear();
+
+	return !BrokenDependency;
+}
+
+bool ZEModule::CheckUninitializedDependency()
+{
+	bool Result = true;
+	DependencyModules.LockRead();
+	{
+		for (ZESize I = 0; I < DependencyModules.GetCount(); I++)
+		{
+			if (!DependencyModules[I]->IsInitialized())
+			{
+				Result = false;
+				break;
+			}
+		}
+	}
+	DependencyModules.UnlockRead();
+
+	return Result;
+}
+
+bool ZEModule::CheckInitializedDependent()
+{
+	bool Result = true;
+
+	DependentModules.LockRead();
+	{
+		for (ZESize I = 0; I < DependentModules.GetCount(); I++)
+		{
+			if (DependentModules[I]->IsInitializedOrInitializing())
+			{
+				Result = false;
+				break;
+			}
+		}
+	}
+	DependentModules.UnlockRead();
+
+	return Result;
 }
 
 ZEModule::ZEModule() : CoreLink(this)
@@ -127,9 +206,11 @@ ZEModule::ZEModule() : CoreLink(this)
 
 ZEModule::~ZEModule()
 {
-	Deinitialize();
+	if (IsInitializedOrInitializing())
+		zeCriticalError("Cannot destruct module. Module is initialized or initializing. Module: \"%s\"", GetClass()->GetName());
+	
 	if (Core != NULL)
-		Core->RemoveModule(this);
+		zeCriticalError("Cannot destruct module. Module is still added to the core. Module: \"%s\"", GetClass()->GetName());
 }
 
 ZECore* ZEModule::GetCore() const
@@ -139,12 +220,26 @@ ZECore* ZEModule::GetCore() const
 
 ZEClass* ZEModule::GetBaseModule() const
 {
-	return GetClass();
+	if (GetClass()->GetParentClass() != NULL)
+		return GetClass()->GetParentClass();
+	else
+		return GetClass();
 }
 
 const ZEString& ZEModule::GetConfigurationFileName() const
 {
 	return ConfigurationFileName;
+}
+
+
+const ZEArray<ZEModule*>& ZEModule::GetDependencyModules() const
+{
+	return DependencyModules;
+}
+
+const ZEArray<ZEModule*>& ZEModule::GetDependentModules() const
+{
+	return DependentModules;
 }
 
 void ZEModule::SetEnabled(bool Enabled)

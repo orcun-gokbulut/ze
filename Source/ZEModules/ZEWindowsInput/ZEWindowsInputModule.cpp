@@ -74,12 +74,11 @@ ZEWindowsInputModule::~ZEWindowsInputModule()
 	Deinitialize();
 }
 
-bool ZEWindowsInputModule::InitializeInternal()
+ZEInitializationResult ZEWindowsInputModule::InitializeInternal()
 {	
 	zeLog("Initializing Windows Input.");
 
-	if (!ZEInputDeviceModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEInputDeviceModule);
 
 	RAWINPUTDEVICE Rid[2];    
 	// Mouse
@@ -97,7 +96,7 @@ bool ZEWindowsInputModule::InitializeInternal()
 	if (RegisterRawInputDevices(Rid, 2, sizeof(RAWINPUTDEVICE)) == FALSE) 
 	{
 		zeError("Can not register input devices.");
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	if (MouseDevice == NULL)
@@ -115,16 +114,18 @@ bool ZEWindowsInputModule::InitializeInternal()
 	MessageHandler.Module = this;
 	MessageHandler.Register();
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEWindowsInputModule::DeinitializeInternal()
+ZEInitializationResult ZEWindowsInputModule::DeinitializeInternal()
 {
 	KeyboardDevice->Deinitialize();
 	MouseDevice->Deinitialize();
 	MessageHandler.Unregister();
 
-	return ZEInputDeviceModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEInputDeviceModule);
+
+	return ZE_IR_DONE;
 }
 
 void ZEWindowsInputModule::Process(const ZETimeParameters* Parameters)

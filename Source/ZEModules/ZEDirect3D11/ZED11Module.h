@@ -54,8 +54,8 @@ class ZED11Module : public ZEGRGraphicsModule
 		ZED11StatePool							StatePool;
 		ZED11Tracer								Tracer;
 
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZEInitializationResult			InitializeInternal() override;
+		virtual ZEInitializationResult			DeinitializeInternal() override;
 
 												ZED11Module();
 		virtual									~ZED11Module();

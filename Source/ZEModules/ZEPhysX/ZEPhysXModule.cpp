@@ -72,10 +72,9 @@ NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 	return CookingInterface;
 }
 
-bool ZEPhysXModule::InitializeInternal()
+ZEInitializationResult ZEPhysXModule::InitializeInternal()
 {
-	if (!ZEPhysicsModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEPhysicsModule);
 
 	zeLog("Initializing PhysX module.");
 
@@ -83,20 +82,20 @@ bool ZEPhysXModule::InitializeInternal()
 	if(!PhysicsSDK)
 	{
 		zeError("Can not create PhysX SDK.");
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	CookingInterface = NxGetCookingLib(NX_PHYSICS_SDK_VERSION);
 	if (CookingInterface == NULL)
 	{
 		zeError("Can not create cooking interface.");
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	if (!CookingInterface->NxInitCooking())
 	{
 		zeError("Can not initilize PhysX cooking library.");
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	PhysicsSDK->setParameter(NX_SKIN_WIDTH, 0.002f);
@@ -105,11 +104,12 @@ bool ZEPhysXModule::InitializeInternal()
 
 	zeLog("PhysX intialized.");
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZEPhysXModule::DeinitializeInternal()
+ZEInitializationResult ZEPhysXModule::DeinitializeInternal()
 {
+
 	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		PhysicalWorlds[I]->Destroy();
 
@@ -127,7 +127,9 @@ bool ZEPhysXModule::DeinitializeInternal()
 		CookingInterface = NULL;
 	}
 
-	return ZEPhysicsModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEPhysicsModule);
+
+	return ZE_IR_DONE;
 }
 
 void ZEPhysXModule::Process(const ZETimeParameters* Parameters)

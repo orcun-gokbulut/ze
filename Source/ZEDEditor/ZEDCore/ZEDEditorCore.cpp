@@ -43,6 +43,9 @@
 #include "ZEDEditor.h"
 
 #include <QApplication>
+#include <QStyleFactory>
+#include <QPalette>
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -59,6 +62,7 @@ void ZEDEditorCore::LoadClasses()
 	#define ZEMT_REGISTER_ENUM(Name) ZEMTProvider::GetInstance()->RegisterEnumerator(Name ## _Enumerator());
 	#define ZEMT_REGISTER_CLASS(Name) ZEMTProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "../ZEMetaRegister.h"
+#include "QPalette"
 	#undef ZEMT_REGISTER_ENUM
 	#undef ZEMT_REGISTER_CLASS
 }
@@ -78,18 +82,14 @@ bool ZEDEditorCore::InitializeInternal()
 	EngineCore->GetSystemMessageManager()->SetEnabled(false);
 	EngineCore->SetConfigurationPath("#E:/Configurations/ZECore-ZEDEditor.ZEConfig");
 	
-	if (!EngineCore->StartUp())
-	{
-		zeError("Cannot start up core.");
-		return false;
-	}
+	EngineCore->StartUp();
 
 	LoadClasses();
 
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
 		Editors[I]->Initialize();
 
-	EngineCore->Run();
+	EngineCore->Execute();
 
 	return true;
 }

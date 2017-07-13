@@ -56,6 +56,7 @@ class ZEConsole;
 class ZESystemMessageManager;
 class ZESystemMessageHandler;
 class ZEPlugin;
+class ZESplashWindow;
 
 #define ZE_CORE_MODULE(Type, Variable) class Type;
 #include "ZECoreModules.h"
@@ -63,15 +64,10 @@ class ZEPlugin;
 
 enum ZECoreState
 {
-	ZE_CS_NONE,
-	ZE_CS_STARTING_UP,
-	ZE_CS_RUNNING,
-	ZE_CS_PAUSED,
-	ZE_CS_SHUTTING_DOWN,
-	ZE_CS_SHUTTED_DOWN,
-	ZE_CS_TERMINATING,
-	ZE_CS_TERMINATED,
-	ZE_CS_CRITICAL_ERROR
+	ZE_CS_NONE				= 0,
+	ZE_CS_STARTING_UP		= 1,
+	ZE_CS_RUNNING			= 2,
+	ZE_CS_SHUTTING_DOWN		= 3,
 };
 
 class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
@@ -93,19 +89,14 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZESystemMessageHandler*						SystemMessageHandler;	
 		ZEString									ConfigurationPath;
 		ZEErrorCallback								OldErrorCallback;
-
-		void										SetState(ZECoreState CoreState);
+		ZESplashWindow*								SplashWindow;
 
 		ZEModule*									FindModule(ZEClass* Class, const char* Name);
 		bool										InitializeModule(ZEModule* Module);
 		void										DeInitializeModule(ZEModule** Module);
-		bool										InitializeModules();
-		void										DeinitializeModules();
 
-		void										LoadPlugins();
-		void										UnloadPlugins();
-
-		void										LoadLateModules();
+		void										StartUpCompleted();
+		void										ShutDownCompleted();
 
 													ZECore();
 													~ZECore();
@@ -114,9 +105,9 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		static ZEOptionSection						CoreOptions;
 		
 		ZECoreState									GetState();
-		bool										IsStarted();
-		bool										IsStartedOrStartingUp();
-
+		bool										IsAlive();
+		bool										IsRunning();
+		
 		ZEErrorManager*								GetError();
 		ZEOptionManager*							GetOptions();
 		ZECommandManager*							GetCommands();
@@ -133,23 +124,16 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZEModule*									GetModule(ZEClass* ModuleClass) const;
 		const ZEList2<ZEModule>&					GetModules() const;
 		bool										AddModule(ZEModule* Module);
-		bool										AddLateModule(ZEModule* Module);
 		bool										RemoveModule(ZEModule* Module);
 
 		ZEPlugin*									LoadPlugin(const ZEString& Path);
+		bool										LoadInternalPlugin(ZEPlugin* Plugin);
 		bool										UnloadPlugin(ZEPlugin* Plugin);
-		bool										AddPlugin(ZEPlugin* Plugin);
-		bool										RemovePlugin(ZEPlugin* Plugin);
 
-		bool										StartUp();
-		void										Terminate();
+		void										StartUp();
 		void										ShutDown();
 
-		void										Run();
-		void										Pause();
 		void										Process();
-		void										MainLoop();
-
 		bool										Execute();
 
 		bool										LoadConfiguration();

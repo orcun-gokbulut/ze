@@ -43,25 +43,26 @@
 
 ZEOptionSection  ZESoundModule::SoundOptions;
 
-bool ZESoundModule::InitializeInternal()
+ZEInitializationResult ZESoundModule::InitializeInternal()
 {
-	if (!ZEModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZESoundModule);
 
 	if (mpg123_init() != MPG123_OK)
 	{
 		zeError("Initialization failed. Cannot initialize mp3 decoder.");
-		return false;
+		return ZE_IR_FAILED;
 	}
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZESoundModule::DeinitializeInternal()
+ZEInitializationResult ZESoundModule::DeinitializeInternal()
 {
 	mpg123_exit();
 
-	return ZEModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZESoundModule);
+
+	return ZE_IR_DONE;
 }
 
 void OnOptionsChanged(ZEOption* Option)

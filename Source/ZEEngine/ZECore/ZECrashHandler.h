@@ -75,25 +75,25 @@ class ZE_EXPORT_ZEENGINE ZECrashHandler : public ZEModule
 	ZE_OBJECT
 	friend class ZECore;
 	private:
-		bool						ExecuteCrashReporter;
-		ZELock						CrashLock;
+		bool							ExecuteCrashReporter;
+		ZELock							CrashLock;
 
-		void						RegisterHandlers();
-		void						UnregisterHandlers();
+		void							RegisterHandlers();
+		void							UnregisterHandlers();
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+		virtual ZEInitializationResult	InitializeInternal() override;
+		virtual ZEInitializationResult	DeinitializeInternal() override;
 
-		void						GenerateParameters(ZECRReportParameters& Parameters);
+		void							GenerateParameters(ZECRReportParameters& Parameters);
 
-									ZECrashHandler();
-									~ZECrashHandler();
+										ZECrashHandler();
+										~ZECrashHandler();
 
 	public:
-		void						SetExecuteCrashReporter(bool Enabled);
-		bool						GetExecuteCrashReporter() const;
+		void							SetExecuteCrashReporter(bool Enabled);
+		bool							GetExecuteCrashReporter() const;
 
-		void						Crashed(ZECrashReason Reason);
+		void							Crashed(ZECrashReason Reason);
 
-		static ZECrashHandler*		CreateInstance();
+		static ZECrashHandler*			CreateInstance();
 };

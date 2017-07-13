@@ -92,10 +92,9 @@ static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device1* Device)
 	return DXGIFactory;
 }
 
-bool ZED11Module::InitializeInternal()
+ZEInitializationResult ZED11Module::InitializeInternal()
 {
-	if (!ZEGRGraphicsModule::InitializeInternal())
-		return false;
+	ZE_INITIALIZABLE_INITIALIZE_CHAIN(ZEGRGraphicsModule);
 
 	#ifdef ZE_DEBUG_ENABLE
 		ZEGRTracer::GetInstance()->SetEnabled(true);
@@ -108,7 +107,7 @@ bool ZED11Module::InitializeInternal()
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create factory. Error: %d", Result);
-		return false;
+		return ZE_IR_DONE;
 	}
 
 	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
@@ -141,7 +140,7 @@ bool ZED11Module::InitializeInternal()
 	{
 		zeCriticalError("There is no hardware that supports Directx 11.");
 		Adapter->Release();
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	CurrentAdapter = new ZED11Adapter(Adapter);
@@ -158,7 +157,7 @@ bool ZED11Module::InitializeInternal()
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);
-		return false;
+		return ZE_IR_FAILED;
 	}
 
 	Result = TempDevice->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&Device));
@@ -166,7 +165,7 @@ bool ZED11Module::InitializeInternal()
 	{
 		TempDevice->Release();
 		zeCriticalError("Cannot query ID3D11Device1. Error: %d", Result);
-		return false;
+		return ZE_IR_FAILED;
 	}
 	
 	TempDevice->Release();
@@ -180,10 +179,10 @@ bool ZED11Module::InitializeInternal()
 
 	Context.Initialize(NativeContext);
 
-	return true;
+	return ZE_IR_DONE;
 }
 
-bool ZED11Module::DeinitializeInternal()
+ZEInitializationResult ZED11Module::DeinitializeInternal()
 {
 	delete static_cast<ZED11Adapter*>(CurrentAdapter);
 
@@ -197,7 +196,9 @@ bool ZED11Module::DeinitializeInternal()
 
 	ZEGR_RELEASE(Device);
 
-	return ZEGRGraphicsModule::DeinitializeInternal();
+	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEGRGraphicsModule);
+	
+	return ZE_IR_DONE;
 }
 
 ZED11Module::ZED11Module()
