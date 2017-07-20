@@ -97,7 +97,7 @@ void ZERNCommandDraw::Reset()
 {
 	ZERNCommand::Reset();
 	
-	zeCheckError(InstanceLink.GetInUse(), ZE_VOID, "Subcommand link in use");
+	zeCheckError(InstanceLink.GetInUse(), ZE_VOID, "Instance link in use");
 
 	Instances.AddBegin(&InstanceLink);
 }

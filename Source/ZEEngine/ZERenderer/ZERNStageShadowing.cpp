@@ -100,7 +100,6 @@ void ZERNStageShadowing::GenerateDirectionalShadowMaps(ZEGRContext* Context, con
 		PreRenderParameters.View = &View;
 		PreRenderParameters.Type = ZERN_RT_SHADOW;
 
-		GetRenderer()->BeginNestedRenderer();
 		DirectionalLight.Scene->PreRender(&PreRenderParameters);
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = DirectionalShadowMaps->GetDepthStencilBuffer(false, DirectionalShadowMapIndex + Cascade.GetIndex());
@@ -109,7 +108,6 @@ void ZERNStageShadowing::GenerateDirectionalShadowMaps(ZEGRContext* Context, con
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
 		ShadowRenderer.Render();
-		GetRenderer()->EndNestedRenderer();
 	}
 
 	DirectionalShadowMapIndex += DirectionalLight.Cascades.GetCount();
@@ -131,7 +129,6 @@ void ZERNStageShadowing::GenerateSpotShadowMaps(ZEGRContext* Context, const ZERN
 	PreRenderParameters.View = &View;
 	PreRenderParameters.Type = ZERN_RT_SHADOW;
 
-	GetRenderer()->BeginNestedRenderer();
 	SpotLight.Scene->PreRender(&PreRenderParameters);
 
 	const ZEGRDepthStencilBuffer* DepthBuffer = SpotShadowMaps->GetDepthStencilBuffer(false, SpotShadowMapIndex);
@@ -140,7 +137,6 @@ void ZERNStageShadowing::GenerateSpotShadowMaps(ZEGRContext* Context, const ZERN
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
 	ShadowRenderer.Render();
-	GetRenderer()->EndNestedRenderer();
 
 	SpotShadowMapIndex++;
 }
@@ -161,7 +157,6 @@ void ZERNStageShadowing::GenerateProjectiveShadowMaps(ZEGRContext* Context, cons
 	PreRenderParameters.View = &View;
 	PreRenderParameters.Type = ZERN_RT_SHADOW;
 
-	GetRenderer()->BeginNestedRenderer();
 	ProjectiveLight.Scene->PreRender(&PreRenderParameters);
 
 	const ZEGRDepthStencilBuffer* DepthBuffer = ProjectiveShadowMaps->GetDepthStencilBuffer(false, ProjectiveShadowMapIndex);
@@ -170,7 +165,6 @@ void ZERNStageShadowing::GenerateProjectiveShadowMaps(ZEGRContext* Context, cons
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
 	ShadowRenderer.Render();
-	GetRenderer()->EndNestedRenderer();
 
 	ProjectiveShadowMapIndex++;
 }

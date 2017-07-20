@@ -92,8 +92,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEHolder<ZEGRBuffer>						RendererConstantBuffer;
 		ZEInt										CurrentSceneIndex;
 		ZEArray<ZEScene*>							Scenes;
-		//ZEList2<ZERNCommand>						CommandList;
-		//ZEList2<ZERNCommand>						CommandListInstanced;
+		ZERNCommandList*							MainCommandList;
 		ZEArray<ZERNCommandList*>					CommandLists;
 		ZEUInt										CommandListCount;
 		ZELock										CommandListLock;
@@ -166,13 +165,9 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void										EndScene();
 		
 		ZERNCommandList*							GetCommandList();
-		//void										AddCommand(ZERNCommand* Command);
-		//void										AddCommandList(ZERNCommandList* CommandList);
 		void										CleanCommands();
-
-		void										BeginNestedRenderer();
-		void										EndNestedRenderer();
-
+		void										AddCommand(ZERNCommand* Command);
+		void										AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList);
 		void										Render();
 
 													ZERNRenderer();
