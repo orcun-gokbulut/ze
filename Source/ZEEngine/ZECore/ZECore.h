@@ -90,13 +90,17 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZEString									ConfigurationPath;
 		ZEErrorCallback								OldErrorCallback;
 		ZESplashWindow*								SplashWindow;
+		ZEInt										CoreThreadID;
 
 		ZEModule*									FindModule(ZEClass* Class, const char* Name);
-		bool										InitializeModule(ZEModule* Module);
-		void										DeInitializeModule(ZEModule** Module);
 
-		void										StartUpCompleted();
-		void										ShutDownCompleted();
+		bool										InitializeModule(ZEModule* Module, bool AutoInitializeDependencies);
+		bool										DeinitializeModule(ZEModule* Module, bool AutoDeinitializeDependents);
+
+		void										InitializeModules();
+		void										DeinitializeModules();
+
+		void										ShutdownInternal();
 
 													ZECore();
 													~ZECore();
@@ -117,6 +121,7 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 		ZEResourceManager*							GetResourceManager();
 		ZESystemMessageManager*						GetSystemMessageManager();
 		void*										GetApplicationInstance();
+		ZEInt										GetCoreThreadId();
 
 		void										SetConfigurationPath(const ZEString& Path);
 		const ZEString&								GetConfigurationPath() const;
@@ -132,6 +137,7 @@ class ZE_EXPORT_ZEENGINE ZECore : public ZEObject
 
 		void										StartUp();
 		void										ShutDown();
+		void										Terminate();
 
 		void										Process();
 		bool										Execute();

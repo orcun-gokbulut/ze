@@ -198,7 +198,8 @@ class ZE_EXPORT_ZEENGINE ZEGRWindow : public ZEObject, public ZEInitializable, p
 		bool							GetManageInputAcquisition() const;
 
 		ZEGROutput*						GetOutput() const;
-		
+		void							WaitForVSync();
+
 		bool							GetFocused() const;
 		bool							GetMinimized() const;
 		bool							GetMaximized() const;

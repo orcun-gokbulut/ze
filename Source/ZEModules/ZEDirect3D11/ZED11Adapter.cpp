@@ -111,6 +111,11 @@ const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes() const
 	return Modes;
 }
 
+void ZED11Monitor::WaitForVSync()
+{
+	Output->WaitForVBlank();
+}
+
 ZED11Adapter::ZED11Adapter(IDXGIAdapter1* Adapter)
 {
 	this->Adapter = Adapter;

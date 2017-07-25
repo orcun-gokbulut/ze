@@ -58,6 +58,9 @@
 
 #include <memory.h>
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+
 #define ZE_SDF_CONSTANT_BUFFER		0x01
 
 void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
@@ -637,6 +640,9 @@ bool ZEScene::IsEntitiesLoaded()
 		}
 	}
 	Entities.UnlockRead();
+
+	while(Entities.GetCount() != 0)
+		Sleep(0);
 
 	return true;
 }

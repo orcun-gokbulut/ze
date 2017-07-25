@@ -145,10 +145,22 @@ bool ZEModule::SetupDependence()
 					continue;
 				}
 
-				if (!DependencyModules.Exists(Module))
-					DependencyModules.Add(Module);	
-			}
+				DependencyModules.LockWrite();
+				{
+					if (!DependencyModules.Exists(Module))
+					{
+						Module->DependentModules.LockWrite();
+						{
+							if (Module->DependentModules.Exists(this))
+								Module->DependentModules.Add(this);
+						}
+						Module->DependentModules.UnlockWrite();
 
+						DependencyModules.Add(Module);
+					}
+				}
+				DependencyModules.UnlockWrite();
+			}
 		}
 		CoreModules.UnlockRead();
 	}
@@ -278,8 +290,12 @@ bool ZEModule::LoadConfiguration()
 	return LoadConfiguration(ConfigurationFileName);
 }
 
-bool ZEModule::LoadConfiguration(const ZEString& ConfigurationFileName)
+bool ZEModule::LoadConfiguration(const ZEString& FileName)
 {
+	zeLog("Loading Module Configuration.  Module Name: \"%s\", Configration File Name: \"%s\".", GetClass()->GetName(), FileName.ToCString());
+
+	ConfigurationFileName = FileName;
+
 	ZEMLReader Reader;
 	if (!Reader.Open(ConfigurationFileName))
 	{
@@ -312,8 +328,12 @@ bool ZEModule::SaveConfiguration()
 	return LoadConfiguration(ConfigurationFileName);
 }
 
-bool ZEModule::SaveConfiguration(const ZEString& ConfigNode)
+bool ZEModule::SaveConfiguration(const ZEString& FileName)
 {
+	zeLog("Saving Module Configuration. Module Name: \"%s\", Configration File Name: \"%s\".", GetClass()->GetName(), FileName.ToCString());
+
+	ConfigurationFileName = FileName;
+
 	ZEMLWriter Writer;
 	if (!Writer.Open(ConfigurationFileName))
 	{

@@ -50,6 +50,8 @@ void ZELockRW::LockRead()
 	CountersLock.Lock();
 	if (WriterCount > 0 && AccessLock.OwnerThreadId == ZEThread::GetCurrentThreadId())
 	{
+		// Reader count in write nested read locks within the same thread is negative 
+		// instead of positive like normal read lock.
 		ReaderCount--;
 		CountersLock.Unlock();
 	}
@@ -79,6 +81,8 @@ void ZELockRW::UnlockRead()
 	{
 		zeDebugCheck(AccessLock.OwnerThreadId != ZEThread::GetCurrentThreadId(), "Cannot UnlockWrite. Nested read lock is not locked by this thread.");
 		zeDebugCheck(ReaderCount >= 0, "Cannot UnlockRead. Lock is not locked for nested read.");
+		// Reader count in write nested read locks within the same thread is negative 
+		// instead of positive like normal read lock.
 		ReaderCount++;
 		CountersLock.Unlock();
 	}

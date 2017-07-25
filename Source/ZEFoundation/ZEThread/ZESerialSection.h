@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemMessageManager.cpp
+ Zinek Engine - ZESerialSection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,84 +32,35 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
+#pragma once
+
 #include "ZETypes.h"
-#include "ZECore.h"
-#include "ZEError.h"
-#include "ZESystemMessageManager.h"
-#include "ZESystemMessageHandler.h"
+#include "ZECommon.h"
 
-#define WINDOWS_MEAN_AND_LEAN
-#include <Windows.h>
 
-void ZESystemMessageManager::SetEnabled(bool Enabled)
+#ifdef ZE_DEBUG_ENABLE
+#define ZE_SERIAL_SECTION_CHECK_BEGIN(Name) static ZESerialSection Name##SerialSection; zeDebugCheck(!Name##SerialSection.Begin(), "Multiple threads detected on serial section");
+#define ZE_SERIAL_SECTION_CHECK_END(Name) Name##SerialSection.End();
+#else
+#define ZE_SERIAL_SECTION_CHECK_BEGIN(Name)
+#define ZE_SERIAL_SECTION_CHECK_END(Name)
+#endif
+
+ZE_ALIGN(4) 
+class ZESerialSection
 {
-	this->Enabled = Enabled;
-}
+	ZE_COPY_NO_ACTION(ZESerialSection)
+	friend class ZELockRW;
+	private:
+		volatile ZEUInt32		OwnerThreadId;
+		volatile ZEInt			Counter;
 
-bool ZESystemMessageManager::GetEnabled()
-{
-	return false;
-}
+	public:
+		bool					IsStarted();
+		bool					Begin();
+		void					End();
 
-ZESystemMessageManager::ZESystemMessageManager()
-{
-	Enabled = true;
-}
-
-ZESystemMessageManager::~ZESystemMessageManager()
-{
-
-}
-
-const ZEArray<ZESystemMessageHandler*>& ZESystemMessageManager::GetMessageHandlers()
-{
-	return Handlers;
-}
-
-void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	if (Handlers.Exists(Handler))
-	{
-		zeError("Handler is already added.");
-		return;
-	}
-
-	Handlers.Add(Handler);
-}
-
-void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	Handlers.RemoveValue(Handler);
-}
-
-void ZESystemMessageManager::ProcessMessages()
-{
-	if (!Enabled)
-		return;
-
-	MSG Msg;
-	ZeroMemory(&Msg, sizeof(Msg));
-
-	while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
-	{	
-		TranslateMessage(&Msg);
-
-		bool Handled = false;
-		for(ZESize I = 0; I < Handlers.GetCount(); I++)
-		{
-			if (Msg.message >= Handlers[I]->MinMessage && Msg.message <= Handlers[I]->MaxMessage &&
-				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
-			{
-				if (Handlers[I]->Callback(&Msg))
-					Handled = true;
-			}
-		}
-
-		DispatchMessage(&Msg);
-	}
-}
-
-ZESystemMessageManager* ZESystemMessageManager::GetInstance()
-{
-	return ZECore::GetInstance()->GetSystemMessageManager();
-}
+								ZESerialSection();
+								~ZESerialSection();
+};

@@ -234,6 +234,8 @@ ZEInitializationResult ZECrashHandler::DeinitializeInternal()
 	UnregisterHandlers();
 
 	ZE_INITIALIZABLE_DEINITIALIZE_CHAIN(ZEModule);
+
+	return ZE_IR_DONE;
 }
 
 ZECrashHandler::ZECrashHandler()

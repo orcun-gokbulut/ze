@@ -147,7 +147,7 @@ ZEInitializationResult ZED11Module::InitializeInternal()
 
 	UINT DeviceFlags = 0;
 	#ifdef ZE_DEBUG_ENABLE
-		DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+		//DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 	#else
 		DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 	#endif

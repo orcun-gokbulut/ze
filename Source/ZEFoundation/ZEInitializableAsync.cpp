@@ -163,7 +163,8 @@ ZETaskResult ZEInitializableAsync::UpdateStateFunction(ZETaskThread* Thread, ZES
 
 void ZEInitializableAsync::UpdateState()
 {
-	UpdateStateTask.Run();
+	//UpdateStateTask.Run();
+	while (UpdateStateFunction(NULL, 0, NULL) != ZE_TR_COOPERATING);
 }
 
 ZEInitializationResult ZEInitializableAsync::InitializeInternal()

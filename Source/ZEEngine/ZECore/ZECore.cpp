@@ -52,15 +52,16 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEPlugin.h"
-
-#define ZE_CORE_MODULE_INCLUDES
-#include "ZECoreModules.h"
+#include "ZEThread/ZEThread.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZEFoundation.h"
 #include "ZEEngine.h"
 #include "ZEError.h"
+
+#define ZE_CORE_MODULE_INCLUDES
+#include "ZECoreModules.h"
 #undef ZE_CORE_MODULE_INCLUDES
 
 ZEOptionSection ZECore::CoreOptions; 
@@ -222,21 +223,141 @@ bool ZECore::LoadInternalPlugin(ZEPlugin* Plugin)
 	zeLog("Plugin added. Plugin Name: \"%s\". Plugin Version: \"%s\".", Plugin->GetName(), Plugin->GetVersion().GetShortString().ToCString());
 }
 
-void ZECore::StartUpCompleted()
+bool ZECore::InitializeModule(ZEModule* Module, bool AutoInitializeDependencies)
 {
-	zeLog("Core initialized.");
+	zeCheckError(Module == NULL, false, "Cannot initialize module. Module is NULL.");
 
-	if (GetApplicationModule() != NULL)
-		GetApplicationModule()->PostStartup();
+	if (Module->IsInitialized())
+		return true;
 
-	SplashWindow->Destroy();
-	SplashWindow = NULL;
+	zeLog("Initializing Module. Module Name: \"%s\".", Module->GetClass()->GetName());
+	
+	zeLog("Setting up module dependencies. Module Name: \"%s\".", Module->GetClass()->GetName());
+	
+	if (!Module->SetupDependence())
+	{
+		zeError("Cannot initialize module. Cannot setup dependencies. Module Name: \"%s\".", Module->GetClass()->GetName());
+		return false;
+	}
 
-	State = ZE_CS_RUNNING;
+	bool UnitializedDependency = false;
+	const ZEArray<ZEModule*>& Dependencies = Module->GetDependencyModules();
+	for (ZESize I = 0; I < Dependencies.GetCount(); I++)
+	{
+		ZEModule* Dependency = Dependencies[I];
+		if (!Dependency->IsInitialized())
+		{
+			zeLog("Uninitialized dependency module found. Module Name: \"%s\", Dependency Module Name: \"%s\".", Module->GetClass()->GetName(), Dependency->GetClass()->GetName());
+			
+			if (AutoInitializeDependencies)
+			{
+				zeLog("Initializing dependency module. Module Name: \"%s\", Dependency Module Name: \"%s\".", Module->GetClass()->GetName(), Dependency->GetClass()->GetName());
+				if (!InitializeModule(Dependency, true))
+				{
+					zeError("Module initialization failed. Failed initializing dependency module. Module Name: \"%s\", Dependency Module Name: \"%s\".", Module->GetClass()->GetName(), Dependency->GetClass()->GetName());
+					return false;
+				}
+			}
+			else
+			{
+				UnitializedDependency = true;
+			}
+		}
+
+		if (UnitializedDependency)
+			zeError("Cannot initialize module. Uninitialized dependency modules found. Module Name: \"%s\".", Module->GetClass()->GetName());
+	}
+
+	Module->Initialize();
+
+	if (!Module->IsInitialized())
+	{
+		zeError("Cannot initialize module. Initialization has failed. Module Name: \"%s\".", Module->GetClass()->GetName());
+		return false;
+	}
+
+	return true;
 }
 
-void ZECore::ShutDownCompleted()
+bool ZECore::DeinitializeModule(ZEModule* Module, bool AutoDeinitializeDependents)
 {
+	zeCheckError(Module == NULL, false, "Cannot initialize module. Module is NULL.");
+
+	if (Module->IsInitialized())
+		return true;
+
+	zeLog("Deinitializing Module. Module Name: \"%s\".", Module->GetClass()->GetName());
+
+	bool InitializedDependent = false;
+	const ZEArray<ZEModule*>& Dependents = Module->GetDependentModules();
+	for (ZESize I = 0; I < Dependents.GetCount(); I++)
+	{
+		ZEModule* Dependent = Dependents[I];
+		if (Dependent->IsInitialized())
+		{
+			zeLog("Initialized dependent module found. Module Name: \"%s\", Dependent Module Name: \"%s\".", Module->GetClass()->GetName(), Dependent->GetClass()->GetName());
+
+			if (AutoDeinitializeDependents)
+			{
+				zeLog("Deinitializing dependent module. Module Name: \"%s\", Dependent Module Name: \"%s\".", Module->GetClass()->GetName(), Dependent->GetClass()->GetName());
+				if (!DeinitializeModule(Dependent, true))
+				{
+					zeError("Module deinitialization failed. Failed deinitializing dependent module. Module Name: \"%s\", Dependent Module Name: \"%s\".", Module->GetClass()->GetName(), Dependent->GetClass()->GetName());
+					return false;
+				}
+			}
+			else
+			{
+				InitializedDependent = true;
+			}
+		}
+
+		if (InitializedDependent)
+			zeError("Cannot deinitialize module. Initialized dependent found. Module Name: \"%s\".", Module->GetClass()->GetName());
+	}
+
+	Module->Deinitialize();
+
+	if (Module->IsInitialized())
+	{
+		zeError("Cannot deinitialize module. Deinitialization has failed. Module Name: \"%s\".", Module->GetClass()->GetName());
+		return false;
+	}
+
+	return true;
+}
+
+void ZECore::InitializeModules()
+{
+	for (ZESize I = 0; I < Modules.GetCount(); I++)
+	{
+		ZEModule* Module = Modules[I];
+		if (Module->IsInitialized())
+			continue;
+
+		if (!InitializeModule(Module, true))
+			zeCriticalError("Cannot initialize modules. Module initialization failed. Module Name: \"%s\".", Module->GetClass()->GetName());
+	}
+
+}
+
+void ZECore::DeinitializeModules()
+{
+	for (ZESize I = 0; I < Modules.GetCount(); I++)
+	{
+		ZEModule* Module = Modules[I];
+		if (!Module->IsInitialized())
+			continue;
+
+		if (!DeinitializeModule(Module, true))
+			zeCriticalError("Cannot deinitialize modules. Module deinitialization failed. Module Name: \"%s\".", Module->GetClass()->GetName());
+	}
+}
+
+void ZECore::ShutdownInternal()
+{
+	DeinitializeModules();
+
 	if (GetApplicationModule() != NULL)
 		GetApplicationModule()->PreShutdown();
 
@@ -249,6 +370,8 @@ void ZECore::ShutDownCompleted()
 	StartedCoreInstanceCount--;
 
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
+
+	State = ZE_CS_NONE;
 }
 
 ZECore::ZECore() 
@@ -274,9 +397,8 @@ ZECore::ZECore()
 	#define ZE_CORE_MODULE(Type, Variable) Variable = NULL;
 	#include "ZECoreModules.h"
 	#undef ZE_CORE_MODULE
-
-	/*ZESoundModule::BaseInitialize();
-	ZEInputModule::BaseInitialize();*/
+	
+	CoreThreadID = NULL;
 	
 	static ZEOptionSection CoreOptions;
 	CoreOptions.SetName("ZECore");
@@ -306,9 +428,6 @@ ZECore::~ZECore()
 		ZEPlugin* Plugin = Plugins.GetFirstItem();
 		UnloadPlugin(Plugin);
 	}
-
-	/*ZESoundModule::BaseDeinitialize();
-	ZEInputModule::BaseDeinitialize();*/
 
 	delete ResourceManager;
 	delete ErrorManager;
@@ -370,6 +489,10 @@ void* ZECore::GetApplicationInstance()
 	return ApplicationInstance;
 }
 
+ZEInt ZECore::GetCoreThreadId()
+{
+	return CoreThreadID;
+}
 
 void ZECore::SetConfigurationPath(const ZEString& Path)
 {
@@ -445,16 +568,6 @@ bool ZECore::AddModule(ZEModule* Module)
 			}
 		}
 
-		Module->Core = this;
-		if (!Module->SetupDependence())
-		{
-			zeError("Cannot add module. Error setting up module dependencies. Module Name: \"%s\".\n", Module->GetClass()->GetName());
-			Module->Core = NULL;
-
-			Modules.UnlockWrite();
-			return false;
-		}
-
 		#define ZE_CORE_MODULE(Type, Variable) if (ZEClass::IsDerivedFrom(Type::Class(), Module)) Variable = static_cast<Type*>(Module);
 		#include "ZECoreModules.h"
 		#undef ZE_CORE_MODULE
@@ -502,6 +615,8 @@ void ZECore::StartUp()
 	if (State != ZE_CS_NONE)
 		return;
 
+	CoreThreadID = ZEThread::GetCurrentThreadId();
+
 	State = ZE_CS_STARTING_UP;
 
 	OldErrorCallback = ZEError::GetInstance()->GetCallback();
@@ -531,13 +646,31 @@ void ZECore::StartUp()
 	if (ApplicationModule != NULL)
 		ApplicationModule->StartUp();
 
+	InitializeModules();
+
 	Console->EnableInput();
+
+	if (GetApplicationModule() != NULL)
+		GetApplicationModule()->PostStartup();
+
+	zeLog("Core initialized.");
+
+	SplashWindow->Destroy();
+	SplashWindow = NULL;
+
+	State = ZE_CS_RUNNING;
 }
 
 void ZECore::ShutDown()
 {
 	zeLog("Shuting Down Core.");
 	State = ZE_CS_SHUTTING_DOWN;
+}
+
+void ZECore::Terminate()
+{
+	ShutdownInternal();
+	exit(0);
 }
 
 void ZECore::Process()
@@ -549,7 +682,7 @@ void ZECore::Process()
 	GetConsole()->Process();
 	SystemMessageManager->ProcessMessages();
 
-	Modules.LockRead();
+	/*Modules.LockRead();
 	{
 		if (State == ZE_CS_STARTING_UP || State == ZE_CS_RUNNING)
 		{
@@ -565,7 +698,12 @@ void ZECore::Process()
 			}
 
 			if (AllModulesInitialized)
+			{
+				if (State == ZE_CS_STARTING_UP)
+					StartUpCompleted();
+
 				State = ZE_CS_RUNNING;
+			}
 		}
 		else if (State == ZE_CS_SHUTTING_DOWN)
 		{
@@ -580,26 +718,30 @@ void ZECore::Process()
 				}
 			}
 		}
-
-		ze_for_each(Module, Modules)
-		{
-			if (Module->IsInitialized())
-				Module->PreProcess(&Parameters);
-		}
-
-		ze_for_each(Module, Modules)
-		{
-			if (Module->IsInitialized())
-				Module->Process(&Parameters);
-		}
-
-		ze_for_each(Module, Modules)
-		{
-			if (Module->IsInitialized())
-				Module->PostProcess(&Parameters);
-		}
 	}
-	Modules.UnlockRead();
+	Modules.UnlockRead();*/
+
+	if (State == ZE_CS_SHUTTING_DOWN)
+	{
+
+	}
+	ze_for_each(Module, Modules)
+	{
+		if (Module->IsInitialized())
+			Module->PreProcess(&Parameters);
+	}
+
+	ze_for_each(Module, Modules)
+	{
+		if (Module->IsInitialized())
+			Module->Process(&Parameters);
+	}
+
+	ze_for_each(Module, Modules)
+	{
+		if (Module->IsInitialized())
+			Module->PostProcess(&Parameters);
+	}
 }
 
 bool ZECore::Execute()
@@ -619,6 +761,8 @@ bool ZECore::LoadConfiguration()
 
 bool ZECore::LoadConfiguration(const ZEString& FileName)
 {
+	zeLog("Loading Core Configuration. Configration File Name: \"%s\"", FileName.ToCString());
+
 	ConfigurationPath = FileName;
 
 	ZEMLReader Reader;
@@ -684,6 +828,8 @@ bool ZECore::SaveConfiguration()
 
 bool ZECore::SaveConfiguration(const ZEString& FileName)
 {
+	zeLog("Saving Core Configuration. Configration File Name: \"%s\"", FileName.ToCString());
+
 	ConfigurationPath = FileName;
 
 	ZEMLWriter Writer;

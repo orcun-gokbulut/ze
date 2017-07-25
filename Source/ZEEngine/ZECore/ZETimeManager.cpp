@@ -167,7 +167,7 @@ ZEInitializationResult ZETimeManager::DeinitializeInternal()
 
 ZETimeManager::ZETimeManager()
 {
-	Mode = ZE_TM_FIXED_INTERVAL;
+	Mode = ZE_TM_VARIABLE_INTERVAL;
 	FrameInterval = 1.0 / 30.0; // 60 HZ
 	FrameJumpThreshold = 0.150;
 	Reset();

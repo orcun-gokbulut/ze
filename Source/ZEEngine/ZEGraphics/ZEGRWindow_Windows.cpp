@@ -411,6 +411,27 @@ void ZEGRWindow::SetEnabled(bool Enabled)
 	::EnableWindow(Data->Handle, (BOOL)Enabled);
 }
 
+void ZEGRWindow::WaitForVSync()
+{
+	ZEGRAdapter* Adapter = ZEGRGraphicsModule::GetInstance()->GetCurrentAdapter();
+	HMONITOR HandleMonitor = ::MonitorFromWindow((HWND)GetHandle(), 0);
+	ZEGRMonitor* CurrentMonitor = NULL;
+
+	ze_for_each(Monitor, Adapter->GetMonitors())
+	{
+		if (Monitor.GetItem()->GetHandle() == HandleMonitor)
+		{
+			CurrentMonitor = Monitor.GetItem();
+			break;
+		}
+	}
+
+	if (CurrentMonitor == NULL)
+		return;
+	
+	CurrentMonitor->WaitForVSync();
+}
+
 void ZEGRWindow::Focus()
 {
 	Focused = true;

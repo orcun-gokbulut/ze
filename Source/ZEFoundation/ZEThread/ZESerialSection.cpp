@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemMessageManager.cpp
+ Zinek Engine - ZESerialSection.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,84 +32,46 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZETypes.h"
-#include "ZECore.h"
+
+#include "ZESerialSection.h"
+
 #include "ZEError.h"
-#include "ZESystemMessageManager.h"
-#include "ZESystemMessageHandler.h"
+#include "ZEThread.h"
 
-#define WINDOWS_MEAN_AND_LEAN
-#include <Windows.h>
+ZE_COPY_NO_ACTION_IMP(ZESerialSection)
 
-void ZESystemMessageManager::SetEnabled(bool Enabled)
+bool ZESerialSection::Begin()
 {
-	this->Enabled = Enabled;
-}
+	ZEUInt CurrentThreadId = ZEThread::GetCurrentThreadId();
 
-bool ZESystemMessageManager::GetEnabled()
-{
-	return false;
-}
-
-ZESystemMessageManager::ZESystemMessageManager()
-{
-	Enabled = true;
-}
-
-ZESystemMessageManager::~ZESystemMessageManager()
-{
-
-}
-
-const ZEArray<ZESystemMessageHandler*>& ZESystemMessageManager::GetMessageHandlers()
-{
-	return Handlers;
-}
-
-void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	if (Handlers.Exists(Handler))
+	if (Counter == 0 || OwnerThreadId == CurrentThreadId)
 	{
-		zeError("Handler is already added.");
-		return;
+		Counter++;
+		OwnerThreadId = CurrentThreadId;
+		return true;
 	}
-
-	Handlers.Add(Handler);
-}
-
-void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	Handlers.RemoveValue(Handler);
-}
-
-void ZESystemMessageManager::ProcessMessages()
-{
-	if (!Enabled)
-		return;
-
-	MSG Msg;
-	ZeroMemory(&Msg, sizeof(Msg));
-
-	while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
-	{	
-		TranslateMessage(&Msg);
-
-		bool Handled = false;
-		for(ZESize I = 0; I < Handlers.GetCount(); I++)
-		{
-			if (Msg.message >= Handlers[I]->MinMessage && Msg.message <= Handlers[I]->MaxMessage &&
-				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
-			{
-				if (Handlers[I]->Callback(&Msg))
-					Handled = true;
-			}
-		}
-
-		DispatchMessage(&Msg);
+	else
+	{
+		return false;
 	}
 }
 
-ZESystemMessageManager* ZESystemMessageManager::GetInstance()
+void ZESerialSection::End()
 {
-	return ZECore::GetInstance()->GetSystemMessageManager();
+	zeDebugCheck(Counter == 0, "Cannot end serial section. Section is not started.");
+
+	Counter--;
+	if (Counter == 0)
+		OwnerThreadId = 0;
+}
+
+ZESerialSection::ZESerialSection()
+{
+	Counter = 0;
+	OwnerThreadId = 0;
+}
+
+ZESerialSection::~ZESerialSection()
+{
+    zeDebugCheck(Counter != 0, "Destroying serial section while it is still started.");
 }

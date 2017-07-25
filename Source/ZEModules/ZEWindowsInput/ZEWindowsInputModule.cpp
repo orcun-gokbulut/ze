@@ -38,6 +38,7 @@
 #include "ZEError.h"
 #include "ZEWindowsInputMouseDevice.h"
 #include "ZEWindowsInputKeyboardDevice.h"
+#include "ZECore/ZECore.h"
 #include "ZECore/ZESystemMessageManager.h"
 
 #include <string.h>
@@ -128,7 +129,7 @@ ZEInitializationResult ZEWindowsInputModule::DeinitializeInternal()
 	return ZE_IR_DONE;
 }
 
-void ZEWindowsInputModule::Process(const ZETimeParameters* Parameters)
+void ZEWindowsInputModule::PreProcess(const ZETimeParameters* Parameters)
 {
 	MouseDevice->Process(Messages, MessageCount);
 	KeyboardDevice->Process(Messages, MessageCount);

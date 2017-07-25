@@ -56,6 +56,7 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZERNStageAntiAliasing.h"
+#include "ZEThread/ZESerialSection.h"
 
 ZEHolder<ZEGRBuffer> InstanceVertexBuffer;
 
@@ -281,8 +282,8 @@ void ZERNRenderer::RenderStages()
 	ZEGRBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
 
-	if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
-		Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
+	//if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
+	//	Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
 
 	if (Resized)
 	{
@@ -315,7 +316,7 @@ void ZERNRenderer::RenderStages()
 		ZEInt LastSceneIndex = -1;
 		ze_for_each(Command, Stage->Commands)
 		{
-			if (Command->SceneIndex != LastSceneIndex)
+			if (Command->SceneIndex != LastSceneIndex && Command->SceneIndex != -1)
 			{
 				Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, Scenes[Command->SceneIndex]->GetConstantBuffer());
 				LastSceneIndex = Command->SceneIndex;
@@ -785,7 +786,7 @@ void ZERNRenderer::Render()
 	Context->BeginEvent("CleanCommands");
 	CleanCommands();
 	Context->EndEvent();
-
+		
 	for (ZESize I = 0; I < Scenes.GetCount(); I++)
 		Scenes[I]->RenderList.UnlockRead();
 

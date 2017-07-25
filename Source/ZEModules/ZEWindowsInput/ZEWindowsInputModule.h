@@ -82,7 +82,7 @@ class ZE_EXPORT_ZEWINDOWSINPUT ZEWindowsInputModule : public ZEInputDeviceModule
 		virtual								~ZEWindowsInputModule();
 
 	public:
-		virtual void						Process(const ZETimeParameters* Parameters);
+		virtual void						PreProcess(const ZETimeParameters* Parameters) override;
 
 		static ZEWindowsInputModule*		CreateInstance();
 

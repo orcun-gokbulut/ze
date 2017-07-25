@@ -140,11 +140,15 @@ void ZEPhysXModule::Process(const ZETimeParameters* Parameters)
 	if (Parameters->FrameType != ZE_TT_NORMAL && Parameters->FrameType != ZE_TT_DROPPED)
 		return;
 
-	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
+	PhysicalWorlds.LockRead();
 	{
-		if (PhysicalWorlds[I]->GetEnabled())
-			PhysicalWorlds[I]->Process(Parameters->FrameTimeDelta);
+		for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
+		{
+			if (PhysicalWorlds[I]->GetEnabled())
+				PhysicalWorlds[I]->Process(Parameters->FrameTimeDelta);
+		}
 	}
+	PhysicalWorlds.UnlockRead();
 }
 
 void ZEPhysXModule::UpdateWorlds()

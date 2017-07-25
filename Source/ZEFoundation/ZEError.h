@@ -93,11 +93,18 @@ enum ZEErrorType
 #define zeError(...) do {zeLog(ZE_LOG_ERROR, __VA_ARGS__); ZE_BREAK_ON_ERROR_INTERNAL(__VA_ARGS__); ZEError::GetInstance()->RaiseError(ZE_ET_ERROR);} while(false)
 #define zeWarning(...) do {zeLog(ZE_LOG_WARNING, __VA_ARGS__); ZE_BREAK_ON_WARNING_INTERNAL(__VA_ARGS__); ZEError::GetInstance()->RaiseError(ZE_ET_WARNING);} while(false)
 
+#ifdef ZE_DEBUG_ENABLE
+	#define zeDebugError(...) zeError(__VA_ARGS__)
+	#define zeDebugWarning(...) zeWarning(__VA_ARGS__)
+#else
+	#define zeDebugError(...)
+	#define zeDebugWarning(...)
+#endif
+
 #define ZE_VOID
 #define zeCheck(Condition, ReturnValue)	do {if (Condition) {return ReturnValue;}} while(false)
 #define zeCheckError(Condition, ReturnValue, ...) do {if (Condition) {zeError(__VA_ARGS__); return ReturnValue;}} while(false)
 #define zeCheckWarning(Condition, ReturnValue, ...) do {if (Condition) {zeWarning(__VA_ARGS__); return ReturnValue;}} while(false)
-#define zeCheckDebugError(Condition, ReturnValue, ...) do {if (Condition) {zeDebugCheck(Condition, __VA_ARGS__); return ReturnValue;}} while(false)
 #define zeCheckCriticalError(Condition, ReturnValue, ...) do {if (Condition) {zeCriticalError(__VA_ARGS__); return ReturnValue;}} while(false)
 
 #if defined(ZE_DEBUG_ENABLE)

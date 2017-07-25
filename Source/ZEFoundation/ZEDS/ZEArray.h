@@ -898,7 +898,7 @@ ZESSize ZEArray<ZE_ARRAY_SPECIALIZATION>::BinarySearch(const ZEItemType& Element
 	void* Result = bsearch(&Element, Items, Count, sizeof(ZEItemType), (int (*)(const void*, const void*))(CompareFunction));
 	if (Result == NULL)
 	{
-		Lock.UnlockRead();
+		Lock.UnlockRead();<
 		return -1;
 	}
 	else
