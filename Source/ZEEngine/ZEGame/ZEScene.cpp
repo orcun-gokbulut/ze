@@ -641,9 +641,6 @@ bool ZEScene::IsEntitiesLoaded()
 	}
 	Entities.UnlockRead();
 
-	while(Entities.GetCount() != 0)
-		Sleep(0);
-
 	return true;
 }
 
