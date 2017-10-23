@@ -62,7 +62,7 @@ class ZERSResourceManager : public ZEObject
 
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
-		ZELock									ManagerLock;
+		mutable ZELock							ManagerLock;
 
 		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
 

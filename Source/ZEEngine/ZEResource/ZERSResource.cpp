@@ -58,6 +58,9 @@ void ZERSResource::Reference() const
 
 void ZERSResource::Release() const
 {
+	if (IsShared())
+		GetManager()->ManagerLock.LockNested();
+
 	ReferenceCountLock.Lock();
 	ReferenceCount--;
 	if (Parent != NULL)
@@ -68,11 +71,17 @@ void ZERSResource::Release() const
 	{
 		if (ReferenceCount <= 0)
 		{
+			if (IsShared())
+				GetManager()->ManagerLock.Unlock();
+
 			Destroy();
 			return;
 		}
 	}
 	ReferenceCountLock.Unlock();
+
+	if (IsShared())
+		GetManager()->ManagerLock.Unlock();
 }
 
 void ZERSResource::Destroy() const
