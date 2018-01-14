@@ -226,8 +226,7 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 void ZERNRenderer::PopulateStageCommands()
 {
-	ZERNCommandList* MainCommandList = CommandLists[0];
-	for (ZEUInt I = 1; I < CommandListCount; I++)
+	for (ZEUInt I = 0; I < CommandListCount; I++)
 		MainCommandList->AddCommandMultiple(CommandLists[I]->CommandList);
 
 	MainCommandList->CommandList.Sort<CompareCommands>();
@@ -242,21 +241,6 @@ void ZERNRenderer::PopulateStageCommands()
 			Stage->Commands.AddEnd(Command->GetFreeLink());
 		}
 	}
-
-	//CommandList.MergeEnd(CommandListInstanced);
-	//CommandList.Sort<CompareCommands>();
-	//
-	//ze_for_each(Command, CommandList)
-	//{
-	//	Command->Instances.Sort<CompareCommands>();
-	//	ze_for_each(Stage, Stages)
-	//	{
-	//		if ((Command->StageMask & Stage->GetId()) == 0)
-	//			continue;
-	//
-	//		Stage->Commands.AddEnd(Command->GetFreeLink());
-	//	}
-	//}
 }
 
 void ZERNRenderer::RenderStages()
@@ -281,9 +265,6 @@ void ZERNRenderer::RenderStages()
 
 	ZEGRBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
-
-	//if (OutputTexture != NULL && OutputTexture->GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET))
-	//	Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
 
 	if (Resized)
 	{
@@ -353,6 +334,8 @@ bool ZERNRenderer::InitializeInternal()
 
 	CreatePredefinedSamplers();
 
+	MainCommandList = new ZERNCommandList();
+
 	return true;
 }
 
@@ -360,6 +343,8 @@ bool ZERNRenderer::DeinitializeInternal()
 {
 	CleanCommands();
 	CleanStages();
+
+	delete MainCommandList;
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
@@ -646,15 +631,13 @@ void ZERNRenderer::EndScene()
 ZERNCommandList* ZERNRenderer::GetCommandList()
 {
 	CommandListLock.Lock();
+
 	if (CommandListCount < CommandLists.GetCount())
 	{
 		ZEUInt Index = CommandListCount++;
 		CommandListLock.Unlock();
 		return CommandLists[Index];
 	}
-	//else
-	//{
-	//}
 	
 	ZERNCommandList* CmdList = new ZERNCommandList();
 	CommandLists.Add(CmdList);
@@ -665,111 +648,26 @@ ZERNCommandList* ZERNRenderer::GetCommandList()
 	return CmdList;
 }
 
-//void ZERNRenderer::AddCommand(ZERNCommand* Command)
-//{
-//	if (!IsInitialized())
-//		return;
-//
-//	Command->SceneIndex = CurrentSceneIndex;
-//	if (Command->InstanceTag != NULL)
-//	{
-//		bool Found = false;
-//		ZELink<ZERNCommand>* InstancedCommand;
-//		CommandListInstanced.LockRead();
-//		{
-//			InstancedCommand = CommandListInstanced.GetFirst();
-//			while (InstancedCommand != NULL)
-//			{
-//				ZERNCommand* CurrentCommand = InstancedCommand->GetItem();
-//
-//				if (CurrentCommand->InstanceTag == NULL ||
-//					CurrentCommand->InstanceTag->Hash != Command->InstanceTag->Hash ||
-//					CurrentCommand->InstanceTag->GetClass() != Command->InstanceTag->GetClass() ||
-//					!CurrentCommand->InstanceTag->Check(Command->InstanceTag))
-//				{
-//					InstancedCommand = InstancedCommand->GetNext();
-//					continue;
-//				}
-//
-//				Found = true;
-//				break;
-//			}
-//		}
-//		CommandListInstanced.UnlockRead();
-//
-//		if (Found)
-//		{
-//			if (InstancedCommand != CommandListInstanced.GetFirst())
-//			{
-//				CommandListInstanced.LockWrite();
-//				{
-//					CommandListInstanced.Remove(InstancedCommand);
-//					CommandListInstanced.AddBegin(InstancedCommand);
-//				}
-//				CommandListInstanced.UnlockWrite();
-//			}
-//
-//			InstancedCommand->GetItem()->Instances.AddEnd(Command->GetFreeLink());
-//		}
-//		else
-//		{
-//			CommandListInstanced.AddEnd(Command->GetFreeLink());
-//		}
-//	}
-//	else
-//	{
-//		CommandList.AddEnd(Command->GetFreeLink());
-//	}
-//}
-//
-//void ZERNRenderer::AddCommandList(ZERNCommandList* CommandList)
-//{
-//	CommandList->AddCommandMultiple(CommandList->CommandList);
-//}
-
 void ZERNRenderer::CleanCommands()
 {
 	CommandListCount = 0;
 	ze_for_each(CmdList, CommandLists)
 		CmdList.GetItem()->Clear();
 
-	//ze_for_each(CmdList, CommandLists)
-	//	CmdList.GetItem()->CommandList.Clear();
+	MainCommandList->Clear();
 
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clear();
-
-	//ze_for_each(Command, CommandList)
-	//	Command->Instances.Clear();
-	//
-	//ze_for_each(Stage, Stages)
-	//	Stage->Commands.Clear();
-	//
-	//CommandList.Clear();
 }
 
-void ZERNRenderer::BeginNestedRenderer()
+void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
-	//ze_for_each(CmdList, CommandLists)
-	//{
-	//	ze_for_each(Cmd, CmdList.GetItem()->CommandList)
-	//		Cmd->Push();
-	//}
-
-	//ze_for_each(Command, CommandList)
-	//	Command->PushInstances();
+	MainCommandList->AddCommand(Command);
 }
 
-void ZERNRenderer::EndNestedRenderer()
+void ZERNRenderer::AddCommandMultiple(const ZEList2<ZERNCommand>& CommandList)
 {
-	//ze_for_each(CmdList, CommandLists)
-	//{
-	//	ze_for_each(Cmd, CmdList.GetItem()->CommandList)
-	//		Cmd->Pop();
-	//}
-
-	//ze_for_each(Command, CommandList)
-	//	Command->PopInstances();
+	MainCommandList->AddCommandMultiple(CommandList);
 }
 
 void ZERNRenderer::Render()
@@ -809,7 +707,4 @@ ZERNRenderer::ZERNRenderer()
 ZERNRenderer::~ZERNRenderer()
 {
 	Deinitialize();
-
-	CleanCommands();
-	CleanStages();
 }

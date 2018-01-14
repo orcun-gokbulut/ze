@@ -71,6 +71,8 @@ class ZE_EXPORT_ZEENGINE ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZESize									IndexOffset;
 		ZESize									IndexCount;
 
+		bool									FacingCamera;
+
 		ZEArray<ZEMDResourceDraw>				Draws;
 		
 												ZEMDResourceLOD();
@@ -113,6 +115,9 @@ class ZE_EXPORT_ZEENGINE ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		const ZEArray<ZEMDResourceDraw>&		GetDraws() const;
 		void									AddDraw(const ZEMDResourceDraw& Draw);
 		void									RemoveDraw(ZESize Index);
+
+		void									SetFacingCamera(bool FacingCamera);
+		bool									GetFacingCamera() const;
 
 		bool									Unserialize(const ZEMLReaderNode& LODNode);
 		bool									Serialize(ZEMLWriterNode& LODNode) const;

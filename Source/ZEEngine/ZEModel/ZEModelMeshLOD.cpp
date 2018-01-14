@@ -43,6 +43,7 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZEResource/ZERSHolder.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 {
@@ -59,6 +60,7 @@ bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 	SetIndexType(Resource->GetIndexType());
 	SetIndexOffset(Resource->GetIndexOffset());
 	SetIndexCount(Resource->GetIndexCount());
+	SetFacingCamera(Resource->GetFacingCamera());
 
 	ZESize DrawCount = Resource->GetDraws().GetCount();
 	Draws.SetCount(DrawCount);
@@ -96,6 +98,7 @@ ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 	Opacity = 1.0f;
 	LODTransition = false;
 	DirtyDraws = true;
+	FacingCamera = false;
 
 	Resource = NULL;
 }
@@ -273,8 +276,30 @@ bool ZEModelMeshLOD::GetLODTransition() const
 	return LODTransition;
 }
 
+void ZEModelMeshLOD::SetFacingCamera(bool FacingCamera)
+{
+	this->FacingCamera = FacingCamera;
+}
+
+bool ZEModelMeshLOD::GetFacingCamera() const
+{
+	return FacingCamera;
+}
+
 bool ZEModelMeshLOD::PreRender(const ZERNPreRenderParameters* PreRenderParameters)
 {
+	if (FacingCamera)
+	{
+		ZEVector3 DirectionProjXZ = PreRenderParameters->View->Position - Mesh->GetWorldPosition();
+		DirectionProjXZ.y = 0.0f;
+		DirectionProjXZ.NormalizeSelf();
+
+		ZEQuaternion Rotation;
+		ZEQuaternion::CreateFromDirection(Rotation, DirectionProjXZ);
+
+		Mesh->SetWorldRotation(Rotation);
+	}
+
 	ze_for_each(Draw, Draws)
 	{
 		Draw->DirtyConstants = DirtyDraws;

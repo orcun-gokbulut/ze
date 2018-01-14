@@ -624,8 +624,9 @@ float3 ZERNShading_Diffuse_Lambert(ZERNShading_Surface Surface, float3 LightDire
 float3 ZERNShading_Specular_BlinnPhong(ZERNShading_Surface Surface, float3 LightDirectionView, float3 ViewDirection)
 {
 	float3 HalfVector = normalize(ViewDirection + LightDirectionView);
+	float HdotV = max(0.0f, dot(HalfVector, ViewDirection));
 	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
-	float3 Fresnel = Surface.Specular + (1.0f - Surface.Specular) * pow(1.0f - NdotH, 5.0f);
+	float3 Fresnel = Surface.Specular + (1.0f - Surface.Specular) * pow(1.0f - HdotV, 5.0f);
 	
 	return Fresnel * ((Surface.SpecularPower + 8.0f) / (8.0f * ZERNMath_PI)) * pow(NdotH, Surface.SpecularPower);
 }

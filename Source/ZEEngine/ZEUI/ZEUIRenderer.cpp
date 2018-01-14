@@ -224,7 +224,7 @@ void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
 
 	//Renderer->AddCommand(&Command);
 	Command.Reset();
-	Renderer->GetCommandList()->AddCommand(&Command);
+	Renderer->AddCommand(&Command);
 }
 
 void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)

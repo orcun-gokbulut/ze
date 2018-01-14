@@ -54,6 +54,7 @@ ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 	IndexType = ZEMD_VIT_NONE;
 	IndexOffset = 0;
 	IndexCount = 0;
+	FacingCamera = false;
 }
 
 ZEMDResourceLOD::~ZEMDResourceLOD()
@@ -178,6 +179,16 @@ ZESize ZEMDResourceLOD::GetIndexCount() const
 	return IndexCount;
 }
 
+void ZEMDResourceLOD::SetFacingCamera(bool FacingCamera)
+{
+	this->FacingCamera = FacingCamera;
+}
+
+bool ZEMDResourceLOD::GetFacingCamera() const
+{
+	return FacingCamera;
+}
+
 const ZEArray<ZEMDResourceDraw>& ZEMDResourceLOD::GetDraws() const
 {
 	return Draws;
@@ -209,6 +220,7 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	SetEndDistance(LODNode.ReadFloat("EndDistance", (float)LODNode.ReadInt32("LODEndDistance", 100000)));
 	SetVertexType((ZEMDVertexType)LODNode.ReadUInt8("VertexType", ZEMD_VT_NORMAL));
 	SetIndexType((ZEMDVertexIndexType)(LODNode.ReadUInt8("IndexType", ZEMD_VIT_NONE) / 16));
+	SetFacingCamera(LODNode.ReadBoolean("FacingCamera"));
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 	{

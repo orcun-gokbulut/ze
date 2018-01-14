@@ -57,14 +57,14 @@ bool ZED11Output::Initialize(const ZEGRWindow* Window, ZEGRFormat Format)
 	SwapChainDesc.Height = Window->GetHeight();
 	SwapChainDesc.Format = ZED11ComponentBase::ConvertToNonSRGB(Format);
 	SwapChainDesc.Stereo = FALSE;
-	SwapChainDesc.BufferCount = 2;
+	SwapChainDesc.BufferCount = 1;
 	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	SwapChainDesc.Flags = 0;
 	SwapChainDesc.SampleDesc.Count = 1;
 	SwapChainDesc.SampleDesc.Quality = 0;
-	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 	IDXGIDevice1* DXGIDevice;
 	HRESULT Result = GetDevice()->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
@@ -153,7 +153,7 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 		ZEGR_RELEASE(D11Texture->Resource);
 	}
 
-	HRESULT Result = SwapChain->ResizeBuffers(2, Width, Height, ConvertToNonSRGB(GetFormat()), 0);
+	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertToNonSRGB(GetFormat()), 0);
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot resize swapchain buffers. Error: 0x%X.", Result);

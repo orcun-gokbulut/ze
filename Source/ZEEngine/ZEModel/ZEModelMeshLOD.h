@@ -80,6 +80,7 @@ class ZE_EXPORT_ZEENGINE ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		float										Opacity;
 		bool										LODTransition;
 		bool										DirtyDraws;
+		bool										FacingCamera;
 
 		ZEArray<ZEModelDraw>						Draws;
 		
@@ -134,6 +135,9 @@ class ZE_EXPORT_ZEENGINE ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 
 		void										SetLODTransition(bool LODTransition);
 		bool										GetLODTransition() const;
+
+		void										SetFacingCamera(bool FacingCamera);
+		bool										GetFacingCamera() const;
 
 		bool										PreRender(const ZERNPreRenderParameters* PreRenderParameters);
 

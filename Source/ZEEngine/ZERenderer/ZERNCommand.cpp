@@ -55,7 +55,7 @@ bool ZERNCommand::AddSubCommand(ZERNCommand* Command)
 
 void ZERNCommand::Reset()
 {
-	zeCheckError(Link.GetInUse(), ZE_VOID, "Instancelink in use");
+	zeCheckError(Link.GetInUse(), ZE_VOID, "Subcommand link in use");
 
 	SubCommands.AddBegin(&Link);
 }

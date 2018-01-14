@@ -50,10 +50,6 @@ void ZEDSceneWrapper::PreRenderEntity(ZEDEntityWrapper* EntityWrapper, const ZER
 		return;
 
 	EntityWrapper->PreRender(Parameters);
-
-	const ZEArray<ZEDObjectWrapper*>& ChildWrappers = EntityWrapper->GetChildWrappers();
-	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-		PreRenderEntity(static_cast<ZEDEntityWrapper*>(ChildWrappers[I]), Parameters);
 }
 
 void ZEDSceneWrapper::RayCastEntity(ZEDEntityWrapper* Wrapper, ZERayCastReport& Report, const ZERayCastParameters& Parameters)

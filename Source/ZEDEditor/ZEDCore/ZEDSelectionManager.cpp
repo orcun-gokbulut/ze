@@ -146,6 +146,66 @@ void ZEDSelectionManager::UpdateCommands()
 
 void ZEDSelectionManager::SelectAllCommand_OnAction(const ZEDCommand* Command)
 {
+	ZEDEditor* Editor = GetEditor();
+
+	if (Editor == NULL)
+		return;
+
+	ZEDObjectManager* ObjectManager = Editor->GetObjectManager();
+
+	if (ObjectManager == NULL)
+		return;
+
+	ZEDObjectWrapper* RootWrapper = ObjectManager->GetRootWrapper();
+
+	if (RootWrapper == NULL)
+		return;
+
+	ZEArray<ZEDObjectWrapper*> Stack;
+	ZEDObjectWrapper* CurrentWrapper = NULL;
+	ZEDObjectWrapper* ParentWrapper = NULL;
+	ZESmartArray<ZEDObjectWrapper*> Selection;
+
+	CurrentWrapper = RootWrapper;
+	/*Stack.Push(CurrentWrapper);*/
+
+	while (!(CurrentWrapper == NULL && Stack.GetCount() == 0))
+	{
+		if (CurrentWrapper == NULL)
+		{
+			CurrentWrapper = Stack.Pop();
+			Selection.Add(CurrentWrapper);
+
+			ParentWrapper = CurrentWrapper->GetParent();
+
+			if (ParentWrapper == NULL)
+			{
+				CurrentWrapper = NULL;
+				continue;
+			}
+
+			ZESSize Count = ParentWrapper->GetChildWrappers().GetCount();
+			ZESSize Index = ParentWrapper->GetChildWrappers().FindIndex(CurrentWrapper);
+
+			if (Index < Count - 1)
+				CurrentWrapper = ParentWrapper->GetChildWrappers().GetItem(++Index);
+			else
+				CurrentWrapper = NULL;
+
+		}
+		else
+		{
+			Stack.Push(CurrentWrapper);
+
+			if (CurrentWrapper->GetChildWrappers().GetCount() != 0)
+				CurrentWrapper = CurrentWrapper->GetChildWrappers().GetFirstItem();
+			else
+				CurrentWrapper = NULL;
+		}
+
+	}
+
+	SetSelection(Selection);
 
 }
 
