@@ -58,6 +58,9 @@ class ZEGeographicEntity : public ZEEntity
 
 	public:
 		virtual void						GeographicTransformChanged();
+	
+	protected:
+		virtual void						SetScene(ZEScene* Scene);
 
 											ZEGeographicEntity();
 

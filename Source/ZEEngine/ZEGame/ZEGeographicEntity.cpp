@@ -70,6 +70,12 @@ void ZEGeographicEntity::GeographicTransformChanged()
 	GetChildEntities().UnlockRead();*/
 }
 
+void ZEGeographicEntity::SetScene(ZEScene* Scene)
+{
+	ZEEntity::SetScene(Scene);
+	GeographicTransformChanged();
+}
+
 ZEGeographicEntity::ZEGeographicEntity() : GeoLink(this)
 {
 	GeographicPosition = ZEVector3d::Zero;
