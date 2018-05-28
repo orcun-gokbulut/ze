@@ -1071,6 +1071,7 @@ bool ZEVector4::NotEquals(const ZEVector4& Vector, float Threshold) const
 			(ZEMath::Abs(this->z - Vector.z) >= Threshold) ||
 			(ZEMath::Abs(this->w - Vector.w) >= Threshold));
 }
+
 ZEVector2 ZEVector4::ToVector2() const
 {
 	return ZEVector2(x, y);

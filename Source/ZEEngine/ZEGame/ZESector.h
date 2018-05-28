@@ -51,44 +51,46 @@ class ZESector : public ZEGeographicEntity
 	friend class ZESectorManager;
 	ZE_OBJECT
 	protected:
-		ZEGUID							GUID;
-		ZEString						SectorFile;
-		ZESectorManager*				Manager;
-		ZELock							SectorLock;
-		ZEArray<ZESectorLink>			SectorLinks;
+		ZEGUID								GUID;
+		ZEString							SectorFile;
+		ZESectorManager*					Manager;
+		ZELock								SectorLock;
+		ZEArray<ZESectorLink>				SectorLinks;
 
-		bool							IsSectorFileLoaded;
+		bool								IsSectorFileLoaded;
 
-		bool							CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck);
-		void							SetManager(ZESectorManager* Manager);				
+		bool								CheckLinkInternal(ZESector* TargetSector, ZEUInt32 Depth, bool DepthCheck);
+		void								SetManager(ZESectorManager* Manager);				
 
-		virtual ZEEntityResult			LoadInternal();
-		virtual ZEEntityResult			UnloadInternal();
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
 
-										ZESector();
-		virtual							~ZESector();
-
+											ZESector();
+		virtual								~ZESector();
+	
 	public:
-		void							SetGUID(const ZEGUID& GUID);
-		const ZEGUID&					GetGUID() const;
+		ZESectorManager*					GetSectorManager() const;
 
-		void							SetSectorFile(const ZEString& FilePath);
-		const ZEString&					GetSectorFile() const;
+		void								SetGUID(const ZEGUID& GUID);
+		const ZEGUID&						GetGUID() const;
 
-		ZESectorManager*				GetManager() const;
-		bool							CheckLink(ZESector* TargetSector);
+		void								SetSectorFile(const ZEString& FilePath);
+		const ZEString&						GetSectorFile() const;
 
-		const ZEArray<ZESectorLink>&	GetSectorLinks() const;
-		bool							AddLink(const ZESector* Sector, ZEUInt32 Depth);
-		bool							AddLink(const ZEGUID& SectorId, ZEUInt32 Depth);
-		bool							RemoveLink(const ZESector* Sector);
-		bool							RemoveLink(const ZEGUID& SectorId);
+		ZESectorManager*					GetManager() const;
+		bool								CheckLink(ZESector* TargetSector);
+
+		const ZEArray<ZESectorLink>&		GetSectorLinks() const;
+		bool								AddLink(const ZESector* Sector, ZEUInt32 Depth);
+		bool								AddLink(const ZEGUID& SectorId, ZEUInt32 Depth);
+		bool								RemoveLink(const ZESector* Sector);
+		bool								RemoveLink(const ZEGUID& SectorId);
 		
-		bool							Save();
-		bool							Save(const ZEString& FileName);
+		bool								Save();
+		bool								Save(const ZEString& FileName);
 
-		virtual bool					Serialize(ZEMLWriterNode* Serializer);
-		virtual bool					Unserialize(ZEMLReaderNode* Unserializer);
+		virtual bool						Serialize(ZEMLWriterNode* Serializer);
+		virtual bool						Unserialize(ZEMLReaderNode* Unserializer);
 
-		static ZESector*				CreateInstance();
+		static ZESector*					CreateInstance();
 };

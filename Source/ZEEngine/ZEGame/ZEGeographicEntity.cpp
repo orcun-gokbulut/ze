@@ -35,6 +35,7 @@
 
 #include "ZEGeographicEntity.h"
 #include "ZESectorManager.h"
+#include "ZEScene.h"
 
 #define ZE_GEDF_GEOGRAPHIC_TRANSFORM			0x0001
 #define ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM		0x0002
@@ -43,6 +44,30 @@
 void ZEGeographicEntity::GeographicTransformChanged()
 {
 	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM | ZE_GEDF_LOCAL_TRANSFORM);
+	
+	ZESectorManager* SectorManager;
+	ZESector* OriginSector;
+	if (GetScene() != NULL && 
+		(SectorManager = GetScene()->GetSectorManager()) != NULL && 
+		(OriginSector = GetScene()->GetSectorManager()->GetOriginSector()) != NULL)
+	{
+		ZEMatrix4x4d EntityLocalTransform;
+		ZEMatrix4x4d::Multiply(EntityLocalTransform, OriginSector->GetInvGeographicTransform(), GetGeographicTransform());
+		SetTransform(EntityLocalTransform.ToMatrix4x4());
+	}
+
+	/*GetChildEntities().LockRead();
+	{
+		ze_for_each(ChildEntity, GetChildEntities())
+		{
+			ZEGeographicEntity* GeographicEntity = ZEClass::Cast<ZEGeographicEntity>(ChildEntity.GetItem());
+			if (GeographicEntity == NULL)
+				continue;
+
+			GeographicEntity->GeographicTransformChanged();
+		}
+	}
+	GetChildEntities().UnlockRead();*/
 }
 
 ZEGeographicEntity::ZEGeographicEntity() : GeoLink(this)
@@ -78,6 +103,9 @@ const ZEMatrix4x4d& ZEGeographicEntity::GetInvGeographicTransform() const
 
 void ZEGeographicEntity::SetGeographicPosition(const ZEVector3d& Position)
 {
+	if (GeographicPosition == Position)
+		return;
+
 	GeographicPosition = Position;
 	GeographicTransformChanged();
 }
@@ -89,6 +117,9 @@ ZEVector3d ZEGeographicEntity::GetGeographicPosition() const
 
 void ZEGeographicEntity::SetGeographicRotation(const ZEQuaternion& Rotation)
 {
+	if (GeographicRotation == Rotation)
+		return;
+
 	GeographicRotation = Rotation;
 	GeographicTransformChanged();
 }
@@ -100,6 +131,9 @@ ZEQuaternion ZEGeographicEntity::GetGeographicRotation() const
 
 void ZEGeographicEntity::SetGeographicScale(const ZEVector3d& Scale)
 {
+	if (GeographicScale == Scale)
+		return;
+
 	GeographicScale = Scale;
 	GeographicTransformChanged();
 }

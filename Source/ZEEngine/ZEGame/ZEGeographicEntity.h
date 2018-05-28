@@ -39,6 +39,8 @@
 #include "ZEMath/ZEVectord.h"
 #include "ZEMath/ZEMatrixd.h"
 
+class ZESector;
+
 class ZEGeographicEntity : public ZEEntity
 {
 	friend class ZESectorManager;
@@ -54,7 +56,7 @@ class ZEGeographicEntity : public ZEEntity
 		mutable ZEMatrix4x4d				GeographicTransform;
 		mutable ZEMatrix4x4d				InvGeographicTransform;
 
-	protected:
+	public:
 		virtual void						GeographicTransformChanged();
 
 											ZEGeographicEntity();

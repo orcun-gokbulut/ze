@@ -55,6 +55,7 @@ ZEMT_FORWARD_DECLARE(ZERNPreRenderParameters);
 
 class ZEPhysicalWorld;
 class ZEGRBuffer;
+class ZESectorManager;
 enum ZEEntityState;
 
 ZEMT_INCLUDE("Test.h");
@@ -81,7 +82,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEEntity*								TickCurrentEntity;
 		ZEList2<ZEEntity>						RenderList;
 		ZEOctree<ZEEntity*>						RenderListOctree;
-
+		ZESectorManager*						SectorManager;
 		struct
 		{
 			ZEVector3							AmbientColor;
@@ -130,6 +131,9 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void									SetSpatialDatabase(bool Enabled);
 		bool									GetSpatialDatabase();
+
+		void									SetSectorManager(ZESectorManager* SectorManager);
+		ZESectorManager*						GetSectorManager() const;
 
 		ZEUInt									GetLoadingPercentage();
 

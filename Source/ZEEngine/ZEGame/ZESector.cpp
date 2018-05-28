@@ -213,6 +213,11 @@ ZESector::~ZESector()
 	SectorLinks.Clear();
 }
 
+ZESectorManager* ZESector::GetSectorManager() const
+{
+	return Manager;
+}
+
 void ZESector::SetGUID(const ZEGUID& GUID)
 {
 	this->GUID = GUID;

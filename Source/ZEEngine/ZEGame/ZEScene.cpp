@@ -54,6 +54,7 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
+#include "ZESectorManager.h"
 
 #include <memory.h>
 
@@ -445,6 +446,23 @@ bool ZEScene::GetSpatialDatabase()
 	return SpatialDatabase;
 }
 
+void ZEScene::SetSectorManager(ZESectorManager* Manager)
+{
+	zeCheckError(Manager != NULL && Manager->GetScene() != NULL, ZE_VOID, "Sector manager already registered to a scene.");
+	
+	if (SectorManager != NULL)
+		SectorManager->Scene = NULL;
+
+	SectorManager = Manager;
+	
+	if (SectorManager != NULL)
+		SectorManager->Scene = this;
+}
+
+ZESectorManager* ZEScene::GetSectorManager() const
+{
+	return SectorManager;
+}
 
 ZEUInt ZEScene::GetLoadingPercentage()
 {
@@ -963,6 +981,7 @@ ZEScene::ZEScene()
 	SpatialDatabase = false;
 	EntityState = ZE_ES_NONE;
 	TickCurrentEntity = NULL;
+	SectorManager = NULL;
 
 	Constants.AmbientColor = ZEVector3::Zero;
 
@@ -976,6 +995,9 @@ ZEScene::~ZEScene()
 	Deinitialize();
 
 	ClearEntities();
+
+	if (SectorManager != NULL)
+		SectorManager->Scene = NULL;
 
 	if (PhysicalWorld != NULL)
 	{

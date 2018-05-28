@@ -44,9 +44,9 @@ class ZEScene;
 
 class ZESectorManager : public ZEObject
 {
-	ZE_OBJECT;
-
-	protected:
+	ZE_OBJECT
+	friend class ZEScene;
+	private:
 		ZEScene*							Scene;
 		ZESector* 							OriginSector;
 		ZEUInt32							CacheDepth;
@@ -56,8 +56,7 @@ class ZESectorManager : public ZEObject
 		ZEArray<ZESector*>					ActiveSectors;
 
 		ZEList2<ZEGeographicEntity>			Selectors;
-		ZEList2<ZEGeographicEntity>			GeographicEntities;
-
+	
 		void								ActivateSector(ZESector* Sector);
 		void								DeactivateSector(ZESector* Sector);
 
@@ -65,17 +64,16 @@ class ZESectorManager : public ZEObject
 		void								RemoveFromCache(ZESector* Sector);
 
 		void								FollowLinks(ZEArray<ZESector*>& ActivateList, ZEArray<ZESector*>& CacheList, ZESector* Sector, ZESSize ActivateDepth, ZESSize CacheDepth);
-		void								UpdateTransformation(ZEGeographicEntity* Entity, bool Forced = false);
 		void								UpdateTransformations();
 		void								UpdateActiveSectors();
 
 											ZESectorManager();
+		virtual								~ZESectorManager();
 
 	public:
-		void								SetScene(ZEScene* Scene);
 		ZEScene*							GetScene() const;
 
-		void								SetCacheDepth(ZESize Depth);
+		void								SetCacheDepth(ZEUInt32 Depth);
 		ZESize								GetCacheDepth() const;
 
 		const ZEList2<ZEGeographicEntity>&	GetSectors() const;
@@ -92,11 +90,6 @@ class ZESectorManager : public ZEObject
 		bool								AddSelector(ZESectorSelector* Selector);
 		void								RemoveSelector(ZESectorSelector* Selector);
 		void								ClearSelectors();
-
-		const ZEList2<ZEGeographicEntity>&	GetGeographicEntities() const;
-		bool								AddGeographicEntity(ZEGeographicEntity* Entity);
-		void								RemoveGeographicEntity(ZEGeographicEntity* Entity);
-		void								ClearGeographicEntities();
 
 		virtual void						Process(float Time);
 
