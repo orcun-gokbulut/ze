@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEDEditorCore.cpp							Sources)
 ze_add_source(ZEDEditorCore.h							Sources ZEMC)
@@ -109,9 +108,9 @@ ze_add_source(ZEDGrid.h									Sources ZEMC)
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
 qt5_wrap_ui (QtUIFiles ${QtUI})
 
-ze_add_library(TARGET ZEDCore 
+ze_add_library(TARGET ZEDCore
 	ZEMC ${ZEMC}
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation)
 
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

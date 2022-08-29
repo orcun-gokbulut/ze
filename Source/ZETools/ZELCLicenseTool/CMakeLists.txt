@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZELCMain.cpp								Sources)
 ze_add_source(ZELCLicenseToolWindow.cpp					Sources)
@@ -51,6 +50,6 @@ source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 ze_add_executable(TARGET ZELCLicensingTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
 	LIBS ZEFoundation ZEProtect Qt5::WinMain)
-	
+
 qt5_use_modules(ZELCLicensingTool Widgets)
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEAllocator.cpp					Sources)
 ze_add_source(ZEAllocator.h						Sources Headers)
@@ -115,11 +114,11 @@ ze_add_source(ZEReference.h						Sources Headers)
 ze_add_source(ZEReference.cpp					Sources)
 
 
-ze_add_library(TARGET ZEDS 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZEDS
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEThread ZERegEx)
-	
-ze_add_test(TARGET ZEDSTests 
+
+ze_add_test(TARGET ZEDSTests
 	SOURCES ${Tests}
 	TEST_TARGET ZEDS)

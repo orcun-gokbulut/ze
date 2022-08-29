@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEDConsoleWidget.cpp						Sources)
 ze_add_source(ZEDConsoleWidget.h						Sources Headers QtMocs)
@@ -57,7 +56,7 @@ qt5_wrap_ui (QtUiFiles ${QtUI})
 
 add_custom_command(
 	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
-	COMMAND "${CMAKE_SOURCE_DIR}/Tool/re2c.exe" 
+	COMMAND "${CMAKE_SOURCE_DIR}/Tool/re2c.exe"
 	ARGS "-o" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterLexer.l"
 	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterLexer.l"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
@@ -70,22 +69,22 @@ add_custom_command(
 	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.cpp" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h"
 	COMMAND "${CMAKE_COMMAND}"
 		ARGS "-E" "copy_if_different" "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterParser.y" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp"
-	COMMAND "${CMAKE_SOURCE_DIR}/Tool/lemon.exe" 
+	COMMAND "${CMAKE_SOURCE_DIR}/Tool/lemon.exe"
 		ARGS "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp"
 	COMMAND "${CMAKE_COMMAND}"
 		ARGS "-E" "copy_if_different" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.c" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.cpp"
 	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterParser.y"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-	
-ze_add_executable(TARGET ZEDConsole 
+
+ze_add_executable(TARGET ZEDConsole
 	ZEMC ${ZEMC}
 	SOURCES ${Sources} ${QtMocFiles} ${QtUiFiles}
 	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
-	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h" 
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h"
 	LIBS ZEFoundation ZEEngine)
 
-source_group("Generated" FILES 
-	${QtMocFiles} 
+source_group("Generated" FILES
+	${QtMocFiles}
 	${QtUiFiles}
 	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
 	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.cpp"

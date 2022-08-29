@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZELock.cpp         		Sources)
 ze_add_source(ZELock.h          	 	Sources Headers)
@@ -74,7 +73,7 @@ if (ZEBUILD_VTUNE_ENABLED)
 endif()
 
 ze_add_library(TARGET ZEThread
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS "${VTune_LIBRARIES}")
 

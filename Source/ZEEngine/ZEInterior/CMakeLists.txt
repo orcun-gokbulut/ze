@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEInterior.cpp				Sources)
 ze_add_source(ZEInterior.h					Sources Headers ZEMC)
@@ -46,7 +45,7 @@ ze_add_source(ZEInteriorHelper.h			Sources Headers ZEMC)
 ze_add_source(ZEInteriorResource.cpp		Sources)
 ze_add_source(ZEInteriorResource.h			Sources Headers)
 
-ze_add_library(TARGET ZEInterior 
+ze_add_library(TARGET ZEInterior
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

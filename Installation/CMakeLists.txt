@@ -33,23 +33,22 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 set(ZEBUILD_BUILD_INSTALLER		TRUE CACHE BOOL "Build Installer.")
 
 if (ZEBUILD_BUILD_INSTALLER)
-	install(DIRECTORY Dll/${ZEBUILD_PLATFORM}/ 
-		DESTINATION Bin 
+	install(DIRECTORY Dll/${ZEBUILD_PLATFORM}/
+		DESTINATION Bin
 		CONFIGURATIONS Release
-		FILES_MATCHING 
-			PATTERN "*.dll" 
+		FILES_MATCHING
+			PATTERN "*.dll"
 			PATTERN "Debug" EXCLUDE
 			PATTERN "Release" EXCLUDE)
 
 	install(DIRECTORY Dll/${ZEBUILD_PLATFORM}/Release/
 		DESTINATION Bin
 		CONFIGURATIONS Release)
-			
+
 	include(InstallRequiredSystemLibraries)
 
 	set(CPACK_PACKAGE_NAME "Zinek Engine")
@@ -88,7 +87,7 @@ if (ZEBUILD_BUILD_INSTALLER)
 	set(CPACK_COMPONENT_ZEEDITOR_DISPLAY_NAME "ZEEditor")
 	set(CPACK_COMPONENT_ZEEDITOR_DESCRIPTION "Zinek Engine Editor")
 	set(CPACK_COMPONENT_ZEEDITOR_GROUP "Content Creation")
-		
+
 	set(CPACK_COMPONENT_ZE3DSMAX_EXPORTERS_DISPLAY_NAME "Autodesk 3ds Max Exporters")
 	set(CPACK_COMPONENT_ZE3DSMAX_DESCRIPTION "3ds Max plugins for exporting ZEModel and ZEMap files.")
 	set(CPACK_COMPONENT_ZE3DSMAX_GROUP "Content Creation")
@@ -104,11 +103,11 @@ if (ZEBUILD_BUILD_INSTALLER)
 	set(CPACK_COMPONENT_ZEBLENDER_EXPORTERS_DISPLAY_NAME "Blender Exporters")
 	set(CPACK_COMPONENT_ZEBLENDER_DESCRIPTION "Blender plugins for exporting ZEModel and ZEMap files.")
 	set(CPACK_COMPONENT_ZEBLENDER_GROUP "Content Creation")
-	
+
 	set(CPACK_COMPONENT_ZECONENTSAMPLES_EXPORTERS_DISPLAY_NAME "Sample and Base Contents")
 	set(CPACK_COMPONENT_ZECONENTSAMPLES_DESCRIPTION "Sample and base conent files for creating and deriving new content.")
 	set(CPACK_COMPONENT_ZECONENTSAMPLES_GROUP "Content Creation")
-	
+
 	set(CPACK_COMPONENT_ZESDK_DISPLAY_NAME "ZESDK")
 	set(CPACK_COMPONENT_ZESDK_DESCRIPTION "Zinek Engine C++ Software Development Kit.")
 	set(CPACK_COMPONENT_ZESDK_GROUP "C++ Development")

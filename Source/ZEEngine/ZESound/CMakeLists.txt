@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEListener.cpp				Sources)
 ze_add_source(ZEListener.h					Sources Headers ZEMC)
@@ -51,7 +50,7 @@ ze_add_source(ZESoundResourceWAV.h			Sources)
 ze_add_source(ZESoundSource.cpp				Sources)
 ze_add_source(ZESoundSource.h				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZESound 
+ze_add_library(TARGET ZESound
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

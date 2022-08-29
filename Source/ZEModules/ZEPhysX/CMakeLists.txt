@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEPhysXModule.cpp					Sources)
 ze_add_source(ZEPhysXModule.h					Sources ZEMC)
@@ -58,7 +57,7 @@ ze_add_source(ZEPhysXStream.h					Sources)
 ze_add_source(ZEPhysXUserOutputStream.cpp		Sources)
 ze_add_source(ZEPhysXUserOutputStream.h			Sources)
 
-ze_add_library(TARGET ZEPhysX 
+ze_add_library(TARGET ZEPhysX
 	SOURCES ${Sources}
 	ZEMC ${ZEMC}
 	LIBS libPhysX2)

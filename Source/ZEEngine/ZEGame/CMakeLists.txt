@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZECanvasBrush.cpp			Sources)
 ze_add_source(ZECanvasBrush.h			Sources Headers ZEMC)
@@ -64,7 +63,7 @@ ze_add_source(ZEStateScreen.h			Sources Headers ZEMC)
 ze_add_source(ZESpawner.cpp				Sources)
 ze_add_source(ZESpawner.h				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEGame 
+ze_add_library(TARGET ZEGame
 	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers})

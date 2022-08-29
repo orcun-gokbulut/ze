@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 find_package(OpenMP REQUIRED)
 if (OPENMP_FOUND)
@@ -92,7 +91,7 @@ qt5_wrap_ui(QtUIOutputs ${QtUIs})
 qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
 qt5_add_resources(QtResourceOutputs ${QtResources})
 
-ze_add_executable(TARGET ZELNLauncher 
+ze_add_executable(TARGET ZELNLauncher
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
 	LIBS ZEFoundation ZEProtect ZEITIntegrity libCryptopp Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
@@ -110,5 +109,5 @@ qt5_use_modules(ZELNLauncher Widgets)
 	#COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgets.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Release"
 	# Output Message
 	#COMMENT "Copying Qt binaries" VERBATIM)
-	
+
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

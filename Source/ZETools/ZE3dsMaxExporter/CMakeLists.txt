@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZETools")
 
@@ -104,7 +103,7 @@ ze_add_source(ZEResourceConfigurator.cpp					Sources)
 ze_add_source(ZEResourceConfiguratorWidget.ui				Sources QtUI)
 ze_add_source(ZEResourceConfiguratorWidget.h				Sources QtMocs)
 ze_add_source(ZEResourceConfiguratorWidget.cpp				Sources)
-		
+
 ze_add_source(ZEProgressDialog.h							Sources)
 ze_add_source(ZEProgressDialog.cpp							Sources)
 ze_add_source(ZEProgressDialogTask.h						Sources)

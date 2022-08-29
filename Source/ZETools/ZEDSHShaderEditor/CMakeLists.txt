@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEDSHErrorsWindow.cpp				Sources)
 ze_add_source(ZEDSHErrorsWindow.h				Sources QtMocs)
@@ -71,7 +70,7 @@ ze_add_library(TARGET ZEDSHShaderEditorDLL
 	DLL)
 
 qt5_use_modules(ZEDSHShaderEditorDLL Widgets)
-	
+
 set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Rundir")
 set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Rundir")
 set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Rundir")

@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEIPAddress.cpp							Sources)
 ze_add_source(ZEIPAddress_Unix.cpp						Sources PLATFORMS Unix)
@@ -66,8 +65,8 @@ ze_add_source(ZESocketTCPServerListener.h				Sources Headers)
 #ze_add_source(ZEIPAddressTests_Windows.cpp				Tests PLATFORMS Windows)
 #ze_add_source(ZESocketTests_Windows.cpp				Tests PLATFORMS Windows)
 
-ze_add_library(TARGET ZESocket 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZESocket
+	SOURCES ${Sources}
 	HEADERS ${Headers}
     LIBS ZEDS)
 

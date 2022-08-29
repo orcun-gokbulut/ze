@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 project (ZEFoundation)
 
@@ -115,9 +114,9 @@ ze_add_source(ZEEncryption.h					Sources Headers)
 
 ze_add_source(ZEAutoExp.txt						FoundationSources FoundationHeaders)
 ze_add_source(ZE.natvis							FoundationSources FoundationHeaders)
-	
+
 ze_add_library(TARGET ZEFoundationBase
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	COMBINE
 	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta libCryptopp)

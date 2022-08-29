@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEFileCompiler.cpp 			Sources)
 ze_add_source(ZEFileCompiler.h   			Sources)
@@ -41,7 +40,7 @@ ze_add_source(ZEFileCompilerOptions.cpp		Sources)
 ze_add_source(ZEFileCompilerOptions.h		Sources)
 ze_add_source(ZEMain.cpp					Sources)
 
-ze_add_executable(TARGET ZEFileCompiler 
-	CONSOLE 
-	SOURCES ${Sources} 
+ze_add_executable(TARGET ZEFileCompiler
+	CONSOLE
+	SOURCES ${Sources}
 	LIBS ZEFoundationBase)

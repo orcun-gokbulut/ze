@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEClass.cpp							Sources)
 ze_add_source(ZEClass.h 							Sources Headers)
@@ -89,11 +88,11 @@ ze_add_source(ZEMTTypeTestTable.h					Sources)
 ze_add_source(ZEMTTestObject.h						Tests ZEMC)
 ze_add_source(ZEMTTestObject.cpp					Tests)
 
-ze_add_library(TARGET ZEMeta 
+ze_add_library(TARGET ZEMeta
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS)
-	
+
 ze_add_test(TARGET ZEMetaTests
 	SOURCES ${Tests} ZEVariantTest.cpp
 	ZEMC ${ZEMC}

@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEDirectInputModule.cpp			Sources)
 ze_add_source(ZEDirectInputModule.h				Sources ZEMC)
@@ -46,7 +45,7 @@ include_directories(
 link_directories(
 	${ZEBUILD_LIB_PATH}/DirectX)
 
-ze_add_library(TARGET ZEDirectInput 
+ze_add_library(TARGET ZEDirectInput
 	SOURCES ${Sources}
 	ZEMC ${ZEMC}
 	LIBS libDirectInput)

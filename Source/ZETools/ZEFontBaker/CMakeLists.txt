@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEFontBaker.cpp				Sources)
 ze_add_source(ZEFontBaker.h					Sources Headers)

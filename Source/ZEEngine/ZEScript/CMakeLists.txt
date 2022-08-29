@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEScriptEngine.cpp					Sources)
 ze_add_source(ZEScriptEngine.h						Sources Headers)
@@ -46,7 +45,7 @@ ze_add_source(ZEScriptFunction.h					Sources Headers)
 ze_add_source(ZEScriptManager.cpp					Sources)
 ze_add_source(ZEScriptManager.h						Sources Headers)
 
-ze_add_library(TARGET ZEScript 
+ze_add_library(TARGET ZEScript
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation libAngelScript)

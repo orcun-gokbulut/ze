@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEMCDriver.cpp 							Sources)
 ze_add_source(ZEMCDriver.h 								Sources)
@@ -60,8 +59,8 @@ ze_add_source(ZEMCParser.h								Sources)
 ze_add_source(ZEMCRegisterer.h							Sources)
 ze_add_source(ZEMCRegisterer.cpp						Sources)
 
-ze_add_executable(TARGET ZEMetaCompiler 
-	CONSOLE 
+ze_add_executable(TARGET ZEMetaCompiler
+	CONSOLE
 	SOURCES ${Sources}
 	LIBS ZEFoundationBase libClang)
 

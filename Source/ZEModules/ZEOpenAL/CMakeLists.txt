@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEALModule.cpp				Sources)
 ze_add_source(ZEALModule.h					Sources ZEMC)
@@ -43,8 +42,8 @@ ze_add_source(ZEALListener.cpp				Sources)
 ze_add_source(ZEALListener.h				Sources)
 ze_add_source(ZEALSoundSource.cpp			Sources)
 ze_add_source(ZEALSoundSource.h				Sources)
-	
-ze_add_library(TARGET ZEOpenAL 
+
+ze_add_library(TARGET ZEOpenAL
 	SOURCES ${Sources}
 	ZEMC ${ZEMC}
 	LIBS libOpenAL)

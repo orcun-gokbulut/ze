@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEMLCommon.h					Sources Headers)
 ze_add_source(ZEMLCommon.cpp				Sources)
@@ -64,8 +63,8 @@ ze_add_source(ZEMLReader.cpp				Sources)
 ze_add_source(ZEMLWriter.h 					Sources Headers)
 ze_add_source(ZEMLWriter.cpp 				Sources)
 
-ze_add_library(TARGET ZEML 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZEML
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS ZEMath libTinyXML)
 

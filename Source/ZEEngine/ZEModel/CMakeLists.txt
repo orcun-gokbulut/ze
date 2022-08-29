@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEModel.cpp					Sources)
 ze_add_source(ZEModel.h						Sources Headers ZEMC)
@@ -79,8 +78,8 @@ ze_add_source(ZEMDResourceAnimation.h		Sources Headers ZEMC)
 ze_add_source(ZEMDResourceHelper.cpp		Sources)
 ze_add_source(ZEMDResourceHelper.h			Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEModel 
-	ZEMC ${ZEMC} 
+ze_add_library(TARGET ZEModel
+	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEFoundation)

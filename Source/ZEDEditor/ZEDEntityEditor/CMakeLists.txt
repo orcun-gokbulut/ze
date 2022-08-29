@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEDEntityEditor.cpp						Sources)
 ze_add_source(ZEDEntityEditor.h							Sources ZEMC)
@@ -72,9 +71,9 @@ ze_add_source(ZEDTextureAsset.h							Sources)
 ze_add_source(ZEDTextureAssetType.cpp					Sources)
 ze_add_source(ZEDTextureAssetType.h						Sources ZEMC)
 
-ze_add_library(TARGET ZEDEntityEditor 
+ze_add_library(TARGET ZEDEntityEditor
 	ZEMC ${ZEMC}
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation ZEDCore ZEDUserInterface)
 
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

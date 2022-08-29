@@ -33,14 +33,13 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZESerialPort.h				Sources Headers)
 ze_add_source(ZESerialPort.cpp				Sources)
 ze_add_source(ZESerialPort_Windows.cpp		Sources PLATFORMS Windows)
 ze_add_source(ZESerialPort_Unix.cpp			Sources PLATFORMS Unix)
 
-ze_add_library(TARGET ZESerialPort 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZESerialPort
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS)

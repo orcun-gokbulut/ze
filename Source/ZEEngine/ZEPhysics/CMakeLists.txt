@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEPhysicalCloth.cpp				Sources)
 ze_add_source(ZEPhysicalCloth.h					Sources Headers ZEMC)
@@ -56,7 +55,7 @@ ze_add_source(ZEPhysicalWorld.h					Sources Headers ZEMC)
 ze_add_source(ZEPhysicsModule.cpp				Sources)
 ze_add_source(ZEPhysicsModule.h					Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEPhysics 
+ze_add_library(TARGET ZEPhysics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

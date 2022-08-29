@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS_DEBUG ZE_DEBUG_D3D10_DEBUG_SHADERS ZE_DEBUG_D3D10_ENABLE_PERFHUD)
 

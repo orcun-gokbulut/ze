@@ -34,7 +34,7 @@
 #ZE_SOURCE_PROCESSOR_END()
 
 cmake_minimum_required(VERSION 3.6.0)
- 
+
 project(ZinekEngine)
 
 
@@ -45,7 +45,7 @@ if(POLICY CMP0043)
 	cmake_policy(SET CMP0043 OLD)
 endif()
 
-	
+
 ## Edition Configuration
 #########################################################################################
 set(ZEBUILD_EDITION "Development" CACHE STRING "Determines Zinek Engine Edition.")

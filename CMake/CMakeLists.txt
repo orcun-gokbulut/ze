@@ -33,10 +33,9 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_cmake_project(CMakeScripts
-	SOURCES	
+	SOURCES
 		ze_modules.cmake
 		ze_check.cmake
 		ze_debugging.cmake

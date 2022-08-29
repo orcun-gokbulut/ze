@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZECompressor.cpp							Sources)
 ze_add_source(ZECompressor.h							Sources)
@@ -53,6 +52,6 @@ ze_add_source(ZEDecompressorZLIB.h						Sources)
 ze_add_source(ZEDecompressorZLIB.cpp					Sources)
 
 ze_add_library(TARGET ZECompression
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS libZLib)

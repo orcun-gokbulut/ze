@@ -33,12 +33,11 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source)
-	
+
 ze_add_source(ZEDirectoryInfo.cpp			Sources)
 ze_add_source(ZEDirectoryInfo.h				Sources Headers)
 ze_add_source(ZEDirectoryInfoTests.cpp		Tests)
@@ -64,8 +63,8 @@ ze_add_source(ZEPathManagerTests.cpp		Tests)
 ze_add_source(ZEFileCommon.cpp				Sources)
 ze_add_source(ZEFileCommon.h				Sources Headers)
 
-ze_add_library(TARGET ZEFile 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZEFile
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS)
 

@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEGRGraphicsModule.cpp 		Sources)
 ze_add_source(ZEGRGraphicsModule.h 			Sources Headers ZEMC)
@@ -112,7 +111,7 @@ ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 ze_add_source(ZEGRCanvas.cpp 				Sources)
 ze_add_source(ZEGRCanvas.h 					Sources Headers)
 
-ze_add_library(TARGET ZEGraphics 
+ze_add_library(TARGET ZEGraphics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

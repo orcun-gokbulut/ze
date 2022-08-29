@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEMain.cpp							Sources)
 ze_add_source(ZEDOperation.cpp						Sources)
@@ -70,8 +69,8 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
-ze_add_executable(TARGET ZEMLEditor 
+ze_add_executable(TARGET ZEMLEditor
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
 	LIBS ZEFoundation Qt5::WinMain)
-	
+
 qt5_use_modules(ZEMLEditor Widgets)

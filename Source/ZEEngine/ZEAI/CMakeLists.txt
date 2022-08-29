@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 project(ZEAI)
 
@@ -76,11 +75,11 @@ ze_add_source(ZENavigationMeshGenerator.h		Sources Headers)
 ze_add_source(ZENavigationMeshGenerator.cpp		Sources)
 
 ze_add_library(TARGET ZEAI
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
 	LIBS ZEFoundation)
-	
-ze_add_test(TARGET ZEAITests 
+
+ze_add_test(TARGET ZEAITests
 	SOURCES ${Tests}
 	TEST_TARGET ZEAI)

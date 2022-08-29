@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZESerializable.cpp		Sources)
 ze_add_source(ZESerializable.h			Sources Headers)
@@ -46,7 +45,7 @@ ze_add_source(ZEFileSerializer.h		Sources Headers)
 ze_add_source(ZEFileUnserializer.cpp	Sources)
 ze_add_source(ZEFileUnserializer.h		Sources Headers)
 
-ze_add_library(TARGET ZESerialization 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZESerialization
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS)

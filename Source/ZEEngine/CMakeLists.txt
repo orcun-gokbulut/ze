@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 project(ZinekEngine)
 
@@ -65,12 +64,12 @@ ze_add_source(ZEDefinitions.h 				Sources Headers)
 ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 
-ze_add_library(TARGET ZEEngine 
+ze_add_library(TARGET ZEEngine
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZECore ZEGraphics ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere ZEResource ZEUI)
 
-ze_add_executable(TARGET ZE 
+ze_add_executable(TARGET ZE
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine
 	INSTALL)

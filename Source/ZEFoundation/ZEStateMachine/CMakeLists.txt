@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEState.cpp						Sources)
 ze_add_source(ZEState.h							Sources Headers ZEMC)
@@ -43,7 +42,7 @@ ze_add_source(ZEStateMachine.cpp				Sources)
 ze_add_source(ZEStateMachine.h					Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEStateMachine
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers}
 	LIBS ZEDS)
 

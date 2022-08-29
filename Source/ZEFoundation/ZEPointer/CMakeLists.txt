@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEDeletor.cpp				Sources)
 ze_add_source(ZEDeletor.h				Sources Headers)
@@ -53,11 +52,11 @@ ze_add_source(ZEReferenceCounted.h		Sources Headers ZEMC)
 ze_add_source(ZEHolder.cpp				Sources)
 ze_add_source(ZEHolder.h				Sources Headers)
 
-ze_add_library(TARGET ZEPointer 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZEPointer
+	SOURCES ${Sources}
 	HEADERS ${Headers})
-	
-ze_add_test(TARGET ZEPointerTests 
+
+ze_add_test(TARGET ZEPointerTests
 	SOURCES ${Tests}
 	TEST_TARGET ZEPointer)
 

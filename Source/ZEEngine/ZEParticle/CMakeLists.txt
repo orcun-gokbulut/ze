@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEParticle.cpp							Sources)
 ze_add_source(ZEParticle.h								Sources Headers ZEMC)
@@ -63,7 +62,7 @@ ze_add_source(ZEParticleRandomAccelerationModifier.h	Sources Headers ZEMC)
 ze_add_source(ZEParticleConfineModifier.cpp				Sources)
 ze_add_source(ZEParticleConfineModifier.h				Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEParticle 
+ze_add_library(TARGET ZEParticle
 	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}

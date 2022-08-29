@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEDTIEditor.cpp							Sources)
 ze_add_source(ZEDTIEditor.h								Sources ZEMC)
@@ -46,9 +45,9 @@ ze_add_source(ZEDTISectorWrapper.h						Sources ZEMC)
 ze_add_source(ZEDTIVegetationWrapper.cpp				Sources)
 ze_add_source(ZEDTIVegetationWrapper.h					Sources ZEMC)
 
-ze_add_library(TARGET ZEDTrainIGEditor 
+ze_add_library(TARGET ZEDTrainIGEditor
 	ZEMC ${ZEMC}
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation ZEDCore ZEDUserInterface ZETrainIG-Module)
 
 ze_meta_register(LIBS ZETrainIG-Module)

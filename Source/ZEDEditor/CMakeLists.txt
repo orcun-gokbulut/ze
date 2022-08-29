@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 project (ZEditor)
 ze_set_project_folder("ZEDEditor")
@@ -50,7 +49,7 @@ add_subdirectory(ZEDTrainIGEditor)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
-ze_add_executable(TARGET ZEDEditor 
+ze_add_executable(TARGET ZEDEditor
 	SOURCES ${Sources}
 	LIBS ZEEngine ZEDEntityEditor ZEDTrainIGEditor)
 

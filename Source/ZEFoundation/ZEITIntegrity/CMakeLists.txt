@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 find_package(OpenMP REQUIRED)
 if (OPENMP_FOUND)
@@ -48,6 +47,6 @@ ze_add_source(ZEITGenerator.h				Sources Headers)
 ze_add_source(ZEITRecord.cpp				Sources)
 ze_add_source(ZEITRecord.h					Sources Headers)
 
-ze_add_library(TARGET ZEITIntegrity 
+ze_add_library(TARGET ZEITIntegrity
 	SOURCES ${Sources}
 	LIBS ZEFoundation libCryptopp)

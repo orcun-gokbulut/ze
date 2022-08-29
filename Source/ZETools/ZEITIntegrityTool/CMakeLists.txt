@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 find_package(Qt5Core)
 find_package(Qt5Widgets)
@@ -53,7 +52,7 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 ze_add_executable(TARGET ZEITIntegrityTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
 	LIBS ZEFoundation ZEITIntegrity Qt5::WinMain)
-	
+
 qt5_use_modules(ZEITIntegrityTool Widgets)
 
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

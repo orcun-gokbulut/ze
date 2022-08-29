@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEInput.cpp								Sources)
 ze_add_source(ZEInput.h									Sources Headers)
@@ -56,7 +55,7 @@ ze_add_source(ZEInputDeviceIndexes.h					Sources Headers)
 ze_add_source(ZEInputModule.cpp							Sources)
 ze_add_source(ZEInputModule.h							Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEInput 
+ze_add_library(TARGET ZEInput
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}

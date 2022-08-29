@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEAABBox.cpp						Sources)
 ze_add_source(ZEAABBox.h						Sources Headers)
@@ -119,14 +118,14 @@ set(BuildIn ${BuildIn}
 	ZEMath/ZEVector.h
 	ZEMath/ZEVectord.h
 	ZEMath/ZEQuaternion.h
-	ZEMath/ZEMatrix.h	
+	ZEMath/ZEMatrix.h
 	ZEMath/ZEMatrixd.h
 	PARENT_SCOPE)
 
-ze_add_library(TARGET ZEMath 
-	SOURCES ${Sources} 
+ze_add_library(TARGET ZEMath
+	SOURCES ${Sources}
 	HEADERS ${Headers})
-	
+
 ze_add_test(TARGET ZEMathTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES ZEMathIOStreamMapping.cpp ZEMathIOStreamMapping.h

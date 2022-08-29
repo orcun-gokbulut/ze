@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEBitmap.cpp								Sources)
 ze_add_source(ZEBitmap.h								Sources Headers)
@@ -135,12 +134,12 @@ ze_add_source(ZEPixel.h									Sources Headers)
 ze_add_source(ZETextureTestUtils.cpp					Sources)
 ze_add_source(ZETextureTestUtils.h						Sources Headers)
 
-ze_add_library(TARGET ZETexture 
+ze_add_library(TARGET ZETexture
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
 	LIBS ZEFoundation libFreeImage libATICompress)
 
-ze_add_test(TARGET ZETextureTests 
+ze_add_test(TARGET ZETextureTests
 	SOURCES ${Tests}
 	TEST_TARGET ZETexture)

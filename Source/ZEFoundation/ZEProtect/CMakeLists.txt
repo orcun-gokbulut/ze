@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZELCLicense.cpp						Sources)
 ze_add_source(ZELCLicense.h							Sources)
@@ -54,5 +53,5 @@ ze_add_source(ZELCUtils.cpp							Sources)
 ze_add_source(ZELCUtils.h							Sources)
 
 ze_add_library(TARGET ZEProtect
-	SOURCES ${Sources} 
+	SOURCES ${Sources}
 	HEADERS ${Headers})

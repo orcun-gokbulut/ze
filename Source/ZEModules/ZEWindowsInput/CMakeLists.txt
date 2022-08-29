@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEWindowsInputModule.cpp				Sources)
 ze_add_source(ZEWindowsInputModule.h				Sources ZEMC)
@@ -42,6 +41,6 @@ ze_add_source(ZEWindowsInputKeyboardDevice.h		Sources)
 ze_add_source(ZEWindowsInputMouseDevice.cpp			Sources)
 ze_add_source(ZEWindowsInputMouseDevice.h			Sources)
 
-ze_add_library(TARGET ZEWindowsInput 
+ze_add_library(TARGET ZEWindowsInput
 	SOURCES ${Sources}
 	ZEMC ${ZEMC})

@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEATAtmosphere.cpp			Sources)
 ze_add_source(ZEATAtmosphere.h				Sources Headers ZEMC)
@@ -54,7 +53,7 @@ ze_add_source(ZEATCloud.h					Sources Headers ZEMC)
 ze_add_source(ZEATSkyBox.cpp				Sources)
 ze_add_source(ZEATSkyBox.h					Sources Headers ZEMC)
 
-ze_add_library(TARGET ZEAtmosphere 
+ze_add_library(TARGET ZEAtmosphere
 	ZEMC ${ZEMC}
 	SOURCES ${Sources}
 	HEADERS ${Headers}

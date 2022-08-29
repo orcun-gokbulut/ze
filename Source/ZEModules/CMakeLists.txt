@@ -33,7 +33,6 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZEModules")
 
@@ -48,7 +47,7 @@ ze_add_source(ZEModules.h			Sources Headers)
 ze_add_source(ZEModules.cpp			Sources)
 ze_add_source(CMakeLists.txt		Sources)
 
-ze_add_library(TARGET ZEModules 
+ze_add_library(TARGET ZEModules
 	SOURCES ${Sources}
 	LIBS ${Modules})
 
