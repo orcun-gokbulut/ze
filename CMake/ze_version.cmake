@@ -54,23 +54,31 @@ endmacro()
 
 macro(ze_version_get_branch)
 	set (VERSION_BRANCH "")
-	include(External/FindSubversion)
-	Subversion_WC_INFO(${ARGV0} SVN_INFO)
-	if (SVN_INFO_WC_RESULT)
-		if ("${SVN_INFO_WC_URL}" MATCHES ".*/(.*)[ \\t]*")
-			set(VERSION_BRANCH ${CMAKE_MATCH_1})
+
+	find_package(Git)
+	if (Git_FOUND)
+		execute_process(
+			COMMAND ${GIT_EXECUTABLE}
+				symbolic-ref -q --short HEAD
+			RESULT_VARIABLE result
+			OUTPUT_VARIABLE VERSION_BRANCH
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
+		if (result EQUAL "")
+			set (VERSION_BRANCH "")
 		endif()
 	endif()
 endmacro()
 
 macro(ze_version_get_revision_number)
 	set (VERSION_REVISION "0")
-	include(External/FindSubversion)
-	Subversion_WC_INFO(${ARGV0} SVN_INFO)
-	if (SVN_INFO_WC_RESULT)
-		set(VERSION_REVISION ${SVN_INFO_WC_REVISION})
-	else()
-		set(VERSION_REVISION "0")
+	find_package(Git)
+	if (Git_FOUND)
+		execute_process(
+			COMMAND ${GIT_EXECUTABLE}
+			rev-parse --verify HEAD
+			RESULT_VARIABLE result
+			OUTPUT_VARIABLE VERSION_REVISION
+			OUTPUT_STRIP_TRAILING_WHITESPACE)
 	endif()
 endmacro()
 
